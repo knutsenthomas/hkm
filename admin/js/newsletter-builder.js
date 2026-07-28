@@ -1208,10 +1208,6 @@ class NewsletterBuilder {
             imageInput.addEventListener('change', (e) => this.handleImageFileSelect(e));
         }
 
-        // Floating Bubble Menu (Notion-style Selection Menu)
-        document.addEventListener('selectionchange', () => {
-            this.handleTextSelection();
-        });
     }
 
     saveSelection() {
@@ -1423,10 +1419,15 @@ class NewsletterBuilder {
             linkBtn.onclick = (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                const url = prompt("Skriv inn nettadresse:", "https://");
-                if (url) {
-                    this.exec('createLink', url);
-                }
+                this.showPromptModal(
+                    "Nettadresse",
+                    "https://...",
+                    (url) => this.exec('createLink', url),
+                    "https://",
+                    "Vennligst oppgi en gyldig nettadresse.",
+                    "Sett inn lenke",
+                    "Sett inn"
+                );
             };
 
             const spacingBtn = createBtn('format_line_spacing', 'Linjeavstand', 'lineHeight');
@@ -1434,10 +1435,15 @@ class NewsletterBuilder {
                 e.preventDefault();
                 e.stopPropagation();
                 const current = this.getCurrentLineHeight() || '1.5';
-                const val = prompt("Angi linjeavstand (f.eks. 1.0, 1.2, 1.5, 1.8):", current);
-                if (val) {
-                    this.setLineHeight(val);
-                }
+                this.showPromptModal(
+                    "Linjeavstand",
+                    "F.eks. 1.0, 1.2, 1.5 eller 1.8",
+                    (value) => this.setLineHeight(value),
+                    current,
+                    "Vennligst oppgi en linjeavstand.",
+                    "Endre linjeavstand",
+                    "Bruk"
+                );
             };
 
             const quoteBtn = createBtn('format_quote', 'Sitat', 'quote');
@@ -1713,14 +1719,15 @@ class NewsletterBuilder {
             }
         });
 
+        const cleanHtml = this.getCleanCanvasHtml();
         this.blocks = [{
             id: 'unified_content',
             type: 'text',
-            content: { text: container.innerHTML }
+            content: { text: cleanHtml }
         }];
 
         try {
-            const currentHtml = container.innerHTML;
+            const currentHtml = cleanHtml;
             const currentSubject = document.getElementById('newsletter-subject')?.value || '';
             const headerNode = document.querySelector('.canvas-header');
 
@@ -1902,10 +1909,15 @@ class NewsletterBuilder {
                     this.exec('insertOrderedList');
                     break;
                 case 'link':
-                    const url = prompt('Skriv inn URL:', 'https://');
-                    if (url) {
-                        this.exec('createLink', url);
-                    }
+                    this.showPromptModal(
+                        "Nettadresse",
+                        "https://...",
+                        (url) => this.exec('createLink', url),
+                        "https://",
+                        "Vennligst oppgi en gyldig nettadresse.",
+                        "Sett inn lenke",
+                        "Sett inn"
+                    );
                     break;
                 case 'textColor':
                     const textInput = toolbar.querySelector('[data-color-input="text"]');
@@ -1917,10 +1929,15 @@ class NewsletterBuilder {
                     break;
                 case 'lineHeight':
                     const currentLineHeight = this.getCurrentLineHeight() || '1.5';
-                    const newHeight = prompt("Angi linjeavstand (f.eks. 1.0, 1.2, 1.5, 1.8, 2.0):", currentLineHeight);
-                    if (newHeight) {
-                        this.setLineHeight(newHeight);
-                    }
+                    this.showPromptModal(
+                        "Linjeavstand",
+                        "F.eks. 1.0, 1.2, 1.5, 1.8 eller 2.0",
+                        (value) => this.setLineHeight(value),
+                        currentLineHeight,
+                        "Vennligst oppgi en linjeavstand.",
+                        "Endre linjeavstand",
+                        "Bruk"
+                    );
                     break;
                 case 'quote':
                     this.toggleQuote();
@@ -1957,6 +1974,15 @@ class NewsletterBuilder {
         const bubbleMenu = document.getElementById('hkm-bubble-menu');
         if (!bubbleMenu) return;
 
+        // The builder is a fixed, high-z-index application layer. Keep the
+        // selection toolbar inside that layer so it cannot render behind it.
+        const editorRoot = document.getElementById('newsletter-builder-layout');
+        if (editorRoot && bubbleMenu.parentElement !== editorRoot) {
+            editorRoot.appendChild(bubbleMenu);
+        }
+        bubbleMenu.setAttribute('role', 'toolbar');
+        bubbleMenu.setAttribute('aria-label', 'Tekstformatering');
+
         // Prevent selection loss when clicking within the bubble menu
         bubbleMenu.addEventListener('mousedown', (e) => {
             this.saveSelection();
@@ -1966,6 +1992,7 @@ class NewsletterBuilder {
 
         // Click actions handler for bubble formatting
         bubbleMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
             const btn = e.target.closest('.hkm-bubble-btn');
             if (!btn) return;
 
@@ -1973,7 +2000,6 @@ class NewsletterBuilder {
             if (!tool) return;
 
             e.preventDefault();
-            e.stopPropagation();
 
             // Scale feedback animation
             btn.style.transform = 'scale(0.9)';
@@ -1996,21 +2022,42 @@ class NewsletterBuilder {
                     this.exec('strikeThrough');
                     break;
                 case 'link':
-                    const url = prompt('Skriv inn URL:', 'https://');
-                    if (url) {
-                        this.exec('createLink', url);
-                    }
+                    this.showPromptModal(
+                        "Nettadresse",
+                        "https://...",
+                        (url) => this.exec('createLink', url),
+                        "https://",
+                        "Vennligst oppgi en gyldig nettadresse.",
+                        "Sett inn lenke",
+                        "Sett inn"
+                    );
                     break;
                 case 'textColor':
-                    const textInput = document.querySelector('#desktop-richtools [data-color-input="text"]');
+                    const textInput = bubbleMenu.querySelector('[data-bubble-color-input="text"]');
                     if (textInput) textInput.click();
                     break;
                 case 'highlightColor':
-                    const hlInput = document.querySelector('#desktop-richtools [data-color-input="highlight"]');
+                    const hlInput = bubbleMenu.querySelector('[data-bubble-color-input="highlight"]');
                     if (hlInput) hlInput.click();
                     break;
             }
         });
+
+        const textColorInput = bubbleMenu.querySelector('[data-bubble-color-input="text"]');
+        if (textColorInput) {
+            textColorInput.addEventListener('input', (e) => {
+                this.restoreSelection();
+                this.exec('foreColor', e.target.value);
+            });
+        }
+
+        const highlightColorInput = bubbleMenu.querySelector('[data-bubble-color-input="highlight"]');
+        if (highlightColorInput) {
+            highlightColorInput.addEventListener('input', (e) => {
+                this.restoreSelection();
+                this.exec('backColor', e.target.value);
+            });
+        }
     }
 
     handleTextSelection() {
@@ -2058,9 +2105,19 @@ class NewsletterBuilder {
         const menuWidth = bubbleMenu.offsetWidth;
         const menuHeight = bubbleMenu.offsetHeight;
 
-        // Position absolute to document body to overlay perfectly
-        const top = rect.top + window.scrollY - menuHeight - 12;
-        const left = rect.left + window.scrollX + (rect.width / 2) - (menuWidth / 2);
+        // Position within the fixed editor viewport and keep the full toolbar
+        // visible near every screen edge.
+        const viewportPadding = 8;
+        const topAbove = rect.top - menuHeight - 12;
+        const topBelow = rect.bottom + 12;
+        const top = topAbove >= viewportPadding
+            ? topAbove
+            : Math.min(topBelow, window.innerHeight - menuHeight - viewportPadding);
+        const centeredLeft = rect.left + (rect.width / 2) - (menuWidth / 2);
+        const left = Math.max(
+            viewportPadding,
+            Math.min(centeredLeft, window.innerWidth - menuWidth - viewportPadding)
+        );
 
         bubbleMenu.style.top = `${top}px`;
         bubbleMenu.style.left = `${left}px`;
@@ -2074,7 +2131,7 @@ class NewsletterBuilder {
         this.openImageInsertionFlowAt(null);
     }
 
-    openImageInsertionFlowAt(afterElement) {
+    openImageInsertionFlowAt(afterElement, imageToReplace = null) {
         this.saveSelection();
         
         // Remove existing modal if any
@@ -2116,7 +2173,7 @@ class NewsletterBuilder {
         card.innerHTML = `
             <input type="file" id="hkm-modal-file-input" accept="image/*" style="display:none;" />
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h3 style="margin:0; font-size:18px; font-weight:800; color:#1e293b;">Sett inn bilde</h3>
+                <h3 style="margin:0; font-size:18px; font-weight:800; color:#1e293b;">${imageToReplace ? 'Endre bilde' : 'Sett inn bilde'}</h3>
                 <button type="button" id="hkm-close-img-modal" class="material-symbols-outlined" style="background:none; border:none; color:#64748b; cursor:pointer; font-size:22px; padding:4px; border-radius:50%; transition:background 0.2s;">close</button>
             </div>
             
@@ -2162,7 +2219,7 @@ class NewsletterBuilder {
         `;
         
         modal.appendChild(card);
-        this.mountEditorModal(modal, 'Sett inn bilde');
+        this.mountEditorModal(modal, imageToReplace ? 'Endre bilde' : 'Sett inn bilde');
         
         // Trigger scale animation
         setTimeout(() => { card.style.transform = 'scale(1)'; }, 10);
@@ -2201,7 +2258,11 @@ class NewsletterBuilder {
                 const file = e.target.files && e.target.files[0];
                 if (file) {
                     closeModal();
-                    this.uploadAndInsertImageFileAt(file, afterElement);
+                    if (imageToReplace) {
+                        this.replaceEditorImageFromFile(imageToReplace, file);
+                    } else {
+                        this.uploadAndInsertImageFileAt(file, afterElement);
+                    }
                 }
             });
         }
@@ -2212,13 +2273,19 @@ class NewsletterBuilder {
             if (window.unsplashManager) {
                 window.unsplashManager.open((selection) => {
                     if (selection && selection.url) {
-                        const imgHtml = `<p><img src="${selection.url}" alt="${escapeHtml(selection.alt || '')}" class="block-img" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;"></p><p><br></p>`;
-                        this.insertHtmlAtCursorOrEndAt(imgHtml, afterElement);
-                        showToast("Bilde satt inn fra Unsplash!", "success");
+                        if (imageToReplace) {
+                            this.replaceEditorImageSource(imageToReplace, selection.url);
+                            if (selection.alt) imageToReplace.alt = selection.alt;
+                            if (typeof showToast === 'function') showToast("Bilde erstattet fra Unsplash!", "success");
+                        } else {
+                            const imgHtml = `<p><img src="${selection.url}" alt="${escapeHtml(selection.alt || '')}" class="block-img" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;"></p><p><br></p>`;
+                            this.insertHtmlAtCursorOrEndAt(imgHtml, afterElement);
+                            if (typeof showToast === 'function') showToast("Bilde satt inn fra Unsplash!", "success");
+                        }
                     }
                 });
             } else {
-                showToast("Unsplash-søk er ikke tilgjengelig akkurat nå.", "warning");
+                if (typeof showToast === 'function') showToast("Unsplash-søk er ikke tilgjengelig akkurat nå.", "warning");
             }
         });
         
@@ -2237,11 +2304,184 @@ class NewsletterBuilder {
                 return;
             }
             
-            const imgHtml = `<p><img src="${url}" alt="" class="block-img" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;"></p><p><br></p>`;
-            this.insertHtmlAtCursorOrEndAt(imgHtml, afterElement);
+            if (imageToReplace) {
+                this.replaceEditorImageSource(imageToReplace, url);
+            } else {
+                const imgHtml = `<p><img src="${url}" alt="" class="block-img" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;"></p><p><br></p>`;
+                this.insertHtmlAtCursorOrEndAt(imgHtml, afterElement);
+            }
             closeModal();
-            showToast("Bilde satt inn!", "success");
+            if (typeof showToast === 'function') {
+                showToast(imageToReplace ? "Bilde erstattet!" : "Bilde satt inn!", "success");
+            }
         });
+    }
+
+    replaceEditorImageSource(image, url) {
+        if (!image || !url) return;
+        image.src = url;
+        image.setAttribute('src', url);
+        const preview = document.querySelector('.inspector-image-preview');
+        if (preview) preview.src = url;
+        this.syncUnifiedBlocks();
+        this.triggerAutosave();
+    }
+
+    async replaceEditorImageFromFile(image, file) {
+        if (!image || !file) return;
+        if (typeof showToast === 'function') showToast("Laster opp...", "info");
+
+        try {
+            let url = '';
+            if (window.firebaseService?.uploadImage) {
+                const uploadPath = `newsletter/images/${Date.now()}_${file.name}`;
+                url = await window.firebaseService.uploadImage(file, uploadPath);
+            } else {
+                url = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            this.replaceEditorImageSource(image, url);
+            if (typeof showToast === 'function') showToast("Bilde erstattet!", "success");
+        } catch (error) {
+            console.error("Image replacement failed:", error);
+            if (typeof showToast === 'function') showToast("Opplasting feilet.", "error");
+        }
+    }
+
+    openVideoInsertionFlow() {
+        this.openVideoInsertionFlowAt(null);
+    }
+
+    openVideoInsertionFlowAt(afterElement) {
+        const existingModal = document.getElementById('hkm-video-selector-modal');
+        if (existingModal) existingModal.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'hkm-video-selector-modal';
+        modal.className = 'profile-modal';
+        modal.style.cssText = `
+            display: flex;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            font-family: 'Inter', sans-serif;
+            padding: 16px;
+            box-sizing: border-box;
+        `;
+
+        modal.innerHTML = `
+            <div class="profile-modal-content card modern" style="width: min(100%, 500px); padding: 0; overflow: hidden; border-radius: 24px; background: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #1B4965, #0f172a); color: white; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span class="material-symbols-outlined" aria-hidden="true" style="font-size: 24px;">play_circle</span>
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: white;">Sett inn YouTube-video</h3>
+                    </div>
+                    <button type="button" id="hkm-video-modal-close" aria-label="Lukk" style="background: none; border: none; color: white; cursor: pointer; display: flex; padding: 4px; border-radius: 50%;">
+                        <span class="material-symbols-outlined" aria-hidden="true">close</span>
+                    </button>
+                </div>
+                <div style="padding: 24px; background: white;">
+                    <label for="hkm-video-url" style="display: block; margin-bottom: 8px; color: #1e293b; font-size: 13px; font-weight: 700;">YouTube-lenke</label>
+                    <input type="url" id="hkm-video-url" value="https://www.youtube.com/watch?v=" placeholder="https://www.youtube.com/watch?v=..." autocomplete="url" style="width: 100%; padding: 12px 14px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 14px; outline: none; box-sizing: border-box;" />
+                    <p style="margin: 8px 0 0; color: #64748b; font-size: 12px;">Lim inn en vanlig YouTube-, Shorts- eller youtu.be-lenke.</p>
+                    <p id="hkm-video-url-error" role="alert" style="display: none; margin: 10px 0 0; color: #b91c1c; font-size: 13px; font-weight: 600;">Lenken er ikke en gyldig YouTube-lenke.</p>
+                </div>
+                <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 10px; background: #f8fafc;">
+                    <button type="button" id="hkm-video-modal-cancel" style="background: white; border: 1px solid #cbd5e1; color: #334155; padding: 10px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;">Avbryt</button>
+                    <button type="button" id="hkm-video-modal-insert" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border: none; color: white; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer;">Sett inn video</button>
+                </div>
+            </div>
+        `;
+
+        this.mountEditorModal(modal, 'Sett inn YouTube-video');
+
+        const input = modal.querySelector('#hkm-video-url');
+        const errorMessage = modal.querySelector('#hkm-video-url-error');
+        const closeModal = () => modal.remove();
+        const getVideoDetails = (rawUrl) => {
+            let value = String(rawUrl || '').trim();
+            if (!value) return null;
+            if (!/^https?:\/\//i.test(value)) value = `https://${value}`;
+
+            try {
+                const parsed = new URL(value);
+                const hostname = parsed.hostname.toLowerCase().replace(/^www\./, '');
+                let videoId = '';
+
+                if (hostname === 'youtu.be') {
+                    videoId = parsed.pathname.split('/').filter(Boolean)[0] || '';
+                } else if (hostname === 'youtube.com' || hostname.endsWith('.youtube.com') || hostname === 'youtube-nocookie.com') {
+                    const pathParts = parsed.pathname.split('/').filter(Boolean);
+                    if (parsed.pathname === '/watch') {
+                        videoId = parsed.searchParams.get('v') || '';
+                    } else if (['embed', 'shorts', 'live'].includes(pathParts[0])) {
+                        videoId = pathParts[1] || '';
+                    }
+                }
+
+                if (!/^[A-Za-z0-9_-]{11}$/.test(videoId)) return null;
+                return { videoId, url: parsed.href };
+            } catch (error) {
+                return null;
+            }
+        };
+
+        const insertVideo = () => {
+            const video = getVideoDetails(input.value);
+            if (!video) {
+                input.setAttribute('aria-invalid', 'true');
+                input.style.borderColor = '#dc2626';
+                errorMessage.style.display = 'block';
+                input.focus();
+                return;
+            }
+
+            const safeUrl = escapeHtml(video.url);
+            const thumbnailUrl = `https://img.youtube.com/vi/${video.videoId}/maxresdefault.jpg`;
+            const html = `
+                <div class="newsletter-video-block" contenteditable="false" style="position: relative; text-align: center; margin: 24px 0;">
+                    <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" style="display: block; position: relative; max-width: 600px; margin: 0 auto; text-decoration: none;">
+                        <img src="${thumbnailUrl}" style="width: 100%; height: auto; border-radius: 12px; display: block; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" alt="Video">
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 68px; height: 68px; background: rgba(27, 73, 101, 0.95); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
+                            <span style="color: white; font-size: 28px; margin-left: 6px; font-family: system-ui, sans-serif;">▶</span>
+                        </div>
+                    </a>
+                </div><p><br></p>`;
+
+            this.insertHtmlAtCursorOrEndAt(html, afterElement);
+            closeModal();
+            if (typeof showToast === 'function') showToast("Video satt inn!", "success");
+        };
+
+        modal.querySelector('#hkm-video-modal-close').addEventListener('click', closeModal);
+        modal.querySelector('#hkm-video-modal-cancel').addEventListener('click', closeModal);
+        modal.querySelector('#hkm-video-modal-insert').addEventListener('click', insertVideo);
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) closeModal();
+        });
+        input.addEventListener('input', () => {
+            input.removeAttribute('aria-invalid');
+            input.style.borderColor = '#cbd5e1';
+            errorMessage.style.display = 'none';
+        });
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                insertVideo();
+            }
+        });
+        setTimeout(() => {
+            input.focus();
+            input.setSelectionRange(input.value.length, input.value.length);
+        }, 0);
     }
 
     addBlock(type) {
@@ -2291,27 +2531,8 @@ class NewsletterBuilder {
                 this.openEventInsertionFlow();
                 return;
             case 'video':
-                const videoUrl = prompt("Angi YouTube video-URL (f.eks. https://www.youtube.com/watch?v=dQw4w9WgXcQ):", "https://www.youtube.com/watch?v=");
-                if (!videoUrl) return;
-                const ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
-                const ytMatch = videoUrl.match(ytRegex);
-                if (ytMatch && ytMatch[1]) {
-                    const videoId = ytMatch[1];
-                    const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-                    html = `
-                        <div class="newsletter-video-block" contenteditable="false" style="position: relative; text-align: center; margin: 24px 0;">
-                            <a href="${videoUrl}" target="_blank" style="display: block; position: relative; max-width: 600px; margin: 0 auto; text-decoration: none;">
-                                <img src="${thumbnailUrl}" style="width: 100%; height: auto; border-radius: 12px; display: block; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" alt="Video">
-                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 68px; height: 68px; background: rgba(27, 73, 101, 0.95); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(0,0,0,0.35); transition: all 0.3s ease;">
-                                    <span style="color: white; font-size: 28px; margin-left: 6px; font-family: system-ui, sans-serif;">▶</span>
-                                </div>
-                            </a>
-                        </div><p><br></p>`;
-                } else {
-                    alert("Ugyldig YouTube-URL. Vennligst oppgi en gyldig YouTube-lenke.");
-                    return;
-                }
-                break;
+                this.openVideoInsertionFlow();
+                return;
             case 'html':
                 const customHtml = prompt("Lim inn din egendefinerte HTML-kode her:", "<div style='padding: 20px; background: #f8fafc; border-radius: 8px; text-align: center; border: 1px dashed #cbd5e1;'>Egendefinert HTML</div>");
                 if (!customHtml) return;
@@ -3627,27 +3848,8 @@ class NewsletterBuilder {
                 this.openEventInsertionFlowAt(afterElement);
                 return;
             case 'video':
-                const videoUrl = prompt("Angi YouTube video-URL (f.eks. https://www.youtube.com/watch?v=dQw4w9WgXcQ):", "https://www.youtube.com/watch?v=");
-                if (!videoUrl) return;
-                const ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
-                const ytMatch = videoUrl.match(ytRegex);
-                if (ytMatch && ytMatch[1]) {
-                    const videoId = ytMatch[1];
-                    const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-                    html = `
-                        <div class="newsletter-video-block" contenteditable="false" style="position: relative; text-align: center; margin: 24px 0;">
-                            <a href="${videoUrl}" target="_blank" style="display: block; position: relative; max-width: 600px; margin: 0 auto; text-decoration: none;">
-                                <img src="${thumbnailUrl}" style="width: 100%; height: auto; border-radius: 12px; display: block; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" alt="Video">
-                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 68px; height: 68px; background: rgba(27, 73, 101, 0.95); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(0,0,0,0.35); transition: all 0.3s ease;">
-                                    <span style="color: white; font-size: 28px; margin-left: 6px; font-family: system-ui, sans-serif;">▶</span>
-                                </div>
-                            </a>
-                        </div><p><br></p>`;
-                } else {
-                    alert("Ugyldig YouTube-URL. Vennligst oppgi en gyldig YouTube-lenke.");
-                    return;
-                }
-                break;
+                this.openVideoInsertionFlowAt(afterElement);
+                return;
             case 'html':
                 const customHtml = prompt("Lim inn din egendefinerte HTML-kode her:", "<div style='padding: 20px; background: #f8fafc; border-radius: 8px; text-align: center; border: 1px dashed #cbd5e1;'>Egendefinert HTML</div>");
                 if (!customHtml) return;
@@ -3771,9 +3973,9 @@ class NewsletterBuilder {
                         </div>
                     </div>
                 `;
-                document.body.appendChild(modal);
             }
 
+            this.mountEditorModal(modal, title);
             const titleEl = modal.querySelector('#confirm-modal-title') || document.getElementById('confirm-modal-title');
             const messageEl = modal.querySelector('#confirm-modal-message') || document.getElementById('confirm-modal-message');
             const confirmBtn = modal.querySelector('#confirm-modal-confirm') || document.getElementById('confirm-modal-confirm');
@@ -3872,7 +4074,7 @@ class NewsletterBuilder {
                     </div>
                 </div>
             `;
-            document.body.appendChild(modal);
+            this.mountEditorModal(modal, title);
 
             const okBtn = modal.querySelector('#success-modal-ok-btn');
             const close = () => {
@@ -3900,6 +4102,7 @@ class NewsletterBuilder {
 
         if (!modal || !inputEl) return;
 
+        this.mountEditorModal(modal, modalTitle);
         if (titleEl) titleEl.innerText = modalTitle;
         if (iconEl) iconEl.innerText = 'edit_note';
         if (labelEl) labelEl.innerText = label;
@@ -3942,11 +4145,11 @@ class NewsletterBuilder {
         });
 
         // Trigger on Cmd+Enter / Ctrl+Enter
-        inputEl.addEventListener('keydown', (e) => {
+        inputEl.onkeydown = (e) => {
             if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
                 newConfirmBtn.click();
             }
-        });
+        };
     }
 
     buildWithAi() {
@@ -4203,7 +4406,6 @@ class NewsletterBuilder {
 
         this.activeBlockNode = node;
         this.activeBlockNode.classList.add('selected-block-active');
-        this.attachBlockQuickToolbar(node);
 
         // Hide floating top toolbar to make it look exactly like Wix
         const topToolbar = document.getElementById('desktop-richtools');
@@ -4216,6 +4418,11 @@ class NewsletterBuilder {
         const img = node.querySelector('img') || (node.tagName === 'IMG' ? node : null);
         const btn = node.querySelector('.block-btn, .product-cta-btn, .newsletter-btn, .btn, a[href], button') || 
                     ((node.classList && (node.classList.contains('block-btn') || node.classList.contains('product-cta-btn') || node.classList.contains('newsletter-btn') || node.classList.contains('btn'))) || node.tagName === 'A' || node.tagName === 'BUTTON' ? node : null);
+
+        // Add move/delete controls only after identifying the original block
+        // type. Otherwise those editor-only buttons make ordinary text look
+        // like a button block to the inspector.
+        this.attachBlockQuickToolbar(node);
         
         if (isSocial) {
             const socialNode = node.classList && node.classList.contains('newsletter-social-block') ? node : node.closest('.newsletter-social-block');
@@ -4917,19 +5124,19 @@ class NewsletterBuilder {
                 <div class="inspector-group inspector-reorder-card">
                     <label class="inspector-group-label" style="font-weight: 700; font-size: 11px; color: #475569; margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Plassering i e-posten</label>
                     <div class="inspector-reorder-grid">
-                        <button type="button" id="btn-block-move-up" class="btn-secondary-outline inspector-reorder-btn" title="Flytt opp">
+                        <button type="button" data-block-action="move-up" class="btn-secondary-outline inspector-reorder-btn" title="Flytt opp">
                             <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px; flex-shrink: 0;">arrow_upward</span>
                             <span>Opp</span>
                         </button>
-                        <button type="button" id="btn-block-move-down" class="btn-secondary-outline inspector-reorder-btn" title="Flytt ned">
+                        <button type="button" data-block-action="move-down" class="btn-secondary-outline inspector-reorder-btn" title="Flytt ned">
                             <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px; flex-shrink: 0;">arrow_downward</span>
                             <span>Ned</span>
                         </button>
-                        <button type="button" id="btn-block-duplicate" class="btn-secondary-outline inspector-reorder-btn" title="Kopier element">
+                        <button type="button" data-block-action="duplicate" class="btn-secondary-outline inspector-reorder-btn" title="Kopier element">
                             <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px; flex-shrink: 0;">content_copy</span>
                             <span>Kopier</span>
                         </button>
-                        <button type="button" id="btn-block-delete" class="btn-secondary-outline inspector-reorder-btn" style="color: #ef4444; border-color: #fca5a5;" title="Slett element">
+                        <button type="button" data-block-action="delete" class="btn-secondary-outline inspector-reorder-btn" style="color: #ef4444; border-color: #fca5a5;" title="Slett element">
                             <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px; flex-shrink: 0;">delete</span>
                             <span>Slett</span>
                         </button>
@@ -5122,19 +5329,19 @@ class NewsletterBuilder {
                 <div class="inspector-group" style="margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
                     <label class="inspector-group-label" style="font-weight: 700; font-size: 13px; color: #1e293b; margin-bottom: 10px; display: block;">Plassering &amp; Handlinger</label>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                        <button type="button" id="btn-block-move-up" class="btn-secondary-outline" style="width: 100%; height: 36px; justify-content: center; font-size: 13px; font-weight: 600;">
+                        <button type="button" data-block-action="move-up" class="btn-secondary-outline" style="width: 100%; height: 36px; justify-content: center; font-size: 13px; font-weight: 600;">
                             <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">arrow_upward</span>
                             <span>Flytt opp</span>
                         </button>
-                        <button type="button" id="btn-block-move-down" class="btn-secondary-outline" style="width: 100%; height: 36px; justify-content: center; font-size: 13px; font-weight: 600;">
+                        <button type="button" data-block-action="move-down" class="btn-secondary-outline" style="width: 100%; height: 36px; justify-content: center; font-size: 13px; font-weight: 600;">
                             <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">arrow_downward</span>
                             <span>Flytt ned</span>
                         </button>
-                        <button type="button" id="btn-block-duplicate" class="btn-secondary-outline" style="width: 100%; height: 36px; justify-content: center; font-size: 13px; font-weight: 600;">
+                        <button type="button" data-block-action="duplicate" class="btn-secondary-outline" style="width: 100%; height: 36px; justify-content: center; font-size: 13px; font-weight: 600;">
                             <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">content_copy</span>
                             <span>Dupliser</span>
                         </button>
-                        <button type="button" id="btn-block-delete" class="btn-secondary-outline" style="width: 100%; height: 36px; justify-content: center; font-size: 13px; font-weight: 600; color: #ef4444; border-color: #fca5a5;">
+                        <button type="button" data-block-action="delete" class="btn-secondary-outline" style="width: 100%; height: 36px; justify-content: center; font-size: 13px; font-weight: 600; color: #ef4444; border-color: #fca5a5;">
                             <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">delete</span>
                             <span>Slett</span>
                         </button>
@@ -5277,11 +5484,18 @@ class NewsletterBuilder {
         if (btnLineHeight) {
             btnLineHeight.addEventListener('click', (e) => {
                 e.preventDefault();
-                const val = prompt("Angi linjeavstand (f.eks. 1.2, 1.5, 1.8 eller normal):", currentNode.style.lineHeight || "1.5");
-                if (val) {
-                    currentNode.style.lineHeight = val;
-                    this.syncUnifiedBlocks();
-                }
+                this.showPromptModal(
+                    "Linjeavstand",
+                    "F.eks. 1.2, 1.5, 1.8 eller normal",
+                    (value) => {
+                        currentNode.style.lineHeight = value;
+                        this.syncUnifiedBlocks();
+                    },
+                    currentNode.style.lineHeight || "1.5",
+                    "Vennligst oppgi en linjeavstand.",
+                    "Endre linjeavstand",
+                    "Bruk"
+                );
             });
         }
 
@@ -5289,11 +5503,18 @@ class NewsletterBuilder {
         if (btnSpacing) {
             btnSpacing.addEventListener('click', (e) => {
                 e.preventDefault();
-                const val = prompt("Angi avstand etter avsnitt (f.eks. 8px, 16px, 24px):", currentNode.style.marginBottom || "16px");
-                if (val) {
-                    currentNode.style.marginBottom = val;
-                    this.syncUnifiedBlocks();
-                }
+                this.showPromptModal(
+                    "Avstand etter avsnitt",
+                    "F.eks. 8px, 16px eller 24px",
+                    (value) => {
+                        currentNode.style.marginBottom = value;
+                        this.syncUnifiedBlocks();
+                    },
+                    currentNode.style.marginBottom || "16px",
+                    "Vennligst oppgi en avstand.",
+                    "Endre avsnittsavstand",
+                    "Bruk"
+                );
             });
         }
 
@@ -5301,11 +5522,18 @@ class NewsletterBuilder {
         if (btnCharSpacing) {
             btnCharSpacing.addEventListener('click', (e) => {
                 e.preventDefault();
-                const val = prompt("Angi tegnmellomrom (f.eks. 0.5px, 1px, 2px, normal):", currentNode.style.letterSpacing || "normal");
-                if (val) {
-                    currentNode.style.letterSpacing = val;
-                    this.syncUnifiedBlocks();
-                }
+                this.showPromptModal(
+                    "Tegnmellomrom",
+                    "F.eks. 0.5px, 1px, 2px eller normal",
+                    (value) => {
+                        currentNode.style.letterSpacing = value;
+                        this.syncUnifiedBlocks();
+                    },
+                    currentNode.style.letterSpacing || "normal",
+                    "Vennligst oppgi et tegnmellomrom.",
+                    "Endre tegnmellomrom",
+                    "Bruk"
+                );
             });
         }
 
@@ -5320,10 +5548,16 @@ class NewsletterBuilder {
             });
         }
 
-        document.getElementById('btn-block-move-up')?.addEventListener('click', () => this.moveActiveBlock(-1));
-        document.getElementById('btn-block-move-down')?.addEventListener('click', () => this.moveActiveBlock(1));
-        document.getElementById('btn-block-duplicate')?.addEventListener('click', () => this.duplicateActiveBlock());
-        document.getElementById('btn-block-delete')?.addEventListener('click', () => this.deleteActiveBlock());
+        document.querySelectorAll('#sidebar-inspector-view [data-block-action]').forEach((button) => {
+            button.addEventListener('click', (event) => {
+                event.preventDefault();
+                const action = button.dataset.blockAction;
+                if (action === 'move-up') this.moveActiveBlock(-1);
+                if (action === 'move-down') this.moveActiveBlock(1);
+                if (action === 'duplicate') this.duplicateActiveBlock();
+                if (action === 'delete') this.deleteActiveBlock();
+            });
+        });
 
         const btnPers = document.getElementById('text-inspector-personalize');
         if (btnPers) {
@@ -5556,50 +5790,7 @@ class NewsletterBuilder {
                 const blockId = node.id || 'unified_content';
                 this.activeImageBlockId = blockId;
                 this.activeColumnIndex = null;
-                
-                const choice = confirm("Hvor vil du hente bildet fra? \\nTrykk 'OK' for å laste opp fra din enhet.\\nTrykk 'Avbryt' for å søke på Unsplash.");
-                if (choice) {
-                    let fileInput = document.getElementById('block-image-upload');
-                    if (!fileInput) {
-                        fileInput = document.createElement('input');
-                        fileInput.type = 'file';
-                        fileInput.id = 'block-image-upload';
-                        fileInput.accept = 'image/*';
-                        fileInput.style.display = 'none';
-                        document.body.appendChild(fileInput);
-                    }
-                    const newFileInput = fileInput.cloneNode(true);
-                    fileInput.parentNode.replaceChild(newFileInput, fileInput);
-                    newFileInput.addEventListener('change', async (e) => {
-                        const file = e.target.files[0];
-                        if (!file) return;
-                        try {
-                            showToast("Laster opp...", "info");
-                            const uploadPath = `newsletter/images/${Date.now()}_${file.name}`;
-                            const url = await window.firebaseService.uploadImage(file, uploadPath);
-                            img.src = url;
-                            img.setAttribute('src', url);
-                            document.querySelector('.inspector-image-preview').src = url;
-                            this.syncUnifiedBlocks();
-                            showToast("Bilde erstattet!", "success");
-                        } catch (err) {
-                            showToast("Opplasting feilet.", "error");
-                        }
-                    });
-                    newFileInput.click();
-                } else {
-                    if (window.unsplashManager) {
-                        window.unsplashManager.open((selection) => {
-                            if (selection && selection.url) {
-                                img.src = selection.url;
-                                img.setAttribute('src', selection.url);
-                                document.querySelector('.inspector-image-preview').src = selection.url;
-                                this.syncUnifiedBlocks();
-                                showToast("Bilde erstattet fra Unsplash!", "success");
-                            }
-                        });
-                    }
-                }
+                this.openImageInsertionFlowAt(null, img);
             });
         }
 
@@ -6553,6 +6744,7 @@ class NewsletterBuilder {
         if (!container) return '';
         const clone = container.cloneNode(true);
         clone.querySelectorAll('.card-delete-btn, .card-edit-btn, #block-quick-toolbar, .block-quick-toolbar, .quick-tb-btn, button.quick-tb-btn').forEach(el => el.remove());
+        clone.querySelectorAll('.selected-block-active').forEach(el => el.classList.remove('selected-block-active'));
         return clone.innerHTML;
     }
 
@@ -6561,6 +6753,7 @@ class NewsletterBuilder {
 
         // 1. Remove all pre-existing edit/delete buttons AND quick toolbar controls to prevent duplicates or leaked editor UI
         container.querySelectorAll('.card-delete-btn, .card-edit-btn, #block-quick-toolbar, .block-quick-toolbar, .quick-tb-btn').forEach(b => b.remove());
+        container.querySelectorAll('.selected-block-active').forEach(el => el.classList.remove('selected-block-active'));
 
         const tileFB = `<svg width="22" height="22" viewBox="0 0 24 24" fill="#1B4965" style="width: 22px !important; height: 22px !important; max-width: 22px !important; max-height: 22px !important; display: block !important;"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`;
         const tileIG = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1B4965" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 24px !important; height: 24px !important; max-width: 24px !important; max-height: 24px !important; display: block !important;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>`;
@@ -6864,23 +7057,31 @@ class NewsletterBuilder {
 
     async saveTemplate() {
         if (!window.firebaseService || !window.firebaseService.isInitialized) return;
-        const name = prompt("Navn på malen:", "Nyhetsbrev Mal");
-        if (!name) return;
-        try {
-            this.syncUnifiedBlocks();
-            const data = {
-                name,
-                blocks: this.blocks,
-                subject: document.getElementById('newsletter-subject').value,
-                createdAt: new Date().toISOString(),
-                isDraft: false
-            };
-            await window.firebaseService.db.collection('newsletter_templates').add(data);
-            showToast("Mal lagret!", "success");
-            this.loadTemplates();
-        } catch (e) {
-            showToast("Kunne ikke lagre mal.");
-        }
+        this.showPromptModal(
+            "Navn på malen",
+            "F.eks. Månedlig nyhetsbrev",
+            async (name) => {
+                try {
+                    this.syncUnifiedBlocks();
+                    const data = {
+                        name,
+                        blocks: this.blocks,
+                        subject: document.getElementById('newsletter-subject').value,
+                        createdAt: new Date().toISOString(),
+                        isDraft: false
+                    };
+                    await window.firebaseService.db.collection('newsletter_templates').add(data);
+                    showToast("Mal lagret!", "success");
+                    this.loadTemplates();
+                } catch (e) {
+                    showToast("Kunne ikke lagre mal.");
+                }
+            },
+            "Nyhetsbrev Mal",
+            "Vennligst oppgi et navn.",
+            "Lagre mal",
+            "Lagre"
+        );
     }
 
     async loadTemplates() {
@@ -7326,27 +7527,44 @@ class NewsletterBuilder {
             const oldText = btn.textContent || '';
             const oldUrl = btn.getAttribute('href') || '';
             
-            const newText = prompt("Ny knapptekst:", oldText);
-            if (newText === null) return;
-            
-            const newUrl = prompt("Ny knapp-URL (f.eks. nettside eller e-post):", oldUrl);
-            if (newUrl === null) return;
-
-            btn.textContent = newText.trim() || 'Les mer';
-            btn.setAttribute('href', newUrl.trim() || 'https://');
-            this.syncUnifiedBlocks();
+            this.showPromptModal(
+                "Knapptekst",
+                "F.eks. Les mer",
+                (newText) => {
+                    setTimeout(() => {
+                        this.showPromptModal(
+                            "Knappens nettadresse",
+                            "https://...",
+                            (newUrl) => {
+                                btn.textContent = newText.trim() || 'Les mer';
+                                btn.setAttribute('href', newUrl.trim() || 'https://');
+                                this.syncUnifiedBlocks();
+                            },
+                            oldUrl,
+                            "Vennligst oppgi en nettadresse.",
+                            "Rediger knapp",
+                            "Oppdater"
+                        );
+                    }, 350);
+                },
+                oldText,
+                "Vennligst oppgi knappetekst.",
+                "Rediger knapp",
+                "Neste"
+            );
         };
 
         const deleteBtn = document.createElement('button');
         deleteBtn.type = 'button';
         deleteBtn.style.cssText = 'background:none; border:none; color:#f87171; cursor:pointer; font-size:11px; font-weight:700; display:flex; align-items:center; gap:3px; padding:0; font-family:inherit;';
         deleteBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;">delete</span> Slett';
-        deleteBtn.onclick = (e) => {
+        deleteBtn.onclick = async (e) => {
             e.preventDefault();
             e.stopPropagation();
             overlay.remove();
             
-            if (confirm("Vil du slette denne knappen?")) {
+            const confirmed = await this.showConfirm("Slett knapp", "Vil du slette denne knappen?", "Slett");
+            if (confirmed) {
                 const parent = btn.closest('div');
                 if (parent && (parent.style.textAlign === 'center' || parent.classList.contains('block-btn-wrap'))) {
                     parent.remove();
@@ -7483,8 +7701,6 @@ class NewsletterBuilder {
                     if (p && p.tagName === 'P' && p.innerHTML.trim() === '') p.remove();
                     if (typeof this.syncUnifiedBlocks === 'function') this.syncUnifiedBlocks();
                 }
-            } else {
-                if (confirm('Slette dette bildet?')) img.remove();
             }
         };
 
@@ -8177,14 +8393,19 @@ class NewsletterBuilder {
                         });
                     } catch (canvasErr) {
                         console.error("Canvas export failed:", canvasErr);
-                        alert("Dette bildet kan ikke beskjæres av sikkerhetsårsaker fordi det er lagret på en ekstern nettside som blokkerer tilgang. Vennligst last opp bildet på nytt fra enheten din.");
+                        await this.showConfirm(
+                            "Kan ikke beskjære bildet",
+                            "Bildet ligger på en ekstern nettside som blokkerer beskjæring. Last opp bildet på nytt fra enheten din.",
+                            "OK",
+                            ""
+                        );
                         saveBtn.disabled = false;
                         saveBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px;">check</span><span>Lagre beskjæring</span>';
                         return;
                     }
 
                     if (!canvas) {
-                        alert("Kunne ikke generere beskåret bilde.");
+                        await this.showConfirm("Beskjæring feilet", "Kunne ikke generere beskåret bilde.", "OK", "");
                         saveBtn.disabled = false;
                         saveBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px;">check</span><span>Lagre beskjæring</span>';
                         return;
@@ -8192,7 +8413,7 @@ class NewsletterBuilder {
 
                     canvas.toBlob(async (blob) => {
                         if (!blob) {
-                            alert("Kunne ikke generere beskåret bilde.");
+                            await this.showConfirm("Beskjæring feilet", "Kunne ikke generere beskåret bilde.", "OK", "");
                             saveBtn.disabled = false;
                             saveBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px;">check</span><span>Lagre beskjæring</span>';
                             return;
@@ -8208,7 +8429,7 @@ class NewsletterBuilder {
                     }, 'image/jpeg', 0.92);
                 } catch (err) {
                     console.error("Cropping failed:", err);
-                    alert("En feil oppstod under beskjæring: " + err.message);
+                    await this.showConfirm("Beskjæring feilet", `En feil oppstod under beskjæring: ${err.message}`, "OK", "");
                     saveBtn.disabled = false;
                     saveBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px;">check</span><span>Lagre beskjæring</span>';
                 }
