@@ -7867,17 +7867,17 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
     height: 100% !important;
 }
 
-.builder-toolbar-header #publish-dropdown-btn {
-    background: rgba(0, 0, 0, 0.15) !important;
-    color: #ffffff !important;
-    border: none !important;
-    border-left: 1px solid rgba(255, 255, 255, 0.25) !important;
-    padding: 0 10px !important;
-    border-radius: 0 10px 10px 0 !important;
-    display: flex !important;
+.builder-toolbar-header #continue-btn .btn-publish-icon {
+    display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    height: 100% !important;
+    transform: translateY(1px) !important;
+}
+
+.builder-toolbar-header #publish-dropdown-btn .material-symbols-outlined {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 /* ==========================================================================
@@ -7985,6 +7985,10 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
         width: 18px !important;
         height: 18px !important;
         line-height: 1 !important;
+    }
+
+    .builder-toolbar-header #continue-btn .btn-publish-icon {
+        transform: translateY(1px) !important;
     }
 }
 
