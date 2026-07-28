@@ -3413,64 +3413,42 @@ class NewsletterBuilder {
             while (temp.firstChild) {
                 container.insertBefore(temp.firstChild, afterElement);
             }
-            this.syncUnifiedBlocks();
-            return;
-        }
-
-        this.restoreSelection();
-        const selection = window.getSelection();
-
-        // Check if we are inserting block-level cards or structured components
-        const isBlockHtml = html.includes('newsletter-social-block') ||
-                            html.includes('newsletter-product-card') || 
-                            html.includes('newsletter-event-card') || 
-                            html.includes('newsletter-video-block') || 
-                            html.includes('newsletter-divider-block') ||
-                            html.includes('newsletter-spacer-block') ||
-                            html.includes('newsletter-columns-block') ||
-                            html.includes('block-btn') || 
-                            html.includes('display: grid') || 
-                            html.includes('display: flex');
-
-        if (isBlockHtml) {
-            let parentBlock = (selection && selection.anchorNode && container.contains(selection.anchorNode)) 
-                ? selection.anchorNode 
-                : null;
-            
-            while (parentBlock && parentBlock.parentNode !== container) {
-                parentBlock = parentBlock.parentNode;
-            }
-
-            const fragment = document.createDocumentFragment();
-            while (temp.firstChild) {
-                fragment.appendChild(temp.firstChild);
-            }
-
-            const lastInsertedNode = fragment.lastChild;
-
-            if (parentBlock && parentBlock.nextSibling) {
-                container.insertBefore(fragment, parentBlock.nextSibling);
-            } else {
-                container.appendChild(fragment);
-            }
-
-            if (lastInsertedNode && typeof lastInsertedNode.scrollIntoView === 'function') {
-                lastInsertedNode.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
-
             this.normalizeCanvasBlocks(container);
             this.syncUnifiedBlocks();
             this.triggerAutosave();
             return;
         }
 
-        if (selection && selection.rangeCount && container.contains(selection.anchorNode)) {
-            this.exec('insertHTML', html);
-        } else {
-            while (temp.firstChild) {
-                container.appendChild(temp.firstChild);
-            }
+        this.restoreSelection();
+        const selection = window.getSelection();
+
+        let parentBlock = (selection && selection.anchorNode && container.contains(selection.anchorNode)) 
+            ? selection.anchorNode 
+            : null;
+        
+        while (parentBlock && parentBlock.parentNode !== container) {
+            parentBlock = parentBlock.parentNode;
         }
+
+        const fragment = document.createDocumentFragment();
+        while (temp.firstChild) {
+            fragment.appendChild(temp.firstChild);
+        }
+
+        const lastInsertedNode = fragment.lastChild;
+
+        if (parentBlock && parentBlock.nextSibling) {
+            container.insertBefore(fragment, parentBlock.nextSibling);
+        } else {
+            container.appendChild(fragment);
+        }
+
+        if (lastInsertedNode && typeof lastInsertedNode.scrollIntoView === 'function') {
+            try {
+                lastInsertedNode.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } catch(e) {}
+        }
+
         this.normalizeCanvasBlocks(container);
         this.syncUnifiedBlocks();
         this.triggerAutosave();
