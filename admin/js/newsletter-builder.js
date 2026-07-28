@@ -8420,7 +8420,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
         if (publishDropdown) publishDropdown.style.setProperty('display', 'none', 'important');
 
         const user = await this.getAuthUser();
-        const recipientEmail = targetEmail || user?.email || 'knutsenthomas@gmail.com';
+        const recipientEmail = (typeof targetEmail === 'string' && targetEmail.includes('@')) ? targetEmail : 'knutsenthomas@gmail.com';
 
         const subject = document.getElementById('newsletter-subject')?.value || 'Nyhetsbrev';
         this.syncUnifiedBlocks();
