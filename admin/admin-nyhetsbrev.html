@@ -106,8 +106,8 @@
     <!-- CSS -->
     <link rel="stylesheet" href="css/dashboard.css?v=20260727_V1">
     <link rel="stylesheet" href="../css/notifications.css?v=1.18">
-    <link rel="stylesheet" href="css/admin-unified.css?v=20260728_V400_PREMIUM">
-    <link rel="stylesheet" href="css/newsletter-builder.css?v=20260728_V400_PREMIUM">
+    <link rel="stylesheet" href="css/admin-unified.css?v=20260728_V500_CLEAN">
+    <link rel="stylesheet" href="css/newsletter-builder.css?v=20260728_V500_CLEAN">
 
     <!-- Firebase SDK (Compat) -->
     <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -1280,65 +1280,41 @@
                         <!-- Left Main Column -->
                         <div class="main-selection-v2">
                             
-                            <!-- Card 1: Emne, Preheader & Live Innboks-Forhåndsvisning -->
+                            <!-- Card 1: Emne og Preheader -->
                             <div class="selection-card-v2">
                                 <div class="card-header-v2">
                                     <div class="card-title-group">
                                         <span class="material-symbols-outlined card-title-icon">edit_note</span>
                                         <div>
-                                            <h3>E-postemne og Innboksvisning</h3>
+                                            <h3>E-postemne og Forhåndsvisningstekst</h3>
                                             <p>Dette er det første mottakerne ser i sin innboks. Gjør det fengende og tydelig.</p>
                                         </div>
                                     </div>
                                 </div>
                                 
-                                <div class="subject-preview-grid">
-                                    <!-- Inputs Column -->
-                                    <div class="subject-inputs-col">
-                                        <div class="form-group-v2">
-                                            <div class="label-row">
-                                                <label for="newsletter-subject">E-postemne (Subject) <span class="required-star">*</span></label>
-                                                <span class="char-count" id="subject-char-count">0 / 80 tegn</span>
-                                            </div>
-                                            <div class="input-wrapper-v2">
-                                                <span class="material-symbols-outlined input-icon">mail_lock</span>
-                                                <input type="text" id="newsletter-subject" placeholder="f.eks. Velkommen til månedens nyhetsbrev! ✨" maxlength="100">
-                                            </div>
-                                            <span class="input-hint">Korte emner på 4–7 ord gir opptil 21% høyere åpningsrate.</span>
+                                <div class="subject-inputs-col">
+                                    <div class="form-group-v2">
+                                        <div class="label-row">
+                                            <label for="newsletter-subject">E-postemne (Subject) <span class="required-star">*</span></label>
+                                            <span class="char-count" id="subject-char-count">0 / 80 tegn</span>
                                         </div>
-
-                                        <div class="form-group-v2">
-                                            <div class="label-row">
-                                                <label for="newsletter-preheader">Forhåndsvisningstekst (Preheader)</label>
-                                                <span class="char-count" id="preheader-char-count">0 / 120 tegn</span>
-                                            </div>
-                                            <div class="input-wrapper-v2">
-                                                <span class="material-symbols-outlined input-icon">subtitles</span>
-                                                <input type="text" id="newsletter-preheader" placeholder="Kort ingress som vises ved siden av emnelinjen..." maxlength="150">
-                                            </div>
-                                            <span class="input-hint">Utfyller emnelinjen i Gmail, Outlook og Apple Mail.</span>
+                                        <div class="input-wrapper-v2">
+                                            <span class="material-symbols-outlined input-icon">mail_lock</span>
+                                            <input type="text" id="newsletter-subject" placeholder="f.eks. Velkommen til månedens nyhetsbrev! ✨" maxlength="100">
                                         </div>
+                                        <span class="input-hint">Korte emner på 4–7 ord gir opptil 21% høyere åpningsrate.</span>
                                     </div>
 
-                                    <!-- Live Inbox Snippet Preview Column -->
-                                    <div class="inbox-preview-col">
-                                        <div class="inbox-preview-card">
-                                            <div class="inbox-preview-header">
-                                                <span class="material-symbols-outlined">mark_email_read</span>
-                                                <span>Live Innboksvisning</span>
-                                            </div>
-                                            <div class="inbox-email-snippet">
-                                                <div class="sender-avatar">HKM</div>
-                                                <div class="snippet-content">
-                                                    <div class="snippet-top">
-                                                        <span class="sender-name">His Kingdom Ministry</span>
-                                                        <span class="snippet-time">Nå</span>
-                                                    </div>
-                                                    <div class="snippet-subject" id="live-preview-subject">Finn hvilen som ruster deg for hverdagen</div>
-                                                    <div class="snippet-preheader" id="live-preview-preheader">Les siste utgave av månedens inspirasjonsbrev...</div>
-                                                </div>
-                                            </div>
+                                    <div class="form-group-v2">
+                                        <div class="label-row">
+                                            <label for="newsletter-preheader">Forhåndsvisningstekst (Preheader)</label>
+                                            <span class="char-count" id="preheader-char-count">0 / 120 tegn</span>
                                         </div>
+                                        <div class="input-wrapper-v2">
+                                            <span class="material-symbols-outlined input-icon">subtitles</span>
+                                            <input type="text" id="newsletter-preheader" placeholder="Kort ingress som vises ved siden av emnelinjen..." maxlength="150">
+                                        </div>
+                                        <span class="input-hint">Utfyller emnelinjen i Gmail, Outlook og Apple Mail.</span>
                                     </div>
                                 </div>
                             </div>
