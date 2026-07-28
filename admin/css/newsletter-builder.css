@@ -5178,6 +5178,14 @@ body.builder-active #newsletter-editor-modal-root {
     pointer-events: auto !important;
 }
 
+#newsletter-editor-modal-root > .custom-prompt-overlay:not(.open) {
+    pointer-events: none !important;
+}
+
+#newsletter-editor-modal-root > .custom-prompt-overlay.open {
+    pointer-events: auto !important;
+}
+
 /* --- High-Fidelity Unified Top Header & Modern Vertical Sidebar Styles --- */
 
 .sidebar-header-modern .sidebar-subtitle-modern {

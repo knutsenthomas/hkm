@@ -4383,7 +4383,8 @@ class NewsletterBuilder {
 
         inputEl.placeholder = placeholder;
         inputEl.value = defaultValue;
-        modal.style.display = 'flex';
+        modal.style.setProperty('display', 'flex', 'important');
+        modal.setAttribute('aria-hidden', 'false');
         setTimeout(() => modal.classList.add('open'), 10);
         inputEl.focus();
         if (defaultValue) {
@@ -4392,7 +4393,12 @@ class NewsletterBuilder {
 
         const closePrompt = () => {
             modal.classList.remove('open');
-            setTimeout(() => modal.style.display = 'none', 300);
+            modal.setAttribute('aria-hidden', 'true');
+            setTimeout(() => {
+                if (!modal.classList.contains('open')) {
+                    modal.style.setProperty('display', 'none', 'important');
+                }
+            }, 300);
         };
 
         // Reset listeners to avoid duplicates
@@ -4412,8 +4418,13 @@ class NewsletterBuilder {
         newConfirmBtn.addEventListener('click', () => {
             const val = inputEl.value.trim();
             if (val) {
-                confirmCallback(val);
                 closePrompt();
+                Promise.resolve().then(() => confirmCallback(val)).catch(error => {
+                    console.error('Dialoghandlingen feilet:', error);
+                    if (typeof showToast === 'function') {
+                        showToast(error?.message || 'Handlingen kunne ikke fullføres.', 'error');
+                    }
+                });
             } else {
                 if (typeof showToast === 'function') showToast(warningMsg, "warning");
             }
@@ -7737,6 +7748,7 @@ class NewsletterBuilder {
         if (!blocksContainer) return '';
 
         const contentClone = blocksContainer.cloneNode(true);
+        this.inlineHeadingStylesForEmail(blocksContainer, contentClone);
 
         // Remove editor UI controls, quick toolbars, buttons, overlays, and drag handles
         contentClone.querySelectorAll(`
@@ -7894,6 +7906,57 @@ class NewsletterBuilder {
   </table>
 </body>
 </html>`;
+    }
+
+    inlineHeadingStylesForEmail(sourceRoot, clonedRoot) {
+        if (!sourceRoot || !clonedRoot || typeof window.getComputedStyle !== 'function') return;
+
+        const sourceHeadings = Array.from(sourceRoot.querySelectorAll('h1, h2, h3, h4, h5, h6'));
+        const clonedHeadings = Array.from(clonedRoot.querySelectorAll('h1, h2, h3, h4, h5, h6'));
+        const properties = [
+            'font-family',
+            'font-size',
+            'font-weight',
+            'font-style',
+            'line-height',
+            'letter-spacing',
+            'color',
+            'text-decoration',
+            'text-transform',
+            'margin-top',
+            'margin-right',
+            'margin-bottom',
+            'margin-left',
+            'padding-top',
+            'padding-right',
+            'padding-bottom',
+            'padding-left'
+        ];
+
+        sourceHeadings.forEach((sourceHeading, index) => {
+            const clonedHeading = clonedHeadings[index];
+            if (!clonedHeading) return;
+
+            const computed = window.getComputedStyle(sourceHeading);
+            properties.forEach(property => {
+                const value = computed.getPropertyValue(property);
+                if (value) clonedHeading.style.setProperty(property, value);
+            });
+
+            let textAlign = computed.getPropertyValue('text-align') || sourceHeading.style.textAlign || 'left';
+            if (textAlign === 'start') {
+                const direction = computed.getPropertyValue('direction') || 'ltr';
+                textAlign = direction === 'rtl' ? 'right' : 'left';
+            } else if (textAlign === 'end') {
+                const direction = computed.getPropertyValue('direction') || 'ltr';
+                textAlign = direction === 'rtl' ? 'left' : 'right';
+            }
+
+            clonedHeading.style.setProperty('text-align', textAlign);
+            if (['left', 'center', 'right', 'justify'].includes(textAlign)) {
+                clonedHeading.setAttribute('align', textAlign);
+            }
+        });
     }
 
     async sendTestEmail() {
