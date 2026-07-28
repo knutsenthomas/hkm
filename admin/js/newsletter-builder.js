@@ -8358,10 +8358,10 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
     }
 
     async sendTestEmail() {
-        const user = window.firebaseService?.auth?.currentUser;
-        if (!user) return showToast("Logg inn først", "warning");
+        const user = window.firebaseService?.auth?.currentUser || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
+        const defaultEmail = user?.email || 'post@hiskingdomministry.no';
 
-        const subject = document.getElementById('newsletter-subject').value || 'Test-e-post';
+        const subject = document.getElementById('newsletter-subject')?.value || 'Test-e-post';
         this.syncUnifiedBlocks();
         
         const textContent = document.getElementById('blocks-container')?.innerHTML || '';
@@ -8390,16 +8390,22 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
 
                 let sendSuccess = false;
                 try {
-                    // Get user ID Token for verification
-                    const idToken = await user.getIdToken();
+                    let idToken = '';
+                    if (user && typeof user.getIdToken === 'function') {
+                        try {
+                            idToken = await user.getIdToken();
+                        } catch (tokErr) {
+                            console.warn("Could not get user idToken:", tokErr);
+                        }
+                    }
 
-                    const fullHtml = this.compileEmailHtml();
+                    const fullHtml = this.compileEmailHtml(this.currentEditorLang || 'no');
 
                     const response = await fetch('https://sendmanualemail-42bhgdjkcq-uc.a.run.app', {
                         method: 'POST',
                         headers: { 
                             'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${idToken}`
+                            ...(idToken ? { 'Authorization': `Bearer ${idToken}` } : {})
                         },
                         body: JSON.stringify({
                             to: recipientEmail,
@@ -8428,7 +8434,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                     }
                 } catch (error) {
                     console.error('Feil ved sending av test-e-post:', error);
-                    showToast('Kunne ikke sende: ' + error.message, 'error');
+                    showToast(`Kunne ikke sende test-e-post: ${error.message}`, "error");
                 } finally {
                     if (testBtn) {
                         testBtn.disabled = false;
@@ -8444,7 +8450,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                     );
                 }
             },
-            user.email,
+            defaultEmail,
             "Vennligst oppgi en e-postadresse.",
             "Send test-e-post",
             "Send test-e-post"
