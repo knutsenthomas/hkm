@@ -8459,7 +8459,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                         },
                         body: JSON.stringify({
                             to: recipientEmail,
-                            subject: `[TEST] ${subject}`,
+                            subject: subject ? `${subject} (Prøveutgave)` : 'Prøveutgave av nyhetsbrev',
                             html: fullHtml,
                             message: plainText.substring(0, 500),
                             fromName: 'His Kingdom Ministry'
