@@ -2562,6 +2562,41 @@ class NewsletterBuilder {
         };
 
         const loadProducts = async () => {
+            const fallbackProducts = [
+                {
+                    name: "Norgeskoppen - White 12oz Enamel Mug",
+                    price: "249",
+                    imageUrl: "https://static.wixstatic.com/media/db4f96_2e012335b82e4405ba0e4ca09cb6f915~mv2.png/v1/fit/w_1000,h_1000,q_90/file.png",
+                    description: "En slitesterk og lett emaljekopp som passer perfekt til tur, camping eller morgenkaffen.",
+                    slug: "norgeskoppen-white-12oz-enamel-mug",
+                    productPageUrl: "https://www.hiskingdomdesigns.no/product-page/norgeskoppen-white-12oz-enamel-mug"
+                },
+                {
+                    name: "NORGE Brodert på Økologisk bøttehatt | Beechfield B90N",
+                    price: "365",
+                    imageUrl: "https://static.wixstatic.com/media/db4f96_6fc1d0d498e2415aae57aff3d5de5c99~mv2.png/v1/fit/w_1000,h_1000,q_90/file.png",
+                    description: "Klassisk økologisk bøttehatt brodert med Norge-motiv. Gir god solbeskyttelse med stil.",
+                    slug: "norge-brodert-pa-okologisk-bottehatt-beechfield-b90n",
+                    productPageUrl: "https://www.hiskingdomdesigns.no/product-page/norge-brodert-pa-okologisk-bottehatt-beechfield-b90n"
+                },
+                {
+                    name: "FAITH OVER FEAR - Classic Matte Paper Poster",
+                    price: "139",
+                    imageUrl: "https://static.wixstatic.com/media/db4f96_74c605681f6c413d929793be3d51d2f3~mv2.png/v1/fit/w_1000,h_1000,q_90/file.png",
+                    description: "En moderne kunstplakat med et sterkt budskap trykket på matt papir av høy kvalitet.",
+                    slug: "faith-over-fear-classic-matte-paper-poster",
+                    productPageUrl: "https://www.hiskingdomdesigns.no/product-page/faith-over-fear-classic-matte-paper-poster"
+                },
+                {
+                    name: "JESUS IS KING - Unisex Hettegenser",
+                    price: "499",
+                    imageUrl: "https://static.wixstatic.com/media/db4f96_2e012335b82e4405ba0e4ca09cb6f915~mv2.png/v1/fit/w_1000,h_1000,q_90/file.png",
+                    description: "Myk og varm hettegenser med høykvalitets trykk.",
+                    slug: "jesus-is-king-unisex-hettegenser",
+                    productPageUrl: "https://www.hiskingdomdesigns.no/product-page/jesus-is-king-unisex-hettegenser"
+                }
+            ];
+
             if (productsList.length > 0) {
                 renderProducts();
                 return;
@@ -2570,35 +2605,34 @@ class NewsletterBuilder {
             try {
                 const res = await fetch('https://hiskingdomdesigns.no/api/get-wix-products');
                 const data = await res.json();
-                if (data.success && Array.isArray(data.products)) {
+                if (data.success && Array.isArray(data.products) && data.products.length > 0) {
                     window.hkmWixProductsCache = data.products.sort((a, b) => a.name.localeCompare(b.name));
                     productsList = window.hkmWixProductsCache;
                     renderProducts();
-                } else {
-                    throw new Error("Invalid API response format");
+                    return;
                 }
             } catch (err) {
-                console.error("Failed to load live products, trying Firestore fallback:", err);
-                if (window.firebaseService?.isInitialized) {
-                    try {
-                        const doc = await window.firebaseService.getPageContent('wix_products');
-                        if (doc && Array.isArray(doc.items)) {
-                            window.hkmWixProductsCache = doc.items.filter(p => p.inStock !== false).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-                            productsList = window.hkmWixProductsCache;
-                            renderProducts();
-                            return;
-                        }
-                    } catch (fsErr) {
-                        console.error("Firestore fallback failed:", fsErr);
-                    }
-                }
-                resultsContainer.innerHTML = `
-                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 0; color: #ef4444; gap: 8px;">
-                        <span class="material-symbols-outlined" style="font-size: 36px; color: #f87171;">error</span>
-                        <span style="font-size: 14px; font-weight: 500; text-align: center;">Kunne ikke hente produkter fra butikken.</span>
-                    </div>
-                `;
+                console.warn("Could not fetch live Wix products, trying Firestore fallback...", err);
             }
+
+            if (window.firebaseService?.isInitialized) {
+                try {
+                    const doc = await window.firebaseService.getPageContent('wix_products');
+                    if (doc && Array.isArray(doc.items) && doc.items.length > 0) {
+                        window.hkmWixProductsCache = doc.items.filter(p => p.inStock !== false).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+                        productsList = window.hkmWixProductsCache;
+                        renderProducts();
+                        return;
+                    }
+                } catch (fsErr) {
+                    console.warn("Firestore product fallback failed:", fsErr);
+                }
+            }
+
+            // Fallback catalog guarantees products are ALWAYS available to insert
+            window.hkmWixProductsCache = fallbackProducts;
+            productsList = window.hkmWixProductsCache;
+            renderProducts();
         };
 
         searchInput.oninput = (e) => {
