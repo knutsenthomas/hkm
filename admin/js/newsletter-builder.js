@@ -505,24 +505,24 @@ class NewsletterBuilder {
 
         if (publishDropdownBtn && publishDropdownMenu) {
             publishDropdownBtn.addEventListener('click', (e) => {
+                e.preventDefault();
                 e.stopPropagation();
-                const isOpen = publishDropdownMenu.style.display !== 'none';
-                publishDropdownMenu.style.display = isOpen ? 'none' : 'flex';
+                publishDropdownMenu.classList.toggle('show');
             });
 
             document.addEventListener('click', (e) => {
                 if (!e.target.closest('.btn-group-publish')) {
-                    publishDropdownMenu.style.display = 'none';
+                    publishDropdownMenu.classList.remove('show');
                 }
             });
 
             document.getElementById('opt-send-now')?.addEventListener('click', () => {
-                publishDropdownMenu.style.display = 'none';
+                publishDropdownMenu.classList.remove('show');
                 this.toggleRecipientsDrawer();
             });
 
             document.getElementById('opt-schedule-send')?.addEventListener('click', () => {
-                publishDropdownMenu.style.display = 'none';
+                publishDropdownMenu.classList.remove('show');
                 this.showPromptModal(
                     "Velg dato og klokkeslett for automatisk utsendelse:",
                     "f.eks. 2026-08-01 kl. 10:00",
@@ -537,22 +537,12 @@ class NewsletterBuilder {
             });
 
             document.getElementById('opt-send-test')?.addEventListener('click', () => {
-                publishDropdownMenu.style.display = 'none';
-                this.showPromptModal(
-                    "Oppgi din e-postadresse for prøveutgave:",
-                    "din.epost@domene.no",
-                    (email) => {
-                        if (typeof showToast === 'function') showToast(`Test-epost sendt til ${email}!`, "info");
-                    },
-                    "post@hiskingdomministry.no",
-                    "Vennligst oppgi en e-postadresse.",
-                    "Send test-epost",
-                    "Send test"
-                );
+                publishDropdownMenu.classList.remove('show');
+                this.sendTestEmail();
             });
 
             document.getElementById('opt-export-html')?.addEventListener('click', () => {
-                publishDropdownMenu.style.display = 'none';
+                publishDropdownMenu.classList.remove('show');
                 this.exportHtmlFile();
             });
         }
