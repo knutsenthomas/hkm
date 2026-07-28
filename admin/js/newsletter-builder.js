@@ -8539,11 +8539,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
     }
 
     async sendCampaign() {
-        const user = window.firebaseService?.auth?.currentUser || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
-        if (!user) {
-            showToast("Logg inn først for å sende nyhetsbrev.", "warning");
-            return;
-        }
+        const user = await this.getAuthUser();
 
         const subject = document.getElementById('newsletter-subject')?.value?.trim();
         this.syncUnifiedBlocks();
@@ -8608,7 +8604,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             const subjectEn = this.englishPayload?.subjectEn || `${subject} – English`;
 
             // 3. Get Auth token for Cloud Function endpoint call
-            const idToken = await user.getIdToken();
+            const idToken = await this.getAuthIdToken();
 
             let sentCount = 0;
             let englishCount = 0;
