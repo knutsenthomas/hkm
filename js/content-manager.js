@@ -1266,7 +1266,7 @@ class ContentManager {
         let misjonLabel = 'Misjon';
         if (lang === 'en') {
             defaultLabel = 'General donation';
-            basarLabel = 'Bazaar';
+            basarLabel = 'Raffle';
             misjonLabel = 'Missions';
         } else if (lang === 'es') {
             defaultLabel = 'Donación general';
