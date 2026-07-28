@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#f7f3ed">
+  <title>Meld deg av nyhetsbrevet | His Kingdom Ministry</title>
+  <link rel="icon" href="/img/logo-hkm.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: var(--text-dark, #2c3e50);
+      --muted: var(--text-light, #7f8c8d);
+      --line: var(--border-color, #e0e0e0);
+      --paper: var(--bg-white, #ffffff);
+      --canvas: var(--bg-light, #f8f9fa);
+      --blue: var(--primary-blue, #1b4965);
+      --orange: var(--primary-orange, #d17d39);
+      --orange-dark: var(--primary-red, #b54d2b);
+      --success: #18765a;
+      --danger: #b54139;
+      --shadow: var(--card-shadow-hover, 0 20px 40px rgba(15, 23, 42, 0.1));
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: var(--canvas);
+    }
+
+    body.unsubscribe-page {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 12%, rgba(209, 125, 57, 0.12), transparent 29rem),
+        radial-gradient(circle at 88% 90%, rgba(27, 73, 101, 0.12), transparent 32rem),
+        var(--canvas);
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .site-header {
+      width: min(1160px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 26px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 13px;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .brand img {
+      width: 46px;
+      height: 46px;
+      object-fit: contain;
+    }
+
+    .brand span {
+      display: grid;
+      gap: 2px;
+    }
+
+    .brand strong {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 17px;
+      line-height: 1.1;
+    }
+
+    .brand small {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .home-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--blue);
+      font-size: 14px;
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .home-link svg {
+      width: 17px;
+      height: 17px;
+      transition: transform 160ms ease;
+    }
+
+    .home-link:hover svg {
+      transform: translateX(-3px);
+    }
+
+    .unsubscribe-main {
+      width: min(1040px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 160px 0 96px;
+    }
+
+    .unsubscribe-card {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.83fr) minmax(420px, 1.17fr);
+      min-height: 570px;
+      padding: 0;
+      overflow: hidden;
+      background: var(--paper);
+      border: 1px solid rgba(218, 209, 198, 0.9);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+    }
+
+    .visual-panel {
+      position: relative;
+      isolation: isolate;
+      padding: 48px 46px;
+      overflow: hidden;
+      color: #ffffff;
+      background:
+        linear-gradient(155deg, rgba(255, 255, 255, 0.08), transparent 38%),
+        linear-gradient(155deg, #173e57 0%, #1b4965 48%, #123348 100%);
+    }
+
+    .visual-panel::before,
+    .visual-panel::after {
+      position: absolute;
+      z-index: -1;
+      content: "";
+      border-radius: 50%;
+      filter: blur(0);
+    }
+
+    .visual-panel::before {
+      top: -90px;
+      right: -110px;
+      width: 270px;
+      height: 270px;
+      background: rgba(209, 125, 57, 0.26);
+    }
+
+    .visual-panel::after {
+      bottom: -170px;
+      left: -140px;
+      width: 360px;
+      height: 360px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow:
+        0 0 0 44px rgba(255, 255, 255, 0.03),
+        0 0 0 88px rgba(255, 255, 255, 0.02);
+    }
+
+    .mail-mark {
+      width: 76px;
+      height: 76px;
+      margin-bottom: 38px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 23px;
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+    }
+
+    .mail-mark svg {
+      width: 34px;
+      height: 34px;
+    }
+
+    .visual-panel .eyebrow {
+      margin: 0 0 16px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .visual-panel h2 {
+      max-width: 310px;
+      margin: 0 0 20px;
+      font-family: "Inter", system-ui, sans-serif;
+      font-size: clamp(32px, 4vw, 45px);
+      font-weight: 750;
+      line-height: 1.12;
+      letter-spacing: -0.025em;
+    }
+
+    .visual-panel p {
+      max-width: 340px;
+      margin: 0;
+      color: rgba(255, 255, 255, 0.74);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    .content-panel {
+      padding: 58px clamp(38px, 6vw, 76px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .content-panel .eyebrow {
+      margin: 0 0 14px;
+      color: var(--orange);
+      font-size: 11px;
+      font-weight: 850;
+      letter-spacing: 0.17em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0 0 17px;
+      font-family: "Inter", system-ui, sans-serif;
+      font-size: clamp(34px, 5vw, 48px);
+      font-weight: 750;
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+    }
+
+    .intro {
+      max-width: 500px;
+      margin: 0 0 30px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.72;
+    }
+
+    form {
+      display: grid;
+      gap: 17px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 9px;
+      color: #35445a;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    input[type="email"] {
+      width: 100%;
+      min-height: 55px;
+      padding: 0 17px;
+      color: var(--ink);
+      background: #ffffff;
+      border: 1px solid #d7dfe8;
+      border-radius: 13px;
+      outline: none;
+      font: inherit;
+      box-shadow: 0 1px 2px rgba(17, 32, 53, 0.03);
+      transition: border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    input[type="email"]:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(27, 73, 101, 0.11);
+    }
+
+    .confirm-address {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 15px 16px;
+      color: #35445a;
+      background: #f7f9fb;
+      border: 1px solid #e0e6ec;
+      border-radius: 14px;
+    }
+
+    .confirm-address svg {
+      width: 22px;
+      height: 22px;
+      flex: 0 0 auto;
+      color: var(--blue);
+    }
+
+    .confirm-address span {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .confirm-address small {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .confirm-address strong {
+      overflow: hidden;
+      font-size: 14px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .primary-button {
+      min-height: 55px;
+      padding: 0 23px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: #ffffff;
+      background: linear-gradient(135deg, #d16a35, var(--orange));
+      border: 0;
+      border-radius: 13px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 15px;
+      font-weight: 800;
+      box-shadow: 0 10px 25px rgba(200, 93, 43, 0.23);
+      transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+    }
+
+    .primary-button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 13px 28px rgba(200, 93, 43, 0.28);
+    }
+
+    .primary-button:focus-visible,
+    .home-link:focus-visible,
+    .brand:focus-visible,
+    .secondary-link:focus-visible {
+      outline: 3px solid rgba(27, 73, 101, 0.27);
+      outline-offset: 4px;
+    }
+
+    .primary-button:disabled {
+      cursor: wait;
+      opacity: 0.68;
+    }
+
+    .button-spinner {
+      width: 18px;
+      height: 18px;
+      display: none;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 750ms linear infinite;
+    }
+
+    .primary-button.is-loading .button-spinner {
+      display: block;
+    }
+
+    .fine-print {
+      margin: 3px 0 0;
+      color: #8791a2;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .status-message {
+      display: none;
+      padding: 13px 15px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 650;
+      line-height: 1.5;
+    }
+
+    .status-message.is-visible {
+      display: block;
+    }
+
+    .status-message.is-error {
+      color: var(--danger);
+      background: #fff4f2;
+      border: 1px solid #f2d1cc;
+    }
+
+    .success-state {
+      display: none;
+    }
+
+    .success-state.is-visible {
+      display: block;
+      animation: enter 300ms ease both;
+    }
+
+    .success-icon {
+      width: 66px;
+      height: 66px;
+      margin-bottom: 26px;
+      display: grid;
+      place-items: center;
+      color: #ffffff;
+      background: var(--success);
+      border-radius: 20px;
+      box-shadow: 0 12px 30px rgba(24, 118, 90, 0.2);
+    }
+
+    .success-icon svg {
+      width: 31px;
+      height: 31px;
+    }
+
+    .success-state h1 {
+      margin-bottom: 15px;
+    }
+
+    .secondary-link {
+      margin-top: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--blue);
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .secondary-link svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    .honeypot {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      overflow: hidden !important;
+      clip: rect(1px, 1px, 1px, 1px) !important;
+      white-space: nowrap !important;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes enter {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 780px) {
+      .site-header {
+        width: min(100% - 28px, 640px);
+        padding: 17px 0;
+      }
+
+      .brand small,
+      .home-link span {
+        display: none;
+      }
+
+      .unsubscribe-main {
+        width: min(100% - 28px, 640px);
+        margin: 0 auto;
+        padding: 120px 0 56px;
+      }
+
+      .unsubscribe-card {
+        grid-template-columns: 1fr;
+        min-height: 0;
+        border-radius: 24px;
+      }
+
+      .visual-panel {
+        padding: 31px 28px;
+      }
+
+      .visual-panel h2,
+      .visual-panel p,
+      .visual-panel .eyebrow {
+        display: none;
+      }
+
+      .mail-mark {
+        width: 60px;
+        height: 60px;
+        margin: 0;
+        border-radius: 18px;
+      }
+
+      .content-panel {
+        min-height: 440px;
+        padding: 38px 28px 42px;
+        justify-content: flex-start;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body class="unsubscribe-page">
+  <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
+    <div class="header-content" id="header-container">
+      <a href="/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+        <div class="w-[45px] h-[45px] flex items-center justify-center rounded-lg overflow-hidden shrink-0 logo-icon">
+          <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
+        </div>
+        <span class="text-xl">His Kingdom Ministry</span>
+      </a>
+
+      <div class="header-actions">
+        <div class="header-actions-dock">
+          <a href="/" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-50 active:scale-95 transition-all" aria-label="Gå til forsiden" title="Gå til forsiden">
+            <span class="material-symbols-outlined text-xl">home</span>
+          </a>
+          <div class="header-actions-expandable">
+            <a href="/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full hover:bg-gray-50 active:scale-95 transition-all header-reading-plans-btn" aria-label="Leseplaner" title="Leseplaner">
+              <span class="material-symbols-outlined text-xl">calendar_today</span>
+            </a>
+            <a href="/media" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full hover:bg-gray-50 active:scale-95 transition-all header-reading-plans-btn" aria-label="Media og podcast" title="Media og podcast">
+              <span class="material-symbols-outlined text-xl">podcasts</span>
+            </a>
+            <div class="hidden md:block w-px h-5 bg-black/10 mx-1 dock-divider"></div>
+            <div class="lang-switcher relative group">
+              <button class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full transition-all lang-btn" aria-label="Velg språk">
+                <span class="material-symbols-outlined text-lg">language</span>
+                <span>NO</span>
+              </button>
+              <div class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden border border-gray-100">
+                <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
+                <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="en">🇺🇸 English</a>
+                <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="es">🇪🇸 Español</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <a href="/donasjoner" class="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-[1.03] active:scale-[0.98] transition-all header-donate-btn">
+          <span>Gi gave</span>
+          <span class="material-symbols-outlined text-lg">favorite</span>
+        </a>
+
+        <button class="menu-toggle w-11 h-11 rounded-full flex items-center justify-center relative focus:outline-none focus:ring-0" id="menu-toggle" aria-label="Åpne meny" aria-controls="mega-menu" aria-expanded="false">
+          <span class="material-symbols-outlined text-2xl open-icon">menu</span>
+          <span class="material-symbols-outlined text-2xl close-icon hidden">close</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu" id="mega-menu" style="display: none;" aria-hidden="true">
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+      <div class="flex items-center justify-between gap-4 md:hidden">
+        <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
+          <i class="fas fa-globe text-gray-400"></i>
+          <a href="/" class="text-sm font-bold text-primary-orange">NO</a>
+          <div class="w-px h-3 bg-gray-300"></div>
+          <a href="/en/" class="text-sm font-semibold text-gray-500">EN</a>
+          <div class="w-px h-3 bg-gray-300"></div>
+          <a href="/es/" class="text-sm font-semibold text-gray-500">ES</a>
+        </div>
+      </div>
+
+      <div class="mega-menu-body">
+        <div class="mega-menu-grid">
+          <div class="menu-col">
+            <div class="menu-section-title" role="heading" aria-level="3">Engasjer deg</div>
+            <ul class="mega-nav-list">
+              <li>
+                <span class="material-symbols-outlined">volunteer_activism</span>
+                <div class="flex flex-col">
+                  <a href="/donasjoner">Støtt arbeidet</a>
+                  <span class="mega-menu-desc">Bidra økonomisk til vår tjeneste.</span>
+                </div>
+              </li>
+              <li>
+                <span class="material-symbols-outlined">favorite</span>
+                <div class="flex flex-col">
+                  <a href="/bli-fast-giver">Bli fast giver</a>
+                  <span class="mega-menu-desc">Støtt oss månedlig for langsiktig arbeid.</span>
+                </div>
+              </li>
+              <li>
+                <span class="material-symbols-outlined">church</span>
+                <div class="flex flex-col">
+                  <a href="/for-menigheter">For menigheter</a>
+                  <span class="mega-menu-desc">Ressurser og undervisning for din kirke.</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="menu-col">
+            <div class="menu-section-title" role="heading" aria-level="3">Bli kjent med oss</div>
+            <ul class="mega-nav-list">
+              <li>
+                <span class="material-symbols-outlined">info</span>
+                <div class="flex flex-col">
+                  <a href="/om-oss">Om oss</a>
+                  <span class="mega-menu-desc">Lær mer om vår visjon, tro og verdier.</span>
+                </div>
+              </li>
+              <li>
+                <span class="material-symbols-outlined">mail</span>
+                <div class="flex flex-col">
+                  <a href="/kontakt">Kontakt oss</a>
+                  <span class="mega-menu-desc">Send oss en melding eller still spørsmål.</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="menu-col">
+            <div class="menu-section-title" role="heading" aria-level="3">Ressurser</div>
+            <ul class="mega-nav-list">
+              <li>
+                <span class="material-symbols-outlined">menu_book</span>
+                <div class="flex flex-col">
+                  <a href="/bibel">Les Bibelen</a>
+                  <span class="mega-menu-desc">Les Guds ord med vår bibelleser.</span>
+                </div>
+              </li>
+              <li>
+                <span class="material-symbols-outlined">podcasts</span>
+                <div class="flex flex-col">
+                  <a href="/media">Media og podcast</a>
+                  <span class="mega-menu-desc">Se taler og lytt til våre podcaster.</span>
+                </div>
+              </li>
+              <li>
+                <span class="material-symbols-outlined">shopping_bag</span>
+                <div class="flex flex-col">
+                  <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer">Butikk</a>
+                  <span class="mega-menu-desc">Kristne klær, kopper og tilbehør.</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="menu-col">
+            <div class="menu-section-title" role="heading" aria-level="3">Aktuelt</div>
+            <ul class="mega-nav-list">
+              <li>
+                <span class="material-symbols-outlined">calendar_today</span>
+                <div class="flex flex-col">
+                  <a href="/leseplaner">Leseplaner</a>
+                  <span class="mega-menu-desc">Følg våre daglige leseplaner.</span>
+                </div>
+              </li>
+              <li>
+                <span class="material-symbols-outlined">event</span>
+                <div class="flex flex-col">
+                  <a href="/arrangementer">Arrangementer</a>
+                  <span class="mega-menu-desc">Bli med på seminarer og samlinger.</span>
+                </div>
+              </li>
+              <li class="min-side-pill">
+                <span class="material-symbols-outlined">person</span>
+                <div class="flex flex-col">
+                  <a href="/minside/index.html">Min Side</a>
+                  <span class="mega-menu-desc">Din profil og dine leseplaner.</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mega-menu-footer">
+          <a href="/donasjoner" class="btn btn-primary btn-large btn-block footer-donate-btn">
+            <span>Støtt nå</span><i class="fas fa-heart heart"></i>
+          </a>
+          <div class="menu-footer-links">
+            <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer">Butikk</a>
+            <a href="/om-oss">Om oss</a>
+            <a href="/personvern">Personvern</a>
+            <a href="/betingelser">Betingelser</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="unsubscribe-main">
+    <section class="unsubscribe-card" aria-labelledby="page-title">
+      <div class="visual-panel" aria-hidden="true">
+        <div class="mail-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+            <rect x="3" y="5" width="18" height="14" rx="3"></rect>
+            <path d="m4 7 8 6 8-6"></path>
+          </svg>
+        </div>
+        <p class="eyebrow">Ditt valg</p>
+        <h2>Du bestemmer hva som lander i innboksen.</h2>
+        <p>Vi respekterer valget ditt. Avmeldingen gjelder nyhetsbrev fra His Kingdom Ministry.</p>
+      </div>
+
+      <div class="content-panel">
+        <div id="form-state">
+          <p class="eyebrow">Nyhetsbrev</p>
+          <h1 id="page-title">Meld deg av nyhetsbrevet</h1>
+          <p class="intro" id="page-intro">
+            Skriv inn e-postadressen du bruker på nyhetsbrevet. Vi sender deg en sikker lenke for å bekrefte avmeldingen.
+          </p>
+
+          <form id="unsubscribe-form" novalidate>
+            <div id="email-field">
+              <label for="email">E-postadresse</label>
+              <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="navn@eksempel.no" required>
+            </div>
+
+            <div class="confirm-address" id="confirm-address" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <rect x="3" y="5" width="18" height="14" rx="3"></rect>
+                <path d="m4 7 8 6 8-6"></path>
+              </svg>
+              <span>
+                <small>E-postadressen som meldes av</small>
+                <strong id="masked-email"></strong>
+              </span>
+            </div>
+
+            <div class="honeypot" aria-hidden="true">
+              <label for="website">Nettside</label>
+              <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+            </div>
+
+            <div class="status-message" id="status-message" role="alert" aria-live="polite"></div>
+
+            <button class="primary-button" id="submit-button" type="submit">
+              <span class="button-spinner" aria-hidden="true"></span>
+              <span id="button-label">Send bekreftelseslenke</span>
+            </button>
+
+            <p class="fine-print" id="fine-print">
+              Av hensyn til sikkerheten sender vi bekreftelsen til adressen du oppgir.
+            </p>
+          </form>
+        </div>
+
+        <div class="success-state" id="success-state" role="status" aria-live="polite">
+          <div class="success-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+              <path d="m5 12 4 4L19 6"></path>
+            </svg>
+          </div>
+          <p class="eyebrow">Ferdig</p>
+          <h1 id="success-title">Du er avmeldt</h1>
+          <p class="intro" id="success-message">
+            E-postadressen din er fjernet fra nyhetsbrevlisten. Du kan melde deg på igjen når som helst.
+          </p>
+          <a class="secondary-link" href="/">
+            Gå til forsiden
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="m9 18 6-6-6-6"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer" id="kontakt">
+    <div class="container">
+      <div class="footer-layout-v2">
+        <div class="footer-left">
+          <div class="footer-brand">
+            <a href="/" class="logo">
+              <div class="logo-icon">
+                <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" loading="lazy">
+              </div>
+              <span class="logo-text">His Kingdom Ministry</span>
+            </a>
+            <p class="brand-description">
+              His Kingdom Ministry er en non-profit organisasjon dedikert til åndelig vekst gjennom undervisning, podcast og reisevirksomhet.
+            </p>
+          </div>
+
+          <div class="footer-nav-grid">
+            <div class="nav-col">
+              <h4>Om oss</h4>
+              <ul>
+                <li><a href="/">Hjem</a></li>
+                <li><a href="/om-oss">Om oss</a></li>
+                <li><a href="/om-oss">Vår visjon</a></li>
+                <li><a href="/kontakt">Kontakt oss</a></li>
+              </ul>
+            </div>
+
+            <div class="nav-col">
+              <h4>Ressurser</h4>
+              <ul>
+                <li><a href="/bibel">Les Bibelen</a></li>
+                <li><a href="/leseplaner">Leseplaner</a></li>
+                <li><a href="/arrangementer">Arrangementer</a></li>
+                <li><a href="/blogg">Nyheter og blogg</a></li>
+                <li><a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer">Butikk</a></li>
+              </ul>
+            </div>
+
+            <div class="nav-col">
+              <h4>Media</h4>
+              <ul>
+                <li><a href="/media">Podcast</a></li>
+                <li><a href="/media">Videoer</a></li>
+                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank" rel="noopener noreferrer">YouTube</a></li>
+                <li><a href="/minside/index.html">Min Side</a></li>
+              </ul>
+            </div>
+
+            <div class="nav-col">
+              <h4>Involvering</h4>
+              <ul>
+                <li><a href="/donasjoner">Gi en gave</a></li>
+                <li><a href="/personvern">Personvern</a></li>
+                <li><a href="/betingelser">Vilkår og betingelser</a></li>
+                <li><a href="/tilgjengelighet">Tilgjengelighet</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-right">
+          <div class="footer-card">
+            <h4>Følg oss</h4>
+            <div class="footer-social-icons">
+              <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="https://www.instagram.com/freedomisathand/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                <i class="fab fa-youtube"></i>
+              </a>
+            </div>
+          </div>
+
+          <div class="footer-card contact-card">
+            <h4>Kontakt oss</h4>
+            <a href="/kontakt" class="btn btn-primary btn-block btn-sm">Kontaktskjema</a>
+            <div class="contact-details">
+              <div class="detail-item">
+                <strong>E-post:</strong>
+                <p>post@hiskingdomministry.no</p>
+              </div>
+              <div class="detail-item">
+                <strong>Telefon:</strong>
+                <p>+47 930 94 615</p>
+              </div>
+              <div class="detail-item">
+                <strong>Vipps:</strong>
+                <p>938361</p>
+              </div>
+              <div class="detail-item">
+                <strong>Konto nr.:</strong>
+                <p>3000.66.08759</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; <span id="copyright-year">2026</span> His Kingdom Ministry. Alle rettigheter reservert.</p>
+        <a href="/admin/login.html" class="admin-link">Admin</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const header = document.getElementById("header");
+      const menuToggle = document.getElementById("menu-toggle");
+      const megaMenu = document.getElementById("mega-menu");
+      const openIcon = menuToggle && menuToggle.querySelector(".open-icon");
+      const closeIcon = menuToggle && menuToggle.querySelector(".close-icon");
+      const copyrightYear = document.getElementById("copyright-year");
+      let closeTimer;
+
+      const setMenuOpen = (open) => {
+        if (!menuToggle || !megaMenu || !header) return;
+        clearTimeout(closeTimer);
+        menuToggle.setAttribute("aria-expanded", String(open));
+        menuToggle.setAttribute("aria-label", open ? "Lukk meny" : "Åpne meny");
+        megaMenu.setAttribute("aria-hidden", String(!open));
+        header.classList.toggle("menu-open", open);
+        document.documentElement.classList.toggle("body-locked", open);
+        document.body.classList.toggle("body-locked", open);
+        if (openIcon) openIcon.classList.toggle("hidden", open);
+        if (closeIcon) closeIcon.classList.toggle("hidden", !open);
+
+        if (open) {
+          megaMenu.style.display = "flex";
+          requestAnimationFrame(() => megaMenu.classList.add("active"));
+        } else {
+          megaMenu.classList.remove("active");
+          closeTimer = window.setTimeout(() => {
+            megaMenu.style.display = "none";
+          }, 300);
+        }
+      };
+
+      if (menuToggle && megaMenu) {
+        menuToggle.addEventListener("click", () => {
+          setMenuOpen(menuToggle.getAttribute("aria-expanded") !== "true");
+        });
+
+        megaMenu.addEventListener("click", (event) => {
+          if (event.target.closest("a")) setMenuOpen(false);
+        });
+
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") setMenuOpen(false);
+        });
+      }
+
+      document.querySelectorAll(".lang-switcher").forEach((switcher) => {
+        const button = switcher.querySelector(".lang-btn");
+        if (!button) return;
+        button.addEventListener("click", (event) => {
+          event.stopPropagation();
+          switcher.classList.toggle("active");
+        });
+      });
+
+      document.addEventListener("click", () => {
+        document.querySelectorAll(".lang-switcher.active").forEach((switcher) => {
+          switcher.classList.remove("active");
+        });
+      });
+
+      const updateHeader = () => {
+        if (header) header.classList.toggle("scrolled", window.scrollY > 16);
+      };
+      updateHeader();
+      window.addEventListener("scroll", updateHeader, { passive: true });
+
+      if (copyrightYear) copyrightYear.textContent = String(new Date().getFullYear());
+    })();
+  </script>
+  <script>
+    (() => {
+      const form = document.getElementById("unsubscribe-form");
+      const formState = document.getElementById("form-state");
+      const successState = document.getElementById("success-state");
+      const emailField = document.getElementById("email-field");
+      const emailInput = document.getElementById("email");
+      const confirmAddress = document.getElementById("confirm-address");
+      const maskedEmail = document.getElementById("masked-email");
+      const pageTitle = document.getElementById("page-title");
+      const pageIntro = document.getElementById("page-intro");
+      const finePrint = document.getElementById("fine-print");
+      const submitButton = document.getElementById("submit-button");
+      const buttonLabel = document.getElementById("button-label");
+      const statusMessage = document.getElementById("status-message");
+      const successTitle = document.getElementById("success-title");
+      const successMessage = document.getElementById("success-message");
+      const params = new URLSearchParams(window.location.search);
+
+      let linkedEmail = String(params.get("email") || "").trim().toLowerCase();
+      let unsubscribeToken = String(params.get("token") || "").trim();
+
+      const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
+
+      const maskEmail = (email) => {
+        const [localPart = "", domain = ""] = String(email || "").split("@");
+        if (!domain) return email;
+        const visible = localPart.slice(0, Math.min(2, localPart.length));
+        return `${visible}${"•".repeat(Math.max(3, localPart.length - visible.length))}@${domain}`;
+      };
+
+      const showError = (message) => {
+        statusMessage.textContent = message;
+        statusMessage.className = "status-message is-visible is-error";
+      };
+
+      const clearError = () => {
+        statusMessage.textContent = "";
+        statusMessage.className = "status-message";
+      };
+
+      const setLoading = (loading) => {
+        submitButton.disabled = loading;
+        submitButton.classList.toggle("is-loading", loading);
+        submitButton.setAttribute("aria-busy", String(loading));
+      };
+
+      const showRequestForm = (prefilledEmail = "") => {
+        unsubscribeToken = "";
+        linkedEmail = "";
+        emailField.hidden = false;
+        confirmAddress.hidden = true;
+        emailInput.required = true;
+        emailInput.value = prefilledEmail;
+        pageTitle.textContent = "Meld deg av nyhetsbrevet";
+        pageIntro.textContent = "Skriv inn e-postadressen du bruker på nyhetsbrevet. Vi sender deg en sikker lenke for å bekrefte avmeldingen.";
+        buttonLabel.textContent = "Send bekreftelseslenke";
+        finePrint.textContent = "Av hensyn til sikkerheten sender vi bekreftelsen til adressen du oppgir.";
+      };
+
+      const showConfirmationForm = () => {
+        emailField.hidden = true;
+        confirmAddress.hidden = false;
+        emailInput.required = false;
+        maskedEmail.textContent = maskEmail(linkedEmail);
+        pageTitle.textContent = "Bekreft avmelding";
+        pageIntro.textContent = "Trykk på knappen under for å slutte å motta nyhetsbrev fra His Kingdom Ministry.";
+        buttonLabel.textContent = "Meld meg av";
+        finePrint.textContent = "Avmeldingen påvirker ikke brukerkontoen din eller andre tjenester.";
+      };
+
+      const showSuccess = (mode) => {
+        formState.hidden = true;
+        successState.classList.add("is-visible");
+
+        if (mode === "confirmation_sent") {
+          successTitle.textContent = "Sjekk innboksen din";
+          successMessage.textContent = "Hvis adressen finnes på nyhetsbrevlisten, har vi sendt en sikker bekreftelseslenke. Sjekk også søppelpost.";
+        } else {
+          successTitle.textContent = "Du er avmeldt";
+          successMessage.textContent = "E-postadressen din er fjernet fra nyhetsbrevlisten. Du kan melde deg på igjen når som helst.";
+        }
+      };
+
+      if (isValidEmail(linkedEmail) && unsubscribeToken) {
+        showConfirmationForm();
+      } else {
+        showRequestForm(isValidEmail(linkedEmail) ? linkedEmail : "");
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        clearError();
+
+        if (document.getElementById("website").value) {
+          showSuccess("confirmation_sent");
+          return;
+        }
+
+        const email = unsubscribeToken
+          ? linkedEmail
+          : String(emailInput.value || "").trim().toLowerCase();
+
+        if (!isValidEmail(email)) {
+          showError("Skriv inn en gyldig e-postadresse.");
+          emailInput.focus();
+          return;
+        }
+
+        setLoading(true);
+
+        try {
+          const response = await fetch("/api/newsletter-unsubscribe", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+            },
+            body: JSON.stringify({
+              email,
+              token: unsubscribeToken || undefined
+            })
+          });
+
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            const error = new Error(data.error || "Kunne ikke behandle avmeldingen akkurat nå.");
+            error.code = data.code || "";
+            throw error;
+          }
+
+          showSuccess(data.mode || (unsubscribeToken ? "unsubscribed" : "confirmation_sent"));
+        } catch (error) {
+          if (error.code === "invalid_unsubscribe_link") {
+            showRequestForm(email);
+          }
+          showError(error.message || "Noe gikk galt. Prøv igjen om litt.");
+        } finally {
+          setLoading(false);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

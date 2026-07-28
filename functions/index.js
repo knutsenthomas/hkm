@@ -1531,6 +1531,133 @@ function escapeHtml(value) {
     .replace(/'/g, "&#39;");
 }
 
+const NEWSLETTER_UNSUBSCRIBE_PAGE = "https://www.hiskingdomministry.no/avmeld";
+const NEWSLETTER_UNSUBSCRIBE_REQUEST_COOLDOWN_MS = 10 * 60 * 1000;
+
+function normalizeNewsletterEmail(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function isValidNewsletterEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeNewsletterEmail(value));
+}
+
+function getNewsletterUnsubscribeSecret() {
+  return getSecretOrEnv(emailPassParam, ["EMAIL_PASS"]);
+}
+
+function createNewsletterUnsubscribeToken(email) {
+  const normalizedEmail = normalizeNewsletterEmail(email);
+  const secret = getNewsletterUnsubscribeSecret();
+  if (!normalizedEmail || !secret) return "";
+
+  return crypto
+    .createHmac("sha256", secret)
+    .update(`newsletter-unsubscribe:v1:${normalizedEmail}`)
+    .digest("base64url");
+}
+
+function isValidNewsletterUnsubscribeToken(email, token) {
+  const expected = createNewsletterUnsubscribeToken(email);
+  const received = String(token || "").trim();
+  if (!expected || !received || expected.length !== received.length) return false;
+
+  try {
+    return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(received));
+  } catch (error) {
+    return false;
+  }
+}
+
+function buildNewsletterUnsubscribeUrl(email) {
+  const normalizedEmail = normalizeNewsletterEmail(email);
+  const token = createNewsletterUnsubscribeToken(normalizedEmail);
+  if (!normalizedEmail || !token) return NEWSLETTER_UNSUBSCRIBE_PAGE;
+
+  const url = new URL(NEWSLETTER_UNSUBSCRIBE_PAGE);
+  url.searchParams.set("email", normalizedEmail);
+  url.searchParams.set("token", token);
+  return url.toString();
+}
+
+function addSignedNewsletterUnsubscribeLink(html, email) {
+  if (typeof html !== "string" || !html.trim()) return html;
+
+  const unsubscribeUrl = escapeHtml(buildNewsletterUnsubscribeUrl(email));
+  let output = html.replace(
+    /href=(["'])https:\/\/(?:www\.)?hiskingdomministry\.no\/avmeld(?:\?[^"']*)?\1/gi,
+    (_match, quote) => `href=${quote}${unsubscribeUrl}${quote}`
+  );
+
+  // Older confirmation templates pointed the unsubscribe label to /minside.
+  output = output.replace(
+    /(<a\b[^>]*\bhref=(["']))[^"']*(\2[^>]*>\s*(?:Avregistrer nyhetsbrev|Meld deg av nyhetsbrev)\s*<\/a>)/gi,
+    (_match, prefix, _quote, suffix) => `${prefix}${unsubscribeUrl}${suffix}`
+  );
+
+  return output;
+}
+
+async function findNewsletterSubscriberReferences(email) {
+  const normalizedEmail = normalizeNewsletterEmail(email);
+  const collectionNames = [
+    "newsletter_subscriptions",
+    "contacts",
+    "users",
+  ];
+  const queries = [
+    ["newsletter_subscriptions", "email"],
+    ["newsletter_subscriptions", "emailLower"],
+    ["contacts", "email"],
+    ["contacts", "emailLower"],
+    ["users", "email"],
+    ["users", "emailLower"],
+  ];
+  const references = new Map();
+
+  await Promise.all(queries.map(async ([collectionName, fieldName]) => {
+    const snapshot = await db.collection(collectionName)
+      .where(fieldName, "==", normalizedEmail)
+      .limit(100)
+      .get();
+
+    snapshot.forEach((document) => {
+      references.set(document.ref.path, {
+        ref: document.ref,
+        collectionName,
+      });
+    });
+  }));
+
+  // Older records may contain capital letters and have no emailLower field.
+  // Only scan collections that did not produce an exact normalized match.
+  const matchedCollections = new Set(
+    Array.from(references.values()).map(({collectionName}) => collectionName)
+  );
+  const fallbackCollections = collectionNames.filter(
+    (collectionName) => !matchedCollections.has(collectionName)
+  );
+
+  await Promise.all(fallbackCollections.map(async (collectionName) => {
+    const snapshot = await db.collection(collectionName)
+      .select("email")
+      .limit(2000)
+      .get();
+
+    snapshot.forEach((document) => {
+      const storedEmail = normalizeNewsletterEmail(document.data().email);
+      if (storedEmail !== normalizedEmail) return;
+
+      references.set(document.ref.path, {
+        ref: document.ref,
+        collectionName,
+      });
+    });
+  }));
+
+  return Array.from(references.values());
+}
+
 function plainTextToHtml(value) {
   if (typeof value !== "string") return "";
   const text = value.trim();
@@ -4843,7 +4970,7 @@ exports.onNewsletterSubscribe = onDocumentCreated({
       <a href="mailto:kontakt@hiskingdomministry.no" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Kontakt</a>
     </div>
     <p style="font-family: 'Inter', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(18, 28, 44, 0.4); margin: 0 0 12px 0;">© 2026 His Kingdom Ministry</p>
-    <a href="https://www.hiskingdomministry.no/minside" style="font-family: 'Inter', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: #1B4965; text-decoration: underline; text-underline-offset: 4px; font-weight: 600;">
+    <a href="https://www.hiskingdomministry.no/avmeld" style="font-family: 'Inter', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: #1B4965; text-decoration: underline; text-underline-offset: 4px; font-weight: 600;">
       Avregistrer nyhetsbrev
     </a>
   </footer>
@@ -4854,23 +4981,28 @@ exports.onNewsletterSubscribe = onDocumentCreated({
   const subject = template.subject.replace("{{email}}", email);
   const htmlBody = template.body.replace("{{email}}", email);
 
-  const html = (htmlBody.includes('FCF9F5') || htmlBody.includes('hkm-email-container'))
+  const html = addSignedNewsletterUnsubscribeLink(
+    (htmlBody.includes('FCF9F5') || htmlBody.includes('hkm-email-container'))
     ? htmlBody
     : `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px;">
         ${htmlBody}
         <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
-          Du kan melde deg av når som helst ved å svare på denne e-posten.
+          <a href="${NEWSLETTER_UNSUBSCRIBE_PAGE}" style="color: #d17d39;">Meld deg av nyhetsbrevet</a>
         </div>
       </div>
-    `;
+    `,
+    email
+  );
+
+  const unsubscribeUrl = buildNewsletterUnsubscribeUrl(email);
 
   try {
     const ok = await sendEmail({
       to: email,
       subject,
       html,
-      text: `Takk for at du meldte deg på nyhetsbrevet vårt!`
+      text: `Takk for at du meldte deg på nyhetsbrevet vårt!\n\nMeld deg av: ${unsubscribeUrl}`
     });
     if (ok) {
       console.log(`Nyhetsbrev-bekreftelse sendt til ${email}`);
@@ -4879,6 +5011,156 @@ exports.onNewsletterSubscribe = onDocumentCreated({
     }
   } catch (error) {
     console.error("Feil ved sending av nyhetsbrev-bekreftelse:", error);
+  }
+});
+
+/**
+ * Public endpoint for secure newsletter unsubscribe confirmation.
+ *
+ * A bare email request sends a signed confirmation link. The signed request
+ * marks matching newsletter records as unsubscribed without deleting CRM data.
+ */
+exports.unsubscribeNewsletter = onRequest({
+  cors: true,
+  secrets: [emailUserParam, emailPassParam],
+}, async (req, res) => {
+  res.set("Cache-Control", "no-store");
+
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+
+  if (req.method !== "POST") {
+    res.status(405).send({error: "Metoden støttes ikke."});
+    return;
+  }
+
+  try {
+    const body = req.body && typeof req.body === "object" ? req.body : {};
+    const email = normalizeNewsletterEmail(body.email);
+    const token = String(body.token || "").trim();
+
+    if (!isValidNewsletterEmail(email)) {
+      res.status(400).send({error: "Skriv inn en gyldig e-postadresse."});
+      return;
+    }
+
+    if (token) {
+      if (!isValidNewsletterUnsubscribeToken(email, token)) {
+        res.status(400).send({
+          error: "Avmeldingslenken er ugyldig. Be om en ny bekreftelseslenke.",
+          code: "invalid_unsubscribe_link",
+        });
+        return;
+      }
+
+      const subscriberReferences = await findNewsletterSubscriberReferences(email);
+      const unsubscribedAt = FieldValue.serverTimestamp();
+
+      for (let offset = 0; offset < subscriberReferences.length; offset += 400) {
+        const batch = db.batch();
+        subscriberReferences.slice(offset, offset + 400).forEach(({ref, collectionName}) => {
+          if (collectionName === "newsletter_subscriptions") {
+            batch.set(ref, {
+              status: "unsubscribed",
+              isSubscribed: false,
+              unsubscribedAt,
+              unsubscribeSource: "email_link",
+            }, {merge: true});
+          } else {
+            batch.set(ref, {
+              newsletterStatus: "unsubscribed",
+              newsletterUnsubscribed: true,
+              newsletterUnsubscribedAt: unsubscribedAt,
+              newsletterUnsubscribeSource: "email_link",
+            }, {merge: true});
+          }
+        });
+        await batch.commit();
+      }
+
+      await db.collection("newsletter_unsubscribe_events").add({
+        emailHash: crypto.createHash("sha256").update(email).digest("hex"),
+        matchedRecords: subscriberReferences.length,
+        createdAt: FieldValue.serverTimestamp(),
+      });
+
+      res.status(200).send({
+        success: true,
+        mode: "unsubscribed",
+      });
+      return;
+    }
+
+    // Do not reveal whether the address exists in the database.
+    const requestId = crypto.createHash("sha256").update(email).digest("hex");
+    const requestRef = db.collection("newsletter_unsubscribe_requests").doc(requestId);
+    const shouldSendConfirmation = await db.runTransaction(async (transaction) => {
+      const requestSnapshot = await transaction.get(requestRef);
+      const requestedAt = requestSnapshot.exists ? requestSnapshot.data().requestedAt : null;
+      const previousRequestMs = requestedAt && typeof requestedAt.toMillis === "function"
+        ? requestedAt.toMillis()
+        : 0;
+
+      if (previousRequestMs && Date.now() - previousRequestMs < NEWSLETTER_UNSUBSCRIBE_REQUEST_COOLDOWN_MS) {
+        return false;
+      }
+
+      transaction.set(requestRef, {
+        emailHash: requestId,
+        requestedAt: FieldValue.serverTimestamp(),
+      }, {merge: true});
+      return true;
+    });
+
+    if (shouldSendConfirmation) {
+      const subscriberReferences = await findNewsletterSubscriberReferences(email);
+      if (subscriberReferences.length > 0) {
+        const unsubscribeUrl = buildNewsletterUnsubscribeUrl(email);
+        const escapedUnsubscribeUrl = escapeHtml(unsubscribeUrl);
+        const confirmationHtml = `
+          <div style="font-family: Inter, Arial, sans-serif; max-width: 560px; margin: 0 auto; background: #fcf9f5; border: 1px solid #e8dfd5; border-radius: 20px; overflow: hidden;">
+            <div style="height: 5px; background: linear-gradient(90deg, #1b4965, #d17d39);"></div>
+            <div style="padding: 38px 34px;">
+              <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" alt="His Kingdom Ministry" width="58" style="display: block; width: 58px; height: auto; margin: 0 0 24px;">
+              <h1 style="margin: 0 0 14px; color: #17243a; font-family: Georgia, serif; font-size: 30px; line-height: 1.2;">Bekreft avmelding</h1>
+              <p style="margin: 0 0 28px; color: #526078; font-size: 16px; line-height: 1.7;">
+                Vi mottok en forespørsel om å melde denne adressen av nyhetsbrevet. Trykk på knappen under for å bekrefte.
+              </p>
+              <a href="${escapedUnsubscribeUrl}" style="display: inline-block; padding: 14px 24px; border-radius: 12px; background: #c85d2b; color: #ffffff; font-size: 15px; font-weight: 700; text-decoration: none;">
+                Fortsett til avmelding
+              </a>
+              <p style="margin: 28px 0 0; color: #7a8495; font-size: 13px; line-height: 1.6;">
+                Hvis du ikke ba om dette, kan du se bort fra e-posten.
+              </p>
+            </div>
+          </div>
+        `;
+
+        const sent = await sendEmail({
+          to: email,
+          subject: "Bekreft avmelding fra nyhetsbrevet",
+          html: confirmationHtml,
+          text: `Bekreft avmelding fra nyhetsbrevet: ${unsubscribeUrl}`,
+          type: "newsletter_unsubscribe_confirmation",
+        });
+
+        if (!sent) {
+          throw new Error("Kunne ikke sende avmeldingsbekreftelsen.");
+        }
+      }
+    }
+
+    res.status(200).send({
+      success: true,
+      mode: "confirmation_sent",
+    });
+  } catch (error) {
+    console.error("Feil ved avmelding fra nyhetsbrev:", error);
+    res.status(500).send({
+      error: "Kunne ikke behandle avmeldingen akkurat nå. Prøv igjen om litt.",
+    });
   }
 });
 
@@ -4904,8 +5186,21 @@ exports.sendManualEmail = onRequest({ cors: true, secrets: [emailUserParam, emai
       }
 
       let html = "";
+      let text = message || "";
       if (rawHtml) {
         html = rawHtml;
+
+        const recipients = normalizeEmailList(to)
+          .split(",")
+          .map((item) => normalizeNewsletterEmail(item))
+          .filter(Boolean);
+        const containsUnsubscribeLink = /hiskingdomministry\.no\/avmeld/i.test(html);
+
+        if (containsUnsubscribeLink && recipients.length === 1 && isValidNewsletterEmail(recipients[0])) {
+          const unsubscribeUrl = buildNewsletterUnsubscribeUrl(recipients[0]);
+          html = addSignedNewsletterUnsubscribeLink(html, recipients[0]);
+          text = `${text ? `${text}\n\n` : ""}Meld deg av nyhetsbrevet: ${unsubscribeUrl}`;
+        }
       } else {
         html = `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
@@ -4920,7 +5215,7 @@ exports.sendManualEmail = onRequest({ cors: true, secrets: [emailUserParam, emai
         `;
       }
 
-      const success = await sendEmail({ to, subject, html, text: message || "", fromName });
+      const success = await sendEmail({ to, subject, html, text, fromName });
 
       if (success) {
         res.status(200).send({ success: true });
@@ -8659,4 +8954,3 @@ exports.onCourseEnrollmentCreated = onDocumentCreated({
     console.error("Feil ved sending av kurs-bekreftelse:", error);
   }
 });
-

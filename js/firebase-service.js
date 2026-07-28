@@ -1019,8 +1019,10 @@ class FirebaseService {
 
     async subscribeNewsletter(email) {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
+        const normalizedEmail = String(email || '').trim().toLowerCase();
         return this.db.collection('newsletter_subscriptions').add({
-            email: email,
+            email: normalizedEmail,
+            emailLower: normalizedEmail,
             subscribedAt: firebase.firestore.FieldValue.serverTimestamp(),
             source: 'website_footer'
         });
