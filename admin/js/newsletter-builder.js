@@ -4024,40 +4024,6 @@ class NewsletterBuilder {
         });
     }
 
-    selectBlock(node) {
-        if (this.activeBlockNode === node) return;
-
-        console.log('[HKM Inspector] selectBlock triggered for element:', node);
-
-        // Clear previous active block highlight
-        this.deselectBlock();
-
-        this.activeBlockNode = node;
-        this.activeBlockNode.classList.add('selected-block-active');
-        this.attachBlockQuickToolbar(node);
-
-        // Hide floating top toolbar to make it look exactly like Wix
-        const topToolbar = document.getElementById('desktop-richtools');
-        if (topToolbar) {
-            topToolbar.style.setProperty('display', 'none', 'important');
-        }
-
-        // Determine block type
-        const img = node.querySelector('img') || (node.tagName === 'IMG' ? node : null);
-        const btn = node.querySelector('.block-btn') || (node.classList.contains('block-btn') ? node : null);
-        
-        if (img) {
-            console.log('[HKM Inspector] Loading IMAGE inspector');
-            this.showImageInspector(img, node);
-        } else if (btn) {
-            console.log('[HKM Inspector] Loading BUTTON inspector');
-            this.showButtonInspector(btn, node);
-        } else {
-            console.log('[HKM Inspector] Loading TEXT inspector');
-            this.showTextInspector(node);
-        }
-    }
-
     showTextInspector(node) {
         const defaultView = document.getElementById('sidebar-default-view');
         const inspectorView = document.getElementById('sidebar-inspector-view');

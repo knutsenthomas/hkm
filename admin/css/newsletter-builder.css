@@ -5961,12 +5961,18 @@ body.builder-active.sidebar-collapsed .sidebar {
 .blocks-container h1,
 .blocks-container h2,
 .blocks-container h3,
-.blocks-container h4,
+.blocks-container h4 {
+    background-color: transparent;
+}
+
 /* --- BULLETPROOF NEWSLETTER BLOCKQUOTES & SITATER --- */
 .blocks-container blockquote,
 #blocks-container blockquote,
 .docs-rte-surface blockquote,
-blockquote {
+blockquote,
+.block-quote,
+.quote-block,
+.sitat {
     border-left: 4px solid #d17d39 !important;
     padding: 10px 16px 10px 20px !important;
     margin: 20px 0 !important;
