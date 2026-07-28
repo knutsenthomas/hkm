@@ -466,7 +466,7 @@ class NewsletterBuilder {
         this.hoverPreviewTimeout = null;
 
         // Block Tool Clicks, Drag and Drop, & Hover Previews Setup
-        document.querySelectorAll('.element-card').forEach(btn => {
+        document.querySelectorAll('.element-card, .block-card-item').forEach(btn => {
             btn.setAttribute('draggable', 'true');
             btn.addEventListener('dragstart', (e) => {
                 this.isDragging = true;
@@ -482,34 +482,22 @@ class NewsletterBuilder {
             btn.addEventListener('mousedown', () => {
                 this.saveSelection();
             });
-        });
-
-        // Delegated click listener to catch clicks on any block cards or inner labels/icons
-        document.addEventListener('click', (e) => {
-            const card = e.target.closest('.element-card, .block-card-item');
-            if (!card) {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const type = btn.dataset.type || btn.getAttribute('data-type');
                 this.hideElementHoverPreview();
-                return;
-            }
-
-            const type = card.dataset.type || card.getAttribute('data-type');
-            if (!type) return;
-
-            e.preventDefault();
-            e.stopPropagation();
-            this.hideElementHoverPreview();
-
-            if (type === 'ai_text') {
-                this.showAiTextPrompt();
-            } else if (type === 'ai_image') {
-                this.showAiImagePrompt();
-            } else {
-                this.addBlock(type);
-            }
-
-            if (this.isMobileViewport()) {
-                this.closeToolsUi();
-            }
+                if (type === 'ai_text') {
+                    this.showAiTextPrompt();
+                } else if (type === 'ai_image') {
+                    this.showAiImagePrompt();
+                } else if (type) {
+                    this.addBlock(type);
+                }
+                if (this.isMobileViewport()) {
+                    this.closeToolsUi();
+                }
+            });
         });
 
         // Global listeners to clean up sticky hover previews in all edge cases
