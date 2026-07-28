@@ -757,123 +757,162 @@ class NewsletterBuilder {
                 }
             });
 
-            // Prevent accidental deletion of product or event cards via backspace or delete key
+            // Keyboard handling for Enter, Backspace & Delete (Mac WebKit & Blink compatible)
             container.addEventListener('keydown', (e) => {
+                const selection = window.getSelection();
+                if (!selection || !selection.rangeCount) return;
+                const range = selection.getRangeAt(0);
+
+                let parentBlock = selection.anchorNode;
+                while (parentBlock && parentBlock.parentNode !== container) {
+                    parentBlock = parentBlock.parentNode;
+                }
+
+                if (!parentBlock) return;
+
                 if (e.key === 'Enter') {
-                    // Let the browser handle standard line break/paragraph insertion naturally
+                    // If inside heading (H1, H2, H3), pressing Enter at the end should insert a standard paragraph <p>
+                    if (/^H[1-6]$/i.test(parentBlock.tagName)) {
+                        const isAtEnd = range.collapsed && (
+                            range.startContainer === parentBlock ||
+                            (range.startContainer.nodeType === Node.TEXT_NODE && range.startOffset === range.startContainer.length)
+                        );
+                        if (isAtEnd) {
+                            e.preventDefault();
+                            const newP = document.createElement('p');
+                            newP.innerHTML = '<br>';
+                            if (parentBlock.nextSibling) {
+                                container.insertBefore(newP, parentBlock.nextSibling);
+                            } else {
+                                container.appendChild(newP);
+                            }
+                            const newRange = document.createRange();
+                            newRange.selectNodeContents(newP);
+                            newRange.collapse(true);
+                            selection.removeAllRanges();
+                            selection.addRange(newRange);
+                            newP.focus();
+                            this.syncUnifiedBlocks();
+                            this.triggerAutosave();
+                            return;
+                        }
+                    }
+
                     setTimeout(() => {
                         this.syncUnifiedBlocks();
                         this.triggerAutosave();
                     }, 0);
                     return;
                 }
+
                 if (e.key === 'Backspace') {
-                    const selection = window.getSelection();
-                    if (!selection.rangeCount) return;
-                    
-                    const range = selection.getRangeAt(0);
-                    
-                    // If cursor is at the start of a paragraph or node
-                    if (range.collapsed && range.startOffset === 0) {
-                        let parentBlock = selection.anchorNode;
-                        while (parentBlock && parentBlock.parentNode !== container) {
-                            parentBlock = parentBlock.parentNode;
-                        }
-                        
-                        if (parentBlock) {
-                            const prevSibling = parentBlock.previousSibling;
-                            
-                            // Check if the previous element is a product card or event card
-                            if (prevSibling && prevSibling.classList && (prevSibling.classList.contains('newsletter-product-card') || prevSibling.classList.contains('newsletter-event-card'))) {
-                                // Block default browser action so it doesn't delete the card
-                                e.preventDefault();
-                                
-                                const isCurrentBlockEmpty = parentBlock.textContent.trim() === '' && !parentBlock.querySelector('img, iframe, table, button, hr, .newsletter-product-card, .newsletter-event-card');
-                                if (isCurrentBlockEmpty) {
-                                    const prevPrevSibling = prevSibling.previousSibling;
-                                    if (prevPrevSibling && prevPrevSibling.nodeType === Node.ELEMENT_NODE) {
-                                        const range = document.createRange();
-                                        const sel = window.getSelection();
-                                        range.selectNodeContents(prevPrevSibling);
-                                        range.collapse(false);
-                                        sel.removeAllRanges();
-                                        sel.addRange(range);
-                                        if (prevPrevSibling.focus) prevPrevSibling.focus();
-                                    } else {
-                                        const newP = document.createElement('p');
-                                        newP.innerHTML = '<br>';
-                                        container.insertBefore(newP, prevSibling);
-                                        const range = document.createRange();
-                                        const sel = window.getSelection();
-                                        range.selectNodeContents(newP);
-                                        range.collapse(true);
-                                        sel.removeAllRanges();
-                                        sel.addRange(range);
-                                        newP.focus();
-                                    }
-                                    
-                                    parentBlock.remove();
-                                    this.syncUnifiedBlocks();
-                                    this.triggerAutosave();
+                    const isCurrentEmpty = !parentBlock.textContent.replace(/\u8203|\u200B/g, '').trim() &&
+                        !parentBlock.querySelector('img, iframe, table, button, hr, .newsletter-product-card, .newsletter-event-card, .newsletter-video-block');
+
+                    // Check if cursor is at the very beginning of the block
+                    let isAtStart = false;
+                    if (range.collapsed) {
+                        if (isCurrentEmpty) {
+                            isAtStart = true;
+                        } else if (range.startOffset === 0) {
+                            let node = range.startContainer;
+                            isAtStart = true;
+                            while (node && node !== parentBlock) {
+                                if (node.previousSibling) {
+                                    isAtStart = false;
+                                    break;
                                 }
-                                return;
+                                node = node.parentNode;
                             }
+                        }
+                    }
+
+                    if (isAtStart || isCurrentEmpty) {
+                        const prevSibling = parentBlock.previousSibling;
+                        if (!prevSibling) return;
+
+                        // If previous sibling is a card, protect card from deletion
+                        if (prevSibling.classList && (
+                            prevSibling.classList.contains('newsletter-product-card') ||
+                            prevSibling.classList.contains('newsletter-event-card') ||
+                            prevSibling.classList.contains('newsletter-video-block') ||
+                            prevSibling.classList.contains('newsletter-html-block')
+                        )) {
+                            if (isCurrentEmpty && container.children.length > 1) {
+                                e.preventDefault();
+                                parentBlock.remove();
+                                this.syncUnifiedBlocks();
+                                this.triggerAutosave();
+                            } else {
+                                e.preventDefault();
+                            }
+                            return;
+                        }
+
+                        // Normal text block backspace (remove empty line or merge text)
+                        if (isCurrentEmpty) {
+                            e.preventDefault();
+                            const newRange = document.createRange();
+                            newRange.selectNodeContents(prevSibling);
+                            newRange.collapse(false);
+                            selection.removeAllRanges();
+                            selection.addRange(newRange);
+                            if (prevSibling.focus) prevSibling.focus();
+
+                            parentBlock.remove();
+                            this.syncUnifiedBlocks();
+                            this.triggerAutosave();
+                            return;
+                        } else if (isAtStart && prevSibling.nodeType === Node.ELEMENT_NODE) {
+                            // Merge current block content into previous sibling
+                            e.preventDefault();
+                            const caretMarker = document.createElement('span');
+                            caretMarker.id = 'hkm-caret-merge-marker';
+                            
+                            if (prevSibling.innerHTML.endsWith('<br>')) {
+                                prevSibling.innerHTML = prevSibling.innerHTML.slice(0, -4);
+                            }
+                            
+                            prevSibling.appendChild(caretMarker);
+                            while (parentBlock.firstChild) {
+                                prevSibling.appendChild(parentBlock.firstChild);
+                            }
+
+                            const newRange = document.createRange();
+                            newRange.selectNodeContents(caretMarker);
+                            newRange.collapse(true);
+                            selection.removeAllRanges();
+                            selection.addRange(newRange);
+                            caretMarker.remove();
+                            if (prevSibling.focus) prevSibling.focus();
+
+                            parentBlock.remove();
+                            this.syncUnifiedBlocks();
+                            this.triggerAutosave();
+                            return;
                         }
                     }
                 } else if (e.key === 'Delete') {
-                    const selection = window.getSelection();
-                    if (!selection.rangeCount) return;
-                    
-                    const range = selection.getRangeAt(0);
-                    
-                    let parentBlock = selection.anchorNode;
-                    while (parentBlock && parentBlock.parentNode !== container) {
-                        parentBlock = parentBlock.parentNode;
-                    }
-                    
-                    if (parentBlock) {
-                        const nextSibling = parentBlock.nextSibling;
-                        
-                        if (nextSibling && nextSibling.classList && (nextSibling.classList.contains('newsletter-product-card') || nextSibling.classList.contains('newsletter-event-card'))) {
-                            // Check if cursor is at the end of the text
-                            const isAtEnd = range.collapsed && 
-                                (range.startContainer === parentBlock || 
-                                 (range.startContainer.nodeType === Node.TEXT_NODE && range.startOffset === range.startContainer.length));
-                            
-                            if (isAtEnd) {
-                                // Block default browser action so it doesn't delete the card
-                                e.preventDefault();
+                    const isCurrentEmpty = !parentBlock.textContent.replace(/\u8203|\u200B/g, '').trim() &&
+                        !parentBlock.querySelector('img, iframe, table, button, hr, .newsletter-product-card, .newsletter-event-card, .newsletter-video-block');
 
-                                const isCurrentBlockEmpty = parentBlock.textContent.trim() === '' && !parentBlock.querySelector('img, iframe, table, button, hr, .newsletter-product-card, .newsletter-event-card');
-                                if (isCurrentBlockEmpty) {
-                                    const nextNextSibling = nextSibling.nextSibling;
-                                    if (nextNextSibling && nextNextSibling.nodeType === Node.ELEMENT_NODE) {
-                                        const range = document.createRange();
-                                        const sel = window.getSelection();
-                                        range.selectNodeContents(nextNextSibling);
-                                        range.collapse(true);
-                                        sel.removeAllRanges();
-                                        sel.addRange(range);
-                                        if (nextNextSibling.focus) nextNextSibling.focus();
-                                    } else {
-                                        const newP = document.createElement('p');
-                                        newP.innerHTML = '<br>';
-                                        container.appendChild(newP);
-                                        const range = document.createRange();
-                                        const sel = window.getSelection();
-                                        range.selectNodeContents(newP);
-                                        range.collapse(true);
-                                        sel.removeAllRanges();
-                                        sel.addRange(range);
-                                        newP.focus();
-                                    }
-                                    
-                                    parentBlock.remove();
-                                    this.syncUnifiedBlocks();
-                                    this.triggerAutosave();
-                                }
-                                return;
+                    const nextSibling = parentBlock.nextSibling;
+                    if (nextSibling && nextSibling.classList && (
+                        nextSibling.classList.contains('newsletter-product-card') ||
+                        nextSibling.classList.contains('newsletter-event-card')
+                    )) {
+                        const isAtEnd = range.collapsed && (
+                            range.startContainer === parentBlock ||
+                            (range.startContainer.nodeType === Node.TEXT_NODE && range.startOffset === range.startContainer.length)
+                        );
+                        if (isAtEnd) {
+                            e.preventDefault();
+                            if (isCurrentEmpty && container.children.length > 1) {
+                                parentBlock.remove();
+                                this.syncUnifiedBlocks();
+                                this.triggerAutosave();
                             }
+                            return;
                         }
                     }
                 }
