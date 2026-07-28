@@ -8446,7 +8446,8 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                 blockCount: this.blocks.length,
                 blocks: this.blocks,
                 html: textContent,
-                status: 'sent',
+                status: 'pending',
+                englishPayload: this.englishPayload || null,
                 sentAt: new Date().toISOString(),
                 sentBy: (window.firebaseService?.auth?.currentUser?.email) || 'admin@hiskingdomministry.no'
             };
@@ -11057,21 +11058,32 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             // Load sent newsletter campaigns
             let campaignItems = [];
             try {
-                const campaignSnap = await this.safeGet(window.firebaseService.db.collection('newsletter_campaigns').orderBy('sentAt', 'desc').limit(15), 8000);
-                campaignSnap.forEach(doc => {
-                    const data = doc.data();
-                    campaignItems.push({
-                        id: doc.id,
-                        title: data.subject || data.name || 'Sendt Nyhetsbrev',
-                        date: data.sentAt || data.createdAt || '',
-                        type: 'newsletter',
-                        author: data.senderName || 'HKM Studio',
-                        excerpt: `Sendt til ${data.recipientCount || 0} mottakere. Klikk for å se eller gjenbruke som mal.`,
-                        coverImage: 'https://images.unsplash.com/photo-1557200134-90327ee9fafa?auto=format&fit=crop&w=400&q=80',
-                        blocks: data.blocks || [],
-                        subject: data.subject || ''
+                let campaignSnap;
+                try {
+                    campaignSnap = await this.safeGet(window.firebaseService.db.collection('newsletter_campaigns').orderBy('sentAt', 'desc').limit(15), 5000);
+                } catch (idxErr) {
+                    campaignSnap = await this.safeGet(window.firebaseService.db.collection('newsletter_campaigns').limit(30), 5000);
+                }
+                const rawCampaigns = [];
+                if (campaignSnap) {
+                    campaignSnap.forEach(doc => {
+                        const data = doc.data();
+                        rawCampaigns.push({
+                            id: doc.id,
+                            title: data.subject || data.name || 'Sendt Nyhetsbrev',
+                            date: data.sentAt || data.createdAt || '',
+                            type: 'newsletter',
+                            author: data.sentBy || data.senderName || 'HKM Studio',
+                            excerpt: `Sendt til ${data.recipientCount || 0} mottakere. Klikk for å se eller gjenbruke som mal.`,
+                            coverImage: 'https://images.unsplash.com/photo-1557200134-90327ee9fafa?auto=format&fit=crop&w=400&q=80',
+                            blocks: data.blocks || [],
+                            subject: data.subject || '',
+                            rawDate: data.sentAt || data.createdAt || ''
+                        });
                     });
-                });
+                }
+                rawCampaigns.sort((a, b) => new Date(b.rawDate || 0) - new Date(a.rawDate || 0));
+                campaignItems = rawCampaigns;
             } catch (e) {
                 console.error("Studio Feed - Failed to load campaigns:", e);
             }
