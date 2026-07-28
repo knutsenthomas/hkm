@@ -219,15 +219,14 @@ class NewsletterBuilder {
 
         const urlParams = new URLSearchParams(window.location.search);
         const urlDraftId = urlParams.get('draftId');
-        let savedMode = 'dashboard';
-        let savedView = 'builder';
-        try {
-            savedMode = localStorage.getItem('hkm_builder_active_mode') || 'dashboard';
-            savedView = localStorage.getItem('hkm_builder_active_view') || 'builder';
-        } catch(e) {}
 
-        if (urlDraftId || savedMode === 'builder' || savedMode === 'campaigns') {
+        // Only open editor mode if draftId is explicitly present in URL (e.g. ?draftId=xxx or ?draftId=new)
+        if (urlDraftId) {
             this.toggleMode('builder');
+            let savedView = 'builder';
+            try {
+                savedView = localStorage.getItem('hkm_builder_active_view') || 'builder';
+            } catch(e) {}
             if (savedView) {
                 this.switchSidebarView(savedView);
             }
@@ -7417,6 +7416,7 @@ ${cleanCanvasHtml}
         const mainHeader = document.getElementById('dashboard-main-header');
         
         if (mode === 'builder') {
+            try { localStorage.setItem('hkm_builder_active_mode', 'builder'); } catch(e) {}
             if (dashboard) dashboard.style.display = 'none';
             if (builder) builder.style.display = 'block';
             if (mainHeader) mainHeader.style.setProperty('display', 'none', 'important');
@@ -7431,6 +7431,7 @@ ${cleanCanvasHtml}
             }
             window.history.replaceState({}, '', url.toString());
         } else {
+            try { localStorage.removeItem('hkm_builder_active_mode'); } catch(e) {}
             if (dashboard) dashboard.style.display = 'block';
             if (builder) builder.style.display = 'none';
             if (mainHeader) {
