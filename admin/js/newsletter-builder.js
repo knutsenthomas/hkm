@@ -8436,6 +8436,9 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             const idToken = await this.getAuthIdToken();
             const fullHtml = this.compileEmailHtml(this.currentEditorLang || 'no');
 
+            const timeStr = new Date().toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' });
+            const testSubject = subject ? `${subject} (Prøveutgave ${timeStr})` : `Prøveutgave av nyhetsbrev (${timeStr})`;
+
             const response = await fetch('https://sendmanualemail-42bhgdjkcq-uc.a.run.app', {
                 method: 'POST',
                 headers: { 
@@ -8444,7 +8447,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                 },
                 body: JSON.stringify({
                     to: recipientEmail,
-                    subject: subject ? `${subject} (Prøveutgave)` : 'Prøveutgave av nyhetsbrev',
+                    subject: testSubject,
                     html: fullHtml,
                     message: plainText.substring(0, 500),
                     fromName: 'His Kingdom Ministry'
