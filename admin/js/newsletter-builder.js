@@ -2408,16 +2408,37 @@ class NewsletterBuilder {
             let combinedHtml = '';
             selectedProductsMap.forEach((p) => {
                 const productId = p.id || p._id || '';
-                const productUrl = p.productPageUrl || p.url || (productId ? `https://hiskingdomdesigns.no/product/${productId}` : 'https://hiskingdomdesigns.no/produkter');
+                const rawUrl = p.productPageUrl || p.url || '';
+                let slug = p.slug || '';
+                if (!slug && rawUrl) {
+                    const parts = rawUrl.split('/product-page/');
+                    if (parts.length > 1) {
+                        slug = parts[1].split('?')[0];
+                    } else {
+                        slug = rawUrl.split('/').pop().split('?')[0];
+                    }
+                }
+                if (!slug && p.name) {
+                    slug = p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                }
+
+                const productUrl = (rawUrl && rawUrl.startsWith('http')) 
+                    ? rawUrl 
+                    : (slug ? `https://www.hiskingdomdesigns.no/product-page/${slug}` : 'https://www.hiskingdomdesigns.no/produkter');
+                
                 const image = p.imageUrl || '';
                 combinedHtml += `
-                    <div class="newsletter-product-card" contenteditable="false" data-product-id="${productId}">
+                    <div class="newsletter-product-card" contenteditable="false" data-product-id="${productId}" data-product-slug="${slug}">
                         <button class="card-delete-btn" title="Slett produkt">×</button>
                         <div class="product-img-wrap">
-                            <img src="${image || 'https://hiskingdomdesigns.no/placeholder.png'}" alt="${escapeHtml(p.name)}" />
+                            <a href="${productUrl}" target="_blank" style="text-decoration: none; display: block;">
+                                <img src="${image || 'https://hiskingdomdesigns.no/placeholder.png'}" alt="${escapeHtml(p.name)}" />
+                            </a>
                         </div>
                         <div class="product-info">
-                            <h4 class="product-title">${escapeHtml(p.name)}</h4>
+                            <h4 class="product-title">
+                                <a href="${productUrl}" target="_blank" style="color: inherit; text-decoration: none;">${escapeHtml(p.name)}</a>
+                            </h4>
                             <span class="product-price">kr ${p.price || 'N/A'},-</span>
                             <div style="margin-top: 4px;">
                                 <a href="${productUrl}" target="_blank" class="product-cta-btn">Se produkt</a>
@@ -6043,21 +6064,29 @@ class NewsletterBuilder {
             const priceEl = card.querySelector('.product-price');
             const price = priceEl ? priceEl.innerText.trim() : '';
             const productId = card.dataset.productId || '';
+            let slug = card.dataset.productSlug || '';
             const linkEl = card.querySelector('.product-cta-btn') || card.querySelector('a');
             let linkHref = linkEl ? linkEl.getAttribute('href') : '';
 
-            // Clean up legacy/broken product links (e.g. /product-page/generated-slug)
-            if (!linkHref || linkHref === '#' || linkHref.includes('/product-page/')) {
-                if (productId) {
-                    linkHref = `https://hiskingdomdesigns.no/product/${productId}`;
-                } else {
-                    // Search product cache by title match
+            // Ensure linkHref points to specific product page https://www.hiskingdomdesigns.no/product-page/{slug}
+            if (!linkHref || linkHref === '#' || linkHref.includes('/product/') || linkHref.endsWith('/produkter')) {
+                if (!slug && title) {
                     const found = (window.hkmWixProductsCache || []).find(p => (p.name || '').trim().toLowerCase() === title.toLowerCase());
-                    if (found && found.id) {
-                        linkHref = `https://hiskingdomdesigns.no/product/${found.id}`;
-                    } else {
-                        linkHref = `https://hiskingdomdesigns.no/produkter`;
+                    if (found) {
+                        slug = found.slug || (found.productPageUrl ? found.productPageUrl.split('/product-page/').pop().split('?')[0] : '');
                     }
+                    if (!slug) {
+                        slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                    }
+                }
+                if (slug) {
+                    linkHref = `https://www.hiskingdomdesigns.no/product-page/${slug}`;
+                } else {
+                    linkHref = `https://www.hiskingdomdesigns.no/produkter`;
+                }
+            } else if (linkHref.includes('/product-page/')) {
+                if (!linkHref.startsWith('http')) {
+                    linkHref = `https://www.hiskingdomdesigns.no${linkHref.startsWith('/') ? '' : '/'}${linkHref}`;
                 }
             }
 
@@ -6067,9 +6096,9 @@ class NewsletterBuilder {
                 <td style="padding: 16px;">
                   <table border="0" cellpadding="0" cellspacing="0" width="100%">
                     <tr>
-                      ${imgSrc ? `<td width="90" style="vertical-align: top; padding-right: 16px;"><img src="${imgSrc}" width="90" height="90" style="width: 90px; height: 90px; object-fit: cover; border-radius: 8px; display: block; border: 0;" alt="${title}" /></td>` : ''}
+                      ${imgSrc ? `<td width="90" style="vertical-align: top; padding-right: 16px;"><a href="${linkHref}" target="_blank" style="text-decoration: none;"><img src="${imgSrc}" width="90" height="90" style="width: 90px; height: 90px; object-fit: cover; border-radius: 8px; display: block; border: 0;" alt="${title}" /></a></td>` : ''}
                       <td style="vertical-align: top;">
-                        <h4 style="margin: 0 0 6px 0; font-size: 16px; font-weight: 700; color: #1B4965; line-height: 1.3; font-family: Arial, sans-serif;">${title}</h4>
+                        <h4 style="margin: 0 0 6px 0; font-size: 16px; font-weight: 700; color: #1B4965; line-height: 1.3; font-family: Arial, sans-serif;"><a href="${linkHref}" target="_blank" style="color: #1B4965; text-decoration: none;">${title}</a></h4>
                         <p style="margin: 0 0 12px 0; font-size: 15px; font-weight: 700; color: #d17d39; font-family: Arial, sans-serif;">${price}</p>
                         <a href="${linkHref}" target="_blank" style="display: inline-block; background-color: #d17d39; color: #ffffff !important; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px; font-family: Arial, sans-serif;">Se produkt</a>
                       </td>
