@@ -8312,6 +8312,8 @@ Returner kun gyldig JSON i dette formatet:
                 subject: subject,
                 recipientCount: estCount,
                 blockCount: this.blocks.length,
+                blocks: this.blocks,
+                html: textContent,
                 status: 'sent',
                 sentAt: new Date().toISOString(),
                 sentBy: (window.firebaseService?.auth?.currentUser?.email) || 'admin@hiskingdomministry.no'
