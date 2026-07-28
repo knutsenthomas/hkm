@@ -1847,7 +1847,9 @@ class NewsletterBuilder {
             const currentSubject = document.getElementById('newsletter-subject')?.value || '';
             const headerNode = document.querySelector('.canvas-header');
 
-            if (currentHtml && currentHtml !== '<p><br></p>') {
+            const isCorrupted = currentHtml && (currentHtml.includes('Oversetter til engelsk') || currentHtml.includes('editor-translation-overlay'));
+
+            if (currentHtml && currentHtml !== '<p><br></p>' && !isCorrupted && this.currentEditorLang === 'no') {
                 localStorage.setItem('hkm_builder_autosave_html', currentHtml);
                 localStorage.setItem('hkm_builder_autosave_subject', currentSubject);
             }
@@ -6820,7 +6822,16 @@ class NewsletterBuilder {
             const autosavedHtml = localStorage.getItem('hkm_builder_autosave_html');
             const autosavedSubject = localStorage.getItem('hkm_builder_autosave_subject');
 
-            if (autosavedHtml && autosavedHtml.trim().length > 15) {
+            const isCorrupted = autosavedHtml && (autosavedHtml.includes('Oversetter til engelsk') || autosavedHtml.includes('editor-translation-overlay') || autosavedHtml.includes('Oversetter...'));
+
+            if (isCorrupted) {
+                try {
+                    localStorage.removeItem('hkm_builder_autosave_html');
+                    localStorage.removeItem('hkm_builder_autosave_subject');
+                } catch(e) {}
+            }
+
+            if (autosavedHtml && autosavedHtml.trim().length > 15 && !isCorrupted) {
                 container.innerHTML = autosavedHtml;
                 if (autosavedSubject) {
                     const subjectInput = document.getElementById('newsletter-subject');
