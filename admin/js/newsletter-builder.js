@@ -2093,15 +2093,8 @@ class NewsletterBuilder {
                 html = `<div style="height: 24px;"></div>`;
                 break;
             case 'button':
-                const label = prompt("Knapptekst:", "Les mer");
-                if (!label) return;
-                const url = prompt("Knapp-URL (f.eks. nettside eller e-post):", "https://");
-                if (!url) return;
-                html = `
-                    <div style="text-align: center; margin: 24px 0;">
-                        <a href="${url}" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 12px 30px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif;">${label}</a>
-                    </div><p><br></p>`;
-                break;
+                this.openButtonInsertionFlow();
+                return;
             case 'columns':
                 html = `
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 24px 0;">
@@ -2854,6 +2847,160 @@ class NewsletterBuilder {
         loadEvents();
     }
 
+    openButtonInsertionFlow() {
+        this.openButtonInsertionFlowAt(null);
+    }
+
+    openButtonInsertionFlowAt(afterElement) {
+        let modal = document.getElementById('hkm-button-selector-modal');
+        if (modal) modal.remove();
+
+        const internalPages = [
+            { name: "🏠 Forside / Hjem", url: "https://www.hiskingdomministry.no/", defaultText: "Gå til forside" },
+            { name: "📅 Arrangementer & Kalender", url: "https://www.hiskingdomministry.no/arrangementer.html", defaultText: "Se arrangementer" },
+            { name: "📖 Bibel & Leseplaner", url: "https://www.hiskingdomministry.no/bibel.html", defaultText: "Les i Bibelen" },
+            { name: "🙏 Bønnevegg & Bønneemner", url: "https://www.hiskingdomministry.no/bonnevegg.html", defaultText: "Send bønneemne" },
+            { name: "📚 Blogg & Undervisning", url: "https://www.hiskingdomministry.no/blogg.html", defaultText: "Les artikler" },
+            { name: "🛍️ Nettbutikk (His Kingdom Designs)", url: "https://www.hiskingdomdesigns.no/", defaultText: "Besøk nettbutikken" },
+            { name: "💖 Gi en gave / Støtt arbeidet", url: "https://www.hiskingdomministry.no/stott-oss.html", defaultText: "Støtt arbeidet" },
+            { name: "ℹ️ Om oss", url: "https://www.hiskingdomministry.no/om-oss.html", defaultText: "Les om oss" },
+            { name: "✉️ Kontakt oss", url: "https://www.hiskingdomministry.no/kontakt.html", defaultText: "Ta kontakt" },
+            { name: "👤 Min side (Medlem)", url: "https://www.hiskingdomministry.no/minside/", defaultText: "Gå til Min side" }
+        ];
+
+        modal = document.createElement('div');
+        modal.id = 'hkm-button-selector-modal';
+        modal.className = 'profile-modal';
+        modal.style.cssText = `
+            display: flex;
+            z-index: 11000;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            font-family: 'Inter', sans-serif;
+        `;
+
+        modal.innerHTML = `
+            <div class="profile-modal-content card modern" style="max-width: 520px; padding: 0; overflow: hidden; border-radius: 24px; background: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); width: 90%; max-height: 85vh; display: flex; flex-direction: column;">
+                <div class="modal-header" style="background: linear-gradient(135deg, #1B4965, #0b2536); color: white; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: none;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="background: rgba(255,255,255,0.1); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                            <span class="material-symbols-outlined" style="font-size: 20px; color: white;">link</span>
+                        </div>
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: white; letter-spacing: -0.01em;">Sett inn knapp</h3>
+                    </div>
+                    <button id="hkm-btn-modal-close" style="background: none; border: none; color: white; opacity: 0.8; cursor: pointer; display: flex; align-items: center; padding: 4px; border-radius: 50%; transition: all 0.2s;"><span class="material-symbols-outlined" style="font-size: 22px;">close</span></button>
+                </div>
+                
+                <div style="padding: 24px; display: flex; flex-direction: column; gap: 18px; background: white; overflow-y: auto;">
+                    <!-- Knappetekst -->
+                    <div>
+                        <label style="display: block; font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">Knappetekst</label>
+                        <input type="text" id="hkm-btn-modal-text" value="${internalPages[0].defaultText}" placeholder="F.eks. Les mer, Se arrangement..." style="width: 100%; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 14px; outline: none; box-sizing: border-box;" />
+                    </div>
+
+                    <!-- Lenketype Radio Toggle -->
+                    <div>
+                        <label style="display: block; font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 8px;">Velg lenketype</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <button type="button" id="hkm-link-type-internal" class="hkm-link-type-btn active" style="padding: 12px; border: 2px solid #1B4965; background: #f0f6fa; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 13px; color: #1B4965; transition: all 0.2s;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">language</span>
+                                Interne sider
+                            </button>
+                            <button type="button" id="hkm-link-type-external" class="hkm-link-type-btn" style="padding: 12px; border: 1.5px solid #cbd5e1; background: #ffffff; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 13px; color: #64748b; transition: all 0.2s;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">open_in_new</span>
+                                Ekstern lenke
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Internal Pages Dropdown Group -->
+                    <div id="hkm-internal-page-group">
+                        <label style="display: block; font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">Velg side på nettsiden</label>
+                        <select id="hkm-internal-page-select" style="width: 100%; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 14px; font-weight: 600; outline: none; background: white; color: #1e293b; box-sizing: border-box; cursor: pointer;">
+                            ${internalPages.map(p => `<option value="${p.url}" data-default-text="${p.defaultText}">${p.name}</option>`).join('')}
+                        </select>
+                    </div>
+
+                    <!-- External URL Input Group -->
+                    <div id="hkm-external-url-group" style="display: none;">
+                        <label style="display: block; font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">Ekstern nettadresse (URL)</label>
+                        <input type="text" id="hkm-btn-modal-url" value="https://" placeholder="https://..." style="width: 100%; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 14px; outline: none; box-sizing: border-box;" />
+                    </div>
+                </div>
+
+                <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 10px; background: #f8fafc; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px;">
+                    <button id="hkm-btn-modal-cancel" style="background: white; border: 1px solid #cbd5e1; color: #334155; padding: 10px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;">Avbryt</button>
+                    <button id="hkm-btn-modal-insert" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border: none; color: white; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(209, 125, 57, 0.25);">Sett inn knapp</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        const closeBtn = document.getElementById('hkm-btn-modal-close');
+        const cancelBtn = document.getElementById('hkm-btn-modal-cancel');
+        const insertBtn = document.getElementById('hkm-btn-modal-insert');
+        const btnTextInput = document.getElementById('hkm-btn-modal-text');
+        const internalBtn = document.getElementById('hkm-link-type-internal');
+        const externalBtn = document.getElementById('hkm-link-type-external');
+        const internalGroup = document.getElementById('hkm-internal-page-group');
+        const externalGroup = document.getElementById('hkm-external-url-group');
+        const internalSelect = document.getElementById('hkm-internal-page-select');
+        const externalInput = document.getElementById('hkm-btn-modal-url');
+
+        let isInternal = true;
+
+        const closeModal = () => modal.remove();
+        closeBtn.onclick = closeModal;
+        cancelBtn.onclick = closeModal;
+        modal.onclick = (e) => { if (e.target === modal) closeModal(); };
+
+        internalBtn.onclick = () => {
+            isInternal = true;
+            internalBtn.className = 'hkm-link-type-btn active';
+            internalBtn.style.cssText = 'padding: 12px; border: 2px solid #1B4965; background: #f0f6fa; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 13px; color: #1B4965; transition: all 0.2s;';
+            externalBtn.className = 'hkm-link-type-btn';
+            externalBtn.style.cssText = 'padding: 12px; border: 1.5px solid #cbd5e1; background: #ffffff; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 13px; color: #64748b; transition: all 0.2s;';
+            internalGroup.style.display = 'block';
+            externalGroup.style.display = 'none';
+        };
+
+        externalBtn.onclick = () => {
+            isInternal = false;
+            externalBtn.className = 'hkm-link-type-btn active';
+            externalBtn.style.cssText = 'padding: 12px; border: 2px solid #1B4965; background: #f0f6fa; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 13px; color: #1B4965; transition: all 0.2s;';
+            internalBtn.className = 'hkm-link-type-btn';
+            internalBtn.style.cssText = 'padding: 12px; border: 1.5px solid #cbd5e1; background: #ffffff; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 13px; color: #64748b; transition: all 0.2s;';
+            internalGroup.style.display = 'none';
+            externalGroup.style.display = 'block';
+        };
+
+        internalSelect.onchange = () => {
+            const opt = internalSelect.options[internalSelect.selectedIndex];
+            if (opt && opt.dataset.defaultText) {
+                btnTextInput.value = opt.dataset.defaultText;
+            }
+        };
+
+        insertBtn.onclick = () => {
+            const label = btnTextInput.value.trim() || 'Les mer';
+            const url = isInternal ? internalSelect.value : (externalInput.value.trim() || 'https://');
+
+            const html = `
+                <div style="text-align: center; margin: 24px 0;">
+                    <a href="${url}" class="block-btn" contenteditable="true" style="display: inline-block; background-color: #d17d39; color: white; padding: 12px 30px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif;">${escapeHtml(label)}</a>
+                </div><p><br></p>`;
+
+            this.insertHtmlAtCursorOrEndAt(html, afterElement);
+            closeModal();
+            showToast("Knapp satt inn!", "success");
+        };
+    }
+
     insertHtmlAtCursorOrEnd(html) {
         this.insertHtmlAtCursorOrEndAt(html, null);
     }
@@ -2988,15 +3135,8 @@ class NewsletterBuilder {
                 html = `<div style="height: 24px;"></div>`;
                 break;
             case 'button':
-                const label = prompt("Knapptekst:", "Les mer");
-                if (!label) return;
-                const url = prompt("Knapp-URL (f.eks. nettside eller e-post):", "https://");
-                if (!url) return;
-                html = `
-                    <div style="text-align: center; margin: 24px 0;">
-                        <a href="${url}" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 12px 30px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif;">${label}</a>
-                    </div><p><br></p>`;
-                break;
+                this.openButtonInsertionFlowAt(afterElement);
+                return;
             case 'columns':
                 html = `
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 24px 0;">
@@ -5037,6 +5177,22 @@ class NewsletterBuilder {
         const isDesktopOnly = node.classList.contains('hkm-desktop-only');
         const isMobileOnly = node.classList.contains('hkm-mobile-only');
 
+        const internalPages = [
+            { name: "🏠 Forside / Hjem", url: "https://www.hiskingdomministry.no/", defaultText: "Gå til forside" },
+            { name: "📅 Arrangementer & Kalender", url: "https://www.hiskingdomministry.no/arrangementer.html", defaultText: "Se arrangementer" },
+            { name: "📖 Bibel & Leseplaner", url: "https://www.hiskingdomministry.no/bibel.html", defaultText: "Les i Bibelen" },
+            { name: "🙏 Bønnevegg & Bønneemner", url: "https://www.hiskingdomministry.no/bonnevegg.html", defaultText: "Send bønneemne" },
+            { name: "📚 Blogg & Undervisning", url: "https://www.hiskingdomministry.no/blogg.html", defaultText: "Les artikler" },
+            { name: "🛍️ Nettbutikk (His Kingdom Designs)", url: "https://www.hiskingdomdesigns.no/", defaultText: "Besøk nettbutikken" },
+            { name: "💖 Gi en gave / Støtt arbeidet", url: "https://www.hiskingdomministry.no/stott-oss.html", defaultText: "Støtt arbeidet" },
+            { name: "ℹ️ Om oss", url: "https://www.hiskingdomministry.no/om-oss.html", defaultText: "Les om oss" },
+            { name: "✉️ Kontakt oss", url: "https://www.hiskingdomministry.no/kontakt.html", defaultText: "Ta kontakt" },
+            { name: "👤 Min side (Medlem)", url: "https://www.hiskingdomministry.no/minside/", defaultText: "Gå til Min side" }
+        ];
+
+        const matchedInternal = internalPages.find(p => p.url === currentUrl || currentUrl.startsWith(p.url));
+        const isInternalLink = !!matchedInternal || !currentUrl.startsWith('http') || currentUrl.includes('hiskingdomministry.no') || currentUrl.includes('hiskingdomdesigns.no');
+
         inspectorView.innerHTML = `
             <div class="inspector-header">
                 <h2>Tilpass knapp</h2>
@@ -5072,12 +5228,27 @@ class NewsletterBuilder {
                 </div>
                 <div class="inspector-group">
                     <label class="inspector-group-label">Knappetekst</label>
-                    <input type="text" class="inspector-input" id="btn-inspector-text" value="${currentText}">
+                    <input type="text" class="inspector-input" id="btn-inspector-text" value="${escapeHtml(currentText)}">
                 </div>
 
                 <div class="inspector-group">
-                    <label class="inspector-group-label">Nettadresse (URL)</label>
-                    <input type="text" class="inspector-input" id="btn-inspector-url" value="${currentUrl}">
+                    <label class="inspector-group-label">Lenketype</label>
+                    <select class="inspector-select" id="btn-inspector-link-type" style="font-weight: 600;">
+                        <option value="internal" ${isInternalLink ? 'selected' : ''}>🌐 Intern side på nettsiden</option>
+                        <option value="external" ${!isInternalLink ? 'selected' : ''}>🔗 Ekstern nettadresse (URL)</option>
+                    </select>
+                </div>
+
+                <div class="inspector-group" id="btn-inspector-internal-group" style="display: ${isInternalLink ? 'block' : 'none'};">
+                    <label class="inspector-group-label">Velg intern side</label>
+                    <select class="inspector-select" id="btn-inspector-internal-select" style="font-weight: 600;">
+                        ${internalPages.map(p => `<option value="${p.url}" data-default-text="${p.defaultText}" ${currentUrl === p.url ? 'selected' : ''}>${p.name}</option>`).join('')}
+                    </select>
+                </div>
+
+                <div class="inspector-group" id="btn-inspector-external-group" style="display: ${!isInternalLink ? 'block' : 'none'};">
+                    <label class="inspector-group-label">Ekstern nettadresse (URL)</label>
+                    <input type="text" class="inspector-input" id="btn-inspector-url" value="${escapeHtml(currentUrl)}">
                 </div>
 
                 <div class="inspector-group" style="margin-top: 16px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
@@ -5187,6 +5358,38 @@ class NewsletterBuilder {
         btn.addEventListener('input', handleCanvasBtnInput);
         btn.addEventListener('keyup', handleCanvasBtnInput);
         btn.addEventListener('blur', handleCanvasBtnInput);
+
+        const linkTypeSelect = document.getElementById('btn-inspector-link-type');
+        const internalGroup = document.getElementById('btn-inspector-internal-group');
+        const externalGroup = document.getElementById('btn-inspector-external-group');
+        const internalSelect = document.getElementById('btn-inspector-internal-select');
+
+        if (linkTypeSelect) {
+            linkTypeSelect.addEventListener('change', () => {
+                const isInternal = linkTypeSelect.value === 'internal';
+                if (internalGroup) internalGroup.style.display = isInternal ? 'block' : 'none';
+                if (externalGroup) externalGroup.style.display = isInternal ? 'none' : 'block';
+
+                if (isInternal && internalSelect) {
+                    btn.setAttribute('href', internalSelect.value);
+                } else if (inputUrl) {
+                    btn.setAttribute('href', inputUrl.value);
+                }
+                this.syncUnifiedBlocks();
+            });
+        }
+
+        if (internalSelect) {
+            internalSelect.addEventListener('change', () => {
+                btn.setAttribute('href', internalSelect.value);
+                const opt = internalSelect.options[internalSelect.selectedIndex];
+                if (opt && opt.dataset.defaultText && inputText && (inputText.value === 'Les mer' || !inputText.value)) {
+                    inputText.value = opt.dataset.defaultText;
+                    btn.innerText = opt.dataset.defaultText;
+                }
+                this.syncUnifiedBlocks();
+            });
+        }
 
         if (inputText) {
             inputText.addEventListener('input', () => {
