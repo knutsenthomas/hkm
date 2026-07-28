@@ -7074,6 +7074,7 @@ class NewsletterBuilder {
                 const prompt = `
                     Du er en oversetter for His Kingdom Ministry (HKM).
                     Oversett emnelinje og nyhetsbrevblokker fra norsk til engelsk for engelskspråklige abonnenter.
+                    VIKTIG REGEL: Oversett det norske ordet 'Basar' / 'Sommerbasar' til 'Raffle' / 'Summer Raffle' (ALDRI 'Bazaar').
 
                     Emnelinje: "${subject}"
                     Blokker: ${JSON.stringify(this.blocks)}
@@ -7148,12 +7149,13 @@ class NewsletterBuilder {
                 enCanvas.style.cssText = 'max-width: 600px; width: 100%; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); font-family: "Inter", sans-serif;';
 
                 let blocksHtml = (this.blocks || []).map(b => {
+                    let text = (b.content?.text || '').replace(/\bbasar\b/gi, 'Raffle').replace(/\bbazaar\b/gi, 'Raffle');
                     if (b.type === 'title') {
-                        return `<h2 style="font-family: 'Playfair Display', Georgia, serif; font-size: 24px; font-weight: 700; color: #0f172a; margin: 24px 0 12px 0;">${b.content?.text || ''}</h2>`;
+                        return `<h2 style="font-family: 'Playfair Display', Georgia, serif; font-size: 24px; font-weight: 700; color: #0f172a; margin: 24px 0 12px 0;">${text}</h2>`;
                     } else if (b.type === 'text') {
-                        return `<div style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155; margin-bottom: 16px;">${b.content?.text || ''}</div>`;
+                        return `<div style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155; margin-bottom: 16px;">${text}</div>`;
                     } else if (b.type === 'button') {
-                        return `<div style="text-align: center; margin: 24px 0;"><a href="${b.content?.url || '#'}" style="background: #1B4965; color: #ffffff; padding: 12px 28px; border-radius: 12px; font-weight: 700; text-decoration: none; display: inline-block;">Read More</a></div>`;
+                        return `<div style="text-align: center; margin: 24px 0;"><a href="${b.content?.url || '#'}" style="background: #1B4965; color: #ffffff; padding: 12px 28px; border-radius: 12px; font-weight: 700; text-decoration: none; display: inline-block;">${text || 'Read More'}</a></div>`;
                     } else if (b.type === 'image' && b.content?.url) {
                         return `<div style="margin: 20px 0; text-align: center;"><img src="${b.content.url}" style="max-width: 100%; border-radius: 12px;" alt="Image"></div>`;
                     } else if (b.type === 'spacer') {
@@ -7815,6 +7817,7 @@ class NewsletterBuilder {
             const prompt = `
                 Du er en profesjonell teologisk og inspirerende oversetter for His Kingdom Ministry (HKM).
                 Oversett følgende nyhetsbrevinnhold fra norsk til et varmt, flytende og engasjerende engelsk språk.
+                VIKTIG REGEL: Oversett det norske ordet 'Basar' / 'Sommerbasar' til 'Raffle' / 'Summer Raffle' (ALDRI 'Bazaar').
 
                 Emnelinje (Norwegian): "${subject}"
 
@@ -7910,6 +7913,7 @@ class NewsletterBuilder {
                     const prompt = `
                         Du er en oversetter for His Kingdom Ministry (HKM).
                         Oversett emnelinje og nyhetsbrevblokker fra norsk til engelsk for engelskspråklige abonnenter.
+                        VIKTIG REGEL: Oversett det norske ordet 'Basar' / 'Sommerbasar' til 'Raffle' / 'Summer Raffle' (ALDRI 'Bazaar').
 
                         Emnelinje: "${subject}"
                         Blokker: ${JSON.stringify(this.blocks)}
