@@ -4100,21 +4100,21 @@ class NewsletterBuilder {
                 <!-- Plassering i e-posten reorder bar -->
                 <div class="inspector-group" style="margin-bottom: 16px; background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0;">
                     <label class="inspector-group-label" style="font-weight: 700; font-size: 11px; color: #475569; margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Plassering i e-posten</label>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px;">
-                        <button type="button" id="btn-block-move-up" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600;" title="Flytt opp">
-                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">arrow_upward</span>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <button type="button" id="btn-block-move-up" class="btn-secondary-outline" style="height: 36px; width: 100%; justify-content: center; font-size: 12px; font-weight: 600;" title="Flytt opp">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">arrow_upward</span>
                             <span>Opp</span>
                         </button>
-                        <button type="button" id="btn-block-move-down" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600;" title="Flytt ned">
-                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">arrow_downward</span>
+                        <button type="button" id="btn-block-move-down" class="btn-secondary-outline" style="height: 36px; width: 100%; justify-content: center; font-size: 12px; font-weight: 600;" title="Flytt ned">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">arrow_downward</span>
                             <span>Ned</span>
                         </button>
-                        <button type="button" id="btn-block-duplicate" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600;" title="Kopier element">
-                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">content_copy</span>
+                        <button type="button" id="btn-block-duplicate" class="btn-secondary-outline" style="height: 36px; width: 100%; justify-content: center; font-size: 12px; font-weight: 600;" title="Kopier element">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">content_copy</span>
                             <span>Kopier</span>
                         </button>
-                        <button type="button" id="btn-block-delete" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600; color: #ef4444; border-color: #fca5a5;" title="Slett element">
-                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">delete</span>
+                        <button type="button" id="btn-block-delete" class="btn-secondary-outline" style="height: 36px; width: 100%; justify-content: center; font-size: 12px; font-weight: 600; color: #ef4444; border-color: #fca5a5;" title="Slett element">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">delete</span>
                             <span>Slett</span>
                         </button>
                     </div>
@@ -4592,21 +4592,21 @@ class NewsletterBuilder {
                 <!-- Plassering i e-posten reorder bar -->
                 <div class="inspector-group" style="margin-bottom: 16px; background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0;">
                     <label class="inspector-group-label" style="font-weight: 700; font-size: 11px; color: #475569; margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Plassering i e-posten</label>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px;">
-                        <button type="button" id="btn-img-move-up" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600;" title="Flytt opp">
-                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">arrow_upward</span>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <button type="button" id="btn-img-move-up" class="btn-secondary-outline" style="height: 36px; width: 100%; justify-content: center; font-size: 12px; font-weight: 600;" title="Flytt opp">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">arrow_upward</span>
                             <span>Opp</span>
                         </button>
-                        <button type="button" id="btn-img-move-down" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600;" title="Flytt ned">
-                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">arrow_downward</span>
+                        <button type="button" id="btn-img-move-down" class="btn-secondary-outline" style="height: 36px; width: 100%; justify-content: center; font-size: 12px; font-weight: 600;" title="Flytt ned">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">arrow_downward</span>
                             <span>Ned</span>
                         </button>
-                        <button type="button" id="btn-img-duplicate" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600;" title="Kopier element">
-                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">content_copy</span>
+                        <button type="button" id="btn-img-duplicate" class="btn-secondary-outline" style="height: 36px; width: 100%; justify-content: center; font-size: 12px; font-weight: 600;" title="Kopier element">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">content_copy</span>
                             <span>Kopier</span>
                         </button>
-                        <button type="button" id="btn-img-delete" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600; color: #ef4444; border-color: #fca5a5;" title="Slett element">
-                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">delete</span>
+                        <button type="button" id="btn-img-delete" class="btn-secondary-outline" style="height: 36px; width: 100%; justify-content: center; font-size: 12px; font-weight: 600; color: #ef4444; border-color: #fca5a5;" title="Slett element">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">delete</span>
                             <span>Slett</span>
                         </button>
                     </div>
@@ -4938,21 +4938,21 @@ class NewsletterBuilder {
                 <!-- Plassering i e-posten reorder bar -->
                 <div class="inspector-group" style="margin-bottom: 16px; background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0;">
                     <label class="inspector-group-label" style="font-weight: 700; font-size: 11px; color: #475569; margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Plassering i e-posten</label>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px;">
-                        <button type="button" id="btn-btn-move-up" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600;" title="Flytt opp">
-                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">arrow_upward</span>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <button type="button" id="btn-btn-move-up" class="btn-secondary-outline" style="height: 36px; width: 100%; justify-content: center; font-size: 12px; font-weight: 600;" title="Flytt opp">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">arrow_upward</span>
                             <span>Opp</span>
                         </button>
-                        <button type="button" id="btn-btn-move-down" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600;" title="Flytt ned">
-                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">arrow_downward</span>
+                        <button type="button" id="btn-btn-move-down" class="btn-secondary-outline" style="height: 36px; width: 100%; justify-content: center; font-size: 12px; font-weight: 600;" title="Flytt ned">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">arrow_downward</span>
                             <span>Ned</span>
                         </button>
-                        <button type="button" id="btn-btn-duplicate" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600;" title="Kopier element">
-                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">content_copy</span>
+                        <button type="button" id="btn-btn-duplicate" class="btn-secondary-outline" style="height: 36px; width: 100%; justify-content: center; font-size: 12px; font-weight: 600;" title="Kopier element">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">content_copy</span>
                             <span>Kopier</span>
                         </button>
-                        <button type="button" id="btn-btn-delete" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600; color: #ef4444; border-color: #fca5a5;" title="Slett element">
-                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">delete</span>
+                        <button type="button" id="btn-btn-delete" class="btn-secondary-outline" style="height: 36px; width: 100%; justify-content: center; font-size: 12px; font-weight: 600; color: #ef4444; border-color: #fca5a5;" title="Slett element">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">delete</span>
                             <span>Slett</span>
                         </button>
                     </div>
