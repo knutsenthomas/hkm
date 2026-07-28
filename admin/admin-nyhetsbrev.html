@@ -1081,89 +1081,48 @@
                             <input type="text" id="elements-search-input" placeholder="Søk etter elementer..." class="elements-search-input">
                         </div>
 
-                    <div class="elements-panel-body">
-                        <!-- Basisblokker -->
-                        <div class="elements-category active">
-                            <div class="category-header">
-                                <span>BASISBLOKKER</span>
-                            </div>
-                            <div class="basic-blocks-grid">
-                                <button class="block-card-item element-card" data-type="text" title="Sett inn tekstblokk">
-                                    <div class="block-card-icon-text">T</div>
-                                    <span class="block-card-label">Tekst</span>
-                                </button>
-                                <button class="block-card-item element-card" data-type="image" title="Sett inn bilde">
-                                    <span class="material-symbols-outlined block-card-icon">image</span>
-                                    <span class="block-card-label">Bilde</span>
-                                </button>
-                                <button class="block-card-item element-card" data-type="button" title="Sett inn knapp">
-                                    <span class="material-symbols-outlined block-card-icon">crop_7_5</span>
-                                    <span class="block-card-label">Knapp</span>
-                                </button>
-                                <button class="block-card-item element-card" data-type="divider" title="Sett inn skillelinje">
-                                    <span class="material-symbols-outlined block-card-icon">horizontal_rule</span>
-                                    <span class="block-card-label">Skillelinje</span>
-                                </button>
-                                <button class="block-card-item element-card" data-type="spacer" title="Sett inn avstandshøyde">
-                                    <span class="material-symbols-outlined block-card-icon">height</span>
-                                    <span class="block-card-label">Avstand</span>
-                                </button>
-                                <button class="block-card-item element-card highlight-blue" data-type="product" title="Sett inn produkt fra nettbutikken">
-                                    <span class="material-symbols-outlined block-card-icon">shopping_bag</span>
-                                    <span class="block-card-label">Produkt</span>
-                                </button>
-                                <button class="block-card-item element-card highlight-blue" data-type="event" title="Sett inn arrangement fra kalenderen">
-                                    <span class="material-symbols-outlined block-card-icon">event</span>
-                                    <span class="block-card-label">Arrangement</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Utvidbare seksjoner (Media, Oppsett, Lagrede blokker) -->
-                        <div class="elements-accordion-item">
-                            <button class="accordion-header-btn" data-accordion="media">
-                                <span>Media</span>
-                                <span class="material-symbols-outlined accordion-arrow">expand_more</span>
+                    <div class="elements-panel-body" style="padding: 16px !important;">
+                        <div class="basic-blocks-grid" style="display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important;">
+                            <button class="block-card-item element-card" data-type="text" title="Sett inn tekstblokk">
+                                <div class="block-card-icon-text">T</div>
+                                <span class="block-card-label">Tekst</span>
                             </button>
-                            <div class="accordion-content" id="accordion-media" style="display: none;">
-                                <div class="basic-blocks-grid">
-                                    <button class="block-card-item element-card" data-type="video">
-                                        <span class="material-symbols-outlined block-card-icon">play_circle</span>
-                                        <span class="block-card-label">Video</span>
-                                    </button>
-                                    <button class="block-card-item element-card" data-type="logo">
-                                        <span class="material-symbols-outlined block-card-icon">featured_seasonal_and_gifts</span>
-                                        <span class="block-card-label">Logo</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="elements-accordion-item">
-                            <button class="accordion-header-btn" data-accordion="layout">
-                                <span>Oppsett</span>
-                                <span class="material-symbols-outlined accordion-arrow">expand_more</span>
+                            <button class="block-card-item element-card" data-type="image" title="Sett inn bilde">
+                                <span class="material-symbols-outlined block-card-icon">image</span>
+                                <span class="block-card-label">Bilde</span>
                             </button>
-                            <div class="accordion-content" id="accordion-layout" style="display: none;">
-                                <div class="basic-blocks-grid">
-                                    <button class="block-card-item element-card" data-type="columns">
-                                        <span class="material-symbols-outlined block-card-icon">view_column</span>
-                                        <span class="block-card-label">Kolonner</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="elements-accordion-item">
-                            <button class="accordion-header-btn" data-accordion="saved">
-                                <span>Lagrede blokker</span>
-                                <span class="material-symbols-outlined accordion-arrow">expand_more</span>
+                            <button class="block-card-item element-card" data-type="button" title="Sett inn knapp">
+                                <span class="material-symbols-outlined block-card-icon">crop_7_5</span>
+                                <span class="block-card-label">Knapp</span>
                             </button>
-                            <div class="accordion-content" id="accordion-saved" style="display: none;">
-                                <div class="sidebar-empty-state">
-                                    <span>Ingen lagrede blokker</span>
-                                </div>
-                            </div>
+                            <button class="block-card-item element-card highlight-blue" data-type="product" title="Sett inn produkt fra nettbutikken">
+                                <span class="material-symbols-outlined block-card-icon">shopping_bag</span>
+                                <span class="block-card-label">Produkt</span>
+                            </button>
+                            <button class="block-card-item element-card highlight-blue" data-type="event" title="Sett inn arrangement fra kalenderen">
+                                <span class="material-symbols-outlined block-card-icon">event</span>
+                                <span class="block-card-label">Arrangement</span>
+                            </button>
+                            <button class="block-card-item element-card" data-type="video" title="Sett inn YouTube-video">
+                                <span class="material-symbols-outlined block-card-icon">play_circle</span>
+                                <span class="block-card-label">Video</span>
+                            </button>
+                            <button class="block-card-item element-card" data-type="logo" title="Sett inn logo">
+                                <span class="material-symbols-outlined block-card-icon">featured_seasonal_and_gifts</span>
+                                <span class="block-card-label">Logo</span>
+                            </button>
+                            <button class="block-card-item element-card" data-type="divider" title="Sett inn skillelinje">
+                                <span class="material-symbols-outlined block-card-icon">horizontal_rule</span>
+                                <span class="block-card-label">Skillelinje</span>
+                            </button>
+                            <button class="block-card-item element-card" data-type="spacer" title="Sett inn avstandshøyde">
+                                <span class="material-symbols-outlined block-card-icon">height</span>
+                                <span class="block-card-label">Avstand</span>
+                            </button>
+                            <button class="block-card-item element-card" data-type="social" title="Sett inn sosiale medier lenker">
+                                <span class="material-symbols-outlined block-card-icon">share</span>
+                                <span class="block-card-label">Sosialt</span>
+                            </button>
                         </div>
                     </div>
                 </aside>
