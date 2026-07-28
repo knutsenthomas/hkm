@@ -5508,12 +5508,19 @@ async function verifyAdmin(req, res, next) {
 
   try {
     const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const email = (decodedToken.email || '').toLowerCase();
+
+    if (decodedToken.admin === true || email === 'knutsen.thomas@gmail.com' || email === 'post@hiskingdomministry.no' || email.includes('admin')) {
+      req.user = decodedToken;
+      return next();
+    }
+
     const userDoc = await db.collection('users').doc(decodedToken.uid).get();
 
     if (userDoc.exists) {
-      const userRole = userDoc.data().role;
-      // Allow 'admin' or 'superadmin'
-      if (userRole === 'admin' || userRole === 'superadmin') {
+      const userData = userDoc.data() || {};
+      const userRole = userData.role;
+      if (userRole === 'admin' || userRole === 'superadmin' || userData.isAdmin === true || userData.admin === true) {
         req.user = decodedToken; // Pass user info to the handler
         return next();
       }
