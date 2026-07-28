@@ -1049,6 +1049,22 @@
                     </div>
                 </aside>
 
+                <!-- Mobile Workspace Navigation Tabs (Visible on screens <= 991px) -->
+                <div class="mobile-workspace-tabs" id="mobile-workspace-tabs-bar">
+                    <button type="button" class="mobile-workspace-tab-btn active" id="tab-btn-canvas" onclick="if(window.builder) builder.switchMobileTab('canvas');">
+                        <span class="material-symbols-outlined">mail</span>
+                        <span>Kanvas</span>
+                    </button>
+                    <button type="button" class="mobile-workspace-tab-btn" id="tab-btn-elements" onclick="if(window.builder) builder.switchMobileTab('elements');">
+                        <span class="material-symbols-outlined">widgets</span>
+                        <span>Elementer</span>
+                    </button>
+                    <button type="button" class="mobile-workspace-tab-btn" id="tab-btn-properties" onclick="if(window.builder) builder.switchMobileTab('properties');">
+                        <span class="material-symbols-outlined">tune</span>
+                        <span>Egenskaper</span>
+                    </button>
+                </div>
+
                 <!-- Builder Main Workspace Wrapper (Kanvas, Elementer og Egenskaper) -->
                 <div id="builder-main-workspace" style="display: flex; flex: 1; min-width: 0; height: 100%;">
                     <!-- 2. Elementpanel (Lys profil) -->

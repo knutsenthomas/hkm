@@ -248,10 +248,20 @@ class NewsletterBuilder {
         this.setupBubbleMenu();
         this.applyBackgrounds();
         this.renderCanvas();
+        this.switchMobileTab('canvas');
     }
 
     isMobileViewport() {
         return window.matchMedia('(max-width: 991px)').matches;
+    }
+
+    switchMobileTab(tabName) {
+        document.body.classList.remove('mobile-tab-canvas', 'mobile-tab-elements', 'mobile-tab-properties');
+        document.body.classList.add(`mobile-tab-${tabName}`);
+
+        document.querySelectorAll('.mobile-workspace-tab-btn').forEach(btn => btn.classList.remove('active'));
+        const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+        if (activeBtn) activeBtn.classList.add('active');
     }
 
     openToolsPanel(tab = null) {
@@ -3452,6 +3462,10 @@ class NewsletterBuilder {
         } else {
             console.log('[HKM Inspector] Loading TEXT inspector');
             this.showTextInspector(node);
+        }
+
+        if (window.innerWidth <= 991) {
+            this.switchMobileTab('properties');
         }
     }
 

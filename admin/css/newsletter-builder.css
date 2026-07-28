@@ -7492,3 +7492,149 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
         font-size: 24px !important;
     }
 }
+
+/* ==========================================================================
+   STRICT MOBILE BUILDER ISOLATION & MOBILE TABS SYSTEM
+   ========================================================================== */
+
+/* Always hide main admin sidebar in builder mode on mobile */
+@media (max-width: 991px) {
+    body.builder-active .sidebar,
+    body.builder-active .sidebar.active,
+    #newsletter-builder-layout .builder-dark-sidebar {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        width: 0 !important;
+        opacity: 0 !important;
+    }
+
+    #newsletter-builder-layout {
+        width: 100vw !important;
+        left: 0 !important;
+        margin-left: 0 !important;
+    }
+
+    /* Mobile Workspace Tabs Bar */
+    .mobile-workspace-tabs {
+        display: flex !important;
+        width: 100% !important;
+        background: #ffffff !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        padding: 6px 8px !important;
+        gap: 6px !important;
+        box-sizing: border-box !important;
+        position: relative !important;
+        z-index: 100 !important;
+    }
+
+    .mobile-workspace-tab-btn {
+        flex: 1 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 6px !important;
+        height: 38px !important;
+        border: 1px solid #e2e8f0 !important;
+        background: #f8fafc !important;
+        border-radius: 10px !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        color: #64748b !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .mobile-workspace-tab-btn.active {
+        background: #1B4965 !important;
+        color: #ffffff !important;
+        border-color: #1B4965 !important;
+        box-shadow: 0 2px 6px rgba(27, 73, 101, 0.2) !important;
+    }
+
+    /* Mobile Workspace Panel Display Logic */
+    #builder-main-workspace {
+        flex-direction: column !important;
+        height: calc(100vh - 104px) !important;
+        overflow: hidden !important;
+    }
+
+    body.mobile-tab-elements #builder-main-workspace .builder-elements-panel {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 1 !important;
+        height: 100% !important;
+        overflow-y: auto !important;
+    }
+    body.mobile-tab-elements #builder-main-workspace .builder-canvas-wrapper,
+    body.mobile-tab-elements #builder-main-workspace .builder-properties-panel {
+        display: none !important;
+    }
+
+    body.mobile-tab-canvas #builder-main-workspace .builder-canvas-wrapper {
+        display: flex !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 1 !important;
+        height: 100% !important;
+        padding: 12px 8px !important;
+        box-sizing: border-box !important;
+        overflow-y: auto !important;
+    }
+    body.mobile-tab-canvas #builder-main-workspace .builder-elements-panel,
+    body.mobile-tab-canvas #builder-main-workspace .builder-properties-panel {
+        display: none !important;
+    }
+
+    body.mobile-tab-properties #builder-main-workspace .builder-properties-panel {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 1 !important;
+        height: 100% !important;
+        overflow-y: auto !important;
+    }
+    body.mobile-tab-properties #builder-main-workspace .builder-elements-panel,
+    body.mobile-tab-properties #builder-main-workspace .builder-canvas-wrapper {
+        display: none !important;
+    }
+}
+
+/* Header Action Buttons Mobile Clean Up */
+@media (max-width: 600px) {
+    .builder-toolbar-header {
+        padding: 4px 8px !important;
+        gap: 4px !important;
+    }
+
+    .builder-toolbar-header #sidebar-title {
+        font-size: 14px !important;
+    }
+
+    .builder-toolbar-header .autosave-pill {
+        display: none !important; /* Hide autosave badge on mobile header to prevent overlapping button text */
+    }
+
+    .builder-toolbar-header .device-pill-btn span:not(.material-symbols-outlined) {
+        display: none !important; /* Keep icons only for device toggle */
+    }
+
+    .builder-toolbar-header .device-pill-btn {
+        padding: 0 6px !important;
+        min-width: 32px !important;
+    }
+
+    .builder-toolbar-header #save-draft-btn,
+    .builder-toolbar-header #preview-btn {
+        padding: 0 8px !important;
+        height: 34px !important;
+        font-size: 12px !important;
+    }
+
+    .builder-toolbar-header .btn-primary-publish {
+        padding: 0 10px !important;
+        height: 34px !important;
+        font-size: 12px !important;
+    }
+}
