@@ -2726,16 +2726,44 @@ class NewsletterBuilder {
                 const key = e.id || `${title}|${e.start || e.date || ''}`;
                 const image = e.imageUrl || e.image || e.dashboardImage || e.imageLink || 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
                 
-                const startDate = (e.date || e.start) ? new Date(e.date || e.start) : null;
+                const rawDateStr = e.date || e.start || e.startDate || e.createdAt;
+                let startDate = null;
+                if (rawDateStr) {
+                    const parsed = new Date(rawDateStr);
+                    if (!isNaN(parsed.getTime())) startDate = parsed;
+                }
+
                 const day = startDate ? startDate.getDate() : '--';
-                const monthStr = startDate ? startDate.toLocaleString('nb-NO', { month: 'short' }).replace('.', '').toUpperCase() : '--';
+                let monthStr = '--';
+                if (startDate) {
+                    try {
+                        monthStr = startDate.toLocaleString('nb-NO', { month: 'short' }).replace('.', '').toUpperCase();
+                    } catch(err) {
+                        monthStr = '--';
+                    }
+                }
                 const dateBadge = `${day}. ${monthStr}`;
 
-                const formattedDate = startDate ? startDate.toLocaleDateString('nb-NO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '';
-                const timeStr = e.time || (startDate && e.start && e.start.includes('T') ? startDate.toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' }) : '');
-                const timeLabel = formattedDate + (timeStr ? ` kl. ${timeStr}` : '');
+                let formattedDate = '';
+                if (startDate) {
+                    try {
+                        formattedDate = startDate.toLocaleDateString('nb-NO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                    } catch(err) {
+                        formattedDate = '';
+                    }
+                }
+
+                let timeStr = e.time || '';
+                if (!timeStr && startDate && typeof e.start === 'string' && e.start.includes('T')) {
+                    try {
+                        timeStr = startDate.toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' });
+                    } catch(err) {
+                        timeStr = '';
+                    }
+                }
+                const timeLabel = (formattedDate ? formattedDate : '') + (timeStr ? ` kl. ${timeStr}` : '');
                 
-                const location = e.location || '';
+                const location = e.location || e.place || '';
                 const detailsUrl = `https://www.hiskingdomministry.no/arrangement-detaljer.html?id=${encodeURIComponent(key)}`;
 
                 combinedHtml += `
@@ -2751,7 +2779,7 @@ class NewsletterBuilder {
                             <h4 style="margin: 0; font-size: 16px; font-weight: 700; color: #1B4965; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(title)}</h4>
                             <div style="display: flex; align-items: center; gap: 6px; color: #64748b; font-size: 13px; font-weight: 500;">
                                 <span class="material-symbols-outlined" style="font-size: 16px; color: #d17d39;">schedule</span>
-                                <span>${timeLabel}</span>
+                                <span>${timeLabel || 'Tidspunkt kommer'}</span>
                             </div>
                             ${location ? `
                             <div style="display: flex; align-items: center; gap: 6px; color: #64748b; font-size: 13px; font-weight: 500;">
@@ -2775,6 +2803,18 @@ class NewsletterBuilder {
             showToast(`${selectedEventsMap.size} ${selectedEventsMap.size === 1 ? 'arrangement' : 'arrangementer'} satt inn!`, "success");
         };
 
+        const extractEventsArray = (doc) => {
+            if (!doc) return [];
+            if (Array.isArray(doc)) return doc;
+            if (doc.items && Array.isArray(doc.items)) return doc.items;
+            if (typeof doc === 'object') {
+                return Object.keys(doc)
+                    .map(k => typeof doc[k] === 'object' && doc[k] ? { id: k, ...doc[k] } : null)
+                    .filter(Boolean);
+            }
+            return [];
+        };
+
         const loadEvents = async () => {
             try {
                 let items = [];
@@ -2783,7 +2823,7 @@ class NewsletterBuilder {
                 } else if (window.firebaseService) {
                     try {
                         const doc = await window.firebaseService.getPageContent('collection_events');
-                        items = Array.isArray(doc) ? doc : (doc?.items || []);
+                        items = extractEventsArray(doc);
                     } catch(e) {
                         console.warn("getPageContent collection_events failed:", e);
                     }
@@ -2799,8 +2839,8 @@ class NewsletterBuilder {
                 if (items && items.length > 0) {
                     window.hkmEventsCache = items;
                     eventsList = items.sort((a, b) => {
-                        const dateA = new Date(a.date || a.start || a.createdAt || 0);
-                        const dateB = new Date(b.date || b.start || b.createdAt || 0);
+                        const dateA = new Date(a.date || a.start || a.createdAt || 0).getTime() || 0;
+                        const dateB = new Date(b.date || b.start || b.createdAt || 0).getTime() || 0;
                         return dateB - dateA;
                     });
                 } else {
