@@ -943,8 +943,8 @@
             <div id="mobile-elements-backdrop" class="mobile-drawer-backdrop" onclick="if(window.builder) builder.closeMobileDrawers();"></div>
 
             <!-- Verktøylinje / Sub-Header -->
-            <div class="builder-toolbar-header" style="height: 56px !important; min-height: 56px !important; max-height: 56px !important; background: #ffffff !important; border-bottom: 1px solid #e2e8f0 !important; display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; justify-content: space-between !important; padding: 0 24px !important; box-sizing: border-box !important; width: 100% !important; position: relative !important; z-index: 1000 !important; overflow: visible !important;">
-                <div class="toolbar-left-cell" style="display: flex !important; align-items: center !important; justify-content: flex-start !important; height: 100% !important; flex: 0 0 auto !important; gap: 8px !important;">
+            <div class="builder-toolbar-header">
+                <div class="toolbar-left-cell">
                     <button type="button" class="mobile-nav-toggle" aria-label="Vis meny" title="Vis meny">
                         <span class="material-symbols-outlined">menu</span>
                     </button>
@@ -952,27 +952,27 @@
                         <span class="material-symbols-outlined">add</span>
                         <span>Elementer</span>
                     </button>
-                    <h3 id="sidebar-title" style="margin: 0 !important; font-size: 18px !important; font-weight: 700 !important; color: #1e293b !important; line-height: 1 !important; white-space: nowrap !important; display: flex !important; align-items: center !important;">Elementer</h3>
-                    <div id="newsletter-autosave-status" class="autosave-pill" style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: #10b981; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 20px; padding: 2px 8px; margin-left: 4px;">
+                    <h3 id="sidebar-title">Elementer</h3>
+                    <div id="newsletter-autosave-status" class="autosave-pill">
                         <span class="material-symbols-outlined" style="font-size: 14px;">cloud_done</span>
-                        <span id="newsletter-autosave-text" style="font-weight: 600;">Lagret</span>
+                        <span id="newsletter-autosave-text">Lagret</span>
                     </div>
                 </div>
 
-                <div class="toolbar-center-cell" style="display: flex !important; align-items: center !important; justify-content: center !important; height: 100% !important; flex: 1 1 auto !important; min-width: 0 !important;">
+                <div class="toolbar-center-cell">
                     <div class="device-switch-pill">
-                        <button type="button" class="device-pill-btn device-btn active" data-view="desktop">
+                        <button type="button" class="device-pill-btn device-btn active" data-view="desktop" title="Skrivebord">
                             <span class="material-symbols-outlined">desktop_windows</span>
                             <span>Skrivebord</span>
                         </button>
-                        <button type="button" class="device-pill-btn device-btn" data-view="mobile">
+                        <button type="button" class="device-pill-btn device-btn" data-view="mobile" title="Mobil">
                             <span class="material-symbols-outlined">smartphone</span>
                             <span>Mobil</span>
                         </button>
                     </div>
                 </div>
 
-                <div class="toolbar-right-cell toolbar-right-actions" style="display: flex !important; align-items: center !important; justify-content: flex-end !important; height: 100% !important; gap: 8px !important; flex: 0 0 auto !important; margin-left: auto !important; white-space: nowrap !important;">
+                <div class="toolbar-right-cell toolbar-right-actions">
                     <button id="save-draft-btn" class="btn-secondary-outline" title="Lagre utkast">
                         <span class="material-symbols-outlined" style="font-size: 18px;">save</span>
                         <span class="btn-label-text">Lagre utkast</span>
@@ -981,7 +981,7 @@
                         <span class="material-symbols-outlined" style="font-size: 18px;">visibility</span>
                         <span class="btn-label-text">Forhåndsvisning</span>
                     </button>
-                    <div class="btn-group-publish" style="position: relative;">
+                    <div class="btn-group-publish">
                         <button id="continue-btn" class="btn-primary-publish" title="Publiser">
                             <span class="material-symbols-outlined btn-publish-icon">send</span>
                             <span class="btn-publish-label">Publiser</span>
