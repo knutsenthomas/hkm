@@ -6832,7 +6832,8 @@ class NewsletterBuilder {
             }
 
             if (autosavedHtml && autosavedHtml.trim().length > 15 && !isCorrupted) {
-                container.innerHTML = autosavedHtml;
+                const cleanedHtml = autosavedHtml.replace(/photo-1506744038136-46273834b3fb/g, 'photo-1464822759023-fed622ff2c3b');
+                container.innerHTML = cleanedHtml;
                 if (autosavedSubject) {
                     const subjectInput = document.getElementById('newsletter-subject');
                     if (subjectInput && !subjectInput.value) subjectInput.value = autosavedSubject;
