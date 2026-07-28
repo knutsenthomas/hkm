@@ -9910,11 +9910,13 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
         }
     }
 
-    async fetchSubscribersList() {
+    async fetchSubscribersList(options = {}) {
+        const { onlyNewsletterSubscribers = true } = options;
         if (!window.firebaseService || !window.firebaseService.isInitialized) return [];
 
         const subscribersMap = new Map();
         const explicitlyUnsubscribedEmails = new Set();
+
         const isNewsletterUnsubscribed = (data, isSubscription = false) => {
             const newsletterStatus = String(data.newsletterStatus || '').trim().toLowerCase();
             const subscriptionStatus = String(data.status || '').trim().toLowerCase();
@@ -9928,49 +9930,24 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                 || ['unsubscribed', 'avmeldt', 'inactive', 'inaktiv'].includes(subscriptionStatus);
         };
 
-        // 1. Primary CRM contact list: collection('contacts')
-        try {
-            const contactsSnap = await this.safeGet(window.firebaseService.db.collection('contacts'), 8000);
-            if (contactsSnap) {
-                contactsSnap.forEach(doc => {
-                    const data = doc.data();
-                    if (!data.email) return;
-                    const email = data.email.toLowerCase().trim();
-                    if (isNewsletterUnsubscribed(data)) {
-                        explicitlyUnsubscribedEmails.add(email);
-                        return;
-                    }
-                    const name = data.name || (data.firstName ? `${data.firstName} ${data.lastName || ''}`.trim() : email.split('@')[0]);
-                    let dateStr = 'Kontakt';
-                    if (data.createdAt) {
-                        try {
-                            const d = data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
-                            dateStr = d.toLocaleDateString('no');
-                        } catch(e) {}
-                    }
-                    const tags = Array.isArray(data.tags) ? data.tags : (typeof data.tags === 'string' && data.tags ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : (Array.isArray(data.labels) ? data.labels : []));
-                    const segments = Array.isArray(data.segments) ? data.segments : (typeof data.segments === 'string' && data.segments ? data.segments.split(',').map(s => s.trim()).filter(Boolean) : (data.segment ? [data.segment] : ['Kontaktliste (CRM)']));
-                    const phone = data.phone || data.mobile || data.tlf || '';
+        const isExplicitNewsletterSubscriber = (data) => {
+            const newsletterStatus = String(data.newsletterStatus || '').trim().toLowerCase();
+            const subscriptionStatus = String(data.status || '').trim().toLowerCase();
+            const tags = Array.isArray(data.tags) ? data.tags : (typeof data.tags === 'string' ? data.tags.split(',') : []);
+            const segments = Array.isArray(data.segments) ? data.segments : (typeof data.segments === 'string' ? data.segments.split(',') : []);
+            const allTags = [...tags, ...segments].map(t => String(t).trim().toLowerCase());
 
-                    subscribersMap.set(email, {
-                        id: doc.id,
-                        collection: 'contacts',
-                        name,
-                        email,
-                        phone,
-                        source: 'Kontaktliste (CRM)',
-                        status: data.status || 'Aktiv',
-                        dateStr,
-                        tags,
-                        segments
-                    });
-                });
-            }
-        } catch (err) {
-            console.warn('[HKM Subscribers] Could not fetch contacts collection:', err);
-        }
+            return data.isSubscribed === true
+                || data.newsletterSubscribed === true
+                || newsletterStatus === 'subscribed'
+                || newsletterStatus === 'aktiv'
+                || newsletterStatus === 'active'
+                || subscriptionStatus === 'subscribed'
+                || allTags.includes('nyhetsbrev')
+                || allTags.includes('newsletter');
+        };
 
-        // 2. Secondary subscriber list: newsletter_subscriptions
+        // 1. Primary list for newsletter: newsletter_subscriptions collection
         try {
             const subSnap = await this.safeGet(window.firebaseService.db.collection('newsletter_subscriptions'), 8000);
             if (subSnap) {
@@ -9982,26 +9959,73 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                         explicitlyUnsubscribedEmails.add(email);
                         return;
                     }
+                    const name = data.name || data.displayName || email.split('@')[0];
+                    let dateStr = 'Nylig';
+                    if (data.subscribedAt) {
+                        try {
+                            const d = data.subscribedAt.toDate ? data.subscribedAt.toDate() : new Date(data.subscribedAt);
+                            dateStr = d.toLocaleDateString('no');
+                        } catch(e) {}
+                    }
+                    const tags = Array.isArray(data.tags) ? data.tags : (typeof data.tags === 'string' && data.tags ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : []);
+                    const segments = Array.isArray(data.segments) ? data.segments : (typeof data.segments === 'string' && data.segments ? data.segments.split(',').map(s => s.trim()).filter(Boolean) : [data.source === 'website_footer' ? 'Nettsted' : (data.source || 'Nyhetsbrev')]);
+                    const phone = data.phone || data.mobile || '';
+
+                    subscribersMap.set(email, {
+                        id: doc.id,
+                        collection: 'newsletter_subscriptions',
+                        name,
+                        email,
+                        phone,
+                        source: data.source === 'website_footer' ? 'Nettsted' : (data.source || 'Direkte påmeldt'),
+                        status: data.status || 'Aktiv',
+                        dateStr,
+                        tags,
+                        segments
+                    });
+                });
+            }
+        } catch (err) {
+            console.warn('[HKM Subscribers] Could not fetch newsletter_subscriptions:', err);
+        }
+
+        // 2. Secondary CRM contact list: collection('contacts') - included only if explicitly subscribed
+        try {
+            const contactsSnap = await this.safeGet(window.firebaseService.db.collection('contacts'), 8000);
+            if (contactsSnap) {
+                contactsSnap.forEach(doc => {
+                    const data = doc.data();
+                    if (!data.email) return;
+                    const email = data.email.toLowerCase().trim();
+                    if (isNewsletterUnsubscribed(data)) {
+                        explicitlyUnsubscribedEmails.add(email);
+                        return;
+                    }
+
+                    if (onlyNewsletterSubscribers && !isExplicitNewsletterSubscriber(data)) {
+                        return; // Skip general CRM contacts who didn't opt into newsletter
+                    }
+
                     if (!subscribersMap.has(email)) {
-                        const name = data.name || data.displayName || email.split('@')[0];
-                        let dateStr = 'Nylig';
-                        if (data.subscribedAt) {
+                        const name = data.name || (data.firstName ? `${data.firstName} ${data.lastName || ''}`.trim() : email.split('@')[0]);
+                        let dateStr = 'Kontakt';
+                        if (data.createdAt) {
                             try {
-                                const d = data.subscribedAt.toDate ? data.subscribedAt.toDate() : new Date(data.subscribedAt);
+                                const d = data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
                                 dateStr = d.toLocaleDateString('no');
                             } catch(e) {}
                         }
-                        const tags = Array.isArray(data.tags) ? data.tags : (typeof data.tags === 'string' && data.tags ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : []);
-                        const segments = Array.isArray(data.segments) ? data.segments : (typeof data.segments === 'string' && data.segments ? data.segments.split(',').map(s => s.trim()).filter(Boolean) : [data.source === 'website_footer' ? 'Nettsted' : (data.source || 'Nyhetsbrev')]);
-                        const phone = data.phone || data.mobile || '';
+                        const tags = Array.isArray(data.tags) ? data.tags : (typeof data.tags === 'string' && data.tags ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : (Array.isArray(data.labels) ? data.labels : []));
+                        const segments = Array.isArray(data.segments) ? data.segments : (typeof data.segments === 'string' && data.segments ? data.segments.split(',').map(s => s.trim()).filter(Boolean) : (data.segment ? [data.segment] : ['Kontaktliste (CRM)']));
+                        const phone = data.phone || data.mobile || data.tlf || '';
 
                         subscribersMap.set(email, {
                             id: doc.id,
-                            collection: 'newsletter_subscriptions',
+                            collection: 'contacts',
                             name,
                             email,
                             phone,
-                            source: data.source === 'website_footer' ? 'Nettsted' : (data.source || 'Direkte påmeldt'),
+                            source: 'Kontaktliste (CRM)',
                             status: data.status || 'Aktiv',
                             dateStr,
                             tags,
@@ -10011,10 +10035,10 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                 });
             }
         } catch (err) {
-            console.warn('[HKM Subscribers] Could not fetch newsletter_subscriptions:', err);
+            console.warn('[HKM Subscribers] Could not fetch contacts collection:', err);
         }
 
-        // 3. Tertiary list: registered users
+        // 3. Registered users list - included only if explicitly subscribed
         try {
             const usersSnap = await this.safeGet(window.firebaseService.db.collection('users'), 8000);
             if (usersSnap) {
@@ -10026,6 +10050,11 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                         explicitlyUnsubscribedEmails.add(email);
                         return;
                     }
+
+                    if (onlyNewsletterSubscribers && !isExplicitNewsletterSubscriber(data)) {
+                        return; // Skip general users who didn't opt into newsletter
+                    }
+
                     if (!subscribersMap.has(email)) {
                         const name = data.displayName || data.name || (data.firstName ? `${data.firstName} ${data.lastName || ''}`.trim() : email.split('@')[0]);
                         let dateStr = 'Medlem';
@@ -10056,34 +10085,6 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             }
         } catch (err) {
             console.warn('[HKM Subscribers] Could not fetch users collection:', err);
-        }
-
-        // 4. Default fallback admin subscribers if list is empty
-        if (!subscribersMap.has('thomas@hiskingdomministry.no') && !explicitlyUnsubscribedEmails.has('thomas@hiskingdomministry.no')) {
-            subscribersMap.set('thomas@hiskingdomministry.no', {
-                id: 'admin_thomas',
-                name: 'Thomas Knutsen',
-                email: 'thomas@hiskingdomministry.no',
-                phone: '',
-                source: 'Administrator',
-                status: 'Aktiv',
-                dateStr: new Date().toLocaleDateString('no'),
-                tags: ['Leder', 'Admin'],
-                segments: ['Nyhetsbrev', 'Administrator']
-            });
-        }
-        if (!subscribersMap.has('post@hiskingdomministry.no') && !explicitlyUnsubscribedEmails.has('post@hiskingdomministry.no')) {
-            subscribersMap.set('post@hiskingdomministry.no', {
-                id: 'admin_hkm',
-                name: 'HKM Medlem',
-                email: 'post@hiskingdomministry.no',
-                phone: '',
-                source: 'Administrator',
-                status: 'Aktiv',
-                dateStr: new Date().toLocaleDateString('no'),
-                tags: ['Admin'],
-                segments: ['Nyhetsbrev', 'Administrator']
-            });
         }
 
         explicitlyUnsubscribedEmails.forEach(email => subscribersMap.delete(email));
