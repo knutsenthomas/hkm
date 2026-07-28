@@ -2483,21 +2483,29 @@ class NewsletterBuilder {
                 const rawUrl = p.productPageUrl || p.url || '';
                 let slug = p.slug || '';
                 if (!slug && rawUrl) {
-                    const parts = rawUrl.split('/product-page/');
-                    if (parts.length > 1) {
-                        slug = parts[1].split('?')[0];
-                    } else {
-                        slug = rawUrl.split('/').pop().split('?')[0];
+                    if (rawUrl.includes('/product-page/')) {
+                        slug = rawUrl.split('/product-page/')[1].split('?')[0].split('#')[0];
+                    } else if (rawUrl.includes('/product/')) {
+                        slug = rawUrl.split('/product/')[1].split('?')[0].split('#')[0];
                     }
                 }
                 if (!slug && p.name) {
-                    slug = p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                    slug = p.name.toLowerCase()
+                        .replace(/æ/g, 'ae').replace(/ø/g, 'o').replace(/å/g, 'a')
+                        .replace(/[^a-z0-9]+/g, '-')
+                        .replace(/(^-|-$)/g, '');
                 }
 
-                const productUrl = (rawUrl && rawUrl.startsWith('http')) 
-                    ? rawUrl 
-                    : (slug ? `https://www.hiskingdomdesigns.no/product-page/${slug}` : 'https://www.hiskingdomdesigns.no/produkter');
-                
+                // If rawUrl is already a specific product page, use it; otherwise build the direct /product-page/slug URL
+                let productUrl = '';
+                if (rawUrl && rawUrl.startsWith('http') && (rawUrl.includes('/product-page/') || rawUrl.includes('/product/'))) {
+                    productUrl = rawUrl;
+                } else if (slug) {
+                    productUrl = `https://www.hiskingdomdesigns.no/product-page/${slug}`;
+                } else {
+                    productUrl = 'https://www.hiskingdomdesigns.no/produkter';
+                }
+
                 const image = p.imageUrl || '';
                 combinedHtml += `
                     <div class="newsletter-product-card" contenteditable="false" data-product-id="${productId}" data-product-slug="${slug}">
@@ -6504,7 +6512,33 @@ class NewsletterBuilder {
             }
         });
 
-        // 5. Ensure all non-text block cards in the container have exactly ONE delete button and edit control positioned cleanly
+        // 5. Upgrade product card links so they always point directly to /product-page/slug instead of generic front page
+        container.querySelectorAll('.newsletter-product-card').forEach(card => {
+            let slug = card.dataset.productSlug || '';
+            const titleEl = card.querySelector('.product-title, h4');
+            const titleText = titleEl ? titleEl.textContent.trim() : '';
+
+            if (!slug && titleText) {
+                slug = titleText.toLowerCase()
+                    .replace(/æ/g, 'ae').replace(/ø/g, 'o').replace(/å/g, 'a')
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/(^-|-$)/g, '');
+                card.setAttribute('data-product-slug', slug);
+            }
+
+            if (slug) {
+                const targetUrl = `https://www.hiskingdomdesigns.no/product-page/${slug}`;
+                card.querySelectorAll('a[href]').forEach(a => {
+                    const href = a.getAttribute('href') || '';
+                    if (!href.includes('/product-page/') || href.endsWith('/produkter') || href === 'https://www.hiskingdomdesigns.no/' || href === 'https://hiskingdomdesigns.no/' || href === 'https://www.hiskingdomdesigns.no/produkter') {
+                        a.setAttribute('href', targetUrl);
+                        a.setAttribute('target', '_blank');
+                    }
+                });
+            }
+        });
+
+        // 6. Ensure all non-text block cards in the container have exactly ONE delete button and edit control positioned cleanly
         container.querySelectorAll(
             '.newsletter-product-card, .newsletter-event-card, .newsletter-social-block, ' +
             '.newsletter-video-block, .newsletter-divider-block, .newsletter-spacer-block, .newsletter-columns-block'
