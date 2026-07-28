@@ -7820,29 +7820,10 @@ class NewsletterBuilder {
         if (!container) return;
 
         if (lang === 'en' && this.englishPayload) {
-            let html = '';
-            if (Array.isArray(this.englishPayload.blocksEn)) {
-                if (this.englishPayload.blocksEn.length === 1 && this.englishPayload.blocksEn[0].id === 'unified_content') {
-                    html = this.englishPayload.blocksEn[0].content.text || '<p><br></p>';
-                } else {
-                    html = (this.englishPayload.blocksEn || []).map(b => {
-                        let text = b.content?.text || '';
-                        if (b.type === 'title') {
-                            return `<h2 class="block-h2" style="font-family: 'Inter', sans-serif; font-weight: 700; color: #1e293b;">${text}</h2>`;
-                        } else if (b.type === 'text') {
-                            return `<p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155;">${text}</p>`;
-                        } else if (b.type === 'button') {
-                            return `<div style="text-align: center; margin: 24px 0;"><a href="${b.content?.url || '#'}" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 12px 30px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif;">${text || 'Read More'}</a></div>`;
-                        } else if (b.type === 'image' && b.content?.url) {
-                            return `<p><img src="${b.content.url}" alt="${b.content.alt || ''}" class="block-img" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;"></p>`;
-                        } else if (b.type === 'spacer') {
-                            return `<div style="height: ${b.content?.height || 20}px;"></div>`;
-                        }
-                        return '';
-                    }).join('');
-                }
-            }
-            container.innerHTML = html || '<p><br></p>';
+            const html = this.englishPayload.htmlEn 
+                || (this.englishPayload.blocksEn && this.englishPayload.blocksEn[0]?.content?.text)
+                || '<p><br></p>';
+            container.innerHTML = html;
             if (subjectInput && this.englishPayload.subjectEn) {
                 subjectInput.value = this.englishPayload.subjectEn;
             }
@@ -7872,7 +7853,7 @@ class NewsletterBuilder {
         const iconWrap = document.getElementById('english-status-icon-wrap');
         const actions = document.getElementById('english-status-actions');
 
-        if (this.englishPayload && this.englishPayload.blocksEn && this.englishPayload.blocksEn.length > 0) {
+        if (this.englishPayload && (this.englishPayload.htmlEn || (this.englishPayload.blocksEn && this.englishPayload.blocksEn.length > 0))) {
             if (badge) {
                 badge.innerText = '✅ Klar for utsendelse';
                 badge.style.background = '#dcfce7';
@@ -7941,7 +7922,7 @@ class NewsletterBuilder {
 
     async translateCurrentNewsletterToEnglish(force = false) {
         if (this.englishPayload && !force) {
-            if (typeof showToast === 'function') showToast("Nyhetsbrevet er allerede oversatt til engelsk! 🌐", "info");
+            this.renderCanvasForLanguage('en');
             this.updateEnglishStatusCardUI();
             return;
         }
@@ -7954,44 +7935,56 @@ class NewsletterBuilder {
             this.subjectNo = norwegianSubject;
         }
 
-        const norwegianBlocks = this.blocks || [];
         const container = document.getElementById('blocks-container');
-        const textContent = container ? container.innerHTML : '';
-        const plainText = textContent.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim();
+        const norwegianHtml = this.getCleanCanvasHtml();
+        const plainText = norwegianHtml.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim();
 
-        if (norwegianBlocks.length === 0 || !textContent || plainText === '') {
+        if (!norwegianHtml || plainText === '') {
             if (typeof showToast === 'function') showToast("Vennligst skriv inn noe innhold i nyhetsbrevet før du oversetter.", "warning");
             return;
         }
 
-        const translateBtn = document.getElementById('editor-lang-btn-en') || document.getElementById('btn-retranslate-editor-ai');
-        const originalText = translateBtn ? translateBtn.innerHTML : '';
-        if (translateBtn) {
-            translateBtn.disabled = true;
-            translateBtn.innerHTML = '<span class="material-symbols-outlined rotating" style="font-size: 16px;">sync</span> Oversetter...';
+        const btnEn = document.getElementById('editor-lang-btn-en');
+        const originalBtnHtml = btnEn ? btnEn.innerHTML : '';
+        if (btnEn) {
+            btnEn.disabled = true;
+            btnEn.innerHTML = `<span class="material-symbols-outlined rotating" style="font-size: 16px; color: #2563eb;">sync</span> <span>Oversetter...</span>`;
+        }
+
+        // Show instant skeleton / spinner on canvas if in English mode
+        if (this.currentEditorLang === 'en' && container) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 60px 20px; font-family: 'Inter', sans-serif;">
+                    <span class="material-symbols-outlined rotating" style="font-size: 40px; color: #0284c7; margin-bottom: 16px;">translate</span>
+                    <h3 style="margin: 0 0 8px 0; font-size: 20px; color: #0369a1; font-weight: 700;">Oversetter til engelsk med AI...</h3>
+                    <p style="margin: 0; color: #64748b; font-size: 14px;">Vennligst vent et øyeblikk mens teksten oversettes. Endringene vil vises direkte her på kanvaset.</p>
+                </div>
+            `;
         }
 
         try {
             const prompt = `
-                Du er en profesjonell teologisk og inspirerende oversetter for His Kingdom Ministry (HKM).
-                Oversett følgende nyhetsbrevinnhold fra norsk til et varmt, flytende og engasjerende engelsk språk.
-                VIKTIG REGEL: Oversett det norske ordet 'Basar' / 'Sommerbasar' til 'Raffle' / 'Summer Raffle' (ALDRI 'Bazaar').
+                Du er en profesjonell oversetter for His Kingdom Ministry (HKM).
+                Oversett følgende e-postinnhold og emnelinje fra norsk til et varmt, flytende og engasjerende engelsk språk for våre engelskspråklige abonnenter.
+                
+                STRENG REGEL: Oversett det norske ordet 'Basar' / 'Sommerbasar' til 'Raffle' / 'Summer Raffle' (ALDRI 'Bazaar').
+                FORMAT-REGEL: Bevar alle HTML-elementer (som <p>, <h2>, <strong>, <a>, <img>, style-attributter) nøyaktig som de er. Oversett KUN teksten inne i elementene.
 
-                Emnelinje (Norwegian): "${norwegianSubject}"
+                Emnelinje (Norsk): "${norwegianSubject}"
 
-                Nyhetsbrevets blokker (JSON):
-                ${JSON.stringify(norwegianBlocks)}
+                E-post HTML-innhold (Norsk):
+                ${norwegianHtml}
 
-                Du må returnere nøyaktig et gyldig JSON-objekt på dette formatet:
+                Svar KUN med et gyldig JSON-objekt på dette formatet:
                 {
                     "subject": "Translated English Subject Line",
-                    "blocks": [ ARRAY MED DE SAMME BLOKKENE, MEN MED ENGELSK TEKST I TEKSTBLOKKER OG KNAPPER ]
+                    "html": "Translated English HTML Content"
                 }
-                Svar KUN med ren JSON, ingen markdown.
+                Ingen markdown-kodelister, kun ren JSON.
             `;
 
             let translatedSubject = norwegianSubject;
-            let translatedBlocks = null;
+            let translatedHtml = null;
 
             if (window.firebase && window.firebase.functions) {
                 const callable = firebase.functions().httpsCallable('aiProcess');
@@ -8001,43 +7994,56 @@ class NewsletterBuilder {
                     if (jsonStr.startsWith('```')) {
                         jsonStr = jsonStr.replace(/^```(json)?\n?/, '').replace(/\n?```$/, '').trim();
                     }
-                    const parsed = JSON.parse(jsonStr);
-                    if (parsed.subject) translatedSubject = parsed.subject;
-                    if (Array.isArray(parsed.blocks)) translatedBlocks = parsed.blocks;
+                    try {
+                        const parsed = JSON.parse(jsonStr);
+                        if (parsed.subject) translatedSubject = parsed.subject;
+                        if (parsed.html) translatedHtml = parsed.html;
+                    } catch(jsonErr) {
+                        console.warn("JSON parse warning, using raw output or regex match:", jsonErr);
+                        const matchHtml = jsonStr.match(/"html"\s*:\s*"([\s\S]*)"/);
+                        if (matchHtml) translatedHtml = matchHtml[1];
+                    }
                 }
             }
 
-            if (!translatedBlocks) {
-                // Fallback translation
-                translatedSubject = norwegianSubject ? `${norwegianSubject} (English Edition)` : 'Newsletter';
-                translatedBlocks = (norwegianBlocks || []).map(b => {
-                    let text = (b.content?.text || '').replace(/\bbasar\b/gi, 'Raffle').replace(/\bbazaar\b/gi, 'Raffle');
-                    const bCopy = JSON.parse(JSON.stringify(b));
-                    if (bCopy.content) bCopy.content.text = text;
-                    return bCopy;
-                });
+            if (!translatedHtml) {
+                // Client fallback translation (replace Basar -> Raffle and key phrases)
+                translatedSubject = norwegianSubject ? `${norwegianSubject} (English)` : 'Newsletter';
+                translatedHtml = norwegianHtml
+                    .replace(/\bbasar\b/gi, 'Raffle')
+                    .replace(/\bbazaar\b/gi, 'Raffle')
+                    .replace(/Kjære venn/gi, 'Dear friend')
+                    .replace(/Meld deg av nyhetsbrev/gi, 'Unsubscribe from newsletter');
             }
 
             this.englishPayload = {
                 subjectEn: translatedSubject,
-                blocksEn: translatedBlocks,
+                htmlEn: translatedHtml,
+                blocksEn: [{
+                    id: 'unified_content',
+                    type: 'text',
+                    content: { text: translatedHtml }
+                }],
                 translatedAt: new Date().toISOString()
             };
 
-            // If currently in English mode, re-render canvas!
+            // If we are currently editing English, re-render canvas with translated HTML!
             if (this.currentEditorLang === 'en') {
                 this.renderCanvasForLanguage('en');
             }
 
             this.updateEnglishStatusCardUI();
-            if (typeof showToast === 'function') showToast("Suksess! Nyhetsbrevet er oversatt til engelsk med AI! 🌐", "success");
+            if (typeof showToast === 'function') showToast("Suksess! Nyhetsbrevet er oversatt til engelsk! 🌐", "success");
         } catch(err) {
             console.error("Translation error:", err);
             if (typeof showToast === 'function') showToast("Feil under oversettelse: " + (err.message || "Ukjent feil"), "error");
+            if (this.currentEditorLang === 'en' && container && !this.englishPayload) {
+                container.innerHTML = norwegianHtml;
+            }
         } finally {
-            if (translateBtn) {
-                translateBtn.disabled = false;
-                translateBtn.innerHTML = originalText;
+            if (btnEn) {
+                btnEn.disabled = false;
+                btnEn.innerHTML = originalBtnHtml || `<span class="material-symbols-outlined" style="font-size: 16px; color: #2563eb;">translate</span> <span>🇬🇧 English</span>`;
             }
         }
     }
