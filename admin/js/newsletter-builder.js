@@ -3386,9 +3386,13 @@ class NewsletterBuilder {
         const selection = window.getSelection();
 
         // Check if we are inserting block-level cards or structured components
-        const isBlockHtml = html.includes('newsletter-product-card') || 
+        const isBlockHtml = html.includes('newsletter-social-block') ||
+                            html.includes('newsletter-product-card') || 
                             html.includes('newsletter-event-card') || 
                             html.includes('newsletter-video-block') || 
+                            html.includes('newsletter-divider-block') ||
+                            html.includes('newsletter-spacer-block') ||
+                            html.includes('newsletter-columns-block') ||
                             html.includes('block-btn') || 
                             html.includes('display: grid') || 
                             html.includes('display: flex');
@@ -3419,18 +3423,22 @@ class NewsletterBuilder {
                 lastInsertedNode.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
 
+            this.normalizeCanvasBlocks(container);
             this.syncUnifiedBlocks();
+            this.triggerAutosave();
             return;
         }
 
-        if (selection.rangeCount && container.contains(selection.anchorNode)) {
+        if (selection && selection.rangeCount && container.contains(selection.anchorNode)) {
             this.exec('insertHTML', html);
         } else {
             while (temp.firstChild) {
                 container.appendChild(temp.firstChild);
             }
-            this.syncUnifiedBlocks();
         }
+        this.normalizeCanvasBlocks(container);
+        this.syncUnifiedBlocks();
+        this.triggerAutosave();
     }
 
     async uploadAndInsertImageFileAt(file, afterElement) {
