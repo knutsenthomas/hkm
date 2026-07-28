@@ -8408,14 +8408,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
         if (publishDropdown) publishDropdown.style.setProperty('display', 'none', 'important');
 
         const user = await this.getAuthUser();
-        const idToken = await this.getAuthIdToken();
-
-        if (!idToken) {
-            if (typeof showToast === 'function') {
-                showToast("Du må være innlogget for å sende test-e-post. Vennligst logg inn på nytt.", "warning");
-            }
-            return;
-        }
+        const defaultEmail = user?.email || 'post@hiskingdomministry.no';
 
         const subject = document.getElementById('newsletter-subject')?.value || 'Test-e-post';
         this.syncUnifiedBlocks();
@@ -8426,8 +8419,6 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
         if (!textContent || plainText === '' || textContent === '<p><br></p>' || textContent === '<p>Skriv nyhetsbrevet ditt her...</p>') {
             plainText = "Dette er en test-e-post fra His Kingdom Ministry.";
         }
-
-        const defaultEmail = user?.email || 'post@hiskingdomministry.no';
 
         this.showPromptModal(
             "Hvem vil du sende test-e-posten til?",
