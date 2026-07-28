@@ -769,8 +769,53 @@ class NewsletterBuilder {
                 }
             });
 
+            // Click handler for delete buttons (×) and block card selection
+            container.addEventListener('click', (e) => {
+                const deleteBtn = e.target.closest('.card-delete-btn, .block-delete-btn');
+                if (deleteBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const block = deleteBtn.closest(
+                        '.newsletter-event-card, .newsletter-product-card, .newsletter-social-block, ' +
+                        '.newsletter-video-block, .newsletter-columns-block, .newsletter-divider-block, ' +
+                        '.newsletter-spacer-block, .newsletter-html-block, .block-img-wrapper, .newsletter-subscribe-block'
+                    ) || deleteBtn.parentElement;
+                    if (block) {
+                        block.remove();
+                        this.syncUnifiedBlocks();
+                        this.triggerAutosave();
+                        showToast("Element slettet", "info");
+                        return;
+                    }
+                }
+
+                const blockCard = e.target.closest(
+                    '.newsletter-event-card, .newsletter-product-card, .newsletter-social-block, ' +
+                    '.newsletter-video-block, .newsletter-divider-block, .newsletter-spacer-block, .newsletter-columns-block'
+                );
+                if (blockCard) {
+                    this.selectedBlockCard = blockCard;
+                    document.querySelectorAll('.hkm-selected-block').forEach(el => el.classList.remove('hkm-selected-block'));
+                    blockCard.classList.add('hkm-selected-block');
+                } else if (!e.target.closest('.card-delete-btn')) {
+                    this.selectedBlockCard = null;
+                    document.querySelectorAll('.hkm-selected-block').forEach(el => el.classList.remove('hkm-selected-block'));
+                }
+            });
+
             // Keyboard handling for Enter, Backspace & Delete (Mac WebKit & Blink compatible)
             container.addEventListener('keydown', (e) => {
+                // If a non-text block card is currently selected, Backspace or Delete removes it immediately!
+                if ((e.key === 'Backspace' || e.key === 'Delete') && this.selectedBlockCard && container.contains(this.selectedBlockCard)) {
+                    e.preventDefault();
+                    this.selectedBlockCard.remove();
+                    this.selectedBlockCard = null;
+                    this.syncUnifiedBlocks();
+                    this.triggerAutosave();
+                    showToast("Element slettet", "info");
+                    return;
+                }
+
                 const selection = window.getSelection();
                 if (!selection || !selection.rangeCount) return;
                 const range = selection.getRangeAt(0);
@@ -782,32 +827,44 @@ class NewsletterBuilder {
 
                 if (!parentBlock) return;
 
+                const isBlockCard = parentBlock.classList && (
+                    parentBlock.classList.contains('newsletter-event-card') ||
+                    parentBlock.classList.contains('newsletter-product-card') ||
+                    parentBlock.classList.contains('newsletter-social-block') ||
+                    parentBlock.classList.contains('newsletter-video-block') ||
+                    parentBlock.classList.contains('newsletter-divider-block') ||
+                    parentBlock.classList.contains('newsletter-spacer-block') ||
+                    parentBlock.classList.contains('newsletter-columns-block')
+                );
+
+                if (isBlockCard && (e.key === 'Backspace' || e.key === 'Delete')) {
+                    e.preventDefault();
+                    parentBlock.remove();
+                    this.syncUnifiedBlocks();
+                    this.triggerAutosave();
+                    showToast("Element slettet", "info");
+                    return;
+                }
+
                 if (e.key === 'Enter') {
-                    // If inside heading (H1, H2, H3), pressing Enter at the end should insert a standard paragraph <p>
-                    if (/^H[1-6]$/i.test(parentBlock.tagName)) {
-                        const isAtEnd = range.collapsed && (
-                            range.startContainer === parentBlock ||
-                            (range.startContainer.nodeType === Node.TEXT_NODE && range.startOffset === range.startContainer.length)
-                        );
-                        if (isAtEnd) {
-                            e.preventDefault();
-                            const newP = document.createElement('p');
-                            newP.innerHTML = '<br>';
-                            if (parentBlock.nextSibling) {
-                                container.insertBefore(newP, parentBlock.nextSibling);
-                            } else {
-                                container.appendChild(newP);
-                            }
-                            const newRange = document.createRange();
-                            newRange.selectNodeContents(newP);
-                            newRange.collapse(true);
-                            selection.removeAllRanges();
-                            selection.addRange(newRange);
-                            newP.focus();
-                            this.syncUnifiedBlocks();
-                            this.triggerAutosave();
-                            return;
+                    if (/^H[1-6]$/i.test(parentBlock.tagName) || isBlockCard) {
+                        e.preventDefault();
+                        const newP = document.createElement('p');
+                        newP.innerHTML = '<br>';
+                        if (parentBlock.nextSibling) {
+                            container.insertBefore(newP, parentBlock.nextSibling);
+                        } else {
+                            container.appendChild(newP);
                         }
+                        const newRange = document.createRange();
+                        newRange.selectNodeContents(newP);
+                        newRange.collapse(true);
+                        selection.removeAllRanges();
+                        selection.addRange(newRange);
+                        newP.focus();
+                        this.syncUnifiedBlocks();
+                        this.triggerAutosave();
+                        return;
                     }
 
                     setTimeout(() => {
@@ -819,9 +876,8 @@ class NewsletterBuilder {
 
                 if (e.key === 'Backspace') {
                     const isCurrentEmpty = !parentBlock.textContent.replace(/\u8203|\u200B/g, '').trim() &&
-                        !parentBlock.querySelector('img, iframe, table, button, hr, .newsletter-product-card, .newsletter-event-card, .newsletter-video-block');
+                        !parentBlock.querySelector('img, iframe, table, button, hr, .newsletter-product-card, .newsletter-event-card, .newsletter-video-block, .newsletter-social-block');
 
-                    // Check if cursor is at the very beginning of the block
                     let isAtStart = false;
                     if (range.collapsed) {
                         if (isCurrentEmpty) {
@@ -843,40 +899,21 @@ class NewsletterBuilder {
                         const prevSibling = parentBlock.previousSibling;
                         if (!prevSibling) return;
 
-                        // If previous sibling is a card, protect card from deletion
-                        if (prevSibling.classList && (
-                            prevSibling.classList.contains('newsletter-product-card') ||
-                            prevSibling.classList.contains('newsletter-event-card') ||
-                            prevSibling.classList.contains('newsletter-video-block') ||
-                            prevSibling.classList.contains('newsletter-html-block')
-                        )) {
-                            if (isCurrentEmpty && container.children.length > 1) {
-                                e.preventDefault();
-                                parentBlock.remove();
-                                this.syncUnifiedBlocks();
-                                this.triggerAutosave();
-                            } else {
-                                e.preventDefault();
-                            }
-                            return;
-                        }
-
-                        // Normal text block backspace (remove empty line or merge text)
-                        if (isCurrentEmpty) {
+                        if (isCurrentEmpty && container.children.length > 1) {
                             e.preventDefault();
-                            const newRange = document.createRange();
-                            newRange.selectNodeContents(prevSibling);
-                            newRange.collapse(false);
-                            selection.removeAllRanges();
-                            selection.addRange(newRange);
-                            if (prevSibling.focus) prevSibling.focus();
-
+                            if (prevSibling.nodeType === Node.ELEMENT_NODE && prevSibling.focus) {
+                                const newRange = document.createRange();
+                                newRange.selectNodeContents(prevSibling);
+                                newRange.collapse(false);
+                                selection.removeAllRanges();
+                                selection.addRange(newRange);
+                                prevSibling.focus();
+                            }
                             parentBlock.remove();
                             this.syncUnifiedBlocks();
                             this.triggerAutosave();
                             return;
-                        } else if (isAtStart && prevSibling.nodeType === Node.ELEMENT_NODE) {
-                            // Merge current block content into previous sibling
+                        } else if (isAtStart && prevSibling.nodeType === Node.ELEMENT_NODE && !prevSibling.classList.contains('newsletter-event-card') && !prevSibling.classList.contains('newsletter-product-card') && !prevSibling.classList.contains('newsletter-social-block') && !prevSibling.classList.contains('newsletter-video-block')) {
                             e.preventDefault();
                             const caretMarker = document.createElement('span');
                             caretMarker.id = 'hkm-caret-merge-marker';
@@ -906,26 +943,23 @@ class NewsletterBuilder {
                     }
                 } else if (e.key === 'Delete') {
                     const isCurrentEmpty = !parentBlock.textContent.replace(/\u8203|\u200B/g, '').trim() &&
-                        !parentBlock.querySelector('img, iframe, table, button, hr, .newsletter-product-card, .newsletter-event-card, .newsletter-video-block');
+                        !parentBlock.querySelector('img, iframe, table, button, hr, .newsletter-product-card, .newsletter-event-card, .newsletter-video-block, .newsletter-social-block');
 
-                    const nextSibling = parentBlock.nextSibling;
-                    if (nextSibling && nextSibling.classList && (
-                        nextSibling.classList.contains('newsletter-product-card') ||
-                        nextSibling.classList.contains('newsletter-event-card')
-                    )) {
-                        const isAtEnd = range.collapsed && (
-                            range.startContainer === parentBlock ||
-                            (range.startContainer.nodeType === Node.TEXT_NODE && range.startOffset === range.startContainer.length)
-                        );
-                        if (isAtEnd) {
-                            e.preventDefault();
-                            if (isCurrentEmpty && container.children.length > 1) {
-                                parentBlock.remove();
-                                this.syncUnifiedBlocks();
-                                this.triggerAutosave();
-                            }
-                            return;
+                    if (isCurrentEmpty && container.children.length > 1) {
+                        const nextSibling = parentBlock.nextSibling;
+                        e.preventDefault();
+                        if (nextSibling && nextSibling.nodeType === Node.ELEMENT_NODE && nextSibling.focus) {
+                            const newRange = document.createRange();
+                            newRange.selectNodeContents(nextSibling);
+                            newRange.collapse(true);
+                            selection.removeAllRanges();
+                            selection.addRange(newRange);
+                            nextSibling.focus();
                         }
+                        parentBlock.remove();
+                        this.syncUnifiedBlocks();
+                        this.triggerAutosave();
+                        return;
                     }
                 }
             });
@@ -2101,19 +2135,30 @@ class NewsletterBuilder {
                 html = `<p>Skriv din tekst her...</p>`;
                 break;
             case 'divider':
-                html = `<hr style="border: none; border-top: 2px solid #e2e8f0; margin: 24px 0;">`;
+                html = `
+                    <div class="newsletter-divider-block" contenteditable="false" style="position: relative; margin: 24px 0; padding: 12px 0;">
+                        <button class="card-delete-btn" style="position: absolute; top: -10px; right: -10px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Slett skillelinje">×</button>
+                        <hr style="border: none; border-top: 2px solid #e2e8f0; margin: 0;">
+                    </div><p><br></p>`;
                 break;
             case 'spacer':
-                html = `<div style="height: 24px;"></div>`;
+                html = `
+                    <div class="newsletter-spacer-block" contenteditable="false" style="position: relative; margin: 12px 0; padding: 6px; border: 1px dashed #cbd5e1; border-radius: 8px; text-align: center; color: #94a3b8; font-size: 12px;">
+                        <button class="card-delete-btn" style="position: absolute; top: -10px; right: -10px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Slett avstand">×</button>
+                        <div style="height: 24px; display: flex; align-items: center; justify-content: center;">Avstand (24px)</div>
+                    </div><p><br></p>`;
                 break;
             case 'button':
                 this.openButtonInsertionFlow();
                 return;
             case 'columns':
                 html = `
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 24px 0;">
-                        <div style="min-height: 50px;">Venstre kolonne...</div>
-                        <div style="min-height: 50px;">Høyre kolonne...</div>
+                    <div class="newsletter-columns-block" contenteditable="false" style="position: relative; margin: 24px 0; padding: 8px; border: 1px dashed #cbd5e1; border-radius: 12px;">
+                        <button class="card-delete-btn" style="position: absolute; top: -10px; right: -10px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Slett kolonner">×</button>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                            <div contenteditable="true" style="min-height: 50px; padding: 12px; border: 1px dashed #e2e8f0; border-radius: 8px; background: white;">Venstre kolonne...</div>
+                            <div contenteditable="true" style="min-height: 50px; padding: 12px; border: 1px dashed #e2e8f0; border-radius: 8px; background: white;">Høyre kolonne...</div>
+                        </div>
                     </div><p><br></p>`;
                 break;
             case 'image':
@@ -2122,10 +2167,13 @@ class NewsletterBuilder {
                 return;
             case 'social':
                 html = `
-                    <div style="text-align: center; margin: 24px 0; display: flex; justify-content: center; gap: 16px;">
-                        <a href="https://facebook.com/hiskingdomministry" style="color: #1B4965; text-decoration: none; font-family: 'Inter', sans-serif; font-weight: 600;">Facebook</a>
-                        <a href="https://instagram.com/hiskingdomministry" style="color: #1B4965; text-decoration: none; font-family: 'Inter', sans-serif; font-weight: 600;">Instagram</a>
-                        <a href="https://youtube.com/@HisKingdomMinistry" style="color: #1B4965; text-decoration: none; font-family: 'Inter', sans-serif; font-weight: 600;">YouTube</a>
+                    <div class="newsletter-social-block" contenteditable="false" style="position: relative; text-align: center; margin: 24px 0; padding: 16px; border: 1px solid #e2e8f0; border-radius: 14px; background: #ffffff; display: flex; justify-content: center; gap: 16px; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                        <button class="card-delete-btn" style="position: absolute; top: -10px; right: -10px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Slett sosial blokk">×</button>
+                        <a href="https://facebook.com/hiskingdomministry" target="_blank" style="color: #1B4965; text-decoration: none; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px;">Facebook</a>
+                        <span style="color: #cbd5e1;">•</span>
+                        <a href="https://instagram.com/hiskingdomministry" target="_blank" style="color: #1B4965; text-decoration: none; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px;">Instagram</a>
+                        <span style="color: #cbd5e1;">•</span>
+                        <a href="https://youtube.com/@HisKingdomMinistry" target="_blank" style="color: #1B4965; text-decoration: none; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px;">YouTube</a>
                     </div><p><br></p>`;
                 break;
             case 'product':
@@ -2143,7 +2191,8 @@ class NewsletterBuilder {
                     const videoId = ytMatch[1];
                     const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
                     html = `
-                        <div class="newsletter-video-block" contenteditable="false" style="text-align: center; margin: 24px 0; position: relative;">
+                        <div class="newsletter-video-block" contenteditable="false" style="position: relative; text-align: center; margin: 24px 0;">
+                            <button class="card-delete-btn" style="position: absolute; top: -10px; right: -10px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Slett video">×</button>
                             <a href="${videoUrl}" target="_blank" style="display: block; position: relative; max-width: 600px; margin: 0 auto; text-decoration: none;">
                                 <img src="${thumbnailUrl}" style="width: 100%; height: auto; border-radius: 12px; display: block; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" alt="Video">
                                 <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 68px; height: 68px; background: rgba(27, 73, 101, 0.95); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(0,0,0,0.35); transition: all 0.3s ease;">
