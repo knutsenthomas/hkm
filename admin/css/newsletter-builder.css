@@ -5736,8 +5736,16 @@ body.builder-active .builder-workspace > .main-header {
 
 @media (max-width: 1500px) {
     #save-draft-btn span:not(.material-symbols-outlined),
-    #save-template-btn span:not(.material-symbols-outlined) {
+    #save-template-btn span:not(.material-symbols-outlined),
+    .builder-toolbar-header .btn-secondary-outline .btn-label-text {
         display: none !important; /* Hide secondary button text */
+    }
+    .builder-toolbar-header .btn-secondary-outline {
+        width: 36px !important;
+        min-width: 36px !important;
+        padding: 0 !important;
+        justify-content: center !important;
+        border-radius: 10px !important;
     }
     /* Symmetriske, runde sirkulære knapper for kladd/mal på mindre skjermer */
     .builder-unified-header #save-draft-btn,
