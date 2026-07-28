@@ -6871,19 +6871,16 @@ class NewsletterBuilder {
         const tileIG = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1B4965" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 24px !important; height: 24px !important; max-width: 24px !important; max-height: 24px !important; display: block !important;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>`;
         const tileYT = `<svg width="26" height="24" viewBox="0 0 24 24" fill="#1B4965" style="width: 26px !important; height: 24px !important; max-width: 26px !important; max-height: 24px !important; display: block !important;"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`;
 
-        // Enforce strict dimensions and monochromatic #1B4965 color on any existing social SVG icons inside container
+        // Enforce monochromatic #1B4965 color on all social blocks in canvas
         container.querySelectorAll('.newsletter-social-block').forEach(block => {
             block.querySelectorAll('a').forEach(a => {
                 a.style.color = '#1B4965';
-                const href = (a.getAttribute('href') || '').toLowerCase();
-                const title = (a.getAttribute('title') || '').toLowerCase();
-                if (href.includes('facebook') || title.includes('facebook')) {
-                    a.innerHTML = tileFB;
-                } else if (href.includes('instagram') || title.includes('instagram')) {
-                    a.innerHTML = tileIG;
-                } else if (href.includes('youtube') || title.includes('youtube') || href.includes('youtu.be')) {
-                    a.innerHTML = tileYT;
-                }
+                a.querySelectorAll('svg').forEach(svg => {
+                    const fill = svg.getAttribute('fill');
+                    if (fill && fill !== 'none') svg.setAttribute('fill', '#1B4965');
+                    const stroke = svg.getAttribute('stroke');
+                    if (stroke && stroke !== 'none') svg.setAttribute('stroke', '#1B4965');
+                });
             });
             block.querySelectorAll('svg').forEach(svg => {
                 svg.style.setProperty('width', '24px', 'important');
