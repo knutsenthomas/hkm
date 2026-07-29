@@ -3921,7 +3921,6 @@ class BibleReader {
             dictDrawer = document.createElement('aside');
             dictDrawer.className = 'dictionary-drawer';
             dictDrawer.id = 'dictionary-drawer';
-            dictDrawer.style.zIndex = '25000';
             dictDrawer.innerHTML = `
                 <div class="dict-header" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border-color); background: var(--bg-card);">
                     <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: var(--text-base);">Bibeleksikon</h3>
@@ -3978,12 +3977,21 @@ class BibleReader {
                 </div>
             `;
             document.body.appendChild(dictDrawer);
+        } else if (dictDrawer.parentNode !== document.body) {
+            document.body.appendChild(dictDrawer);
+        }
 
-            dictDrawer.querySelector('#close-dict-btn')?.addEventListener('click', () => {
+        dictDrawer.style.setProperty('z-index', '35000', 'important');
+
+        const closeBtn = dictDrawer.querySelector('#close-dict-btn');
+        if (closeBtn && !closeBtn._hkmBound) {
+            closeBtn._hkmBound = true;
+            closeBtn.onclick = () => {
                 dictDrawer.classList.remove('active');
+                dictDrawer.style.right = '';
                 const backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
                 if (backdrop) backdrop.classList.remove('active');
-            });
+            };
         }
         return dictDrawer;
     }
@@ -3999,6 +4007,8 @@ class BibleReader {
 
         const dictDrawer = this.ensureDictionaryDrawerExists();
         dictDrawer.classList.add('active');
+        dictDrawer.style.setProperty('right', '0px', 'important');
+        dictDrawer.style.setProperty('z-index', '35000', 'important');
         
         this.pushModalHistoryState('dictionary-drawer');
         let backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
@@ -4009,6 +4019,7 @@ class BibleReader {
             document.body.appendChild(backdrop);
         }
         backdrop.classList.add('active');
+        backdrop.style.setProperty('z-index', '34000', 'important');
 
         const dictBody = dictDrawer ? dictDrawer.querySelector('.dict-body') : null;
         if (dictBody) dictBody.scrollTop = 0;

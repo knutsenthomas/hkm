@@ -8869,10 +8869,37 @@ html[data-theme="dark"] .hkm-chat-field textarea:focus {
 
 /* Dictionary Drawer & Close Button Enhancements */
 .dictionary-drawer {
-    z-index: 30000 !important;
+    position: fixed !important;
+    top: 0 !important;
+    right: -450px !important;
+    width: 400px !important;
+    max-width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    background: var(--bg-sidebar, #ffffff) !important;
+    border-left: 1px solid var(--border-color, #e2e8f0) !important;
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.15) !important;
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    z-index: 35000 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
 }
 .dictionary-drawer.active {
-    z-index: 30000 !important;
+    right: 0 !important;
+    z-index: 35000 !important;
+}
+.dictionary-drawer.expanded {
+    width: 100vw !important;
+}
+@media (max-width: 640px) {
+    .dictionary-drawer {
+        width: 100vw !important;
+        right: -100vw !important;
+    }
+    .dictionary-drawer.active {
+        right: 0 !important;
+    }
 }
 .close-dict-btn {
     background: rgba(0, 0, 0, 0.06) !important;
