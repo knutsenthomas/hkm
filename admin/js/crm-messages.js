@@ -163,11 +163,11 @@ class MessagesManager {
         if (!listEl) return;
 
         try {
-            // Fetch Contact Messages
+            // Fetch Contact Messages (up to 100)
             const messagesSnapshot = await window.firebaseService.db
                 .collection('contactMessages')
                 .orderBy('createdAt', 'desc')
-                .limit(20)
+                .limit(100)
                 .get();
             
             this.messages = messagesSnapshot.docs.map(doc => ({
@@ -176,11 +176,31 @@ class MessagesManager {
                 ...doc.data()
             }));
 
-            // Fetch Visitor Chats
+            // Fetch any unread contact messages explicitly if not included in top 100
+            try {
+                const unreadSnap = await window.firebaseService.db
+                    .collection('contactMessages')
+                    .where('status', '==', 'ny')
+                    .get();
+                
+                unreadSnap.docs.forEach(doc => {
+                    if (!this.messages.some(m => m.id === doc.id)) {
+                        this.messages.push({
+                            id: doc.id,
+                            type: 'email',
+                            ...doc.data()
+                        });
+                    }
+                });
+            } catch (e) {
+                console.warn('Optional unread query notice:', e);
+            }
+
+            // Fetch Visitor Chats (up to 100)
             const chatsSnapshot = await window.firebaseService.db
                 .collection('visitorChats')
                 .orderBy('updatedAt', 'desc')
-                .limit(20)
+                .limit(100)
                 .get();
 
             this.visitorChats = chatsSnapshot.docs.map(doc => ({
@@ -193,7 +213,7 @@ class MessagesManager {
             const pushSnapshot = await window.firebaseService.db
                 .collection('push_log')
                 .orderBy('sentAt', 'desc')
-                .limit(20)
+                .limit(50)
                 .get();
 
             this.pushNotifications = pushSnapshot.docs.map(doc => ({
@@ -1147,6 +1167,43 @@ class MessagesManager {
         });
     }
 
+    async markAllAsRead() {
+        try {
+            // 1. Mark unread contactMessages as read in Firestore
+            const unreadMessages = this.messages.filter(m => m.status !== 'lest');
+            for (const msg of unreadMessages) {
+                await window.firebaseService.db.collection('contactMessages').doc(msg.id).update({ status: 'lest' });
+                msg.status = 'lest';
+            }
+
+            // 2. Mark unread user_notifications as read for the logged in user
+            if (window.firebaseService.auth?.currentUser?.uid) {
+                const unreadNotifsSnap = await window.firebaseService.db
+                    .collection('user_notifications')
+                    .where('userId', '==', window.firebaseService.auth.currentUser.uid)
+                    .where('read', '==', false)
+                    .get();
+                
+                if (!unreadNotifsSnap.empty) {
+                    const batch = window.firebaseService.db.batch();
+                    unreadNotifsSnap.forEach(doc => {
+                        batch.update(doc.ref, { read: true });
+                    });
+                    await batch.commit();
+                }
+            }
+
+            this.unreadInboxMessages = 0;
+            this.unreadUserNotifications = 0;
+            this.updateAdminBell();
+            this.updateBadges();
+            this.renderThreadList();
+            if (window.adminHeaderInstance) window.adminHeaderInstance.updateNotifications();
+        } catch (err) {
+            console.error("Error marking all as read:", err);
+        }
+    }
+
     updateBadges() {
         const unreadEmails = this.messages.filter(m => m.status !== 'lest').length;
         const unreadChats = this.visitorChats.filter(c => c.lastMessage && c.lastMessage.sender === 'visitor').length;
@@ -1156,8 +1213,8 @@ class MessagesManager {
         const badgeUnread = document.getElementById('badge-unread');
 
         if (badgeAll) {
-            badgeAll.textContent = totalUnread;
-            badgeAll.style.display = totalUnread > 0 ? 'inline-block' : 'none';
+            badgeAll.textContent = this.unifiedThreads.length;
+            badgeAll.style.display = this.unifiedThreads.length > 0 ? 'inline-block' : 'none';
         }
         if (badgeUnread) {
             badgeUnread.textContent = totalUnread;
