@@ -1719,11 +1719,68 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
 /* CRM Email Composer Modal Enhancements */
 .crm-send-email-modal-wrapper {
     max-width: 720px !important;
+    width: 100% !important;
     border-radius: 20px !important;
 }
 
-.crm-editor-toolbar button {
+/* Rich text toolbar button rules overriding generic mobile modal button expansion */
+.crm-editor-toolbar {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 4px !important;
+    width: 100% !important;
+    padding: 8px 10px !important;
+    box-sizing: border-box !important;
+}
+
+.crm-editor-toolbar button,
+.crm-editor-toolbar .editor-btn {
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    flex: 0 0 32px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 6px !important;
+    box-sizing: border-box !important;
     transition: all 0.15s ease;
+}
+
+.crm-editor-toolbar select,
+.crm-editor-toolbar #crm-editor-format-block,
+.crm-editor-toolbar #crm-email-merge-tag-select {
+    width: auto !important;
+    min-width: 80px !important;
+    max-width: 140px !important;
+    flex: 0 0 auto !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 6px !important;
+    font-size: 12px !important;
+    border-radius: 6px !important;
+    box-sizing: border-box !important;
+}
+
+.crm-editor-toolbar #crm-email-insert-img-btn,
+.crm-editor-toolbar #crm-email-insert-yt-btn {
+    width: auto !important;
+    min-width: auto !important;
+    flex: 0 0 auto !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 8px !important;
+    font-size: 12px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    border-radius: 6px !important;
 }
 
 .crm-editor-toolbar button:hover {
@@ -1733,6 +1790,34 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
 
 .crm-editor-toolbar button:active {
     transform: scale(0.95);
+}
+
+@media (max-width: 640px) {
+    .crm-send-email-modal-wrapper {
+        margin: 10px auto !important;
+        max-width: calc(100vw - 20px) !important;
+        border-radius: 16px !important;
+    }
+
+    .crm-email-meta-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+
+    .crm-editor-toolbar {
+        padding: 6px 8px !important;
+        gap: 4px !important;
+    }
+
+    .crm-editor-divider {
+        display: none !important;
+    }
+
+    #crm-email-body-editor {
+        min-height: 160px !important;
+        max-height: 260px !important;
+        padding: 12px !important;
+    }
 }
 
 #crm-email-body-editor img {

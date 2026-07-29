@@ -2098,7 +2098,7 @@ class CRMManager {
                 </div>
 
                 <!-- 2-Column Meta Row: From & Template -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                <div class="crm-email-meta-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
                     <div style="display: flex; flex-direction: column; gap: 5px;">
                         <label style="font-weight: 700; font-size: 13px; color: #334155; display: flex; align-items: center; gap: 4px;">
                             <span>Fra:</span>
@@ -2148,7 +2148,7 @@ class CRMManager {
                                 <span class="material-symbols-outlined" style="font-size: 19px;">link</span>
                             </button>
                             
-                            <div style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 3px;"></div>
+                            <div class="crm-editor-divider" style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 3px;"></div>
 
                             <!-- Format Selector -->
                             <select id="crm-editor-format-block" title="Tekststørrelse / Overskrift" style="height: 30px; border-radius: 6px; border: 1px solid #cbd5e1; background: white; padding: 0 8px; font-size: 12.5px; font-weight: 600; color: #334155; cursor: pointer; outline: none;">
@@ -2162,7 +2162,7 @@ class CRMManager {
                                 <span class="material-symbols-outlined" style="font-size: 19px;">format_quote</span>
                             </button>
 
-                            <div style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 3px;"></div>
+                            <div class="crm-editor-divider" style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 3px;"></div>
 
                             <button type="button" class="editor-btn" data-cmd="insertUnorderedList" title="Kulepunkter" style="width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
                                 <span class="material-symbols-outlined" style="font-size: 19px;">format_list_bulleted</span>
@@ -2177,7 +2177,7 @@ class CRMManager {
                                 <span class="material-symbols-outlined" style="font-size: 19px;">format_indent_increase</span>
                             </button>
 
-                            <div style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 3px;"></div>
+                            <div class="crm-editor-divider" style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 3px;"></div>
 
                             <button type="button" id="crm-email-add-att-btn" title="Legg til vedlegg" style="width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
                                 <span class="material-symbols-outlined" style="font-size: 19px;">attach_file</span>
