@@ -363,8 +363,8 @@ body.crm-body {
 
 .table-header .search-box {
     position: relative;
-    width: 300px !important;
-    max-width: 360px !important;
+    width: 340px !important;
+    max-width: 400px !important;
 }
 
 .search-box span {
@@ -392,7 +392,7 @@ body.crm-body {
 }
 
 .tag-filter-select {
-    padding: 10px 42px 10px 16px !important;
+    padding: 10px 36px 10px 14px !important;
     border: 1px solid var(--border-color, #cbd5e1) !important;
     border-radius: 8px !important;
     font-size: 14px !important;
@@ -406,11 +406,12 @@ body.crm-body {
     height: auto !important;
     min-height: 42px !important;
     transition: all 0.2s !important;
-    max-width: 280px !important;
+    width: 170px !important;
+    max-width: 170px !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
     overflow: hidden !important;
-    background-position: right 16px center !important;
+    background-position: right 12px center !important;
 }
 
 .tag-filter-select:hover {
