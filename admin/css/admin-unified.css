@@ -4889,7 +4889,7 @@ body.admin-body #overview-section .stat-icon-wrap > .material-symbols-outlined {
 /* Unify admin dashboard sidebar with the cleaner Segmenter/CRM menu style */
 body.admin-body .sidebar,
 body.minside-body .sidebar {
-  padding: 24px 16px !important;
+  padding: 0 16px 24px 16px !important;
   background: #fff !important;
   border-right: 1px solid var(--border-color, #dae1e7) !important;
   box-shadow: none !important;
@@ -4899,6 +4899,7 @@ body.admin-body .sidebar-header,
 body.minside-body .sidebar-header,
 body.crm-body .sidebar-header {
   padding: 16px 18px !important;
+  margin-top: 0 !important;
   margin-bottom: 18px !important;
   border-bottom: 1px solid rgba(226, 232, 240, 0.7) !important;
   display: flex !important;
