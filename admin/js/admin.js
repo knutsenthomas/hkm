@@ -28073,55 +28073,103 @@ class AdminManager {
         });
 
         // Initialize HTML/Code toggle logic (Live Read-Only Preview Frame)
-        const toggleBtn = document.getElementById('toggle-editor-mode-btn');
+        const previewTabBtn = document.getElementById('toggle-preview-mode-btn');
+        const codeTabBtn = document.getElementById('toggle-code-mode-btn');
         const rawTextarea = document.getElementById('edit-template-body-raw');
         const previewContainer = document.getElementById('template-live-preview-container');
         const quillContainer = document.getElementById('quill-editor-container');
 
-        const updatePreviewIframe = (templateId, htmlContent) => {
+        this.updatePreviewIframe = (templateId, htmlContent) => {
             const iframe = document.getElementById('template-preview-iframe');
             if (!iframe) return;
             let sampleHtml = htmlContent || "";
+            
+            // Format mock values for Norwegian visualization
             sampleHtml = sampleHtml
-                .replace(/\{\{name\}\}/g, "Test-bruker")
-                .replace(/\{\{email\}\}/g, "knutsenthomas@gmail.com")
-                .replace(/\{\{phone\}\}/g, "41234567")
+                .replace(/\{\{name\}\}/g, "Ola Nordmann")
+                .replace(/\{\{email\}\}/g, "ola.nordmann@eksempel.no")
+                .replace(/\{\{phone\}\}/g, "412 34 567")
                 .replace(/\{\{courseTitle\}\}/g, "Identitet i Kristus")
                 .replace(/\{\{amount\}\}/g, "Kr 0,- (Vipps / Gratis)")
-                .replace(/\{\{paymentMethod\}\}/g, "Vipps / Gratis")
-                .replace(/\{\{status\}\}/g, "Venter på godkjenning")
+                .replace(/\{\{paymentMethod\}\}/g, "Vipps")
+                .replace(/\{\{status\}\}/g, "Godkjent")
                 .replace(/\{\{day\}\}/g, "1")
-                .replace(/\{\{title\}\}/g, "Identitet i Kristus")
-                .replace(/\{\{passage\}\}/g, "Joh 14:1-6")
-                .replace(/\{\{devotional\}\}/g, "Dagens andakt og bønnefokus...")
+                .replace(/\{\{title\}\}/g, "Johannesevangeliet")
+                .replace(/\{\{passage\}\}/g, "Johannes 3:16-21")
+                .replace(/\{\{devotional\}\}/g, "Dette er en inspirerende andaktstekst for dagens lesing.")
                 .replace(/\{\{planId\}\}/g, "leseplan-1");
 
-            iframe.srcdoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>body{margin:0;padding:16px;background:#f8fafc;font-family:sans-serif;}</style></head><body>${sampleHtml}</body></html>`;
+            if (sampleHtml.includes("{{reading_content}}")) {
+                const mockReadingCard = `
+                    <div style="background-color: #FCF9F5; padding: 20px; border-radius: 12px; font-family: 'Inter', sans-serif;">
+                        <section style="margin-bottom: 20px; text-align: center;">
+                            <h2 style="font-family: Georgia, serif; font-size: 22px; color: #121c2c; margin: 0 0 6px 0; font-style: italic;">Hei Ola Nordmann</h2>
+                            <p style="font-size: 13px; color: #56423b; margin: 0; font-style: italic;">Måtte dagens ord bringe deg stillhet, refleksjon og fornyet styrke.</p>
+                        </section>
+                        <section style="background: #ffffff; border-left: 4px solid #1B4965; padding: 16px 20px; border-radius: 0 8px 8px 0; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                            <div style="font-size: 9px; font-weight: 800; color: #1B4965; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px;">BIBELTEKST</div>
+                            <h3 style="font-family: Georgia, serif; font-size: 16px; color: #121c2c; margin: 0 0 4px 0;">Johannesevangeliet - Dag 1</h3>
+                            <p style="font-size: 13px; color: #56423b; margin: 0; font-weight: 600;">Johannes 3:16-21</p>
+                        </section>
+                        <section style="background: #ffffff; border-left: 4px solid #d17d39; padding: 16px 20px; border-radius: 0 8px 8px 0; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                            <div style="font-size: 9px; font-weight: 800; color: #d17d39; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px;">ANDAKT & BØNN</div>
+                            <h4 style="font-family: Georgia, serif; font-size: 15px; color: #121c2c; margin: 0 0 6px 0;">Dagens andakt og bønn</h4>
+                            <p style="font-size: 13px; line-height: 1.6; color: #121c2c; margin: 0;">For så høyt har Gud elsket verden at han ga sin Sønn, den enbårne, for at hver den som tror på ham, ikke skal gå fortapt, men ha evig liv.</p>
+                        </section>
+                        <div style="text-align: center;">
+                            <a href="#" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 10px 32px; border-radius: 20px; font-weight: 700; text-decoration: none; font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; display: inline-block;">LES PLAN</a>
+                        </div>
+                    </div>
+                `;
+                sampleHtml = sampleHtml.replace(/\{\{reading_content\}\}/g, mockReadingCard);
+            }
+
+            iframe.srcdoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>body{margin:0;padding:16px;background:#FCF9F5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;}</style></head><body>${sampleHtml}</body></html>`;
         };
 
-        if (toggleBtn && rawTextarea) {
-            toggleBtn.onclick = () => {
-                const isCodeView = rawTextarea.style.display !== 'none';
-                const templateId = document.getElementById('edit-template-id').value;
-
-                if (quillContainer) quillContainer.style.display = 'none';
-
-                if (isCodeView) {
-                    // Switch from HTML code editor to Visual Read-only Live Preview
-                    rawTextarea.style.display = 'none';
-                    if (previewContainer) {
-                        previewContainer.style.display = 'block';
-                        updatePreviewIframe(templateId, rawTextarea.value);
-                    }
-                    toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transform: translateY(1px); margin-right: -3px !important;">code</span><span style="display: inline-flex; align-items: center; line-height: 1;">HTML-kode</span>';
-                } else {
-                    // Switch back to HTML code editor
-                    if (previewContainer) previewContainer.style.display = 'none';
-                    rawTextarea.style.display = 'block';
-                    toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transform: translateY(1px); margin-right: -3px !important;">visibility</span><span style="display: inline-flex; align-items: center; line-height: 1;">Visuelt utseende</span>';
+        const switchToPreviewTab = () => {
+            const templateId = document.getElementById('edit-template-id').value;
+            if (rawTextarea) rawTextarea.style.display = 'none';
+            if (quillContainer) quillContainer.style.display = 'none';
+            if (previewContainer) {
+                previewContainer.style.display = 'block';
+                const currentCode = rawTextarea ? rawTextarea.value : "";
+                if (this.updatePreviewIframe) {
+                    this.updatePreviewIframe(templateId, currentCode);
                 }
-            };
-        }
+            }
+
+            if (previewTabBtn) {
+                previewTabBtn.style.background = '#1B4965';
+                previewTabBtn.style.color = '#ffffff';
+                previewTabBtn.style.border = 'none';
+            }
+            if (codeTabBtn) {
+                codeTabBtn.style.background = '#f1f5f9';
+                codeTabBtn.style.color = '#475569';
+                codeTabBtn.style.border = '1px solid #cbd5e1';
+            }
+        };
+
+        const switchToCodeTab = () => {
+            if (previewContainer) previewContainer.style.display = 'none';
+            if (quillContainer) quillContainer.style.display = 'none';
+            if (rawTextarea) rawTextarea.style.display = 'block';
+
+            if (codeTabBtn) {
+                codeTabBtn.style.background = '#1B4965';
+                codeTabBtn.style.color = '#ffffff';
+                codeTabBtn.style.border = 'none';
+            }
+            if (previewTabBtn) {
+                previewTabBtn.style.background = '#f1f5f9';
+                previewTabBtn.style.color = '#475569';
+                previewTabBtn.style.border = '1px solid #cbd5e1';
+            }
+        };
+
+        if (previewTabBtn) previewTabBtn.onclick = switchToPreviewTab;
+        if (codeTabBtn) codeTabBtn.onclick = switchToCodeTab;
 
         const testBtn = document.getElementById('send-test-template-btn');
         if (testBtn) {
@@ -28441,19 +28489,37 @@ class AdminManager {
             if (permissionNotice) permissionNotice.style.display = 'none';
         }
 
-        // Always use raw HTML editor as default view (never destructive Quill)
+        // Set raw textarea value
         if (rawTextarea) {
             rawTextarea.value = bodyContent;
-            rawTextarea.style.display = 'block';
+            rawTextarea.style.display = 'none';
         }
         if (quillContainer) quillContainer.style.display = 'none';
-        if (previewContainer) previewContainer.style.display = 'none';
         
-        if (toggleBtn) {
-            toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transform: translateY(1px); margin-right: -3px !important;">visibility</span><span style="display: inline-flex; align-items: center; line-height: 1;">Visuelt utseende</span>';
+        // Show visual live preview BY DEFAULT when opening modal!
+        if (previewContainer) {
+            previewContainer.style.display = 'block';
+            if (this.updatePreviewIframe) {
+                this.updatePreviewIframe(templateId, bodyContent);
+            }
         }
+
+        // Set tab styles (Preview active by default)
+        const previewTabBtn = document.getElementById('toggle-preview-mode-btn');
+        const codeTabBtn = document.getElementById('toggle-code-mode-btn');
+        if (previewTabBtn) {
+            previewTabBtn.style.background = '#1B4965';
+            previewTabBtn.style.color = '#ffffff';
+            previewTabBtn.style.border = 'none';
+        }
+        if (codeTabBtn) {
+            codeTabBtn.style.background = '#f1f5f9';
+            codeTabBtn.style.color = '#475569';
+            codeTabBtn.style.border = '1px solid #cbd5e1';
+        }
+        
         if (warningEl) {
-            warningEl.textContent = 'OBS: Denne malen bruker avansert HTML-struktur. Du redigerer koden direkte i HTML-vinduet under, og trykker på "Visuelt utseende" for å se nøyaktig hvordan e-posten blir seende ut.';
+            warningEl.textContent = '👁️ Du ser den visuelle forhåndsvisningen. Velg "Rediger HTML-kode" for å gjøre endringer i koden.';
             warningEl.style.display = 'block';
         }
 
