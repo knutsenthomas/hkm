@@ -666,6 +666,21 @@ body.admin-body {
 }
 
 /* System Status Special Styling */
+.hkm-dashboard-section {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin-bottom: 24px !important;
+}
+
+.hkm-widgets-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+    gap: 16px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 4px !important;
+}
+
 .stat-card.modern[data-id="status"] {
     border-left: 4px solid #10b981 !important;
     border-color: #d1fae5 !important;
