@@ -9750,25 +9750,79 @@ class BibleReader {
         const audioBtn = stepContainer.querySelector('#hkm-yv-btn-audio');
         if (audioBtn) {
             audioBtn.onclick = () => {
-                if (window.speechSynthesis) {
-                    if (window.speechSynthesis.speaking) {
-                        window.speechSynthesis.cancel();
-                        audioBtn.querySelector('span').innerText = 'volume_up';
-                        audioBtn.classList.remove('speaking');
-                    } else {
-                        // Extract speakable text from body inner
-                        const speakText = stepContainer.querySelector('.hkm-yv-body-inner').innerText;
-                        const utterance = new SpeechSynthesisUtterance(speakText);
-                        utterance.lang = lang === 'en' ? 'en-US' : (lang === 'es' ? 'es-ES' : 'no-NO');
-                        utterance.onend = () => {
-                            audioBtn.querySelector('span').innerText = 'volume_up';
-                            audioBtn.classList.remove('speaking');
-                        };
-                        audioBtn.querySelector('span').innerText = 'volume_off';
-                        audioBtn.classList.add('speaking');
-                        window.speechSynthesis.speak(utterance);
-                    }
+                if (!('speechSynthesis' in window)) {
+                    alert(lang === 'en' ? 'Speech synthesis is not supported in your browser.' : (lang === 'es' ? 'La síntesis de voz no es compatible con su navegador.' : 'Tekst-til-tale er ikke støttet i denne nettleseren.'));
+                    return;
                 }
+
+                const resetAudioUI = () => {
+                    audioBtn.querySelector('span').innerText = 'volume_up';
+                    audioBtn.classList.remove('speaking');
+                };
+
+                if (window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                    resetAudioUI();
+                    return;
+                }
+
+                const speakBody = stepContainer.querySelector('.hkm-yv-body-inner');
+                const speakText = speakBody ? speakBody.innerText.trim() : '';
+
+                if (!speakText) {
+                    alert(lang === 'en' ? 'No text available to read out.' : (lang === 'es' ? 'No hay texto disponible para leer.' : 'Ingen tekst tilgjengelig for opplesning.'));
+                    return;
+                }
+
+                window.speechSynthesis.cancel();
+
+                const targetLang = lang === 'en' ? 'en' : (lang === 'es' ? 'es' : 'no');
+                const voices = window.speechSynthesis.getVoices() || [];
+                const matchedVoice = voices.find(v => v.lang && v.lang.toLowerCase().replace('_', '-').startsWith(targetLang));
+
+                const sentences = speakText.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [speakText];
+                let currentChunkIndex = 0;
+
+                audioBtn.querySelector('span').innerText = 'volume_off';
+                audioBtn.classList.add('speaking');
+
+                const speakNextChunk = () => {
+                    if (currentChunkIndex >= sentences.length || !audioBtn.classList.contains('speaking')) {
+                        resetAudioUI();
+                        return;
+                    }
+
+                    const chunk = sentences[currentChunkIndex].trim();
+                    if (!chunk) {
+                        currentChunkIndex++;
+                        speakNextChunk();
+                        return;
+                    }
+
+                    const utterance = new SpeechSynthesisUtterance(chunk);
+                    utterance.lang = lang === 'en' ? 'en-US' : (lang === 'es' ? 'es-ES' : 'no-NO');
+                    if (matchedVoice) {
+                        utterance.voice = matchedVoice;
+                    }
+
+                    utterance.onend = () => {
+                        currentChunkIndex++;
+                        speakNextChunk();
+                    };
+
+                    utterance.onerror = (e) => {
+                        console.warn("[SpeechSynthesis] Utterance error:", e);
+                        currentChunkIndex++;
+                        speakNextChunk();
+                    };
+
+                    window.speechSynthesis.speak(utterance);
+                    if (window.speechSynthesis.paused) {
+                        window.speechSynthesis.resume();
+                    }
+                };
+
+                speakNextChunk();
             };
         }
 
@@ -10079,14 +10133,70 @@ class BibleReader {
                 });
             })
             .catch(err => {
-                console.error("[BibleAudio] Error generating ChatGPT audio:", err);
-                alert("Kunne ikke generere ChatGPT AI-lyd for dette kapittelet: " + (err.message || 'Prøv igjen om et øyeblikk'));
-                this.stopAudioPlayback();
+                console.warn("[BibleAudio] Error generating ChatGPT audio, falling back to Web Speech API:", err);
+                if (infoDisplay) {
+                    infoDisplay.textContent = 'Spiller av med nettleserstemme...';
+                }
+                this.fallbackToWebSpeech(chapterText, paragraphs);
             });
         } else {
-            alert('Lydtjenesten var utilgjengelig. Prøv å laste siden på nytt.');
-            this.stopAudioPlayback();
+            this.fallbackToWebSpeech(chapterText, paragraphs);
         }
+    }
+
+    fallbackToWebSpeech(chapterText, paragraphs) {
+        if (!('speechSynthesis' in window)) {
+            alert('Lydtjenesten og tekst-til-tale er dessverre ikke støttet i din nettleser.');
+            this.stopAudioPlayback();
+            return;
+        }
+
+        window.speechSynthesis.cancel();
+        const lang = document.documentElement.lang || 'no';
+        const targetLang = lang === 'en' ? 'en' : (lang === 'es' ? 'es' : 'no');
+        const voices = window.speechSynthesis.getVoices() || [];
+        const matchedVoice = voices.find(v => v.lang && v.lang.toLowerCase().replace('_', '-').startsWith(targetLang));
+
+        const sentences = chapterText.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [chapterText];
+        let currentChunkIndex = 0;
+
+        const speakNext = () => {
+            if (!this.audioIsPlaying || currentChunkIndex >= sentences.length) {
+                this.stopAudioPlayback();
+                return;
+            }
+
+            const chunk = sentences[currentChunkIndex].trim();
+            if (!chunk) {
+                currentChunkIndex++;
+                speakNext();
+                return;
+            }
+
+            const utterance = new SpeechSynthesisUtterance(chunk);
+            utterance.lang = lang === 'en' ? 'en-US' : (lang === 'es' ? 'es-ES' : 'no-NO');
+            if (matchedVoice) utterance.voice = matchedVoice;
+            if (this.audioSpeed) utterance.rate = this.audioSpeed;
+
+            utterance.onend = () => {
+                currentChunkIndex++;
+                speakNext();
+            };
+
+            utterance.onerror = (err) => {
+                console.warn("[BibleAudio Fallback] Speech error:", err);
+                currentChunkIndex++;
+                speakNext();
+            };
+
+            window.speechSynthesis.speak(utterance);
+            if (window.speechSynthesis.paused) {
+                window.speechSynthesis.resume();
+            }
+        };
+
+        this.updateAudioPlayerUI();
+        speakNext();
     }
 
     stopAudioPlayback() {
