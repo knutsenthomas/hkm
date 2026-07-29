@@ -28143,8 +28143,8 @@ class AdminManager {
                                 </div>
                             `;
                     } else if (templateId === 'course_registration') {
-                        const emailSubject = subject.replace("{{name}}", "Test-bruker").replace("{{courseTitle}}", "Identitet i Kristus");
-                        const htmlBody = body.replace("{{name}}", "Test-bruker").replace("{{courseTitle}}", "Identitet i Kristus");
+                        const emailSubject = subject.replace(/\{\{name\}\}/g, "Test-bruker").replace(/\{\{courseTitle\}\}/g, "Identitet i Kristus");
+                        const htmlBody = body.replace(/\{\{name\}\}/g, "Test-bruker").replace(/\{\{courseTitle\}\}/g, "Identitet i Kristus");
                         testSubject = emailSubject;
                         testHtml = (htmlBody.includes('FCF9F5') || htmlBody.includes('hkm-email-container'))
                             ? htmlBody
@@ -28153,6 +28153,47 @@ class AdminManager {
                                     ${htmlBody}
                                     <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
                                         Dette er en automatisk utsendt test-e-post fra His Kingdom Ministry.
+                                    </div>
+                                </div>
+                            `;
+                    } else if (templateId === 'course_registration_admin') {
+                        const emailSubject = subject
+                            .replace(/\{\{name\}\}/g, "Test-bruker")
+                            .replace(/\{\{courseTitle\}\}/g, "Identitet i Kristus");
+                        const htmlBody = body
+                            .replace(/\{\{name\}\}/g, "Test-bruker")
+                            .replace(/\{\{email\}\}/g, email)
+                            .replace(/\{\{phone\}\}/g, "41234567")
+                            .replace(/\{\{courseTitle\}\}/g, "Identitet i Kristus")
+                            .replace(/\{\{amount\}\}/g, "Kr 0,-")
+                            .replace(/\{\{paymentMethod\}\}/g, "Vipps / Gratis")
+                            .replace(/\{\{status\}\}/g, "Venter på godkjenning");
+                        testSubject = emailSubject;
+                        testHtml = (htmlBody.includes('FCF9F5') || htmlBody.includes('hkm-email-container'))
+                            ? htmlBody
+                            : `
+                                <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px;">
+                                    ${htmlBody}
+                                    <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
+                                        Dette er et automatisk varsel til admin om ny kurspåmelding.
+                                    </div>
+                                </div>
+                            `;
+                    } else if (templateId === 'course_registration_approved') {
+                        const emailSubject = subject
+                            .replace(/\{\{name\}\}/g, "Test-bruker")
+                            .replace(/\{\{courseTitle\}\}/g, "Identitet i Kristus");
+                        const htmlBody = body
+                            .replace(/\{\{name\}\}/g, "Test-bruker")
+                            .replace(/\{\{courseTitle\}\}/g, "Identitet i Kristus");
+                        testSubject = emailSubject;
+                        testHtml = (htmlBody.includes('FCF9F5') || htmlBody.includes('hkm-email-container'))
+                            ? htmlBody
+                            : `
+                                <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px;">
+                                    ${htmlBody}
+                                    <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
+                                        Dette er en automatisk bekreftelse på godkjent tilgang fra His Kingdom Ministry.
                                     </div>
                                 </div>
                             `;
@@ -28276,12 +28317,21 @@ class AdminManager {
                         }
                         testSubject = emailSubject;
                     } else {
-                        // Fallback simple wrap
-                        testHtml = `
-                            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px;">
-                                \${body}
-                            </div>
-                        `;
+                        // Fallback simple wrap with variable replacements
+                        const htmlBody = body
+                            .replace(/\{\{name\}\}/g, "Test-bruker")
+                            .replace(/\{\{courseTitle\}\}/g, "Identitet i Kristus")
+                            .replace(/\{\{email\}\}/g, email);
+                        testSubject = subject
+                            .replace(/\{\{name\}\}/g, "Test-bruker")
+                            .replace(/\{\{courseTitle\}\}/g, "Identitet i Kristus");
+                        testHtml = (htmlBody.includes('FCF9F5') || htmlBody.includes('hkm-email-container'))
+                            ? htmlBody
+                            : `
+                                <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px;">
+                                    ${htmlBody}
+                                </div>
+                            `;
                     }
 
                     await this.sendEmailToUser(email, `[TEST] ${testSubject}`, "Test e-postmal", testHtml);
