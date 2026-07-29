@@ -9591,21 +9591,9 @@ class BibleReader {
             }
         } else if (step === 2) {
             const heading = dayConfig.verses || 'BIBEL';
-            const biblesList = this.bibles || [
-                { id: 'norsk_2024', name: 'Bibel 2024' },
-                { id: 'nb_07', name: 'Norsk 88/07' },
-                { id: 'kjv', name: 'King James Version' }
-            ];
-            const transOptionsHtml = biblesList.map(b => 
-                `<option value="${b.id}" ${b.id === this.selectedBibleId ? 'selected' : ''}>${b.name || b.abbreviation}</option>`
-            ).join('');
-
             stepContentHtml = `
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 8px;">
+                <div style="margin-bottom: 14px;">
                     <h3 class="hkm-devotional-step-title" style="margin-bottom: 0;">${heading}</h3>
-                    <select id="hkm-yv-translation-select" class="hkm-yv-translation-select" style="background: rgba(209, 125, 57, 0.08); border: 1px solid rgba(209, 125, 57, 0.2); color: #d17d39; font-weight: 700; font-size: 12px; border-radius: 20px; padding: 4px 10px; cursor: pointer; outline: none;">
-                        ${transOptionsHtml}
-                    </select>
                 </div>
                 <div class="hkm-devotional-text-serif">${scriptureHtml}</div>
                 
