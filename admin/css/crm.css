@@ -1829,6 +1829,44 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
     border-radius: 20px !important;
 }
 
+/* Responsive Email Templates & Editor Container Guard */
+#crm-email-body-editor,
+.ql-editor,
+.crm-email-preview-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: auto !important;
+    word-break: break-word !important;
+}
+
+#crm-email-body-editor > div,
+#crm-email-body-editor table,
+.ql-editor > div,
+.ql-editor table,
+.crm-email-preview-container > div,
+.crm-email-preview-container table {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+}
+
+#crm-email-body-editor *,
+.ql-editor *,
+.crm-email-preview-container * {
+    box-sizing: border-box !important;
+    max-width: 100% !important;
+}
+
+#crm-email-body-editor img,
+.ql-editor img,
+.crm-email-preview-container img {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
 /* Rich text toolbar button rules overriding generic mobile modal button expansion */
 .crm-editor-toolbar {
     display: flex !important;
