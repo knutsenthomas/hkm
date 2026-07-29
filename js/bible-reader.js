@@ -4060,7 +4060,7 @@ class BibleReader {
         let dictRes = null;
         let resources = null;
 
-        const isChapterOrVerses = forceExtended || (typeof parseReference === 'function' && !!parseReference(word)) || /^[1-4]?\s*[a-zæøå\s]+\s*\d+/i.test(word);
+        const isChapterOrVerses = forceExtended || (typeof parseReference === 'function' && !!parseReference(word)) || /^[1-4]?\s*\.?\s*[a-zæøå\.\s]+\s*\d+/i.test(word) || /\d+/.test(word);
 
         const cacheKey = `${word.trim().toLowerCase()}_${isChapterOrVerses ? 'ext_' : ''}${document.documentElement.lang || 'no'}`;
         if (this.dictCache && this.dictCache[cacheKey]) {
@@ -4107,19 +4107,19 @@ class BibleReader {
                                dictRes.category === 'Not Bible-related' || 
                                dictRes.category === 'No relacionado con la Biblia';
             
-            if (this.dom.dictExtendedTriggerWrap) {
+            if (dictExtendedTriggerWrap) {
                 if (dictRes.extendedAnalysis) {
-                    this.dom.dictExtendedTriggerWrap.style.display = 'none';
-                    if (this.dom.dictExtendedText) {
-                        this.dom.dictExtendedText.innerHTML = this.parseMarkdown(dictRes.extendedAnalysis);
+                    dictExtendedTriggerWrap.style.display = 'none';
+                    if (dictExtendedText) {
+                        dictExtendedText.innerHTML = this.parseMarkdown(dictRes.extendedAnalysis);
                     }
-                    if (this.dom.dictExtendedSection) {
-                        this.dom.dictExtendedSection.style.display = 'block';
+                    if (dictExtendedSection) {
+                        dictExtendedSection.style.display = 'block';
                     }
                 } else if (!isRejected && dictRes.definition && !dictRes.definition.includes('Ingen forhåndsdefinert forklaring')) {
-                    this.dom.dictExtendedTriggerWrap.style.display = 'block';
+                    dictExtendedTriggerWrap.style.display = 'block';
                 } else {
-                    this.dom.dictExtendedTriggerWrap.style.display = 'none';
+                    dictExtendedTriggerWrap.style.display = 'none';
                 }
             }
 
@@ -9746,7 +9746,7 @@ class BibleReader {
                     <h1 class="chapter-number" style="font-size: 56px; font-weight: 900; color: var(--text-base, #0f172a); margin: 0; line-height: 1;">${chapNumText}</h1>
                     
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 6px;">
-                        <button id="hkm-yv-btn-lookup-header" onclick="window.bibleReader.lookupWord('${escapedHeading}', '', '${escapedHeading}')" class="nav-btn" style="font-size: 13px; padding: 8px 16px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #0f172a); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                        <button id="hkm-yv-btn-lookup-header" onclick="window.bibleReader.lookupWord('${escapedHeading}', '', '${escapedHeading}', true)" class="nav-btn" style="font-size: 13px; padding: 8px 16px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #0f172a); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
                             <span class="material-symbols-outlined" style="font-size: 18px; color: #d17d39;">menu_book</span>
                             <span>Forklar kapittelet i Bibeleksikon</span>
                         </button>
@@ -10027,7 +10027,7 @@ class BibleReader {
         if (lookupHeaderBtn) {
             lookupHeaderBtn.onclick = (e) => {
                 e.stopPropagation();
-                this.lookupWord(versesRef || 'BIBEL', '', versesRef || 'BIBEL');
+                this.lookupWord(versesRef || 'BIBEL', '', versesRef || 'BIBEL', true);
             };
         }
 
