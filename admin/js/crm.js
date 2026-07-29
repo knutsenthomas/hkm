@@ -228,6 +228,9 @@ class CRMManager {
         const hkmBulkDelete = document.getElementById('hkm-bulk-delete-btn');
         if (hkmBulkDelete) hkmBulkDelete.onclick = () => this.deleteSelectedContacts();
 
+        const hkmBulkEmail = document.getElementById('hkm-bulk-email-btn');
+        if (hkmBulkEmail) hkmBulkEmail.onclick = () => this.bulkSendEmail();
+
         const hkmBulkTag = document.getElementById('hkm-bulk-tag-btn');
         if (hkmBulkTag) hkmBulkTag.onclick = () => this.bulkEditLabels();
 
@@ -475,6 +478,10 @@ class CRMManager {
                                 <span class="material-symbols-outlined">more_horiz</span>
                             </button>
                             <div class="contact-row-menu" role="menu" aria-label="Handlinger for kontakt">
+                                <button class="contact-row-menu-item" type="button" data-action="email" data-id="${safeId}">
+                                    <span class="material-symbols-outlined">mail</span>
+                                    Send e-post
+                                </button>
                                 <button class="contact-row-menu-item" type="button" data-action="edit" data-id="${safeId}">
                                     <span class="material-symbols-outlined">edit</span>
                                     Rediger
@@ -524,6 +531,10 @@ class CRMManager {
                 const id = btn.dataset.id;
                 this.openContactMenuId = null;
 
+                if (action === 'email') {
+                    this.openSendEmailModalForId(id);
+                    return;
+                }
                 if (action === 'edit') {
                     this.openEditContactModal(id);
                     return;
@@ -2001,6 +2012,152 @@ class CRMManager {
         }
     }
 
+    openSendEmailModalForId(contactId) {
+        const contact = this.contacts.find(c => String(c.id) === String(contactId));
+        if (contact) {
+            this.openSendEmailModal([contact]);
+        }
+    }
+
+    bulkSendEmail() {
+        if (!this.selectedContactIds || this.selectedContactIds.size === 0) {
+            this.notify('Ingen kontakter valgt.', 'warning');
+            return;
+        }
+        const selected = this.contacts.filter(c => this.selectedContactIds.has(c.id));
+        this.openSendEmailModal(selected);
+    }
+
+    async openSendEmailModal(targetContacts = []) {
+        const contactsWithEmail = targetContacts.filter(c => c.email && c.email.includes('@'));
+
+        if (contactsWithEmail.length === 0) {
+            this.notify('Ingen av de valgte kontaktene har en gyldig e-postadresse.', 'error');
+            return;
+        }
+
+        const user = window.firebaseService?.auth?.currentUser || (window.firebase && window.firebase.auth().currentUser);
+        const adminEmail = user?.email || 'adminbruker';
+        const adminName = user?.displayName || adminEmail.split('@')[0];
+
+        const recipientSummary = contactsWithEmail.length === 1
+            ? `${contactsWithEmail[0].displayName || (contactsWithEmail[0].firstName + ' ' + contactsWithEmail[0].lastName).trim() || contactsWithEmail[0].email} (${contactsWithEmail[0].email})`
+            : `${contactsWithEmail.length} kontakter (${contactsWithEmail.slice(0, 3).map(c => c.email).join(', ')}${contactsWithEmail.length > 3 ? '...' : ''})`;
+
+        const html = `
+            <div class="crm-send-email-modal" style="display: flex; flex-direction: column; gap: 16px; padding: 4px 0;">
+                <div style="background: #f8fafc; padding: 12px 16px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 13px; color: #334155;">
+                    <div style="font-weight: 700; color: #0f172a; margin-bottom: 2px;">Mottakere:</div>
+                    <div style="word-break: break-all;">${this.escapeHtml(recipientSummary)}</div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <label style="font-weight: 700; font-size: 13px; color: #334155; display: flex; align-items: center; gap: 6px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: #64748b;">alternate_email</span>
+                        Send e-post fra (Avsender):
+                    </label>
+                    <select id="crm-email-from-mode" class="form-control" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 14px; background: white; color: #0f172a; outline: none; cursor: pointer;">
+                        <option value="post" selected>His Kingdom Ministry (post@hiskingdomministry.no)</option>
+                        <option value="admin">Min egen e-post (${this.escapeHtml(adminName)} - ${this.escapeHtml(adminEmail)})</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <label style="font-weight: 700; font-size: 13px; color: #334155;">Emne:</label>
+                    <input type="text" id="crm-email-subject" class="form-control" placeholder="Skriv e-postemne her..." style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 14px; outline: none;">
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <label style="font-weight: 700; font-size: 13px; color: #334155;">Melding (Innhold):</label>
+                    <textarea id="crm-email-message" class="form-control" rows="6" placeholder="Skriv din melding her..." style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 14px; outline: none; resize: vertical; min-height: 120px;"></textarea>
+                </div>
+            </div>
+        `;
+
+        this.openCrmToolDialog({
+            mode: 'custom-html',
+            title: contactsWithEmail.length === 1 ? 'Send e-post til kontakt' : `Send e-post til ${contactsWithEmail.length} kontakter`,
+            subtitle: 'Velg avsenderadresse og skriv din e-post.',
+            html: html,
+            confirmLabel: 'Send e-post',
+            onConfirm: async () => {
+                const fromModeEl = document.getElementById('crm-email-from-mode');
+                const subjectEl = document.getElementById('crm-email-subject');
+                const messageEl = document.getElementById('crm-email-message');
+
+                const fromMode = fromModeEl ? fromModeEl.value : 'post';
+                const subject = subjectEl ? subjectEl.value.trim() : '';
+                const message = messageEl ? messageEl.value.trim() : '';
+
+                if (!subject) {
+                    this.notify('Vennligst oppgi et emne for e-posten.', 'error');
+                    return false;
+                }
+                if (!message) {
+                    this.notify('Vennligst skriv inn meldingstekst.', 'error');
+                    return false;
+                }
+
+                try {
+                    const currentUser = window.firebaseService?.auth?.currentUser || (window.firebase && window.firebase.auth().currentUser);
+                    const idToken = currentUser ? await currentUser.getIdToken() : '';
+
+                    let sentCount = 0;
+                    let failCount = 0;
+
+                    this.notify(`Sender e-post til ${contactsWithEmail.length} ${contactsWithEmail.length === 1 ? 'mottaker' : 'mottakere'}...`);
+
+                    for (const contact of contactsWithEmail) {
+                        try {
+                            const fromName = fromMode === 'admin'
+                                ? (currentUser?.displayName || currentUser?.email || 'HKM Admin')
+                                : 'His Kingdom Ministry';
+
+                            const payload = {
+                                to: contact.email,
+                                subject: subject,
+                                message: message,
+                                fromMode: fromMode,
+                                fromName: fromName
+                            };
+
+                            const response = await fetch('https://sendmanualemail-42bhgdjkcq-uc.a.run.app', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    ...(idToken ? { 'Authorization': `Bearer ${idToken}` } : {})
+                                },
+                                body: JSON.stringify(payload)
+                            });
+
+                            const result = await response.json().catch(() => ({}));
+                            if (response.ok && (result.success || result.messageId || result.id)) {
+                                sentCount++;
+                            } else {
+                                console.warn(`Feil ved sending til ${contact.email}:`, result.error || response.statusText);
+                                failCount++;
+                            }
+                        } catch (err) {
+                            console.error(`E-postfeil for ${contact.email}:`, err);
+                            failCount++;
+                        }
+                    }
+
+                    if (sentCount > 0) {
+                        this.notify(`Sendte ${sentCount} e-post${sentCount === 1 ? '' : 'er'}!${failCount > 0 ? ` (${failCount} feilet)` : ''}`);
+                    } else {
+                        this.notify('Kunne ikke sende e-post. Sjekk konsollen for detaljer.', 'error');
+                    }
+                    return true;
+                } catch (e) {
+                    console.error('Kunne ikke fullføre e-postsending:', e);
+                    this.notify('Feil ved sending av e-post: ' + e.message, 'error');
+                    return false;
+                }
+            }
+        });
+    }
+
     async bulkEditLabels() {
         const count = this.selectedContactIds.size;
         if (count === 0) return;
@@ -2495,10 +2652,10 @@ class CRMManager {
                         <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
                         Rediger
                     </button>
-                    <a href="mailto:${contact.email}" class="btn btn-primary btn-sm">
+                    <button class="btn btn-primary btn-sm" onclick="window.crm.openSendEmailModalForId('${contact.id}')">
                         <span class="material-symbols-outlined" style="font-size: 18px;">mail</span>
                         Send e-post
-                    </a>
+                    </button>
                 </div>
             </div>
 
