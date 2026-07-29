@@ -520,52 +520,79 @@
 
                     <!-- 4. Push Dashboard (Hidden by default) -->
                     <section class="inbox-push-dashboard" id="inbox-push-dashboard" style="display: none;">
-                        <div class="push-dashboard-header">
-                            <div class="push-header-content">
-                                <div class="push-icon-box">
-                                    <span class="material-symbols-outlined">campaign</span>
+                        <div class="push-dashboard-header" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); padding: 28px 40px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between;">
+                            <div class="push-header-content" style="display: flex; align-items: center; gap: 20px;">
+                                <div class="push-icon-box" style="width: 56px; height: 56px; border-radius: 16px; background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); color: #d17d39; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.2);">
+                                    <span class="material-symbols-outlined" style="font-size: 28px;">campaign</span>
                                 </div>
                                 <div class="push-title-text">
-                                    <h3>Logg & Aktivitet</h3>
-                                    <p>Send varsler og se historikk over utsendelser</p>
+                                    <h3 style="margin: 0; font-size: 22px; font-weight: 800; color: #0f172a;">Logg & Aktivitet</h3>
+                                    <p style="margin: 4px 0 0; font-size: 14px; color: #64748b;">Send push-varsler og følg opp henvendelser i sanntid</p>
                                 </div>
+                            </div>
+                            <div style="display: flex; gap: 10px; align-items: center;" class="hide-mobile">
+                                <span class="badge" style="background: #dcfce7; color: #166534; font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 999px; border: 1px solid #bbf7d0; display: inline-flex; align-items: center; gap: 6px;">
+                                    <span class="material-symbols-outlined" style="font-size: 16px; color: #16a34a;">sensors</span> FCM Live
+                                </span>
                             </div>
                         </div>
 
                         <div class="push-dashboard-grid">
                             <!-- Form Panel -->
                             <div class="push-form-panel">
-                                <div class="design-ui-panel">
-                                    <div class="design-ui-panel-header">
-                                        <h3 class="design-ui-panel-title">Send ny varsling</h3>
+                                <div class="design-ui-panel" style="background: white; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 4px 20px rgba(0,0,0,0.04); overflow: hidden;">
+                                    <div class="design-ui-panel-header" style="padding: 20px 24px; border-bottom: 1px solid #f1f5f9; background: #f8fafc; display: flex; align-items: center; justify-content: space-between;">
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <div style="width: 36px; height: 36px; border-radius: 10px; background: #fff7ed; color: #d17d39; display: flex; align-items: center; justify-content: center;">
+                                                <span class="material-symbols-outlined" style="font-size: 20px;">send_to_mobile</span>
+                                            </div>
+                                            <h3 class="design-ui-panel-title" style="margin: 0; font-size: 16px; font-weight: 700; color: #0f172a;">Send ny varsling</h3>
+                                        </div>
+                                        <span class="badge" style="background: #e0f2fe; color: #0369a1; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px;">Push API</span>
                                     </div>
-                                    <div class="design-ui-panel-body">
+                                    <div class="design-ui-panel-body" style="padding: 24px;">
                                         <form id="push-notification-form">
-                                            <div class="form-group">
-                                                <label>Målgruppe</label>
-                                                <select id="push-target-role" name="targetRole" class="form-control">
-                                                    <option value="all">Alle Brukere</option>
+                                            <div class="form-group" style="margin-bottom: 18px;">
+                                                <label style="font-weight: 700; font-size: 13px; color: #334155; margin-bottom: 6px; display: block;">Målgruppe</label>
+                                                <select id="push-target-role" name="targetRole" class="form-control" style="border-radius: 12px; height: 44px; font-weight: 600; border: 1px solid #cbd5e1; background: #f8fafc; color: #0f172a;">
+                                                    <option value="all">Alle Brukere (Global push)</option>
                                                     <option value="medlem">Bare Medlemmer</option>
                                                     <option value="selected">Valgte brukere</option>
                                                 </select>
                                             </div>
-                                            <div id="push-user-selection" class="user-selection-container" style="display: none;">
+                                            <div id="push-user-selection" class="user-selection-container" style="display: none; margin-bottom: 18px;">
                                                 <!-- User list will be injected here -->
                                             </div>
-                                            <div class="form-group">
-                                                <label>Tittel</label>
-                                                <input type="text" id="push-title" name="title" class="form-control" required placeholder="F.eks. Nytt arrangement!">
+                                            <div class="form-group" style="margin-bottom: 18px;">
+                                                <label style="font-weight: 700; font-size: 13px; color: #334155; margin-bottom: 6px; display: block;">Tittel</label>
+                                                <input type="text" id="push-title" name="title" class="form-control" required placeholder="F.eks. Nytt arrangement!" style="border-radius: 12px; height: 44px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 500;">
                                             </div>
-                                            <div class="form-group">
-                                                <label>Melding</label>
-                                                <textarea id="push-body" name="body" class="form-control" rows="3" required placeholder="Skriv meldingen din her..."></textarea>
+                                            <div class="form-group" style="margin-bottom: 18px;">
+                                                <label style="font-weight: 700; font-size: 13px; color: #334155; margin-bottom: 6px; display: block;">Melding</label>
+                                                <textarea id="push-body" name="body" class="form-control" rows="3" required placeholder="Skriv meldingen din her..." style="border-radius: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 500; resize: vertical; min-height: 90px;"></textarea>
                                             </div>
-                                            <div class="form-group" style="margin-bottom: 24px;">
-                                                <label>Link (valgfri)</label>
-                                                <input type="text" id="push-click-action" name="click_action" class="form-control" placeholder="https://...">
+                                            <div class="form-group" style="margin-bottom: 20px;">
+                                                <label style="font-weight: 700; font-size: 13px; color: #334155; margin-bottom: 6px; display: block;">Link (valgfri)</label>
+                                                <input type="text" id="push-click-action" name="click_action" class="form-control" placeholder="https://..." style="border-radius: 12px; height: 44px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 500;">
                                             </div>
-                                            <button type="submit" class="btn btn-primary" style="width: 100%;">
-                                                <span class="material-symbols-outlined">send</span>
+
+                                            <!-- Live Push Notification Preview Card -->
+                                            <div class="push-preview-card" style="margin-bottom: 24px; padding: 16px; border-radius: 16px; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; box-shadow: 0 8px 24px rgba(15,23,42,0.15);">
+                                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                                                    <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; opacity: 0.8; font-weight: 600;">
+                                                        <span class="material-symbols-outlined" style="font-size: 16px; color: #d17d39;">notifications_active</span>
+                                                        <span>His Kingdom Ministry</span>
+                                                        <span>•</span>
+                                                        <span>Nå</span>
+                                                    </div>
+                                                    <span style="font-size: 10px; background: rgba(255,255,255,0.15); padding: 2px 8px; border-radius: 999px;">Forhåndsvisning</span>
+                                                </div>
+                                                <div id="preview-push-title" style="font-size: 14px; font-weight: 700; margin-bottom: 4px; color: #ffffff;">F.eks. Nytt arrangement!</div>
+                                                <div id="preview-push-body" style="font-size: 12px; color: #94a3b8; line-height: 1.4;">Skriv meldingen din her...</div>
+                                            </div>
+
+                                            <button type="submit" class="btn btn-primary" style="width: 100%; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border: none; font-weight: 700; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 16px rgba(209, 125, 57, 0.35); cursor: pointer; transition: all 0.2s ease;">
+                                                <span class="material-symbols-outlined" style="font-size: 20px;">send</span>
                                                 Send push-varsling
                                             </button>
                                             <div id="push-status" class="status-message" style="margin-top: 15px;"></div>
@@ -576,12 +603,20 @@
 
                             <!-- Log Panel -->
                             <div class="push-log-panel">
-                                <div class="design-ui-panel" style="height: 100%;">
-                                    <div class="design-ui-panel-header">
-                                        <h3 class="design-ui-panel-title">Aktivitetslogg</h3>
+                                <div class="design-ui-panel" style="height: 100%; background: white; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 4px 20px rgba(0,0,0,0.04); overflow: hidden;">
+                                    <div class="design-ui-panel-header" style="padding: 20px 24px; border-bottom: 1px solid #f1f5f9; background: #f8fafc; display: flex; align-items: center; justify-content: space-between;">
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <div style="width: 36px; height: 36px; border-radius: 10px; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center;">
+                                                <span class="material-symbols-outlined" style="font-size: 20px;">history</span>
+                                            </div>
+                                            <h3 class="design-ui-panel-title" style="margin: 0; font-size: 16px; font-weight: 700; color: #0f172a;">Aktivitetslogg & Historikk</h3>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline" onclick="window.messagesManager.loadActivityLog(document.querySelector('.log-filter-btn.active')?.dataset?.filter || 'all')" style="border-radius: 8px; font-size: 12px; padding: 6px 12px; display: inline-flex; align-items: center; gap: 4px; font-weight: 600; cursor: pointer;">
+                                            <span class="material-symbols-outlined" style="font-size: 16px;">refresh</span> Oppdater
+                                        </button>
                                     </div>
-                                    <div class="design-ui-panel-body">
-                                        <div id="log-filters" class="log-filters">
+                                    <div class="design-ui-panel-body" style="padding: 24px;">
+                                        <div id="log-filters" class="log-filters" style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;">
                                             <button class="log-filter-btn active" data-filter="all">Alle</button>
                                             <button class="log-filter-btn" data-filter="push">Push-varslinger</button>
                                             <button class="log-filter-btn" data-filter="chat">Nettsidechat</button>

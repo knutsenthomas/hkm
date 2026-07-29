@@ -1410,14 +1410,14 @@ class MessagesManager {
 
         container.innerHTML = filtered.map(item => {
             let icon = 'campaign';
-            let color = '#3b82f6';
-            let bg = '#eff6ff';
+            let color = '#d17d39';
+            let bg = '#fff7ed';
             let title = '';
             let meta = '';
             
             if (item.type === 'push') {
                 title = item.title || 'Push-varsling';
-                meta = `${item.body || ''} · Til: ${item.targetRole === 'all' ? 'Alle' : item.targetRole} · Sendt av ${item.sentBy || 'Admin'}`;
+                meta = `${item.body || ''} · Til: ${item.targetRole === 'all' ? 'Alle Brukere' : item.targetRole} · Sendt av ${item.sentBy || 'Admin'}`;
             } else if (item.type === 'email') {
                 icon = 'mail';
                 color = '#10b981';
@@ -1426,8 +1426,8 @@ class MessagesManager {
                 meta = item.subject || item.message || '';
             } else if (item.type === 'chat') {
                 icon = 'forum';
-                color = '#8b5cf6';
-                bg = '#f5f3ff';
+                color = '#2563eb';
+                bg = '#eff6ff';
                 title = `Chat med ${item.visitorName || 'Anonym'}`;
                 meta = item.lastMessage?.text || 'Ingen meldinger';
             }
@@ -1435,14 +1435,17 @@ class MessagesManager {
             const date = (item.updatedAt || item.createdAt || item.sentAt)?.toDate?.() || new Date(item.updatedAt || item.createdAt || item.sentAt || 0);
             
             return `
-                <div class="log-item">
-                    <div class="log-item-icon" style="background: ${bg}; color: ${color};">
-                        <span class="material-symbols-outlined">${icon}</span>
+                <div class="log-item" onclick="${item.type !== 'push' ? `window.messagesManager.selectThread('${item.id}', '${item.type}')` : ''}" style="cursor: ${item.type !== 'push' ? 'pointer' : 'default'}; transition: all 0.2s ease;">
+                    <div class="log-item-icon" style="background: ${bg}; color: ${color}; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <span class="material-symbols-outlined" style="font-size: 22px;">${icon}</span>
                     </div>
-                    <div class="log-item-content">
-                        <div class="log-item-title">${this.escapeHtml(title)}</div>
-                        <div class="log-item-meta">${this.escapeHtml(meta)}</div>
-                        <div class="log-item-date">${this.formatTime(date)}</div>
+                    <div class="log-item-content" style="flex: 1;">
+                        <div class="log-item-title" style="display: flex; justify-content: space-between; align-items: center; font-weight: 700; color: #0f172a; font-size: 14px;">
+                            <span>${this.escapeHtml(title)}</span>
+                            ${item.type !== 'push' ? `<span style="font-size: 11px; color: #d17d39; font-weight: 700; display: inline-flex; align-items: center; gap: 2px;">Åpne <span class="material-symbols-outlined" style="font-size: 14px;">arrow_forward</span></span>` : ''}
+                        </div>
+                        <div class="log-item-meta" style="font-size: 13px; color: #64748b; margin-top: 2px; line-height: 1.4;">${this.escapeHtml(meta)}</div>
+                        <div class="log-item-date" style="font-size: 12px; color: #94a3b8; margin-top: 6px; font-weight: 500;">${this.formatTime(date)}</div>
                     </div>
                 </div>
             `;
