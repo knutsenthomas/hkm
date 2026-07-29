@@ -4803,7 +4803,7 @@ class AdminManager {
                             </div>
                         `).join('')}
                     </div>
-                    <a href="#analytics" class="top-nav-tab" data-category="analytics" style="display:flex; align-items:center; gap:8px; margin-top:20px; font-size:13px; color: var(--admin-accent-color, #1B4965); text-decoration:none; font-weight:600;">
+                    <a href="/admin/admin-analytics.html" style="display:flex; align-items:center; gap:8px; margin-top:20px; font-size:13px; color: var(--admin-accent-color, #1B4965); text-decoration:none; font-weight:600;">
                         <span>Se detaljert analyse</span>
                         <span class="material-symbols-outlined" aria-hidden="true" style="font-size: 16px;">arrow_forward</span>
                     </a>
