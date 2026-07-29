@@ -6682,7 +6682,9 @@ body.admin-body .template-item:active {
     gap: 12px !important;
   }
 
-  .header-right-actions {
+  .header-right-actions,
+  .table-header .header-right-actions,
+  #contacts-tools {
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: wrap !important;
@@ -6706,7 +6708,11 @@ body.admin-body .template-item:active {
   .header-right-actions button,
   .header-right-actions .btn,
   .header-left-actions > button,
-  .header-left-actions > .btn {
+  .header-left-actions > .btn,
+  .table-header .header-right-actions button,
+  .table-header .header-right-actions .btn,
+  #contacts-tools button,
+  #contacts-tools .btn {
     width: auto !important;
     flex: 0 0 auto !important;
     min-width: 44px !important;
