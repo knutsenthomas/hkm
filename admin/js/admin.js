@@ -4635,9 +4635,104 @@ class AdminManager {
             }
 
             this.gaData = gaData;
+
+            // Fetch recent course enrollments for overview card
+            let recentCourseEnrollments = [];
+            try {
+                const db = window.firebaseService?.db || (typeof firebase !== 'undefined' ? firebase.firestore() : null);
+                if (db) {
+                    const enrollSnap = await db.collection('courseEnrollments').orderBy('enrolledAt', 'desc').limit(5).get();
+                    enrollSnap.forEach(doc => {
+                        recentCourseEnrollments.push({ id: doc.id, ...doc.data() });
+                    });
+                }
+            } catch (cErr) {
+                console.warn("[AdminManager] Could not fetch courseEnrollments:", cErr);
+            }
+
+            this.recentCourseEnrollments = recentCourseEnrollments;
         } catch (err) {
             console.warn("[AdminManager] Failed to fetch overview data, using mock statistics:", err);
         }
+
+        // Build Recent Course Signups Card HTML
+        let courseSignupsItemsHtml = '';
+        const enrollments = this.recentCourseEnrollments || [];
+        if (enrollments.length > 0) {
+            courseSignupsItemsHtml = enrollments.map(item => {
+                const name = this.escapeHtml(item.name || item.userName || 'Ukjent påmeldt');
+                const email = this.escapeHtml(item.email || item.userEmail || '');
+                const course = this.escapeHtml(item.courseTitle || item.courseName || 'HKM Kurs');
+                
+                let initials = name.trim().split(/\s+/).map(p => p[0]).join('').substring(0, 2).toUpperCase() || 'KP';
+                if (initials.length === 1 && name.length >= 2) initials = name.substring(0, 2).toUpperCase();
+
+                let dateStr = 'Nylig';
+                if (item.enrolledAt) {
+                    const d = item.enrolledAt.toDate ? item.enrolledAt.toDate() : new Date(item.enrolledAt);
+                    dateStr = d.toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+                }
+
+                const status = String(item.status || 'godkjent').toLowerCase();
+                let statusBadge = '<span class="status-pill status-approved" style="background:#dcfce7;color:#16a34a;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;">🟢 Påmeldt</span>';
+                if (['pending', 'venter'].includes(status)) {
+                    statusBadge = '<span class="status-pill status-pending" style="background:#fff7ed;color:#d17d39;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;">🟡 Venter</span>';
+                } else if (['fullført', 'completed'].includes(status)) {
+                    statusBadge = '<span class="status-pill status-completed" style="background:#e0f2fe;color:#0284c7;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;">🔵 Fullført</span>';
+                }
+
+                return `
+                    <div class="recent-signup-item" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #ffffff; border: 1.5px solid #f1f5f9; border-radius: 14px; transition: all 0.2s ease;">
+                        <div style="display: flex; align-items: center; gap: 14px; min-width: 0;">
+                            <div style="width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); color: #d17d39; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid #ffedd5;">
+                                ${initials}
+                            </div>
+                            <div style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                <div style="font-weight: 700; font-size: 14px; color: #1e293b; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${name}</div>
+                                <div style="font-size: 12px; color: #64748b; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${email ? email + ' • ' : ''}<span style="color: #d17d39; font-weight: 600;">${course}</span></div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0; margin-left: 12px;">
+                            <span style="font-size: 11px; color: #94a3b8; font-weight: 500;">${dateStr}</span>
+                            ${statusBadge}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } else {
+            courseSignupsItemsHtml = `
+                <div style="text-align: center; padding: 32px 24px; background: #f8fafc; border-radius: 14px; border: 1.5px dashed #e2e8f0;">
+                    <div style="width: 52px; height: 52px; border-radius: 16px; background: #fff7ed; color: #d17d39; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; border: 1px solid #ffedd5;">
+                        <span class="material-symbols-outlined" style="font-size: 28px;">school</span>
+                    </div>
+                    <h4 style="margin: 0; font-size: 15px; font-weight: 700; color: #1e293b;">Ingen nye kurspåmeldinger enda</h4>
+                    <p style="margin: 6px 0 0 0; font-size: 13px; color: #64748b;">Når nye studenter melder seg på et kurs, vil deres registreringer vises her i sanntid.</p>
+                </div>
+            `;
+        }
+
+        const courseSignupsCardHtml = `
+            <div class="dashboard-course-signups-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px; margin-top: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 44px; height: 44px; border-radius: 14px; background: #fff7ed; color: #d17d39; display: flex; align-items: center; justify-content: center; border: 1px solid #ffedd5;">
+                            <span class="material-symbols-outlined" style="font-size: 24px;">school</span>
+                        </div>
+                        <div>
+                            <h3 style="margin: 0; font-size: 17px; font-weight: 800; color: #1e293b;">Siste kurspåmeldinger</h3>
+                            <p style="margin: 2px 0 0 0; font-size: 12px; color: #64748b; font-weight: 500;">Nylig registrert deltakelse på HKM Kurs</p>
+                        </div>
+                    </div>
+                    <a href="/admin/index.html#courses" class="nav-link" data-section="courses" style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #d17d39; text-decoration: none; background: #fff7ed; padding: 8px 14px; border-radius: 10px; border: 1px solid #ffedd5; transition: all 0.2s ease;">
+                        <span>Se alle påmeldinger</span>
+                        <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+                    </a>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    ${courseSignupsItemsHtml}
+                </div>
+            </div>
+        `;
 
         // Render dashboard grid with stats
         const enabledWidgets = ['visitors', 'analytics-engagement', 'users', 'status', 'blog', 'teaching', 'donations', 'donation-amount', 'youtube', 'podcast'];
@@ -5020,6 +5115,7 @@ class AdminManager {
             <div class="analytics-footer-section">
                 ${analyticsFooterHtml}
             </div>
+            ${courseSignupsCardHtml}
         `;
         // Initialize supporting systems
         this._initOverviewRealtimeSubscriptions();
