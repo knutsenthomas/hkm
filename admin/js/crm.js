@@ -289,6 +289,9 @@ class CRMManager {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('action') === 'add-contact' || sessionStorage.getItem('pendingFabAction') === 'add-contact-btn') {
                 sessionStorage.removeItem('pendingFabAction');
+                if (urlParams.get('action') === 'add-contact') {
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
                 this.openCreateContactModal();
             }
         } catch (error) {
