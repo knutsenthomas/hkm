@@ -3916,27 +3916,63 @@ class BibleReader {
     }
 
     async lookupWord(word, contextText, refText) {
-        if (this.dom.dictDrawer) this.dom.dictDrawer.classList.add('active');
+        if (!word) return;
+
+        const getEl = (key, id) => {
+            let el = (this.dom && this.dom[key]) ? this.dom[key] : document.getElementById(id);
+            if (el && this.dom) this.dom[key] = el;
+            return el;
+        };
+
+        const dictDrawer = getEl('dictDrawer', 'dictionary-drawer');
+        if (dictDrawer) dictDrawer.classList.add('active');
+        
         this.pushModalHistoryState('dictionary-drawer');
         const backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
         if (backdrop) backdrop.classList.add('active');
-        const dictBody = this.dom.dictDrawer ? this.dom.dictDrawer.querySelector('.dict-body') : null;
+        const dictBody = dictDrawer ? dictDrawer.querySelector('.dict-body') : null;
         if (dictBody) dictBody.scrollTop = 0;
-        if (this.dom.dictWelcomeState) this.dom.dictWelcomeState.style.display = 'none';
-        this.dom.dictSpinner.style.display = 'flex';
-        this.dom.dictContentWrap.style.display = 'none';
+
+        const dictWelcomeState = getEl('dictWelcomeState', 'dict-welcome-state');
+        if (dictWelcomeState) dictWelcomeState.style.display = 'none';
+
+        const dictSpinner = getEl('dictSpinner', 'dict-spinner');
+        if (dictSpinner) dictSpinner.style.display = 'flex';
+
+        const dictContentWrap = getEl('dictContentWrap', 'dict-content-wrap');
+        if (dictContentWrap) dictContentWrap.style.display = 'none';
         
-        if (this.dom.dictSearchInput) this.dom.dictSearchInput.value = word;
-        this.dom.dictWordTitle.innerText = word;
+        const dictSearchInput = getEl('dictSearchInput', 'dict-search-input');
+        if (dictSearchInput) dictSearchInput.value = word;
+
+        const dictWordTitle = getEl('dictWordTitle', 'dict-word-title');
+        if (dictWordTitle) dictWordTitle.innerText = word;
+
+        const dictCategory = getEl('dictCategory', 'dict-category');
+        const dictDefinition = getEl('dictDefinition', 'dict-definition');
+        const dictContextualNote = getEl('dictContextualNote', 'dict-contextual-note');
 
         // Reset extended analysis sections and button states
-        if (this.dom.dictExtendedSection) this.dom.dictExtendedSection.style.display = 'none';
-        if (this.dom.dictExtendedTriggerWrap) this.dom.dictExtendedTriggerWrap.style.display = 'none';
-        if (this.dom.dictExtendedText) this.dom.dictExtendedText.innerHTML = '';
-        if (this.dom.dictExtendedBtn) this.dom.dictExtendedBtn.disabled = false;
-        if (this.dom.dictExtendedBtnText) this.dom.dictExtendedBtnText.textContent = this.t('extended_btn');
-        if (this.dom.dictHistoricalSection) this.dom.dictHistoricalSection.style.display = 'none';
-        if (this.dom.dictHistoricalList) this.dom.dictHistoricalList.innerHTML = '';
+        const dictExtendedSection = getEl('dictExtendedSection', 'dict-extended-section');
+        if (dictExtendedSection) dictExtendedSection.style.display = 'none';
+
+        const dictExtendedTriggerWrap = getEl('dictExtendedTriggerWrap', 'dict-extended-trigger-wrap');
+        if (dictExtendedTriggerWrap) dictExtendedTriggerWrap.style.display = 'none';
+
+        const dictExtendedText = getEl('dictExtendedText', 'dict-extended-text');
+        if (dictExtendedText) dictExtendedText.innerHTML = '';
+
+        const dictExtendedBtn = getEl('dictExtendedBtn', 'dict-extended-btn');
+        if (dictExtendedBtn) dictExtendedBtn.disabled = false;
+
+        const dictExtendedBtnText = getEl('dictExtendedBtnText', 'dict-extended-btn-text');
+        if (dictExtendedBtnText) dictExtendedBtnText.textContent = this.t('extended_btn');
+
+        const dictHistoricalSection = getEl('dictHistoricalSection', 'dict-historical-section');
+        if (dictHistoricalSection) dictHistoricalSection.style.display = 'none';
+
+        const dictHistoricalList = getEl('dictHistoricalList', 'dict-historical-list');
+        if (dictHistoricalList) dictHistoricalList.innerHTML = '';
 
         const dictRelatedBox = document.getElementById('dict-related-resources');
         if (dictRelatedBox) dictRelatedBox.innerHTML = '';
@@ -3975,13 +4011,13 @@ class BibleReader {
                 }
             }
 
-            this.dom.dictSpinner.style.display = 'none';
-            this.dom.dictContentWrap.style.display = 'block';
+            if (dictSpinner) dictSpinner.style.display = 'none';
+            if (dictContentWrap) dictContentWrap.style.display = 'block';
 
-            this.dom.dictWordTitle.innerText = dictRes.word || word;
-            this.dom.dictCategory.innerText = dictRes.category || this.t('dictionary');
-            this.dom.dictDefinition.innerHTML = this.parseMarkdown(dictRes.definition) || '';
-            this.dom.dictContextualNote.innerHTML = this.parseMarkdown(dictRes.contextualNote) || '';
+            if (dictWordTitle) dictWordTitle.innerText = dictRes.word || word;
+            if (dictCategory) dictCategory.innerText = dictRes.category || this.t('dictionary');
+            if (dictDefinition) dictDefinition.innerHTML = this.parseMarkdown(dictRes.definition) || '';
+            if (dictContextualNote) dictContextualNote.innerHTML = this.parseMarkdown(dictRes.contextualNote) || '';
 
             // Show/hide the extended analysis trigger based on biblical relevance
             const isRejected = dictRes.category === 'Ikke bibelrelatert' || 
@@ -9627,7 +9663,7 @@ class BibleReader {
                     <h1 class="chapter-number" style="font-size: 56px; font-weight: 900; color: var(--text-base, #0f172a); margin: 0; line-height: 1;">${chapNumText}</h1>
                     
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 6px;">
-                        <button onclick="window.bibleReader.lookupWord('${escapedHeading}', '', '${escapedHeading}')" class="nav-btn" style="font-size: 13px; padding: 8px 16px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #0f172a); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                        <button id="hkm-yv-btn-lookup-header" onclick="window.bibleReader.lookupWord('${escapedHeading}', '', '${escapedHeading}')" class="nav-btn" style="font-size: 13px; padding: 8px 16px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #0f172a); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
                             <span class="material-symbols-outlined" style="font-size: 18px; color: #d17d39;">menu_book</span>
                             <span>Forklar kapittelet i Bibeleksikon</span>
                         </button>
@@ -9901,6 +9937,15 @@ class BibleReader {
                 });
                 if (matched) devBookId = matched.id;
             }
+        }
+
+        // Wire Lookup (Bibeleksikon) button in Header
+        const lookupHeaderBtn = stepContainer.querySelector('#hkm-yv-btn-lookup-header');
+        if (lookupHeaderBtn) {
+            lookupHeaderBtn.onclick = (e) => {
+                e.stopPropagation();
+                this.lookupWord(versesRef || 'BIBEL', '', versesRef || 'BIBEL');
+            };
         }
 
         // Wire Audio button in Header
