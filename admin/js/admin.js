@@ -28124,8 +28124,26 @@ class AdminManager {
                 sampleHtml = sampleHtml.replace(/\{\{reading_content\}\}/g, mockReadingCard);
             }
 
-            iframe.srcdoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>body{margin:0;padding:16px;background:#FCF9F5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;}</style></head><body>${sampleHtml}</body></html>`;
+            const fullHtmlDoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>body{margin:0;padding:20px;background:#FCF9F5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#121c2c;}</style></head><body>${sampleHtml}</body></html>`;
+            iframe.srcdoc = fullHtmlDoc;
+            try {
+                const doc = iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document);
+                if (doc) {
+                    doc.open();
+                    doc.write(fullHtmlDoc);
+                    doc.close();
+                }
+            } catch(e) {}
         };
+
+        if (rawTextarea) {
+            rawTextarea.addEventListener('input', () => {
+                const templateId = document.getElementById('edit-template-id')?.value;
+                if (this.updatePreviewIframe && templateId) {
+                    this.updatePreviewIframe(templateId, rawTextarea.value);
+                }
+            });
+        }
 
         const switchToPreviewTab = () => {
             const templateId = document.getElementById('edit-template-id').value;
@@ -28176,8 +28194,7 @@ class AdminManager {
             testBtn.onclick = async () => {
                 const templateId = document.getElementById('edit-template-id').value;
                 const subject = document.getElementById('edit-template-subject').value;
-                const isCodeView = rawTextarea && rawTextarea.style.display !== 'none';
-                const body = isCodeView ? (rawTextarea ? rawTextarea.value : "") : (this.quill ? this.quill.root.innerHTML : "");
+                const body = (rawTextarea && rawTextarea.value) ? rawTextarea.value : (this.quill ? this.quill.root.innerHTML : "");
 
                 if (!subject) {
                     this.showToast("Emnefeltet kan ikke være tomt.", "error");
@@ -28416,8 +28433,7 @@ class AdminManager {
         saveBtn.onclick = async () => {
             const templateId = document.getElementById('edit-template-id').value;
             const subject = document.getElementById('edit-template-subject').value;
-            const isCodeView = rawTextarea && rawTextarea.style.display !== 'none';
-            const body = isCodeView ? (rawTextarea ? rawTextarea.value : "") : (this.quill ? this.quill.root.innerHTML : "");
+            const body = (rawTextarea && rawTextarea.value) ? rawTextarea.value : (this.quill ? this.quill.root.innerHTML : "");
 
             if (!subject) {
                 this.showToast("Emnefeltet kan ikke være tomt.", "error");
