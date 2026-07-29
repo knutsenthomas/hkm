@@ -3426,7 +3426,7 @@ class BibleReader {
                     const lang = document.documentElement.lang || 'no';
                     const labelIntroBtn = lang === 'en' ? 'Book Intro' : (lang === 'es' ? 'Intro Libro' : 'Bokintroduksjon');
                     bookIntroBtn.innerHTML = `
-                        <span class="material-symbols-outlined" style="font-size: 16px; color: #1B4965;">auto_stories</span>
+                        <span class="material-symbols-outlined" style="font-size: 16px; color: var(--bible-primary, #d17d39);">auto_stories</span>
                         <span>${labelIntroBtn}</span>
                     `;
                     bookIntroBtn.addEventListener('click', () => {
@@ -5651,6 +5651,8 @@ class BibleReader {
                 .bible-theme-dark .hkm-yv-footer { background: #0f172a !important; border-top-color: #1e293b !important; }
                 .bible-theme-dark .hkm-yv-nav-circle-btn:not(.active) { background: #1e293b !important; color: #cbd5e1 !important; }
                 .bible-theme-dark .hkm-yv-nav-circle-btn:hover { background: #334155 !important; color: #f8fafc !important; }
+                .bible-theme-dark #btn-book-intro-dynamic { background: #1e293b !important; border-color: #334155 !important; color: #f8fafc !important; }
+                .bible-theme-dark #btn-book-intro-dynamic .material-symbols-outlined { color: #f97316 !important; }
                 .bible-theme-dark .hkm-yv-footer-pill { background: #1e293b !important; border-color: #334155 !important; color: #94a3b8 !important; }
                 
                 /* Dark Mode fixes for Book Intro & Cross References modals */
