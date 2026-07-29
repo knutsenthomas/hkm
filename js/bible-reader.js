@@ -3181,7 +3181,7 @@ class BibleReader {
                 </div>
 
                 <!-- Floating Bottom Action Button (Pill style like reference screenshot) -->
-                <div style="padding: 14px 20px; padding-bottom: max(14px, env(safe-area-inset-bottom, 14px)); border-top: 1px solid var(--border-color, rgba(0,0,0,0.08)); display: flex; justify-content: center; align-items: center; flex-shrink: 0; background: var(--bg-card, #ffffff);">
+                <div class="hkm-book-intro-footer-wrapper" style="padding: 14px 20px; padding-bottom: max(14px, env(safe-area-inset-bottom, 14px)); border-top: 1px solid var(--border-color, rgba(0,0,0,0.08)); display: flex; justify-content: center; align-items: center; flex-shrink: 0; background: var(--bg-card, #ffffff);">
                     <button id="btn-close-book-intro-footer" style="background: var(--bg-surface, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #334155); border-radius: 9999px; padding: 10px 24px; font-weight: 700; font-size: 13.5px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); transition: all 0.2s ease;">
                         <span class="material-symbols-outlined" style="font-size: 18px; color: #D17D39;">auto_stories</span>
                         <span>${labelClose}</span>
@@ -5660,6 +5660,7 @@ class BibleReader {
                 .bible-theme-dark .verse-crossref-sheet-card,
                 .bible-theme-dark .hkm-book-intro-header,
                 .bible-theme-dark .hkm-book-intro-scroll-body,
+                .bible-theme-dark .hkm-book-intro-footer-wrapper,
                 .bible-theme-dark .verse-crossref-sheet-body { background: #0f172a !important; color: #f8fafc !important; border-color: #1e293b !important; }
                 .bible-theme-dark .sheet-handle-bar { background: rgba(255, 255, 255, 0.25) !important; }
                 .bible-theme-dark #btn-close-book-intro-x,
