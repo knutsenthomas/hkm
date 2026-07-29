@@ -6625,29 +6625,48 @@ body.admin-body .template-item:active {
 
   /* Actions and filters wrap nicely */
   .table-header,
-  .header-left-actions,
-  .header-right-actions {
+  .header-left-actions {
     flex-direction: column !important;
     align-items: stretch !important;
     width: 100% !important;
     gap: 12px !important;
   }
 
+  .header-right-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    width: 100% !important;
+    gap: 8px !important;
+  }
+
   .header-right-actions .search-box,
-  .header-right-actions .threads-search {
+  .header-right-actions .threads-search,
+  .header-left-actions select,
+  .header-left-actions .search-box,
+  .view-selector,
+  .tag-filter-select {
     width: 100% !important;
     max-width: none !important;
+    min-height: 44px !important;
   }
 
   .header-right-actions button,
   .header-right-actions .btn,
-  .header-left-actions button,
-  .header-left-actions .btn,
-  .header-left-actions select,
-  .view-selector {
-    width: 100% !important;
+  .header-left-actions > button,
+  .header-left-actions > .btn {
+    width: auto !important;
+    flex: 0 0 auto !important;
+    min-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    padding: 0 12px !important;
+    border-radius: 12px !important;
     justify-content: center !important;
-    min-height: 48px !important;
+    display: inline-flex !important;
+    align-items: center !important;
   }
 }
 
