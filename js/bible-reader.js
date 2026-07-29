@@ -5654,6 +5654,12 @@ class BibleReader {
                 .bible-theme-dark #btn-book-intro-dynamic { background: #1e293b !important; border-color: #334155 !important; color: #f8fafc !important; }
                 .bible-theme-dark #btn-book-intro-dynamic .material-symbols-outlined { color: #f97316 !important; }
                 .bible-theme-dark .hkm-yv-footer-pill { background: #1e293b !important; border-color: #334155 !important; color: #94a3b8 !important; }
+                .bible-theme-dark .floating-chapter-popover { background: #18181b !important; border-color: #27272a !important; color: #f8fafc !important; }
+                .bible-theme-dark .floating-chapter-popover .book-genre-filter-container { background: #18181b !important; border-bottom-color: rgba(255, 255, 255, 0.08) !important; }
+                .bible-theme-dark #floating-book-search-input { background: rgba(255, 255, 255, 0.07) !important; border: 1px solid rgba(255, 255, 255, 0.15) !important; color: #f8fafc !important; box-shadow: none !important; }
+                .bible-theme-dark #floating-book-search-input::placeholder { color: #94a3b8 !important; }
+                .bible-theme-dark .genre-pill-btn:not(.active) { background: rgba(255, 255, 255, 0.06) !important; border: 1px solid rgba(255, 255, 255, 0.12) !important; color: #cbd5e1 !important; }
+                .bible-theme-dark .genre-pill-btn.active { background: #d17d39 !important; border-color: #d17d39 !important; color: #ffffff !important; }
                 
                 /* Dark Mode fixes for Book Intro & Cross References modals */
                 .bible-theme-dark .hkm-book-intro-sheet-card,
