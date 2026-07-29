@@ -3788,7 +3788,8 @@ html[data-theme="dark"] .hkm-slider {
     height: 16px;
     width: 16px;
     left: 2.5px;
-    bottom: 2.5px;
+    top: 50%;
+    transform: translateY(-50%);
     background-color: #ffffff;
     border-radius: 50%;
     box-shadow: 0 1px 3px rgba(0,0,0,0.15);
@@ -3796,7 +3797,7 @@ html[data-theme="dark"] .hkm-slider {
 }
 
 .hkm-switch input:checked + .hkm-slider::before {
-    transform: translateX(20px);
+    transform: translate(20px, -50%);
 }
 
 .hkm-switch:hover .hkm-slider {
