@@ -610,7 +610,7 @@ class CRMManager {
     }
 
     getAllAvailableLabels() {
-        const defaultSet = new Set(['Medlem', 'Ny', 'Fast giver', 'Abonnent', 'Giver']);
+        const defaultSet = new Set(['Ny', 'Medlem', 'Frivillig', 'Lovsang', 'Giver', 'Fast giver', 'Abonnent', 'Leder', 'Ungdom', 'Styre']);
         (this.contacts || []).forEach((c) => {
             const labels = this.getContactLabels(c);
             labels.forEach((l) => {
@@ -1606,15 +1606,8 @@ class CRMManager {
         const labelSelect = document.getElementById('contact-label-select');
         if (!labelSelect) return;
 
-        const defaultLabels = ['Ny', 'Medlem', 'Frivillig', 'Lovsang', 'Giver', 'Abonnent', 'Leder'];
-        const uniqueLabels = new Set(defaultLabels);
-
-        if (this.contacts && Array.isArray(this.contacts)) {
-            this.contacts.forEach(c => {
-                if (c.label) uniqueLabels.add(c.label);
-                if (Array.isArray(c.labels)) c.labels.forEach(l => l && uniqueLabels.add(l));
-            });
-        }
+        const availableLabels = this.getAllAvailableLabels();
+        const uniqueLabels = new Set(availableLabels);
 
         if (selectedLabel && selectedLabel !== '__CREATE_NEW__') {
             uniqueLabels.add(selectedLabel);
@@ -1622,7 +1615,7 @@ class CRMManager {
 
         let html = `<option value="" disabled selected>+ Velg etikett for å legge til...</option>`;
         uniqueLabels.forEach(lbl => {
-            html += `<option value="${lbl}">${lbl}</option>`;
+            html += `<option value="${this.escapeHtml(lbl)}">${this.escapeHtml(lbl)}</option>`;
         });
         html += `<option value="__CREATE_NEW__">+ Opprett helt ny etikett...</option>`;
 
@@ -2333,44 +2326,103 @@ class CRMManager {
         const count = this.selectedContactIds.size;
         if (count === 0) return;
 
+        const availableLabels = this.getAllAvailableLabels();
+
+        const html = `
+            <div class="crm-bulk-labels-modal" style="display: flex; flex-direction: column; gap: 14px; padding: 2px 0;">
+                <div style="font-weight: 700; font-size: 13px; color: #334155;">Velg en etikett for de ${count} valgte kontaktene:</div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; max-height: 240px; overflow-y: auto; padding: 2px;">
+                    ${availableLabels.map((tag, idx) => `
+                        <label style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 10px; cursor: pointer; background: white; transition: all 0.2s; font-size: 13px; font-weight: 600; color: #0f172a;" class="crm-label-option">
+                            <input type="radio" name="crm-bulk-label-radio" value="${this.escapeHtml(tag)}" ${idx === 0 ? 'checked' : ''} style="accent-color: #d17d39; cursor: pointer;">
+                            <span>${this.escapeHtml(tag)}</span>
+                        </label>
+                    `).join('')}
+                    <label style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1px dashed #d17d39; border-radius: 10px; cursor: pointer; background: #fff7ed; transition: all 0.2s; font-size: 13px; font-weight: 700; color: #c05d2a;" class="crm-label-option">
+                        <input type="radio" name="crm-bulk-label-radio" value="__CUSTOM__" id="crm-label-radio-custom" style="accent-color: #d17d39; cursor: pointer;">
+                        <span>+ Ny etikett...</span>
+                    </label>
+                </div>
+
+                <div id="crm-custom-label-wrapper" style="display: none; flex-direction: column; gap: 6px; margin-top: 4px;">
+                    <label style="font-weight: 700; font-size: 13px; color: #334155;">Skriv inn navnet på ny etikett:</label>
+                    <input type="text" id="crm-custom-label-input" class="form-control" placeholder="F.eks. Konfirmant, Sponsor, etc." style="width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 14px; outline: none;">
+                </div>
+            </div>
+        `;
+
         this.openCrmToolDialog({
-            mode: 'choice',
+            mode: 'custom-html',
             title: 'Endre etiketter (Massehandling)',
-            subtitle: `Velg ny etikett for de ${count} valgte kontaktene.`,
-            selectedValue: 'Medlem',
+            subtitle: `Velg eller opprett ny etikett for kontaktene.`,
+            html: html,
             confirmLabel: 'Oppdater etiketter',
-            options: [
-                { value: 'Ny', label: 'Ny' },
-                { value: 'Medlem', label: 'Medlem' },
-                { value: 'Frivillig', label: 'Frivillig' },
-                { value: 'Lovsang', label: 'Lovsang' },
-                { value: 'Giver', label: 'Giver' },
-                { value: 'Abonnent', label: 'Abonnent' },
-                { value: 'Leder', label: 'Leder' }
-            ],
-            onConfirm: async (selectedValue) => {
-                const db = window.firebaseService.db;
-                const batch = db.batch();
-                const ids = Array.from(this.selectedContactIds);
+            onConfirm: async () => {
+                const selectedRadio = document.querySelector('input[name="crm-bulk-label-radio"]:checked');
+                if (!selectedRadio) {
+                    this.notify('Vennligst velg en etikett.', 'warning');
+                    return false;
+                }
 
-                ids.forEach(id => {
-                    batch.update(db.collection('contacts').doc(id), {
-                        labels: [selectedValue],
-                        updatedAt: new Date().toISOString()
+                let finalLabel = selectedRadio.value;
+                if (finalLabel === '__CUSTOM__') {
+                    const customInput = document.getElementById('crm-custom-label-input');
+                    finalLabel = customInput ? customInput.value.trim() : '';
+                    if (!finalLabel) {
+                        this.notify('Vennligst skriv inn navnet på den nye etiketten.', 'error');
+                        return false;
+                    }
+                }
+
+                try {
+                    const db = window.firebaseService.db;
+                    const batch = db.batch();
+                    const ids = Array.from(this.selectedContactIds);
+
+                    ids.forEach(id => {
+                        batch.update(db.collection('contacts').doc(id), {
+                            labels: [finalLabel],
+                            updatedAt: new Date().toISOString()
+                        });
                     });
-                });
 
-                await batch.commit();
-                
-                this.selectedContactIds.clear();
-                const selectAll = document.getElementById('select-all-contacts');
-                if (selectAll) selectAll.checked = false;
-                
-                this.updateBulkActionsVisibility();
-                await this.loadContacts();
-                this.notify(`Etiketter oppdatert til "${selectedValue}" for ${count} kontakter.`);
+                    await batch.commit();
+                    
+                    this.selectedContactIds.clear();
+                    const selectAll = document.getElementById('select-all-contacts');
+                    if (selectAll) selectAll.checked = false;
+                    
+                    this.updateBulkActionsVisibility();
+                    await this.loadContacts();
+                    this.populateTagFilterSelect();
+                    this.notify(`Etiketter oppdatert til "${finalLabel}" for ${count} kontakter.`);
+                    return true;
+                } catch (error) {
+                    console.error("Bulk label update error:", error);
+                    this.notify("Kunne ikke oppdatere etiketter: " + error.message, 'error');
+                    return false;
+                }
             }
         });
+
+        // Add toggle listener for custom label input
+        setTimeout(() => {
+            const radios = document.querySelectorAll('input[name="crm-bulk-label-radio"]');
+            const customWrapper = document.getElementById('crm-custom-label-wrapper');
+            const customInput = document.getElementById('crm-custom-label-input');
+
+            radios.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    if (radio.value === '__CUSTOM__') {
+                        if (customWrapper) customWrapper.style.display = 'flex';
+                        if (customInput) customInput.focus();
+                    } else {
+                        if (customWrapper) customWrapper.style.display = 'none';
+                    }
+                });
+            });
+        }, 50);
     }
 
     async bulkEditStatus() {
