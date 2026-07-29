@@ -275,17 +275,21 @@ body.crm-body {
     color: #3b82f6;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    margin-bottom: 16px;
+    margin-bottom: 12px !important;
     background: #eff6ff;
     padding: 4px 10px;
     border-radius: 4px;
     align-self: flex-start;
+    display: inline-block !important;
+    position: relative !important;
 }
 
 .promo-card h3 {
     font-size: 18px;
     font-weight: 700;
-    margin-bottom: 12px;
+    margin-top: 0 !important;
+    margin-bottom: 12px !important;
+    line-height: 1.3 !important;
 }
 
 .promo-card p {

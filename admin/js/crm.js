@@ -347,12 +347,14 @@ class CRMManager {
                 filterBtn.style.borderColor = '#d17d39';
                 filterBtn.style.color = '#d17d39';
                 filterBtn.style.background = '#fff7ed';
-                filterBtn.innerHTML = `<span class="material-symbols-outlined">filter_list</span> Filtrer (Aktiv)`;
+                filterBtn.innerHTML = `<span class="material-symbols-outlined">filter_list</span>`;
+                filterBtn.title = 'Filtrer (Aktiv)';
             } else {
                 filterBtn.style.borderColor = '';
                 filterBtn.style.color = '';
                 filterBtn.style.background = '';
-                filterBtn.innerHTML = `<span class="material-symbols-outlined">filter_list</span> Filtrer`;
+                filterBtn.innerHTML = `<span class="material-symbols-outlined">filter_list</span>`;
+                filterBtn.title = 'Filtrer kontakter';
             }
         }
 
