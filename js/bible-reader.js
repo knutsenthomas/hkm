@@ -10339,7 +10339,15 @@ class BibleReader {
 
         let paragraphs = [];
         if (targetContainer) {
-            paragraphs = Array.from(targetContainer.querySelectorAll('.hkm-devotional-text-serif p, .hkm-devotional-text-serif'));
+            let pNodes = Array.from(targetContainer.querySelectorAll('.hkm-devotional-text-serif p, p.v-line, p'));
+            if (pNodes.length === 0) {
+                pNodes = Array.from(targetContainer.querySelectorAll('.hkm-devotional-text-serif > *'));
+            }
+            if (pNodes.length === 0) {
+                pNodes = [targetContainer.querySelector('.hkm-devotional-text-serif') || targetContainer];
+            }
+            paragraphs = pNodes.filter(node => node.tagName.toLowerCase() === 'p' || node.classList.contains('v-line') || node.children.length === 0);
+            if (paragraphs.length === 0) paragraphs = pNodes;
         } else if (this.dom && this.dom.readingPane) {
             paragraphs = Array.from(this.dom.readingPane.querySelectorAll('p'));
         }
@@ -10405,9 +10413,7 @@ class BibleReader {
                 this.bibleAudio.onended = async () => {
                     console.log("[BibleAudio] Chapter finished. Auto-advancing to next chapter for continuous reading...");
                     try {
-                        if (this.dom && this.dom.readingPane) {
-                            this.dom.readingPane.querySelectorAll('.audio-playing-highlight').forEach(el => el.classList.remove('audio-playing-highlight'));
-                        }
+                        document.querySelectorAll('.audio-playing-highlight').forEach(el => el.classList.remove('audio-playing-highlight'));
                         if (this.audioIsPlaying) {
                             await this.navigateChapter(1);
                             setTimeout(() => {
@@ -10553,10 +10559,7 @@ class BibleReader {
             this.bibleAudio = null;
         }
 
-        if (this.dom && this.dom.readingPane) {
-            const highlights = this.dom.readingPane.querySelectorAll('.audio-playing-highlight');
-            highlights.forEach(el => el.classList.remove('audio-playing-highlight'));
-        }
+        document.querySelectorAll('.audio-playing-highlight').forEach(el => el.classList.remove('audio-playing-highlight'));
         
         this.hideAudioPlayerBar();
     }
