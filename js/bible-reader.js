@@ -9959,6 +9959,134 @@ class BibleReader {
             };
         }
 
+        // Ensure main verse action toolbar (#verse-context-toolbar) exists at document.body level
+        let mainToolbar = document.getElementById('verse-context-toolbar');
+        if (!mainToolbar) {
+            mainToolbar = document.createElement('div');
+            mainToolbar.id = 'verse-context-toolbar';
+            mainToolbar.className = 'sheet-action-bar';
+            mainToolbar.innerHTML = `
+                <div class="sheet-handle-bar" style="width: 36px; height: 4px; background: rgba(0,0,0,0.2); border-radius: 2px; margin: 0 auto 8px auto;"></div>
+                <div id="sheet-verse-reference" class="sheet-verse-reference" style="font-weight: 800; font-size: 15px; text-align: center; color: var(--text-base, #0f172a); margin-bottom: 8px;">Velg vers</div>
+
+                <div class="sheet-scrollable-row" style="display: flex; align-items: center; justify-content: center; gap: 8px; overflow-x: auto; padding-bottom: 4px;">
+                    <button class="color-swatch-circle" data-color="none" style="width: 32px; height: 32px; border-radius: 50%; background: var(--bg-card, #ffffff); border: 2px dashed #94a3b8; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Fjern farge">
+                        <span class="material-symbols-outlined" style="font-size: 15px; color: #94a3b8;">block</span>
+                    </button>
+                    <button class="color-swatch-circle" data-color="yellow" style="width: 32px; height: 32px; border-radius: 50%; background: #facc15; border: 1.5px solid #eab308; cursor: pointer;" title="Gul"></button>
+                    <button class="color-swatch-circle" data-color="green" style="width: 32px; height: 32px; border-radius: 50%; background: #4ade80; border: 1.5px solid #22c55e; cursor: pointer;" title="Grønn"></button>
+                    <button class="color-swatch-circle" data-color="cyan" style="width: 32px; height: 32px; border-radius: 50%; background: #38bdf8; border: 1.5px solid #0284c7; cursor: pointer;" title="Blå"></button>
+                    <button class="color-swatch-circle" id="custom-color-swatch-btn" data-color="custom" style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #facc15, #4ade80, #38bdf8, #f472b6); border: 1.5px solid #cbd5e1; cursor: pointer;" title="Velg egendefinert farge"></button>
+
+                    <div style="width: 1px; height: 24px; background: #e2e8f0; margin: 0 4px;"></div>
+
+                    <button id="toolbar-btn-bookmark" class="sheet-action-btn" style="display: flex; flex-direction: column; align-items: center; background: none; border: none; font-size: 11px; font-weight: 700; color: var(--text-base, #0f172a); cursor: pointer; padding: 4px 8px;" title="Lagre vers">
+                        <span class="material-symbols-outlined" style="font-size: 20px; color: #d17d39;">bookmark</span>
+                        <span>Lagre</span>
+                    </button>
+
+                    <button id="toolbar-btn-save-user" class="sheet-action-btn" style="display: flex; flex-direction: column; align-items: center; background: none; border: none; font-size: 11px; font-weight: 700; color: var(--text-base, #0f172a); cursor: pointer; padding: 4px 8px;" title="Skriv notat">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">edit_note</span>
+                        <span>Notat</span>
+                    </button>
+
+                    <button id="toolbar-btn-crossref" class="sheet-action-btn" style="display: flex; flex-direction: column; align-items: center; background: none; border: none; font-size: 11px; font-weight: 700; color: var(--text-base, #0f172a); cursor: pointer; padding: 4px 8px;" title="Kryssreferanser">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">link</span>
+                        <span>Kryssref</span>
+                    </button>
+
+                    <button id="toolbar-btn-download" class="sheet-action-btn" style="display: flex; flex-direction: column; align-items: center; background: none; border: none; font-size: 11px; font-weight: 700; color: var(--text-base, #0f172a); cursor: pointer; padding: 4px 8px;" title="Kopier vers">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">content_copy</span>
+                        <span>Kopier</span>
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(mainToolbar);
+        } else if (mainToolbar.parentNode !== document.body) {
+            document.body.appendChild(mainToolbar);
+        }
+
+        // Attach event listeners to mainToolbar swatches & action buttons if not already bound
+        if (!mainToolbar._hkmBound) {
+            mainToolbar._hkmBound = true;
+            
+            // Color swatches
+            mainToolbar.querySelectorAll('.color-swatch-circle').forEach(swatch => {
+                swatch.onclick = (e) => {
+                    e.stopPropagation();
+                    const color = swatch.getAttribute('data-color');
+                    if (this.selectedVerses && this.selectedVerses.length > 0) {
+                        this.selectedVerses.forEach(v => {
+                            if (color === 'none') {
+                                v.paragraph.removeAttribute('data-highlight-color');
+                                v.paragraph.style.removeProperty('--custom-highlight-bg');
+                                this.saveVerseHighlight(v.verseNum, 'none');
+                            } else {
+                                v.paragraph.setAttribute('data-highlight-color', color);
+                                this.saveVerseHighlight(v.verseNum, color);
+                            }
+                        });
+                        this.clearSelection();
+                    }
+                };
+            });
+
+            // Bookmark button
+            const btnBookmark = mainToolbar.querySelector('#toolbar-btn-bookmark');
+            if (btnBookmark) {
+                btnBookmark.onclick = (e) => {
+                    e.stopPropagation();
+                    if (this.selectedVerses && this.selectedVerses.length > 0) {
+                        this.selectedVerses.forEach(v => {
+                            const vNum = parseInt(v.verseNum, 10);
+                            if (!isNaN(vNum)) this.toggleBookmark(vNum);
+                        });
+                        this.clearSelection();
+                    }
+                };
+            }
+
+            // Copy button
+            const btnCopy = mainToolbar.querySelector('#toolbar-btn-download');
+            if (btnCopy) {
+                btnCopy.onclick = async (e) => {
+                    e.stopPropagation();
+                    if (this.selectedVerses && this.selectedVerses.length > 0) {
+                        const text = this.selectedVerses.map(v => v.paragraph.innerText.trim()).join('\n\n');
+                        if (text) {
+                            await navigator.clipboard.writeText(text);
+                            alert('Verstekst kopiert til utklippstavlen!');
+                        }
+                        this.clearSelection();
+                    }
+                };
+            }
+
+            // Note button
+            const btnNote = mainToolbar.querySelector('#toolbar-btn-save-user');
+            if (btnNote) {
+                btnNote.onclick = (e) => {
+                    e.stopPropagation();
+                    if (this.selectedVerses && this.selectedVerses.length > 0) {
+                        const first = this.selectedVerses[0];
+                        this.openVerseNoteModal(first.verseNum, first.paragraph.innerText.trim());
+                    }
+                };
+            }
+
+            // CrossRef button
+            const btnCrossRef = mainToolbar.querySelector('#toolbar-btn-crossref');
+            if (btnCrossRef) {
+                btnCrossRef.onclick = (e) => {
+                    e.stopPropagation();
+                    if (this.selectedVerses && this.selectedVerses.length > 0) {
+                        const first = this.selectedVerses[0];
+                        this.openVerseCrossReferenceModal(first.verseNum, first.paragraph.innerText.trim());
+                    }
+                };
+            }
+        }
+
         verseParagraphs.forEach(p => {
             const vSup = p.querySelector('sup.v');
             if (vSup) {
@@ -9988,22 +10116,17 @@ class BibleReader {
                     p.classList.add('selected-verse');
                 }
 
-                // Trigger main verse action sheet modal popover (Screenshot 1)
-                const mainToolbar = this.dom.verseToolbar || document.getElementById('verse-context-toolbar');
-                if (mainToolbar) {
-                    if (this.selectedVerses.length > 0) {
-                        mainToolbar.style.display = 'flex';
-                        mainToolbar.style.zIndex = '9999999';
-                        const sheetRefEl = document.getElementById('sheet-verse-reference');
-                        if (sheetRefEl) {
-                            const bookName = versesRef || 'Bibel';
-                            sheetRefEl.textContent = this.selectedVerses.length === 1 
-                                ? `${bookName}:${this.selectedVerses[0].verseNum}`
-                                : `${bookName}:${this.selectedVerses[0].verseNum}-${this.selectedVerses[this.selectedVerses.length - 1].verseNum}`;
-                        }
-                    } else {
-                        mainToolbar.style.display = 'none';
+                if (this.selectedVerses.length > 0) {
+                    mainToolbar.style.cssText = 'display: flex !important; position: fixed !important; bottom: 0 !important; top: auto !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 99999999 !important; width: 100% !important; max-width: 520px !important; border-radius: 28px 28px 0 0 !important; background: var(--bg-card, #ffffff) !important; box-shadow: 0 -10px 40px rgba(0,0,0,0.25) !important; border-top: 1px solid rgba(0,0,0,0.06) !important; padding: 12px 20px 28px !important; box-sizing: border-box !important; flex-direction: column !important; gap: 12px !important; animation: sheetSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;';
+                    const sheetRefEl = mainToolbar.querySelector('#sheet-verse-reference');
+                    if (sheetRefEl) {
+                        const bookName = versesRef || 'Bibel';
+                        sheetRefEl.textContent = this.selectedVerses.length === 1 
+                            ? `${bookName}:${this.selectedVerses[0].verseNum}`
+                            : `${bookName}:${this.selectedVerses[0].verseNum}-${this.selectedVerses[this.selectedVerses.length - 1].verseNum}`;
                     }
+                } else {
+                    mainToolbar.style.display = 'none';
                 }
             };
         });
