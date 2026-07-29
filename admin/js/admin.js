@@ -7498,13 +7498,18 @@ class AdminManager {
         if (!section) return;
 
         section.innerHTML = `
-            ${this.renderSectionHeader('hub', 'Integrasjoner', 'Administrer YouTube, Google Calendar, AI og oversettelse.', '')}
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr)); gap: 24px;">
-                <div class="card modern">
+            ${this.renderSectionHeader('hub', 'Integrasjoner', 'Administrer YouTube, Google Calendar, AI, Podcast og eksterne tjenester.', '')}
+            <div class="integrations-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; align-items: stretch;">
+                <div class="card modern" style="height: 100%; display: flex; flex-direction: column;">
                     <div class="card-header flex-between">
-                        <h3 class="card-title">YouTube</h3>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 32px; height: 32px; border-radius: 8px; background: #fff1f2; color: #e11d48; display: flex; align-items: center; justify-content: center;">
+                                <span class="material-symbols-outlined" style="font-size: 20px;">video_library</span>
+                            </div>
+                            <h3 class="card-title">YouTube</h3>
+                        </div>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
                         <div class="form-section">
                             <div class="form-group">
                                 <label>YouTube Channel ID</label>
@@ -7518,13 +7523,14 @@ class AdminManager {
                                 <label>YouTube Kategorier (Playlister)</label>
                                 <textarea id="yt-playlists" class="form-control" style="height: 100px;" placeholder="Navn: PlaylistID (én per linje)"></textarea>
                             </div>
-                            <div style="margin-top: 24px;">
-                                <button class="btn-primary" id="save-youtube-settings" style="width: 100%;">Lagre YouTube-innstillinger</button>
-                            </div>
+                        </div>
+                        <div style="margin-top: 24px;">
+                            <button class="btn-primary" id="save-youtube-settings" style="width: 100%;">Lagre YouTube-innstillinger</button>
                         </div>
                     </div>
                 </div>
-                <div class="card modern">
+
+                <div class="card modern" style="height: 100%; display: flex; flex-direction: column;">
                     <div class="card-header flex-between">
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <div style="width: 32px; height: 32px; border-radius: 8px; background: #e0f2fe; color: #0ea5e9; display: flex; align-items: center; justify-content: center;">
@@ -7534,23 +7540,26 @@ class AdminManager {
                         </div>
                         <div class="status-badge" id="gcal-status" style="font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #fee2e2; color: #991b1b; font-weight: 600;">Frakoblet</div>
                     </div>
-                    <div class="card-body">
-                        <div class="form-group">
-                            <label>Google API Key</label>
-                            <input type="password" id="gcal-api-key" class="form-control" placeholder="Din Google Cloud API Key">
-                        </div>
-                        <div class="form-group" style="margin-top: 15px;">
-                            <label>Calendar ID</label>
-                            <div id="gcal-list" class="gcal-list" style="margin-bottom: 8px;"></div>
-                            <button type="button" class="btn btn-outline" id="add-gcal" style="width: 100%;">
-                                <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">add</span>
-                                Legg til kalender
-                            </button>
+                    <div class="card-body" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div class="form-group">
+                                <label>Google API Key</label>
+                                <input type="password" id="gcal-api-key" class="form-control" placeholder="Din Google Cloud API Key">
+                            </div>
+                            <div class="form-group" style="margin-top: 15px;">
+                                <label>Calendar ID</label>
+                                <div id="gcal-list" class="gcal-list" style="margin-bottom: 8px;"></div>
+                                <button type="button" class="btn btn-outline" id="add-gcal" style="width: 100%;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">add</span>
+                                    Legg til kalender
+                                </button>
+                            </div>
                         </div>
                         <div id="google-auth-status" style="margin-top: 20px;"></div>
                     </div>
                 </div>
-                <div class="card modern">
+
+                <div class="card modern" style="height: 100%; display: flex; flex-direction: column;">
                     <div class="card-header flex-between">
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <div style="width: 32px; height: 32px; border-radius: 8px; background: #fef2f2; color: #ef4444; display: flex; align-items: center; justify-content: center;">
@@ -7559,25 +7568,28 @@ class AdminManager {
                             <h3 class="card-title">Google Analytics 4</h3>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div class="form-group" style="margin-bottom: 12px;">
-                            <label>GA4 Property ID</label>
-                            <input type="text" id="ga-property-id" class="form-control" placeholder="f.eks. 123456789">
-                        </div>
-                        <div class="form-group" style="margin-bottom: 12px;">
-                            <label>Service Account Email</label>
-                            <input type="text" id="ga-service-email" class="form-control" placeholder="analytics-bot@project.iam.gserviceaccount.com">
-                        </div>
-                        <div class="form-group">
-                            <label>Service Account Private Key</label>
-                            <textarea id="ga-private-key" class="form-control" style="height: 80px; font-family: monospace; font-size: 11px;" placeholder="-----BEGIN PRIVATE KEY-----\n..."></textarea>
+                    <div class="card-body" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div class="form-group" style="margin-bottom: 12px;">
+                                <label>GA4 Property ID</label>
+                                <input type="text" id="ga-property-id" class="form-control" placeholder="f.eks. 123456789">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 12px;">
+                                <label>Service Account Email</label>
+                                <input type="text" id="ga-service-email" class="form-control" placeholder="analytics-bot@project.iam.gserviceaccount.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Service Account Private Key</label>
+                                <textarea id="ga-private-key" class="form-control" style="height: 80px; font-family: monospace; font-size: 11px;" placeholder="-----BEGIN PRIVATE KEY-----\n..."></textarea>
+                            </div>
                         </div>
                         <div style="margin-top: 24px;">
                             <button class="btn-primary" id="save-ga-settings" style="width: 100%; background: #ef4444;">Lagre Analytics-nøkler</button>
                         </div>
                     </div>
                 </div>
-                <div class="card modern">
+
+                <div class="card modern" style="height: 100%; display: flex; flex-direction: column;">
                     <div class="card-header flex-between">
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <div style="width: 32px; height: 32px; border-radius: 8px; background: #f5f3ff; color: #7c3aed; display: flex; align-items: center; justify-content: center;">
@@ -7586,23 +7598,31 @@ class AdminManager {
                             <h3 class="card-title">AI & Oversettelse</h3>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div class="form-group" style="margin-bottom: 15px;">
-                            <label>Leverandør</label>
-                            <select id="translation-provider" class="form-control">
-                                <option value="mymemory">MyMemory (gratis)</option>
-                                <option value="gemini">Gemini (Google AI)</option>
-                            </select>
+                    <div class="card-body" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div class="form-group" style="margin-bottom: 15px;">
+                                <label>Leverandør</label>
+                                <select id="translation-provider" class="form-control">
+                                    <option value="mymemory">MyMemory (gratis)</option>
+                                    <option value="gemini">Gemini (Google AI)</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 15px;">
+                                <label>Gemini API Key</label>
+                                <input type="password" id="gemini-api-key" class="form-control" placeholder="AIza...">
+                            </div>
+                            <div class="form-group">
+                                <label>Modell</label>
+                                <input type="text" id="gemini-model" class="form-control" placeholder="gemini-1.5-flash">
+                            </div>
                         </div>
-                        <div class="form-group" style="margin-bottom: 15px;">
-                            <label>Gemini API Key</label>
-                            <input type="password" id="gemini-api-key" class="form-control" placeholder="AIza...">
+                        <div style="margin-top: 24px;">
+                            <button class="btn-primary" id="save-ai-settings" style="width: 100%; background: #7c3aed;">Lagre AI-innstillinger</button>
                         </div>
-                        <div class="form-group">
-                            <label>Modell</label>
-                            <input type="text" id="gemini-model" class="form-control" placeholder="gemini-1.5-flash">
-                        </div>
-                <div class="card modern">
+                    </div>
+                </div>
+
+                <div class="card modern" style="height: 100%; display: flex; flex-direction: column;">
                     <div class="card-header flex-between">
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <div style="width: 32px; height: 32px; border-radius: 8px; background: #fff7ed; color: #d17d39; display: flex; align-items: center; justify-content: center;">
@@ -7611,29 +7631,32 @@ class AdminManager {
                             <h3 class="card-title">Podcast & RSS Feed</h3>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div class="form-group" style="margin-bottom: 15px;">
-                            <label>RSS Feed URL</label>
-                            <input type="text" id="integ-podcast-rss-url" class="form-control" placeholder="https://anchor.fm/s/f7a13dec/podcast/rss">
-                        </div>
-                        <div class="form-group" style="margin-bottom: 15px;">
-                            <label>Spotify Podcast URL</label>
-                            <input type="text" id="integ-podcast-spotify-url" class="form-control" placeholder="https://open.spotify.com/show/...">
-                        </div>
-                        <div class="form-group" style="margin-bottom: 15px;">
-                            <label>Apple Podcasts URL</label>
-                            <input type="text" id="integ-podcast-apple-url" class="form-control" placeholder="https://podcasts.apple.com/...">
-                        </div>
-                        <div class="form-group">
-                            <label>Globale kategorier (hurtigvalg)</label>
-                            <input type="text" id="integ-podcast-custom-categories" class="form-control" placeholder="Separer med komma, f.eks. Vitnesbyrd, Lydbok">
+                    <div class="card-body" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div class="form-group" style="margin-bottom: 15px;">
+                                <label>RSS Feed URL</label>
+                                <input type="text" id="integ-podcast-rss-url" class="form-control" placeholder="https://anchor.fm/s/f7a13dec/podcast/rss">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 15px;">
+                                <label>Spotify Podcast URL</label>
+                                <input type="text" id="integ-podcast-spotify-url" class="form-control" placeholder="https://open.spotify.com/show/...">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 15px;">
+                                <label>Apple Podcasts URL</label>
+                                <input type="text" id="integ-podcast-apple-url" class="form-control" placeholder="https://podcasts.apple.com/...">
+                            </div>
+                            <div class="form-group">
+                                <label>Globale kategorier (hurtigvalg)</label>
+                                <input type="text" id="integ-podcast-custom-categories" class="form-control" placeholder="Separer med komma, f.eks. Vitnesbyrd, Lydbok">
+                            </div>
                         </div>
                         <div style="margin-top: 24px;">
                             <button class="btn-primary" id="save-integ-podcast-settings" style="width: 100%;">Lagre podcast-integrasjon</button>
                         </div>
                     </div>
                 </div>
-                <div id="google-tasks-integration-card" style="grid-column: 1 / -1; width: 100%;"></div>
+
+                <div id="google-tasks-integration-card" style="width: 100%;"></div>
             </div>
         `;
 
