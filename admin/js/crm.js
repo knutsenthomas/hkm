@@ -110,6 +110,15 @@ class CRMManager {
         const filterContactsBtn = document.getElementById('filter-contacts-btn');
         if (filterContactsBtn) filterContactsBtn.onclick = () => this.openFilterDialog();
 
+        const contactTagFilter = document.getElementById('contact-tag-filter');
+        if (contactTagFilter) {
+            contactTagFilter.onchange = (e) => {
+                this.tagFilter = e.target.value;
+                this.applyCurrentFiltersAndSearch();
+                this.updateViewSelector();
+            };
+        }
+
         const importExportBtn = document.getElementById('import-export-btn');
         if (importExportBtn) importExportBtn.onclick = () => this.openImportExportDialog();
 
@@ -343,6 +352,31 @@ class CRMManager {
                 filterBtn.innerHTML = `<span class="material-symbols-outlined">filter_list</span> Filtrer`;
             }
         }
+
+        this.populateTagFilterSelect();
+    }
+
+    populateTagFilterSelect() {
+        const select = document.getElementById('contact-tag-filter');
+        if (!select) return;
+
+        const availableLabels = this.getAllAvailableLabels();
+        const currentValue = this.tagFilter || 'ALL';
+
+        const optionsHtml = `
+            <option value="ALL" ${currentValue === 'ALL' ? 'selected' : ''}>Alle etiketter</option>
+            <option value="__NO_TAGS__" ${currentValue === '__NO_TAGS__' ? 'selected' : ''}>Uten etikett</option>
+            ${availableLabels.map(tag => `
+                <option value="${this.escapeHtml(tag)}" ${tag === currentValue ? 'selected' : ''}>
+                    ${this.escapeHtml(tag)}
+                </option>
+            `).join('')}
+        `;
+
+        if (select.innerHTML !== optionsHtml) {
+            select.innerHTML = optionsHtml;
+        }
+        select.value = currentValue;
     }
 
     renderTable() {
@@ -992,9 +1026,9 @@ class CRMManager {
             options: [
                 { value: 'standard', label: 'Standard', description: 'Vis alle kolonner med normal radavstand.' },
                 { value: 'kompakt', label: 'Kompakt', description: 'Tettere rader for å se flere kontakter samtidig.' },
-                { value: 'skjul_etiketter', label: 'Skjul etiketter', description: 'Skjuler etikett-kolonnen for mer plass.' },
+                { value: 'skjul_etiketter', label: 'Skjul etikett-kolonnen', description: 'Skjuler kolonnen for etiketter i tabellen (påvirker kun tabelloppsett, ikke filtrering).' },
                 { value: 'skjul_siste_aktivitet', label: 'Skjul siste aktivitet', description: 'Skjuler aktivitetskolonnen for bedre oversikt på smale skjermer.' },
-                { value: 'fokus', label: 'Fokus', description: 'Skjuler både etiketter og siste aktivitet.' }
+                { value: 'fokus', label: 'Fokus', description: 'Skjuler både etiketter og siste aktivitet i tabelloppsettet.' }
             ],
             onConfirm: async (selectedValue) => {
                 const normalized = String(selectedValue || 'standard').trim().toLowerCase().replace(/\s+/g, '_');
