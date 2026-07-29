@@ -1679,3 +1679,47 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
         background: rgba(255, 255, 255, 0.08) !important;
     }
 }
+
+/* CRM Email Composer Modal Enhancements */
+.crm-send-email-modal-wrapper {
+    max-width: 720px !important;
+    border-radius: 20px !important;
+}
+
+.crm-editor-toolbar button {
+    transition: all 0.15s ease;
+}
+
+.crm-editor-toolbar button:hover {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+.crm-editor-toolbar button:active {
+    transform: scale(0.95);
+}
+
+#crm-email-body-editor img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+}
+
+#crm-email-body-editor blockquote {
+    border-left: 4px solid #2563eb;
+    margin: 14px 0;
+    padding: 10px 16px;
+    background: #f8fafc;
+    border-radius: 0 10px 10px 0;
+    font-style: italic;
+    color: #334155;
+}
+
+.email-yt-card a {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.email-yt-card a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2) !important;
+}

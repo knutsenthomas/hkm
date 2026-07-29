@@ -798,6 +798,8 @@ class CRMManager {
             actions: Array.isArray(config.actions) ? config.actions : [],
             note: config.note || '',
             html: config.html || '',
+            footerLeftHtml: config.footerLeftHtml || '',
+            dialogClass: config.dialogClass || '',
             onConfirm: typeof config.onConfirm === 'function' ? config.onConfirm : null,
             onCancel: typeof config.onCancel === 'function' ? config.onCancel : null
         };
@@ -823,6 +825,15 @@ class CRMManager {
         const cancelBtn = document.querySelector('.crm-tool-modal-footer [data-crm-tool-close]');
         if (!titleEl || !subtitleEl || !contentEl || !footerEl || !confirmBtn || !cancelBtn) return;
 
+        const modalContentEl = document.querySelector('.crm-tool-modal-content');
+        if (modalContentEl) {
+            if (state.dialogClass) {
+                modalContentEl.className = 'modal-content crm-tool-modal-content ' + state.dialogClass;
+            } else {
+                modalContentEl.className = 'modal-content crm-tool-modal-content';
+            }
+        }
+
         titleEl.textContent = state.title || 'Verktøy';
         subtitleEl.textContent = state.subtitle || '';
         subtitleEl.style.display = state.subtitle ? '' : 'none';
@@ -831,6 +842,26 @@ class CRMManager {
         confirmBtn.dataset.variant = state.confirmVariant === 'danger' ? 'danger' : 'primary';
         cancelBtn.textContent = state.cancelLabel || 'Avbryt';
         cancelBtn.style.display = state.showCancel === false ? 'none' : '';
+
+        let leftNoteEl = footerEl.querySelector('.crm-tool-footer-left-note');
+        if (!leftNoteEl) {
+            leftNoteEl = document.createElement('div');
+            leftNoteEl.className = 'crm-tool-footer-left-note';
+            leftNoteEl.style.marginRight = 'auto';
+            leftNoteEl.style.display = 'flex';
+            leftNoteEl.style.alignItems = 'center';
+            leftNoteEl.style.gap = '6px';
+            leftNoteEl.style.fontSize = '13px';
+            footerEl.insertBefore(leftNoteEl, footerEl.firstChild);
+        }
+
+        if (state.footerLeftHtml) {
+            leftNoteEl.innerHTML = state.footerLeftHtml;
+            leftNoteEl.style.display = 'flex';
+        } else {
+            leftNoteEl.innerHTML = '';
+            leftNoteEl.style.display = 'none';
+        }
 
         if (state.mode === 'actions') {
             footerEl.classList.add('is-hidden');
@@ -2021,7 +2052,7 @@ class CRMManager {
         this.openSendEmailModal(selected);
     }
 
-    async openSendEmailModal(targetContacts = []) {
+        async openSendEmailModal(targetContacts = []) {
         const contactsWithEmail = targetContacts.filter(c => c.email && c.email.includes('@'));
 
         if (contactsWithEmail.length === 0) {
@@ -2030,121 +2061,195 @@ class CRMManager {
         }
 
         const user = window.firebaseService?.auth?.currentUser || (window.firebase && window.firebase.auth().currentUser);
-        const adminEmail = user?.email || 'adminbruker';
+        const adminEmail = user?.email || 'post@hiskingdomministry.no';
         const adminName = user?.displayName || adminEmail.split('@')[0];
 
+        const unsubscribedCount = targetContacts.filter(c => c.subscribed === false || c.status === 'unsubscribed').length;
+
         const recipientSummary = contactsWithEmail.length === 1
-            ? `${contactsWithEmail[0].displayName || (contactsWithEmail[0].firstName + ' ' + contactsWithEmail[0].lastName).trim() || contactsWithEmail[0].email} (${contactsWithEmail[0].email})`
+            ? `${contactsWithEmail[0].displayName || (contactsWithEmail[0].firstName + ' ' + (contactsWithEmail[0].lastName || '')).trim() || contactsWithEmail[0].email} (${contactsWithEmail[0].email})`
             : `${contactsWithEmail.length} kontakter (${contactsWithEmail.slice(0, 3).map(c => c.email).join(', ')}${contactsWithEmail.length > 3 ? '...' : ''})`;
 
         const attachments = [];
 
+        const footerLeftHtml = unsubscribedCount > 0
+            ? `<span class="material-symbols-outlined" style="font-size: 17px; color: #d97706;">warning</span> <span style="color: #d97706; font-weight: 600; font-size: 13px;">${unsubscribedCount} Blokkerte / avmeldte e-poster</span>`
+            : `<span style="color: #64748b; font-size: 12.5px; font-weight: 500;">✓ Alle ${contactsWithEmail.length} mottakere er aktive</span>`;
+
         const html = `
             <div class="crm-send-email-modal" style="display: flex; flex-direction: column; gap: 14px; padding: 2px 0;">
-                <div style="background: #f8fafc; padding: 10px 14px; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 13px; color: #334155;">
-                    <div style="font-weight: 700; color: #0f172a; margin-bottom: 2px;">Mottakere:</div>
-                    <div style="word-break: break-all;">${this.escapeHtml(recipientSummary)}</div>
+                <!-- Recipient Count Header -->
+                <div style="background: #ffffff; padding: 14px 18px; border-radius: 14px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                    <div style="font-size: 18px; font-weight: 800; color: #0f172a; letter-spacing: -0.01em;">
+                        ${contactsWithEmail.length} ${contactsWithEmail.length === 1 ? 'mottaker' : 'mottakere'}
+                    </div>
+                    <div style="font-size: 13px; color: #64748b; margin-top: 2px;">
+                        ${contactsWithEmail.length === 1 
+                            ? `E-posten sendes til ${this.escapeHtml(recipientSummary)}.` 
+                            : `Denne e-posten vil bli sendt til alle de ${contactsWithEmail.length} valgte kontaktene.`}
+                    </div>
                 </div>
 
-                <div style="display: flex; flex-direction: column; gap: 4px;">
-                    <label style="font-weight: 700; font-size: 13px; color: #334155; display: flex; align-items: center; gap: 6px;">
-                        <span class="material-symbols-outlined" style="font-size: 18px; color: #64748b;">alternate_email</span>
-                        Send e-post fra (Avsender):
-                    </label>
-                    <select id="crm-email-from-mode" class="form-control" style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; background: white; color: #0f172a; outline: none; cursor: pointer;">
-                        <option value="post" selected>His Kingdom Ministry (post@hiskingdomministry.no)</option>
-                        <option value="admin">Min egen e-post (${this.escapeHtml(adminName)} - ${this.escapeHtml(adminEmail)})</option>
-                    </select>
+                <!-- 2-Column Meta Row: From & Template -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                        <label style="font-weight: 700; font-size: 13px; color: #334155; display: flex; align-items: center; gap: 4px;">
+                            <span>Fra:</span>
+                            <span class="material-symbols-outlined" style="font-size: 15px; color: #94a3b8;" title="Avsenderadresse">info</span>
+                        </label>
+                        <select id="crm-email-from-mode" class="form-control" style="width: 100%; height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 13.5px; background: white; color: #0f172a; outline: none; cursor: pointer; font-weight: 500;">
+                            <option value="post" selected>His Kingdom Ministry &lt;post@hiskingdomministry.no&gt;</option>
+                            <option value="admin">${this.escapeHtml(adminName)} &lt;${this.escapeHtml(adminEmail)}&gt;</option>
+                        </select>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                        <label style="font-weight: 700; font-size: 13px; color: #334155;">Mal:</label>
+                        <div style="position: relative;">
+                            <span class="material-symbols-outlined" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #94a3b8; pointer-events: none;">search</span>
+                            <select id="crm-email-template-select" class="form-control" style="width: 100%; height: 40px; padding: 0 12px 0 34px !important; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 13.5px; background: white; color: #0f172a; outline: none; cursor: pointer; font-weight: 500;">
+                                <option value="">Velg e-postmal...</option>
+                                <option value="summer_camp">Youth Summer Camp is coming!</option>
+                                <option value="newsletter">Månedsoppdatering & Nyheter</option>
+                                <option value="encouragement">Personlig Oppmuntring</option>
+                                <option value="thank_you">Takk for Støtte / Gave</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
+                <!-- Subject Input -->
                 <div style="display: flex; flex-direction: column; gap: 4px;">
-                    <label style="font-weight: 700; font-size: 13px; color: #334155;">Emne:</label>
-                    <input type="text" id="crm-email-subject" class="form-control" placeholder="Skriv e-postemne her..." style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 14px; outline: none;">
+                    <input type="text" id="crm-email-subject" class="form-control" placeholder="Youth Summer Camp is coming!..." style="width: 100%; height: 42px; padding: 0 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 14px; outline: none; background: white; font-weight: 500; color: #0f172a;">
                 </div>
 
                 <!-- Rich Editor Section -->
                 <div style="display: flex; flex-direction: column; gap: 4px;">
-                    <label style="font-weight: 700; font-size: 13px; color: #334155; display: flex; justify-content: space-between; align-items: center;">
-                        <span>Melding (Innhold & Design):</span>
-                        <span style="font-size: 11px; color: #64748b; font-weight: 500;">Visuell e-posteditor</span>
-                    </label>
-                    
-                    <div style="border: 1px solid #cbd5e1; border-radius: 10px; overflow: hidden; background: #ffffff;">
-                        <!-- Formatting Toolbar -->
-                        <div class="crm-editor-toolbar" style="display: flex; flex-wrap: wrap; align-items: center; gap: 2px; padding: 6px 10px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
-                            <button type="button" class="editor-btn" data-cmd="bold" title="Fet tekst" style="padding: 4px 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; cursor: pointer; color: #334155;">
-                                <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle;">format_bold</span>
+                    <div style="border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                        <!-- Formatting Toolbar matching reference screenshot -->
+                        <div class="crm-editor-toolbar" style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 8px 12px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                            <button type="button" class="editor-btn" data-cmd="bold" title="Fet tekst (B)" style="font-weight: 800; font-size: 15px; width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                                B
                             </button>
-                            <button type="button" class="editor-btn" data-cmd="italic" title="Kursiv tekst" style="padding: 4px 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; cursor: pointer; color: #334155;">
-                                <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle;">format_italic</span>
+                            <button type="button" class="editor-btn" data-cmd="italic" title="Kursiv (I)" style="font-style: italic; font-weight: 700; font-size: 15px; width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                                I
                             </button>
-                            <button type="button" class="editor-btn" data-cmd="underline" title="Understreket" style="padding: 4px 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; cursor: pointer; color: #334155;">
-                                <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle;">format_underlined</span>
+                            <button type="button" class="editor-btn" data-cmd="strikeThrough" title="Gjennomstreking" style="text-decoration: line-through; font-weight: 700; font-size: 14px; width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                                S
                             </button>
-                            <div style="width: 1px; height: 16px; background: #cbd5e1; margin: 0 4px;"></div>
-                            <button type="button" class="editor-btn" data-cmd="h2" title="Overskrift (H2)" style="padding: 4px 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; font-weight: 800; font-size: 12px; cursor: pointer; color: #334155;">
-                                H2
+                            <button type="button" class="editor-btn" data-cmd="createLink" title="Sett inn lenke" style="width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                                <span class="material-symbols-outlined" style="font-size: 19px;">link</span>
                             </button>
-                            <button type="button" class="editor-btn" data-cmd="h3" title="Underoverskrift (H3)" style="padding: 4px 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; font-weight: 700; font-size: 11px; cursor: pointer; color: #334155;">
-                                H3
+                            
+                            <div style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 3px;"></div>
+
+                            <!-- Format Selector -->
+                            <select id="crm-editor-format-block" title="Tekststørrelse / Overskrift" style="height: 30px; border-radius: 6px; border: 1px solid #cbd5e1; background: white; padding: 0 8px; font-size: 12.5px; font-weight: 600; color: #334155; cursor: pointer; outline: none;">
+                                <option value="p">Normal tekst</option>
+                                <option value="h1">Stor overskrift (H1)</option>
+                                <option value="h2">Overskrift (H2)</option>
+                                <option value="h3">Underoverskrift (H3)</option>
+                            </select>
+
+                            <button type="button" class="editor-btn" data-cmd="blockquote" title="Sitat (Quote)" style="width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                                <span class="material-symbols-outlined" style="font-size: 19px;">format_quote</span>
                             </button>
-                            <div style="width: 1px; height: 16px; background: #cbd5e1; margin: 0 4px;"></div>
-                            <button type="button" class="editor-btn" data-cmd="insertUnorderedList" title="Kulepunkter" style="padding: 4px 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; cursor: pointer; color: #334155;">
-                                <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle;">format_list_bulleted</span>
+
+                            <div style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 3px;"></div>
+
+                            <button type="button" class="editor-btn" data-cmd="insertUnorderedList" title="Kulepunkter" style="width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                                <span class="material-symbols-outlined" style="font-size: 19px;">format_list_bulleted</span>
                             </button>
-                            <button type="button" class="editor-btn" data-cmd="insertOrderedList" title="Nummerert liste" style="padding: 4px 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; cursor: pointer; color: #334155;">
-                                <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle;">format_list_numbered</span>
+                            <button type="button" class="editor-btn" data-cmd="insertOrderedList" title="Nummerert liste" style="width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                                <span class="material-symbols-outlined" style="font-size: 19px;">format_list_numbered</span>
                             </button>
-                            <div style="width: 1px; height: 16px; background: #cbd5e1; margin: 0 4px;"></div>
-                            <button type="button" class="editor-btn" data-cmd="createLink" title="Sett inn lenke" style="padding: 4px 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; cursor: pointer; color: #334155;">
-                                <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle;">link</span>
+                            <button type="button" class="editor-btn" data-cmd="outdent" title="Minsk innrykk" style="width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                                <span class="material-symbols-outlined" style="font-size: 19px;">format_indent_decrease</span>
                             </button>
-                            <button type="button" class="editor-btn" data-cmd="justifyLeft" title="Venstrejuster" style="padding: 4px 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; cursor: pointer; color: #334155;">
-                                <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle;">format_align_left</span>
+                            <button type="button" class="editor-btn" data-cmd="indent" title="Øk innrykk" style="width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                                <span class="material-symbols-outlined" style="font-size: 19px;">format_indent_increase</span>
                             </button>
-                            <button type="button" class="editor-btn" data-cmd="justifyCenter" title="Midtstill" style="padding: 4px 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; cursor: pointer; color: #334155;">
-                                <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle;">format_align_center</span>
+
+                            <div style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 3px;"></div>
+
+                            <button type="button" id="crm-email-add-att-btn" title="Legg til vedlegg" style="width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                                <span class="material-symbols-outlined" style="font-size: 19px;">attach_file</span>
                             </button>
-                            <div style="width: 1px; height: 16px; background: #cbd5e1; margin: 0 4px;"></div>
-                            <button type="button" class="editor-btn" data-cmd="removeFormat" title="Fjern formatering" style="padding: 4px 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; cursor: pointer; color: #64748b;">
-                                <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle;">format_clear</span>
+                            <input type="file" id="crm-email-file-input" multiple style="display: none;">
+
+                            <button type="button" class="editor-btn" data-cmd="undo" title="Angre" style="width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                                <span class="material-symbols-outlined" style="font-size: 19px;">undo</span>
+                            </button>
+                            <button type="button" class="editor-btn" data-cmd="redo" title="Gjenta" style="width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                                <span class="material-symbols-outlined" style="font-size: 19px;">redo</span>
+                            </button>
+
+                            <div style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 3px;"></div>
+
+                            <!-- Variable Tag Selector -->
+                            <select id="crm-email-merge-tag-select" title="Sett inn flettefelt ({{ tag }})" style="height: 30px; border-radius: 6px; border: 1px solid #cbd5e1; background: white; padding: 0 6px; font-size: 12.5px; font-weight: 700; color: #2563eb; cursor: pointer; outline: none;">
+                                <option value="">{{ }}</option>
+                                <option value="{{ to.first_name }}">Mottakers fornavn ({{ to.first_name }})</option>
+                                <option value="{{ to.full_name }}">Mottakers fullt navn ({{ to.full_name }})</option>
+                                <option value="{{ to.email }}">Mottakers e-post ({{ to.email }})</option>
+                            </select>
+
+                            <!-- Inline Image Button -->
+                            <button type="button" id="crm-email-insert-img-btn" title="Sett inn inline bilde i e-posten" style="padding: 4px 10px; border-radius: 6px; border: 1px solid #cbd5e1; background: #ffffff; cursor: pointer; color: #334155; display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600;">
+                                <span class="material-symbols-outlined" style="font-size: 18px; color: #2563eb;">image</span>
+                                <span>Bilde</span>
+                            </button>
+
+                            <!-- Inline YouTube Video Button -->
+                            <button type="button" id="crm-email-insert-yt-btn" title="Sett inn YouTube-video med forhåndsvisning" style="padding: 4px 10px; border-radius: 6px; border: 1px solid #cbd5e1; background: #ffffff; cursor: pointer; color: #334155; display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600;">
+                                <span class="material-symbols-outlined" style="font-size: 18px; color: #ff0000;">smart_display</span>
+                                <span>YouTube</span>
                             </button>
                         </div>
 
                         <!-- Editable Content Area -->
-                        <div id="crm-email-body-editor" contenteditable="true" style="min-height: 150px; max-height: 280px; overflow-y: auto; padding: 12px; font-size: 14px; line-height: 1.6; color: #0f172a; outline: none;"></div>
+                        <div id="crm-email-body-editor" contenteditable="true" style="min-height: 220px; max-height: 380px; overflow-y: auto; padding: 16px; font-size: 14px; line-height: 1.6; color: #0f172a; outline: none; background: white;"></div>
                     </div>
                 </div>
 
-                <!-- Attachments Section -->
-                <div style="display: flex; flex-direction: column; gap: 6px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <label style="font-weight: 700; font-size: 13px; color: #334155; display: flex; align-items: center; gap: 6px;">
-                            <span class="material-symbols-outlined" style="font-size: 18px; color: #64748b;">attach_file</span>
-                            Vedlegg:
-                        </label>
-                        <button type="button" id="crm-email-add-att-btn" style="padding: 4px 10px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; border-radius: 6px; border: 1px solid #cbd5e1; background: #ffffff; color: #334155; cursor: pointer;">
-                            <span class="material-symbols-outlined" style="font-size: 16px;">add_circle</span>
-                            Legg til vedlegg
-                        </button>
-                        <input type="file" id="crm-email-file-input" multiple style="display: none;">
-                    </div>
+                <!-- Attachments List Container -->
+                <div id="crm-email-attachments-list" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: -4px;"></div>
 
-                    <div id="crm-email-attachments-list" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
+                <!-- Send Options Toggles matching reference screenshot -->
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 4px; padding: 12px 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <label style="display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 500; color: #334155; cursor: pointer; user-select: none;">
+                        <input type="checkbox" id="crm-email-send-copy" style="width: 16px; height: 16px; accent-color: #2563eb; cursor: pointer;">
+                        <span>Send en kopi av denne e-posten til meg selv (${this.escapeHtml(adminEmail)})</span>
+                    </label>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 500; color: #334155; cursor: pointer; user-select: none;">
+                            <input type="checkbox" id="crm-email-schedule-delivery" style="width: 16px; height: 16px; accent-color: #2563eb; cursor: pointer;">
+                            <span>Planlegg utsending</span>
+                        </label>
+                        <div id="crm-email-schedule-picker-container" style="display: none; padding-left: 26px; margin-top: 2px;">
+                            <input type="datetime-local" id="crm-email-schedule-time" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; color: #0f172a; outline: none; background: white;">
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
 
         this.openCrmToolDialog({
             mode: 'custom-html',
-            title: contactsWithEmail.length === 1 ? 'Send e-post til kontakt' : `Send e-post til ${contactsWithEmail.length} kontakter`,
-            subtitle: 'Formater e-posten, legg til vedlegg og velg avsender.',
+            title: 'Send e-post',
+            subtitle: '',
+            dialogClass: 'crm-send-email-modal-wrapper',
+            footerLeftHtml: footerLeftHtml,
             html: html,
             confirmLabel: 'Send e-post',
             onConfirm: async () => {
                 const fromModeEl = document.getElementById('crm-email-from-mode');
                 const subjectEl = document.getElementById('crm-email-subject');
                 const editorEl = document.getElementById('crm-email-body-editor');
+                const sendCopyEl = document.getElementById('crm-email-send-copy');
+                const scheduleEl = document.getElementById('crm-email-schedule-delivery');
+                const scheduleTimeEl = document.getElementById('crm-email-schedule-time');
 
                 const fromMode = fromModeEl ? fromModeEl.value : 'post';
                 const subject = subjectEl ? subjectEl.value.trim() : '';
@@ -2160,16 +2265,30 @@ class CRMManager {
                     return false;
                 }
 
+                const sendCopy = sendCopyEl ? sendCopyEl.checked : false;
+                const isScheduled = scheduleEl ? scheduleEl.checked : false;
+                const scheduledTime = (isScheduled && scheduleTimeEl) ? scheduleTimeEl.value : null;
+
+                if (isScheduled && !scheduledTime) {
+                    this.notify('Vennligst velg dato og tidspunkt for planlagt utsending.', 'warning');
+                    return false;
+                }
+
                 try {
                     const currentUser = window.firebaseService?.auth?.currentUser || (window.firebase && window.firebase.auth().currentUser);
                     const idToken = currentUser ? await currentUser.getIdToken() : '';
 
+                    let finalRecipients = [...contactsWithEmail];
+                    if (sendCopy && adminEmail && !finalRecipients.some(c => c.email === adminEmail)) {
+                        finalRecipients.push({ email: adminEmail, displayName: adminName + ' (Kopi)' });
+                    }
+
                     let sentCount = 0;
                     let failCount = 0;
 
-                    this.notify(`Sender e-post til ${contactsWithEmail.length} ${contactsWithEmail.length === 1 ? 'mottaker' : 'mottakere'}...`);
+                    this.notify(`Sender e-post til ${finalRecipients.length} ${finalRecipients.length === 1 ? 'mottaker' : 'mottakere'}...`);
 
-                    for (const contact of contactsWithEmail) {
+                    for (const contact of finalRecipients) {
                         try {
                             const fromName = fromMode === 'admin'
                                 ? (currentUser?.displayName || currentUser?.email || 'HKM Admin')
@@ -2182,7 +2301,8 @@ class CRMManager {
                                 html: htmlContent,
                                 attachments: attachments,
                                 fromMode: fromMode,
-                                fromName: fromName
+                                fromName: fromName,
+                                scheduledTime: scheduledTime
                             };
 
                             const response = await fetch('https://sendmanualemail-42bhgdjkcq-uc.a.run.app', {
@@ -2221,11 +2341,165 @@ class CRMManager {
             }
         });
 
-        // Attach editor toolbar & attachment upload listeners after modal renders
-        setTimeout(() => {
+        // Attach editor toolbar, templates, image, youtube & attachment listeners
+        setTimeout(async () => {
             const editor = document.getElementById('crm-email-body-editor');
             const toolbar = document.querySelector('.crm-editor-toolbar');
+            const templateSelect = document.getElementById('crm-email-template-select');
+            const subjectInput = document.getElementById('crm-email-subject');
 
+            // Built-in email templates dictionary
+            const builtInTemplates = {
+                summer_camp: {
+                    subject: 'Youth Summer Camp is coming!',
+                    body: `<div style="text-align: center; margin-bottom: 20px;">
+                        <img src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=800&auto=format&fit=crop&q=80" alt="Centerville Church Summer Camp" style="width: 100%; max-width: 600px; border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); display: block; margin: 0 auto;">
+                    </div>
+                    <p>Hi {{ to.first_name }},</p>
+                    <p>Summer Camp is back! This July 20–25, your student will spend a week building friendships, growing in their faith, and having an absolute blast. We've got an incredible lineup of speakers, games, and activities planned — it's going to be a week they won't forget.</p>
+                    <p>Space fills up fast, so sign up soon on <strong>Church Center</strong>.</p>
+                    <p>Can't wait to see your student there!</p>`
+                },
+                newsletter: {
+                    subject: 'Månedsoppdatering fra His Kingdom Ministry 📖',
+                    body: `<div style="text-align: center; margin-bottom: 20px;">
+                        <img src="https://images.unsplash.com/photo-1499209974431-9dac3cea004b?w=800&auto=format&fit=crop&q=80" alt="Bibel og Kaffe" style="width: 100%; max-width: 600px; border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); display: block; margin: 0 auto;">
+                    </div>
+                    <p>Kjære {{ to.first_name }},</p>
+                    <p>Vi ønsker å dele noen fantastiske nyheter og oppdateringer med deg denne måneden!</p>
+                    <p>Gud gjør utrolig mye igjennom fellesskapet vårt, og vi er så takknemlige for at du er en del av denne reisen.</p>
+                    <div style="margin: 24px 0; text-align: center;">
+                        <a href="https://www.hiskingdomministry.no/blogg.html" target="_blank" style="background: #2563eb; color: #ffffff; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-weight: 700; display: inline-block;">Les siste artikler</a>
+                    </div>`
+                },
+                encouragement: {
+                    subject: 'En personlig hilsen og oppmuntring til deg 🙏',
+                    body: `<p>Hei {{ to.first_name }},</p>
+                    <p>Vi i His Kingdom Ministry ønsker å sende deg en liten oppmuntring i hverdagen.</p>
+                    <blockquote style="border-left: 4px solid #2563eb; margin: 16px 0; padding: 12px 18px; background: #f8fafc; border-radius: 0 12px 12px 0; font-style: italic; color: #334155;">
+                        "For jeg vet hvilke tanker jeg har med dere, sier Herren, fredstanker og ikke tanker til ulykke, til å gi dere fremtid og håp." — Jeremia 29:11
+                    </blockquote>
+                    <p>Må Guds fred og velsignelse fylle din uke!</p>`
+                },
+                thank_you: {
+                    subject: 'Tusen takk for din støtte til Guds rike! 💖',
+                    body: `<p>Kjære {{ to.first_name }},</p>
+                    <p>Tusen takk for din trofaste støtte og engasjement for His Kingdom Ministry.</p>
+                    <p>Takket være din støtte kan vi nå ut til ennå flere med evangeliet, undervisning og ressurser.</p>
+                    <p>Med vennlig hilsen,<br><strong>His Kingdom Ministry</strong></p>`
+                }
+            };
+
+            // Load custom templates from Firestore if available
+            if (templateSelect && window.firebaseService?.db) {
+                try {
+                    const snap = await window.firebaseService.db.collection('email_templates').get();
+                    if (snap && !snap.empty) {
+                        snap.forEach(doc => {
+                            const tData = doc.data();
+                            const opt = document.createElement('option');
+                            opt.value = 'fs_' + doc.id;
+                            opt.textContent = tData.name || tData.subject || doc.id;
+                            templateSelect.appendChild(opt);
+                            builtInTemplates['fs_' + doc.id] = {
+                                subject: tData.subject || '',
+                                body: tData.body || ''
+                            };
+                        });
+                    }
+                } catch (err) {
+                    console.warn('Kunne ikke laste e-postmaler fra Firestore:', err);
+                }
+            }
+
+            // Template Change Handler
+            if (templateSelect) {
+                templateSelect.addEventListener('change', () => {
+                    const val = templateSelect.value;
+                    if (val && builtInTemplates[val]) {
+                        const t = builtInTemplates[val];
+                        if (subjectInput) subjectInput.value = t.subject;
+                        if (editor) editor.innerHTML = t.body;
+                    }
+                });
+            }
+
+            // Schedule Delivery Toggle
+            const scheduleCheckbox = document.getElementById('crm-email-schedule-delivery');
+            const schedulePickerContainer = document.getElementById('crm-email-schedule-picker-container');
+            if (scheduleCheckbox && schedulePickerContainer) {
+                scheduleCheckbox.addEventListener('change', () => {
+                    schedulePickerContainer.style.display = scheduleCheckbox.checked ? 'block' : 'none';
+                });
+            }
+
+            // Format Block Selector (H1, H2, H3, P)
+            const formatBlockSelect = document.getElementById('crm-editor-format-block');
+            if (formatBlockSelect && editor) {
+                formatBlockSelect.addEventListener('change', () => {
+                    editor.focus();
+                    const tag = formatBlockSelect.value;
+                    document.execCommand('formatBlock', false, `<${tag}>`);
+                });
+            }
+
+            // Merge Tag Selector ({{ to.first_name }}, etc.)
+            const mergeTagSelect = document.getElementById('crm-email-merge-tag-select');
+            if (mergeTagSelect && editor) {
+                mergeTagSelect.addEventListener('change', () => {
+                    const tag = mergeTagSelect.value;
+                    if (tag) {
+                        editor.focus();
+                        document.execCommand('insertHTML', false, tag);
+                        mergeTagSelect.value = '';
+                    }
+                });
+            }
+
+            // Insert Inline Image Handler
+            const insertImgBtn = document.getElementById('crm-email-insert-img-btn');
+            if (insertImgBtn && editor) {
+                insertImgBtn.addEventListener('click', () => {
+                    editor.focus();
+                    const url = window.prompt('Lim inn bildelenke (URL):', 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=800');
+                    if (url && url.trim()) {
+                        const imgCardHtml = `<div style="text-align: center; margin: 18px 0;"><img src="${url.trim()}" alt="Bilde" style="max-width: 100%; height: auto; border-radius: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); display: block; margin: 0 auto;"></div><p><br></p>`;
+                        document.execCommand('insertHTML', false, imgCardHtml);
+                    }
+                });
+            }
+
+            // Insert Inline YouTube Video Handler
+            const insertYtBtn = document.getElementById('crm-email-insert-yt-btn');
+            if (insertYtBtn && editor) {
+                insertYtBtn.addEventListener('click', () => {
+                    editor.focus();
+                    const inputUrl = window.prompt('Lim inn YouTube-nettadresse (f.eks: https://www.youtube.com/watch?v=VIDEO_ID):');
+                    if (inputUrl && inputUrl.trim()) {
+                        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                        const match = inputUrl.trim().match(regExp);
+                        const videoId = (match && match[2].length === 11) ? match[2] : inputUrl.trim();
+
+                        if (videoId) {
+                            const ytCardHtml = `<div class="email-yt-card" style="margin: 20px 0; text-align: center;">
+                                <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank" rel="noopener noreferrer" style="display: inline-block; position: relative; text-decoration: none; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.15); max-width: 100%;">
+                                    <img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" alt="Se video på YouTube" style="width: 100%; max-width: 540px; display: block; border-radius: 16px; aspect-ratio: 16/9; object-fit: cover;">
+                                    <div style="position: absolute; inset: 0; background: rgba(15, 23, 42, 0.35); display: flex; align-items: center; justify-content: center;">
+                                        <div style="width: 64px; height: 64px; border-radius: 50%; background: #ff0000; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(255,0,0,0.4);">
+                                            <div style="width: 0; height: 0; border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-left: 18px solid #ffffff; margin-left: 4px;"></div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div><p><br></p>`;
+                            document.execCommand('insertHTML', false, ytCardHtml);
+                        } else {
+                            this.notify('Ugyldig YouTube-nettadresse.', 'error');
+                        }
+                    }
+                });
+            }
+
+            // Toolbar Button Click Handlers
             if (toolbar && editor) {
                 toolbar.querySelectorAll('.editor-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
@@ -2237,10 +2511,8 @@ class CRMManager {
                         if (cmd === 'createLink') {
                             const url = window.prompt('Lim inn URL/lenke:');
                             if (url) document.execCommand('createLink', false, url);
-                        } else if (cmd === 'h2') {
-                            document.execCommand('formatBlock', false, '<h2>');
-                        } else if (cmd === 'h3') {
-                            document.execCommand('formatBlock', false, '<h3>');
+                        } else if (cmd === 'blockquote') {
+                            document.execCommand('formatBlock', false, '<blockquote>');
                         } else {
                             document.execCommand(cmd, false, null);
                         }
@@ -2251,6 +2523,7 @@ class CRMManager {
                 });
             }
 
+            // Attachment Handler
             const addAttBtn = document.getElementById('crm-email-add-att-btn');
             const fileInput = document.getElementById('crm-email-file-input');
 
