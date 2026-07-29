@@ -10242,6 +10242,8 @@ html[data-theme="dark"] .design-ui-callout p {
     margin: 0 0 6px 0 !important;
     padding: 0 !important;
     display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
     justify-content: center !important;
     align-items: center !important;
   }

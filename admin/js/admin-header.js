@@ -13,6 +13,17 @@ const initAdminHeader = () => {
     const applySidebarMiniState = (isMini) => {
         if (window.innerWidth >= 1025) {
             document.body.classList.toggle('sidebar-mini', isMini);
+            if (isMini) {
+                document.querySelectorAll('.nav-item[data-nav-category]').forEach(item => {
+                    item.style.setProperty('display', 'flex', 'important');
+                    item.style.setProperty('visibility', 'visible', 'important');
+                    item.style.setProperty('opacity', '1', 'important');
+                    item.classList.remove('nav-cat-hidden');
+                    item.classList.add('visible');
+                });
+            } else if (typeof window.hkmRestoreSidebarCategories === 'function') {
+                window.hkmRestoreSidebarCategories();
+            }
         } else {
             document.body.classList.remove('sidebar-mini');
         }
@@ -726,17 +737,43 @@ const initAdminHeader = () => {
         const categoryHeaders = document.querySelectorAll('.nav-category-header[data-target-category]');
         if (categoryHeaders.length === 0) return;
 
+        window.hkmRestoreSidebarCategories = () => {
+            if (document.body.classList.contains('sidebar-mini')) {
+                document.querySelectorAll('.nav-item[data-nav-category]').forEach(item => {
+                    item.style.setProperty('display', 'flex', 'important');
+                    item.style.setProperty('visibility', 'visible', 'important');
+                    item.style.setProperty('opacity', '1', 'important');
+                });
+                return;
+            }
+
+            categoryHeaders.forEach(header => {
+                const cat = header.getAttribute('data-target-category');
+                const activeLink = document.querySelector('.nav-link.active[data-section]');
+                const activeSection = activeLink?.getAttribute('data-section') || window.location.hash.substring(1) || sessionStorage.getItem('hkm_admin_last_dashboard_section') || 'overview';
+                const matchingNavItem = document.querySelector(`.nav-item[data-nav-category] a[data-section="${activeSection}"]`);
+                const activeCat = matchingNavItem?.closest('.nav-item')?.getAttribute('data-nav-category');
+
+                let shouldBeOpen = (cat === 'kommunikasjon');
+                if (activeCat) {
+                    shouldBeOpen = (cat === activeCat);
+                }
+                setCategory(cat, shouldBeOpen);
+            });
+        };
+
         function setCategory(category, shouldBeOpen) {
             const header = document.querySelector(`.nav-category-header[data-target-category="${category}"]`);
             const items = document.querySelectorAll(`.nav-item[data-nav-category="${category}"]`);
             if (!header) return;
 
-            if (shouldBeOpen) {
+            const isMini = document.body.classList.contains('sidebar-mini');
+            if (shouldBeOpen || isMini) {
                 header.classList.remove('collapsed');
                 items.forEach(item => {
                     item.classList.remove('nav-cat-hidden');
                     item.classList.add('visible');
-                    item.style.setProperty('display', 'block', 'important');
+                    item.style.setProperty('display', 'flex', 'important');
                     item.style.setProperty('visibility', 'visible', 'important');
                     item.style.setProperty('opacity', '1', 'important');
                 });
@@ -750,29 +787,15 @@ const initAdminHeader = () => {
             }
         }
 
+        window.hkmRestoreSidebarCategories();
+
         categoryHeaders.forEach(header => {
-            const cat = header.getAttribute('data-target-category');
-            
-            // Check if this category contains the active section on load
-            const activeLink = document.querySelector('.nav-link.active[data-section]');
-            const activeSection = activeLink?.getAttribute('data-section') || window.location.hash.substring(1) || sessionStorage.getItem('hkm_admin_last_dashboard_section') || 'overview';
-            const matchingNavItem = document.querySelector(`.nav-item[data-nav-category] a[data-section="${activeSection}"]`);
-            const activeCat = matchingNavItem?.closest('.nav-item')?.getAttribute('data-nav-category');
-
-            let shouldBeOpen = (cat === 'kommunikasjon'); // default: only Kommunikasjon open
-            if (activeCat) {
-                shouldBeOpen = (cat === activeCat);
-            }
-            
-            setCategory(cat, shouldBeOpen);
-
-            // Use direct onclick to ensure it's not blocked by other listeners
             header.onclick = (e) => {
                 e.preventDefault();
+                const cat = header.getAttribute('data-target-category');
                 const currentlyCollapsed = header.classList.contains('collapsed');
                 
                 if (currentlyCollapsed) {
-                    // Collapse all other categories
                     categoryHeaders.forEach(otherHeader => {
                         const otherCat = otherHeader.getAttribute('data-target-category');
                         if (otherCat !== cat) {
