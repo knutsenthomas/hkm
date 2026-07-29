@@ -1518,7 +1518,7 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
     padding: 8px 16px;
     border-radius: 999px;
     box-shadow: 0 20px 40px rgba(15, 23, 42, 0.45), 0 4px 14px rgba(0, 0, 0, 0.25);
-    z-index: 1000;
+    z-index: 13000 !important; /* Above mobile bottom nav (12000) */
     transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, visibility 0.3s ease !important;
     opacity: 0;
     visibility: hidden;
@@ -1634,13 +1634,14 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
 /* Mobile Responsive Styling (< 860px) */
 @media (max-width: 860px) {
     .hkm-bulk-bar {
-        bottom: 16px !important;
+        bottom: calc(75px + env(safe-area-inset-bottom, 0px)) !important;
         left: 50% !important;
-        transform: translate3d(-50%, 120px, 0) !important;
+        transform: translate3d(-50%, 140px, 0) !important;
         width: calc(100vw - 24px) !important;
         max-width: 520px !important;
         padding: 10px 14px !important;
         border-radius: 16px !important;
+        z-index: 13000 !important;
     }
 
     .hkm-bulk-bar.active {
