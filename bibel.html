@@ -1385,22 +1385,73 @@
         }
 
         .floating-settings-popover .theme-option[data-theme="cream"] {
-            background: #fdfbf7 !important;
-            border: 2px solid #e2e8f0 !important;
+            background: #fdf6ea !important;
+            border: 2px solid #e2d7c5 !important;
         }
         .floating-settings-popover .theme-option[data-theme="light"] {
             background: #ffffff !important;
             border: 2px solid #cbd5e1 !important;
         }
         .floating-settings-popover .theme-option[data-theme="dark"] {
-            background: #1e293b !important;
+            background: #0f172a !important;
             border: 2px solid #334155 !important;
         }
 
         .floating-settings-popover .theme-option.active {
             transform: scale(1.15) !important;
             border-color: var(--bible-primary, #d17d39) !important;
-            box-shadow: 0 0 0 3px rgba(209, 125, 57, 0.3) !important;
+            box-shadow: 0 0 0 3px rgba(209, 125, 57, 0.4) !important;
+        }
+
+        /* Dark Mode High-Contrast Overrides for Settings & Tools Sheet */
+        html[data-theme="dark"] .floating-settings-popover,
+        html[data-theme="dark"] .settings-dropdown {
+            background: #0f172a !important;
+            border-color: #1e293b !important;
+            color: #f8fafc !important;
+        }
+
+        html[data-theme="dark"] .floating-settings-popover h3,
+        html[data-theme="dark"] .floating-settings-popover .settings-label,
+        html[data-theme="dark"] .floating-settings-popover label,
+        html[data-theme="dark"] .settings-dropdown .settings-label {
+            color: #f8fafc !important;
+        }
+
+        html[data-theme="dark"] .floating-settings-popover input,
+        html[data-theme="dark"] .floating-settings-popover select,
+        html[data-theme="dark"] .settings-dropdown input {
+            background: #1e293b !important;
+            border: 1px solid #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        html[data-theme="dark"] .floating-settings-popover input::placeholder {
+            color: #94a3b8 !important;
+        }
+
+        html[data-theme="dark"] .hkm-segmented-control,
+        html[data-theme="dark"] .btn-setting-group,
+        html[data-theme="dark"] .floating-settings-popover .hkm-segmented-control,
+        html[data-theme="dark"] .floating-settings-popover .btn-setting-group {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        html[data-theme="dark"] .hkm-segmented-control .segment-btn,
+        html[data-theme="dark"] .btn-setting-group button,
+        html[data-theme="dark"] .floating-settings-popover .segment-btn {
+            color: #cbd5e1 !important;
+        }
+
+        html[data-theme="dark"] .hkm-segmented-control .segment-btn.active,
+        html[data-theme="dark"] .floating-settings-popover .hkm-segmented-control .segment-btn.active,
+        html[data-theme="dark"] .floating-settings-popover #font-size-display,
+        html[data-theme="dark"] #font-size-display {
+            background: #d17d39 !important;
+            color: #ffffff !important;
+            font-weight: 700 !important;
+            box-shadow: 0 2px 8px rgba(209, 125, 57, 0.4) !important;
         }
 
         .floating-nav-btn {
