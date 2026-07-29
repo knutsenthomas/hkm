@@ -2084,37 +2084,42 @@ class CRMManager {
             : `<span style="color: #64748b; font-size: 12.5px; font-weight: 500;">✓ Alle ${contactsWithEmail.length} mottakere er aktive</span>`;
 
         const html = `
-            <div class="crm-send-email-modal" style="display: flex; flex-direction: column; gap: 14px; padding: 2px 0;">
-                <!-- Recipient Count Header -->
-                <div style="background: #ffffff; padding: 14px 18px; border-radius: 14px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
-                    <div style="font-size: 18px; font-weight: 800; color: #0f172a; letter-spacing: -0.01em;">
-                        ${contactsWithEmail.length} ${contactsWithEmail.length === 1 ? 'mottaker' : 'mottakere'}
+            <div class="crm-send-email-modal" style="display: flex; flex-direction: column; gap: 16px; padding: 2px 0;">
+                <!-- Recipient Header Card -->
+                <div style="background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%); padding: 14px 18px; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                    <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #d17d39, #bd4f2a); color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(209,125,57,0.25);">
+                        <span class="material-symbols-outlined" style="font-size: 24px;">mark_email_read</span>
                     </div>
-                    <div style="font-size: 13px; color: #64748b; margin-top: 2px;">
-                        ${contactsWithEmail.length === 1 
-                            ? `E-posten sendes til ${this.escapeHtml(recipientSummary)}.` 
-                            : `Denne e-posten vil bli sendt til alle de ${contactsWithEmail.length} valgte kontaktene.`}
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-size: 16px; font-weight: 800; color: #0f172a; letter-spacing: -0.01em;">
+                            ${contactsWithEmail.length} ${contactsWithEmail.length === 1 ? 'mottaker' : 'mottakere'}
+                        </div>
+                        <div style="font-size: 12.5px; color: #64748b; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            ${contactsWithEmail.length === 1 
+                                ? `Sendes til ${this.escapeHtml(recipientSummary)}` 
+                                : `Sendes til alle ${contactsWithEmail.length} valgte kontakter.`}
+                        </div>
                     </div>
                 </div>
 
                 <!-- 2-Column Meta Row: From & Template -->
                 <div class="crm-email-meta-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
-                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
                         <label style="font-weight: 700; font-size: 13px; color: #334155; display: flex; align-items: center; gap: 4px;">
                             <span>Fra:</span>
                             <span class="material-symbols-outlined" style="font-size: 15px; color: #94a3b8;" title="Avsenderadresse">info</span>
                         </label>
-                        <select id="crm-email-from-mode" class="form-control" style="width: 100%; height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 13.5px; background: white; color: #0f172a; outline: none; cursor: pointer; font-weight: 500;">
+                        <select id="crm-email-from-mode" class="form-control" style="width: 100%; height: 42px; padding: 0 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 13.5px; background: white; color: #0f172a; outline: none; cursor: pointer; font-weight: 500;">
                             <option value="post" selected>His Kingdom Ministry &lt;post@hiskingdomministry.no&gt;</option>
                             <option value="admin">${this.escapeHtml(adminName)} &lt;${this.escapeHtml(adminEmail)}&gt;</option>
                         </select>
                     </div>
 
-                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
                         <label style="font-weight: 700; font-size: 13px; color: #334155;">Mal:</label>
                         <div style="position: relative;">
-                            <span class="material-symbols-outlined" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #94a3b8; pointer-events: none;">search</span>
-                            <select id="crm-email-template-select" class="form-control" style="width: 100%; height: 40px; padding: 0 12px 0 34px !important; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 13.5px; background: white; color: #0f172a; outline: none; cursor: pointer; font-weight: 500;">
+                            <span class="material-symbols-outlined" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #94a3b8; pointer-events: none;">search</span>
+                            <select id="crm-email-template-select" class="form-control" style="width: 100%; height: 42px; padding: 0 12px 0 36px !important; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 13.5px; background: white; color: #0f172a; outline: none; cursor: pointer; font-weight: 500;">
                                 <option value="">Velg e-postmal...</option>
                                 <option value="summer_camp">Youth Summer Camp is coming!</option>
                                 <option value="newsletter">Månedsoppdatering & Nyheter</option>
@@ -2126,75 +2131,77 @@ class CRMManager {
                 </div>
 
                 <!-- Subject Input -->
-                <div style="display: flex; flex-direction: column; gap: 4px;">
-                    <input type="text" id="crm-email-subject" class="form-control" placeholder="Youth Summer Camp is coming!..." style="width: 100%; height: 42px; padding: 0 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 14px; outline: none; background: white; font-weight: 500; color: #0f172a;">
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <label for="crm-email-subject" style="font-weight: 700; font-size: 13px; color: #334155;">Emne / Tittel:</label>
+                    <input type="text" id="crm-email-subject" class="form-control" placeholder="F.eks. Velkommen til Youth Summer Camp!..." style="width: 100%; height: 42px; padding: 0 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 14px; outline: none; background: white; font-weight: 500; color: #0f172a;">
                 </div>
 
                 <!-- Rich Editor Section -->
-                <div style="display: flex; flex-direction: column; gap: 4px;">
-                    <div style="border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
-                        <!-- Formatting Toolbar matching reference screenshot -->
-                        <div class="crm-editor-toolbar" style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 8px 12px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
-                            <button type="button" class="editor-btn" data-cmd="bold" title="Fet tekst (B)" style="font-weight: 800; font-size: 15px; width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <label style="font-weight: 700; font-size: 13px; color: #334155;">Innhold / Melding:</label>
+                    <div style="border: 1px solid #cbd5e1; border-radius: 14px; overflow: hidden; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                        <!-- Formatting Toolbar -->
+                        <div class="crm-editor-toolbar">
+                            <button type="button" class="editor-btn" data-cmd="bold" title="Fet tekst (B)" style="font-weight: 800; font-size: 15px;">
                                 B
                             </button>
-                            <button type="button" class="editor-btn" data-cmd="italic" title="Kursiv (I)" style="font-style: italic; font-weight: 700; font-size: 15px; width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                            <button type="button" class="editor-btn" data-cmd="italic" title="Kursiv (I)" style="font-style: italic; font-weight: 700; font-size: 15px;">
                                 I
                             </button>
-                            <button type="button" class="editor-btn" data-cmd="strikeThrough" title="Gjennomstreking" style="text-decoration: line-through; font-weight: 700; font-size: 14px; width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                            <button type="button" class="editor-btn" data-cmd="strikeThrough" title="Gjennomstreking" style="text-decoration: line-through; font-weight: 700; font-size: 14px;">
                                 S
                             </button>
-                            <button type="button" class="editor-btn" data-cmd="createLink" title="Sett inn lenke" style="width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                            <button type="button" class="editor-btn" data-cmd="createLink" title="Sett inn lenke">
                                 <span class="material-symbols-outlined" style="font-size: 19px;">link</span>
                             </button>
                             
-                            <div class="crm-editor-divider" style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 3px;"></div>
+                            <div class="crm-editor-divider" style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 3px; flex-shrink: 0;"></div>
 
                             <!-- Format Selector -->
-                            <select id="crm-editor-format-block" title="Tekststørrelse / Overskrift" style="height: 30px; border-radius: 6px; border: 1px solid #cbd5e1; background: white; padding: 0 8px; font-size: 12.5px; font-weight: 600; color: #334155; cursor: pointer; outline: none;">
+                            <select id="crm-editor-format-block" title="Tekststørrelse / Overskrift" style="height: 32px; border-radius: 6px; border: 1px solid #cbd5e1; background: white; padding: 0 8px; font-size: 12.5px; font-weight: 600; color: #334155; cursor: pointer; outline: none; flex-shrink: 0;">
                                 <option value="p">Normal tekst</option>
                                 <option value="h1">Stor overskrift (H1)</option>
                                 <option value="h2">Overskrift (H2)</option>
                                 <option value="h3">Underoverskrift (H3)</option>
                             </select>
 
-                            <button type="button" class="editor-btn" data-cmd="blockquote" title="Sitat (Quote)" style="width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                            <button type="button" class="editor-btn" data-cmd="blockquote" title="Sitat (Quote)">
                                 <span class="material-symbols-outlined" style="font-size: 19px;">format_quote</span>
                             </button>
 
-                            <div class="crm-editor-divider" style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 3px;"></div>
+                            <div class="crm-editor-divider" style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 3px; flex-shrink: 0;"></div>
 
-                            <button type="button" class="editor-btn" data-cmd="insertUnorderedList" title="Kulepunkter" style="width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                            <button type="button" class="editor-btn" data-cmd="insertUnorderedList" title="Kulepunkter">
                                 <span class="material-symbols-outlined" style="font-size: 19px;">format_list_bulleted</span>
                             </button>
-                            <button type="button" class="editor-btn" data-cmd="insertOrderedList" title="Nummerert liste" style="width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                            <button type="button" class="editor-btn" data-cmd="insertOrderedList" title="Nummerert liste">
                                 <span class="material-symbols-outlined" style="font-size: 19px;">format_list_numbered</span>
                             </button>
-                            <button type="button" class="editor-btn" data-cmd="outdent" title="Minsk innrykk" style="width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                            <button type="button" class="editor-btn" data-cmd="outdent" title="Minsk innrykk">
                                 <span class="material-symbols-outlined" style="font-size: 19px;">format_indent_decrease</span>
                             </button>
-                            <button type="button" class="editor-btn" data-cmd="indent" title="Øk innrykk" style="width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                            <button type="button" class="editor-btn" data-cmd="indent" title="Øk innrykk">
                                 <span class="material-symbols-outlined" style="font-size: 19px;">format_indent_increase</span>
                             </button>
 
-                            <div class="crm-editor-divider" style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 3px;"></div>
+                            <div class="crm-editor-divider" style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 3px; flex-shrink: 0;"></div>
 
-                            <button type="button" id="crm-email-add-att-btn" title="Legg til vedlegg" style="width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                            <button type="button" id="crm-email-add-att-btn" title="Legg til vedlegg">
                                 <span class="material-symbols-outlined" style="font-size: 19px;">attach_file</span>
                             </button>
                             <input type="file" id="crm-email-file-input" multiple style="display: none;">
 
-                            <button type="button" class="editor-btn" data-cmd="undo" title="Angre" style="width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                            <button type="button" class="editor-btn" data-cmd="undo" title="Angre">
                                 <span class="material-symbols-outlined" style="font-size: 19px;">undo</span>
                             </button>
-                            <button type="button" class="editor-btn" data-cmd="redo" title="Gjenta" style="width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; cursor: pointer; color: #334155; display: inline-flex; align-items: center; justify-content: center;">
+                            <button type="button" class="editor-btn" data-cmd="redo" title="Gjenta">
                                 <span class="material-symbols-outlined" style="font-size: 19px;">redo</span>
                             </button>
 
-                            <div style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 3px;"></div>
+                            <div class="crm-editor-divider" style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 3px; flex-shrink: 0;"></div>
 
                             <!-- Variable Tag Selector -->
-                            <select id="crm-email-merge-tag-select" title="Sett inn flettefelt ({{ tag }})" style="height: 30px; border-radius: 6px; border: 1px solid #cbd5e1; background: white; padding: 0 6px; font-size: 12.5px; font-weight: 700; color: #2563eb; cursor: pointer; outline: none;">
+                            <select id="crm-email-merge-tag-select" title="Sett inn flettefelt ({{ tag }})" style="height: 32px; border-radius: 6px; border: 1px solid #cbd5e1; background: white; padding: 0 8px; font-size: 12.5px; font-weight: 700; color: #2563eb; cursor: pointer; outline: none; flex-shrink: 0;">
                                 <option value="">{{ }}</option>
                                 <option value="{{ to.first_name }}">Mottakers fornavn ({{ to.first_name }})</option>
                                 <option value="{{ to.full_name }}">Mottakers fullt navn ({{ to.full_name }})</option>
@@ -2202,15 +2209,15 @@ class CRMManager {
                             </select>
 
                             <!-- Inline Image Button -->
-                            <button type="button" id="crm-email-insert-img-btn" title="Sett inn inline bilde i e-posten" style="padding: 4px 10px; border-radius: 6px; border: 1px solid #cbd5e1; background: #ffffff; cursor: pointer; color: #334155; display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600;">
+                            <button type="button" id="crm-email-insert-img-btn" title="Sett inn inline bilde i e-posten" style="width: auto !important; min-width: 32px !important; padding: 0 10px !important; border-radius: 6px !important; border: 1px solid #cbd5e1 !important; background: #ffffff !important; flex: 0 0 auto !important;">
                                 <span class="material-symbols-outlined" style="font-size: 18px; color: #2563eb;">image</span>
-                                <span>Bilde</span>
+                                <span style="font-size: 12px; font-weight: 600; color: #334155; margin-left: 4px;">Bilde</span>
                             </button>
 
                             <!-- Inline YouTube Video Button -->
-                            <button type="button" id="crm-email-insert-yt-btn" title="Sett inn YouTube-video med forhåndsvisning" style="padding: 4px 10px; border-radius: 6px; border: 1px solid #cbd5e1; background: #ffffff; cursor: pointer; color: #334155; display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600;">
-                                <span class="material-symbols-outlined" style="font-size: 18px; color: #ff0000;">smart_display</span>
-                                <span>YouTube</span>
+                            <button type="button" id="crm-email-insert-yt-btn" title="Sett inn YouTube-video med forhåndsvisning" style="width: auto !important; min-width: 32px !important; padding: 0 10px !important; border-radius: 6px !important; border: 1px solid #cbd5e1 !important; background: #ffffff !important; flex: 0 0 auto !important;">
+                                <span class="material-symbols-outlined" style="font-size: 18px; color: #ef4444;">smart_display</span>
+                                <span style="font-size: 12px; font-weight: 600; color: #334155; margin-left: 4px;">YouTube</span>
                             </button>
                         </div>
 
@@ -2222,20 +2229,20 @@ class CRMManager {
                 <!-- Attachments List Container -->
                 <div id="crm-email-attachments-list" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: -4px;"></div>
 
-                <!-- Send Options Toggles matching reference screenshot -->
-                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 4px; padding: 12px 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
-                    <label style="display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 500; color: #334155; cursor: pointer; user-select: none;">
-                        <input type="checkbox" id="crm-email-send-copy" style="width: 16px; height: 16px; accent-color: #2563eb; cursor: pointer;">
+                <!-- Send Options Card -->
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 4px; padding: 14px 16px; background: #f8fafc; border-radius: 14px; border: 1px solid #e2e8f0;">
+                    <label style="display: flex; align-items: center; gap: 12px; font-size: 13.5px; font-weight: 600; color: #334155; cursor: pointer; user-select: none; margin: 0;">
+                        <input type="checkbox" id="crm-email-send-copy" style="width: 18px !important; min-width: 18px !important; height: 18px !important; min-height: 18px !important; accent-color: #d17d39 !important; cursor: pointer;">
                         <span>Send en kopi av denne e-posten til meg selv (${this.escapeHtml(adminEmail)})</span>
                     </label>
                     
                     <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label style="display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 500; color: #334155; cursor: pointer; user-select: none;">
-                            <input type="checkbox" id="crm-email-schedule-delivery" style="width: 16px; height: 16px; accent-color: #2563eb; cursor: pointer;">
-                            <span>Planlegg utsending</span>
+                        <label style="display: flex; align-items: center; gap: 12px; font-size: 13.5px; font-weight: 600; color: #334155; cursor: pointer; user-select: none; margin: 0;">
+                            <input type="checkbox" id="crm-email-schedule-delivery" style="width: 18px !important; min-width: 18px !important; height: 18px !important; min-height: 18px !important; accent-color: #d17d39 !important; cursor: pointer;">
+                            <span>Planlegg utsending til et senere tidspunkt</span>
                         </label>
-                        <div id="crm-email-schedule-picker-container" style="display: none; padding-left: 26px; margin-top: 2px;">
-                            <input type="datetime-local" id="crm-email-schedule-time" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; color: #0f172a; outline: none; background: white;">
+                        <div id="crm-email-schedule-picker-container" style="display: none; padding-left: 30px; margin-top: 2px;">
+                            <input type="datetime-local" id="crm-email-schedule-time" style="padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; color: #0f172a; outline: none; background: white; width: auto; min-width: 220px;">
                         </div>
                     </div>
                 </div>

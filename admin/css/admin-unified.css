@@ -6582,15 +6582,15 @@ body.admin-body .template-item:active {
   }
 
   /* Full width forms and touch safety */
-  form .form-group input,
+  form .form-group input:not([type="checkbox"]):not([type="radio"]),
   form .form-group select,
   form .form-group textarea,
   form button[type="submit"],
-  .modal-content input,
+  .modal-content input:not([type="checkbox"]):not([type="radio"]),
   .modal-content select,
   .modal-content textarea,
   .modal-content button,
-  #admin-modal-profile-form input,
+  #admin-modal-profile-form input:not([type="checkbox"]):not([type="radio"]),
   #admin-modal-profile-form textarea,
   #admin-modal-profile-form button,
   .quill-editor-container,
@@ -6599,6 +6599,24 @@ body.admin-body .template-item:active {
     min-height: 48px !important; /* Touch-friendly size */
     box-sizing: border-box !important;
     font-size: 16px !important; /* Stops iOS automatic zoom on focus */
+  }
+
+  /* Specific rule for checkboxes and radios inside modals and forms on mobile */
+  .modal-content input[type="checkbox"],
+  .modal-content input[type="radio"],
+  form input[type="checkbox"],
+  form input[type="radio"] {
+    width: 18px !important;
+    min-width: 18px !important;
+    max-width: 18px !important;
+    height: 18px !important;
+    min-height: 18px !important;
+    max-height: 18px !important;
+    margin: 0 !important;
+    flex: 0 0 18px !important;
+    accent-color: #d17d39 !important;
+    display: inline-block !important;
+    box-sizing: border-box !important;
   }
 
   /* Exclude editor toolbar buttons & controls from 100% full-width expansion */

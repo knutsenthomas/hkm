@@ -1284,6 +1284,67 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
     }
 }
 
+/* Responsive Send Email Modal & Rich Editor Toolbar */
+.crm-send-email-modal-wrapper .modal-content {
+    max-width: 680px !important;
+    width: 100% !important;
+    border-radius: 20px !important;
+}
+
+.crm-editor-toolbar {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 4px !important;
+    width: 100% !important;
+    padding: 6px 8px !important;
+    box-sizing: border-box !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: thin;
+    background: #f8fafc !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.crm-editor-toolbar button,
+.crm-editor-toolbar .editor-btn {
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    flex: 0 0 32px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 6px !important;
+    border: none !important;
+    background: transparent !important;
+    cursor: pointer !important;
+}
+
+.crm-editor-toolbar button:hover,
+.crm-editor-toolbar .editor-btn:hover {
+    background: #e2e8f0 !important;
+}
+
+@media (max-width: 640px) {
+    .crm-send-email-modal-wrapper {
+        padding: 10px !important;
+    }
+    .crm-email-meta-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+    .crm-editor-toolbar button span:not(.material-symbols-outlined) {
+        display: none !important;
+    }
+}
+
 @media (max-width: 480px) {
     .header-actions {
         grid-template-columns: 1fr !important;
