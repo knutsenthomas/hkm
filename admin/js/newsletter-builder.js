@@ -11429,11 +11429,11 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                     <p class="card-excerpt">${item.excerpt}</p>
                     <div class="card-footer" style="display: flex !important; align-items: center !important; justify-content: space-between !important; padding-top: 14px !important; border-top: 1px solid #f1f5f9 !important; gap: 12px !important;">
                         <div style="display: flex !important; gap: 12px !important; align-items: center !important; min-width: 0 !important; flex: 1 !important;">
-                            <div class="card-meta-item" style="white-space: nowrap !important; flex-shrink: 0 !important;">
+                            <div class="card-meta-item" style="white-space: nowrap !important; flex-shrink: 0 !important; display: inline-flex !important; align-items: center !important;">
                                 <span class="material-symbols-outlined">calendar_today</span>
                                 <span>${dateStr}</span>
                             </div>
-                            <div class="card-meta-item" style="white-space: nowrap !important; min-width: 0 !important; max-width: 140px !important; overflow: hidden !important; text-overflow: ellipsis !important;">
+                            <div class="card-meta-item" style="white-space: nowrap !important; min-width: 0 !important; max-width: 140px !important; overflow: hidden !important; text-overflow: ellipsis !important; display: inline-flex !important; align-items: center !important;">
                                 <span class="material-symbols-outlined">person</span>
                                 <span style="overflow: hidden !important; text-overflow: ellipsis !important;">${item.author}</span>
                             </div>
