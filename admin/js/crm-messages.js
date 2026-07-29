@@ -368,18 +368,35 @@ class MessagesManager {
         const isActive = this.activeThreadId === t.id;
         const isSelected = this.selectedThreads.has(t.id);
 
+        // Compute initials for person
+        const getInitials = (n) => {
+            if (!n || n === 'Anonym' || n === 'Ukjent') return '';
+            const parts = n.trim().split(/\s+/);
+            if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+            return n.substring(0, 2).toUpperCase();
+        };
+        const initials = getInitials(name);
+
         let icon = 'person';
         let channelIcon = 'mail';
         let avatarClass = '';
+        let channelTag = 'E-post';
 
         if (isChat) {
-            icon = 'person';
-            channelIcon = 'chat_bubble';
+            icon = 'chat_bubble';
+            channelIcon = 'forum';
+            avatarClass = 'chat';
+            channelTag = 'Nettsidechat';
         } else if (isPush) {
-            icon = 'send_to_mobile';
-            channelIcon = 'campaign';
+            icon = 'campaign';
+            channelIcon = 'notifications';
             avatarClass = 'push';
+            channelTag = 'Push';
         }
+
+        const avatarContent = initials 
+            ? `<span class="thread-avatar-initials">${this.escapeHtml(initials)}</span>` 
+            : `<span class="material-symbols-outlined">${icon}</span>`;
 
         return `
             <div class="thread-item ${isUnread ? 'unread' : ''} ${isActive ? 'active' : ''}" data-id="${t.id}" data-type="${t.type}">
@@ -387,7 +404,7 @@ class MessagesManager {
                     <input type="checkbox" class="thread-checkbox" data-id="${t.id}" ${isSelected ? 'checked' : ''} onchange="window.messagesManager.toggleThreadSelection('${t.id}', this.checked)">
                 </div>
                 <div class="thread-avatar ${avatarClass}">
-                    <span class="material-symbols-outlined">${icon}</span>
+                    ${avatarContent}
                     <div class="thread-channel-icon">
                         <span class="material-symbols-outlined">${channelIcon}</span>
                     </div>

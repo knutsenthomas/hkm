@@ -489,15 +489,16 @@
 
                     <!-- 2. Thread List -->
                     <section class="inbox-threads">
-                        <div class="threads-header" style="display: flex; gap: 10px; align-items: center; justify-content: space-between;">
-                            <div class="threads-search" style="flex: 1;">
-                                <span class="material-symbols-outlined">search</span>
-                                <input type="text" id="inbox-search" placeholder="Søk i innboks..." style="padding-left: 60px !important;">
+                        <div class="threads-header">
+                            <div class="threads-search-row">
+                                <div class="threads-search">
+                                    <span class="material-symbols-outlined">search</span>
+                                    <input type="text" id="inbox-search" placeholder="Søk i innboks...">
+                                </div>
+                                <button class="btn-icon-square" id="mark-all-read-btn" onclick="window.messagesManager.markAllAsRead()" title="Marker alle meldinger som lest">
+                                    <span class="material-symbols-outlined" style="color: #10b981;">done_all</span>
+                                </button>
                             </div>
-                            <button class="btn btn-sm btn-outline" id="mark-all-read-btn" onclick="window.messagesManager.markAllAsRead()" title="Marker alle som lest" style="border-radius: 10px; height: 38px; font-size: 12px; font-weight: 600; padding: 0 12px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; flex-shrink: 0; background: #ffffff; border: 1px solid #cbd5e1; color: #475569; cursor: pointer;">
-                                <span class="material-symbols-outlined" style="font-size: 16px; color: #16a34a;">done_all</span>
-                                <span>Marker alt lest</span>
-                            </button>
                             <div class="bulk-actions" id="bulk-actions" style="display: none;">
                                 <div class="bulk-actions-left">
                                     <input type="checkbox" id="select-all-threads">
@@ -517,8 +518,13 @@
                     <!-- 3. Thread View -->
                     <section class="inbox-view" id="inbox-thread-view">
                         <div class="inbox-empty-view">
-                            <span class="material-symbols-outlined">forum</span>
-                            <p>Velg en samtale for å lese meldinger</p>
+                            <div class="inbox-empty-card">
+                                <div class="inbox-empty-icon-wrap">
+                                    <span class="material-symbols-outlined">forum</span>
+                                </div>
+                                <h3 class="inbox-empty-title">Velg en samtale</h3>
+                                <p class="inbox-empty-desc">Klikk på en melding i listen til venstre for å lese, besvare eller behandle henvendelsen.</p>
+                            </div>
                         </div>
                     </section>
 
