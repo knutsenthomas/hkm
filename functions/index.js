@@ -9112,30 +9112,30 @@ exports.onCourseEnrollmentCreated = onDocumentCreated({
       <div style="display: inline-block; padding: 2px 8px; background-color: rgba(209, 125, 57, 0.1); color: #d17d39; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; border-radius: 4px; margin-bottom: 16px;">
         DETALJER OM PÅMELDINGEN
       </div>
-      <table style="width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; font-size: 14px; color: #121c2c;">
+      <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-family: 'Inter', sans-serif; font-size: 14px; color: #121c2c;">
         <tr>
-          <td style="padding: 8px 0; font-weight: 700; color: #64748b; width: 140px; border-bottom: 1px solid #f1f5f9;">Deltaker:</td>
-          <td style="padding: 8px 0; font-weight: 700; color: #0f172a; border-bottom: 1px solid #f1f5f9;">{{name}}</td>
+          <td style="padding: 8px 0; font-weight: 700; color: #64748b; width: 110px; border-bottom: 1px solid #f1f5f9; vertical-align: top;">Deltaker:</td>
+          <td style="padding: 8px 0; font-weight: 700; color: #0f172a; border-bottom: 1px solid #f1f5f9; word-break: break-word; vertical-align: top;">{{name}}</td>
         </tr>
         <tr>
-          <td style="padding: 8px 0; font-weight: 700; color: #64748b; border-bottom: 1px solid #f1f5f9;">E-post:</td>
-          <td style="padding: 8px 0; border-bottom: 1px solid #f1f5f9;"><a href="mailto:{{email}}" style="color: #d17d39; text-decoration: underline;">{{email}}</a></td>
+          <td style="padding: 8px 0; font-weight: 700; color: #64748b; border-bottom: 1px solid #f1f5f9; vertical-align: top;">E-post:</td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #f1f5f9; word-break: break-all; overflow-wrap: anywhere; vertical-align: top;"><a href="mailto:{{email}}" style="color: #d17d39; text-decoration: underline; word-break: break-all; word-wrap: break-word;">{{email}}</a></td>
         </tr>
         <tr>
-          <td style="padding: 8px 0; font-weight: 700; color: #64748b; border-bottom: 1px solid #f1f5f9;">Telefon:</td>
-          <td style="padding: 8px 0; border-bottom: 1px solid #f1f5f9;">{{phone}}</td>
+          <td style="padding: 8px 0; font-weight: 700; color: #64748b; border-bottom: 1px solid #f1f5f9; vertical-align: top;">Telefon:</td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #f1f5f9; word-break: break-word; vertical-align: top;">{{phone}}</td>
         </tr>
         <tr>
-          <td style="padding: 8px 0; font-weight: 700; color: #64748b; border-bottom: 1px solid #f1f5f9;">Kurs:</td>
-          <td style="padding: 8px 0; font-weight: 700; border-bottom: 1px solid #f1f5f9;">{{courseTitle}}</td>
+          <td style="padding: 8px 0; font-weight: 700; color: #64748b; border-bottom: 1px solid #f1f5f9; vertical-align: top;">Kurs:</td>
+          <td style="padding: 8px 0; font-weight: 700; border-bottom: 1px solid #f1f5f9; word-break: break-word; vertical-align: top;">{{courseTitle}}</td>
         </tr>
         <tr>
-          <td style="padding: 8px 0; font-weight: 700; color: #64748b; border-bottom: 1px solid #f1f5f9;">Beløp / Metode:</td>
-          <td style="padding: 8px 0; border-bottom: 1px solid #f1f5f9;">{{amount}} ({{paymentMethod}})</td>
+          <td style="padding: 8px 0; font-weight: 700; color: #64748b; border-bottom: 1px solid #f1f5f9; vertical-align: top;">Beløp / Metode:</td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #f1f5f9; word-break: break-word; vertical-align: top;">{{amount}} ({{paymentMethod}})</td>
         </tr>
         <tr>
-          <td style="padding: 8px 0; font-weight: 700; color: #64748b;">Status:</td>
-          <td style="padding: 8px 0;"><span style="background: #ffedd5; color: #c2410c; padding: 3px 10px; border-radius: 6px; font-weight: 700; font-size: 12px; display: inline-block;">{{status}}</span></td>
+          <td style="padding: 8px 0; font-weight: 700; color: #64748b; vertical-align: top;">Status:</td>
+          <td style="padding: 8px 0; vertical-align: top;"><span style="background: #ffedd5; color: #c2410c; padding: 3px 10px; border-radius: 6px; font-weight: 700; font-size: 12px; display: inline-block;">{{status}}</span></td>
         </tr>
       </table>
     </section>
