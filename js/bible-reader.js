@@ -5653,6 +5653,42 @@ class BibleReader {
                 .bible-theme-dark .hkm-yv-nav-circle-btn:hover { background: #334155 !important; color: #f8fafc !important; }
                 .bible-theme-dark .hkm-yv-footer-pill { background: #1e293b !important; border-color: #334155 !important; color: #94a3b8 !important; }
                 
+                /* Dark Mode fixes for Book Intro & Cross References modals */
+                .bible-theme-dark .hkm-book-intro-sheet-card,
+                .bible-theme-dark .verse-crossref-sheet-card,
+                .bible-theme-dark .hkm-book-intro-header,
+                .bible-theme-dark .hkm-book-intro-scroll-body,
+                .bible-theme-dark .verse-crossref-sheet-body { background: #0f172a !important; color: #f8fafc !important; border-color: #1e293b !important; }
+                .bible-theme-dark .sheet-handle-bar { background: rgba(255, 255, 255, 0.25) !important; }
+                .bible-theme-dark #btn-close-book-intro-x,
+                .bible-theme-dark .color-wheel-close-btn { background: #1e293b !important; color: #f8fafc !important; border: 1px solid #334155 !important; }
+                .bible-theme-dark #btn-close-book-intro-x .material-symbols-outlined,
+                .bible-theme-dark .color-wheel-close-btn .material-symbols-outlined { color: #f8fafc !important; }
+                .bible-theme-dark #btn-close-book-intro-footer,
+                .bible-theme-dark #verse-crossref-related-btn,
+                .bible-theme-dark .hkm-sheet-footer-btn { background: #1e293b !important; border: 1px solid #334155 !important; color: #f8fafc !important; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important; }
+                .bible-theme-dark #btn-close-book-intro-footer span,
+                .bible-theme-dark #verse-crossref-related-btn span,
+                .bible-theme-dark .hkm-sheet-footer-btn span { color: #f8fafc !important; }
+                .bible-theme-dark #btn-close-book-intro-footer .material-symbols-outlined,
+                .bible-theme-dark #verse-crossref-related-btn .material-symbols-outlined,
+                .bible-theme-dark .hkm-sheet-footer-btn .material-symbols-outlined { color: #d17d39 !important; }
+                .bible-theme-dark .hkm-book-intro-scroll-body div[style*="background: rgba"] { background: #1e293b !important; border-color: #334155 !important; }
+                .bible-theme-dark .hkm-book-intro-scroll-body span[style*="color: var(--text-muted"],
+                .bible-theme-dark .hkm-book-intro-scroll-body span[style*="color: #64748b"],
+                .bible-theme-dark .hkm-book-intro-scroll-body div[style*="color: #1B4965"],
+                .bible-theme-dark .hkm-book-intro-scroll-body span[style*="color: #1B4965"] { color: #94a3b8 !important; }
+                .bible-theme-dark .hkm-book-intro-scroll-body strong,
+                .bible-theme-dark .hkm-book-intro-scroll-body h2,
+                .bible-theme-dark .hkm-book-intro-scroll-body h3,
+                .bible-theme-dark .hkm-book-intro-scroll-body p { color: #f8fafc !important; }
+                .bible-theme-dark .hkm-book-intro-scroll-body .material-symbols-outlined[style*="color: #1B4965"] { color: #38bdf8 !important; }
+                .bible-theme-dark .verse-crossref-row-item { border-bottom-color: #334155 !important; }
+                .bible-theme-dark .verse-crossref-row-item:hover { background: #1e293b !important; }
+                .bible-theme-dark .crossref-ref-link { color: #f97316 !important; }
+                .bible-theme-dark #verse-crossref-title,
+                .bible-theme-dark #verse-crossref-quote-preview { color: #f8fafc !important; }
+                
                 /* Cream Mode theme for Devotional Wizard */
                 .bible-theme-cream .hkm-devotional-overlay { background: #ffffff !important; }
                 .bible-theme-cream .hkm-devotional-content { background: #ffffff !important; }
