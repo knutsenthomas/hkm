@@ -6589,7 +6589,7 @@ body.admin-body .template-item:active {
   .modal-content input:not([type="checkbox"]):not([type="radio"]),
   .modal-content select,
   .modal-content textarea,
-  .modal-content button:not(.close-modal):not(.close-modal-btn):not(.editor-btn):not(#btn-toggle-new-label),
+  .modal-content button:not(.close-modal):not(.close-modal-btn):not(.editor-btn):not(.editor-media-btn):not(#btn-toggle-new-label):not(#crm-email-insert-img-btn):not(#crm-email-insert-yt-btn),
   #admin-modal-profile-form input:not([type="checkbox"]):not([type="radio"]),
   #admin-modal-profile-form textarea,
   #admin-modal-profile-form button:not(.close-modal):not(.close-modal-btn),
@@ -6620,15 +6620,16 @@ body.admin-body .template-item:active {
   }
 
   /* Exclude editor toolbar buttons & controls from 100% full-width expansion */
-  .crm-editor-toolbar button,
-  .crm-editor-toolbar .editor-btn,
-  .editor-toolbar button,
+  .crm-editor-toolbar button:not(#crm-email-insert-img-btn):not(#crm-email-insert-yt-btn):not(.editor-media-btn),
+  .crm-editor-toolbar .editor-btn:not(#crm-email-insert-img-btn):not(#crm-email-insert-yt-btn):not(.editor-media-btn),
+  .editor-toolbar button:not(#crm-email-insert-img-btn):not(#crm-email-insert-yt-btn):not(.editor-media-btn),
   .ql-toolbar button {
     width: 32px !important;
     min-width: 32px !important;
     max-width: 32px !important;
     height: 32px !important;
     min-height: 32px !important;
+    max-height: 32px !important;
     padding: 0 !important;
     margin: 0 !important;
     flex: 0 0 32px !important;
@@ -6636,6 +6637,28 @@ body.admin-body .template-item:active {
     align-items: center !important;
     justify-content: center !important;
     border-radius: 6px !important;
+  }
+
+  .crm-editor-toolbar #crm-email-insert-img-btn,
+  .crm-editor-toolbar #crm-email-insert-yt-btn,
+  .crm-editor-toolbar .editor-media-btn {
+    width: auto !important;
+    min-width: 32px !important;
+    max-width: none !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+    padding: 0 10px !important;
+    font-size: 12px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    border-radius: 6px !important;
+    box-sizing: border-box !important;
+    flex: 0 0 auto !important;
+    border: 1px solid #cbd5e1 !important;
+    background: #ffffff !important;
   }
 
   .crm-editor-toolbar select,

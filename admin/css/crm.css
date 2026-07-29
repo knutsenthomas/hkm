@@ -1352,13 +1352,14 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
     border-bottom: 1px solid #e2e8f0 !important;
 }
 
-.crm-editor-toolbar button,
-.crm-editor-toolbar .editor-btn {
+.crm-editor-toolbar button:not(#crm-email-insert-img-btn):not(#crm-email-insert-yt-btn):not(.editor-media-btn),
+.crm-editor-toolbar .editor-btn:not(#crm-email-insert-img-btn):not(#crm-email-insert-yt-btn):not(.editor-media-btn) {
     width: 32px !important;
     min-width: 32px !important;
     max-width: 32px !important;
     height: 32px !important;
     min-height: 32px !important;
+    max-height: 32px !important;
     padding: 0 !important;
     margin: 0 !important;
     flex: 0 0 32px !important;
@@ -1840,13 +1841,14 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
     box-sizing: border-box !important;
 }
 
-.crm-editor-toolbar button,
-.crm-editor-toolbar .editor-btn {
+.crm-editor-toolbar button:not(#crm-email-insert-img-btn):not(#crm-email-insert-yt-btn):not(.editor-media-btn),
+.crm-editor-toolbar .editor-btn:not(#crm-email-insert-img-btn):not(#crm-email-insert-yt-btn):not(.editor-media-btn) {
     width: 32px !important;
     min-width: 32px !important;
     max-width: 32px !important;
     height: 32px !important;
     min-height: 32px !important;
+    max-height: 32px !important;
     padding: 0 !important;
     margin: 0 !important;
     flex: 0 0 32px !important;
@@ -1874,18 +1876,25 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
 }
 
 .crm-editor-toolbar #crm-email-insert-img-btn,
-.crm-editor-toolbar #crm-email-insert-yt-btn {
+.crm-editor-toolbar #crm-email-insert-yt-btn,
+.crm-editor-toolbar .editor-media-btn {
     width: auto !important;
-    min-width: auto !important;
-    flex: 0 0 auto !important;
+    min-width: 32px !important;
+    max-width: none !important;
     height: 32px !important;
     min-height: 32px !important;
-    padding: 0 8px !important;
+    max-height: 32px !important;
+    padding: 0 10px !important;
     font-size: 12px !important;
     display: inline-flex !important;
     align-items: center !important;
+    justify-content: center !important;
     gap: 4px !important;
     border-radius: 6px !important;
+    box-sizing: border-box !important;
+    flex: 0 0 auto !important;
+    border: 1px solid #cbd5e1 !important;
+    background: #ffffff !important;
 }
 
 .crm-editor-toolbar button:hover {
