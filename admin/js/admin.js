@@ -3289,7 +3289,12 @@ class AdminManager {
 
         section.innerHTML = `
             ${this.renderSectionHeader('mic_external_on', 'Podcast Administrasjon', 'Administrer episoder, AI-transkripsjoner og overstyringer.', `
-                <div style="display:flex; gap:12px;">
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <button class="btn btn-secondary" id="toggle-podcast-settings-btn" type="button" style="display:inline-flex; align-items:center; gap:6px;">
+                        <span class="material-symbols-outlined">settings</span>
+                        Innstillinger
+                        <span class="material-symbols-outlined" id="podcast-settings-chevron">expand_more</span>
+                    </button>
                     <button class="btn btn-secondary" onclick="window.adminManager.loadPodcastEpisodes()">
                         <span class="material-symbols-outlined">refresh</span>
                         Synkroniser
@@ -3300,39 +3305,44 @@ class AdminManager {
                 </div>
             `, '')}
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 24px; margin-bottom: 24px;">
-                <div class="card modern">
-                    <div class="card-header flex-between">
-                        <h3 class="card-title">Podcast-innstillinger</h3>
+            <!-- Collapsible Podcast Settings Card -->
+            <div id="podcast-settings-collapsible" style="display: none; margin-bottom: 24px; transition: all 0.3s ease;">
+                <div class="card modern" style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.04);">
+                    <div class="card-header flex-between" style="padding: 16px 20px; border-bottom: 1px solid #f1f5f9; background: #f8fafc; border-top-left-radius: 16px; border-top-right-radius: 16px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span class="material-symbols-outlined" style="color: #d17d39;">tune</span>
+                            <h3 class="card-title" style="margin: 0; font-size: 16px; font-weight: 700;">Podcast-innstillinger & RSS-feed</h3>
+                        </div>
+                        <button type="button" id="close-podcast-settings-card" class="btn-icon" style="background: transparent; border: none; cursor: pointer; color: #64748b;">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
                     </div>
-                    <div class="card-body">
-                        <div class="form-section">
+                    <div class="card-body" style="padding: 20px;">
+                        <div class="form-section" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
                             <div class="form-group">
-                                <label>RSS Feed URL</label>
-                                <input type="text" id="podcast-rss-url" class="form-control" placeholder="https://feeds.simplecast.com/xxxxxx">
+                                <label style="font-weight: 700; font-size: 13px; color: #334155;">RSS Feed URL</label>
+                                <input type="text" id="podcast-rss-url" class="form-control" placeholder="https://anchor.fm/s/f7a13dec/podcast/rss">
                             </div>
-                            <div class="form-group" style="margin-top: 15px;">
-                                <label>Spotify Podcast URL</label>
+                            <div class="form-group">
+                                <label style="font-weight: 700; font-size: 13px; color: #334155;">Spotify Podcast URL</label>
                                 <input type="text" id="podcast-spotify-url" class="form-control" placeholder="https://open.spotify.com/show/...">
                             </div>
-                            <div class="form-group" style="margin-top: 15px;">
-                                <label>Apple Podcasts URL</label>
+                            <div class="form-group">
+                                <label style="font-weight: 700; font-size: 13px; color: #334155;">Apple Podcasts URL</label>
                                 <input type="text" id="podcast-apple-url" class="form-control" placeholder="https://podcasts.apple.com/...">
                             </div>
-                            <div class="form-group" style="margin-top: 15px;">
-                                <label>Globale kategorier (hurtigvalg)</label>
-                                <input type="text" id="podcast-custom-categories" class="form-control" placeholder="f.eks. Lederskap, Helbredelse, Familie">
+                            <div class="form-group" style="grid-column: 1 / -1;">
+                                <label style="font-weight: 700; font-size: 13px; color: #334155;">Globale kategorier (hurtigvalg)</label>
+                                <input type="text" id="podcast-custom-categories" class="form-control" placeholder="f.eks. Vitnesbyrd, Lydbok, Undervisning">
                                 <input type="hidden" id="podcast-global-categories-sync">
                                 <p style="font-size: 11px; color: #64748b; margin-top: 6px; line-height: 1.4;">Separer med komma. Disse vises som hurtigvalg når du redigerer enkeltepisoder.</p>
                             </div>
-                            <div style="margin-top: 24px;">
-                                <button class="btn-primary" id="save-podcast-settings" style="width: 100%;">Lagre podcast-innstillinger</button>
-                            </div>
+                        </div>
+                        <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                            <button class="btn btn-primary" id="save-podcast-settings" style="padding: 8px 24px;">Lagre podcast-innstillinger</button>
                         </div>
                     </div>
                 </div>
-
-
             </div>
 
             <div class="podcast-management-grid" style="display: grid; grid-template-columns: 1fr; gap: 24px;">
@@ -3368,6 +3378,20 @@ class AdminManager {
         this.loadPodcastOverrides();
 
         section.addEventListener('click', (event) => {
+            const toggleBtn = event.target.closest('#toggle-podcast-settings-btn');
+            const closeBtn = event.target.closest('#close-podcast-settings-card');
+            
+            if (toggleBtn || closeBtn) {
+                const panel = document.getElementById('podcast-settings-collapsible');
+                const chevron = document.getElementById('podcast-settings-chevron');
+                if (panel) {
+                    const isHidden = panel.style.display === 'none';
+                    panel.style.display = isHidden ? 'block' : 'none';
+                    if (chevron) chevron.textContent = isHidden ? 'expand_less' : 'expand_more';
+                }
+                return;
+            }
+
             if (event.target.id === 'save-podcast-settings') this.savePodcastSettings('save-podcast-settings');
             if (event.target.id === 'save-podcast-overrides') this.savePodcastOverrides();
             if (event.target.id === 'refresh-podcast-list') this.loadPodcastOverrides();
@@ -7578,8 +7602,34 @@ class AdminManager {
                             <label>Modell</label>
                             <input type="text" id="gemini-model" class="form-control" placeholder="gemini-1.5-flash">
                         </div>
+                <div class="card modern">
+                    <div class="card-header flex-between">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 32px; height: 32px; border-radius: 8px; background: #fff7ed; color: #d17d39; display: flex; align-items: center; justify-content: center;">
+                                <span class="material-symbols-outlined" style="font-size: 20px;">podcasts</span>
+                            </div>
+                            <h3 class="card-title">Podcast & RSS Feed</h3>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>RSS Feed URL</label>
+                            <input type="text" id="integ-podcast-rss-url" class="form-control" placeholder="https://anchor.fm/s/f7a13dec/podcast/rss">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Spotify Podcast URL</label>
+                            <input type="text" id="integ-podcast-spotify-url" class="form-control" placeholder="https://open.spotify.com/show/...">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Apple Podcasts URL</label>
+                            <input type="text" id="integ-podcast-apple-url" class="form-control" placeholder="https://podcasts.apple.com/...">
+                        </div>
+                        <div class="form-group">
+                            <label>Globale kategorier (hurtigvalg)</label>
+                            <input type="text" id="integ-podcast-custom-categories" class="form-control" placeholder="Separer med komma, f.eks. Vitnesbyrd, Lydbok">
+                        </div>
                         <div style="margin-top: 24px;">
-                            <button class="btn-primary" id="save-ai-settings" style="width: 100%;">Lagre AI-integrasjoner</button>
+                            <button class="btn-primary" id="save-integ-podcast-settings" style="width: 100%;">Lagre podcast-integrasjon</button>
                         </div>
                     </div>
                 </div>
@@ -7589,6 +7639,7 @@ class AdminManager {
 
         section.setAttribute('data-rendered', 'true');
         this.loadMediaSettings();
+        this.loadPodcastSettings();
         this._loadIntegrationsSettings();
 
         if (typeof window.mountGoogleTasksIntegration === 'function') {
@@ -7598,6 +7649,7 @@ class AdminManager {
         section.addEventListener('click', (event) => {
             if (event.target.id === 'save-youtube-settings') this.saveMediaSettings('save-youtube-settings');
             if (event.target.id === 'save-ai-settings' || event.target.id === 'save-ga-settings') this.saveIntegrationsSettings();
+            if (event.target.id === 'save-integ-podcast-settings') this.savePodcastSettings('save-integ-podcast-settings');
             if (event.target.id === 'add-gcal') this.addGCalInput();
         });
     }
@@ -9117,6 +9169,8 @@ class AdminManager {
     async loadPodcastSettings() {
         try {
             const settings = await this.getPodcastSettings();
+            
+            // Podcast page inputs
             const podcastRss = document.getElementById('podcast-rss-url');
             const spotify = document.getElementById('podcast-spotify-url');
             const apple = document.getElementById('podcast-apple-url');
@@ -9127,6 +9181,17 @@ class AdminManager {
             if (apple) apple.value = settings.appleUrl || '';
             if (podcastCategories) podcastCategories.value = settings.podcastCustomCategories || '';
 
+            // Integrations page inputs
+            const integRss = document.getElementById('integ-podcast-rss-url');
+            const integSpotify = document.getElementById('integ-podcast-spotify-url');
+            const integApple = document.getElementById('integ-podcast-apple-url');
+            const integCategories = document.getElementById('integ-podcast-custom-categories');
+
+            if (integRss) integRss.value = settings.podcastRssUrl || '';
+            if (integSpotify) integSpotify.value = settings.spotifyUrl || '';
+            if (integApple) integApple.value = settings.appleUrl || '';
+            if (integCategories) integCategories.value = settings.podcastCustomCategories || '';
+
             const syncInput = document.getElementById('podcast-global-categories-sync');
             if (syncInput) syncInput.value = settings.podcastCustomCategories || '';
         } catch (e) {
@@ -9136,10 +9201,11 @@ class AdminManager {
 
     async savePodcastSettings(buttonId = 'save-podcast-settings') {
         const btn = document.getElementById(buttonId) || document.getElementById('save-podcast-settings');
-        const podcastRssInput = document.getElementById('podcast-rss-url');
-        const spotifyInput = document.getElementById('podcast-spotify-url');
-        const appleInput = document.getElementById('podcast-apple-url');
-        const podcastCategoriesInput = document.getElementById('podcast-custom-categories');
+        
+        const podcastRssInput = document.getElementById('podcast-rss-url') || document.getElementById('integ-podcast-rss-url');
+        const spotifyInput = document.getElementById('podcast-spotify-url') || document.getElementById('integ-podcast-spotify-url');
+        const appleInput = document.getElementById('podcast-apple-url') || document.getElementById('integ-podcast-apple-url');
+        const podcastCategoriesInput = document.getElementById('podcast-custom-categories') || document.getElementById('integ-podcast-custom-categories');
 
         const originalText = btn?.textContent || 'Lagre';
         if (btn) {
@@ -9161,6 +9227,9 @@ class AdminManager {
 
             await firebaseService.savePageContent('settings_podcast', nextSettings);
             this.showToast('✅ Podcast-innstillingene er lagret!', 'success', 5000);
+            
+            // Reload in both places
+            this.loadPodcastSettings();
             if (document.getElementById('podcast-overrides-list')) this.loadPodcastOverrides();
         } catch (err) {
             console.error("Save podcast settings error:", err);
