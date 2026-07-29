@@ -2681,8 +2681,8 @@ body.crm-body .crm-table .btn-delete-message:hover {
     0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
   --admin-page-topbar-height: 72px;
   --admin-page-gutter: 24px;
-  --admin-page-max: 1280px;
-  /* UI Audit: Capped at 1200px for better focus */
+  --admin-page-max: 100%;
+  /* Full-width responsive layout for large external displays */
   --admin-page-primary: #1B4965;
   --admin-page-primary-hover: #123043;
   --admin-page-icon-bg: #f0f7ff;
@@ -10237,6 +10237,31 @@ html[data-theme="dark"] .design-ui-callout p {
   .desktop-sidebar-toggle-btn {
     display: none !important;
   }
+}
+
+/* ==========================================================================
+   Full Width Responsive Layout for Large External Displays
+   ========================================================================== */
+:root {
+  --admin-page-max: 100% !important;
+}
+
+body.admin-body .main-content,
+body.admin-body .admin-page-container,
+body.admin-body .section-container,
+body.admin-body .content-wrapper,
+body.crm-body .crm-main,
+body.crm-body .crm-content,
+body.crm-body .content-wrapper,
+body.builder-active .main-content,
+.main-header > .section-header,
+.main-header > .design-ui-header,
+.admin-page-container,
+.crm-main > .section-content,
+.main-content > .section,
+.crm-content {
+  max-width: 100% !important;
+  width: 100% !important;
 }
 
 
