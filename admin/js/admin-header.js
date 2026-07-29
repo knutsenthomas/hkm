@@ -8,6 +8,53 @@ const initAdminHeader = () => {
     const ADMIN_IDENTITY_CACHE_KEY = 'hkm_admin_identity_cache';
     const ADMIN_SW_DEV_CLEANUP_KEY = 'hkm_admin_sw_dev_cleanup_done';
     const ADMIN_SIDEBAR_SCROLL_KEY = 'hkm_admin_sidebar_scroll_top';
+    const SIDEBAR_MINI_KEY = 'hkm_admin_sidebar_mini';
+
+    const applySidebarMiniState = (isMini) => {
+        if (window.innerWidth >= 1025) {
+            document.body.classList.toggle('sidebar-mini', isMini);
+        } else {
+            document.body.classList.remove('sidebar-mini');
+        }
+        const toggleBtn = document.getElementById('desktop-sidebar-toggle');
+        if (toggleBtn) {
+            const icon = toggleBtn.querySelector('.material-symbols-outlined');
+            if (icon) {
+                icon.textContent = isMini ? 'menu' : 'menu_open';
+            }
+            const title = isMini ? 'Vis full meny (tekst og ikoner)' : 'Smal meny (kun ikoner)';
+            toggleBtn.setAttribute('title', title);
+            toggleBtn.setAttribute('aria-label', title);
+        }
+    };
+
+    const setupDesktopSidebarToggle = () => {
+        const isMiniStored = localStorage.getItem(SIDEBAR_MINI_KEY) === 'true';
+        applySidebarMiniState(isMiniStored);
+
+        const sidebarHeader = document.querySelector('.sidebar-header');
+        if (sidebarHeader && !document.getElementById('desktop-sidebar-toggle')) {
+            const toggleBtn = document.createElement('button');
+            toggleBtn.id = 'desktop-sidebar-toggle';
+            toggleBtn.type = 'button';
+            toggleBtn.className = 'desktop-sidebar-toggle-btn';
+            toggleBtn.innerHTML = `<span class="material-symbols-outlined">${isMiniStored ? 'menu' : 'menu_open'}</span>`;
+            const title = isMiniStored ? 'Vis full meny (tekst og ikoner)' : 'Smal meny (kun ikoner)';
+            toggleBtn.setAttribute('title', title);
+            toggleBtn.setAttribute('aria-label', title);
+            
+            toggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const nowMini = !document.body.classList.contains('sidebar-mini');
+                localStorage.setItem(SIDEBAR_MINI_KEY, nowMini ? 'true' : 'false');
+                applySidebarMiniState(nowMini);
+            });
+
+            sidebarHeader.appendChild(toggleBtn);
+        }
+    };
+
+    setupDesktopSidebarToggle();
 
     // Premium Progress Bar helper
     const injectLoadingProgressBar = () => {
@@ -351,7 +398,7 @@ const initAdminHeader = () => {
             return `
                 <li class="nav-item${visible}${hiddenClass}"${hiddenStyle}${categoryAttr}>
                     <div class="nav-link-wrap">
-                        <a href="${href}" class="nav-link${active}"${dataSection}${id}${target}${rel} style="flex: 1; padding-right: 40px !important;">
+                        <a href="${href}" class="nav-link${active}"${dataSection}${id}${target}${rel} title="${item.label}" style="flex: 1; padding-right: 40px !important;">
                             <span class="material-symbols-outlined">${item.icon}</span>
                             <span>${item.label}</span>
                             ${item.badgeId ? `<span id="${item.badgeId}" class="nav-badge" style="display: none;">0</span>` : ''}
@@ -434,7 +481,7 @@ const initAdminHeader = () => {
 
         const footerHtml = footerItems.map(item => renderItem(item)).join('') + `
             <li class="nav-item visible" data-nav-category="all">
-                <button id="logout-btn" class="nav-link logout">
+                <button id="logout-btn" class="nav-link logout" title="Logg ut">
                     <span class="material-symbols-outlined">logout</span>
                     <span>Logg ut</span>
                 </button>
@@ -454,6 +501,7 @@ const initAdminHeader = () => {
             </div>
         `;
         sidebarNav.dataset.hkmNormalized = '1';
+        setupDesktopSidebarToggle();
     };
 
     console.log("[admin-header] Normalizing sidebar...");

@@ -10082,6 +10082,163 @@ html[data-theme="dark"] .design-ui-callout p {
   color: var(--admin-text-muted, #cbd5e1) !important;
 }
 
+/* ==========================================================================
+   Desktop Icon-Only / Mini Sidebar Mode (.sidebar-mini)
+   ========================================================================== */
+@media (min-width: 1025px) {
+  .desktop-sidebar-toggle-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 34px !important;
+    height: 34px !important;
+    padding: 0 !important;
+    background: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 9px !important;
+    color: #475569 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    flex-shrink: 0 !important;
+  }
+  .desktop-sidebar-toggle-btn:hover {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+    border-color: #94a3b8 !important;
+    transform: scale(1.05) !important;
+  }
+  .desktop-sidebar-toggle-btn span {
+    font-size: 20px !important;
+  }
+
+  html[data-theme="dark"] .desktop-sidebar-toggle-btn {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #94a3b8 !important;
+  }
+  html[data-theme="dark"] .desktop-sidebar-toggle-btn:hover {
+    background: #334155 !important;
+    color: #f8fafc !important;
+  }
+
+  body.sidebar-mini .sidebar {
+    width: 72px !important;
+    min-width: 72px !important;
+    max-width: 72px !important;
+    padding: 16px 6px !important;
+    overflow-x: hidden !important;
+    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  body.sidebar-mini .main-content,
+  body.sidebar-mini .crm-main,
+  body.sidebar-mini .main-header,
+  body.sidebar-mini .admin-container {
+    margin-left: 72px !important;
+    width: calc(100% - 72px) !important;
+    max-width: calc(100% - 72px) !important;
+    transition: margin-left 0.3s cubic-bezier(0.16, 1, 0.3, 1), width 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  body.sidebar-mini .sidebar-header {
+    padding: 8px 0 !important;
+    margin-bottom: 16px !important;
+    justify-content: center !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  body.sidebar-mini .sidebar-header .logo {
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body.sidebar-mini .sidebar-header .logo-text,
+  body.sidebar-mini .sidebar-header .logo h1 {
+    display: none !important;
+  }
+
+  body.sidebar-mini .sidebar-header .logo img {
+    width: 32px !important;
+    height: 32px !important;
+    margin: 0 auto !important;
+  }
+
+  body.sidebar-mini .sidebar .nav-category-header {
+    height: 1px !important;
+    min-height: 1px !important;
+    padding: 0 !important;
+    margin: 10px 4px !important;
+    background: #e2e8f0 !important;
+    overflow: hidden !important;
+    border: none !important;
+  }
+
+  html[data-theme="dark"] body.sidebar-mini .sidebar .nav-category-header {
+    background: #334155 !important;
+  }
+
+  body.sidebar-mini .sidebar .nav-category-header * {
+    display: none !important;
+  }
+
+  body.sidebar-mini .sidebar .nav-item {
+    width: 100% !important;
+    margin-bottom: 4px !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
+
+  body.sidebar-mini .sidebar .nav-link-wrap {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  body.sidebar-mini .sidebar .nav-link {
+    width: 48px !important;
+    height: 48px !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    justify-content: center !important;
+    align-items: center !important;
+    border-radius: 12px !important;
+    position: relative !important;
+  }
+
+  body.sidebar-mini .sidebar .nav-link > span:not(.material-symbols-outlined) {
+    display: none !important;
+  }
+
+  body.sidebar-mini .sidebar .nav-fav-toggle-btn {
+    display: none !important;
+  }
+
+  body.sidebar-mini .sidebar .nav-link .material-symbols-outlined {
+    font-size: 22px !important;
+    margin: 0 !important;
+    line-height: 1 !important;
+  }
+
+  body.sidebar-mini .sidebar .nav-badge {
+    position: absolute !important;
+    top: 4px !important;
+    right: 4px !important;
+    font-size: 9px !important;
+    padding: 2px 4px !important;
+    border-radius: 99px !important;
+    min-width: 14px !important;
+    text-align: center !important;
+    line-height: 1 !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .desktop-sidebar-toggle-btn {
+    display: none !important;
+  }
+}
+
 
 
 
