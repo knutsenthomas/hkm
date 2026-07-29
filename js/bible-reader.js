@@ -9131,58 +9131,61 @@ class BibleReader {
     async openDevotionalWizard(planId, dayNumber, startStep = 1) {
         const targetDay = parseInt(dayNumber, 10) || 1;
         let globalPlan = this.activePlanData;
-        let dayConfig = null;
 
-        if (globalPlan) {
-            if (window.contentManager && typeof window.contentManager.getLocalizedContentItem === 'function') {
-                globalPlan = window.contentManager.getLocalizedContentItem(globalPlan);
-            }
-            if (globalPlan.days) {
-                dayConfig = globalPlan.days.find(d => parseInt(d.dayNumber, 10) === targetDay) || globalPlan.days[0];
+        if (!globalPlan || (planId && globalPlan.id !== planId && globalPlan.slug !== planId)) {
+            if (window.contentManager && typeof window.contentManager.getAllPlans === 'function') {
+                const allPlans = window.contentManager.getAllPlans() || [];
+                const found = allPlans.find(p => p.id === planId || p.slug === planId || (p.title && p.title.toLowerCase().includes(String(planId).toLowerCase())));
+                if (found) {
+                    globalPlan = window.contentManager.getLocalizedContentItem ? window.contentManager.getLocalizedContentItem(found) : found;
+                }
             }
         }
 
-        if (!dayConfig) {
-            const db = await this.getFirestoreAsync(10000);
-            if (db) {
-                let globalPlanSnap = await db.collection('reading_plans').doc(planId).get();
-                if (!globalPlanSnap.exists) {
-                    try {
+        let dayConfig = null;
+        if (globalPlan && globalPlan.days) {
+            dayConfig = globalPlan.days.find(d => parseInt(d.dayNumber, 10) === targetDay) || globalPlan.days[0];
+        }
+
+        if (!dayConfig && planId) {
+            try {
+                const db = await this.getFirestoreAsync(5000);
+                if (db) {
+                    let globalPlanSnap = await db.collection('reading_plans').doc(planId).get();
+                    if (!globalPlanSnap.exists) {
                         const snap = await db.collection('reading_plans').get();
-                        const target = planId.toLowerCase().trim();
+                        const target = String(planId).toLowerCase().trim();
                         snap.forEach(d => {
                             const data = d.data();
                             if (d.id.toLowerCase() === target || (data.slug && data.slug.toLowerCase() === target) || (data.title && data.title.toLowerCase().includes(target))) {
                                 globalPlanSnap = { exists: true, id: d.id, data: () => data };
                             }
                         });
-                    } catch (err) {
-                        console.warn("[BibleReader] Fallback global plan snap search failed:", err);
+                    }
+                    if (globalPlanSnap && globalPlanSnap.exists) {
+                        const raw = { id: globalPlanSnap.id, ...globalPlanSnap.data() };
+                        globalPlan = window.contentManager && typeof window.contentManager.getLocalizedContentItem === 'function' ? window.contentManager.getLocalizedContentItem(raw) : raw;
+                        if (globalPlan && globalPlan.days) {
+                            dayConfig = globalPlan.days.find(d => parseInt(d.dayNumber, 10) === targetDay) || globalPlan.days[0];
+                        }
                     }
                 }
-                if (globalPlanSnap && globalPlanSnap.exists) {
-                    const raw = { id: globalPlanSnap.id, ...globalPlanSnap.data() };
-                    if (window.contentManager && typeof window.contentManager.getLocalizedContentItem === 'function') {
-                        globalPlan = window.contentManager.getLocalizedContentItem(raw);
-                    } else {
-                        globalPlan = raw;
-                    }
-                    if (globalPlan.days) {
-                        dayConfig = globalPlan.days.find(d => parseInt(d.dayNumber, 10) === targetDay) || globalPlan.days[0];
-                    }
-                }
+            } catch (err) {
+                console.warn("[BibleReader] Firestore plan fetch error:", err);
             }
         }
 
+        if (!globalPlan) {
+            globalPlan = { id: planId || 'plan', title: 'Leseplan', days: [] };
+        }
         if (!dayConfig) {
-            alert("Dagens andakt er ikke konfigurert.");
-            return;
+            dayConfig = { dayNumber: targetDay, verses: 'Rut 4', prayerFocus: 'Reflekter over ordene du har lest.' };
         }
 
         let modal = document.getElementById('hkm-devotional-modal');
         if (modal) modal.remove();
 
-        // Close and hide all leftover modal overlays (note modal, color wheel modal, etc.)
+        // Close and hide all leftover modal overlays
         document.querySelectorAll('.color-wheel-modal-overlay, #verse-note-modal, #color-wheel-modal').forEach(m => {
             m.classList.remove('active');
             m.style.display = 'none';
@@ -9194,18 +9197,29 @@ class BibleReader {
         modal.id = 'hkm-devotional-modal';
         modal.className = 'hkm-devotional-overlay';
         modal.style.cssText = 'position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; background: #ffffff !important; z-index: 15000 !important; display: flex !important; align-items: center !important; justify-content: center !important;';
-        
+
         document.body.appendChild(modal);
 
-        let scriptureHtml = '<p style="text-align: center; color: #64748b;">Henter bibeltekst...</p>';
-        try {
-            scriptureHtml = await this.fetchAndFilterVersesText(dayConfig.verses);
-        } catch (e) {
-            console.error("Failed to fetch scripture text for devotional:", e);
-            scriptureHtml = `<p style="text-align: center; color: #ef4444;">Kunne ikke hente bibelteksten for: <strong>${dayConfig.verses}</strong></p>`;
-        }
+        // Render step IMMEDIATELY with initial loading text so modal opens in 0ms
+        const initialScripture = '<p style="text-align: center; color: #64748b; padding: 40px 0;">Henter bibeltekst...</p>';
+        this.renderDevotionalStep(modal, globalPlan, targetDay, dayConfig, startStep, initialScripture);
 
-        this.renderDevotionalStep(modal, globalPlan, dayNumber, dayConfig, startStep, scriptureHtml);
+        // Asynchronously load scripture text and update DOM
+        if (dayConfig.verses) {
+            this.fetchAndFilterVersesText(dayConfig.verses).then(html => {
+                const textEl = modal.querySelector('.hkm-devotional-text-serif');
+                if (textEl && html) {
+                    textEl.innerHTML = html;
+                    this.attachStep2VerseInteractions(modal, dayConfig.verses);
+                }
+            }).catch(e => {
+                console.error("Failed to load scripture text:", e);
+                const textEl = modal.querySelector('.hkm-devotional-text-serif');
+                if (textEl) {
+                    textEl.innerHTML = `<p style="text-align: center; color: #ef4444; padding: 20px;">Kunne ikke hente bibelteksten for <strong>${dayConfig.verses}</strong>.</p>`;
+                }
+            });
+        }
     }
 
     async fetchAndFilterVersesText(versesText) {
