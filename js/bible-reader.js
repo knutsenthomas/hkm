@@ -9600,9 +9600,45 @@ class BibleReader {
             }
         } else if (step === 2) {
             const heading = dayConfig.verses || 'BIBEL';
+            const biblesList = this.bibles || [
+                { id: 'norsk_2024', name: 'Bibel 2024' },
+                { id: 'nb_07', name: 'Norsk 88/07' },
+                { id: 'kjv', name: 'King James Version' }
+            ];
+            const transOptionsHtml = biblesList.map(b => 
+                `<option value="${b.id}" ${b.id === this.selectedBibleId ? 'selected' : ''}>${b.name || b.abbreviation}</option>`
+            ).join('');
+
             stepContentHtml = `
-                <h3 class="hkm-devotional-step-title">${heading}</h3>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 8px;">
+                    <h3 class="hkm-devotional-step-title" style="margin-bottom: 0;">${heading}</h3>
+                    <select id="hkm-yv-translation-select" class="hkm-yv-translation-select" style="background: rgba(209, 125, 57, 0.08); border: 1px solid rgba(209, 125, 57, 0.2); color: #d17d39; font-weight: 700; font-size: 12px; border-radius: 20px; padding: 4px 10px; cursor: pointer; outline: none;">
+                        ${transOptionsHtml}
+                    </select>
+                </div>
                 <div class="hkm-devotional-text-serif">${scriptureHtml}</div>
+                
+                <!-- Step 2 Floating Verse Action Sheet Toolbar -->
+                <div id="hkm-devotional-verse-toolbar" class="hkm-devotional-verse-toolbar" style="display: none; position: sticky; bottom: 12px; margin-top: 16px; z-index: 100; background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border-radius: 16px; padding: 10px 14px; align-items: center; justify-content: space-between; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <button class="hkm-dv-tool-btn" data-color="yellow" style="width: 24px; height: 24px; border-radius: 50%; background: #fef08a; border: 1.5px solid #fde047; cursor: pointer;" title="Gul"></button>
+                        <button class="hkm-dv-tool-btn" data-color="green" style="width: 24px; height: 24px; border-radius: 50%; background: #bbf7d0; border: 1.5px solid #86efac; cursor: pointer;" title="Grønn"></button>
+                        <button class="hkm-dv-tool-btn" data-color="blue" style="width: 24px; height: 24px; border-radius: 50%; background: #bfdbfe; border: 1.5px solid #93c5fd; cursor: pointer;" title="Blå"></button>
+                        <button class="hkm-dv-tool-btn" data-color="pink" style="width: 24px; height: 24px; border-radius: 50%; background: #fbcfe8; border: 1.5px solid #f472b6; cursor: pointer;" title="Rosa"></button>
+                        <button class="hkm-dv-tool-btn" data-color="none" style="width: 24px; height: 24px; border-radius: 50%; background: #ffffff; border: 1.5px solid #cbd5e1; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #64748b;" title="Fjern farge">✕</button>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button id="hkm-dv-btn-bookmark" style="background: none; border: none; color: #d17d39; cursor: pointer; display: flex; align-items: center; padding: 4px;" title="Bokmerke">
+                            <span class="material-symbols-outlined">bookmark</span>
+                        </button>
+                        <button id="hkm-dv-btn-copy" style="background: none; border: none; color: #475569; cursor: pointer; display: flex; align-items: center; padding: 4px;" title="Kopier vers">
+                            <span class="material-symbols-outlined">content_copy</span>
+                        </button>
+                        <button id="hkm-dv-btn-share-verse" style="background: none; border: none; color: #475569; cursor: pointer; display: flex; align-items: center; padding: 4px;" title="Del vers">
+                            <span class="material-symbols-outlined">share</span>
+                        </button>
+                    </div>
+                </div>
             `;
         } else if (step === 3) {
             const heading = lang === 'en' ? 'Resources' : (lang === 'es' ? 'Recursos' : 'Dypere Dykk');
@@ -9847,16 +9883,27 @@ class BibleReader {
             };
         }
 
-        // Interactive verse selection for Step 2 (Scripture reading step)
+        // Interactive verse selection & translation switcher for Step 2 (Scripture reading step)
         if (step === 2) {
-            const verseParagraphs = stepContainer.querySelectorAll('.hkm-devotional-text-serif p');
-            verseParagraphs.forEach(p => {
-                p.style.cursor = 'pointer';
-                p.onclick = (e) => {
-                    e.stopPropagation();
-                    p.classList.toggle('selected-verse');
+            const transSelect = stepContainer.querySelector('#hkm-yv-translation-select');
+            if (transSelect) {
+                transSelect.onchange = async () => {
+                    this.selectedBibleId = transSelect.value;
+                    const textEl = stepContainer.querySelector('.hkm-devotional-text-serif');
+                    if (textEl) {
+                        textEl.innerHTML = '<p style="text-align: center; color: #64748b;">Laster oversettelse...</p>';
+                        try {
+                            const newHtml = await this.fetchAndFilterVersesText(dayConfig.verses);
+                            textEl.innerHTML = newHtml;
+                            this.attachStep2VerseInteractions(stepContainer, dayConfig.verses);
+                        } catch (e) {
+                            textEl.innerHTML = `<p style="text-align: center; color: #ef4444;">Kunne ikke laste oversettelse for ${dayConfig.verses}</p>`;
+                        }
+                    }
                 };
-            });
+            }
+
+            this.attachStep2VerseInteractions(stepContainer, dayConfig.verses);
         }
 
         // Wire up Footer Navigation listeners
@@ -9900,6 +9947,116 @@ class BibleReader {
                     modal.remove();
                     this.setupReadingPlanUI(true);
                 }
+            };
+        }
+    }
+
+    attachStep2VerseInteractions(stepContainer, versesRef) {
+        const verseParagraphs = stepContainer.querySelectorAll('.hkm-devotional-text-serif p');
+        const toolbar = stepContainer.querySelector('#hkm-devotional-verse-toolbar');
+        
+        verseParagraphs.forEach(p => {
+            const vSup = p.querySelector('sup.v');
+            if (vSup) {
+                const vNum = vSup.innerText.trim();
+                const key = `${this.selectedBibleId}_${this.selectedBookId}_${this.selectedChapterId}_v${vNum}`;
+                if (this.verseHighlights && this.verseHighlights[key]) {
+                    const hl = this.verseHighlights[key];
+                    p.setAttribute('data-highlight-color', hl.color);
+                    if (hl.hex) p.style.setProperty('--custom-highlight-bg', hl.hex);
+                }
+            }
+
+            p.style.cursor = 'pointer';
+            p.onclick = (e) => {
+                e.stopPropagation();
+                p.classList.toggle('selected-verse');
+                
+                const selected = stepContainer.querySelectorAll('.hkm-devotional-text-serif p.selected-verse');
+                if (toolbar) {
+                    toolbar.style.display = selected.length > 0 ? 'flex' : 'none';
+                }
+            };
+        });
+
+        if (!toolbar) return;
+
+        // Highlight color swatches
+        toolbar.querySelectorAll('.hkm-dv-tool-btn').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const color = btn.getAttribute('data-color');
+                const selected = stepContainer.querySelectorAll('.hkm-devotional-text-serif p.selected-verse');
+                selected.forEach(p => {
+                    const vSup = p.querySelector('sup.v');
+                    const vNum = vSup ? vSup.innerText.trim() : null;
+                    if (color === 'none') {
+                        p.removeAttribute('data-highlight-color');
+                        p.style.removeProperty('--custom-highlight-bg');
+                        if (vNum) this.saveVerseHighlight(vNum, 'none');
+                    } else {
+                        p.setAttribute('data-highlight-color', color);
+                        if (vNum) this.saveVerseHighlight(vNum, color);
+                    }
+                    p.classList.remove('selected-verse');
+                });
+                toolbar.style.display = 'none';
+            };
+        });
+
+        // Bookmark button
+        const btnBookmark = toolbar.querySelector('#hkm-dv-btn-bookmark');
+        if (btnBookmark) {
+            btnBookmark.onclick = (e) => {
+                e.stopPropagation();
+                const selected = stepContainer.querySelectorAll('.hkm-devotional-text-serif p.selected-verse');
+                selected.forEach(p => {
+                    const vSup = p.querySelector('sup.v');
+                    if (vSup) {
+                        const vNum = parseInt(vSup.innerText.trim(), 10);
+                        if (!isNaN(vNum)) this.toggleBookmark(vNum);
+                    }
+                    p.classList.remove('selected-verse');
+                });
+                toolbar.style.display = 'none';
+            };
+        }
+
+        // Copy button
+        const btnCopy = toolbar.querySelector('#hkm-dv-btn-copy');
+        if (btnCopy) {
+            btnCopy.onclick = async (e) => {
+                e.stopPropagation();
+                const selected = Array.from(stepContainer.querySelectorAll('.hkm-devotional-text-serif p.selected-verse'));
+                const text = selected.map(p => p.innerText.trim()).join('\n\n');
+                if (text) {
+                    await navigator.clipboard.writeText(text);
+                    alert('Verstekst kopiert til utklippstavlen!');
+                }
+                selected.forEach(p => p.classList.remove('selected-verse'));
+                toolbar.style.display = 'none';
+            };
+        }
+
+        // Share button
+        const btnShare = toolbar.querySelector('#hkm-dv-btn-share-verse');
+        if (btnShare) {
+            btnShare.onclick = async (e) => {
+                e.stopPropagation();
+                const selected = Array.from(stepContainer.querySelectorAll('.hkm-devotional-text-serif p.selected-verse'));
+                const text = selected.map(p => p.innerText.trim()).join('\n\n');
+                if (text) {
+                    if (navigator.share) {
+                        try {
+                            await navigator.share({ title: versesRef || 'Bibellesing', text, url: window.location.href });
+                        } catch (err) {}
+                    } else {
+                        await navigator.clipboard.writeText(text);
+                        alert('Verstekst kopiert til utklippstavlen!');
+                    }
+                }
+                selected.forEach(p => p.classList.remove('selected-verse'));
+                toolbar.style.display = 'none';
             };
         }
     }
