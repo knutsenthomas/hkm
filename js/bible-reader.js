@@ -9847,6 +9847,18 @@ class BibleReader {
             };
         }
 
+        // Interactive verse selection for Step 2 (Scripture reading step)
+        if (step === 2) {
+            const verseParagraphs = stepContainer.querySelectorAll('.hkm-devotional-text-serif p');
+            verseParagraphs.forEach(p => {
+                p.style.cursor = 'pointer';
+                p.onclick = (e) => {
+                    e.stopPropagation();
+                    p.classList.toggle('selected-verse');
+                };
+            });
+        }
+
         // Wire up Footer Navigation listeners
         const backBtn = stepContainer.querySelector('#btn-yv-back');
         if (backBtn && step > 1) {
