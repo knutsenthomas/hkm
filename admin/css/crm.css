@@ -1504,7 +1504,7 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
     text-overflow: ellipsis;
 }
 
-/* --- Floating Bulk Actions Bar --- */
+/* --- Floating Bulk Actions Bar (Responsive) --- */
 .hkm-bulk-bar {
     position: fixed;
     bottom: 28px;
@@ -1513,23 +1513,19 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
     backface-visibility: hidden !important;
     -webkit-backface-visibility: hidden !important;
     background: #0f172a; /* Premium Dark Slate */
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.14);
     color: white;
     padding: 8px 16px;
     border-radius: 999px;
-    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.4), 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.45), 0 4px 14px rgba(0, 0, 0, 0.25);
     z-index: 1000;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, visibility 0.3s ease !important;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, visibility 0.3s ease !important;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
     display: flex !important;
     max-width: calc(100vw - 32px);
-    overflow-x: auto;
-}
-
-.hkm-bulk-bar::-webkit-scrollbar {
-    display: none;
+    box-sizing: border-box !important;
 }
 
 .hkm-bulk-bar.active {
@@ -1544,6 +1540,7 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
     align-items: center;
     gap: 12px;
     white-space: nowrap;
+    width: 100%;
 }
 
 .hkm-bulk-bar-info {
@@ -1569,14 +1566,21 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
     align-items: center;
     gap: 4px;
     white-space: nowrap;
-    flex-shrink: 0;
+    flex-shrink: 1;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.hkm-bulk-bar-buttons::-webkit-scrollbar {
+    display: none;
 }
 
 .hkm-bulk-btn {
     background: transparent;
     border: none;
     color: rgba(255, 255, 255, 0.88);
-    padding: 8px 14px;
+    padding: 7px 13px;
     border-radius: 999px;
     font-size: 13px;
     font-weight: 600;
@@ -1625,4 +1629,52 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
 .hkm-bulk-close:hover {
     background: rgba(255, 255, 255, 0.15);
     color: white;
+}
+
+/* Mobile Responsive Styling (< 860px) */
+@media (max-width: 860px) {
+    .hkm-bulk-bar {
+        bottom: 16px !important;
+        left: 50% !important;
+        transform: translate3d(-50%, 120px, 0) !important;
+        width: calc(100vw - 24px) !important;
+        max-width: 520px !important;
+        padding: 10px 14px !important;
+        border-radius: 16px !important;
+    }
+
+    .hkm-bulk-bar.active {
+        transform: translate3d(-50%, 0, 0) !important;
+    }
+
+    .hkm-bulk-bar-content {
+        flex-wrap: wrap !important;
+        justify-content: space-between !important;
+        gap: 8px !important;
+    }
+
+    .hkm-bulk-bar-info {
+        font-size: 13px !important;
+    }
+
+    .hkm-bulk-bar-divider {
+        display: none !important;
+    }
+
+    .hkm-bulk-bar-buttons {
+        order: 3;
+        width: 100% !important;
+        padding-top: 6px !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .hkm-bulk-close {
+        order: 2;
+    }
+
+    .hkm-bulk-btn {
+        padding: 6px 11px !important;
+        font-size: 12px !important;
+        background: rgba(255, 255, 255, 0.08) !important;
+    }
 }
