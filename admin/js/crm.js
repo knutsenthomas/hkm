@@ -1974,6 +1974,7 @@ class CRMManager {
             if (btn && text) {
                 btn.style.display = 'flex';
                 text.textContent = `Slett ${count} ${count === 1 ? 'valgt' : 'valgte'}`;
+                btn.title = text.textContent;
             }
             if (floatingBar && countText) {
                 floatingBar.style.display = 'block';
