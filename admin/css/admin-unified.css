@@ -10399,6 +10399,19 @@ body.builder-active .main-content,
   box-sizing: border-box !important;
 }
 
+/* Responsive Podcast Table styling on mobile */
+.podcast-table {
+  min-width: 720px !important;
+  width: 100% !important;
+}
+
+@media (max-width: 768px) {
+  .podcast-management-grid .table-container {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
 
 
 

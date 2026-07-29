@@ -3444,17 +3444,17 @@ class AdminManager {
 
                 return `
                     <tr data-episode-id="${id}" style="transition: background 0.2s;">
-                        <td style="padding-left: 24px;">
-                            <div style="width: 54px; height: 54px; border-radius: 12px; overflow: hidden; background: #f1f5f9; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center;">
+                        <td style="padding-left: 24px; min-width: 70px;">
+                            <div style="width: 54px; height: 54px; border-radius: 12px; overflow: hidden; background: #f1f5f9; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                 ${imageUrl 
                                     ? `<img src="${imageUrl}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none';this.parentElement.innerHTML='<span class=\\'material-symbols-outlined\\' style=\\'font-size:24px;color:#94a3b8\\'>mic</span>'">`
                                     : `<span class="material-symbols-outlined" style="font-size: 24px; color: #94a3b8;">mic</span>`
                                 }
                             </div>
                         </td>
-                        <td style="max-width: 400px;">
-                            <div style="font-weight: 700; color: #1e293b; font-size: 15px; margin-bottom: 4px;">${this.escapeHtml(title)}</div>
-                            <div style="font-size: 13px; color: #64748b; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                        <td style="min-width: 240px; max-width: 400px;">
+                            <div style="font-weight: 700; color: #1e293b; font-size: 15px; margin-bottom: 4px; line-height: 1.3;">${this.escapeHtml(title)}</div>
+                            <div style="font-size: 13px; color: #64748b; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.4;">
                                 ${(() => { 
                                     const raw = summary || ep.description || '';
                                     const tmp = document.createElement('div'); 
@@ -3464,10 +3464,10 @@ class AdminManager {
                                 })()}...
                             </div>
                         </td>
-                        <td>
-                            <div style="font-size: 13px; font-weight: 500; color: #64748b;">${dateStr}</div>
+                        <td style="min-width: 100px;">
+                            <div style="font-size: 13px; font-weight: 500; color: #64748b; white-space: nowrap;">${dateStr}</div>
                         </td>
-                        <td>
+                        <td style="min-width: 240px;">
                             <div style="display: flex; gap: 8px; align-items: center; flex-wrap: nowrap;">
                                 <span class="podcast-status-badge" style="background: ${hasTranscript ? '#dcfce7' : '#f1f5f9'}; color: ${hasTranscript ? '#166534' : '#64748b'}; border: 1px solid ${hasTranscript ? '#bbf7d0' : '#e2e8f0'}; white-space: nowrap; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 5px !important; min-height: 32px !important; padding: 4px 12px !important; font-size: 12px !important; font-weight: 800 !important;">
                                     <span class="material-symbols-outlined podcast-status-icon" style="font-size: 16px !important; width: 16px !important; height: 16px !important; min-width: 16px !important; min-height: 16px !important; flex: 0 0 16px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; margin: 0 !important; padding: 0 !important;">${hasTranscript ? 'check_circle' : 'hourglass_empty'}</span>
@@ -3483,7 +3483,7 @@ class AdminManager {
                                 </span>
                             </div>
                         </td>
-                        <td style="text-align:right; padding-right:24px;">
+                        <td style="text-align:right; padding-right:24px; min-width: 80px;">
                             <div style="display:flex; gap:8px; justify-content:flex-end;">
                                 <button class="btn-icon-round" onclick="window.adminManager.openPodcastTranscriptEditorById('${id}')" title="Rediger tekst">
                                     <span class="material-symbols-outlined">edit</span>
