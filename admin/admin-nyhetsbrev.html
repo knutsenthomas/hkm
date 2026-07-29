@@ -53,7 +53,7 @@
                     
                     var titleEl = document.createElement('div');
                     titleEl.style.cssText = 'font-weight:800;font-size:15px;margin-bottom:6px;display:flex;align-items:center;gap:8px;';
-                    titleEl.innerHTML = '<span style="font-size:18px;">⚠️</span> ' + title;
+                    titleEl.innerHTML = '' + title;
                     
                     var msgEl = document.createElement('div');
                     msgEl.id = 'hkm-crit-err-msg';
@@ -984,11 +984,11 @@
                     <!-- TOSPRÅKLIG SPRÅKVELGER -->
                     <div id="editor-language-switcher" style="display: flex; align-items: center; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px; padding: 3px; gap: 4px; flex-shrink: 0; margin-right: 4px;">
                         <button type="button" id="editor-lang-btn-no" class="editor-lang-btn active" style="display: flex; align-items: center; gap: 6px; padding: 5px 12px; border: none; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; background: #ffffff; color: #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.06); transition: all 0.2s;">
-                            <span>🇳🇴</span><span class="lang-text">Norsk</span>
+                            <span>NO</span><span class="lang-text">Norsk</span>
                         </button>
                         <button type="button" id="editor-lang-btn-en" class="editor-lang-btn" style="display: flex; align-items: center; gap: 6px; padding: 5px 12px; border: none; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; background: transparent; color: #64748b; transition: all 0.2s;">
                             <span class="material-symbols-outlined lang-translate-icon" style="font-size: 16px; color: #2563eb;">translate</span>
-                            <span>🇬🇧</span><span class="lang-text">English</span>
+                            <span class="lang-text">English</span>
                         </button>
                         <button type="button" id="editor-retranslate-btn" title="Re-oversett fra norsk med AI" style="display: none; align-items: center; gap: 4px; padding: 5px 10px; border: none; border-radius: 9px; font-size: 12px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af; transition: all 0.2s;">
                             <span class="material-symbols-outlined" style="font-size: 15px;">sync</span>
@@ -1331,7 +1331,7 @@
                                         </div>
                                         <div class="input-wrapper-v2">
                                             <span class="material-symbols-outlined input-icon">mail_lock</span>
-                                            <input type="text" id="newsletter-subject" placeholder="f.eks. Velkommen til månedens nyhetsbrev! ✨" maxlength="100">
+                                            <input type="text" id="newsletter-subject" placeholder="f.eks. Velkommen til månedens nyhetsbrev!" maxlength="100">
                                         </div>
                                         <span class="input-hint">Korte emner på 4–7 ord gir opptil 21% høyere åpningsrate.</span>
                                     </div>

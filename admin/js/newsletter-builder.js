@@ -971,7 +971,7 @@ class NewsletterBuilder {
                 }
             });
 
-            // Click handler for delete buttons (×), edit buttons (✏️), and block card selection
+            // Click handler for delete buttons (×), edit buttons, and block card selection
             container.addEventListener('click', (e) => {
                 const deleteBtn = e.target.closest('.card-delete-btn, .block-delete-btn');
                 if (deleteBtn) {
@@ -3051,7 +3051,7 @@ class NewsletterBuilder {
                 const isSelected = selectedProductsMap.has(slug);
                 const img = p.imageUrl 
                     ? `<img src="${p.imageUrl}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0;" />`
-                    : `<div style="width: 44px; height: 44px; border-radius: 8px; background: #f1f5f9; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 18px;">🛍️</div>`;
+                    : `<div style="width: 44px; height: 44px; border-radius: 8px; background: #f1f5f9; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 18px;"><span class="material-symbols-outlined">shopping_bag</span></div>`;
                 
                 const itemStyles = isSelected 
                     ? 'border-color: #d17d39 !important; background: #fffcf8 !important; box-shadow: 0 4px 6px -1px rgba(209, 125, 57, 0.05);' 
@@ -3394,7 +3394,7 @@ class NewsletterBuilder {
                 const imgUrl = e.imageUrl || e.image || e.dashboardImage || e.imageLink;
                 const img = imgUrl 
                     ? `<img src="${imgUrl}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0;" />`
-                    : `<div style="width: 44px; height: 44px; border-radius: 8px; background: #f1f5f9; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 18px;">📅</div>`;
+                    : `<div style="width: 44px; height: 44px; border-radius: 8px; background: #f1f5f9; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 18px;"><span class="material-symbols-outlined">calendar_today</span></div>`;
                 
                 const itemStyles = isSelected 
                     ? 'border-color: #1B4965 !important; background: #f0f6fa !important; box-shadow: 0 4px 6px -1px rgba(27, 73, 101, 0.05);' 
@@ -3627,16 +3627,16 @@ class NewsletterBuilder {
         if (modal) modal.remove();
 
         const internalPages = [
-            { name: "🏠 Forside / Hjem", url: "https://www.hiskingdomministry.no/", defaultText: "Gå til forside" },
-            { name: "📅 Arrangementer & Kalender", url: "https://www.hiskingdomministry.no/arrangementer.html", defaultText: "Se arrangementer" },
-            { name: "📖 Bibel & Leseplaner", url: "https://www.hiskingdomministry.no/bibel.html", defaultText: "Les i Bibelen" },
-            { name: "🙏 Bønnevegg & Bønneemner", url: "https://www.hiskingdomministry.no/bonnevegg.html", defaultText: "Send bønneemne" },
-            { name: "📚 Blogg & Undervisning", url: "https://www.hiskingdomministry.no/blogg.html", defaultText: "Les artikler" },
-            { name: "🛍️ Nettbutikk (His Kingdom Designs)", url: "https://www.hiskingdomdesigns.no/", defaultText: "Besøk nettbutikken" },
-            { name: "💖 Gi en gave / Støtt arbeidet", url: "https://www.hiskingdomministry.no/stott-oss.html", defaultText: "Støtt arbeidet" },
+            { name: "Forside / Hjem", url: "https://www.hiskingdomministry.no/", defaultText: "Gå til forside" },
+            { name: "Arrangementer & Kalender", url: "https://www.hiskingdomministry.no/arrangementer.html", defaultText: "Se arrangementer" },
+            { name: "Bibel & Leseplaner", url: "https://www.hiskingdomministry.no/bibel.html", defaultText: "Les i Bibelen" },
+            { name: "Bønnevegg & Bønneemner", url: "https://www.hiskingdomministry.no/bonnevegg.html", defaultText: "Send bønneemne" },
+            { name: "Blogg & Undervisning", url: "https://www.hiskingdomministry.no/blogg.html", defaultText: "Les artikler" },
+            { name: "Nettbutikk (His Kingdom Designs)", url: "https://www.hiskingdomdesigns.no/", defaultText: "Besøk nettbutikken" },
+            { name: "Gi en gave / Støtt arbeidet", url: "https://www.hiskingdomministry.no/stott-oss.html", defaultText: "Støtt arbeidet" },
             { name: "ℹ️ Om oss", url: "https://www.hiskingdomministry.no/om-oss.html", defaultText: "Les om oss" },
-            { name: "✉️ Kontakt oss", url: "https://www.hiskingdomministry.no/kontakt.html", defaultText: "Ta kontakt" },
-            { name: "👤 Min side (Medlem)", url: "https://www.hiskingdomministry.no/minside/", defaultText: "Gå til Min side" }
+            { name: "Kontakt oss", url: "https://www.hiskingdomministry.no/kontakt.html", defaultText: "Ta kontakt" },
+            { name: "Min side (Medlem)", url: "https://www.hiskingdomministry.no/minside/", defaultText: "Gå til Min side" }
         ];
 
         modal = document.createElement('div');
@@ -3984,7 +3984,7 @@ class NewsletterBuilder {
             const fullBlockHtml = `
                 <div class="newsletter-social-block" contenteditable="false" data-style="${selectedStyle}" style="position: relative; text-align: center; margin: 28px 0; padding: ${isTiles ? '0' : '16px'}; background: ${isTiles ? 'transparent' : '#ffffff'}; border: ${isTiles ? 'none' : '1px solid #e2e8f0'}; border-radius: 16px; display: flex; flex-direction: ${isTiles ? 'column' : 'row'}; flex-wrap: wrap; justify-content: center; gap: ${selectedStyle === 'text_only' ? '12px' : '14px'}; align-items: center; box-shadow: ${isTiles ? 'none' : '0 2px 4px rgba(0,0,0,0.02)'};">
                     <button class="card-delete-btn" style="position: absolute; top: -10px; right: -10px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Slett sosial blokk">×</button>
-                    <button class="card-edit-btn" style="position: absolute; top: -10px; right: 20px; width: 24px; height: 24px; border-radius: 50%; background: #1B4965; border: 2px solid white; color: white; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Endre stil & lenker">✏️</button>
+                    <button class="card-edit-btn" style="position: absolute; top: -10px; right: 20px; width: 24px; height: 24px; border-radius: 50%; background: #1B4965; border: 2px solid white; color: white; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Endre stil & lenker"><span class="material-symbols-outlined" style="font-size:14px;">edit</span></button>
                     ${linksHtml}
                 </div>
             `;
@@ -5325,14 +5325,14 @@ class NewsletterBuilder {
                 <span class="material-symbols-outlined" style="font-size: 16px;">arrow_downward</span>
             </button>
             ${socialNode ? `
-            <button type="button" class="quick-tb-btn" id="qtb-edit-social" title="Endre stil & lenker (✏️)" style="color: #3b82f6;">
+            <button type="button" class="quick-tb-btn" id="qtb-edit-social" title="Endre stil & lenker" style="color: #3b82f6;">
                 <span class="material-symbols-outlined" style="font-size: 16px;">tune</span>
             </button>
             ` : ''}
             <button type="button" class="quick-tb-btn" id="qtb-duplicate-block" title="Dupliser element">
                 <span class="material-symbols-outlined" style="font-size: 16px;">content_copy</span>
             </button>
-            <button type="button" class="quick-tb-btn" id="qtb-delete-block" title="Slett element (🗑️)" style="color: #ef4444;">
+            <button type="button" class="quick-tb-btn" id="qtb-delete-block" title="Slett element" style="color: #ef4444;">
                 <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
             </button>
         `;
@@ -5621,21 +5621,21 @@ class NewsletterBuilder {
                             <div class="visibility-card ${!isDesktopOnly && !isMobileOnly ? 'active' : ''}" data-value="all" style="position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; background: #ffffff; transition: all 0.2s ease;">
                                 <span class="material-symbols-outlined" style="font-size: 20px; color: #475569;">devices</span>
                                 <span style="font-weight: 600; color: #1e293b; font-size: 14px;">Alle enheter</span>
-                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${!isDesktopOnly && !isMobileOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">✓</div>
+                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${!isDesktopOnly && !isMobileOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;"><span class="material-symbols-outlined" style="font-size:12px;color:white;">check</span></div>
                             </div>
                             
                             <!-- Option 2: Kun PC -->
                             <div class="visibility-card ${isDesktopOnly ? 'active' : ''}" data-value="desktop" style="position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; background: #ffffff; transition: all 0.2s ease;">
                                 <span class="material-symbols-outlined" style="font-size: 20px; color: #475569;">computer</span>
                                 <span style="font-weight: 600; color: #1e293b; font-size: 14px;">Kun PC</span>
-                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${isDesktopOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">✓</div>
+                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${isDesktopOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;"><span class="material-symbols-outlined" style="font-size:12px;color:white;">check</span></div>
                             </div>
                             
                             <!-- Option 3: Kun mobil -->
                             <div class="visibility-card ${isMobileOnly ? 'active' : ''}" data-value="mobile" style="position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; background: #ffffff; transition: all 0.2s ease;">
                                 <span class="material-symbols-outlined" style="font-size: 20px; color: #475569;">smartphone</span>
                                 <span style="font-weight: 600; color: #1e293b; font-size: 14px;">Kun mobil</span>
-                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${isMobileOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">✓</div>
+                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${isMobileOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;"><span class="material-symbols-outlined" style="font-size:12px;color:white;">check</span></div>
                             </div>
                         </div>
                         
@@ -6037,21 +6037,21 @@ class NewsletterBuilder {
                             <div class="visibility-card ${!isDesktopOnly && !isMobileOnly ? 'active' : ''}" data-value="all" style="position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; background: #ffffff; transition: all 0.2s ease;">
                                 <span class="material-symbols-outlined" style="font-size: 20px; color: #475569;">devices</span>
                                 <span style="font-weight: 600; color: #1e293b; font-size: 14px;">Alle enheter</span>
-                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${!isDesktopOnly && !isMobileOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">✓</div>
+                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${!isDesktopOnly && !isMobileOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;"><span class="material-symbols-outlined" style="font-size:12px;color:white;">check</span></div>
                             </div>
                             
                             <!-- Option 2: Kun PC -->
                             <div class="visibility-card ${isDesktopOnly ? 'active' : ''}" data-value="desktop" style="position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; background: #ffffff; transition: all 0.2s ease;">
                                 <span class="material-symbols-outlined" style="font-size: 20px; color: #475569;">computer</span>
                                 <span style="font-weight: 600; color: #1e293b; font-size: 14px;">Kun PC</span>
-                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${isDesktopOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">✓</div>
+                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${isDesktopOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;"><span class="material-symbols-outlined" style="font-size:12px;color:white;">check</span></div>
                             </div>
                             
                             <!-- Option 3: Kun mobil -->
                             <div class="visibility-card ${isMobileOnly ? 'active' : ''}" data-value="mobile" style="position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; background: #ffffff; transition: all 0.2s ease;">
                                 <span class="material-symbols-outlined" style="font-size: 20px; color: #475569;">smartphone</span>
                                 <span style="font-weight: 600; color: #1e293b; font-size: 14px;">Kun mobil</span>
-                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${isMobileOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">✓</div>
+                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${isMobileOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;"><span class="material-symbols-outlined" style="font-size:12px;color:white;">check</span></div>
                             </div>
                         </div>
                         
@@ -6270,16 +6270,16 @@ class NewsletterBuilder {
         const isMobileOnly = node.classList.contains('hkm-mobile-only');
 
         const internalPages = [
-            { name: "🏠 Forside / Hjem", url: "https://www.hiskingdomministry.no/", defaultText: "Gå til forside" },
-            { name: "📅 Arrangementer & Kalender", url: "https://www.hiskingdomministry.no/arrangementer.html", defaultText: "Se arrangementer" },
-            { name: "📖 Bibel & Leseplaner", url: "https://www.hiskingdomministry.no/bibel.html", defaultText: "Les i Bibelen" },
-            { name: "🙏 Bønnevegg & Bønneemner", url: "https://www.hiskingdomministry.no/bonnevegg.html", defaultText: "Send bønneemne" },
-            { name: "📚 Blogg & Undervisning", url: "https://www.hiskingdomministry.no/blogg.html", defaultText: "Les artikler" },
-            { name: "🛍️ Nettbutikk (His Kingdom Designs)", url: "https://www.hiskingdomdesigns.no/", defaultText: "Besøk nettbutikken" },
-            { name: "💖 Gi en gave / Støtt arbeidet", url: "https://www.hiskingdomministry.no/stott-oss.html", defaultText: "Støtt arbeidet" },
+            { name: "Forside / Hjem", url: "https://www.hiskingdomministry.no/", defaultText: "Gå til forside" },
+            { name: "Arrangementer & Kalender", url: "https://www.hiskingdomministry.no/arrangementer.html", defaultText: "Se arrangementer" },
+            { name: "Bibel & Leseplaner", url: "https://www.hiskingdomministry.no/bibel.html", defaultText: "Les i Bibelen" },
+            { name: "Bønnevegg & Bønneemner", url: "https://www.hiskingdomministry.no/bonnevegg.html", defaultText: "Send bønneemne" },
+            { name: "Blogg & Undervisning", url: "https://www.hiskingdomministry.no/blogg.html", defaultText: "Les artikler" },
+            { name: "Nettbutikk (His Kingdom Designs)", url: "https://www.hiskingdomdesigns.no/", defaultText: "Besøk nettbutikken" },
+            { name: "Gi en gave / Støtt arbeidet", url: "https://www.hiskingdomministry.no/stott-oss.html", defaultText: "Støtt arbeidet" },
             { name: "ℹ️ Om oss", url: "https://www.hiskingdomministry.no/om-oss.html", defaultText: "Les om oss" },
-            { name: "✉️ Kontakt oss", url: "https://www.hiskingdomministry.no/kontakt.html", defaultText: "Ta kontakt" },
-            { name: "👤 Min side (Medlem)", url: "https://www.hiskingdomministry.no/minside/", defaultText: "Gå til Min side" }
+            { name: "Kontakt oss", url: "https://www.hiskingdomministry.no/kontakt.html", defaultText: "Ta kontakt" },
+            { name: "Min side (Medlem)", url: "https://www.hiskingdomministry.no/minside/", defaultText: "Gå til Min side" }
         ];
 
         const matchedInternal = internalPages.find(p => p.url === currentUrl || currentUrl.startsWith(p.url));
@@ -6326,8 +6326,8 @@ class NewsletterBuilder {
                 <div class="inspector-group">
                     <label class="inspector-group-label">Lenketype</label>
                     <select class="inspector-select" id="btn-inspector-link-type" style="font-weight: 600;">
-                        <option value="internal" ${isInternalLink ? 'selected' : ''}>🌐 Intern side på nettsiden</option>
-                        <option value="external" ${!isInternalLink ? 'selected' : ''}>🔗 Ekstern nettadresse (URL)</option>
+                        <option value="internal" ${isInternalLink ? 'selected' : ''}>Intern side på nettsiden</option>
+                        <option value="external" ${!isInternalLink ? 'selected' : ''}>Ekstern nettadresse (URL)</option>
                     </select>
                 </div>
 
@@ -6357,21 +6357,21 @@ class NewsletterBuilder {
                             <div class="visibility-card ${!isDesktopOnly && !isMobileOnly ? 'active' : ''}" data-value="all" style="position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; background: #ffffff; transition: all 0.2s ease;">
                                 <span class="material-symbols-outlined" style="font-size: 20px; color: #475569;">devices</span>
                                 <span style="font-weight: 600; color: #1e293b; font-size: 14px;">Alle enheter</span>
-                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${!isDesktopOnly && !isMobileOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">✓</div>
+                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${!isDesktopOnly && !isMobileOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;"><span class="material-symbols-outlined" style="font-size:12px;color:white;">check</span></div>
                             </div>
                             
                             <!-- Option 2: Kun PC -->
                             <div class="visibility-card ${isDesktopOnly ? 'active' : ''}" data-value="desktop" style="position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; background: #ffffff; transition: all 0.2s ease;">
                                 <span class="material-symbols-outlined" style="font-size: 20px; color: #475569;">computer</span>
                                 <span style="font-weight: 600; color: #1e293b; font-size: 14px;">Kun PC</span>
-                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${isDesktopOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">✓</div>
+                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${isDesktopOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;"><span class="material-symbols-outlined" style="font-size:12px;color:white;">check</span></div>
                             </div>
                             
                             <!-- Option 3: Kun mobil -->
                             <div class="visibility-card ${isMobileOnly ? 'active' : ''}" data-value="mobile" style="position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; background: #ffffff; transition: all 0.2s ease;">
                                 <span class="material-symbols-outlined" style="font-size: 20px; color: #475569;">smartphone</span>
                                 <span style="font-weight: 600; color: #1e293b; font-size: 14px;">Kun mobil</span>
-                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${isMobileOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">✓</div>
+                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${isMobileOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;"><span class="material-symbols-outlined" style="font-size:12px;color:white;">check</span></div>
                             </div>
                         </div>
                         
@@ -7445,7 +7445,7 @@ class NewsletterBuilder {
                 editBtn.className = 'card-edit-btn';
                 editBtn.setAttribute('style', 'position: absolute; top: -10px; right: 30px; width: 24px; height: 24px; border-radius: 50%; background: #1B4965; border: 2px solid white; color: white; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;');
                 editBtn.title = 'Endre stil & lenker';
-                editBtn.innerHTML = '✏️';
+                editBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">edit</span>';
                 card.appendChild(editBtn);
             }
         });
@@ -8234,8 +8234,8 @@ class NewsletterBuilder {
             if (typeof showToast === 'function') {
                 showToast(
                     targetLanguage === 'en'
-                        ? 'Du redigerer nå den engelske versjonen. 🇬🇧'
-                        : 'Du redigerer nå den norske versjonen. 🇳🇴',
+                        ? 'Du redigerer nå den engelske versjonen.'
+                        : 'Du redigerer nå den norske versjonen. NO',
                     'info'
                 );
             }
@@ -8369,7 +8369,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             this.triggerAutosave();
 
             if (typeof showToast === 'function') {
-                showToast('Engelsk versjon er opprettet og lagret! 🇬🇧', 'success');
+                showToast('Engelsk versjon er opprettet og lagret!', 'success');
             }
             return true;
         } catch (error) {
@@ -8474,9 +8474,9 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
 
             if (response.ok && result.success) {
                 if (typeof showToast === 'function') {
-                    showToast(`Test-e-post er sendt til ${recipientEmail}! 🚀`, "success");
+                    showToast(`Test-e-post er sendt til ${recipientEmail}!`, "success");
                 }
-                alert(`✅ Test-e-post er sendt til ${recipientEmail}!\nSjekk innboksen din nå.`);
+                alert(`Test-e-post er sendt til ${recipientEmail}!\nSjekk innboksen din nå.`);
                 sendSuccess = true;
                 
                 const testIcon = document.getElementById('chk-test-icon');
@@ -8494,7 +8494,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             if (typeof showToast === 'function') {
                 showToast(`Kunne ikke sende test-e-post: ${error.message}`, "error");
             }
-            alert(`❌ Kunne ikke sende test-epost:\n${error.message}`);
+            alert(`Kunne ikke sende test-epost:\n${error.message}`);
         } finally {
             if (testBtn) {
                 testBtn.disabled = false;
@@ -8504,7 +8504,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
 
         if (sendSuccess) {
             await this.showSuccessModal(
-                "Test-e-post er sendt! 🚀",
+                "Test-e-post er sendt!",
                 `Vellykket utsending! Test-e-posten ble sendt til <strong style="color: #0f172a;">${recipientEmail}</strong>.<br><br>Sjekk innboksen din nå.`,
                 "Flott, skjønner!"
             );
@@ -8684,7 +8684,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             if (typeof showToast === 'function') {
                 showToast(`Kunne ikke starte kampanjen: ${e.message}`, "error");
             }
-            alert(`❌ Kunne ikke starte kampanjen:\n${e.message}`);
+            alert(`Kunne ikke starte kampanjen:\n${e.message}`);
             const finalBtn = document.getElementById('final-send-btn');
             if (finalBtn) {
                 finalBtn.disabled = false;
@@ -10275,7 +10275,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                         </td>
                         <td>
                             <strong>${sub.name}</strong>
-                            ${sub.phone ? `<div style="font-size: 11px; color: #64748b;">📞 ${sub.phone}</div>` : ''}
+                            ${sub.phone ? `<div style="font-size: 11px; color: #64748b;">Tlf: ${sub.phone}</div>` : ''}
                         </td>
                         <td>${sub.email}</td>
                         <td>${segmentsHtml}</td>

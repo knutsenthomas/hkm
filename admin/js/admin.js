@@ -191,7 +191,7 @@ class AdminManager {
         const rememberedSection = sessionStorage.getItem('hkm_admin_last_dashboard_section');
         const initialSection = hash || rememberedSection || 'overview';
         if (initialSection && initialSection !== 'overview') {
-            console.log(`[AdminManager] 🚀 Auto-triggering initial section switch on startup: ${initialSection}`);
+            console.log(`[AdminManager] Auto-triggering initial section switch on startup: ${initialSection}`);
             setTimeout(() => {
                 if (typeof window.handleSectionSwitch === 'function') {
                     window.handleSectionSwitch(initialSection);
@@ -1594,7 +1594,7 @@ class AdminManager {
                 await firebaseService.savePageContent('collection_blog', { items: translatedItems });
                 await this.loadCollection('blog');
                 if (!silent) {
-                    this.showToast('✅ Blogginnlegg er oversatt til tilgjengelige språk.', 'success', 5000);
+                    this.showToast('Blogginnlegg er oversatt til tilgjengelige språk.', 'success', 5000);
                 }
             } else if (!silent) {
                 this.showToast('Blogginnlegg er allerede oppdatert på tilgjengelige språk.', 'success', 3500);
@@ -1785,7 +1785,7 @@ class AdminManager {
             }
 
             console.log(`[AdminManager] GCal sync (${method}) successful.`);
-            this.showToast(`✅ Google Calendar: ${method === 'DELETE' ? 'Slettet' : 'Oppdatert'}`, 'success', 3000);
+            this.showToast(`Google Calendar: ${method === 'DELETE' ? 'Slettet' : 'Oppdatert'}`, 'success', 3000);
         } catch (error) {
             console.error('[AdminManager] Google Calendar sync failed:', error);
             if (error.message.includes('401') || error.message.includes('token') || error.message.includes('expired')) {
@@ -2573,7 +2573,7 @@ class AdminManager {
         if (typeof window.triggerProgressAnimation === 'function') {
             window.triggerProgressAnimation();
         }
-        console.log(`[AdminManager] 🚀 Switching to section: ${sectionId}`);
+        console.log(`[AdminManager] Switching to section: ${sectionId}`);
         this.currentSection = sectionId;
 
         // HKM Studio: Capture pending creation request from studio cards
@@ -2821,7 +2821,7 @@ class AdminManager {
                 }, 300);
                 
                 // Immediately open the editor for this item
-                this.showToast(`✅ AI-utkast opprettet og lagret!`, 'success', 5000);
+                this.showToast(`AI-utkast opprettet og lagret!`, 'success', 5000);
                 setTimeout(() => {
                     this.editCollectionItem(sectionId, 0);
                 }, 400);
@@ -3765,7 +3765,7 @@ class AdminManager {
                         });
                     }
 
-                    this.showToast('✅ Innstillinger lagret!', 'success');
+                    this.showToast('Innstillinger lagret!', 'success');
                     close();
                 } catch (err) {
                     console.error('Save podcast settings error:', err);
@@ -3848,11 +3848,11 @@ class AdminManager {
                         const pid = btn.dataset.postId;
                         try {
                             await firebaseService.deleteComment(pid, cid);
-                            this.showToast('✅ Kommentar slettet');
+                            this.showToast('Kommentar slettet');
                             this.loadComments();
                         } catch (err) {
                             console.error('Kunne ikke slette kommentar:', err);
-                            this.showToast('❌ Feil ved sletting', 'error');
+                            this.showToast('Feil ved sletting', 'error');
                         }
                     }
                 };
@@ -6920,7 +6920,7 @@ class AdminManager {
                     const url = `https://www.hiskingdomdesigns.no/product-page/${slug}`;
                     const img = p.imageUrl 
                         ? `<img src="${p.imageUrl}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; background: #334155;" />`
-                        : `<div style="width: 40px; height: 40px; border-radius: 6px; background: #334155; display: flex; align-items: center; justify-content: center; font-size: 16px;">🛍️</div>`;
+                        : `<div style="width: 40px; height: 40px; border-radius: 6px; background: #334155; display: flex; align-items: center; justify-content: center; font-size: 16px;"><span class="material-symbols-outlined">shopping_bag</span></div>`;
                     return `
                         <div class="hkm-link-product-item" data-url="${url}" style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: #1e293b; border: 1px solid #334155; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
                             ${img}
@@ -6962,7 +6962,7 @@ class AdminManager {
                     const url = `/arrangement-detaljer.html?id=${e.id || e.key}`;
                     const img = e.imageUrl 
                         ? `<img src="${e.imageUrl}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; background: #334155;" />`
-                        : `<div style="width: 40px; height: 40px; border-radius: 6px; background: #334155; display: flex; align-items: center; justify-content: center; font-size: 16px;">📅</div>`;
+                        : `<div style="width: 40px; height: 40px; border-radius: 6px; background: #334155; display: flex; align-items: center; justify-content: center; font-size: 16px;"><span class="material-symbols-outlined">calendar_today</span></div>`;
                     return `
                         <div class="hkm-link-event-item" data-url="${url}" style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: #1e293b; border: 1px solid #334155; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
                             ${img}
@@ -9249,14 +9249,14 @@ class AdminManager {
             if (podcastCategoriesInput) nextSettings.podcastCustomCategories = podcastCategoriesInput.value.trim();
 
             await firebaseService.savePageContent('settings_podcast', nextSettings);
-            this.showToast('✅ Podcast-innstillingene er lagret!', 'success', 5000);
+            this.showToast('Podcast-innstillingene er lagret!', 'success', 5000);
             
             // Reload in both places
             this.loadPodcastSettings();
             if (document.getElementById('podcast-overrides-list')) this.loadPodcastOverrides();
         } catch (err) {
             console.error("Save podcast settings error:", err);
-            this.showToast('❌ Feil ved lagring: ' + err.message, 'error', 5000);
+            this.showToast('Feil ved lagring: ' + err.message, 'error', 5000);
         } finally {
             if (btn) {
                 btn.textContent = originalText;
@@ -9306,10 +9306,10 @@ class AdminManager {
             if (ytPlaylistsInput) nextSettings.youtubePlaylists = ytPlaylistsInput.value.trim();
 
             await firebaseService.savePageContent('settings_media', nextSettings);
-            this.showToast('✅ Innstillingene er lagret!', 'success', 5000);
+            this.showToast('Innstillingene er lagret!', 'success', 5000);
         } catch (err) {
             console.error("Save media settings error:", err);
-            this.showToast('❌ Feil ved lagring: ' + err.message, 'error', 5000);
+            this.showToast('Feil ved lagring: ' + err.message, 'error', 5000);
         } finally {
             if (btn) {
                 btn.textContent = originalText;
@@ -9536,13 +9536,13 @@ class AdminManager {
             const mainCustomInput = document.getElementById('podcast-custom-categories');
             if (mainCustomInput) mainCustomInput.value = updatedGlobalStr;
 
-            this.showToast('✅ Lagret! Alle kategorier er nå faste.', 'success', 3000);
+            this.showToast('Lagret! Alle kategorier er nå faste.', 'success', 3000);
             
             // Reload the list to convert text inputs into chips
             await this.loadPodcastOverrides();
         } catch (err) {
             console.error("Save overrides error:", err);
-            this.showToast('❌ Feil ved lagring: ' + err.message, 'error', 5000);
+            this.showToast('Feil ved lagring: ' + err.message, 'error', 5000);
         } finally {
             btn.textContent = 'Lagre overstyringer';
             btn.disabled = false;
@@ -11827,7 +11827,7 @@ class AdminManager {
 
                     if (!items.length) items = ['Ny oppgave'];
 
-                    const checklistHtml = `<ul>${items.map((t) => `<li>${escapeEditorHtml(`☐ ${t}`)}</li>`).join('')}</ul>`;
+                    const checklistHtml = `<ul>${items.map((t) => `<li>${escapeEditorHtml(`${t}`)}</li>`).join('')}</ul>`;
                     exec('insertHTML', checklistHtml);
                 };
 
@@ -13382,9 +13382,9 @@ class AdminManager {
                             Object.assign(item, translatedItem);
                             this._renderBlogTranslationStatusBadge(item);
                             if (successfulLanguages.length === targetLanguages.length) {
-                                this.showToast('✅ Innlegget er oversatt til tilgjengelige språk og lagret.', 'success', 5000);
+                                this.showToast('Innlegget er oversatt til tilgjengelige språk og lagret.', 'success', 5000);
                             } else {
-                                this.showToast(`⚠️ Delvis oversettelse lagret (${successfulLanguages.length}/${targetLanguages.length} språk).`, 'warning', 6500);
+                                this.showToast(`Delvis oversettelse lagret (${successfulLanguages.length}/${targetLanguages.length} språk).`, 'warning', 6500);
                             }
 
                             // Show checkmark success indicator on the button
@@ -13449,7 +13449,7 @@ class AdminManager {
                             case 'youtubeVideo': {
                                 const ytUrl = block.data.url || '';
                                 return ytUrl
-                                    ? `<div class="print-video-ref"><span>🎥 Video: </span><a href="${ytUrl}">${ytUrl}</a></div>`
+                                    ? `<div class="print-video-ref"><span>Video: </span><a href="${ytUrl}">${ytUrl}</a></div>`
                                     : '';
                             }
                             default:
@@ -13645,8 +13645,8 @@ class AdminManager {
             <div class="print-category">His Kingdom Ministry${collectionId === 'blog' ? ' — Blogg' : collectionId === 'teaching' ? ' — Undervisning' : ''}</div>
             <h1 class="print-title">${title}</h1>
             <div class="print-meta">
-                ${author ? `<span>✍️ ${author}</span>` : ''}
-                ${formattedDate ? `<span>📅 ${formattedDate}</span>` : ''}
+                ${author ? `<span>${author}</span>` : ''}
+                ${formattedDate ? `<span>${formattedDate}</span>` : ''}
             </div>
         </div>
         <div class="print-body">
@@ -13761,7 +13761,7 @@ class AdminManager {
                                 }
 
                                 // Stay in the editor after saving — just show confirmation
-                                this.showToast('✅ Lagret og publisert!', 'success');
+                                this.showToast('Lagret og publisert!', 'success');
                                 
                                 // Clear restore state on successful save so a subsequent page refresh
                                 // doesn't try to "restore" potentially stale content from session storage.
@@ -13835,7 +13835,7 @@ class AdminManager {
 
                                 await firebaseService.savePageContent(`collection_${collectionId}`, { items: list });
 
-                                this.showToast('✅ Lagret som utkast!', 'success');
+                                this.showToast('Lagret som utkast!', 'success');
                                 
                                 this._clearOpenEditorState(collectionId);
                                 this.loadCollection(collectionId);
@@ -13961,7 +13961,7 @@ class AdminManager {
                     }
 
                     await this.loadCollection(collectionId);
-                    this.showToast('✅ Element slettet!', 'success');
+                    this.showToast('Element slettet!', 'success');
                 } catch (err) {
                     console.error('Delete failed:', err);
                     this.showToast('Kunne ikke slette elementet.', 'error', 5000);
@@ -14814,10 +14814,10 @@ class AdminManager {
 
                 try {
                     await firebaseService.savePageContent('settings_design', resetData);
-                    this.showToast('✅ Tema er tilbakestilt og lagret!', 'success', 5000);
+                    this.showToast('Tema er tilbakestilt og lagret!', 'success', 5000);
                 } catch (err) {
                     console.error('Reset save error:', err);
-                    this.showToast('❌ Feil ved lagring av tilbakestilling', 'error', 5000);
+                    this.showToast('Feil ved lagring av tilbakestilling', 'error', 5000);
                 }
             };
         }
@@ -14918,10 +14918,10 @@ class AdminManager {
                 btn.disabled = true;
                 btn.innerHTML = '<span class="material-symbols-outlined spin">sync</span> Lagrer...';
                 await firebaseService.savePageContent('settings_design', data);
-                this.showToast('✅ Design lagret!', 'success', 3000);
+                this.showToast('Design lagret!', 'success', 3000);
             } catch (err) {
                 console.error('Save error:', err);
-                this.showToast('❌ Kunne ikke lagre', 'error', 5000);
+                this.showToast('Kunne ikke lagre', 'error', 5000);
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<span class="material-symbols-outlined">save</span> Lagre Design';
@@ -17389,7 +17389,7 @@ class AdminManager {
             <div class="wix-product-card" data-id="custom" data-price="0"
                  onclick="window.adminManager?.selectWixProduct?.('custom', 0)"
                  style="display:flex; flex-direction:column; align-items:center; border-radius:10px; padding:10px 8px; cursor:pointer; transition:all 0.18s ease; ${customSelected} text-align:center; gap:6px;">
-                <div style="width:72px; height:72px; border-radius:8px; background:#f1f5f9; display:flex; align-items:center; justify-content:center; font-size:28px;">✏️</div>
+                <div style="width:72px; height:72px; border-radius:8px; background:#f1f5f9; display:flex; align-items:center; justify-content:center; font-size:28px;"><span class="material-symbols-outlined">edit</span></div>
                 <span style="font-size:0.75rem; font-weight:600; color:#334155; line-height:1.2;">Egendefinert</span>
                 <span style="font-size:0.7rem; color:#64748b;">–</span>
             </div>`;
@@ -17399,7 +17399,7 @@ class AdminManager {
             const borderStyle = isSelected ? 'border:2px solid #1B4965; background:#f0f6fb;' : 'border:2px solid #e2e8f0; background:#fff;';
             const imgEl = p.imageUrl
                 ? `<img src="${p.imageUrl}" alt="" style="width:72px; height:72px; object-fit:cover; border-radius:8px; display:block;" loading="lazy">`
-                : `<div style="width:72px; height:72px; border-radius:8px; background:#f1f5f9; display:flex; align-items:center; justify-content:center; font-size:24px;">🛍️</div>`;
+                : `<div style="width:72px; height:72px; border-radius:8px; background:#f1f5f9; display:flex; align-items:center; justify-content:center; font-size:24px;"><span class="material-symbols-outlined">shopping_bag</span></div>`;
             const stockBadge = p.inStock
                 ? ''
                 : `<span style="position:absolute; top:4px; right:4px; background:#ef4444; color:white; font-size:0.6rem; padding:1px 5px; border-radius:4px; font-weight:700;">Utsolgt</span>`;
@@ -21004,7 +21004,7 @@ class AdminManager {
             await firebaseService.savePageContent('collection_causes', { items: causes });
             document.getElementById('cause-form-modal').style.display = 'none';
             await this.loadCauses();
-            this.showToast('✅ Innsamlingsaksjon lagret!', 'success');
+            this.showToast('Innsamlingsaksjon lagret!', 'success');
         } catch (error) {
             console.error('Error saving cause:', error);
             this.showToast('Feil ved lagring av innsamlingsaksjon', 'error', 5000);
@@ -21039,7 +21039,7 @@ class AdminManager {
             causes.splice(index, 1);
             await firebaseService.savePageContent('collection_causes', { items: causes });
             await this.loadCauses();
-            this.showToast('✅ Innsamlingsaksjon slettet!', 'success');
+            this.showToast('Innsamlingsaksjon slettet!', 'success');
         } catch (error) {
             console.error('Error deleting cause:', error);
             this.showToast('Feil ved sletting av innsamlingsaksjon', 'error', 5000);
@@ -21064,7 +21064,7 @@ class AdminManager {
             if (causes[index]) {
                 causes[index].collected = actualSum;
                 await firebaseService.savePageContent('collection_causes', { items: causes });
-                this.showToast('✅ Fremgang synkronisert!', 'success');
+                this.showToast('Fremgang synkronisert!', 'success');
                 await this.loadCauses();
             }
         } catch (error) {
@@ -21863,7 +21863,7 @@ class AdminManager {
             };
 
             await firebaseService.savePageContent('index', indexContent);
-            this.showToast('🚀 Statistikk er nå oppdatert på forsiden!', 'success', 5000);
+            this.showToast('Statistikk er nå oppdatert på forsiden!', 'success', 5000);
         } catch (e) {
             console.error('Feil ved lagring av statistikk:', e);
             this.showToast('Kunne ikke lagre statistikk.', 'error', 5000);
@@ -22229,11 +22229,11 @@ class AdminManager {
                 }
 
                 await firebaseService.savePageContent('settings_profile', data);
-                this.showToast('✅ Profilen er lagret!', 'success', 5000);
+                this.showToast('Profilen er lagret!', 'success', 5000);
                 await this.updateUserInfo(authUser);
             } catch (err) {
                 console.error(err);
-                this.showToast('❌ Feil ved lagring', 'error', 5000);
+                this.showToast('Feil ved lagring', 'error', 5000);
             } finally {
                 btn.innerHTML = original;
                 btn.disabled = false;
@@ -22474,10 +22474,10 @@ class AdminManager {
                     modal.querySelector('#hero-subtitle-es').value = finalTranslations.es.subtitle || '';
                     modal.querySelector('#hero-btn-text-es').value = finalTranslations.es.btnText || '';
                     
-                    this.showToast('✅ Oversettelse fullført!', 'success');
+                    this.showToast('Oversettelse fullført!', 'success');
                 } catch (err) {
                     console.error("Auto translation error:", err);
-                    this.showToast('❌ Kunne ikke oversette automatisk.', 'error');
+                    this.showToast('Kunne ikke oversette automatisk.', 'error');
                 } finally {
                     autoTranslateBtn.disabled = false;
                     autoTranslateBtn.innerHTML = originalText;
@@ -22596,11 +22596,11 @@ class AdminManager {
                     videoInput.value = url;
                     videoInput.dispatchEvent(new Event('input')); 
                     this.showToast('Video lastet opp!', 'success');
-                    uploadVideoStatus.textContent = '✅ Video opplastet';
+                    uploadVideoStatus.textContent = 'Video opplastet';
                 } catch (err) {
                     console.error("Upload error:", err);
                     this.showToast('Kunne ikke laste opp video: ' + (err.message || 'Ukjent feil'), 'error', 6000);
-                    uploadVideoStatus.textContent = '❌ Opplasting feilet';
+                    uploadVideoStatus.textContent = 'Opplasting feilet';
                 } finally {
                     uploadVideoBtn.disabled = false;
                     uploadVideoBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">upload</span> Last opp MP4';
@@ -22679,12 +22679,12 @@ class AdminManager {
 
             try {
                 await firebaseService.savePageContent('hero_slides', { slides: this.heroSlides });
-                this.showToast('✅ Slide lagret!', 'success');
+                this.showToast('Slide lagret!', 'success');
                 modal.remove();
                 this.renderHeroSlides(this.heroSlides);
             } catch (err) {
                 console.error("Save error:", err);
-                this.showToast('❌ Kunne ikke lagre sliden.', 'error');
+                this.showToast('Kunne ikke lagre sliden.', 'error');
                 saveBtn.disabled = false;
                 saveBtn.textContent = 'Lagre slide';
             }
@@ -22739,9 +22739,9 @@ class AdminManager {
         try {
             await firebaseService.savePageContent('hero_slides', { slides: this.heroSlides });
             this.renderHeroSlides(this.heroSlides);
-            this.showToast('✅ Slettet!', 'success');
+            this.showToast('Slettet!', 'success');
         } catch (err) {
-            this.showToast('❌ Feil ved sletting', 'error', 5000);
+            this.showToast('Feil ved sletting', 'error', 5000);
         }
     }
 
@@ -22982,7 +22982,7 @@ class AdminManager {
                     <div style="background:white;border-radius:16px;max-width:780px;margin:20px auto;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
                             <h3 id="course-modal-title" style="font-size:1.4rem;font-weight:700;">Nytt kurs</h3>
-                            <button id="close-course-modal" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:1.5rem;">✕</button>
+                            <button id="close-course-modal" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:1.5rem;">&times;</button>
                         </div>
 
                         <form id="course-form">
@@ -23145,7 +23145,7 @@ class AdminManager {
                 <div style="background:white;border-radius:16px;max-width:500px;margin:80px auto;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
                         <h3 style="font-size:1.25rem;font-weight:700;color:#1B4965;margin:0;">Leksjonstilgang</h3>
-                        <button id="close-lesson-access-modal" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:1.5rem;padding:0;line-height:1;">✕</button>
+                        <button id="close-lesson-access-modal" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:1.5rem;padding:0;line-height:1;">&times;</button>
                     </div>
                     <p style="font-size:14px;color:#64748b;margin-bottom:20px;line-height:1.5;">
                         Velg hvilke leksjoner denne brukeren skal ha tilgang til. Huker du av alle (eller ingen), vil brukeren ha tilgang til hele kurset.
@@ -23364,7 +23364,7 @@ class AdminManager {
 
             await firebaseService.savePageContent('collection_events', { items: list });
 
-            this.showToast('✅ Kalenderarrangement opprettet! Åpner Arrangementer...', 'success', 3000);
+            this.showToast('Kalenderarrangement opprettet! Åpner Arrangementer...', 'success', 3000);
             
             this.clearPublicEventCache();
 
@@ -23546,7 +23546,7 @@ class AdminManager {
                     <span class="lesson-header-index">Leksjon ${index}</span>
                 </div>
                 <button type="button" class="lesson-delete-btn" style="background:#fee2e2;color:#ef4444;border:none;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s;"
-                    onclick="this.closest('div.lesson-row-item').remove(); window.adminManager._updateLessonIndices();">✕</button>
+                    onclick="this.closest('div.lesson-row-item').remove(); window.adminManager._updateLessonIndices();">&times;</button>
             </div>
             <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;">
                 <input type="text" placeholder="Tittel" value="${lessonTitle}"
@@ -23616,7 +23616,7 @@ class AdminManager {
                     </button>
                     <input type="file" class="resource-file-input" style="display:none;">
                 </div>
-                <button type="button" class="resource-remove-btn" style="background:#fee2e2;color:#ef4444;border:none;width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:0.85rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" title="Fjern denne ressursen">✕</button>
+                <button type="button" class="resource-remove-btn" style="background:#fee2e2;color:#ef4444;border:none;width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:0.85rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" title="Fjern denne ressursen">&times;</button>
             `;
             resourcesContainer.appendChild(rRow);
 
@@ -23824,7 +23824,7 @@ class AdminManager {
                         await ref.set({ items, updatedAt: new Date().toISOString() }, { merge: true });
                     }
 
-                    if (status) { status.style.color = '#16a34a'; status.textContent = '✅ Kurs lagret!'; }
+                    if (status) { status.style.color = '#16a34a'; status.textContent = 'Kurs lagret!'; }
                     setTimeout(() => {
                         this._closeCourseModal();
                         this._loadCoursesList();
@@ -23879,7 +23879,7 @@ class AdminManager {
 
                     this._closeCourseModal();
                     await this._loadCoursesList();
-                    this.showToast('✅ Kurs slettet!', 'success');
+                    this.showToast('Kurs slettet!', 'success');
                 } catch (err) {
                     console.error(err);
                     if (status) { status.style.color = '#ef4444'; status.textContent = 'Kunne ikke slette kurs: ' + err.message; }
@@ -24136,9 +24136,9 @@ class AdminManager {
             btn.disabled = true;
             try {
                 await firebaseService.savePageContent('settings_seo', seoData);
-                this.showToast('✅ Globale SEO-innstillinger lagret!', 'success', 5000);
+                this.showToast('Globale SEO-innstillinger lagret!', 'success', 5000);
             } catch (err) {
-                this.showToast('❌ Feil ved lagring', 'error', 5000);
+                this.showToast('Feil ved lagring', 'error', 5000);
             } finally {
                 btn.textContent = 'Lagre Globale Innstillinger';
                 btn.disabled = false;
@@ -24295,7 +24295,7 @@ class AdminManager {
         document.getElementById('save-fb').addEventListener('click', () => {
             const val = document.getElementById('fb-config').value;
             localStorage.setItem('hkm_firebase_config', val);
-            this.showToast('✅ Lagret! Laster på nytt...', 'success', 5000);
+            this.showToast('Lagret! Laster på nytt...', 'success', 5000);
             setTimeout(() => window.location.reload(), 2000);
         });
 
@@ -24330,9 +24330,9 @@ class AdminManager {
                 header: {
                     currentLanguage: 'NO',
                     languages: {
-                        no: '🇳🇴 Norsk',
-                        en: '🇺🇸 English',
-                        es: '🇪🇸 Español'
+                        no: 'Norsk',
+                        en: 'English',
+                        es: 'Español'
                     },
                     donateLabel: 'Gi gave',
                     menuToggleLabel: 'Toggle meny'
@@ -26358,7 +26358,7 @@ class AdminManager {
                             sanitized.translations.es = await this._buildPageContentTranslation(sanitized, 'es', 'no', currentDoc?.translations?.es, currentDoc);
                         } catch (transErr) {
                             console.error('Kunne ikke fullføre automatisk oversettelse:', transErr);
-                            this.showToast('⚠️ Lagret, men oversettelse feilet: ' + transErr.message, 'warning', 8000);
+                            this.showToast('Lagret, men oversettelse feilet: ' + transErr.message, 'warning', 8000);
                         }
                     }
                     await firebaseService.savePageContent(pageId, sanitized, {
@@ -26367,9 +26367,9 @@ class AdminManager {
                         versionSource: 'website-page-editor',
                         versionMinIntervalMs: 0
                     });
-                    this.showToast('✅ Innholdet er lagret!', 'success', 5000);
+                    this.showToast('Innholdet er lagret!', 'success', 5000);
                 } catch (err) {
-                    this.showToast('❌ Feil ved lagring: ' + err.message, 'error', 5000);
+                    this.showToast('Feil ved lagring: ' + err.message, 'error', 5000);
                 }
             }, {
                 loadingText: 'Lagrer...'
@@ -26402,7 +26402,7 @@ class AdminManager {
             onRestore: async () => {
                 firebaseService.invalidatePageContentCache(pageId);
                 await this.loadPageFields(pageId);
-                this.showToast(`✅ "${pageLabel}" er hentet tilbake fra versjonshistorikken.`, 'success', 5500);
+                this.showToast(`"${pageLabel}" er hentet tilbake fra versjonshistorikken.`, 'success', 5500);
             }
         });
     }
@@ -27526,7 +27526,7 @@ class AdminManager {
 </div>`
             },
             course_registration_admin: {
-                subject: "🎓 Ny kurspåmelding: {{name}} ({{courseTitle}})",
+                subject: "Ny kurspåmelding: {{name}} ({{courseTitle}})",
                 body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
   <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
   <header style="padding: 40px 32px 24px 32px; text-align: center; background-color: #FCF9F5;">
@@ -27586,7 +27586,7 @@ class AdminManager {
 </div>`
             },
             course_registration_approved: {
-                subject: "🎉 Din tilgang er godkjent: {{courseTitle}}",
+                subject: "Din tilgang er godkjent: {{courseTitle}}",
                 body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
   <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
   <header style="padding: 40px 32px 24px 32px; text-align: center; background-color: #FCF9F5;">
@@ -27598,7 +27598,7 @@ class AdminManager {
   </header>
   <div style="padding: 0 32px 40px 32px; background-color: #FCF9F5;">
     <section style="margin-bottom: 32px; text-align: center; max-width: 440px; margin-left: auto; margin-right: auto;">
-      <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 32px; line-height: 40px; font-weight: 700; color: #121c2c; margin: 0 0 12px 0; font-style: italic;">Tilgang Godkjent! 🎉</h2>
+      <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 32px; line-height: 40px; font-weight: 700; color: #121c2c; margin: 0 0 12px 0; font-style: italic;">Tilgang Godkjent!</h2>
       <p style="font-family: 'Inter', sans-serif; font-size: 16px; line-height: 26px; font-weight: 400; color: #56423b; margin: 0; font-style: italic; opacity: 0.8;">
         Hei {{name}}! Påmeldingen din er nå godkjent og du har full tilgang.
       </p>
@@ -28495,7 +28495,7 @@ class AdminManager {
             if (rawTextarea) rawTextarea.readOnly = true;
             if (saveBtn) saveBtn.style.display = 'none';
             if (permissionNotice) {
-                permissionNotice.innerHTML = '🔒 <strong>Visningsmodus:</strong> Kun Thomas Knutsen og godkjente redaktører har tilgang til å redigere og lagre e-postmaler.';
+                permissionNotice.innerHTML = '<strong>Visningsmodus:</strong> Kun Thomas Knutsen og godkjente redaktører har tilgang til å redigere og lagre e-postmaler.';
                 permissionNotice.style.display = 'block';
             }
         } else {
@@ -28535,7 +28535,7 @@ class AdminManager {
         }
         
         if (warningEl) {
-            warningEl.textContent = '👁️ Du ser den visuelle forhåndsvisningen. Velg "Rediger HTML-kode" for å gjøre endringer i koden.';
+            warningEl.textContent = 'Du ser den visuelle forhåndsvisningen. Velg "Rediger HTML-kode" for å gjøre endringer i koden.';
             warningEl.style.display = 'block';
         }
 
@@ -29357,11 +29357,11 @@ class AdminManager {
                 status: 'paid',
                 approvedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-            this.showToast('✅ Tilgang godkjent og bekreftelses-e-post sendt!', 'success');
+            this.showToast('Tilgang godkjent og bekreftelses-e-post sendt!', 'success');
             await this._loadEnrollmentsList();
         } catch (err) {
             console.error('Approve enrollment error:', err);
-            this.showToast('❌ Kunne ikke godkjenne tilgang: ' + err.message, 'error');
+            this.showToast('Kunne ikke godkjenne tilgang: ' + err.message, 'error');
         }
     }
 
@@ -29375,11 +29375,11 @@ class AdminManager {
                 status: 'refunded',
                 refundedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-            this.showToast('✅ Status oppdatert til refundert. Tilgang stoppet.', 'success');
+            this.showToast('Status oppdatert til refundert. Tilgang stoppet.', 'success');
             await this._loadEnrollmentsList();
         } catch (err) {
             console.error('Refund enrollment error:', err);
-            this.showToast('❌ Kunne ikke oppdatere status: ' + err.message, 'error');
+            this.showToast('Kunne ikke oppdatere status: ' + err.message, 'error');
         }
     }
 
@@ -29390,11 +29390,11 @@ class AdminManager {
         try {
             const db = window.firebaseService?.db || firebase.firestore();
             await db.collection('courseEnrollments').doc(id).delete();
-            this.showToast('✅ Påmelding slettet.', 'success');
+            this.showToast('Påmelding slettet.', 'success');
             await this._loadEnrollmentsList();
         } catch (err) {
             console.error('Delete enrollment error:', err);
-            this.showToast('❌ Kunne ikke slette påmelding: ' + err.message, 'error');
+            this.showToast('Kunne ikke slette påmelding: ' + err.message, 'error');
         }
     }
 
@@ -29413,7 +29413,7 @@ class AdminManager {
 
         const course = (this.coursesItems || []).find(c => c.id === enrollment.courseId || c.title === enrollment.courseTitle);
         if (!course || !Array.isArray(course.lessons) || course.lessons.length === 0) {
-            this.showToast('❌ Fant ingen leksjoner registrert for dette kurset.', 'error');
+            this.showToast('Fant ingen leksjoner registrert for dette kurset.', 'error');
             return;
         }
 
@@ -29461,12 +29461,12 @@ class AdminManager {
                 await db.collection('courseEnrollments').doc(enrollmentId).update({
                     paidLessons: paidLessons
                 });
-                this.showToast('✅ Leksjonstilgang oppdatert!', 'success');
+                this.showToast('Leksjonstilgang oppdatert!', 'success');
                 closeModal();
                 await this._loadEnrollmentsList();
             } catch (err) {
                 console.error('Save lesson access error:', err);
-                this.showToast('❌ Kunne ikke oppdatere leksjonstilgang: ' + err.message, 'error');
+                this.showToast('Kunne ikke oppdatere leksjonstilgang: ' + err.message, 'error');
             }
         };
     }

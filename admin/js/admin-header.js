@@ -1050,9 +1050,9 @@ const initAdminHeader = () => {
                     <span>NO</span>
                 </button>
                 <div class="lang-dropdown" style="display: none; position: absolute; top: calc(100% + 6px); right: 0; width: 150px; background: var(--card-bg, #ffffff); border: 1px solid rgba(27, 73, 101, 0.08); border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); z-index: 500; overflow: hidden; padding: 4px 0;">
-                    <a href="javascript:void(0)" class="actions-item lang-switch-btn" data-lang="no" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; text-decoration: none; color: #1B4965; font-size: 13.5px; font-weight: 500;">🇳🇴 Norsk</a>
-                    <a href="javascript:void(0)" class="actions-item lang-switch-btn" data-lang="en" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; text-decoration: none; color: #1B4965; font-size: 13.5px; font-weight: 500;">🇺🇸 English</a>
-                    <a href="javascript:void(0)" class="actions-item lang-switch-btn" data-lang="es" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; text-decoration: none; color: #1B4965; font-size: 13.5px; font-weight: 500;">🇪🇸 Español</a>
+                    <a href="javascript:void(0)" class="actions-item lang-switch-btn" data-lang="no" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; text-decoration: none; color: #1B4965; font-size: 13.5px; font-weight: 500;">Norsk</a>
+                    <a href="javascript:void(0)" class="actions-item lang-switch-btn" data-lang="en" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; text-decoration: none; color: #1B4965; font-size: 13.5px; font-weight: 500;">English</a>
+                    <a href="javascript:void(0)" class="actions-item lang-switch-btn" data-lang="es" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; text-decoration: none; color: #1B4965; font-size: 13.5px; font-weight: 500;">Español</a>
                 </div>
             `;
             

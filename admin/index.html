@@ -1213,13 +1213,13 @@
                             <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; flex: 1; min-width: 280px;">
                                 <!-- Search input -->
                                 <div style="position: relative; flex: 1; min-width: 220px;">
-                                    <span class="material-symbols-outlined" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 20px; color: #94a3b8; display: block;">search</span>
-                                    <input type="text" id="email-log-search" placeholder="Søk i e-post (mottaker, emne, type)..." style="width: 100%; padding: 10px 14px 10px 40px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 14px; background: #f8fafc; color: #1e293b; transition: all 0.2s ease;">
+                                    <span class="material-symbols-outlined" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 20px; color: #94a3b8; display: block; pointer-events: none; z-index: 2;">search</span>
+                                    <input type="text" id="email-log-search" placeholder="Søk i e-post (mottaker, emne, type)..." style="width: 100%; padding: 10px 14px 10px 42px !important; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 14px; background: #f8fafc; color: #1e293b; transition: all 0.2s ease;">
                                 </div>
 
                                 <!-- Date preset selector -->
                                 <select id="email-log-date-preset" style="padding: 10px 14px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 14px; background: #f8fafc; color: #1e293b; cursor: pointer; font-weight: 500;">
-                                    <option value="all">📅 Alle datoer</option>
+                                    <option value="all">Alle datoer</option>
                                     <option value="today">I dag</option>
                                     <option value="7days">Siste 7 dager</option>
                                     <option value="30days">Siste 30 dager</option>
@@ -1235,9 +1235,9 @@
 
                                 <!-- Status filter -->
                                 <select id="email-log-status-filter" style="padding: 10px 14px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 14px; background: #f8fafc; color: #1e293b; cursor: pointer; font-weight: 500;">
-                                    <option value="all">⚡ Alle statuser</option>
-                                    <option value="sent">✅ Sendt</option>
-                                    <option value="failed">❌ Feilet</option>
+                                    <option value="all">Alle statuser</option>
+                                    <option value="sent">Sendt</option>
+                                    <option value="failed">Feilet</option>
                                 </select>
 
                                 <!-- Limit fetch selector -->

@@ -383,7 +383,7 @@
 
                         if (!service || !service.isInitialized) {
                             console.error("[HKM] Firebase service not ready", { service: !!service, initialized: service?.isInitialized });
-                            showToast("⚠️ Tjenesten er ikke helt klar. Vennligst prøv igjen om et sekund.", "warning");
+                            showToast('Tjenesten er ikke helt klar. Vennligst prøv igjen om et sekund.', 'warning');
                             btn.textContent = originalText;
                             btn.disabled = false;
                             return;
@@ -412,7 +412,7 @@
                         const adminUtils = window.HKMAdminUtils || {};
                         const service = window.firebaseService;
                         if (!service || !service.isInitialized) {
-                            showToast("⚠️ Tjenesten er ikke klar!", "error");
+                            showToast("Tjenesten er ikke klar!", "error");
                             return;
                         }
 

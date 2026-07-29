@@ -3831,7 +3831,7 @@ div[id^="editorjs-holder-"] {
 }
 
 .image-tool__image::after, .block-image::after {
-    content: '🔄  Klikk for å erstatte';
+    content: 'Klikk for å erstatte';
     position: absolute;
     inset: 0;
     display: flex;
