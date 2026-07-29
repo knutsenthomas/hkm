@@ -9072,12 +9072,7 @@ exports.onCourseEnrollmentCreated = onDocumentCreated({
   const subjectDeltaker = templateDeltaker.subject.replace(/{{name}}/g, name).replace(/{{courseTitle}}/g, courseTitle);
   const htmlDeltaker = templateDeltaker.body
     .replace(/{{name}}/g, name)
-    .replace(/{{email}}/g, email)
-    .replace(/{{phone}}/g, phoneStr)
-    .replace(/{{courseTitle}}/g, courseTitle)
-    .replace(/{{amount}}/g, amountStr)
-    .replace(/{{paymentMethod}}/g, methodStr)
-    .replace(/{{status}}/g, statusStr);
+    .replace(/{{courseTitle}}/g, courseTitle);
 
   try {
     await sendEmail({
@@ -9094,49 +9089,80 @@ exports.onCourseEnrollmentCreated = onDocumentCreated({
   // 2. E-post til Admin (thomas@hiskingdomministry.no og post@hiskingdomministry.no)
   const fallbackAdmin = {
     subject: "🎓 Ny kurspåmelding: {{name}} ({{courseTitle}})",
-    body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; padding: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
-    <div style="width: 44px; height: 44px; border-radius: 12px; background: #fff7ed; color: #d17d39; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold;">🎓</div>
-    <div>
-      <h2 style="margin: 0; font-size: 20px; font-weight: 800; color: #0f172a;">Ny kurspåmelding registrert!</h2>
-      <p style="margin: 2px 0 0; font-size: 13px; color: #64748b;">{{courseTitle}}</p>
+    body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
+  <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
+
+  <header style="padding: 40px 32px 24px 32px; text-align: center; background-color: #FCF9F5;">
+    <div style="margin-bottom: 16px;">
+      <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 48px; width: auto; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
     </div>
-  </div>
-  
-  <div style="background: #f8fafc; border-radius: 12px; padding: 20px; border: 1px solid #f1f5f9; margin-bottom: 24px;">
-    <table style="width: 100%; border-collapse: collapse; font-size: 14px; color: #334155;">
-      <tr>
-        <td style="padding: 6px 0; font-weight: 700; color: #64748b; width: 130px;">Deltaker:</td>
-        <td style="padding: 6px 0; font-weight: 700; color: #0f172a;">{{name}}</td>
-      </tr>
-      <tr>
-        <td style="padding: 6px 0; font-weight: 700; color: #64748b;">E-post:</td>
-        <td style="padding: 6px 0;"><a href="mailto:{{email}}" style="color: #d17d39; text-decoration: underline;">{{email}}</a></td>
-      </tr>
-      <tr>
-        <td style="padding: 6px 0; font-weight: 700; color: #64748b;">Telefon:</td>
-        <td style="padding: 6px 0;">{{phone}}</td>
-      </tr>
-      <tr>
-        <td style="padding: 6px 0; font-weight: 700; color: #64748b;">Kurs:</td>
-        <td style="padding: 6px 0; font-weight: 700;">{{courseTitle}}</td>
-      </tr>
-      <tr>
-        <td style="padding: 6px 0; font-weight: 700; color: #64748b;">Beløp / Metode:</td>
-        <td style="padding: 6px 0;">{{amount}} ({{paymentMethod}})</td>
-      </tr>
-      <tr>
-        <td style="padding: 6px 0; font-weight: 700; color: #64748b;">Status:</td>
-        <td style="padding: 6px 0;"><span style="background: #ffedd5; color: #c2410c; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px;">{{status}}</span></td>
-      </tr>
-    </table>
+    <h1 style="margin: 0; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: rgba(18, 28, 44, 0.6); text-transform: uppercase; letter-spacing: 0.25em; line-height: 1.5;">His Kingdom Ministry Admin</h1>
+    <div style="width: 32px; height: 1px; background-color: rgba(137, 114, 105, 0.4); margin: 20px auto 0 auto;"></div>
+  </header>
+
+  <div style="padding: 0 32px 40px 32px; background-color: #FCF9F5;">
+    <section style="margin-bottom: 32px; text-align: center; max-width: 440px; margin-left: auto; margin-right: auto;">
+      <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 28px; line-height: 36px; font-weight: 700; color: #121c2c; margin: 0 0 12px 0; font-style: italic;">Ny kurspåmelding registrert!</h2>
+      <p style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 24px; font-weight: 400; color: #56423b; margin: 0; opacity: 0.85;">
+        {{name}} har registrert seg til kurset <strong>{{courseTitle}}</strong>.
+      </p>
+    </section>
+
+    <section style="margin-bottom: 40px; background-color: #ffffff; border-left: 4px solid #d17d39; border-radius: 0 12px 12px 0; padding: 24px; box-shadow: 0 2px 8px rgba(209, 125, 57, 0.05); border-top: 1px solid rgba(221, 193, 182, 0.2); border-right: 1px solid rgba(221, 193, 182, 0.2); border-bottom: 1px solid rgba(221, 193, 182, 0.2);">
+      <div style="display: inline-block; padding: 2px 8px; background-color: rgba(209, 125, 57, 0.1); color: #d17d39; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; border-radius: 4px; margin-bottom: 16px;">
+        DETALJER OM PÅMELDINGEN
+      </div>
+      <table style="width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; font-size: 14px; color: #121c2c;">
+        <tr>
+          <td style="padding: 8px 0; font-weight: 700; color: #64748b; width: 140px; border-bottom: 1px solid #f1f5f9;">Deltaker:</td>
+          <td style="padding: 8px 0; font-weight: 700; color: #0f172a; border-bottom: 1px solid #f1f5f9;">{{name}}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-weight: 700; color: #64748b; border-bottom: 1px solid #f1f5f9;">E-post:</td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #f1f5f9;"><a href="mailto:{{email}}" style="color: #d17d39; text-decoration: underline;">{{email}}</a></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-weight: 700; color: #64748b; border-bottom: 1px solid #f1f5f9;">Telefon:</td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #f1f5f9;">{{phone}}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-weight: 700; color: #64748b; border-bottom: 1px solid #f1f5f9;">Kurs:</td>
+          <td style="padding: 8px 0; font-weight: 700; border-bottom: 1px solid #f1f5f9;">{{courseTitle}}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-weight: 700; color: #64748b; border-bottom: 1px solid #f1f5f9;">Beløp / Metode:</td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #f1f5f9;">{{amount}} ({{paymentMethod}})</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-weight: 700; color: #64748b;">Status:</td>
+          <td style="padding: 8px 0;"><span style="background: #ffedd5; color: #c2410c; padding: 3px 10px; border-radius: 6px; font-weight: 700; font-size: 12px; display: inline-block;">{{status}}</span></td>
+        </tr>
+      </table>
+    </section>
+
+    <div style="text-align: center; margin-bottom: 48px;">
+      <a href="https://www.hiskingdomministry.no/admin/index.html#courses" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 14px 44px; border-radius: 24px 8px 24px 8px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.2em; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.25);">
+        Behandle påmelding i Admin
+      </a>
+    </div>
+
+    <section style="border-top: 1px solid rgba(221, 193, 182, 0.1); padding-top: 32px; margin-bottom: 16px; text-align: left;">
+      <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse; display: inline-table; vertical-align: middle;">
+        <tr>
+          <td style="vertical-align: middle; padding-right: 12px;">
+            <div style="width: 32px; height: 1px; background-color: rgba(27, 73, 101, 0.3); font-size: 1px; line-height: 1px; overflow: hidden;"></div>
+          </td>
+          <td style="vertical-align: middle; line-height: 1;">
+            <span style="font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: #1B4965; text-transform: uppercase; letter-spacing: 0.3em; margin: 0; display: inline-block; line-height: 1; vertical-align: middle;">HIS KINGDOM MINISTRY</span>
+          </td>
+        </tr>
+      </table>
+    </section>
   </div>
 
-  <div style="text-align: center;">
-    <a href="https://www.hiskingdomministry.no/admin/index.html#courses" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 14px 28px; border-radius: 12px; font-weight: 700; text-decoration: none; display: inline-block; font-size: 14px; box-shadow: 0 4px 14px rgba(209,125,57,0.3);">
-      Behandle påmelding i Admin
-    </a>
-  </div>
+  <footer style="padding: 24px 32px; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
+    <p style="font-family: 'Inter', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(18, 28, 44, 0.4); margin: 0;">© 2026 His Kingdom Ministry Admin Notification</p>
+  </footer>
 </div>`
   };
 
@@ -9171,7 +9197,7 @@ exports.onCourseEnrollmentCreated = onDocumentCreated({
 /**
  * Trigger som sender e-post når en kurspåmelding oppdateres (f.eks. godkjennes av admin).
  */
-exports.onCourseEnrollmentStatusUpdated = onDocumentUpdated({
+exports.onCourseEnrollmentUpdatedTrigger = onDocumentUpdated({
   document: "courseEnrollments/{id}",
   secrets: [emailUserParam, emailPassParam],
 }, async (event) => {
@@ -9190,21 +9216,66 @@ exports.onCourseEnrollmentStatusUpdated = onDocumentUpdated({
 
     const fallbackApproved = {
       subject: "🎉 Din tilgang er godkjent: {{courseTitle}}",
-      body: `<div style="font-family: 'Inter', system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; padding: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-  <div style="text-align: center; margin-bottom: 24px;">
-    <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 48px; width: auto;" alt="His Kingdom Ministry Logo">
-  </div>
-  <h2 style="margin: 0 0 12px 0; font-size: 22px; font-weight: 800; color: #0f172a; text-align: center;">Din tilgang er godkjent! 🎉</h2>
-  <p style="font-size: 15px; color: #475569; line-height: 1.6; text-align: center; margin-bottom: 24px;">
-    Hei {{name}}! Påmeldingen din til <strong>{{courseTitle}}</strong> er nå godkjent og du har full tilgang.
-  </p>
+      body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
+  <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
 
-  <div style="text-align: center; margin-bottom: 32px;">
-    <a href="https://www.hiskingdomministry.no/minside/index.html" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 14px 32px; border-radius: 12px; font-weight: 700; text-decoration: none; display: inline-block; font-size: 14px; box-shadow: 0 4px 14px rgba(209,125,57,0.3);">
-      Gå til Min Side og start kurset
-    </a>
+  <header style="padding: 40px 32px 24px 32px; text-align: center; background-color: #FCF9F5;">
+    <div style="margin-bottom: 16px;">
+      <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 48px; width: auto; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
+    </div>
+    <h1 style="margin: 0; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: rgba(18, 28, 44, 0.6); text-transform: uppercase; letter-spacing: 0.25em; line-height: 1.5;">His Kingdom Ministry</h1>
+    <div style="width: 32px; height: 1px; background-color: rgba(137, 114, 105, 0.4); margin: 20px auto 0 auto;"></div>
+  </header>
+
+  <div style="padding: 0 32px 40px 32px; background-color: #FCF9F5;">
+    <section style="margin-bottom: 32px; text-align: center; max-width: 440px; margin-left: auto; margin-right: auto;">
+      <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 32px; line-height: 40px; font-weight: 700; color: #121c2c; margin: 0 0 12px 0; font-style: italic;">Tilgang Godkjent! 🎉</h2>
+      <p style="font-family: 'Inter', sans-serif; font-size: 16px; line-height: 26px; font-weight: 400; color: #56423b; margin: 0; font-style: italic; opacity: 0.8;">
+        Hei {{name}}! Påmeldingen din er nå godkjent og du har full tilgang.
+      </p>
+    </section>
+
+    <section style="margin-bottom: 40px; background-color: #ffffff; border-left: 4px solid #1B4965; border-radius: 0 12px 12px 0; padding: 20px 24px; box-shadow: 0 2px 8px rgba(27, 73, 101, 0.02); border-top: 1px solid rgba(27, 73, 101, 0.05); border-right: 1px solid rgba(27, 73, 101, 0.05); border-bottom: 1px solid rgba(27, 73, 101, 0.05);">
+      <div style="display: inline-block; padding: 2px 6px; background-color: rgba(27, 73, 101, 0.08); color: #1B4965; font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; border-radius: 4px; margin-bottom: 12px;">
+        KURS
+      </div>
+      <h3 style="font-family: 'Merriweather', Georgia, serif; font-size: 20px; line-height: 28px; font-weight: 600; color: #121c2c; margin: 0 0 12px 0;">
+        {{courseTitle}}
+      </h3>
+      <p style="margin: 0; color: rgba(18, 28, 44, 0.9); font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6;">
+        Du kan nå logge inn på Min Side og gå i gang med kurset når det passer deg!
+      </p>
+    </section>
+
+    <div style="text-align: center; margin-bottom: 48px;">
+      <a href="https://www.hiskingdomministry.no/minside" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 14px 44px; border-radius: 24px 8px 24px 8px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.2em; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.25);">
+        Gå til Min Side og start kurset
+      </a>
+    </div>
+
+    <section style="border-top: 1px solid rgba(221, 193, 182, 0.1); padding-top: 40px; margin-bottom: 16px; text-align: left;">
+      <p style="font-family: 'Inter', sans-serif; font-size: 15px; color: #56423b; font-style: italic; margin: 0 0 20px 0;">Vennlig hilsen,</p>
+      <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse; display: inline-table; vertical-align: middle;">
+        <tr>
+          <td style="vertical-align: middle; padding-right: 12px;">
+            <div style="width: 32px; height: 1px; background-color: rgba(27, 73, 101, 0.3); font-size: 1px; line-height: 1px; overflow: hidden;"></div>
+          </td>
+          <td style="vertical-align: middle; line-height: 1;">
+            <span style="font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: #1B4965; text-transform: uppercase; letter-spacing: 0.3em; margin: 0; display: inline-block; line-height: 1; vertical-align: middle;">HIS KINGDOM MINISTRY</span>
+          </td>
+        </tr>
+      </table>
+    </section>
   </div>
-  <p style="font-size: 13px; color: #94a3b8; text-align: center; margin: 0;">His Kingdom Ministry</p>
+
+  <footer style="padding: 32px 32px 40px 32px; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
+    <div style="margin-bottom: 24px;">
+      <a href="https://www.hiskingdomministry.no/" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Hjem</a>
+      <a href="https://www.hiskingdomministry.no/minside" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Min Side</a>
+      <a href="mailto:kontakt@hiskingdomministry.no" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Kontakt</a>
+    </div>
+    <p style="font-family: 'Inter', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(18, 28, 44, 0.4); margin: 0 0 12px 0;">© 2026 His Kingdom Ministry</p>
+  </footer>
 </div>`
     };
 

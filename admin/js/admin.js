@@ -27449,7 +27449,9 @@ class AdminManager {
             // Standardmaler som alltid bør finnes
             const defaultTemplates = [
                 { id: 'welcome_email', name: 'Velkomst-e-post', description: 'Sendes når en ny bruker registrerer seg.' },
-                { id: 'course_registration', name: 'Kurs-registrering', description: 'Sendes når en person melder seg på et kurs.' },
+                { id: 'course_registration', name: 'Kurspåmelding (Deltaker)', description: 'Sendes til deltaker ved registrering til et kurs.' },
+                { id: 'course_registration_admin', name: 'Kurspåmelding (Admin-varsel)', description: 'Sendes til admin (thomas@ & post@) ved ny kurspåmelding.' },
+                { id: 'course_registration_approved', name: 'Kurstilgang Godkjent (Deltaker)', description: 'Sendes til deltaker når kurstilgangen godkjennes.' },
                 { id: 'newsletter_confirmation', name: 'Nyhetsbrev-bekreftelse', description: 'Sendes ved påmelding til nyhetsbrev.' },
                 { id: 'daily_bible_reading', name: 'Dagens bibellesing', description: 'Sendes som daglig e-postvarsel for leseplaner.' }
             ];
