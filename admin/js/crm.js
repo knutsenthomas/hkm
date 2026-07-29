@@ -225,6 +225,12 @@ class CRMManager {
             this.applyCurrentFiltersAndSearch();
             this.updateViewSelector();
             this.updateStats();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('action') === 'add-contact' || sessionStorage.getItem('pendingFabAction') === 'add-contact-btn') {
+                sessionStorage.removeItem('pendingFabAction');
+                this.openCreateContactModal();
+            }
         } catch (error) {
             console.error("Error loading contacts:", error);
             tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:red;">Feil ved lasting av kontakter.</td></tr>`;

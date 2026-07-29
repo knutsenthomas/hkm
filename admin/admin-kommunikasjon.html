@@ -389,6 +389,10 @@
 
                         </div>
                         <div class="header-right-actions" id="contacts-tools">
+                            <button class="btn btn-primary" id="add-contact-btn" type="button" onclick="if(window.crmSystem) window.crmSystem.openCreateContactModal();" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">person_add</span>
+                                Ny kontakt
+                            </button>
                             <div class="search-box">
                                 <span class="material-symbols-outlined">search</span>
                                 <input type="text" id="contact-search" placeholder="Søk...">
@@ -556,6 +560,10 @@
     <!-- FAB Menu -->
     <div class="fab-menu-container">
         <div class="fab-menu" id="fab-menu">
+            <button class="fab-item" id="add-contact-fab-item" onclick="if(window.crmSystem){ window.crmSystem.openCreateContactModal(); } else { window.location.href='admin-kommunikasjon.html?action=add-contact'; }">
+                <span class="fab-label">Ny kontakt</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">person_add</span></div>
+            </button>
             <button class="fab-item" onclick="triggerFabAction('blog', 'add-new-blog')">
                 <span class="fab-label">Ny blogg</span>
                 <div class="fab-icon"><span class="material-symbols-outlined">edit_document</span></div>
