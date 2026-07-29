@@ -70,14 +70,15 @@
             overflow-x: hidden !important;
             width: 100% !important;
             max-width: 100% !important;
+            box-sizing: border-box !important;
         }
 
         @media (min-width: 1025px) {
             body.admin-analytics-page .main-content {
-                flex: none !important;
-                width: calc(100% - var(--sidebar-width, 260px)) !important;
-                max-width: calc(100% - var(--sidebar-width, 260px)) !important;
-                margin-left: var(--sidebar-width, 260px) !important;
+                flex: 1 1 0% !important;
+                width: calc(100% - 260px) !important;
+                max-width: calc(100% - 260px) !important;
+                margin-left: 260px !important;
                 box-sizing: border-box !important;
                 min-width: 0 !important;
                 overflow-x: hidden !important;
@@ -97,15 +98,15 @@
 
         .analytics-container {
             width: 100% !important;
-            max-width: none !important;
+            max-width: 100% !important;
             margin: 0 !important;
-            padding: 24px 40px 28px !important;
+            padding: 24px 24px 28px !important;
             box-sizing: border-box !important;
         }
 
         @media (max-width: 768px) {
             .analytics-container {
-                padding: 16px 16px 28px !important;
+                padding: 16px 12px 28px !important;
                 overflow-x: hidden !important;
             }
             .chart-card-premium {
@@ -117,6 +118,14 @@
             .stats-grid-premium, .analytics-main-grid {
                 gap: 16px !important;
             }
+        }
+
+        /* Prevent long page paths from causing horizontal overflow */
+        .top-page-info, .page-info, .top-page-path, .page-url {
+            white-space: nowrap !important;
+            text-overflow: ellipsis !important;
+            overflow: hidden !important;
+            min-width: 0 !important;
         }
 
         body.admin-analytics-page .content-wrapper {
