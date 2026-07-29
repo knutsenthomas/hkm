@@ -9475,138 +9475,110 @@ class MinSideManager {
         if (currentFilter === 'completed') filteredTasks = completedTasks;
 
         const html = `
-            <div class="hkm-tasks-container">
-                <div class="hkm-tasks-layout">
-                    <!-- Left Sidebar / Control Panel -->
-                    <div class="hkm-tasks-sidebar">
-                        <!-- Stats & Progress Card -->
-                        <div class="bento-card" style="padding: 24px; background: var(--bg-card, #ffffff); border-radius: 20px; border: 1px solid var(--border-color, rgba(0,0,0,0.06)); box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
-                            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
-                                <div style="width: 48px; height: 48px; border-radius: 16px; background: rgba(209, 125, 57, 0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                    <span class="material-symbols-outlined" style="color: #d17d39; font-size: 26px;">task_alt</span>
-                                </div>
-                                <div style="display: flex; flex-direction: column; gap: 4px;">
-                                    <h2 style="margin: 0; font-size: 20px; font-weight: 700; color: var(--text-main); line-height: 1.2;">Huskeliste</h2>
-                                    <p style="margin: 0; font-size: 13px; color: var(--text-muted, #64748b); line-height: 1.4;">Dine gjøremål og sjekklistepunkter</p>
-                                </div>
+            <div class="hkm-tasks-container" style="width: 100%; max-width: 100%; box-sizing: border-box; padding-bottom: 40px;">
+                <!-- Main Bento Section Card -->
+                <div class="bento-card" style="padding: 32px; background: var(--bg-card, #ffffff); border-radius: 20px; border: 1px solid var(--border-color, rgba(0,0,0,0.06)); box-shadow: 0 4px 24px rgba(0,0,0,0.04);">
+                    
+                    <!-- Section Header -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+                        <div style="display: flex; align-items: center; gap: 14px;">
+                            <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(209, 125, 57, 0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <span class="material-symbols-outlined" style="color: #d17d39; font-size: 24px;">task_alt</span>
                             </div>
-
-                            <div style="margin-bottom: 24px;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 8px;">
-                                    <span>Framgang</span>
-                                    <span>${completedCount} av ${totalCount} fullført (${progressPct}%)</span>
-                                </div>
-                                <div style="width: 100%; height: 10px; background: rgba(209, 125, 57, 0.12); border-radius: 99px; overflow: hidden;">
-                                    <div style="width: ${progressPct}%; height: 100%; background: linear-gradient(90deg, #d17d39 0%, #bd4f2a 100%); transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 99px;"></div>
-                                </div>
+                            <div>
+                                <h2 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--text-main); line-height: 1.2;">Huskeliste</h2>
+                                <p style="margin: 2px 0 0 0; font-size: 13px; color: var(--text-muted, #64748b);">Administrer og utfør dine gjøremål</p>
                             </div>
-
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding-top: 16px; border-top: 1px solid var(--border-color, rgba(0,0,0,0.06));">
-                                <div style="background: var(--bg-main, #f8fafc); padding: 16px; border-radius: 14px; text-align: center; border: 1px solid var(--border-color, rgba(0,0,0,0.04));">
-                                    <span style="display: block; font-size: 22px; font-weight: 700; color: #d17d39; line-height: 1.2;">${activeTasks.length}</span>
-                                    <span style="font-size: 12px; font-weight: 600; color: var(--text-muted, #64748b); text-transform: uppercase; letter-spacing: 0.04em;">Aktive</span>
-                                </div>
-                                <div style="background: var(--bg-main, #f8fafc); padding: 16px; border-radius: 14px; text-align: center; border: 1px solid var(--border-color, rgba(0,0,0,0.04));">
-                                    <span style="display: block; font-size: 22px; font-weight: 700; color: #10b981; line-height: 1.2;">${completedCount}</span>
-                                    <span style="font-size: 12px; font-weight: 600; color: var(--text-muted, #64748b); text-transform: uppercase; letter-spacing: 0.04em;">Fullførte</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Add Task Form Card -->
-                        <div class="bento-card" style="padding: 24px; background: var(--bg-card, #ffffff); border-radius: 20px; border: 1px solid var(--border-color, rgba(0,0,0,0.06)); box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
-                            <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
-                                <span class="material-symbols-outlined" style="font-size: 22px; color: #d17d39;">add_circle</span>
-                                Ny oppgave
-                            </h3>
-                            <form id="hkm-add-task-form" style="display: flex; flex-direction: column; gap: 16px;">
-                                <div style="display: flex; flex-direction: column; gap: 6px;">
-                                    <label style="font-size: 12px; font-weight: 700; color: var(--text-muted, #64748b); text-transform: uppercase; letter-spacing: 0.04em;">Beskrivelse</label>
-                                    <input type="text" id="task-input-title" placeholder="Hva må gjøres?..." required
-                                        style="width: 100%; padding: 12px 16px; border-radius: 12px; border: 1.5px solid var(--border-color, #e2e8f0); background: var(--bg-main, #f8fafc); font-size: 14px; color: var(--text-main); outline: none; box-sizing: border-box; transition: border-color 0.2s;">
-                                </div>
-                                <div style="display: flex; flex-direction: column; gap: 6px;">
-                                    <label style="font-size: 12px; font-weight: 700; color: var(--text-muted, #64748b); text-transform: uppercase; letter-spacing: 0.04em;">Prioritet</label>
-                                    <select id="task-input-priority" style="width: 100%; padding: 12px 16px; border-radius: 12px; border: 1.5px solid var(--border-color, #e2e8f0); background: var(--bg-main, #f8fafc); font-size: 14px; color: var(--text-main); cursor: pointer; outline: none; box-sizing: border-box;">
-                                        <option value="medium">Medium prioritet</option>
-                                        <option value="high">Høy prioritet</option>
-                                        <option value="low">Lav prioritet</option>
-                                    </select>
-                                </div>
-                                <button type="submit" class="btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 24px; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer; border: none; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; margin-top: 8px; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.3);">
-                                    <span class="material-symbols-outlined" style="font-size: 20px;">add_task</span>
-                                    Legg til i huskelisten
-                                </button>
-                            </form>
                         </div>
                     </div>
 
-                    <!-- Right Main Content Panel -->
-                    <div class="hkm-tasks-main">
-                        <!-- Top Filter Bar Card -->
-                        <div class="bento-card" style="padding: 16px 24px; background: var(--bg-card, #ffffff); border-radius: 20px; border: 1px solid var(--border-color, rgba(0,0,0,0.06)); box-shadow: 0 4px 20px rgba(0,0,0,0.04); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-                            <div class="hkm-tasks-filters" style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                <button class="task-filter-btn ${currentFilter === 'all' ? 'active' : ''}" data-filter="all"
-                                    style="padding: 8px 20px; border-radius: 24px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; background: ${currentFilter === 'all' ? '#d17d39' : 'rgba(0,0,0,0.05)'}; color: ${currentFilter === 'all' ? '#fff' : 'var(--text-main)'}; transition: all 0.2s;">
-                                    Alle oppgaver (${totalCount})
-                                </button>
-                                <button class="task-filter-btn ${currentFilter === 'active' ? 'active' : ''}" data-filter="active"
-                                    style="padding: 8px 20px; border-radius: 24px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; background: ${currentFilter === 'active' ? '#d17d39' : 'rgba(0,0,0,0.05)'}; color: ${currentFilter === 'active' ? '#fff' : 'var(--text-main)'}; transition: all 0.2s;">
-                                    Aktive (${activeTasks.length})
-                                </button>
-                                <button class="task-filter-btn ${currentFilter === 'completed' ? 'active' : ''}" data-filter="completed"
-                                    style="padding: 8px 20px; border-radius: 24px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; background: ${currentFilter === 'completed' ? '#d17d39' : 'rgba(0,0,0,0.05)'}; color: ${currentFilter === 'completed' ? '#fff' : 'var(--text-main)'}; transition: all 0.2s;">
-                                    Fullførte (${completedTasks.length})
-                                </button>
+                    <!-- Warm Accent Banner (Se alle påmeldinger / Stats Style) -->
+                    <div style="background: rgba(209, 125, 57, 0.06); border: 1px solid rgba(209, 125, 57, 0.15); border-radius: 14px; padding: 16px 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span style="font-size: 14px; font-weight: 600; color: var(--text-main);">
+                                Framgang: <strong style="color: #d17d39;">${completedCount} av ${totalCount} fullført (${progressPct}%)</strong>
+                            </span>
+                        </div>
+                        <div class="hkm-tasks-filters" style="display: flex; gap: 8px;">
+                            <button class="task-filter-btn ${currentFilter === 'all' ? 'active' : ''}" data-filter="all"
+                                style="padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; background: ${currentFilter === 'all' ? '#d17d39' : 'rgba(0,0,0,0.06)'}; color: ${currentFilter === 'all' ? '#fff' : 'var(--text-main)'}; transition: all 0.2s;">
+                                Alle (${totalCount})
+                            </button>
+                            <button class="task-filter-btn ${currentFilter === 'active' ? 'active' : ''}" data-filter="active"
+                                style="padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; background: ${currentFilter === 'active' ? '#d17d39' : 'rgba(0,0,0,0.06)'}; color: ${currentFilter === 'active' ? '#fff' : 'var(--text-main)'}; transition: all 0.2s;">
+                                Aktive (${activeTasks.length})
+                            </button>
+                            <button class="task-filter-btn ${currentFilter === 'completed' ? 'active' : ''}" data-filter="completed"
+                                style="padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; background: ${currentFilter === 'completed' ? '#d17d39' : 'rgba(0,0,0,0.06)'}; color: ${currentFilter === 'completed' ? '#fff' : 'var(--text-main)'}; transition: all 0.2s;">
+                                Fullførte (${completedTasks.length})
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Add Form Row -->
+                    <form id="hkm-add-task-form" style="background: var(--bg-main, #f8fafc); border: 1px solid var(--border-color, rgba(0,0,0,0.06)); border-radius: 14px; padding: 14px 20px; margin-bottom: 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 240px;">
+                            <input type="text" id="task-input-title" placeholder="Legg til ny oppgave i huskelisten..." required
+                                style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--border-color, #e2e8f0); background: var(--bg-card, #ffffff); font-size: 14px; color: var(--text-main); outline: none; box-sizing: border-box;">
+                        </div>
+                        <select id="task-input-priority" style="padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--border-color, #e2e8f0); background: var(--bg-card, #ffffff); font-size: 13px; color: var(--text-main); cursor: pointer; outline: none;">
+                            <option value="medium">Medium prio</option>
+                            <option value="high">Høy prio</option>
+                            <option value="low">Lav prio</option>
+                        </select>
+                        <button type="submit" class="btn-primary" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 13px; cursor: pointer; border: none; background: #d17d39; color: #ffffff; transition: transform 0.15s;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+                            Legg til
+                        </button>
+                    </form>
+
+                    <!-- Task Rows List (Exact match to screenshot row style) -->
+                    <div class="hkm-tasks-list" style="display: flex; flex-direction: column; gap: 12px;">
+                        ${filteredTasks.length === 0 ? `
+                            <div style="padding: 48px 24px; text-align: center; background: var(--bg-main, #f8fafc); border-radius: 14px; border: 1px dashed var(--border-color, #e2e8f0);">
+                                <span class="material-symbols-outlined" style="font-size: 44px; color: #94a3b8; margin-bottom: 10px;">check_circle_outline</span>
+                                <h3 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 700; color: var(--text-main);">Ingen oppgaver i listen</h3>
+                                <p style="margin: 0; font-size: 13px; color: var(--text-muted, #64748b);">Legg til en ny oppgave ovenfor for å holde oversikten!</p>
                             </div>
-                        </div>
+                        ` : filteredTasks.map(task => {
+                            const prioColors = {
+                                high: { bg: 'rgba(239, 68, 68, 0.1)', text: '#dc2626', label: 'Høy prio' },
+                                medium: { bg: 'rgba(245, 158, 11, 0.1)', text: '#d97706', label: 'Medium prio' },
+                                low: { bg: 'rgba(100, 116, 139, 0.1)', text: '#64748b', label: 'Lav prio' }
+                            };
+                            const prio = prioColors[task.priority] || prioColors.medium;
+                            const timeStr = task.createdAt?.toDate ? this._timeAgo(task.createdAt.toDate()) : '';
 
-                        <!-- Widescreen Task Grid -->
-                        <div class="hkm-tasks-grid">
-                            ${filteredTasks.length === 0 ? `
-                                <div class="bento-card" style="grid-column: 1 / -1; padding: 64px 24px; text-align: center; background: var(--bg-card, #ffffff); border-radius: 20px; border: 1px dashed var(--border-color, #e2e8f0);">
-                                    <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(209, 125, 57, 0.08); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-                                        <span class="material-symbols-outlined" style="font-size: 36px; color: #d17d39;">task_alt</span>
-                                    </div>
-                                    <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 700; color: var(--text-main);">Ingen oppgaver funnet</h3>
-                                    <p style="margin: 0; font-size: 14px; color: var(--text-muted, #64748b);">Legg til en ny oppgave i skjemaet til venstre for å komme i gang!</p>
-                                </div>
-                            ` : filteredTasks.map(task => {
-                                const prioColors = {
-                                    high: { bg: 'rgba(239, 68, 68, 0.1)', text: '#dc2626', label: 'Høy prio' },
-                                    medium: { bg: 'rgba(245, 158, 11, 0.1)', text: '#d97706', label: 'Medium prio' },
-                                    low: { bg: 'rgba(100, 116, 139, 0.1)', text: '#64748b', label: 'Lav prio' }
-                                };
-                                const prio = prioColors[task.priority] || prioColors.medium;
-                                const timeStr = task.createdAt?.toDate ? this._timeAgo(task.createdAt.toDate()) : '';
+                            return `
+                                <div class="hkm-task-row ${task.completed ? 'completed' : ''}" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.06)); border-radius: 16px; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(0,0,0,0.02); ${task.completed ? 'opacity: 0.65;' : ''}">
+                                    <div style="display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0;">
+                                        <label class="hkm-custom-cb" style="display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: ${task.completed ? 'rgba(34, 197, 94, 0.12)' : 'rgba(209, 125, 57, 0.1)'}; color: ${task.completed ? '#16a34a' : '#d17d39'}; flex-shrink: 0; cursor: pointer; transition: all 0.2s;">
+                                            <input type="checkbox" class="toggle-task-cb" data-id="${task.id}" ${task.completed ? 'checked' : ''} style="width: 20px; height: 20px; cursor: pointer; accent-color: #d17d39;">
+                                        </label>
 
-                                return `
-                                    <div class="hkm-task-card ${task.completed ? 'completed' : ''}" data-task-id="${task.id}">
-                                        <div style="display: flex; align-items: flex-start; gap: 12px;">
-                                            <label class="hkm-custom-cb" style="display: flex; align-items: center; cursor: pointer; flex-shrink: 0; margin-top: 2px;">
-                                                <input type="checkbox" class="toggle-task-cb" data-id="${task.id}" ${task.completed ? 'checked' : ''} style="width: 22px; height: 22px; cursor: pointer; accent-color: #d17d39;">
-                                            </label>
-                                            <div style="flex: 1; min-width: 0;">
-                                                <span class="task-title" style="display: block; font-size: 15px; font-weight: 600; color: var(--text-main); line-height: 1.5; ${task.completed ? 'text-decoration: line-through; color: var(--text-muted);' : ''} word-break: break-word;">
-                                                    ${this._escapeHtml(task.title || '')}
-                                                </span>
-                                                ${timeStr ? `<span style="display: block; font-size: 12px; color: var(--text-muted, #94a3b8); margin-top: 6px;">Opprettet ${timeStr}</span>` : ''}
-                                            </div>
-                                        </div>
-
-                                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; border-top: 1px solid var(--border-color, rgba(0,0,0,0.05)); padding-top: 12px; margin-top: 8px;">
-                                            <span style="padding: 4px 12px; border-radius: 24px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; background: ${prio.bg}; color: ${prio.text};">
-                                                ${prio.label}
+                                        <div style="flex: 1; min-width: 0;">
+                                            <span class="task-title" style="display: block; font-size: 15px; font-weight: 700; color: var(--text-main); line-height: 1.4; ${task.completed ? 'text-decoration: line-through; color: var(--text-muted);' : ''} word-break: break-word;">
+                                                ${this._escapeHtml(task.title || '')}
                                             </span>
-                                            <button class="delete-task-btn" data-id="${task.id}" title="Slett oppgave"
-                                                style="background: transparent; border: none; padding: 6px; cursor: pointer; color: #94a3b8; border-radius: 10px; display: flex; align-items: center; justify-content: center; transition: all 0.15s;">
-                                                <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
-                                            </button>
+                                            <span style="display: block; font-size: 13px; color: var(--text-muted, #64748b); margin-top: 2px;">
+                                                <span style="color: #d17d39; font-weight: 500;">Opprettet ${timeStr || 'nylig'}</span>
+                                                ${task.priority ? ` • Prioritet: <strong>${prio.label}</strong>` : ''}
+                                            </span>
                                         </div>
                                     </div>
-                                `;
-                            }).join('')}
-                        </div>
+
+                                    <div style="display: flex; align-items: center; gap: 14px; flex-shrink: 0;">
+                                        <span style="padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; background: ${task.completed ? 'rgba(34, 197, 94, 0.15)' : 'rgba(209, 125, 57, 0.15)'}; color: ${task.completed ? '#16a34a' : '#d17d39'}; display: inline-flex; align-items: center; gap: 6px;">
+                                            <span style="width: 6px; height: 6px; border-radius: 50%; background: ${task.completed ? '#22c55e' : '#d17d39'}; display: inline-block;"></span>
+                                            ${task.completed ? 'FULLFØRT' : 'AKTIV'}
+                                        </span>
+                                        <button class="delete-task-btn" data-id="${task.id}" title="Slett oppgave" style="background: transparent; border: none; padding: 6px; cursor: pointer; color: #94a3b8; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: all 0.15s;">
+                                            <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
                 </div>
             </div>
