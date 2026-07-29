@@ -7986,7 +7986,7 @@ class BibleReader {
         
         // Task 1: Devotional (Andakt)
         checklistItemsHtml += `
-            <div class="hkm-rp-checklist-item" onclick="window.bibleReader.selectReadingPlanDay(${currentDayNum})" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; cursor: pointer; border-bottom: 1px solid var(--border-color); background: var(--bg-card); transition: all 0.2s;" onmouseover="this.style.backgroundColor='var(--bg-sidebar)'" onmouseout="this.style.backgroundColor='var(--bg-card)'">
+            <div class="hkm-rp-checklist-item" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 1)" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; cursor: pointer; border-bottom: 1px solid var(--border-color); background: var(--bg-card); transition: all 0.2s;" onmouseover="this.style.backgroundColor='var(--bg-sidebar)'" onmouseout="this.style.backgroundColor='var(--bg-card)'">
                 <div style="display: flex; align-items: center; gap: 16px;">
                     ${checkCircleHtml}
                     <span style="font-size: 15px; font-weight: 600; color: var(--text-base);">${lang === 'en' ? 'Devotional' : (lang === 'es' ? 'Devocional' : 'Andakt')}</span>
@@ -7998,7 +7998,7 @@ class BibleReader {
         // Task 2+: Scripture chapters (one row per passage)
         passages.forEach((passage) => {
             checklistItemsHtml += `
-                <div class="hkm-rp-checklist-item" onclick="window.bibleReader.showDayVerses('${passage.replace(/'/g, "\\'")}')" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; cursor: pointer; border-bottom: 1px solid var(--border-color); background: var(--bg-card); transition: all 0.2s;" onmouseover="this.style.backgroundColor='var(--bg-sidebar)'" onmouseout="this.style.backgroundColor='var(--bg-card)'">
+                <div class="hkm-rp-checklist-item" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 2)" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; cursor: pointer; border-bottom: 1px solid var(--border-color); background: var(--bg-card); transition: all 0.2s;" onmouseover="this.style.backgroundColor='var(--bg-sidebar)'" onmouseout="this.style.backgroundColor='var(--bg-card)'">
                     <div style="display: flex; align-items: center; gap: 16px;">
                         ${checkCircleHtml}
                         <span style="font-size: 15px; font-weight: 600; color: var(--text-base);">${passage}</span>
@@ -8094,7 +8094,7 @@ class BibleReader {
                 <!-- 6. Sticky Bottom Action Button -->
                 <div style="padding: 16px; background: var(--bg-base); border-top: 1px solid var(--border-color); box-sizing: border-box; z-index: 10; flex-shrink: 0; width: 100%; display: flex; justify-content: center;">
                     <div style="max-width: 800px; width: 100%; box-sizing: border-box;">
-                        <button class="hkm-rp-start-btn" onclick="window.bibleReader.showDayVerses('${(dayConfig ? dayConfig.verses : '').replace(/'/g, "\\'")}')" 
+                        <button class="hkm-rp-start-btn" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 1)" 
                                 style="width: 100% !important; background: var(--text-base) !important; color: var(--bg-base) !important; border: none !important; border-radius: 99px !important; height: 50px !important; font-size: 14px !important; font-weight: 700; display: flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; cursor: pointer !important; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;"
                                 onmouseover="this.style.filter='brightness(1.15)'; this.style.transform='translateY(-1px)';" 
                                 onmouseout="this.style.filter='none'; this.style.transform='none';"
@@ -8940,7 +8940,7 @@ class BibleReader {
                     <span class="material-symbols-outlined" style="font-size: 18px;">chevron_left</span>
                 </button>
                 
-                <button class="hkm-btn-devotional-trigger-minimal" onclick="window.bibleReader.showDayVerses('${(currentDayConfig ? currentDayConfig.verses : '').replace(/'/g, "\\'")}')">
+                <button class="hkm-btn-devotional-trigger-minimal" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum})">
                     <span class="material-symbols-outlined" style="font-size: 18px;">auto_stories</span>
                     <span>${isPrayerApp ? (lang === 'en' ? 'Start prayer' : (lang === 'es' ? 'Comenzar' : 'Start bønn')) : (lang === 'en' ? 'Read devotion' : (lang === 'es' ? 'Leer' : 'Vis andakt'))}</span>
                 </button>
