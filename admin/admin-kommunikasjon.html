@@ -381,17 +381,6 @@
                                 <option>Nye kontakter</option>
                                 <option>Givere</option>
                             </select>
-                            <button class="btn btn-danger" id="bulk-delete-btn" style="display: none; gap: 6px !important; align-items: center !important; justify-content: center !important;">
-                                <span class="material-symbols-outlined" style="font-size: 18px; margin: 0 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; height: 18px !important; width: 18px !important; line-height: 1 !important;">delete_sweep</span>
-                                <span id="bulk-delete-text">Slett valgte</span>
-                            </button>
-                            <button class="btn-text" id="manage-view-btn" type="button">Administrer visning</button>
-                        </div>
-                        <div class="header-right-actions" id="contacts-tools">
-                            <button class="btn btn-primary" id="add-contact-btn" type="button" onclick="if(window.crmSystem) window.crmSystem.openCreateContactModal();" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700;">
-                                <span class="material-symbols-outlined" style="font-size: 18px;">person_add</span>
-                                Ny kontakt
-                            </button>
                             <div class="search-box">
                                 <span class="material-symbols-outlined">search</span>
                                 <input type="text" id="contact-search" placeholder="Søk...">
@@ -404,9 +393,20 @@
                                 <span class="material-symbols-outlined">filter_list</span>
                                 Filtrer
                             </button>
+                        </div>
+                        <div class="header-right-actions" id="contacts-tools">
+                            <button class="btn btn-danger" id="bulk-delete-btn" style="display: none; gap: 6px !important; align-items: center !important; justify-content: center !important;">
+                                <span class="material-symbols-outlined" style="font-size: 18px; margin: 0 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; height: 18px !important; width: 18px !important; line-height: 1 !important;">delete_sweep</span>
+                                <span id="bulk-delete-text">Slett valgte</span>
+                            </button>
+                            <button class="btn-text" id="manage-view-btn" type="button">Administrer visning</button>
                             <button class="btn btn-outline" id="import-export-btn">
                                 <span class="material-symbols-outlined">import_export</span>
                                 Import/eksport
+                            </button>
+                            <button class="btn btn-primary" id="add-contact-btn" type="button" onclick="if(window.crmSystem) window.crmSystem.openCreateContactModal();" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">person_add</span>
+                                Ny kontakt
                             </button>
                         </div>
                     </div>
