@@ -27743,36 +27743,291 @@ class AdminManager {
         const tbody = document.getElementById('email-logs-body');
         if (!tbody) return;
 
+        const countBadge = document.getElementById('email-log-count-badge');
+        const limitSelect = document.getElementById('email-log-limit-select');
+        const fetchLimit = limitSelect ? parseInt(limitSelect.value, 10) || 500 : 500;
+
+        if (countBadge) countBadge.textContent = 'Henter logger...';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 24px; color: #64748b;">Laster inn e-postlogger...</td></tr>';
+
         try {
             const snapshot = await firebaseService.db.collection('email_logs')
                 .orderBy('timestamp', 'desc')
-                .limit(50)
+                .limit(fetchLimit)
                 .get();
 
-            tbody.innerHTML = snapshot.empty ? '<tr><td colspan="5">Ingen logger funnet.</td></tr>' : '';
-
+            this.emailLogs = [];
             snapshot.forEach(doc => {
-                const log = doc.data();
-                const tr = document.createElement('tr');
-                const date = log.timestamp ? log.timestamp.toDate() : new Date(log.sentAt);
-
-                tr.innerHTML = `
-                                                                                <td>${log.to}</td>
-                                                                                <td>${log.subject}</td>
-                                                                                <td><span class="badge status-read">${log.type || 'automated'}</span></td>
-                                                                                <td>${date.toLocaleString('no-NO')}</td>
-                                                                                <td>
-                                                                                    <span class="status-pill ${log.status}">
-                                                                                        ${log.status === 'sent' ? 'Sendt' : 'Feilet'}
-                                                                                    </span>
-                                                                                </td>
-                                                                                `;
-                tbody.appendChild(tr);
+                const data = doc.data();
+                const dateObj = data.timestamp && data.timestamp.toDate 
+                    ? data.timestamp.toDate() 
+                    : (data.sentAt ? new Date(data.sentAt) : (data.createdAt ? new Date(data.createdAt) : new Date()));
+                
+                this.emailLogs.push({
+                    id: doc.id,
+                    to: data.to || data.recipient || 'Ukjent mottaker',
+                    subject: data.subject || '(Ingen emne)',
+                    type: data.type || 'automated',
+                    status: data.status || 'sent',
+                    date: dateObj,
+                    error: data.error || data.errorMessage || null,
+                    html: data.html || data.body || data.text || null,
+                    raw: data
+                });
             });
+
+            this.bindEmailLogListeners();
+            this.renderFilteredEmailLogs();
+
         } catch (error) {
             console.error("Feil ved lasting av e-postlogger:", error);
-            tbody.innerHTML = '<tr><td colspan="5">Kunne ikke laste logger.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 24px; color: #e53e3e;">Kunne ikke laste logger: ' + (error.message || 'Ukjent feil') + '</td></tr>';
+            if (countBadge) countBadge.textContent = 'Feil ved innlasting';
         }
+    }
+
+    bindEmailLogListeners() {
+        if (this.emailLogListenersBound) return;
+        this.emailLogListenersBound = true;
+
+        const searchInput = document.getElementById('email-log-search');
+        const datePreset = document.getElementById('email-log-date-preset');
+        const customDatesContainer = document.getElementById('email-log-custom-dates');
+        const dateFrom = document.getElementById('email-log-date-from');
+        const dateTo = document.getElementById('email-log-date-to');
+        const statusFilter = document.getElementById('email-log-status-filter');
+        const limitSelect = document.getElementById('email-log-limit-select');
+        const refreshBtn = document.getElementById('email-log-refresh-btn');
+        const exportBtn = document.getElementById('email-log-export-btn');
+        const modal = document.getElementById('email-log-detail-modal');
+        const closeBtn = document.getElementById('close-email-log-modal');
+        const modalCloseBtn = document.getElementById('modal-log-close-btn');
+
+        if (searchInput) searchInput.addEventListener('input', () => this.renderFilteredEmailLogs());
+
+        if (datePreset) {
+            datePreset.addEventListener('change', () => {
+                if (datePreset.value === 'custom') {
+                    if (customDatesContainer) customDatesContainer.style.display = 'inline-flex';
+                } else {
+                    if (customDatesContainer) customDatesContainer.style.display = 'none';
+                }
+                this.renderFilteredEmailLogs();
+            });
+        }
+
+        if (dateFrom) dateFrom.addEventListener('change', () => this.renderFilteredEmailLogs());
+        if (dateTo) dateTo.addEventListener('change', () => this.renderFilteredEmailLogs());
+        if (statusFilter) statusFilter.addEventListener('change', () => this.renderFilteredEmailLogs());
+        if (limitSelect) limitSelect.addEventListener('change', () => this.loadEmailLogs());
+        if (refreshBtn) refreshBtn.addEventListener('click', () => this.loadEmailLogs());
+        if (exportBtn) exportBtn.addEventListener('click', () => this.exportEmailLogsCSV());
+
+        const closeModal = () => {
+            if (modal) modal.style.display = 'none';
+        };
+
+        if (closeBtn) closeBtn.onclick = closeModal;
+        if (modalCloseBtn) modalCloseBtn.onclick = closeModal;
+        if (modal) {
+            modal.onclick = (e) => {
+                if (e.target === modal) closeModal();
+            };
+        }
+    }
+
+    renderFilteredEmailLogs() {
+        const tbody = document.getElementById('email-logs-body');
+        const countBadge = document.getElementById('email-log-count-badge');
+        if (!tbody || !this.emailLogs) return;
+
+        const searchVal = (document.getElementById('email-log-search')?.value || '').toLowerCase().trim();
+        const datePreset = document.getElementById('email-log-date-preset')?.value || 'all';
+        const dateFromVal = document.getElementById('email-log-date-from')?.value;
+        const dateToVal = document.getElementById('email-log-date-to')?.value;
+        const statusVal = document.getElementById('email-log-status-filter')?.value || 'all';
+
+        const now = new Date();
+        let minDate = null;
+        let maxDate = null;
+
+        if (datePreset === 'today') {
+            minDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+        } else if (datePreset === '7days') {
+            minDate = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+        } else if (datePreset === '30days') {
+            minDate = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+        } else if (datePreset === 'custom') {
+            if (dateFromVal) {
+                const parts = dateFromVal.split('-');
+                minDate = new Date(parts[0], parts[1] - 1, parts[2], 0, 0, 0);
+            }
+            if (dateToVal) {
+                const parts = dateToVal.split('-');
+                maxDate = new Date(parts[0], parts[1] - 1, parts[2], 23, 59, 59);
+            }
+        }
+
+        this.filteredEmailLogs = this.emailLogs.filter(log => {
+            // Search filter
+            if (searchVal) {
+                const toStr = Array.isArray(log.to) ? log.to.join(', ').toLowerCase() : String(log.to).toLowerCase();
+                const subjStr = String(log.subject).toLowerCase();
+                const typeStr = String(log.type).toLowerCase();
+                const statusStr = String(log.status).toLowerCase();
+                const match = toStr.includes(searchVal) || subjStr.includes(searchVal) || typeStr.includes(searchVal) || statusStr.includes(searchVal);
+                if (!match) return false;
+            }
+
+            // Status filter
+            if (statusVal !== 'all' && log.status !== statusVal) {
+                return false;
+            }
+
+            // Date filter
+            if (minDate && log.date < minDate) return false;
+            if (maxDate && log.date > maxDate) return false;
+
+            return true;
+        });
+
+        // Update count badge
+        if (countBadge) {
+            if (this.filteredEmailLogs.length === this.emailLogs.length) {
+                countBadge.textContent = `Viser ${this.emailLogs.length} e-poster`;
+            } else {
+                countBadge.textContent = `Viser ${this.filteredEmailLogs.length} av ${this.emailLogs.length} e-poster`;
+            }
+        }
+
+        if (this.filteredEmailLogs.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 48px 24px;">
+                        <div style="max-width: 320px; margin: 0 auto; display: flex; flex-direction: column; align-items: center;">
+                            <span class="material-symbols-outlined" style="font-size: 48px; color: #a0aec0; margin-bottom: 12px;">mark_email_read</span>
+                            <h4 style="font-size: 16px; font-weight: 600; color: #2d3748; margin: 0 0 6px 0;">Ingen e-postlogger funnet</h4>
+                            <p style="font-size: 13px; color: #718096; margin: 0;">Prøv å endre søkeord, datofilter eller tilbakestill søket.</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = '';
+        this.filteredEmailLogs.forEach(log => {
+            const tr = document.createElement('tr');
+            tr.style.cursor = 'pointer';
+            tr.className = 'email-log-row';
+            
+            const recipientStr = Array.isArray(log.to) ? log.to.join(', ') : log.to;
+            const dateStr = log.date ? log.date.toLocaleString('no-NO', {
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            }) : '-';
+
+            const statusClass = log.status === 'sent' ? 'sent' : 'failed';
+            const statusLabel = log.status === 'sent' ? 'Sendt' : 'Feilet';
+
+            tr.innerHTML = `
+                <td style="font-weight: 500; color: #1e293b;">${recipientStr}</td>
+                <td style="color: #334155; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${log.subject}</td>
+                <td><span class="badge status-read">${log.type}</span></td>
+                <td style="font-size: 13px; color: #64748b; white-space: nowrap;">${dateStr}</td>
+                <td>
+                    <span class="status-pill ${statusClass}">
+                        ${statusLabel}
+                    </span>
+                </td>
+                <td style="text-align: center;">
+                    <button class="btn btn-secondary btn-sm log-detail-btn" style="padding: 4px 8px; border-radius: 8px; border: 1px solid #cbd5e1;" title="Vis detaljer">
+                        <span class="material-symbols-outlined" style="font-size: 18px; display: block; color: #475569;">info</span>
+                    </button>
+                </td>
+            `;
+
+            tr.addEventListener('click', () => this.showEmailLogDetailModal(log));
+            tbody.appendChild(tr);
+        });
+    }
+
+    showEmailLogDetailModal(log) {
+        const modal = document.getElementById('email-log-detail-modal');
+        if (!modal) return;
+
+        const toEl = document.getElementById('modal-log-to');
+        const dateEl = document.getElementById('modal-log-date');
+        const typeEl = document.getElementById('modal-log-type');
+        const statusEl = document.getElementById('modal-log-status');
+        const subjectEl = document.getElementById('modal-log-subject');
+        const errorContainer = document.getElementById('modal-log-error-container');
+        const errorText = document.getElementById('modal-log-error-text');
+        const bodyContainer = document.getElementById('modal-log-body-container');
+
+        const recipientStr = Array.isArray(log.to) ? log.to.join(', ') : log.to;
+        if (toEl) toEl.textContent = recipientStr;
+        if (dateEl) dateEl.textContent = log.date ? log.date.toLocaleString('no-NO') : '-';
+        if (typeEl) typeEl.textContent = log.type || 'automated';
+
+        if (statusEl) {
+            const isSent = log.status === 'sent';
+            statusEl.className = `status-pill ${isSent ? 'sent' : 'failed'}`;
+            statusEl.textContent = isSent ? 'Sendt' : 'Feilet';
+        }
+
+        if (subjectEl) subjectEl.textContent = log.subject || '(Ingen emne)';
+
+        if (log.error && errorContainer && errorText) {
+            errorText.textContent = typeof log.error === 'object' ? JSON.stringify(log.error, null, 2) : String(log.error);
+            errorContainer.style.display = 'block';
+        } else if (errorContainer) {
+            errorContainer.style.display = 'none';
+        }
+
+        if (bodyContainer) {
+            if (log.html) {
+                bodyContainer.innerHTML = log.html;
+            } else {
+                bodyContainer.innerHTML = '<span style="color: #94a3b8; font-style: italic;">Ingen e-posttekst lagret for denne loggen.</span>';
+            }
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    exportEmailLogsCSV() {
+        if (!this.filteredEmailLogs || this.filteredEmailLogs.length === 0) {
+            this.showToast('Ingen logger å eksportere.', 'error');
+            return;
+        }
+
+        // Rule #3: CSV with ';' separator and UTF-8 BOM (\uFEFF) for Norwegian Excel
+        let csvContent = '\uFEFFMottaker;Emne;Type;Tidspunkt;Status;Feilmelding\n';
+
+        this.filteredEmailLogs.forEach(log => {
+            const recipientStr = (Array.isArray(log.to) ? log.to.join(', ') : String(log.to || '')).replace(/;/g, ',');
+            const subjectStr = String(log.subject || '').replace(/;/g, ',').replace(/\n/g, ' ');
+            const typeStr = String(log.type || '').replace(/;/g, ',');
+            const dateStr = log.date ? log.date.toLocaleString('no-NO') : '';
+            const statusStr = log.status === 'sent' ? 'Sendt' : 'Feilet';
+            const errorStr = (log.error ? (typeof log.error === 'object' ? JSON.stringify(log.error) : String(log.error)) : '').replace(/;/g, ',').replace(/\n/g, ' ');
+
+            csvContent += `"${recipientStr}";"${subjectStr}";"${typeStr}";"${dateStr}";"${statusStr}";"${errorStr}"\n`;
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const todayStr = new Date().toISOString().slice(0, 10);
+        a.href = url;
+        a.download = `utsendelseslogg-hkm-${todayStr}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        this.showToast('E-postlogg eksportert til CSV.', 'success');
     }
 
     initTemplateEditorModal() {

@@ -1195,6 +1195,63 @@
                     </div>
 
                     <div id="automation-logs" class="automation-pane">
+                        <!-- Email Logs Filter Toolbar -->
+                        <div class="email-logs-toolbar" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 20px; background: #ffffff; padding: 16px 20px; border-radius: 16px; border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                            <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; flex: 1; min-width: 280px;">
+                                <!-- Search input -->
+                                <div style="position: relative; flex: 1; min-width: 220px;">
+                                    <span class="material-symbols-outlined" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 20px; color: #94a3b8; display: block;">search</span>
+                                    <input type="text" id="email-log-search" placeholder="Søk i e-post (mottaker, emne, type)..." style="width: 100%; padding: 10px 14px 10px 40px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 14px; background: #f8fafc; color: #1e293b; transition: all 0.2s ease;">
+                                </div>
+
+                                <!-- Date preset selector -->
+                                <select id="email-log-date-preset" style="padding: 10px 14px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 14px; background: #f8fafc; color: #1e293b; cursor: pointer; font-weight: 500;">
+                                    <option value="all">📅 Alle datoer</option>
+                                    <option value="today">I dag</option>
+                                    <option value="7days">Siste 7 dager</option>
+                                    <option value="30days">Siste 30 dager</option>
+                                    <option value="custom">Tilpasset periode</option>
+                                </select>
+
+                                <!-- Custom date range pickers -->
+                                <div id="email-log-custom-dates" style="display: none; align-items: center; gap: 6px; background: #f8fafc; padding: 4px 10px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                                    <input type="date" id="email-log-date-from" style="padding: 6px 8px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; color: #1e293b;">
+                                    <span style="font-size: 13px; color: #64748b; font-weight: 600;">–</span>
+                                    <input type="date" id="email-log-date-to" style="padding: 6px 8px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; color: #1e293b;">
+                                </div>
+
+                                <!-- Status filter -->
+                                <select id="email-log-status-filter" style="padding: 10px 14px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 14px; background: #f8fafc; color: #1e293b; cursor: pointer; font-weight: 500;">
+                                    <option value="all">⚡ Alle statuser</option>
+                                    <option value="sent">✅ Sendt</option>
+                                    <option value="failed">❌ Feilet</option>
+                                </select>
+
+                                <!-- Limit fetch selector -->
+                                <select id="email-log-limit-select" style="padding: 10px 14px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 14px; background: #f8fafc; color: #1e293b; cursor: pointer; font-weight: 500;" title="Velg hvor mange e-poster du vil laste inn fra databasen">
+                                    <option value="100">Vis 100 siste</option>
+                                    <option value="250">Vis 250 siste</option>
+                                    <option value="500" selected>Vis 500 siste</option>
+                                    <option value="1000">Vis 1000 siste</option>
+                                    <option value="2000">Vis 2000 siste</option>
+                                </select>
+                            </div>
+
+                            <!-- Right action buttons & badge -->
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span id="email-log-count-badge" class="badge" style="font-size: 13px; padding: 7px 14px; border-radius: 20px; background: #f1f5f9; color: #334155; font-weight: 600; border: 1px solid #e2e8f0;">
+                                    Laster logger...
+                                </span>
+                                <button id="email-log-export-btn" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; border-radius: 12px; padding: 9px 14px; font-weight: 600; border: 1px solid #e2e8f0; cursor: pointer;" title="Eksporter synlige logger til CSV (norsk Excel-format med semi-kolon)">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; display: block;">download</span> Eksporter CSV
+                                </button>
+                                <button id="email-log-refresh-btn" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; border-radius: 12px; padding: 9px 12px; font-weight: 600; border: 1px solid #e2e8f0; cursor: pointer;" title="Last på nytt fra databasen">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; display: block;">refresh</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Table Container -->
                         <div class="table-container full-bleed">
                             <table class="crm-table">
                                 <thead>
@@ -1204,6 +1261,7 @@
                                         <th>Type</th>
                                         <th>Tidspunkt</th>
                                         <th>Status</th>
+                                        <th style="width: 90px; text-align: center;">Handling</th>
                                     </tr>
                                 </thead>
                                 <tbody id="email-logs-body">
@@ -1825,6 +1883,67 @@
                 <span data-content-doc="settings_global" data-content-key="search.helpText">Trykk 'Enter' for fullstendig søk.</span>
             </div>
 
+        </div>
+    </div>
+
+    <!-- Email Log Detail Modal -->
+    <div id="email-log-detail-modal" class="profile-modal" style="display: none; z-index: 12000; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div class="profile-modal-content card modern" style="max-width: 680px; width: 92%; max-height: 85vh; border-radius: 20px; background: #ffffff; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+            <div class="modal-header" style="padding: 20px 24px; background: linear-gradient(135deg, #1e293b, #0f172a); color: white; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span class="material-symbols-outlined" style="font-size: 24px; color: #38bdf8; display: block;">mark_email_read</span>
+                    <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: white;">E-post Utsendelsesdetaljer</h3>
+                </div>
+                <button id="close-email-log-modal" style="background: rgba(255,255,255,0.15); border: none; color: white; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                    <span class="material-symbols-outlined" style="font-size: 20px; display: block;">close</span>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;">
+                <!-- Key Details Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; background: #f8fafc; padding: 16px; border-radius: 14px; border: 1px solid #e2e8f0;">
+                    <div>
+                        <span style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Mottaker</span>
+                        <strong id="modal-log-to" style="font-size: 14px; color: #0f172a; word-break: break-all;">-</strong>
+                    </div>
+                    <div>
+                        <span style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Sendt Tidspunkt</span>
+                        <span id="modal-log-date" style="font-size: 14px; color: #0f172a; font-weight: 500;">-</span>
+                    </div>
+                    <div>
+                        <span style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Type</span>
+                        <span id="modal-log-type" class="badge status-read" style="margin-top: 2px;">-</span>
+                    </div>
+                    <div>
+                        <span style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Status</span>
+                        <span id="modal-log-status" style="margin-top: 2px;">-</span>
+                    </div>
+                </div>
+
+                <!-- Subject -->
+                <div>
+                    <label style="font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 6px; display: block;">Emne</label>
+                    <div id="modal-log-subject" style="padding: 12px 16px; background: #ffffff; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 14px; font-weight: 600; color: #0f172a;"></div>
+                </div>
+
+                <!-- Error message if failed -->
+                <div id="modal-log-error-container" style="display: none; background: #fef2f2; border: 1px solid #fecaca; padding: 14px 16px; border-radius: 12px; color: #991b1b;">
+                    <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; margin-bottom: 4px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">error</span> Feilmelding ved sending
+                    </div>
+                    <div id="modal-log-error-text" style="font-size: 13px; font-family: monospace; white-space: pre-wrap; word-break: break-all;"></div>
+                </div>
+
+                <!-- Body preview / HTML snippet -->
+                <div>
+                    <label style="font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 6px; display: block;">E-post innhold / Forhåndsvisning</label>
+                    <div id="modal-log-body-container" style="background: #ffffff; border-radius: 12px; border: 1px solid #cbd5e1; padding: 16px; min-height: 120px; max-height: 280px; overflow-y: auto; font-size: 14px; color: #334155;">
+                        <span style="color: #94a3b8; font-style: italic;">Ingen forhåndsvisning tilgjengelig for denne e-posten.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 16px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end;">
+                <button id="modal-log-close-btn" class="btn btn-secondary" style="padding: 10px 20px; border-radius: 10px; font-weight: 600; cursor: pointer;">Lukk</button>
+            </div>
         </div>
     </div>
 </body>
