@@ -3915,7 +3915,80 @@ class BibleReader {
         return `${book ? book.name : ''} ${chapterNum}`.trim();
     }
 
-    async lookupWord(word, contextText, refText) {
+    ensureDictionaryDrawerExists() {
+        let dictDrawer = document.getElementById('dictionary-drawer');
+        if (!dictDrawer) {
+            dictDrawer = document.createElement('aside');
+            dictDrawer.className = 'dictionary-drawer';
+            dictDrawer.id = 'dictionary-drawer';
+            dictDrawer.style.zIndex = '25000';
+            dictDrawer.innerHTML = `
+                <div class="dict-header" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border-color); background: var(--bg-card);">
+                    <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: var(--text-base);">Bibeleksikon</h3>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button class="toggle-expand-dict-btn" id="toggle-expand-dict-btn" title="Utvid/Gjør smalere" style="background: none; border: none; cursor: pointer; color: var(--text-muted);">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">open_in_full</span>
+                        </button>
+                        <button class="close-dict-btn" id="close-dict-btn" style="background: none; border: none; cursor: pointer; color: var(--text-muted);">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="dict-body" style="flex: 1; overflow-y: auto; padding: 20px;">
+                    <div class="dict-search-container" style="margin-bottom: 20px; display: flex; gap: 8px;">
+                        <input type="text" id="dict-search-input" placeholder="Søk på ord eller spørsmål..." style="flex: 1; height: 38px !important; padding: 0 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-base); color: var(--text-base); font-size: 13px; outline: none; box-sizing: border-box;">
+                        <button id="dict-search-submit-btn" style="background: var(--bible-primary, #d17d39); color: white; border: none; padding: 0 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 38px !important;">Søk</button>
+                    </div>
+                    <div id="dict-welcome-state" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px 10px; color: var(--text-muted);">
+                        <span class="material-symbols-outlined" style="font-size: 40px; color: var(--bible-primary, #d17d39); margin-bottom: 12px; opacity: 0.8;">menu_book</span>
+                        <h4 style="font-size: 14px; font-weight: 700; color: var(--text-base); margin: 0 0 6px 0;">Velkommen til Bibeleksikon</h4>
+                        <p style="font-size: 12px; line-height: 1.5; margin: 0;">Søk etter teologiske begreper, personer, hendelser eller still bibelrelaterte spørsmål direkte her.</p>
+                    </div>
+                    <div id="dict-spinner" style="display: none; flex-direction: column; align-items: center; justify-content: center; height: 150px; color: var(--text-muted);">
+                        <div class="hkm-spinner" style="width: 32px; height: 32px; border: 3px solid rgba(209,125,57,0.2); border-top-color: #d17d39; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px;"></div>
+                        <p style="font-size: 13px; margin: 0;">Analyserer og henter forklaring fra Bibeleksikon...</p>
+                    </div>
+                    <div id="dict-content-wrap" style="display: none;">
+                        <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                            <h2 id="dict-word-title" style="margin: 0; font-size: 20px; font-weight: 800; color: var(--text-base);"></h2>
+                            <span id="dict-category" style="font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 12px; background: rgba(209, 125, 57, 0.12); color: #d17d39; text-transform: uppercase;"></span>
+                        </div>
+                        <div id="dict-definition" class="dict-definition-text" style="font-size: 14px; line-height: 1.6; color: var(--text-base); margin-bottom: 16px;"></div>
+                        <div id="dict-contextual-note" class="dict-note-box" style="font-size: 13px; line-height: 1.5; color: var(--text-muted); background: var(--bg-card); padding: 12px; border-radius: 8px; border-left: 3px solid #d17d39; margin-bottom: 16px;"></div>
+                        <div id="dict-extended-section" style="display: none; margin-bottom: 20px;">
+                            <h4 style="font-size: 14px; font-weight: 700; color: #1B4965; margin: 0 0 8px 0;">Dypere teologisk analyse</h4>
+                            <div id="dict-extended-text" style="font-size: 13.5px; line-height: 1.6; color: var(--text-base);"></div>
+                        </div>
+                        <div id="dict-extended-trigger-wrap" style="display: none; margin-bottom: 20px;">
+                            <button id="dict-extended-btn" class="hkm-btn-secondary" style="width: 100%;">
+                                <span class="material-symbols-outlined">auto_awesome</span>
+                                <span id="dict-extended-btn-text">Generer dypere teologisk analyse</span>
+                            </button>
+                        </div>
+                        <div id="dict-original-words-section" style="display: none; margin-bottom: 20px;">
+                            <h4 style="font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin: 0 0 10px 0;">Grunntekst (Originalspråk)</h4>
+                            <div id="dict-original-words-list"></div>
+                        </div>
+                        <div id="dict-cross-refs-section" style="display: none; margin-bottom: 20px;">
+                            <h4 style="font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin: 0 0 10px 0;">Relevante skriftsteder</h4>
+                            <div id="dict-cross-refs-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                        </div>
+                        <div id="dict-related-resources"></div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(dictDrawer);
+
+            dictDrawer.querySelector('#close-dict-btn')?.addEventListener('click', () => {
+                dictDrawer.classList.remove('active');
+                const backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
+                if (backdrop) backdrop.classList.remove('active');
+            });
+        }
+        return dictDrawer;
+    }
+
+    async lookupWord(word, contextText, refText, forceExtended = false) {
         if (!word) return;
 
         const getEl = (key, id) => {
@@ -3924,12 +3997,19 @@ class BibleReader {
             return el;
         };
 
-        const dictDrawer = getEl('dictDrawer', 'dictionary-drawer');
-        if (dictDrawer) dictDrawer.classList.add('active');
+        const dictDrawer = this.ensureDictionaryDrawerExists();
+        dictDrawer.classList.add('active');
         
         this.pushModalHistoryState('dictionary-drawer');
-        const backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
-        if (backdrop) backdrop.classList.add('active');
+        let backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
+        if (!backdrop) {
+            backdrop = document.createElement('div');
+            backdrop.id = 'hkm-sheet-backdrop-overlay';
+            backdrop.className = 'sheet-overlay-backdrop';
+            document.body.appendChild(backdrop);
+        }
+        backdrop.classList.add('active');
+
         const dictBody = dictDrawer ? dictDrawer.querySelector('.dict-body') : null;
         if (dictBody) dictBody.scrollTop = 0;
 
@@ -3980,7 +4060,9 @@ class BibleReader {
         let dictRes = null;
         let resources = null;
 
-        const cacheKey = `${word.trim().toLowerCase()}_${document.documentElement.lang || 'no'}`;
+        const isChapterOrVerses = forceExtended || (typeof parseReference === 'function' && !!parseReference(word)) || /^[1-4]?\s*[a-zæøå\s]+\s*\d+/i.test(word);
+
+        const cacheKey = `${word.trim().toLowerCase()}_${isChapterOrVerses ? 'ext_' : ''}${document.documentElement.lang || 'no'}`;
         if (this.dictCache && this.dictCache[cacheKey]) {
             const cachedData = this.dictCache[cacheKey];
             dictRes = cachedData.dictRes;
@@ -3993,7 +4075,8 @@ class BibleReader {
                     word: word,
                     context: contextText || '',
                     scriptureRef: refText || '',
-                    lang: document.documentElement.lang || 'no'
+                    lang: document.documentElement.lang || 'no',
+                    extended: isChapterOrVerses ? 'true' : 'false'
                 });
 
                 // Parallel load AI definition and relevant site resources
