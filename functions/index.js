@@ -9083,4 +9083,123 @@ exports.onCourseEnrollmentCreated = onDocumentCreated({
   } catch (error) {
     console.error("Feil ved sending av kurs-bekreftelse:", error);
   }
+
+  // Send e-postvarsel til admin om ny kurspåmelding
+  try {
+    const adminEmail = "thomas@hiskingdomministry.no";
+    const amountStr = enrollData.amount ? `kr ${enrollData.amount}` : 'Gratis / Udefinert';
+    const methodStr = enrollData.paymentMethod || enrollData.method || 'Skjema / Vipps';
+    const phoneStr = enrollData.phone || 'Ikke oppgitt';
+    const statusStr = enrollData.status || 'pending';
+
+    const adminHtml = `
+      <div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; padding: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: #fff7ed; color: #d17d39; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold;">🎓</div>
+          <div>
+            <h2 style="margin: 0; font-size: 20px; font-weight: 800; color: #0f172a;">Ny kurspåmelding registrert!</h2>
+            <p style="margin: 2px 0 0; font-size: 13px; color: #64748b;">${courseTitle}</p>
+          </div>
+        </div>
+        
+        <div style="background: #f8fafc; border-radius: 12px; padding: 20px; border: 1px solid #f1f5f9; margin-bottom: 24px;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 14px; color: #334155;">
+            <tr>
+              <td style="padding: 6px 0; font-weight: 700; color: #64748b; width: 130px;">Deltaker:</td>
+              <td style="padding: 6px 0; font-weight: 700; color: #0f172a;">${name}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; font-weight: 700; color: #64748b;">E-post:</td>
+              <td style="padding: 6px 0;"><a href="mailto:${email}" style="color: #d17d39; text-decoration: underline;">${email}</a></td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; font-weight: 700; color: #64748b;">Telefon:</td>
+              <td style="padding: 6px 0;">${phoneStr}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; font-weight: 700; color: #64748b;">Kurs:</td>
+              <td style="padding: 6px 0; font-weight: 700;">${courseTitle}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; font-weight: 700; color: #64748b;">Beløp / Metode:</td>
+              <td style="padding: 6px 0;">${amountStr} (${methodStr})</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; font-weight: 700; color: #64748b;">Status:</td>
+              <td style="padding: 6px 0;"><span style="background: #ffedd5; color: #c2410c; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px;">${statusStr}</span></td>
+            </tr>
+          </table>
+        </div>
+
+        <div style="text-align: center;">
+          <a href="https://www.hiskingdomministry.no/admin/index.html#courses" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 14px 28px; border-radius: 12px; font-weight: 700; text-decoration: none; display: inline-block; font-size: 14px; box-shadow: 0 4px 14px rgba(209,125,57,0.3);">
+            Behandle påmelding i Admin
+          </a>
+        </div>
+      </div>
+    `;
+
+    await sendEmail({
+      to: adminEmail,
+      subject: `🎓 Ny kurspåmelding: ${name} (${courseTitle})`,
+      html: adminHtml,
+      text: `Ny kurspåmelding fra ${name} (${email}) for kurset ${courseTitle}. Status: ${statusStr}.`
+    });
+    console.log(`[onCourseEnrollmentCreated] Admin-varsel sendt til ${adminEmail}`);
+  } catch (error) {
+    console.error("[onCourseEnrollmentCreated] Feil ved sending av admin-varsel:", error);
+  }
+});
+
+/**
+ * Trigger som sender e-post når en kurspåmelding oppdateres (f.eks. godkjennes av admin).
+ */
+exports.onCourseEnrollmentUpdated = onDocumentUpdated({
+  document: "courseEnrollments/{id}",
+  secrets: [emailUserParam, emailPassParam],
+}, async (event) => {
+  const beforeData = event.data.before?.data();
+  const afterData = event.data.after?.data();
+  if (!beforeData || !afterData) return;
+
+  // Sjekk om status endret seg til 'paid' eller 'success' (godkjent tilgang)
+  const isNowApproved = (afterData.status === 'paid' || afterData.status === 'success') && 
+                        (beforeData.status !== 'paid' && beforeData.status !== 'success');
+
+  if (isNowApproved && afterData.email) {
+    const email = afterData.email;
+    const name = afterData.name || '';
+    const courseTitle = afterData.courseTitle || 'Kurset';
+
+    const approvalHtml = `
+      <div style="font-family: 'Inter', system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; padding: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 48px; width: auto;" alt="His Kingdom Ministry Logo">
+        </div>
+        <h2 style="margin: 0 0 12px 0; font-size: 22px; font-weight: 800; color: #0f172a; text-align: center;">Din tilgang er godkjent! 🎉</h2>
+        <p style="font-size: 15px; color: #475569; line-height: 1.6; text-align: center; margin-bottom: 24px;">
+          Hei ${name}! Påmeldingen din til <strong>${courseTitle}</strong> er nå godkjent og du har full tilgang.
+        </p>
+
+        <div style="text-align: center; margin-bottom: 32px;">
+          <a href="https://www.hiskingdomministry.no/minside/index.html" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 14px 32px; border-radius: 12px; font-weight: 700; text-decoration: none; display: inline-block; font-size: 14px; box-shadow: 0 4px 14px rgba(209,125,57,0.3);">
+            Gå til Min Side og start kurset
+          </a>
+        </div>
+        <p style="font-size: 13px; color: #94a3b8; text-align: center; margin: 0;">His Kingdom Ministry</p>
+      </div>
+    `;
+
+    try {
+      await sendEmail({
+        to: email,
+        subject: `🎉 Tilgang godkjent: ${courseTitle}`,
+        html: approvalHtml,
+        text: `Hei ${name}! Påmeldingen din til ${courseTitle} er nå godkjent. Logg inn på Min Side for å starte!`
+      });
+      console.log(`[onCourseEnrollmentUpdated] Godkjennelses-e-post sendt til ${email}`);
+    } catch (err) {
+      console.error("[onCourseEnrollmentUpdated] Feil ved sending av e-post:", err);
+    }
+  }
 });
