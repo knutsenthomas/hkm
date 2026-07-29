@@ -9695,6 +9695,58 @@ class BibleReader {
             `;
         }
 
+        // Build Day Strip HTML
+        let dayStripHtml = '';
+        if (plan && plan.days && plan.days.length > 0) {
+            const userPlan = this.userPlanProgress || {};
+            const completedDays = userPlan.completedDays || [];
+            
+            const daysPills = plan.days.map(d => {
+                const dNum = parseInt(d.dayNumber, 10);
+                const isActive = dNum === parseInt(dayNumber, 10);
+                const isCompleted = completedDays.includes(dNum);
+                return `
+                    <button onclick="window.bibleReader.openDevotionalWizard('${plan.id}', ${dNum}, ${step})"
+                            style="flex: 0 0 auto; min-width: 40px; height: 40px; padding: 2px 8px; border-radius: 10px; border: 1.5px solid ${isActive ? '#d17d39' : 'rgba(0,0,0,0.08)'}; background: ${isActive ? '#d17d39' : isCompleted ? 'rgba(209, 125, 57, 0.1)' : '#ffffff'}; color: ${isActive ? '#ffffff' : '#0f172a'}; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: system-ui, -apple-system, sans-serif; transition: all 0.2s ease;">
+                        <span style="font-size: 13px; font-weight: 800; line-height: 1;">${dNum}</span>
+                        ${isCompleted ? `<span class="material-symbols-outlined" style="font-size: 11px; margin-top: 1px; color: ${isActive ? '#ffffff' : '#d17d39'}; font-variation-settings: 'FILL' 1;">check</span>` : ''}
+                    </button>
+                `;
+            }).join('');
+
+            dayStripHtml = `
+                <div class="hkm-yv-day-strip" style="display: flex; gap: 8px; overflow-x: auto; padding: 8px 16px; background: #faf8f5; border-bottom: 1px solid #e2e8f0; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; flex-shrink: 0;">
+                    ${daysPills}
+                </div>
+            `;
+        }
+
+        // Build Task Tabs HTML
+        const scriptureLabel = dayConfig.verses || (lang === 'en' ? 'Scripture' : (lang === 'es' ? 'Escritura' : 'Bibeltekst'));
+        const stepTabsHtml = `
+            <div class="hkm-yv-step-tabs" style="display: flex; align-items: center; justify-content: space-around; padding: 4px 8px; background: #ffffff; border-bottom: 1px solid #e2e8f0; flex-shrink: 0;">
+                <button onclick="window.bibleReader.openDevotionalWizard('${plan.id}', ${dayNumber}, 1)" style="flex: 1; padding: 8px 4px; border: none; background: none; font-size: 13px; font-weight: ${step === 1 ? '800' : '600'}; color: ${step === 1 ? '#d17d39' : '#64748b'}; border-bottom: 2px solid ${step === 1 ? '#d17d39' : 'transparent'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.2s;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">auto_stories</span>
+                    <span>${isPrayerApp ? (lang === 'en' ? 'Prayer' : (lang === 'es' ? 'Oración' : 'Bønn')) : (lang === 'en' ? 'Devotional' : (lang === 'es' ? 'Devocional' : 'Andakt'))}</span>
+                </button>
+
+                <button onclick="window.bibleReader.openDevotionalWizard('${plan.id}', ${dayNumber}, 2)" style="flex: 1; padding: 8px 4px; border: none; background: none; font-size: 13px; font-weight: ${step === 2 ? '800' : '600'}; color: ${step === 2 ? '#d17d39' : '#64748b'}; border-bottom: 2px solid ${step === 2 ? '#d17d39' : 'transparent'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.2s;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">menu_book</span>
+                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 120px;">${scriptureLabel}</span>
+                </button>
+
+                <button onclick="window.bibleReader.openDevotionalWizard('${plan.id}', ${dayNumber}, 3)" style="flex: 1; padding: 8px 4px; border: none; background: none; font-size: 13px; font-weight: ${step === 3 ? '800' : '600'}; color: ${step === 3 ? '#d17d39' : '#64748b'}; border-bottom: 2px solid ${step === 3 ? '#d17d39' : 'transparent'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.2s;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">video_library</span>
+                    <span>${lang === 'en' ? 'Resources' : (lang === 'es' ? 'Recursos' : 'Ressurser')}</span>
+                </button>
+
+                <button onclick="window.bibleReader.openDevotionalWizard('${plan.id}', ${dayNumber}, 4)" style="flex: 1; padding: 8px 4px; border: none; background: none; font-size: 13px; font-weight: ${step === 4 ? '800' : '600'}; color: ${step === 4 ? '#d17d39' : '#64748b'}; border-bottom: 2px solid ${step === 4 ? '#d17d39' : 'transparent'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.2s;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">edit_note</span>
+                    <span>${lang === 'en' ? 'Notes' : (lang === 'es' ? 'Notas' : 'Refleksjon')}</span>
+                </button>
+            </div>
+        `;
+
         // Render YouVersion Layout
         stepContainer.innerHTML = `
             <div class="hkm-yv-wrapper">
@@ -9723,6 +9775,9 @@ class BibleReader {
                     </div>
                 </div>
                 
+                ${dayStripHtml}
+                ${stepTabsHtml}
+
                 <!-- 2. Scrollable Body Content -->
                 <div class="hkm-yv-body">
                     <div class="hkm-yv-body-inner">
