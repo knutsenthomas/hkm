@@ -14788,6 +14788,14 @@ class AdminManager {
                                         <input type="checkbox" id="nav-minside-notifications" value="notifications" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
                                         <span>Varslinger</span>
                                     </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-minside-tasks" value="tasks" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Huskeliste</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-minside-notes" value="notes" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Notater</span>
+                                    </label>
                                 </div>
 
                                 <div class="design-ui-divider" style="margin: 20px 0; border-top: 1px solid var(--border-color); opacity: 0.5;"></div>
@@ -15131,7 +15139,7 @@ class AdminManager {
                     faviconUrl: document.getElementById('site-favicon-url')?.value || '',
                     logoText: document.getElementById('site-logo-text')?.value || '',
                     siteTitle: document.getElementById('site-title-seo')?.value || '',
-                    minsideBottomNav: ['overview', 'profile', 'courses', 'reading-plans', 'giving', 'notifications'],
+                    minsideBottomNav: ['overview', 'profile', 'courses', 'reading-plans', 'giving', 'notifications', 'tasks', 'notes'],
                     adminBottomNav: ['overview', 'contacts', 'minside', 'settings'],
                     updatedAt: new Date().toISOString()
                 };
@@ -15184,10 +15192,10 @@ class AdminManager {
                 syncDataRange('fontSizeBodyMobile', 'font-size-body-mobile');
 
                 // Load bottom nav checkboxes
-                const minsideItems = data.minsideBottomNav || ['overview', 'profile', 'courses', 'reading-plans', 'giving', 'notifications'];
+                const minsideItems = data.minsideBottomNav || ['overview', 'profile', 'courses', 'reading-plans', 'giving', 'notifications', 'tasks', 'notes'];
                 const adminItems = data.adminBottomNav || ['overview', 'contacts', 'minside', 'settings'];
 
-                ['overview', 'profile', 'courses', 'reading-plans', 'giving', 'notifications'].forEach(id => {
+                ['overview', 'profile', 'courses', 'reading-plans', 'giving', 'notifications', 'tasks', 'notes'].forEach(id => {
                     const el = document.getElementById(`nav-minside-${id}`);
                     if (el) el.checked = minsideItems.includes(id);
                 });
@@ -15209,7 +15217,7 @@ class AdminManager {
             const btn = document.getElementById('save-design-settings');
             const palette = getPaletteFromInputs();
 
-            const minsideBottomNav = ['overview', 'profile', 'courses', 'reading-plans', 'giving', 'notifications'].filter(id => {
+            const minsideBottomNav = ['overview', 'profile', 'courses', 'reading-plans', 'giving', 'notifications', 'tasks', 'notes'].filter(id => {
                 const el = document.getElementById(`nav-minside-${id}`);
                 return el ? el.checked : false;
             });

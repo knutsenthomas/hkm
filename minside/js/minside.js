@@ -42,6 +42,7 @@ const minsideTranslations = {
         'sidebar.varslinger': 'Varslinger',
         'sidebar.logg': 'Logg',
         'sidebar.notater': 'Notater',
+        'sidebar.huskeliste': 'Huskeliste',
         'sidebar.prayerWall': 'Bønnevegg',
         'sidebar.admin': 'Administrasjon',
         'sidebar.loggut': 'Logg ut',
@@ -345,6 +346,7 @@ const minsideTranslations = {
         'sidebar.varslinger': 'Notifications',
         'sidebar.logg': 'Log',
         'sidebar.notater': 'Notes',
+        'sidebar.huskeliste': 'Task List',
         'sidebar.prayerWall': 'Prayer Wall',
         'sidebar.admin': 'Administration',
         'sidebar.loggut': 'Log Out',
@@ -648,6 +650,7 @@ const minsideTranslations = {
         'sidebar.varslinger': 'Notificaciones',
         'sidebar.logg': 'Historial',
         'sidebar.notater': 'Notas',
+        'sidebar.huskeliste': 'Lista de tareas',
         'sidebar.prayerWall': 'Muro de Oración',
         'sidebar.admin': 'Administración',
         'sidebar.loggut': 'Cerrar Sesión',
@@ -1031,6 +1034,7 @@ class MinSideManager {
             giving: this.renderGiving,
             courses: this.renderCourses,
             notes: this.renderNotes,
+            tasks: this.renderNotes,
             'reading-plans': this.renderReadingPlans,
             'prayer-wall': this.renderPrayerWall,
             'course-player': this.renderCoursePlayer,
@@ -1315,6 +1319,7 @@ class MinSideManager {
             giving: { title: t('view.giving'), icon: 'volunteer_activism' },
             courses: { title: t('view.courses'), icon: 'school' },
             notes: { title: t('view.notes'), icon: 'notes' },
+            tasks: { title: t('sidebar.huskeliste') || 'Huskeliste', icon: 'task_alt' },
             'reading-plans': { title: t('view.readingPlans'), icon: 'auto_stories' },
             'prayer-wall': { title: t('view.prayerWall'), icon: 'favorite' },
             'course-player': { title: 'Kurs-spiller', icon: 'school' }
@@ -2721,11 +2726,13 @@ class MinSideManager {
         const maritalVal = p.maritalStatus ? (t(maritalKeys[p.maritalStatus]) || p.maritalStatus) : '';
 
         // Fetch allowed items (admin default)
-        let allowedItems = ['overview', 'profile', 'courses', 'reading-plans', 'giving', 'notifications'];
+        let allowedItems = ['overview', 'profile', 'courses', 'reading-plans', 'giving', 'notifications', 'tasks', 'notes'];
         try {
             const designSettings = await window.firebaseService.getPageContent('settings_design');
-            if (designSettings && Array.isArray(designSettings.minsideBottomNav)) {
-                allowedItems = designSettings.minsideBottomNav;
+            if (designSettings && Array.isArray(designSettings.minsideBottomNav) && designSettings.minsideBottomNav.length > 0) {
+                allowedItems = [...designSettings.minsideBottomNav];
+                if (!allowedItems.includes('tasks')) allowedItems.push('tasks');
+                if (!allowedItems.includes('notes')) allowedItems.push('notes');
             }
         } catch (e) {}
 
@@ -2737,7 +2744,9 @@ class MinSideManager {
             'courses': { label: t('overview.btnCoursesLabel') || 'Kurs', icon: 'school' },
             'reading-plans': { label: t('overview.btnReadingPlansLabel') || 'Leseplaner', icon: 'auto_stories' },
             'giving': { label: t('overview.btnGivingLabel') || 'Gaver', icon: 'volunteer_activism' },
-            'notifications': { label: t('sidebar.varslinger') || 'Varslinger', icon: 'notifications' }
+            'notifications': { label: t('sidebar.varslinger') || 'Varslinger', icon: 'notifications' },
+            'tasks': { label: t('sidebar.huskeliste') || 'Huskeliste', icon: 'task_alt' },
+            'notes': { label: t('sidebar.notater') || 'Notater', icon: 'edit_note' }
         };
 
         const customNavHtml = allowedItems.map(id => {
