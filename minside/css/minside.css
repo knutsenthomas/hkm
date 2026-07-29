@@ -4010,7 +4010,7 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
     position: fixed !important;
     inset: 0 !important;
     background: #ffffff !important; /* Pure white background for full immersion */
-    z-index: 99999 !important;
+    z-index: 15000 !important;
     display: flex !important;
     align-items: flex-start !important; /* Top-aligned, scrollable */
     justify-content: center !important;

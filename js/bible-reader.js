@@ -5578,7 +5578,8 @@ class BibleReader {
                 .hkm-rp-day-checkbox { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; color: transparent; transition: all 0.2s; flex-shrink: 0; }
                 .hkm-rp-day-checkbox.completed { background: #10b981; border-color: #10b981; color: #ffffff; }
                 .hkm-rp-day-checkbox.completed .material-symbols-outlined { font-size: 14px; font-weight: bold; }
-                .hkm-devotional-overlay { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; background: #ffffff !important; z-index: 9999999 !important; display: flex !important; align-items: center !important; justify-content: center !important; transform: translateZ(0) !important; backface-visibility: hidden !important; }
+                .hkm-devotional-overlay { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; background: #ffffff !important; z-index: 15000 !important; display: flex !important; align-items: center !important; justify-content: center !important; transform: translateZ(0) !important; backface-visibility: hidden !important; }
+                .hkm-audio-player-bar { z-index: 40000 !important; }
                 .hkm-devotional-content { background: #ffffff !important; width: 100% !important; max-width: 100% !important; height: 100% !important; height: 100dvh !important; border-radius: 0 !important; padding: 0 !important; box-shadow: none !important; display: flex !important; flex-direction: column !important; position: relative !important; transform: translateZ(0) !important; backface-visibility: hidden !important; overflow: hidden !important; }
                 .hkm-devotional-step-title { font-size: 22px !important; font-weight: 700 !important; color: #1B4965 !important; margin-bottom: 16px !important; line-height: 1.3 !important; }
                 .hkm-devotional-text-serif { font-family: 'Merriweather', 'Georgia', serif !important; font-size: 18px !important; line-height: 1.8 !important; color: #1e293b !important; margin-bottom: 24px !important; text-align: left !important; }
@@ -9605,13 +9606,28 @@ class BibleReader {
                 }
             }
 
+            // Determine target book ID for book introduction
+            let devBookId = this.selectedBookId || 'ruth';
+            if (heading && this.books && Array.isArray(this.books)) {
+                const q = heading.toLowerCase().trim();
+                const matched = this.books.find(b => {
+                    const bName = b.name.toLowerCase();
+                    return q.startsWith(bName) || bName.startsWith(q.split(' ')[0]);
+                });
+                if (matched) {
+                    devBookId = matched.id;
+                    this.selectedBookId = matched.id;
+                }
+            }
+
+            const escapedHeading = heading.replace(/'/g, "\\'");
             const chapterHeaderHtml = `
                 <div class="reference-header" style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 24px; text-align: center;">
                     <div class="book-badge" style="background: rgba(209, 125, 57, 0.12); color: #d17d39; font-weight: 800; font-size: 11px; padding: 4px 12px; border-radius: 20px; letter-spacing: 0.1em; text-transform: uppercase;">${bookBadgeText}</div>
                     <h1 class="chapter-number" style="font-size: 56px; font-weight: 900; color: var(--text-base, #0f172a); margin: 0; line-height: 1;">${chapNumText}</h1>
                     
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 6px;">
-                        <button onclick="window.bibleReader.lookupWord('${heading}', '', '${heading}')" class="nav-btn" style="font-size: 13px; padding: 8px 16px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #0f172a); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                        <button onclick="window.bibleReader.lookupWord('${escapedHeading}', '', '${escapedHeading}')" class="nav-btn" style="font-size: 13px; padding: 8px 16px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #0f172a); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
                             <span class="material-symbols-outlined" style="font-size: 18px; color: #d17d39;">menu_book</span>
                             <span>Forklar kapittelet i Bibeleksikon</span>
                         </button>
@@ -9622,7 +9638,7 @@ class BibleReader {
                                 <span>Lytt til kapittelet</span>
                             </button>
 
-                            <button onclick="window.bibleReader.openBookIntroModal('${this.selectedBookId || 'ruth'}')" class="nav-btn" style="font-size: 13px; padding: 8px 16px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #0f172a); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                            <button onclick="window.bibleReader.openBookIntroModal('${devBookId}')" class="nav-btn" style="font-size: 13px; padding: 8px 16px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #0f172a); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
                                 <span class="material-symbols-outlined" style="font-size: 18px; color: #d17d39;">auto_stories</span>
                                 <span>Bokintroduksjon</span>
                             </button>
@@ -9778,84 +9794,7 @@ class BibleReader {
             };
         }
 
-        const audioBtn = stepContainer.querySelector('#hkm-yv-btn-audio');
-        if (audioBtn) {
-            audioBtn.onclick = () => {
-                if (!('speechSynthesis' in window)) {
-                    alert(lang === 'en' ? 'Speech synthesis is not supported in your browser.' : (lang === 'es' ? 'La síntesis de voz no es compatible con su navegador.' : 'Tekst-til-tale er ikke støttet i denne nettleseren.'));
-                    return;
-                }
 
-                const resetAudioUI = () => {
-                    audioBtn.querySelector('span').innerText = 'volume_up';
-                    audioBtn.classList.remove('speaking');
-                };
-
-                if (window.speechSynthesis.speaking) {
-                    window.speechSynthesis.cancel();
-                    resetAudioUI();
-                    return;
-                }
-
-                const speakBody = stepContainer.querySelector('.hkm-yv-body-inner');
-                const speakText = speakBody ? speakBody.innerText.trim() : '';
-
-                if (!speakText) {
-                    alert(lang === 'en' ? 'No text available to read out.' : (lang === 'es' ? 'No hay texto disponible para leer.' : 'Ingen tekst tilgjengelig for opplesning.'));
-                    return;
-                }
-
-                window.speechSynthesis.cancel();
-
-                const targetLang = lang === 'en' ? 'en' : (lang === 'es' ? 'es' : 'no');
-                const voices = window.speechSynthesis.getVoices() || [];
-                const matchedVoice = voices.find(v => v.lang && v.lang.toLowerCase().replace('_', '-').startsWith(targetLang));
-
-                const sentences = speakText.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [speakText];
-                let currentChunkIndex = 0;
-
-                audioBtn.querySelector('span').innerText = 'volume_off';
-                audioBtn.classList.add('speaking');
-
-                const speakNextChunk = () => {
-                    if (currentChunkIndex >= sentences.length || !audioBtn.classList.contains('speaking')) {
-                        resetAudioUI();
-                        return;
-                    }
-
-                    const chunk = sentences[currentChunkIndex].trim();
-                    if (!chunk) {
-                        currentChunkIndex++;
-                        speakNextChunk();
-                        return;
-                    }
-
-                    const utterance = new SpeechSynthesisUtterance(chunk);
-                    utterance.lang = lang === 'en' ? 'en-US' : (lang === 'es' ? 'es-ES' : 'no-NO');
-                    if (matchedVoice) {
-                        utterance.voice = matchedVoice;
-                    }
-
-                    utterance.onend = () => {
-                        currentChunkIndex++;
-                        speakNextChunk();
-                    };
-
-                    utterance.onerror = (e) => {
-                        console.warn("[SpeechSynthesis] Utterance error:", e);
-                        currentChunkIndex++;
-                        speakNextChunk();
-                    };
-
-                    window.speechSynthesis.speak(utterance);
-                    if (window.speechSynthesis.paused) {
-                        window.speechSynthesis.resume();
-                    }
-                };
-
-                speakNextChunk();
-            };
-        }
 
         const shareBtn = stepContainer.querySelector('#hkm-yv-btn-share');
         if (shareBtn) {
@@ -9949,13 +9888,35 @@ class BibleReader {
     attachStep2VerseInteractions(stepContainer, versesRef) {
         const verseParagraphs = stepContainer.querySelectorAll('.hkm-devotional-text-serif p');
         
-        // Wire Audio button in Header (Screenshot 2)
+        let devBookId = this.selectedBookId || 'ruth';
+        let chapNumText = '1';
+        if (versesRef) {
+            const match = versesRef.match(/^(\d+)?\s*\.?\s*([a-zæøå\s]+)\s*(\d+)/i);
+            if (match) chapNumText = match[3];
+            if (this.books && Array.isArray(this.books)) {
+                const q = versesRef.toLowerCase().trim();
+                const matched = this.books.find(b => {
+                    const bName = b.name.toLowerCase();
+                    return q.startsWith(bName) || bName.startsWith(q.split(' ')[0]);
+                });
+                if (matched) devBookId = matched.id;
+            }
+        }
+
+        // Wire Audio button in Header
         const audioHeaderBtn = stepContainer.querySelector('#hkm-yv-btn-audio-header');
         if (audioHeaderBtn) {
             audioHeaderBtn.onclick = (e) => {
                 e.stopPropagation();
-                const audioBtn = stepContainer.querySelector('#hkm-yv-btn-audio');
-                if (audioBtn) audioBtn.click();
+                this.startAudioPlayback(stepContainer, devBookId, chapNumText);
+            };
+        }
+
+        const audioBtn = stepContainer.querySelector('#hkm-yv-btn-audio');
+        if (audioBtn) {
+            audioBtn.onclick = (e) => {
+                e.stopPropagation();
+                this.startAudioPlayback(stepContainer, devBookId, chapNumText);
             };
         }
 
@@ -10242,11 +10203,19 @@ class BibleReader {
         }
     }
 
-    async startAudioPlayback() {
-        if (!this.dom.readingPane) return;
+    async startAudioPlayback(targetContainer = null, customBookId = null, customChapterNum = null) {
+        if (this.audioIsPlaying && !targetContainer) {
+            this.toggleAudioPause();
+            return;
+        }
+
+        let paragraphs = [];
+        if (targetContainer) {
+            paragraphs = Array.from(targetContainer.querySelectorAll('.hkm-devotional-text-serif p, .hkm-devotional-text-serif'));
+        } else if (this.dom && this.dom.readingPane) {
+            paragraphs = Array.from(this.dom.readingPane.querySelectorAll('p'));
+        }
         
-        // Find all paragraphs containing verses
-        const paragraphs = Array.from(this.dom.readingPane.querySelectorAll('p'));
         if (paragraphs.length === 0) {
             alert('Kunne ikke finne tekst for opplesning i dette kapittelet.');
             return;
@@ -10255,8 +10224,8 @@ class BibleReader {
         // Combine text of all paragraphs, stripping verse numbers for cleaner audio reading
         const textParts = paragraphs.map(p => {
             const pCopy = p.cloneNode(true);
-            const sup = pCopy.querySelector('sup.v');
-            if (sup) sup.remove();
+            const sups = pCopy.querySelectorAll('sup.v, .v-num, .verse-num');
+            sups.forEach(s => s.remove());
             return pCopy.innerText.trim();
         }).filter(Boolean);
 
@@ -10284,12 +10253,15 @@ class BibleReader {
             console.error("[BibleAudio] Failed to load Firebase SDK:", e);
         }
 
+        const bookIdToUse = customBookId || this.selectedBookId || 'ruth';
+        const chapterNumToUse = customChapterNum || (this.selectedChapterId ? this.selectedChapterId.split('_')[1] : '1');
+
         // Call getBibleChapterAudio Cloud Function for ChatGPT OpenAI TTS
         if (typeof firebase !== 'undefined' && firebase.functions) {
             const callable = firebase.functions().httpsCallable('getBibleChapterAudio');
             callable({
-                bookId: this.selectedBookId,
-                chapterNum: this.selectedChapterId ? this.selectedChapterId.split('_')[1] : '1',
+                bookId: bookIdToUse,
+                chapterNum: chapterNumToUse,
                 lang: lang,
                 text: chapterText,
                 voice: this.audioVoice || 'onyx'
