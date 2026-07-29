@@ -14,6 +14,7 @@ class CRMManager {
         this.openContactMenuId = null;
         this.searchQuery = '';
         this.statusFilter = 'ALL';
+        this.tagFilter = 'ALL';
         this.viewPreset = localStorage.getItem('hkm_crm_view_preset') || 'standard';
         this.crmToolDialog = {
             open: false,
@@ -314,10 +315,33 @@ class CRMManager {
         if (selector && selector.options.length > 0) {
             const total = this.contacts.length;
             const filtered = this.filteredContacts.length;
-            const suffix = this.statusFilter !== 'ALL' ? ` • ${this.statusFilter.replaceAll('_', ' ')}` : '';
+            let suffix = '';
+            if (this.statusFilter && this.statusFilter !== 'ALL') {
+                suffix += ` • Status: ${this.statusFilter.replaceAll('_', ' ')}`;
+            }
+            if (this.tagFilter && this.tagFilter !== 'ALL') {
+                suffix += ` • Etikett: ${this.tagFilter === '__NO_TAGS__' ? 'Uten' : this.tagFilter}`;
+            }
             selector.options[0].textContent = filtered === total
                 ? `Alle kontakter (${total})`
                 : `Alle kontakter (${filtered}/${total})${suffix}`;
+        }
+
+        const filterBtn = document.getElementById('filter-contacts-btn');
+        if (filterBtn) {
+            const isFiltered = (this.statusFilter && this.statusFilter !== 'ALL') || (this.tagFilter && this.tagFilter !== 'ALL');
+            filterBtn.classList.toggle('active-filter', isFiltered);
+            if (isFiltered) {
+                filterBtn.style.borderColor = '#d17d39';
+                filterBtn.style.color = '#d17d39';
+                filterBtn.style.background = '#fff7ed';
+                filterBtn.innerHTML = `<span class="material-symbols-outlined">filter_list</span> Filtrer (Aktiv)`;
+            } else {
+                filterBtn.style.borderColor = '';
+                filterBtn.style.color = '';
+                filterBtn.style.background = '';
+                filterBtn.innerHTML = `<span class="material-symbols-outlined">filter_list</span> Filtrer`;
+            }
         }
     }
 
@@ -499,23 +523,57 @@ class CRMManager {
         this.updateViewSelector();
     }
 
+    getAllAvailableLabels() {
+        const defaultSet = new Set(['Medlem', 'Ny', 'Fast giver', 'Abonnent', 'Giver']);
+        (this.contacts || []).forEach((c) => {
+            const labels = Array.isArray(c.labels)
+                ? c.labels
+                : (c.labels ? [c.labels] : []);
+            labels.forEach((l) => {
+                if (l && typeof l === 'string' && l.trim()) {
+                    defaultSet.add(l.trim());
+                }
+            });
+        });
+        return Array.from(defaultSet).sort((a, b) => a.localeCompare(b, 'no'));
+    }
+
     applyCurrentFiltersAndSearch() {
         const q = this.searchQuery.trim().toLowerCase();
         const normalizedFilter = this.normalizeStatusFilter(this.statusFilter);
+        const selectedTag = this.tagFilter || 'ALL';
 
         this.filteredContacts = this.contacts.filter((c) => {
+            const labelStr = Array.isArray(c.labels) ? c.labels.join(' ') : String(c.labels || '');
             const matchesSearch = !q || [
                 c.firstName,
                 c.lastName,
                 c.displayName,
                 c.email,
-                c.phone
+                c.phone,
+                labelStr
             ].some((value) => String(value || '').toLowerCase().includes(q));
 
             if (!matchesSearch) return false;
 
-            if (normalizedFilter === 'ALL') return true;
-            return this.normalizeStatusFilter(c.status || 'IKKE_MEDLEM') === normalizedFilter;
+            if (normalizedFilter !== 'ALL') {
+                const contactStatus = this.normalizeStatusFilter(c.status || 'IKKE_MEDLEM');
+                if (contactStatus !== normalizedFilter) return false;
+            }
+
+            if (selectedTag !== 'ALL') {
+                const contactLabels = Array.isArray(c.labels)
+                    ? c.labels.map(l => String(l).trim())
+                    : (c.labels ? [String(c.labels).trim()] : []);
+                
+                if (selectedTag === '__NO_TAGS__') {
+                    if (contactLabels.length > 0) return false;
+                } else {
+                    if (!contactLabels.includes(selectedTag)) return false;
+                }
+            }
+
+            return true;
         });
 
         this.sortFilteredContacts();
@@ -827,32 +885,101 @@ class CRMManager {
     }
 
     openFilterDialog() {
-        const labels = {
-            ALL: 'Alle kontakter',
-            NETTSTEDSMEDLEM: 'Nettstedsmedlemmer',
-            BLOKKERT: 'Blokkerte',
-            IKKE_MEDLEM: 'Ikke medlem'
-        };
+        const availableLabels = this.getAllAvailableLabels();
+
+        const statusOptions = [
+            { value: 'ALL', label: 'Alle kontakter (Ingen statusfilter)' },
+            { value: 'NETTSTEDSMEDLEM', label: 'Nettstedsmedlemmer' },
+            { value: 'BLOKKERT', label: 'Blokkerte kontakter' },
+            { value: 'IKKE_MEDLEM', label: 'Ikke medlem' }
+        ];
+
+        const currentStatus = this.statusFilter || 'ALL';
+        const currentTag = this.tagFilter || 'ALL';
+
+        const html = `
+            <div class="crm-filter-modal-content" style="display: flex; flex-direction: column; gap: 20px; padding: 4px 0;">
+                <div class="crm-filter-group" style="display: flex; flex-direction: column; gap: 8px;">
+                    <label style="font-weight: 700; font-size: 13px; color: #334155; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: #64748b;">verified_user</span>
+                        Medlemsstatus
+                    </label>
+                    <select id="crm-modal-status-select" class="form-control" style="width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 14px; background: #ffffff; color: #0f172a; outline: none; cursor: pointer;">
+                        ${statusOptions.map(opt => `
+                            <option value="${opt.value}" ${opt.value === currentStatus ? 'selected' : ''}>
+                                ${opt.label}
+                            </option>
+                        `).join('')}
+                    </select>
+                </div>
+
+                <div class="crm-filter-group" style="display: flex; flex-direction: column; gap: 8px;">
+                    <label style="font-weight: 700; font-size: 13px; color: #334155; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: #64748b;">label</span>
+                        Etikett / Tag
+                    </label>
+                    <select id="crm-modal-tag-select" class="form-control" style="width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 14px; background: #ffffff; color: #0f172a; outline: none; cursor: pointer;">
+                        <option value="ALL" ${currentTag === 'ALL' ? 'selected' : ''}>Alle etiketter (Ingen etikettfilter)</option>
+                        <option value="__NO_TAGS__" ${currentTag === '__NO_TAGS__' ? 'selected' : ''}>Uten etikett (Ingen koder/tags)</option>
+                        ${availableLabels.map(tag => `
+                            <option value="${this.escapeHtml(tag)}" ${tag === currentTag ? 'selected' : ''}>
+                                Etikett: ${this.escapeHtml(tag)}
+                            </option>
+                        `).join('')}
+                    </select>
+                </div>
+
+                ${(currentStatus !== 'ALL' || currentTag !== 'ALL') ? `
+                    <div style="display: flex; justify-content: flex-end; margin-top: 4px;">
+                        <button type="button" id="crm-reset-filters-btn" style="background: none; border: none; color: #ef4444; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 4px 0;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">restart_alt</span>
+                            Tilbakestill alle filtre
+                        </button>
+                    </div>
+                ` : ''}
+            </div>
+        `;
 
         this.openCrmToolDialog({
-            mode: 'choice',
+            mode: 'custom-html',
             title: 'Filtrer kontakter',
-            subtitle: 'Velg hvilke kontakter som skal vises i tabellen.',
-            selectedValue: this.statusFilter,
+            subtitle: 'Velg medlemsstatus og/eller etikett for å spisse listen.',
+            html: html,
             confirmLabel: 'Bruk filter',
-            options: [
-                { value: 'ALL', label: 'Alle kontakter', description: 'Vis hele listen uten statusfilter.' },
-                { value: 'NETTSTEDSMEDLEM', label: 'Nettstedsmedlemmer', description: 'Kontakter med aktiv medlemsstatus.' },
-                { value: 'BLOKKERT', label: 'Blokkerte', description: 'Kontakter som er markert som blokkert.' },
-                { value: 'IKKE_MEDLEM', label: 'Ikke medlem', description: 'Kontakter uten medlemsstatus.' }
-            ],
-            onConfirm: async (selectedValue) => {
-                this.statusFilter = this.normalizeStatusFilter(selectedValue);
+            onConfirm: async () => {
+                const statusSelect = document.getElementById('crm-modal-status-select');
+                const tagSelect = document.getElementById('crm-modal-tag-select');
+                
+                if (statusSelect) {
+                    this.statusFilter = this.normalizeStatusFilter(statusSelect.value);
+                }
+                if (tagSelect) {
+                    this.tagFilter = tagSelect.value;
+                }
+
                 this.applyCurrentFiltersAndSearch();
                 this.updateViewSelector();
-                this.notify(`Filter aktivt: ${labels[this.statusFilter] || this.statusFilter}`);
+
+                const isFiltered = (this.statusFilter && this.statusFilter !== 'ALL') || (this.tagFilter && this.tagFilter !== 'ALL');
+                if (isFiltered) {
+                    this.notify('Filtrering påført kontaktene.');
+                } else {
+                    this.notify('Alle filtre ble tilbakestilt.');
+                }
             }
         });
+
+        setTimeout(() => {
+            const resetBtn = document.getElementById('crm-reset-filters-btn');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', () => {
+                    const statusSelect = document.getElementById('crm-modal-status-select');
+                    const tagSelect = document.getElementById('crm-modal-tag-select');
+                    if (statusSelect) statusSelect.value = 'ALL';
+                    if (tagSelect) tagSelect.value = 'ALL';
+                });
+            }
+        }, 50);
     }
 
     openViewPresetDialog() {
