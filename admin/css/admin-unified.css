@@ -10221,7 +10221,7 @@ html[data-theme="dark"] .design-ui-callout p {
     border-top-color: #334155 !important;
   }
 
-  /* Nav Items & Links in Mini Mode */
+  /* Nav Items & Links in Mini Mode with High Specificity */
   body.sidebar-mini .sidebar .sidebar-nav,
   body.sidebar-mini .sidebar .nav-group,
   body.sidebar-mini .sidebar .nav-list {
@@ -10257,7 +10257,12 @@ html[data-theme="dark"] .design-ui-callout p {
     align-items: center !important;
   }
 
-  body.sidebar-mini .sidebar .nav-link {
+  body.admin-body.sidebar-mini .sidebar .nav-link,
+  body.crm-body.sidebar-mini .sidebar .nav-link,
+  body.minside-body.sidebar-mini .sidebar .nav-link,
+  body.sidebar-mini .sidebar .nav-link,
+  body.admin-body.sidebar-mini .sidebar .nav-item:not([data-nav-category="all"]) > .nav-link,
+  body.crm-body.sidebar-mini .sidebar .nav-item:not([data-nav-category="all"]) > .nav-link {
     width: 44px !important;
     height: 44px !important;
     min-width: 44px !important;
@@ -10265,7 +10270,12 @@ html[data-theme="dark"] .design-ui-callout p {
     min-height: 44px !important;
     max-height: 44px !important;
     padding: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
     margin: 0 auto !important;
+    gap: 0 !important;
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
@@ -10307,20 +10317,27 @@ html[data-theme="dark"] .design-ui-callout p {
     display: none !important;
   }
 
-  /* Icon inside link */
-  body.sidebar-mini .sidebar .nav-link .material-symbols-outlined {
+  /* Icon inside link - High Specificity Centering */
+  body.admin-body.sidebar-mini .sidebar .nav-link .material-symbols-outlined,
+  body.crm-body.sidebar-mini .sidebar .nav-link .material-symbols-outlined,
+  body.minside-body.sidebar-mini .sidebar .nav-link .material-symbols-outlined,
+  body.sidebar-mini .sidebar .nav-link .material-symbols-outlined,
+  body.admin-body.sidebar-mini .sidebar .nav-link span:first-child,
+  body.crm-body.sidebar-mini .sidebar .nav-link span:first-child {
     font-size: 22px !important;
     width: 22px !important;
     height: 22px !important;
     min-width: 22px !important;
     max-width: 22px !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
     padding: 0 !important;
     line-height: 1 !important;
-    display: inline-flex !important;
+    display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     text-align: center !important;
+    position: static !important;
+    flex-shrink: 0 !important;
   }
 
   /* Badge indicator in mini mode */

@@ -398,7 +398,7 @@ const initAdminHeader = () => {
             return `
                 <li class="nav-item${visible}${hiddenClass}"${hiddenStyle}${categoryAttr}>
                     <div class="nav-link-wrap">
-                        <a href="${href}" class="nav-link${active}"${dataSection}${id}${target}${rel} title="${item.label}" style="flex: 1; padding-right: 40px !important;">
+                        <a href="${href}" class="nav-link${active}"${dataSection}${id}${target}${rel} title="${item.label}">
                             <span class="material-symbols-outlined">${item.icon}</span>
                             <span>${item.label}</span>
                             ${item.badgeId ? `<span id="${item.badgeId}" class="nav-badge" style="display: none;">0</span>` : ''}
