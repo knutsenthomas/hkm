@@ -9193,6 +9193,7 @@ class BibleReader {
         modal = document.createElement('div');
         modal.id = 'hkm-devotional-modal';
         modal.className = 'hkm-devotional-overlay';
+        modal.style.cssText = 'position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; background: #ffffff !important; z-index: 15000 !important; display: flex !important; align-items: center !important; justify-content: center !important;';
         
         document.body.appendChild(modal);
 
