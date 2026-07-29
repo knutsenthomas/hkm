@@ -1025,6 +1025,8 @@ class MinSideManager {
         this.views = {
             overview: this.renderOverview,
             profile: this.renderProfile,
+            history: this.renderHistory,
+            activity: this.renderHistory,
             notifications: this.renderNotifications,
             giving: this.renderGiving,
             courses: this.renderCourses,
@@ -1075,6 +1077,7 @@ class MinSideManager {
             try {
                 if (user) {
                     this.currentUser = user;
+                    this._recordLoginSession(user);
 
                     // Immediately trigger initial view load to eliminate initial UX waiting delay
                     const startView = window.location.hash.replace('#', '') || 'overview';
@@ -1306,7 +1309,8 @@ class MinSideManager {
         const viewInfo = {
             overview: { title: t('view.overview'), icon: 'grid_view' },
             profile: { title: t('view.profile'), icon: 'person' },
-            activity: { title: t('view.activity'), icon: 'history' },
+            history: { title: 'Historikk & Aktivitet', icon: 'history' },
+            activity: { title: 'Historikk & Aktivitet', icon: 'history' },
             notifications: { title: t('view.notifications'), icon: 'notifications' },
             giving: { title: t('view.giving'), icon: 'volunteer_activism' },
             courses: { title: t('view.courses'), icon: 'school' },
@@ -3777,76 +3781,473 @@ class MinSideManager {
     }
 
     // ══════════════════════════════════════════════════════════
-    // VIEW: AKTIVITET
+    // RECORD LOGIN SESSION LOG
     // ══════════════════════════════════════════════════════════
-    async renderActivity(container) {
+    async _recordLoginSession(user) {
+        if (!user || !user.uid) return;
+        try {
+            const key = `hkm_login_session_logged_${user.uid}`;
+            if (sessionStorage.getItem(key)) return; // Already logged for this tab session
+            sessionStorage.setItem(key, Date.now().toString());
+
+            const db = firebase.firestore();
+            const userAgent = navigator.userAgent || '';
+            let device = 'Nettleser';
+            if (/iPhone|iPad|iPod/i.test(userAgent)) device = 'iPhone / iPad';
+            else if (/Android/i.test(userAgent)) device = 'Android Mobil';
+            else if (/Macintosh|Mac OS X/i.test(userAgent)) device = 'Mac (macOS)';
+            else if (/Windows/i.test(userAgent)) device = 'Windows PC';
+
+            let browser = 'Chrome/Safari';
+            if (userAgent.includes('Firefox')) browser = 'Firefox';
+            else if (userAgent.includes('Edg')) browser = 'Microsoft Edge';
+            else if (userAgent.includes('Chrome')) browser = 'Google Chrome';
+            else if (userAgent.includes('Safari')) browser = 'Apple Safari';
+
+            const authMethod = user.providerData?.[0]?.providerId === 'google.com' ? 'Google' : 'E-post & Passord';
+
+            await db.collection('users').doc(user.uid).collection('login_history').add({
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                device: device,
+                browser: browser,
+                userAgent: userAgent.substring(0, 200),
+                authMethod: authMethod,
+                email: user.email || ''
+            });
+
+            // Update user doc lastLogin
+            await db.collection('users').doc(user.uid).set({
+                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+        } catch (err) {
+            console.warn('Could not record login session:', err);
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // VIEW: HISTORIKK & AKTIVITET (FULL USER HISTORY CENTER)
+    // ══════════════════════════════════════════════════════════
+    async renderHistory(container, queryParams = {}) {
         const uid = this.currentUser?.uid;
-        container.innerHTML = `<div class="ms-full-width" id="activity-inner"><div class="loading-state ms-loading-min-120"><div class="spinner"></div></div></div>`;
-        const list = container.querySelector('#activity-inner');
+        const userEmail = (this.currentUser?.email || '').trim().toLowerCase();
+        const isNo = document.documentElement.lang === 'no' || !document.documentElement.lang;
+
+        container.innerHTML = `
+            <div class="ms-full-width" id="history-container">
+                <div class="loading-state ms-loading-min-120">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 12px; font-weight: 600; color: var(--text-muted, #64748b);">Laster inn din historikk...</p>
+                </div>
+            </div>
+        `;
+
+        const rootEl = container.querySelector('#history-container');
+        const activeTab = this._historyTab || 'all';
 
         try {
-            const snap = await firebase.firestore()
-                .collection('user_notifications')
-                .where('userId', '==', uid)
-                .orderBy('createdAt', 'desc')
-                .limit(50)
-                .get();
+            const db = firebase.firestore();
 
-            if (snap.empty) {
-                list.innerHTML = `<div class="empty-state">
-                    <span class="material-symbols-outlined">history</span>
-                    <h3>${t('activity.noActivityYet')}</h3>
-                    <p>${t('activity.noActivitySub')}</p>
-                </div>`;
+            // Parallel fetch of all user activity sources
+            const promises = [
+                // 1. Login History
+                uid ? db.collection('users').doc(uid).collection('login_history').orderBy('timestamp', 'desc').limit(50).get().catch(() => null) : Promise.resolve(null),
+                // 2. Sent Contact Messages
+                userEmail ? db.collection('contactMessages').where('email', '==', userEmail).get().catch(() => null) : Promise.resolve(null),
+                // 3. Visitor Chat Inquiries
+                uid ? db.collection('visitorChats').where('visitorUid', '==', uid).get().catch(() => null) : Promise.resolve(null),
+                // 4. Prayer Requests
+                uid ? db.collection('prayers').where('userId', '==', uid).get().catch(() => null) : Promise.resolve(null),
+                // 5. Payments / Donations
+                this._fetchCurrentUserDonations({ order: true }).catch(() => []),
+                // 6. User Notifications
+                uid ? db.collection('user_notifications').where('userId', '==', uid).orderBy('createdAt', 'desc').limit(50).get().catch(() => null) : Promise.resolve(null),
+                // 7. Personal Notes
+                uid ? db.collection('personal_notes').where('userId', '==', uid).orderBy('createdAt', 'desc').limit(30).get().catch(() => null) : Promise.resolve(null)
+            ];
+
+            const [loginsSnap, contactSnap, chatsSnap, prayersSnap, donations, notifSnap, notesSnap] = await Promise.all(promises);
+
+            const timelineItems = [];
+
+            // Parse Logins
+            if (loginsSnap && !loginsSnap.empty) {
+                loginsSnap.forEach(doc => {
+                    const data = doc.data();
+                    const date = data.timestamp?.toDate ? data.timestamp.toDate() : new Date(data.timestamp || Date.now());
+                    timelineItems.push({
+                        id: doc.id,
+                        category: 'logins',
+                        typeLabel: isNo ? 'Innlogging' : 'Login',
+                        title: isNo ? `Innlogging fra ${data.device || 'Nettleser'}` : `Login from ${data.device || 'Browser'}`,
+                        subtitle: `${data.browser || 'Ukjent'} • ${data.authMethod || 'Konto'}`,
+                        date: date,
+                        icon: 'login',
+                        badgeClass: 'badge-login',
+                        badgeText: isNo ? 'Innlogget' : 'Logged in',
+                        details: {
+                            'Enhet': data.device || 'Nettleser',
+                            'Nettleser': data.browser || 'Ukjent',
+                            'Innloggingsmetode': data.authMethod || 'Passord',
+                            'Konto': data.email || userEmail
+                        }
+                    });
+                });
+            } else {
+                // Add current active session as fallback login
+                timelineItems.push({
+                    id: 'current-session',
+                    category: 'logins',
+                    typeLabel: isNo ? 'Innlogging' : 'Login',
+                    title: isNo ? 'Aktiv økt (Nåværende enhet)' : 'Active Session (Current device)',
+                    subtitle: `${navigator.userAgent.includes('Mac') ? 'Mac' : 'Enhet'} • Innlogget som ${userEmail}`,
+                    date: new Date(),
+                    icon: 'verified_user',
+                    badgeClass: 'badge-active-session',
+                    badgeText: isNo ? 'Aktiv nå' : 'Active now',
+                    details: {
+                        'Status': isNo ? 'Aktiv økt' : 'Active session',
+                        'Konto': userEmail,
+                        'System': navigator.userAgent.substring(0, 90)
+                    }
+                });
+            }
+
+            // Parse Sent Contact Messages
+            if (contactSnap && !contactSnap.empty) {
+                contactSnap.forEach(doc => {
+                    const data = doc.data();
+                    const date = data.createdAt?.toDate ? data.createdAt.toDate() : (data.createdAt ? new Date(data.createdAt) : new Date(0));
+                    timelineItems.push({
+                        id: doc.id,
+                        category: 'sent',
+                        typeLabel: isNo ? 'Sendt melding' : 'Sent message',
+                        title: data.subject || (isNo ? 'Henvendelse via kontaktskjema' : 'Contact form inquiry'),
+                        subtitle: data.message ? (data.message.substring(0, 90) + (data.message.length > 90 ? '...' : '')) : '',
+                        date: date,
+                        icon: 'send',
+                        badgeClass: 'badge-sent',
+                        badgeText: data.status === 'besvart' ? (isNo ? 'Besvart' : 'Answered') : (isNo ? 'Sendt inn' : 'Submitted'),
+                        details: {
+                            'Emne': data.subject || 'Generell henvendelse',
+                            'Status': data.status || 'Sendt inn',
+                            'Melding': data.message || ''
+                        }
+                    });
+                });
+            }
+
+            // Parse Visitor Chats
+            if (chatsSnap && !chatsSnap.empty) {
+                chatsSnap.forEach(doc => {
+                    const data = doc.data();
+                    const date = data.updatedAt?.toDate ? data.updatedAt.toDate() : (data.createdAt?.toDate ? data.createdAt.toDate() : new Date(0));
+                    timelineItems.push({
+                        id: doc.id,
+                        category: 'sent',
+                        typeLabel: isNo ? 'Chat-dialog' : 'Chat inquiry',
+                        title: data.lastVisitorMessage || (isNo ? 'Chat-henvendelse til HKM' : 'Chat inquiry to HKM'),
+                        subtitle: data.lastMessage || (isNo ? 'Melding sendt i chat' : 'Message sent in chat'),
+                        date: date,
+                        icon: 'chat',
+                        badgeClass: 'badge-chat',
+                        badgeText: isNo ? 'Chat-dialog' : 'Chat dialog',
+                        details: {
+                            'Mottaker': 'HKM Support',
+                            'Siste melding': data.lastMessage || 'Ingen meldinger'
+                        }
+                    });
+                });
+            }
+
+            // Parse Prayers
+            if (prayersSnap && !prayersSnap.empty) {
+                prayersSnap.forEach(doc => {
+                    const data = doc.data();
+                    const date = data.createdAt?.toDate ? data.createdAt.toDate() : new Date(0);
+                    timelineItems.push({
+                        id: doc.id,
+                        category: 'sent',
+                        typeLabel: isNo ? 'Bønneønske' : 'Prayer request',
+                        title: data.request || data.title || (isNo ? 'Innsendt bønneønske' : 'Submitted prayer request'),
+                        subtitle: data.details ? (data.details.substring(0, 80) + '...') : '',
+                        date: date,
+                        icon: 'favorite',
+                        badgeClass: 'badge-prayer',
+                        badgeText: isNo ? 'Bønneønske' : 'Prayer',
+                        details: {
+                            'Bønneønske': data.request || 'Bønneønske',
+                            'Detaljer': data.details || 'Ingen ekstra detaljer',
+                            'Forbedere': `${data.prayedCount || 0} personer har bedt for dette`
+                        }
+                    });
+                });
+            }
+
+            // Parse Donations / Payments
+            if (donations && donations.length > 0) {
+                donations.forEach(d => {
+                    const date = this._getDonationDate(d);
+                    const amountFormatted = `${(d.amount || 0).toLocaleString('no-NO')} kr`;
+                    const method = d.paymentMethod === 'vipps' ? 'Vipps' : (d.paymentMethod === 'stripe' ? 'Kort (Stripe)' : (d.paymentMethod || 'Betaling'));
+                    timelineItems.push({
+                        id: d.id,
+                        category: 'payments',
+                        typeLabel: isNo ? 'Gave / Betaling' : 'Donation / Payment',
+                        title: `${isNo ? 'Gave på' : 'Donation of'} ${amountFormatted}`,
+                        subtitle: `${isNo ? 'Betalt med' : 'Paid via'} ${method} • ${d.status === 'completed' || d.status === 'fullført' ? (isNo ? 'Fullført' : 'Completed') : d.status}`,
+                        date: date,
+                        icon: 'payments',
+                        badgeClass: 'badge-payment',
+                        badgeText: amountFormatted,
+                        details: {
+                            'Beløp': amountFormatted,
+                            'Betalingsmetode': method,
+                            'Transaksjons-ID': d.paymentIntentId || d.id || 'N/A',
+                            'Status': d.status || 'Fullført'
+                        }
+                    });
+                });
+            }
+
+            // Parse Notes
+            if (notesSnap && !notesSnap.empty) {
+                notesSnap.forEach(doc => {
+                    const data = doc.data();
+                    const date = data.createdAt?.toDate ? data.createdAt.toDate() : new Date(0);
+                    timelineItems.push({
+                        id: doc.id,
+                        category: 'study',
+                        typeLabel: isNo ? 'Notat lagret' : 'Note saved',
+                        title: data.title || (isNo ? 'Uten tittel' : 'Untitled'),
+                        subtitle: data.content ? (data.content.replace(/<[^>]*>/g, '').substring(0, 80) + '...') : '',
+                        date: date,
+                        icon: 'note_alt',
+                        badgeClass: 'badge-note',
+                        badgeText: isNo ? 'Notat' : 'Note',
+                        details: {
+                            'Tittel': data.title || 'Notat',
+                            'Dato': date.toLocaleDateString('no-NO')
+                        }
+                    });
+                });
+            }
+
+            // Sort all timeline items chronologically (newest first)
+            timelineItems.sort((a, b) => b.date.getTime() - a.date.getTime());
+
+            // Render History UI
+            this._renderHistoryUI(rootEl, timelineItems, activeTab);
+
+        } catch (err) {
+            console.error("renderHistory error:", err);
+            rootEl.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">error</span><h3>Kunne ikke laste historikk</h3><p>${err.message}</p></div>`;
+        }
+    }
+
+    _renderHistoryUI(rootEl, items, activeTab = 'all') {
+        const isNo = document.documentElement.lang === 'no' || !document.documentElement.lang;
+
+        // Statistics counts
+        const countTotal = items.length;
+        const countSent = items.filter(i => i.category === 'sent').length;
+        const countLogins = items.filter(i => i.category === 'logins').length;
+        const countPayments = items.filter(i => i.category === 'payments').length;
+        const countStudy = items.filter(i => i.category === 'study').length;
+
+        // Calculate total payments amount
+        const totalAmountPaid = items
+            .filter(i => i.category === 'payments')
+            .reduce((sum, item) => {
+                const val = parseInt(item.details?.['Beløp']?.replace(/[^0-9]/g, ''), 10) || 0;
+                return sum + val;
+            }, 0);
+
+        rootEl.innerHTML = `
+            <div class="history-dashboard">
+                <!-- Summary Stats Cards -->
+                <div class="history-stats-grid">
+                    <div class="history-stat-card">
+                        <div class="history-stat-icon icon-blue">
+                            <span class="material-symbols-outlined">history</span>
+                        </div>
+                        <div>
+                            <div class="history-stat-val">${countTotal}</div>
+                            <div class="history-stat-label">${isNo ? 'Totalt registrerte hendelser' : 'Total recorded events'}</div>
+                        </div>
+                    </div>
+
+                    <div class="history-stat-card">
+                        <div class="history-stat-icon icon-purple">
+                            <span class="material-symbols-outlined">outbox</span>
+                        </div>
+                        <div>
+                            <div class="history-stat-val">${countSent}</div>
+                            <div class="history-stat-label">${isNo ? 'Sendte henvendelser' : 'Sent inquiries'}</div>
+                        </div>
+                    </div>
+
+                    <div class="history-stat-card">
+                        <div class="history-stat-icon icon-emerald">
+                            <span class="material-symbols-outlined">payments</span>
+                        </div>
+                        <div>
+                            <div class="history-stat-val">${totalAmountPaid > 0 ? totalAmountPaid.toLocaleString('no-NO') + ' kr' : countPayments}</div>
+                            <div class="history-stat-label">${isNo ? 'Gaver & Betalinger' : 'Donations & Payments'}</div>
+                        </div>
+                    </div>
+
+                    <div class="history-stat-card">
+                        <div class="history-stat-icon icon-orange">
+                            <span class="material-symbols-outlined">verified_user</span>
+                        </div>
+                        <div>
+                            <div class="history-stat-val">${countLogins}</div>
+                            <div class="history-stat-label">${isNo ? 'Innlogginger registrert' : 'Logins recorded'}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Pills & Search Bar -->
+                <div class="history-controls">
+                    <div class="history-filter-pills">
+                        <button class="history-pill ${activeTab === 'all' ? 'active' : ''}" data-tab="all">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">apps</span>
+                            ${isNo ? 'Alt' : 'All'} (${countTotal})
+                        </button>
+                        <button class="history-pill ${activeTab === 'sent' ? 'active' : ''}" data-tab="sent">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">send</span>
+                            ${isNo ? 'Sendt ut' : 'Sent'} (${countSent})
+                        </button>
+                        <button class="history-pill ${activeTab === 'logins' ? 'active' : ''}" data-tab="logins">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">login</span>
+                            ${isNo ? 'Innlogginger' : 'Logins'} (${countLogins})
+                        </button>
+                        <button class="history-pill ${activeTab === 'payments' ? 'active' : ''}" data-tab="payments">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">payments</span>
+                            ${isNo ? 'Betalinger' : 'Payments'} (${countPayments})
+                        </button>
+                        <button class="history-pill ${activeTab === 'study' ? 'active' : ''}" data-tab="study">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">auto_stories</span>
+                            ${isNo ? 'Notater & Studier' : 'Notes & Study'} (${countStudy})
+                        </button>
+                    </div>
+
+                    <div class="history-search-box">
+                        <span class="material-symbols-outlined" style="color: var(--text-muted, #64748b); font-size: 18px;">search</span>
+                        <input type="text" id="history-search-input" placeholder="${isNo ? 'Søk i historikk...' : 'Search history...'}" autocomplete="off">
+                    </div>
+                </div>
+
+                <!-- Timeline List Container -->
+                <div class="history-timeline" id="history-timeline-list">
+                    <!-- Items inserted dynamically -->
+                </div>
+            </div>
+        `;
+
+        const listEl = rootEl.querySelector('#history-timeline-list');
+        const searchInput = rootEl.querySelector('#history-search-input');
+        let currentFilterTab = activeTab;
+
+        const updateList = () => {
+            const query = (searchInput?.value || '').trim().toLowerCase();
+
+            let filtered = items;
+            if (currentFilterTab !== 'all') {
+                filtered = filtered.filter(item => item.category === currentFilterTab);
+            }
+
+            if (query) {
+                filtered = filtered.filter(item => 
+                    item.title.toLowerCase().includes(query) ||
+                    item.subtitle.toLowerCase().includes(query) ||
+                    item.typeLabel.toLowerCase().includes(query) ||
+                    Object.values(item.details || {}).some(v => String(v).toLowerCase().includes(query))
+                );
+            }
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `
+                    <div class="empty-state" style="padding: 48px 24px; text-align: center; background: var(--card-bg, #ffffff); border-radius: 16px; border: 1px solid var(--border-solid, #e2e8f0);">
+                        <span class="material-symbols-outlined" style="font-size: 44px; color: var(--text-muted, #94a3b8); margin-bottom: 12px;">history_toggle_off</span>
+                        <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main, #0f172a); margin: 0 0 4px 0;">${isNo ? 'Ingen treff i historikken' : 'No history items found'}</h3>
+                        <p style="font-size: 13.5px; color: var(--text-muted, #64748b); margin: 0;">${isNo ? 'Ingen aktiviteter matcher valgte filter eller søkeord.' : 'No activity matches your selected filter or query.'}</p>
+                    </div>
+                `;
                 return;
             }
 
-            const getNotifIcon = (n) => {
-                if (n.isReading || n.type === 'reading') {
-                    return { icon: 'auto_stories', toneClass: 'activity-icon-tone-push' };
-                }
-                if (n.type === 'message') {
-                    return { icon: 'mail', toneClass: 'activity-icon-tone-message' };
-                }
-                if (n.type === 'push') {
-                    return { icon: 'campaign', toneClass: 'activity-icon-tone-push' };
-                }
-                return { icon: 'notifications', toneClass: 'activity-icon-tone-default' };
-            };
+            listEl.innerHTML = filtered.map(item => {
+                const dateStr = this._timeAgo ? this._timeAgo(item.date) : item.date.toLocaleDateString('no-NO');
+                const fullDateStr = item.date.toLocaleString('no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                
+                const detailsHtml = Object.entries(item.details || {}).map(([k, v]) => `
+                    <div class="history-detail-item">
+                        <div class="history-detail-key">${this._escapeHtml(k)}</div>
+                        <div class="history-detail-val">${this._escapeHtml(String(v))}</div>
+                    </div>
+                `).join('');
 
-            const items = snap.docs.map(doc => this._normalizeNotificationDoc(doc));
-
-            list.innerHTML = items.map(d => {
-                const date = d.createdAt?.toDate ? d.createdAt.toDate() : new Date(0);
-                const m = getNotifIcon(d);
                 return `
-                <div class="activity-item ${!d.read ? 'unread' : ''}" data-id="${d.id}" style="cursor: pointer;">
-                    <div class="activity-icon ${m.toneClass}">
-                        <span class="material-symbols-outlined">${m.icon}</span>
-                    </div>
-                    <div class="activity-content">
-                        <div class="activity-title">
-                            <span>${this._escapeHtml(d.title)}</span>
+                    <div class="history-card" data-id="${item.id}">
+                        <div class="history-card-icon cat-${item.category}">
+                            <span class="material-symbols-outlined">${item.icon}</span>
                         </div>
-                        ${d.body ? `<div class="activity-body">${this._escapeHtml(d.body)}</div>` : ''}
-                        <div class="activity-time">${this._timeAgo(date)}</div>
+                        <div class="history-card-body">
+                            <div class="history-card-header">
+                                <div class="history-card-title">${this._escapeHtml(item.title)}</div>
+                                <div class="history-card-time" title="${fullDateStr}">${dateStr}</div>
+                            </div>
+                            <div class="history-card-sub">${this._escapeHtml(item.subtitle)}</div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px;">
+                                <span class="history-badge ${item.badgeClass}">${this._escapeHtml(item.badgeText)}</span>
+                                <span style="font-size: 11.5px; color: var(--text-muted, #64748b); font-weight: 600; display: inline-flex; align-items: center; gap: 2px;">
+                                    ${fullDateStr}
+                                </span>
+                            </div>
+                            <div class="history-details-drawer" style="display: none;">
+                                ${detailsHtml}
+                            </div>
+                        </div>
                     </div>
-                </div>`;
+                `;
             }).join('');
 
-            list.querySelectorAll('.activity-item').forEach(el => {
-                el?.addEventListener('click', () => {
-                    const notif = items.find(n => n.id === el.dataset.id);
-                    if (notif) this.showNotificationModal(notif);
-                    if (notif && !notif.read) el.classList.remove('unread');
+            // Add click event listener to expand card details
+            listEl.querySelectorAll('.history-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const drawer = card.querySelector('.history-details-drawer');
+                    if (drawer) {
+                        const isExpanded = drawer.style.display !== 'none';
+                        drawer.style.display = isExpanded ? 'none' : 'grid';
+                    }
                 });
             });
+        };
 
-        } catch (err) {
-            console.error('renderActivity error:', err);
-            this._notify(t('activity.loadErrorNotice'), 'warning');
-            list.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">error</span><p>${t('activity.loadErrorCopy')}</p></div>`;
-        }
+        // Filter Pills Event Listeners
+        rootEl.querySelectorAll('.history-pill').forEach(btn => {
+            btn.addEventListener('click', () => {
+                rootEl.querySelectorAll('.history-pill').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilterTab = btn.getAttribute('data-tab');
+                this._historyTab = currentFilterTab;
+                updateList();
+            });
+        });
+
+        // Search Input Listener
+        searchInput?.addEventListener('input', () => updateList());
+
+        // Initial render of timeline
+        updateList();
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // VIEW: AKTIVITET
+    // ══════════════════════════════════════════════════════════
+    async renderActivity(container) {
+        return this.renderHistory(container);
     }
 
     // ══════════════════════════════════════════════════════════

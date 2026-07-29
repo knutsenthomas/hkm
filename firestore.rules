@@ -217,6 +217,14 @@ service cloud.firestore {
       match /reading_plans/{planId} {
         allow read, write: if isSelf(userId) || isAdmin();
       }
+
+      match /login_history/{logId} {
+        allow read, write: if isSelf(userId) || isAdmin();
+      }
+
+      match /{allSubcollections=**} {
+        allow read, write: if isSelf(userId) || isAdmin();
+      }
     }
 
     // Reading Plans root collection
@@ -236,10 +244,14 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
-    // Contact form messages (public submit, admin process)
+    // Contact form messages (public submit, admin process, user can read own)
     match /contactMessages/{messageId} {
       allow create: if validPublicContactMessage();
-      allow read, update, delete: if isAdmin();
+      allow read: if isAdmin() || (signedIn() && (
+        (hasKey(resource.data, 'userId') && resource.data.userId == request.auth.uid) ||
+        (hasKey(resource.data, 'email') && request.auth.token.email is string && resource.data.email.lower() == request.auth.token.email.lower())
+      ));
+      allow update, delete: if isAdmin();
     }
 
     // Visitor chat: authenticated anonymously on the client and synced with Google Chat via Cloud Functions.
