@@ -513,35 +513,61 @@
                 </div>
 
                 <div
-                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; margin-top: 50px;">
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-top: 50px;">
                     <!-- Option 1: Donación Regular (Vipps/Stripe) -->
                     <div
-                        style="background: #f8f9fa; padding: 40px; border-radius: 15px; text-align: center; border: 1px solid #eee;">
-                        <div
-                            style="width: 70px; height: 70px; background: #FF5B24; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; color: white; font-size: 30px;">
-                            <i class="fas fa-hand-holding-heart"></i>
+                        style="background: #f8f9fa; padding: 40px; border-radius: 15px; text-align: center; border: 1px solid #eee; display: flex; flex-direction: column; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div
+                                style="width: 70px; height: 70px; background: #FF5B24; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; color: white; font-size: 30px;">
+                                <i class="fas fa-hand-holding-heart"></i>
+                            </div>
+                            <h3 style="margin-bottom: 15px;" data-content-key="regular_donor.recurring.title">Donación Regular (Vipps / Tarjeta)</h3>
+                            <p style="color: var(--text-light); margin-bottom: 25px;" data-content-key="regular_donor.recurring.text">La forma más fácil de ser donante regular. Puede configurar fácilmente un acuerdo recurrente utilizando Vipps o tarjeta.</p>
                         </div>
-                        <h3 style="margin-bottom: 15px;" data-content-key="regular_donor.recurring.title">Donación Regular (Vipps / Tarjeta)</h3>
-                        <p style="color: var(--text-light); margin-bottom: 25px;" data-content-key="regular_donor.recurring.text">La forma más fácil de ser donante regular. Puede configurar fácilmente un acuerdo recurrente utilizando Vipps o tarjeta.</p>
                         <a href="/es/donantes-regulares" class="btn btn-outline"
                             style="color: #FF5B24; border-color: #FF5B24;" data-content-key="regular_donor.recurring.cta">Crear donación regular</a>
                     </div>
 
-                    <!-- Option 2: Transferencia Bancaria -->
+                    <!-- Option 2: Buy Me a Coffee -->
                     <div
-                        style="background: #f8f9fa; padding: 40px; border-radius: 15px; text-align: center; border: 1px solid #eee;">
-                        <div
-                            style="width: 70px; height: 70px; background: #2196F3; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; color: white; font-size: 30px;">
-                            <i class="fas fa-university"></i>
+                        style="background: #f8f9fa; padding: 40px; border-radius: 15px; text-align: center; border: 1px solid #eee; display: flex; flex-direction: column; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div
+                                style="width: 70px; height: 70px; background: #c05d2a; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; color: white; font-size: 30px;">
+                                <i class="fas fa-coffee"></i>
+                            </div>
+                            <h3 style="margin-bottom: 15px;">Buy Me a Coffee</h3>
+                            <p style="color: var(--text-light); margin-bottom: 25px;">Apoye nuestro trabajo directamente con un café virtual o una donación única a través de Buy Me a Coffee.</p>
                         </div>
-                        <h3 style="margin-bottom: 15px;" data-content-key="regular_donor.bank.title">Transferencia Bancaria</h3>
-                        <p style="color: var(--text-light); margin-bottom: 25px;" data-content-key="regular_donor.bank.text">Configure una transferencia regular en
-                            su banco en línea a nuestra cuenta. Esto nos genera las comisiones más bajas.</p>
-                        <div
-                            style="background: white; padding: 15px; border-radius: 8px; font-weight: 700; color: var(--primary-orange); border: 1px dashed var(--primary-orange); line-height: 1.5;" data-content-key="regular_donor.bank.account">
-                            IBAN: NO72 3000 6608 759<br>
-                            BIC/SWIFT: SPSONO22<br>
-                            Banco: Sparebanken Sør
+                        <div style="display: flex; justify-content: center; align-items: center; width: 100%; min-height: 55px;">
+                            <a class="bmc-button" target="_blank" rel="noopener noreferrer" href="https://buymeacoffee.com/Hiskingdomministry" style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 12px 24px; background-color: #c15d2a; color: #ffffff; font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 700; border-radius: 12px; text-decoration: none; border: 1px solid transparent; transition: all 0.2s ease-in-out; box-shadow: 0 4px 14px rgba(193, 93, 42, 0.3);">
+                                <i class="fas fa-coffee" style="font-size: 20px; color: #FFDD00;"></i>
+                                <span style="line-height: 1;">Buy me a coffee</span>
+                            </a>
+                            <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="Hiskingdomministry" data-color="#c15d2a" data-emoji="" data-font="Inter" data-text="Buy me a coffee" data-outline-color="#ffffff" data-font-color="#ffffff" data-coffee-color="#FFDD00" ></script>
+                        </div>
+                    </div>
+
+                    <!-- Option 3: Transferencia Bancaria -->
+                    <div
+                        style="background: #f8f9fa; padding: 40px; border-radius: 15px; text-align: center; border: 1px solid #eee; display: flex; flex-direction: column; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div
+                                style="width: 70px; height: 70px; background: #2196F3; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; color: white; font-size: 30px;">
+                                <i class="fas fa-university"></i>
+                            </div>
+                            <h3 style="margin-bottom: 15px;" data-content-key="regular_donor.bank.title">Transferencia Bancaria</h3>
+                            <p style="color: var(--text-light); margin-bottom: 25px;" data-content-key="regular_donor.bank.text">Configure una transferencia regular en
+                                su banco en línea a nuestra cuenta. Esto nos genera las comisiones más bajas.</p>
+                        </div>
+                        <div style="width: 100%;">
+                            <div
+                                style="background: white; padding: 15px; border-radius: 8px; font-weight: 700; color: var(--primary-orange); border: 1px dashed var(--primary-orange); line-height: 1.5;" data-content-key="regular_donor.bank.account">
+                                IBAN: NO72 3000 6608 759<br>
+                                BIC/SWIFT: SPSONO22<br>
+                                Banco: Sparebanken Sør
+                            </div>
                         </div>
                     </div>
                 </div>

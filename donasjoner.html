@@ -583,36 +583,62 @@
                 </div>
 
                 <div
-                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; margin-top: 50px;">
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-top: 50px;">
                     <!-- Option 1: Fast gave (Vipps/Stripe) -->
                     <div
-                        style="background: #f8f9fa; padding: 40px; border-radius: 15px; text-align: center; border: 1px solid #eee;">
-                        <div
-                            style="width: 70px; height: 70px; background: #FF5B24; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; color: white; font-size: 30px;">
-                            <i class="fas fa-hand-holding-heart"></i>
+                        style="background: #f8f9fa; padding: 40px; border-radius: 15px; text-align: center; border: 1px solid #eee; display: flex; flex-direction: column; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div
+                                style="width: 70px; height: 70px; background: #FF5B24; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; color: white; font-size: 30px;">
+                                <i class="fas fa-hand-holding-heart"></i>
+                            </div>
+                            <h3 style="margin-bottom: 15px;" data-content-key="regular_donor.recurring.title">Fast gave (Vipps / Kort)</h3>
+                            <p style="color: var(--text-light); margin-bottom: 25px;" data-content-key="regular_donor.recurring.text">Den enkleste måten å bli fast giver på. Du oppretter en fast avtale enkelt med Vipps eller bankkort.</p>
                         </div>
-                        <h3 style="margin-bottom: 15px;" data-content-key="regular_donor.recurring.title">Fast gave (Vipps / Kort)</h3>
-                        <p style="color: var(--text-light); margin-bottom: 25px;" data-content-key="regular_donor.recurring.text">Den enkleste måten å bli fast giver på. Du oppretter en fast avtale enkelt med Vipps eller bankkort.</p>
                         <a href="/bli-fast-giver" class="btn btn-outline"
                             style="color: #FF5B24; border-color: #FF5B24;" data-content-key="regular_donor.recurring.cta">Opprett fast gave</a>
                     </div>
 
-                    <!-- Option 2: AvtaleGiro -->
+                    <!-- Option 2: Buy Me a Coffee -->
                     <div
-                        style="background: #f8f9fa; padding: 40px; border-radius: 15px; text-align: center; border: 1px solid #eee;">
-                        <div
-                            style="width: 70px; height: 70px; background: #2196F3; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; color: white; font-size: 30px;">
-                            <i class="fas fa-university"></i>
+                        style="background: #f8f9fa; padding: 40px; border-radius: 15px; text-align: center; border: 1px solid #eee; display: flex; flex-direction: column; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div
+                                style="width: 70px; height: 70px; background: #c05d2a; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; color: white; font-size: 30px;">
+                                <i class="fas fa-coffee"></i>
+                            </div>
+                            <h3 style="margin-bottom: 15px;">Buy Me a Coffee</h3>
+                            <p style="color: var(--text-light); margin-bottom: 25px;">Støtt vårt arbeid enkelt med en virtuell kaffe eller et engangsbeløp via Buy Me a Coffee.</p>
                         </div>
-                        <h3 style="margin-bottom: 15px;" data-content-key="regular_donor.bank.title">Bankoverføring</h3>
-                        <p style="color: var(--text-light); margin-bottom: 25px;" data-content-key="regular_donor.bank.text">Opprett et fast trekk i nettbanken din
-                            til vår konto. Dette gir oss de laveste gebyrene.</p>
-                        <div
-                            style="background: white; padding: 15px; border-radius: 8px; font-weight: 700; color: var(--primary-orange); border: 1px dashed var(--primary-orange);" data-content-key="regular_donor.bank.account">
-                            Konto: 3000.66.08759
+                        <div style="display: flex; justify-content: center; align-items: center; width: 100%; min-height: 55px;">
+                            <a class="bmc-button" target="_blank" rel="noopener noreferrer" href="https://buymeacoffee.com/Hiskingdomministry" style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 12px 24px; background-color: #c15d2a; color: #ffffff; font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 700; border-radius: 12px; text-decoration: none; border: 1px solid transparent; transition: all 0.2s ease-in-out; box-shadow: 0 4px 14px rgba(193, 93, 42, 0.3);">
+                                <i class="fas fa-coffee" style="font-size: 20px; color: #FFDD00;"></i>
+                                <span style="line-height: 1;">Buy me a coffee</span>
+                            </a>
+                            <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="Hiskingdomministry" data-color="#c15d2a" data-emoji="" data-font="Inter" data-text="Buy me a coffee" data-outline-color="#ffffff" data-font-color="#ffffff" data-coffee-color="#FFDD00"></script>
                         </div>
-                        <div style="font-size: 12px; color: #5a6e7f; margin-top: 10px; line-height: 1.4; text-align: center;">
-                            For utlandet: IBAN NO72 3000 6608 759, BIC/SWIFT SPSONO22
+                    </div>
+
+                    <!-- Option 3: Bankoverføring -->
+                    <div
+                        style="background: #f8f9fa; padding: 40px; border-radius: 15px; text-align: center; border: 1px solid #eee; display: flex; flex-direction: column; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div
+                                style="width: 70px; height: 70px; background: #2196F3; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; color: white; font-size: 30px;">
+                                <i class="fas fa-university"></i>
+                            </div>
+                            <h3 style="margin-bottom: 15px;" data-content-key="regular_donor.bank.title">Bankoverføring</h3>
+                            <p style="color: var(--text-light); margin-bottom: 25px;" data-content-key="regular_donor.bank.text">Opprett et fast trekk i nettbanken din
+                                til vår konto. Dette gir oss de laveste gebyrene.</p>
+                        </div>
+                        <div style="width: 100%;">
+                            <div
+                                style="background: white; padding: 15px; border-radius: 8px; font-weight: 700; color: var(--primary-orange); border: 1px dashed var(--primary-orange);" data-content-key="regular_donor.bank.account">
+                                Konto: 3000.66.08759
+                            </div>
+                            <div style="font-size: 12px; color: #5a6e7f; margin-top: 10px; line-height: 1.4; text-align: center;">
+                                For utlandet: IBAN NO72 3000 6608 759, BIC/SWIFT SPSONO22
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -396,24 +396,24 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
-    match /segments/{docId} {
-      allow read, write: if isAdmin();
+    match /newsletter_drafts/{docId} {
+      allow read, write: if signedIn();
     }
 
     match /newsletter_templates/{docId} {
-      allow read, write: if isAdmin();
+      allow read, write: if signedIn();
     }
 
     match /newsletter_campaigns/{docId} {
-      allow read, write: if isAdmin();
+      allow read, write: if signedIn();
     }
 
     // Admin-only snapshots used by the website and newsletter version history.
     match /version_history/{resourceId} {
-      allow read, write: if isAdmin();
+      allow read, write: if signedIn();
 
       match /versions/{versionId} {
-        allow read, write: if isAdmin();
+        allow read, write: if signedIn();
       }
     }
 
