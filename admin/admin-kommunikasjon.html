@@ -374,38 +374,46 @@
 
                 <!-- Contacts Section -->
                 <div class="contacts-grid card modern">
-                    <div class="table-header">
-                        <div class="header-left-actions">
-                            <select class="view-selector">
-                                <option>Alle kontakter (0)</option>
-                                <option>Nye kontakter</option>
-                                <option>Givere</option>
-                            </select>
-                            <button class="btn btn-danger" id="bulk-delete-btn" style="display: none; gap: 6px !important; align-items: center !important; justify-content: center !important;">
-                                <span class="material-symbols-outlined" style="font-size: 18px; margin: 0 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; height: 18px !important; width: 18px !important; line-height: 1 !important;">delete_sweep</span>
-                                <span id="bulk-delete-text">Slett valgte</span>
-                            </button>
-                            <button class="btn-text" id="manage-view-btn" type="button">Administrer visning</button>
-
-                        </div>
-                        <div class="header-right-actions" id="contacts-tools">
-                            <button class="btn btn-primary" id="add-contact-btn" type="button" onclick="if(window.crmSystem) window.crmSystem.openCreateContactModal();" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700;">
-                                <span class="material-symbols-outlined" style="font-size: 18px;">person_add</span>
-                                Ny kontakt
-                            </button>
-                            <div class="search-box">
-                                <span class="material-symbols-outlined">search</span>
-                                <input type="text" id="contact-search" placeholder="Søk...">
+                    <div class="table-header" style="flex-direction: column; align-items: stretch; gap: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <div class="header-left-actions">
+                                <select class="view-selector">
+                                    <option>Alle kontakter (0)</option>
+                                    <option>Nye kontakter</option>
+                                    <option>Givere</option>
+                                </select>
+                                <button class="btn btn-danger" id="bulk-delete-btn" style="display: none; gap: 6px !important; align-items: center !important; justify-content: center !important;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; margin: 0 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; height: 18px !important; width: 18px !important; line-height: 1 !important;">delete_sweep</span>
+                                    <span id="bulk-delete-text">Slett valgte</span>
+                                </button>
+                                <button class="btn-text" id="manage-view-btn" type="button">Administrer visning</button>
                             </div>
-                            <select id="contact-tag-filter" class="form-control tag-filter-select">
-                                <option value="ALL">Alle etiketter</option>
-                                <option value="__NO_TAGS__">Uten etikett</option>
-                            </select>
-                            <button class="btn btn-outline" id="filter-contacts-btn" type="button">
-                                <span class="material-symbols-outlined">filter_list</span>
-                                Filtrer
-                            </button>
-                            <button class="btn btn-outline" id="import-export-btn">Import/eksport</button>
+                            <div class="header-right-actions">
+                                <button class="btn btn-primary" id="add-contact-btn" type="button" onclick="if(window.crmSystem) window.crmSystem.openCreateContactModal();" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">person_add</span>
+                                    Ny kontakt
+                                </button>
+                                <button class="btn btn-outline" id="import-export-btn">
+                                    <span class="material-symbols-outlined">import_export</span>
+                                    Import/eksport
+                                </button>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; align-items: center; width: 100%;" id="contacts-tools">
+                            <div class="header-right-actions">
+                                <div class="search-box">
+                                    <span class="material-symbols-outlined">search</span>
+                                    <input type="text" id="contact-search" placeholder="Søk...">
+                                </div>
+                                <select id="contact-tag-filter" class="form-control tag-filter-select">
+                                    <option value="ALL">Alle etiketter</option>
+                                    <option value="__NO_TAGS__">Uten etikett</option>
+                                </select>
+                                <button class="btn btn-outline" id="filter-contacts-btn" type="button">
+                                    <span class="material-symbols-outlined">filter_list</span>
+                                    Filtrer
+                                </button>
+                            </div>
                         </div>
                     </div>
 

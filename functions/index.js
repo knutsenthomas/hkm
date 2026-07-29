@@ -4517,7 +4517,7 @@ async function getEmailTemplate(templateId, fallback) {
 /**
  * Helper-funksjon for å sende e-post.
  */
-async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Ministry", type = "automated", cc = "", bcc = "", replyTo = "post@hiskingdomministry.no", attachments = [] }) {
+async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Ministry", type = "automated", cc = "", bcc = "", replyTo = "post@hiskingdomministry.no", attachments = [], headers = {} }) {
   const user = getSecretOrEnv(emailUserParam, ["EMAIL_USER"]) || "post@hiskingdomministry.no";
   const pass = getSecretOrEnv(emailPassParam, ["EMAIL_PASS"]);
 
@@ -4542,6 +4542,13 @@ async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Mini
   });
 
   try {
+    // Legg til standard bulk/unsubscribe-headere for nyhetsbrev for å unngå søppelpost
+    let finalHeaders = { ...headers };
+    if (type === "newsletter" && !finalHeaders["List-Unsubscribe"]) {
+      finalHeaders["List-Unsubscribe"] = `<mailto:post@hiskingdomministry.no?subject=unsubscribe>, <https://hiskingdomministry.no/avmeld.html>`;
+      finalHeaders["Precedence"] = "bulk";
+    }
+
     await transporter.sendMail({
       from: `"${fromName}" <${senderEmail}>`,
       to,
@@ -4552,6 +4559,7 @@ async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Mini
       text,
       html,
       attachments: Array.isArray(attachments) && attachments.length ? attachments : undefined,
+      headers: finalHeaders,
     });
 
     // Logg utsendelsen
@@ -5138,11 +5146,36 @@ exports.onNewsletterCampaignCreate = onDocumentCreated({
       }
 
       try {
+        // Generer avmeldingslenke
+        const unsubscribeUrl = `https://hiskingdomministry.no/avmeld.html?email=${encodeURIComponent(recipient.email)}`;
+        const listUnsubscribeHeader = `<mailto:post@hiskingdomministry.no?subject=unsubscribe-${encodeURIComponent(recipient.email)}>, <${unsubscribeUrl}>`;
+        
+        // Legg til avmeldingslenke i bunnen av e-posten hvis den mangler
+        if (emailHtml && !emailHtml.includes("avmeld.html")) {
+          const footerHtml = `<div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 12px; color: #64748b; font-family: sans-serif;">
+            <p>Du mottar denne e-posten fordi du abonnerer på nyhetsbrevet til His Kingdom Ministry.</p>
+            <p><a href="${unsubscribeUrl}" style="color: #64748b; text-decoration: underline;">Klikk her for å melde deg av nyhetsbrevet</a></p>
+          </div>`;
+          
+          if (emailHtml.includes("</body>")) {
+            emailHtml = emailHtml.replace("</body>", footerHtml + "</body>");
+          } else {
+            emailHtml += footerHtml;
+          }
+        }
+
         await sendEmail({
           to: recipient.email,
           subject: recipientSubject,
           html: emailHtml,
-          text: recipientSubject
+          text: recipientSubject + `\n\nMeld deg av: ${unsubscribeUrl}`,
+          type: "newsletter",
+          headers: {
+            "List-Unsubscribe": listUnsubscribeHeader,
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+            "Precedence": "bulk",
+            "X-Auto-Response-Suppress": "OOF, AutoReply"
+          }
         });
         sentCount++;
       } catch (err) {
