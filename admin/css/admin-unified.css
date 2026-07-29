@@ -10125,12 +10125,18 @@ html[data-theme="dark"] .design-ui-callout p {
   }
 
   /* Mini Sidebar Outer Container */
+  body.sidebar-mini .sidebar,
+  body.sidebar-mini .sidebar * {
+    box-sizing: border-box !important;
+  }
+
   body.sidebar-mini .sidebar {
-    width: 68px !important;
-    min-width: 68px !important;
-    max-width: 68px !important;
+    width: 72px !important;
+    min-width: 72px !important;
+    max-width: 72px !important;
     padding: 16px 0 !important;
     overflow-x: hidden !important;
+    overflow-y: auto !important;
     transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
     display: flex !important;
     flex-direction: column !important;
@@ -10141,21 +10147,21 @@ html[data-theme="dark"] .design-ui-callout p {
   body.sidebar-mini .crm-main,
   body.sidebar-mini .main-header,
   body.sidebar-mini .admin-container {
-    margin-left: 68px !important;
-    width: calc(100% - 68px) !important;
-    max-width: calc(100% - 68px) !important;
+    margin-left: 72px !important;
+    width: calc(100% - 72px) !important;
+    max-width: calc(100% - 72px) !important;
     transition: margin-left 0.3s cubic-bezier(0.16, 1, 0.3, 1), width 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
 
   /* Sidebar Header & Brand Logo in Mini Mode */
   body.sidebar-mini .sidebar-header {
     width: 100% !important;
-    padding: 8px 0 16px 0 !important;
+    padding: 8px 0 14px 0 !important;
     margin-bottom: 12px !important;
     justify-content: center !important;
     align-items: center !important;
     flex-direction: column !important;
-    gap: 10px !important;
+    gap: 8px !important;
     border-bottom: 1px solid var(--border-color, #e2e8f0) !important;
     box-sizing: border-box !important;
   }
@@ -10177,9 +10183,22 @@ html[data-theme="dark"] .design-ui-callout p {
   body.sidebar-mini .sidebar-header .logo img {
     width: 34px !important;
     height: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
     object-fit: contain !important;
     margin: 0 auto !important;
     display: block !important;
+  }
+
+  body.sidebar-mini .desktop-sidebar-toggle-btn {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   /* Completely hide category header text & arrows to prevent double lines */
@@ -10191,8 +10210,8 @@ html[data-theme="dark"] .design-ui-callout p {
   body.sidebar-mini .sidebar .nav-group + .nav-group,
   body.sidebar-mini .sidebar .nav-list > li.nav-item[data-nav-category="administrasjon"]:first-of-type,
   body.sidebar-mini .sidebar .nav-list > li.nav-item[data-nav-category="kommunikasjon"]:first-of-type {
-    margin-top: 8px !important;
-    padding-top: 8px !important;
+    margin-top: 10px !important;
+    padding-top: 10px !important;
     border-top: 1px solid var(--border-color, #e2e8f0) !important;
   }
 
@@ -10203,9 +10222,12 @@ html[data-theme="dark"] .design-ui-callout p {
   }
 
   /* Nav Items & Links in Mini Mode */
+  body.sidebar-mini .sidebar .sidebar-nav,
   body.sidebar-mini .sidebar .nav-group,
   body.sidebar-mini .sidebar .nav-list {
     width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
     padding: 0 !important;
     margin: 0 !important;
     display: flex !important;
@@ -10215,20 +10237,24 @@ html[data-theme="dark"] .design-ui-callout p {
 
   body.sidebar-mini .sidebar .nav-item {
     width: 100% !important;
-    margin-bottom: 4px !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 0 6px 0 !important;
+    padding: 0 !important;
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
-    padding: 0 !important;
   }
 
   body.sidebar-mini .sidebar .nav-link-wrap {
     width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
     justify-content: center !important;
     align-items: center !important;
-    display: flex !important;
-    padding: 0 !important;
-    margin: 0 !important;
   }
 
   body.sidebar-mini .sidebar .nav-link {
@@ -10236,13 +10262,16 @@ html[data-theme="dark"] .design-ui-callout p {
     height: 44px !important;
     min-width: 44px !important;
     max-width: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
     padding: 0 !important;
     margin: 0 auto !important;
+    display: flex !important;
     justify-content: center !important;
     align-items: center !important;
     border-radius: 14px !important;
     position: relative !important;
-    flex: none !important;
+    flex: 0 0 44px !important;
     box-sizing: border-box !important;
   }
 
@@ -10281,11 +10310,17 @@ html[data-theme="dark"] .design-ui-callout p {
   /* Icon inside link */
   body.sidebar-mini .sidebar .nav-link .material-symbols-outlined {
     font-size: 22px !important;
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    max-width: 22px !important;
     margin: 0 !important;
+    padding: 0 !important;
     line-height: 1 !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
+    text-align: center !important;
   }
 
   /* Badge indicator in mini mode */
