@@ -379,12 +379,28 @@ class CRMManager {
         select.value = currentValue;
     }
 
+    resetAllFilters() {
+        this.statusFilter = 'ALL';
+        this.tagFilter = 'ALL';
+        this.searchQuery = '';
+        const searchInput = document.getElementById('contact-search');
+        if (searchInput) searchInput.value = '';
+        this.applyCurrentFiltersAndSearch();
+        this.updateViewSelector();
+        this.notify('Alle filtre er nullstilt.');
+    }
+
     renderTable() {
         const tableBody = document.getElementById('contacts-table-body');
         if (!tableBody) return;
 
         if (this.filteredContacts.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 40px;">Ingen kontakter funnet.</td></tr>`;
+            const isFiltered = (this.statusFilter && this.statusFilter !== 'ALL') || (this.tagFilter && this.tagFilter !== 'ALL') || Boolean(this.searchQuery);
+            let emptyMsg = 'Ingen kontakter funnet.';
+            if (isFiltered) {
+                emptyMsg = `Ingen kontakter matchet de valgte filtrene.<br><button type="button" class="btn btn-outline" style="margin-top: 12px; padding: 6px 14px; font-size: 13px; cursor: pointer;" onclick="if(window.crmSystem) window.crmSystem.resetAllFilters();">Nullstill alle filtre</button>`;
+            }
+            tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 40px; color: #64748b;">${emptyMsg}</td></tr>`;
             this.applyViewPreset();
             return;
         }
@@ -557,12 +573,35 @@ class CRMManager {
         this.updateViewSelector();
     }
 
+    getContactLabels(c) {
+        if (!c) return [];
+        const list = [];
+        if (Array.isArray(c.labels)) {
+            c.labels.forEach(l => l && list.push(String(l).trim()));
+        } else if (c.labels) {
+            list.push(String(c.labels).trim());
+        }
+
+        if (Array.isArray(c.tags)) {
+            c.tags.forEach(t => t && list.push(String(t).trim()));
+        } else if (c.tags) {
+            list.push(String(c.tags).trim());
+        }
+
+        if (c.label && !list.includes(String(c.label).trim())) {
+            list.push(String(c.label).trim());
+        }
+        if (c.tag && !list.includes(String(c.tag).trim())) {
+            list.push(String(c.tag).trim());
+        }
+
+        return list.filter(Boolean);
+    }
+
     getAllAvailableLabels() {
         const defaultSet = new Set(['Medlem', 'Ny', 'Fast giver', 'Abonnent', 'Giver']);
         (this.contacts || []).forEach((c) => {
-            const labels = Array.isArray(c.labels)
-                ? c.labels
-                : (c.labels ? [c.labels] : []);
+            const labels = this.getContactLabels(c);
             labels.forEach((l) => {
                 if (l && typeof l === 'string' && l.trim()) {
                     defaultSet.add(l.trim());
@@ -575,10 +614,13 @@ class CRMManager {
     applyCurrentFiltersAndSearch() {
         const q = this.searchQuery.trim().toLowerCase();
         const normalizedFilter = this.normalizeStatusFilter(this.statusFilter);
-        const selectedTag = this.tagFilter || 'ALL';
+        const selectedTag = (this.tagFilter || 'ALL').trim();
 
         this.filteredContacts = this.contacts.filter((c) => {
-            const labelStr = Array.isArray(c.labels) ? c.labels.join(' ') : String(c.labels || '');
+            const contactLabels = this.getContactLabels(c);
+            const effectiveLabels = contactLabels.length > 0 ? contactLabels : ['Ny'];
+            const labelStr = effectiveLabels.join(' ');
+
             const matchesSearch = !q || [
                 c.firstName,
                 c.lastName,
@@ -596,14 +638,12 @@ class CRMManager {
             }
 
             if (selectedTag !== 'ALL') {
-                const contactLabels = Array.isArray(c.labels)
-                    ? c.labels.map(l => String(l).trim())
-                    : (c.labels ? [String(c.labels).trim()] : []);
-                
                 if (selectedTag === '__NO_TAGS__') {
                     if (contactLabels.length > 0) return false;
                 } else {
-                    if (!contactLabels.includes(selectedTag)) return false;
+                    const targetTag = selectedTag.toLowerCase();
+                    const hasMatchingTag = effectiveLabels.some(l => l.toLowerCase() === targetTag);
+                    if (!hasMatchingTag) return false;
                 }
             }
 
