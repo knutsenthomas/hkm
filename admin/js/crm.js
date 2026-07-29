@@ -8,6 +8,7 @@ class CRMManager {
         this.contacts = [];
         this.filteredContacts = [];
         this.selectedContactIds = new Set();
+        this.editingContactLabels = new Set();
         this.isModalOpen = false;
         this.editingContactId = null;
         this.openContactMenuId = null;
@@ -135,10 +136,15 @@ class CRMManager {
 
         if (labelSelect) {
             labelSelect.addEventListener('change', (e) => {
-                if (e.target.value === '__CREATE_NEW__') {
+                const val = e.target.value;
+                if (val === '__CREATE_NEW__') {
                     showNewLabelInput();
-                } else if (newLabelContainer) {
-                    newLabelContainer.style.display = 'none';
+                } else if (val) {
+                    if (!this.editingContactLabels) this.editingContactLabels = new Set();
+                    this.editingContactLabels.add(val);
+                    this.renderSelectedLabelPills();
+                    labelSelect.value = '';
+                    if (newLabelContainer) newLabelContainer.style.display = 'none';
                 }
             });
         }
@@ -155,7 +161,10 @@ class CRMManager {
             const val = newLabelInput.value.trim();
             if (!val) return;
 
-            this.populateLabelOptions(val);
+            if (!this.editingContactLabels) this.editingContactLabels = new Set();
+            this.editingContactLabels.add(val);
+            this.populateLabelOptions();
+            this.renderSelectedLabelPills();
             if (newLabelContainer) newLabelContainer.style.display = 'none';
             this.notify(`Etiketten "${val}" ble lagt til!`, 'success');
         };
@@ -1346,6 +1355,40 @@ class CRMManager {
         this.toggleModal(true);
     }
 
+    renderSelectedLabelPills() {
+        const container = document.getElementById('contact-selected-labels-pills');
+        if (!container) return;
+
+        if (!this.editingContactLabels || this.editingContactLabels.size === 0) {
+            container.innerHTML = `<span style="font-size: 12px; color: var(--text-muted, #94a3b8); font-style: italic;">Ingen etiketter valgt ennå</span>`;
+            return;
+        }
+
+        let html = '';
+        this.editingContactLabels.forEach(lbl => {
+            const safeLbl = this.escapeHtml(lbl);
+            html += `
+                <div class="selected-label-pill">
+                    <span>${safeLbl}</span>
+                    <span class="remove-label-x" data-label="${safeLbl}" title="Fjern etikett">&times;</span>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+
+        container.querySelectorAll('.remove-label-x').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const labelToRemove = btn.getAttribute('data-label');
+                if (labelToRemove && this.editingContactLabels) {
+                    this.editingContactLabels.delete(labelToRemove);
+                    this.renderSelectedLabelPills();
+                }
+            };
+        });
+    }
+
     populateLabelOptions(selectedLabel = '') {
         const labelSelect = document.getElementById('contact-label-select');
         if (!labelSelect) return;
@@ -1364,19 +1407,13 @@ class CRMManager {
             uniqueLabels.add(selectedLabel);
         }
 
-        let html = '';
+        let html = `<option value="" disabled selected>+ Velg etikett for å legge til...</option>`;
         uniqueLabels.forEach(lbl => {
             html += `<option value="${lbl}">${lbl}</option>`;
         });
-        html += `<option value="__CREATE_NEW__">+ Lag ny etikett...</option>`;
+        html += `<option value="__CREATE_NEW__">+ Opprett helt ny etikett...</option>`;
 
         labelSelect.innerHTML = html;
-
-        if (selectedLabel && uniqueLabels.has(selectedLabel)) {
-            labelSelect.value = selectedLabel;
-        } else {
-            labelSelect.value = 'Ny';
-        }
     }
 
     applyContactFormState({ mode, contact = null }) {
@@ -1388,8 +1425,21 @@ class CRMManager {
 
         if (!form) return;
 
-        const currentLabel = contact ? (contact.label || contact.labels?.[0] || 'Ny') : 'Ny';
-        this.populateLabelOptions(currentLabel);
+        let labelsList = [];
+        if (contact) {
+            if (Array.isArray(contact.labels) && contact.labels.length > 0) {
+                labelsList = contact.labels;
+            } else if (contact.label) {
+                labelsList = [contact.label];
+            }
+        }
+        if (labelsList.length === 0 && mode === 'create') {
+            labelsList = ['Ny'];
+        }
+
+        this.editingContactLabels = new Set(labelsList);
+        this.populateLabelOptions();
+        this.renderSelectedLabelPills();
 
         if (mode === 'edit' && contact) {
             let firstName = contact.firstName || '';
@@ -1408,7 +1458,6 @@ class CRMManager {
             if (form.elements.zip) form.elements.zip.value = contact.zip || '';
             if (form.elements.city) form.elements.city.value = contact.city || '';
             if (form.elements.country) form.elements.country.value = contact.country || 'Norge';
-            if (form.elements.label) form.elements.label.value = currentLabel;
             form.elements.status.value = contact.status || 'IKKE_MEDLEM';
 
             if (titleEl) titleEl.textContent = 'Rediger kontakt';
@@ -1445,12 +1494,11 @@ class CRMManager {
         const zip = String(formData.get('zip') || '').trim();
         const city = String(formData.get('city') || '').trim();
         const country = String(formData.get('country') || 'Norge').trim();
-        let label = String(formData.get('label') || 'Ny').trim() || 'Ny';
-        if (label === '__CREATE_NEW__') {
-            const customInput = document.getElementById('custom-new-label-input');
-            const customVal = customInput ? customInput.value.trim() : '';
-            label = customVal || 'Ny';
+        const labelsArray = Array.from(this.editingContactLabels || []);
+        if (labelsArray.length === 0) {
+            labelsArray.push('Ny');
         }
+        const primaryLabel = labelsArray[0] || 'Ny';
         const status = String(formData.get('status') || 'IKKE_MEDLEM').trim() || 'IKKE_MEDLEM';
 
         if (!firstName || !lastName || !email) {
@@ -1468,8 +1516,8 @@ class CRMManager {
             zip,
             city,
             country,
-            label,
-            labels: [label],
+            label: primaryLabel,
+            labels: labelsArray,
             status,
             updatedAt: new Date().toISOString(),
             updatedBy: 'admin'

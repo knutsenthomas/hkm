@@ -745,6 +745,51 @@ body.crm-body {
     box-shadow: 0 0 0 4px var(--accent-light);
 }
 
+/* Multi-Label Badge Pills styling */
+.selected-label-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 20px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #334155;
+    transition: all 0.2s ease;
+}
+
+.selected-label-pill .remove-label-x {
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+    color: #94a3b8;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    margin-left: 2px;
+}
+
+.selected-label-pill .remove-label-x:hover {
+    background: #e2e8f0;
+    color: #ef4444;
+}
+
+html[data-theme="dark"] .selected-label-pill {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f8fafc;
+}
+
+html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
+    background: #334155;
+    color: #f87171;
+}
+
 .modal-footer {
     padding-top: 12px;
     display: flex;
