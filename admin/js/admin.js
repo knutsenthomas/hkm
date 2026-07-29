@@ -28072,33 +28072,53 @@ class AdminManager {
             }
         });
 
-        // Initialize HTML/Code toggle logic
+        // Initialize HTML/Code toggle logic (Live Read-Only Preview Frame)
         const toggleBtn = document.getElementById('toggle-editor-mode-btn');
         const rawTextarea = document.getElementById('edit-template-body-raw');
+        const previewContainer = document.getElementById('template-live-preview-container');
         const quillContainer = document.getElementById('quill-editor-container');
 
-        if (toggleBtn && rawTextarea && quillContainer) {
+        const updatePreviewIframe = (templateId, htmlContent) => {
+            const iframe = document.getElementById('template-preview-iframe');
+            if (!iframe) return;
+            let sampleHtml = htmlContent || "";
+            sampleHtml = sampleHtml
+                .replace(/\{\{name\}\}/g, "Test-bruker")
+                .replace(/\{\{email\}\}/g, "knutsenthomas@gmail.com")
+                .replace(/\{\{phone\}\}/g, "41234567")
+                .replace(/\{\{courseTitle\}\}/g, "Identitet i Kristus")
+                .replace(/\{\{amount\}\}/g, "Kr 0,- (Vipps / Gratis)")
+                .replace(/\{\{paymentMethod\}\}/g, "Vipps / Gratis")
+                .replace(/\{\{status\}\}/g, "Venter på godkjenning")
+                .replace(/\{\{day\}\}/g, "1")
+                .replace(/\{\{title\}\}/g, "Identitet i Kristus")
+                .replace(/\{\{passage\}\}/g, "Joh 14:1-6")
+                .replace(/\{\{devotional\}\}/g, "Dagens andakt og bønnefokus...")
+                .replace(/\{\{planId\}\}/g, "leseplan-1");
+
+            iframe.srcdoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>body{margin:0;padding:16px;background:#f8fafc;font-family:sans-serif;}</style></head><body>${sampleHtml}</body></html>`;
+        };
+
+        if (toggleBtn && rawTextarea) {
             toggleBtn.onclick = () => {
                 const isCodeView = rawTextarea.style.display !== 'none';
                 const templateId = document.getElementById('edit-template-id').value;
+
+                if (quillContainer) quillContainer.style.display = 'none';
+
                 if (isCodeView) {
-                    // Switch to visual (Quill)
-                    if (['daily_bible_reading', 'course_registration', 'welcome_email', 'newsletter_confirmation'].includes(templateId)) {
-                        const confirmSwitch = confirm("Advarsel: Hvis du veksler til visuell editor på denne malen, vil den avanserte HTML-strukturen og alle designstiler bli slettet. Vil du fortsette?");
-                        if (!confirmSwitch) return;
-                    }
-                    if (this.quill) {
-                        this.quill.root.innerHTML = rawTextarea.value;
-                    }
+                    // Switch from HTML code editor to Visual Read-only Live Preview
                     rawTextarea.style.display = 'none';
-                    quillContainer.style.display = 'block';
+                    if (previewContainer) {
+                        previewContainer.style.display = 'block';
+                        updatePreviewIframe(templateId, rawTextarea.value);
+                    }
                     toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transform: translateY(1px); margin-right: -3px !important;">code</span><span style="display: inline-flex; align-items: center; line-height: 1;">HTML-kode</span>';
                 } else {
-                    // Switch to raw HTML
-                    rawTextarea.value = this.quill ? this.quill.root.innerHTML : "";
-                    quillContainer.style.display = 'none';
+                    // Switch back to HTML code editor
+                    if (previewContainer) previewContainer.style.display = 'none';
                     rawTextarea.style.display = 'block';
-                    toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transform: translateY(1px); margin-right: -3px !important;">edit</span><span style="display: inline-flex; align-items: center; line-height: 1;">Visuell editor</span>';
+                    toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transform: translateY(1px); margin-right: -3px !important;">visibility</span><span style="display: inline-flex; align-items: center; line-height: 1;">Visuelt utseende</span>';
                 }
             };
         }
@@ -28385,47 +28405,56 @@ class AdminManager {
 
         document.getElementById('edit-template-id').value = templateId;
         document.getElementById('template-editor-title').textContent = `Rediger mal: ${templateName}`;
-        document.getElementById('edit-template-subject').value = currentData.subject || "";
+        
+        const subjectInput = document.getElementById('edit-template-subject');
+        if (subjectInput) subjectInput.value = currentData.subject || "";
 
         const bodyContent = currentData.body || "";
 
         const rawTextarea = document.getElementById('edit-template-body-raw');
         const quillContainer = document.getElementById('quill-editor-container');
+        const previewContainer = document.getElementById('template-live-preview-container');
         const toggleBtn = document.getElementById('toggle-editor-mode-btn');
         const warningEl = document.getElementById('template-editor-warning');
+        const permissionNotice = document.getElementById('template-permission-notice');
+        const saveBtn = document.getElementById('save-template-btn');
 
-        // Setup warning & default view mode
-        if (['daily_bible_reading', 'course_registration', 'course_registration_admin', 'course_registration_approved', 'welcome_email', 'newsletter_confirmation'].includes(templateId)) {
-            if (rawTextarea) {
-                rawTextarea.value = bodyContent;
-                rawTextarea.style.display = 'block';
-            }
-            if (quillContainer) {
-                quillContainer.style.display = 'none';
-            }
-            if (toggleBtn) {
-                toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transform: translateY(1px); margin-right: -3px !important;">edit</span><span style="display: inline-flex; align-items: center; line-height: 1;">Visuell editor</span>';
-            }
-            if (warningEl) {
-                warningEl.textContent = 'OBS: Denne malen bruker avansert HTML-struktur. Vi anbefaler å redigere i HTML-modus for å bevare design og stiler.';
-                warningEl.style.display = 'block';
+        // Check Editing Permissions: Only Thomas Knutsen (or explicitly granted template editors) can edit/save
+        const currentUser = firebase.auth().currentUser;
+        const userEmail = (currentUser && currentUser.email ? currentUser.email : "").toLowerCase().trim();
+        const isThomasKnutsen = userEmail === 'knutsenthomas@gmail.com' || userEmail === 'thomas@hiskingdomministry.no';
+        const isAuthorizedEditor = isThomasKnutsen || 
+            (this.currentUserPermissions && (this.currentUserPermissions.canEditEmailTemplates === true || this.currentUserPermissions.role === 'super_admin'));
+
+        if (!isAuthorizedEditor) {
+            if (subjectInput) subjectInput.readOnly = true;
+            if (rawTextarea) rawTextarea.readOnly = true;
+            if (saveBtn) saveBtn.style.display = 'none';
+            if (permissionNotice) {
+                permissionNotice.innerHTML = '🔒 <strong>Visningsmodus:</strong> Kun Thomas Knutsen og godkjente redaktører har tilgang til å redigere og lagre e-postmaler.';
+                permissionNotice.style.display = 'block';
             }
         } else {
-            if (this.quill) {
-                this.quill.root.innerHTML = bodyContent;
-            }
-            if (rawTextarea) {
-                rawTextarea.style.display = 'none';
-            }
-            if (quillContainer) {
-                quillContainer.style.display = 'block';
-            }
-            if (toggleBtn) {
-                toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transform: translateY(1px); margin-right: -3px !important;">code</span><span style="display: inline-flex; align-items: center; line-height: 1;">HTML-kode</span>';
-            }
-            if (warningEl) {
-                warningEl.style.display = 'none';
-            }
+            if (subjectInput) subjectInput.readOnly = false;
+            if (rawTextarea) rawTextarea.readOnly = false;
+            if (saveBtn) saveBtn.style.display = 'inline-block';
+            if (permissionNotice) permissionNotice.style.display = 'none';
+        }
+
+        // Always use raw HTML editor as default view (never destructive Quill)
+        if (rawTextarea) {
+            rawTextarea.value = bodyContent;
+            rawTextarea.style.display = 'block';
+        }
+        if (quillContainer) quillContainer.style.display = 'none';
+        if (previewContainer) previewContainer.style.display = 'none';
+        
+        if (toggleBtn) {
+            toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transform: translateY(1px); margin-right: -3px !important;">visibility</span><span style="display: inline-flex; align-items: center; line-height: 1;">Visuelt utseende</span>';
+        }
+        if (warningEl) {
+            warningEl.textContent = 'OBS: Denne malen bruker avansert HTML-struktur. Du redigerer koden direkte i HTML-vinduet under, og trykker på "Visuelt utseende" for å se nøyaktig hvordan e-posten blir seende ut.';
+            warningEl.style.display = 'block';
         }
 
         // Render dynamic variables
