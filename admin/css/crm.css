@@ -359,8 +359,8 @@ body.crm-body {
 
 .search-box {
     position: relative;
-    width: 340px !important;
-    max-width: 420px !important;
+    width: 380px !important;
+    max-width: 450px !important;
 }
 
 .search-box span {
