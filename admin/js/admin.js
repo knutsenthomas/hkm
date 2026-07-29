@@ -27441,6 +27441,242 @@ class AdminManager {
         });
     }
 
+    getDefaultTemplateData(id) {
+        const defaults = {
+            welcome_email: {
+                subject: "Velkommen til His Kingdom Ministry!",
+                body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
+  <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
+  <header style="padding: 40px 32px 24px 32px; text-align: center; background-color: #FCF9F5;">
+    <div style="margin-bottom: 16px;">
+      <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 48px; width: auto; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
+    </div>
+    <h1 style="margin: 0; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: rgba(18, 28, 44, 0.6); text-transform: uppercase; letter-spacing: 0.25em; line-height: 1.5;">His Kingdom Ministry</h1>
+    <div style="width: 32px; height: 1px; background-color: rgba(137, 114, 105, 0.4); margin: 20px auto 0 auto;"></div>
+  </header>
+  <div style="padding: 0 32px 40px 32px; background-color: #FCF9F5;">
+    <section style="margin-bottom: 32px; text-align: center; max-width: 440px; margin-left: auto; margin-right: auto;">
+      <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 32px; line-height: 40px; font-weight: 700; color: #121c2c; margin: 0 0 12px 0; font-style: italic;">Velkommen, {{name}}!</h2>
+      <p style="font-family: 'Inter', sans-serif; font-size: 16px; line-height: 26px; font-weight: 400; color: #56423b; margin: 0; font-style: italic; opacity: 0.8;">
+        Vi er så glade for at du har registrert deg i vårt system. Måtte fellesskapet være til velsignelse for deg.
+      </p>
+    </section>
+    <section style="margin-bottom: 40px; background-color: #ffffff; border-left: 4px solid #1B4965; border-radius: 0 12px 12px 0; padding: 20px 24px; box-shadow: 0 2px 8px rgba(27, 73, 101, 0.02); border-top: 1px solid rgba(27, 73, 101, 0.05); border-right: 1px solid rgba(27, 73, 101, 0.05); border-bottom: 1px solid rgba(27, 73, 101, 0.05);">
+      <div style="display: inline-block; padding: 2px 6px; background-color: rgba(27, 73, 101, 0.08); color: #1B4965; font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; border-radius: 4px; margin-bottom: 16px;">
+        DITT MEDLEMSKAP
+      </div>
+      <h3 style="font-family: 'Merriweather', Georgia, serif; font-size: 20px; line-height: 28px; font-weight: 600; color: #121c2c; margin: 0 0 16px 0;">
+        Hva kan du gjøre på Min Side?
+      </h3>
+      <ul style="margin: 0; padding: 0 0 0 20px; font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.8; color: rgba(18, 28, 44, 0.9);">
+        <li style="margin-bottom: 8px;"><strong>Min Side:</strong> Hold oversikt over profilen din og dine aktive leseplaner.</li>
+        <li style="margin-bottom: 8px;"><strong>Ressurser:</strong> Få tilgang til eksklusive artikler, videoer og undervisning.</li>
+        <li><strong>Kurs:</strong> Påmelding og progresjon på våre bibelkurs.</li>
+      </ul>
+    </section>
+    <div style="text-align: center; margin-bottom: 48px;">
+      <a href="https://www.hiskingdomministry.no/minside" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 14px 44px; border-radius: 24px 8px 24px 8px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.2em; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.25);">
+        Gå til Min Side
+      </a>
+    </div>
+  </div>
+  <footer style="padding: 32px 32px 40px 32px; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
+    <p style="font-family: 'Inter', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(18, 28, 44, 0.4); margin: 0 0 12px 0;">© 2026 His Kingdom Ministry</p>
+  </footer>
+</div>`
+            },
+            course_registration: {
+                subject: "Bekreftelse på kurspåmelding: {{courseTitle}}",
+                body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
+  <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
+  <header style="padding: 40px 32px 24px 32px; text-align: center; background-color: #FCF9F5;">
+    <div style="margin-bottom: 16px;">
+      <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 48px; width: auto; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
+    </div>
+    <h1 style="margin: 0; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: rgba(18, 28, 44, 0.6); text-transform: uppercase; letter-spacing: 0.25em; line-height: 1.5;">His Kingdom Ministry</h1>
+    <div style="width: 32px; height: 1px; background-color: rgba(137, 114, 105, 0.4); margin: 20px auto 0 auto;"></div>
+  </header>
+  <div style="padding: 0 32px 40px 32px; background-color: #FCF9F5;">
+    <section style="margin-bottom: 32px; text-align: center; max-width: 440px; margin-left: auto; margin-right: auto;">
+      <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 32px; line-height: 40px; font-weight: 700; color: #121c2c; margin: 0 0 12px 0; font-style: italic;">Takk for din påmelding, {{name}}!</h2>
+      <p style="font-family: 'Inter', sans-serif; font-size: 16px; line-height: 26px; font-weight: 400; color: #56423b; margin: 0; font-style: italic; opacity: 0.8;">
+        Vi har mottatt din påmelding til <strong>{{courseTitle}}</strong>.
+      </p>
+    </section>
+    <section style="margin-bottom: 40px; background-color: #ffffff; border-left: 4px solid #1B4965; border-radius: 0 12px 12px 0; padding: 20px 24px; box-shadow: 0 2px 8px rgba(27, 73, 101, 0.02); border-top: 1px solid rgba(27, 73, 101, 0.05); border-right: 1px solid rgba(27, 73, 101, 0.05); border-bottom: 1px solid rgba(27, 73, 101, 0.05);">
+      <div style="display: inline-block; padding: 2px 6px; background-color: rgba(27, 73, 101, 0.08); color: #1B4965; font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; border-radius: 4px; margin-bottom: 12px;">
+        KURSINFORMASJON
+      </div>
+      <h3 style="font-family: 'Merriweather', Georgia, serif; font-size: 20px; line-height: 28px; font-weight: 600; color: #121c2c; margin: 0 0 12px 0;">
+        {{courseTitle}}
+      </h3>
+      <p style="margin: 0; color: rgba(18, 28, 44, 0.9); font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6;">
+        Din påmelding behandles nå. Du vil motta en oppdatering så snart kurstilgangen din er godkjent og klar på Min Side.
+      </p>
+    </section>
+    <div style="text-align: center; margin-bottom: 48px;">
+      <a href="https://www.hiskingdomministry.no/minside" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 14px 44px; border-radius: 24px 8px 24px 8px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.2em; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.25);">
+        Gå til Min Side
+      </a>
+    </div>
+  </div>
+  <footer style="padding: 32px 32px 40px 32px; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
+    <p style="font-family: 'Inter', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(18, 28, 44, 0.4); margin: 0 0 12px 0;">© 2026 His Kingdom Ministry</p>
+  </footer>
+</div>`
+            },
+            course_registration_admin: {
+                subject: "🎓 Ny kurspåmelding: {{name}} ({{courseTitle}})",
+                body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
+  <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
+  <header style="padding: 40px 32px 24px 32px; text-align: center; background-color: #FCF9F5;">
+    <div style="margin-bottom: 16px;">
+      <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 48px; width: auto; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
+    </div>
+    <h1 style="margin: 0; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: rgba(18, 28, 44, 0.6); text-transform: uppercase; letter-spacing: 0.25em; line-height: 1.5;">His Kingdom Ministry Admin</h1>
+    <div style="width: 32px; height: 1px; background-color: rgba(137, 114, 105, 0.4); margin: 20px auto 0 auto;"></div>
+  </header>
+  <div style="padding: 0 32px 40px 32px; background-color: #FCF9F5;">
+    <section style="margin-bottom: 32px; text-align: center; max-width: 440px; margin-left: auto; margin-right: auto;">
+      <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 28px; line-height: 36px; font-weight: 700; color: #121c2c; margin: 0 0 12px 0; font-style: italic;">Ny kurspåmelding registrert!</h2>
+      <p style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 24px; font-weight: 400; color: #56423b; margin: 0; opacity: 0.85;">
+        {{name}} har registrert seg til kurset <strong>{{courseTitle}}</strong>.
+      </p>
+    </section>
+    <section style="margin-bottom: 40px; background-color: #ffffff; border-left: 4px solid #d17d39; border-radius: 0 12px 12px 0; padding: 24px; box-shadow: 0 2px 8px rgba(209, 125, 57, 0.05); border-top: 1px solid rgba(221, 193, 182, 0.2); border-right: 1px solid rgba(221, 193, 182, 0.2); border-bottom: 1px solid rgba(221, 193, 182, 0.2);">
+      <div style="display: inline-block; padding: 2px 8px; background-color: rgba(209, 125, 57, 0.1); color: #d17d39; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; border-radius: 4px; margin-bottom: 16px;">
+        DETALJER OM PÅMELDINGEN
+      </div>
+      <table style="width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; font-size: 14px; color: #121c2c;">
+        <tr>
+          <td style="padding: 8px 0; font-weight: 700; color: #64748b; width: 140px; border-bottom: 1px solid #f1f5f9;">Deltaker:</td>
+          <td style="padding: 8px 0; font-weight: 700; color: #0f172a; border-bottom: 1px solid #f1f5f9;">{{name}}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-weight: 700; color: #64748b; border-bottom: 1px solid #f1f5f9;">E-post:</td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #f1f5f9;"><a href="mailto:{{email}}" style="color: #d17d39; text-decoration: underline;">{{email}}</a></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-weight: 700; color: #64748b; border-bottom: 1px solid #f1f5f9;">Telefon:</td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #f1f5f9;">{{phone}}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-weight: 700; color: #64748b; border-bottom: 1px solid #f1f5f9;">Kurs:</td>
+          <td style="padding: 8px 0; font-weight: 700; border-bottom: 1px solid #f1f5f9;">{{courseTitle}}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-weight: 700; color: #64748b; border-bottom: 1px solid #f1f5f9;">Beløp / Metode:</td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #f1f5f9;">{{amount}} ({{paymentMethod}})</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-weight: 700; color: #64748b;">Status:</td>
+          <td style="padding: 8px 0;"><span style="background: #ffedd5; color: #c2410c; padding: 3px 10px; border-radius: 6px; font-weight: 700; font-size: 12px; display: inline-block;">{{status}}</span></td>
+        </tr>
+      </table>
+    </section>
+    <div style="text-align: center; margin-bottom: 48px;">
+      <a href="https://www.hiskingdomministry.no/admin/index.html#courses" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 14px 44px; border-radius: 24px 8px 24px 8px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.2em; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.25);">
+        Behandle påmelding i Admin
+      </a>
+    </div>
+  </div>
+  <footer style="padding: 24px 32px; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
+    <p style="font-family: 'Inter', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(18, 28, 44, 0.4); margin: 0;">© 2026 His Kingdom Ministry Admin Notification</p>
+  </footer>
+</div>`
+            },
+            course_registration_approved: {
+                subject: "🎉 Din tilgang er godkjent: {{courseTitle}}",
+                body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
+  <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
+  <header style="padding: 40px 32px 24px 32px; text-align: center; background-color: #FCF9F5;">
+    <div style="margin-bottom: 16px;">
+      <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 48px; width: auto; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
+    </div>
+    <h1 style="margin: 0; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: rgba(18, 28, 44, 0.6); text-transform: uppercase; letter-spacing: 0.25em; line-height: 1.5;">His Kingdom Ministry</h1>
+    <div style="width: 32px; height: 1px; background-color: rgba(137, 114, 105, 0.4); margin: 20px auto 0 auto;"></div>
+  </header>
+  <div style="padding: 0 32px 40px 32px; background-color: #FCF9F5;">
+    <section style="margin-bottom: 32px; text-align: center; max-width: 440px; margin-left: auto; margin-right: auto;">
+      <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 32px; line-height: 40px; font-weight: 700; color: #121c2c; margin: 0 0 12px 0; font-style: italic;">Tilgang Godkjent! 🎉</h2>
+      <p style="font-family: 'Inter', sans-serif; font-size: 16px; line-height: 26px; font-weight: 400; color: #56423b; margin: 0; font-style: italic; opacity: 0.8;">
+        Hei {{name}}! Påmeldingen din er nå godkjent og du har full tilgang.
+      </p>
+    </section>
+    <section style="margin-bottom: 40px; background-color: #ffffff; border-left: 4px solid #1B4965; border-radius: 0 12px 12px 0; padding: 20px 24px; box-shadow: 0 2px 8px rgba(27, 73, 101, 0.02); border-top: 1px solid rgba(27, 73, 101, 0.05); border-right: 1px solid rgba(27, 73, 101, 0.05); border-bottom: 1px solid rgba(27, 73, 101, 0.05);">
+      <div style="display: inline-block; padding: 2px 6px; background-color: rgba(27, 73, 101, 0.08); color: #1B4965; font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; border-radius: 4px; margin-bottom: 12px;">
+        KURS
+      </div>
+      <h3 style="font-family: 'Merriweather', Georgia, serif; font-size: 20px; line-height: 28px; font-weight: 600; color: #121c2c; margin: 0 0 12px 0;">
+        {{courseTitle}}
+      </h3>
+      <p style="margin: 0; color: rgba(18, 28, 44, 0.9); font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6;">
+        Du kan nå logge inn på Min Side og gå i gang med kurset når det passer deg!
+      </p>
+    </section>
+    <div style="text-align: center; margin-bottom: 48px;">
+      <a href="https://www.hiskingdomministry.no/minside" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 14px 44px; border-radius: 24px 8px 24px 8px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.2em; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.25);">
+        Gå til Min Side og start kurset
+      </a>
+    </div>
+  </div>
+  <footer style="padding: 32px 32px 40px 32px; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
+    <p style="font-family: 'Inter', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(18, 28, 44, 0.4); margin: 0 0 12px 0;">© 2026 His Kingdom Ministry</p>
+  </footer>
+</div>`
+            },
+            newsletter_confirmation: {
+                subject: "Bekreftelse på nyhetsbrev - His Kingdom Ministry",
+                body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
+  <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
+  <header style="padding: 40px 32px 24px 32px; text-align: center; background-color: #FCF9F5;">
+    <div style="margin-bottom: 16px;">
+      <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 48px; width: auto; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
+    </div>
+    <h1 style="margin: 0; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: rgba(18, 28, 44, 0.6); text-transform: uppercase; letter-spacing: 0.25em; line-height: 1.5;">His Kingdom Ministry</h1>
+    <div style="width: 32px; height: 1px; background-color: rgba(137, 114, 105, 0.4); margin: 20px auto 0 auto;"></div>
+  </header>
+  <div style="padding: 0 32px 40px 32px; background-color: #FCF9F5;">
+    <section style="margin-bottom: 32px; text-align: center; max-width: 440px; margin-left: auto; margin-right: auto;">
+      <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 32px; line-height: 40px; font-weight: 700; color: #121c2c; margin: 0 0 12px 0; font-style: italic;">Velkommen til nyhetsbrevet!</h2>
+      <p style="font-family: 'Inter', sans-serif; font-size: 16px; line-height: 26px; font-weight: 400; color: #56423b; margin: 0; font-style: italic; opacity: 0.8;">
+        Takk for at du meldte deg på vårt nyhetsbrev. Du vil nå motta jevnlige oppdateringer, oppmuntringer og nyheter fra His Kingdom Ministry.
+      </p>
+    </section>
+  </div>
+  <footer style="padding: 32px 32px 40px 32px; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
+    <p style="font-family: 'Inter', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(18, 28, 44, 0.4); margin: 0 0 12px 0;">© 2026 His Kingdom Ministry</p>
+  </footer>
+</div>`
+            },
+            daily_bible_reading: {
+                subject: "Dagens Bibellesing - His Kingdom Ministry",
+                body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
+  <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
+  <header style="padding: 40px 32px 24px 32px; text-align: center; background-color: #FCF9F5;">
+    <div style="margin-bottom: 16px;">
+      <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 48px; width: auto; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
+    </div>
+    <h1 style="margin: 0; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: rgba(18, 28, 44, 0.6); text-transform: uppercase; letter-spacing: 0.25em; line-height: 1.5;">Dagens Bibellesing</h1>
+    <div style="width: 32px; height: 1px; background-color: rgba(137, 114, 105, 0.4); margin: 20px auto 0 auto;"></div>
+  </header>
+  <div style="padding: 0 32px 40px 32px; background-color: #FCF9F5;">
+    <section style="margin-bottom: 32px; text-align: center; max-width: 440px; margin-left: auto; margin-right: auto;">
+      <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 32px; line-height: 40px; font-weight: 700; color: #121c2c; margin: 0 0 12px 0; font-style: italic;">Dagens Ord til deg, {{name}}</h2>
+      <p style="font-family: 'Inter', sans-serif; font-size: 16px; line-height: 26px; font-weight: 400; color: #56423b; margin: 0; font-style: italic; opacity: 0.8;">
+        Her er dagens avsnitt i din leseplan.
+      </p>
+    </section>
+  </div>
+  <footer style="padding: 32px 32px 40px 32px; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
+    <p style="font-family: 'Inter', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(18, 28, 44, 0.4); margin: 0 0 12px 0;">© 2026 His Kingdom Ministry</p>
+  </footer>
+</div>`
+            }
+        };
+        return defaults[id] || { subject: "", body: "" };
+    }
+
     async loadEmailTemplates() {
         const tbody = document.getElementById('email-templates-body');
         if (!tbody) return;
@@ -27459,9 +27695,15 @@ class AdminManager {
             const loadedTemplates = await Promise.all(
                 defaultTemplates.map(async (t) => {
                     const doc = await firebaseService.db.collection('email_templates').doc(t.id).get();
+                    const dbData = doc.exists ? doc.data() : {};
+                    const fallbackData = this.getDefaultTemplateData(t.id);
                     return {
                         ...t,
-                        data: doc.exists ? doc.data() : {}
+                        data: {
+                            subject: dbData.subject || fallbackData.subject,
+                            body: dbData.body || fallbackData.body,
+                            updatedAt: dbData.updatedAt || null
+                        }
                     };
                 })
             );
@@ -27751,7 +27993,7 @@ class AdminManager {
 
                                     <!-- Body -->
                                     <div class="hkm-email-body" style="padding: 0 32px 40px 32px; background-color: #FCF9F5; color: #121c2c;">
-                                        ${emailBody}
+                                        \${emailBody}
                                     </div>
 
                                     <!-- Footer -->
@@ -27782,7 +28024,7 @@ class AdminManager {
                         // Fallback simple wrap
                         testHtml = `
                             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px;">
-                                ${body}
+                                \${body}
                             </div>
                         `;
                     }
@@ -27848,7 +28090,7 @@ class AdminManager {
         const warningEl = document.getElementById('template-editor-warning');
 
         // Setup warning & default view mode
-        if (['daily_bible_reading', 'course_registration', 'welcome_email', 'newsletter_confirmation'].includes(templateId)) {
+        if (['daily_bible_reading', 'course_registration', 'course_registration_admin', 'course_registration_approved', 'welcome_email', 'newsletter_confirmation'].includes(templateId)) {
             if (rawTextarea) {
                 rawTextarea.value = bodyContent;
                 rawTextarea.style.display = 'block';
@@ -27890,6 +28132,21 @@ class AdminManager {
             if (templateId === 'welcome_email') {
                 vars = [{ tag: '{{name}}', label: 'Navn' }];
             } else if (templateId === 'course_registration') {
+                vars = [
+                    { tag: '{{name}}', label: 'Navn' },
+                    { tag: '{{courseTitle}}', label: 'Kurstittel' }
+                ];
+            } else if (templateId === 'course_registration_admin') {
+                vars = [
+                    { tag: '{{name}}', label: 'Navn' },
+                    { tag: '{{email}}', label: 'E-post' },
+                    { tag: '{{phone}}', label: 'Telefon' },
+                    { tag: '{{courseTitle}}', label: 'Kurstittel' },
+                    { tag: '{{amount}}', label: 'Beløp' },
+                    { tag: '{{paymentMethod}}', label: 'Metode' },
+                    { tag: '{{status}}', label: 'Status' }
+                ];
+            } else if (templateId === 'course_registration_approved') {
                 vars = [
                     { tag: '{{name}}', label: 'Navn' },
                     { tag: '{{courseTitle}}', label: 'Kurstittel' }
