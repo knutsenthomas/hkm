@@ -2761,8 +2761,14 @@ class MinSideManager {
 
         container.innerHTML = `
         <div class="profile-tabs-container">
-            <button class="profile-tab-btn ${activeTab === 'my-profile' ? 'active' : ''}" data-profile-tab="my-profile">Min profil</button>
-            <button class="profile-tab-btn ${activeTab === 'notifications' ? 'active' : ''}" data-profile-tab="notifications">Varsler</button>
+            <button class="profile-tab-btn ${activeTab === 'my-profile' ? 'active' : ''}" data-profile-tab="my-profile">
+                <span class="material-symbols-outlined profile-tab-icon">person</span>
+                <span>Min profil</span>
+            </button>
+            <button class="profile-tab-btn ${activeTab === 'notifications' ? 'active' : ''}" data-profile-tab="notifications">
+                <span class="material-symbols-outlined profile-tab-icon">notifications</span>
+                <span>Varsler</span>
+            </button>
         </div>
 
         <div id="profile-tab-content-my-profile" class="profile-tab-content" style="${activeTab === 'my-profile' ? '' : 'display: none;'}">
@@ -2989,22 +2995,25 @@ class MinSideManager {
         <div id="profile-tab-content-notifications" class="profile-tab-content" style="${activeTab === 'notifications' ? '' : 'display: none;'}">
             <div class="notif-settings-container">
                 
-                <!-- Main Header (Mockup Title and Description) -->
-                <div style="margin-bottom: 28px;">
-                    <h2 style="font-size: 30px; font-weight: 800; color: #d17d39; margin: 0 0 8px 0; letter-spacing: -0.02em;">Varslingsinnstillinger</h2>
-                    <p style="font-size: 13.5px; color: #64748b; margin: 0; line-height: 1.5; font-weight: 500;">
-                        Administrer hvordan du ønsker å motta oppdateringer og undervisning fra oss. Hold deg tilkoblet fellesskapet på dine egne premisser.
-                    </p>
+                <!-- Main Header Banner -->
+                <div class="notif-header-banner">
+                    <div class="notif-header-icon-badge">
+                        <span class="material-symbols-outlined">tune</span>
+                    </div>
+                    <div class="notif-header-text">
+                        <h2>Varslingsinnstillinger</h2>
+                        <p>Administrer hvordan du ønsker å motta oppdateringer og undervisning fra oss. Hold deg tilkoblet fellesskapet på dine egne premisser.</p>
+                    </div>
                 </div>
 
                 <div class="notif-grid-layout">
                     <!-- LEFT COLUMN: Push-varslinger -->
                     <div class="notif-grid-left">
                         <!-- CARD 1: Push-varslinger -->
-                        <div class="notif-settings-card push" style="margin-bottom: 0;">
-                            <div class="notif-card-header" style="display: flex; align-items: flex-start; gap: 18px;">
-                                <div class="notif-icon-circle push" style="margin-top: -11px !important;">
-                                    <span class="material-symbols-outlined" style="font-size: 24px;">notifications</span>
+                        <div class="notif-settings-card push">
+                            <div class="notif-card-header">
+                                <div class="notif-icon-circle push">
+                                    <span class="material-symbols-outlined">notifications_active</span>
                                 </div>
                                 <div class="notif-card-title-container">
                                     <h3 class="notif-card-title">Push-varslinger</h3>
@@ -3016,7 +3025,9 @@ class MinSideManager {
                                 <!-- Ny undervisning -->
                                 <div class="notif-setting-item">
                                     <div class="notif-setting-left">
-                                        <span class="material-symbols-outlined notif-setting-sub-icon">school</span>
+                                        <div class="notif-setting-icon-badge">
+                                            <span class="material-symbols-outlined">school</span>
+                                        </div>
                                         <div class="notif-setting-text">
                                             <div class="notif-setting-label">${t('profile.pushTeachings')}</div>
                                             <div class="notif-setting-description">${t('profile.pushTeachingsSub')}</div>
@@ -3031,7 +3042,9 @@ class MinSideManager {
                                 <!-- Ny podcast -->
                                 <div class="notif-setting-item">
                                     <div class="notif-setting-left">
-                                        <span class="material-symbols-outlined notif-setting-sub-icon">podcasts</span>
+                                        <div class="notif-setting-icon-badge">
+                                            <span class="material-symbols-outlined">podcasts</span>
+                                        </div>
                                         <div class="notif-setting-text">
                                             <div class="notif-setting-label">${t('profile.pushPodcasts')}</div>
                                             <div class="notif-setting-description">${t('profile.pushPodcastsSub')}</div>
@@ -3046,7 +3059,9 @@ class MinSideManager {
                                 <!-- Nytt blogginnlegg -->
                                 <div class="notif-setting-item">
                                     <div class="notif-setting-left">
-                                        <span class="material-symbols-outlined notif-setting-sub-icon">rate_review</span>
+                                        <div class="notif-setting-icon-badge">
+                                            <span class="material-symbols-outlined">rate_review</span>
+                                        </div>
                                         <div class="notif-setting-text">
                                             <div class="notif-setting-label">${t('profile.pushBlogs')}</div>
                                             <div class="notif-setting-description">${t('profile.pushBlogsSub')}</div>
@@ -3061,7 +3076,9 @@ class MinSideManager {
                                 <!-- Bibel- og leseplaner -->
                                 <div class="notif-setting-item">
                                     <div class="notif-setting-left">
-                                        <span class="material-symbols-outlined notif-setting-sub-icon">auto_stories</span>
+                                        <div class="notif-setting-icon-badge">
+                                            <span class="material-symbols-outlined">auto_stories</span>
+                                        </div>
                                         <div class="notif-setting-text">
                                             <div class="notif-setting-label">${t('profile.pushReadingPlans')}</div>
                                             <div class="notif-setting-description">${t('profile.pushReadingPlansSub')}</div>
@@ -3079,10 +3096,10 @@ class MinSideManager {
                     <!-- RIGHT COLUMN: E-postvarslinger and Tidspunkt -->
                     <div class="notif-grid-right">
                         <!-- CARD 2: E-postvarslinger -->
-                        <div class="notif-settings-card email" style="margin-bottom: 0;">
-                            <div class="notif-card-header" style="display: flex; align-items: flex-start; gap: 18px;">
-                                <div class="notif-icon-circle email" style="margin-top: -11px !important;">
-                                    <span class="material-symbols-outlined" style="font-size: 24px;">mail</span>
+                        <div class="notif-settings-card email">
+                            <div class="notif-card-header">
+                                <div class="notif-icon-circle email">
+                                    <span class="material-symbols-outlined">mail</span>
                                 </div>
                                 <div class="notif-card-title-container">
                                     <h3 class="notif-card-title">E-postvarslinger</h3>
@@ -3094,7 +3111,9 @@ class MinSideManager {
                                 <!-- Nyhetsbrev -->
                                 <div class="notif-setting-item">
                                     <div class="notif-setting-left">
-                                        <span class="material-symbols-outlined notif-setting-sub-icon">send</span>
+                                        <div class="notif-setting-icon-badge">
+                                            <span class="material-symbols-outlined">send</span>
+                                        </div>
                                         <div class="notif-setting-text">
                                             <div class="notif-setting-label">Nyhetsbrev</div>
                                             <div class="notif-setting-description">Motta nyhetsbrev og oppdateringer om tjenesten.</div>
@@ -3109,7 +3128,9 @@ class MinSideManager {
                                 <!-- Daglige leseplanoppdateringer -->
                                 <div class="notif-setting-item">
                                     <div class="notif-setting-left">
-                                        <span class="material-symbols-outlined notif-setting-sub-icon">calendar_today</span>
+                                        <div class="notif-setting-icon-badge">
+                                            <span class="material-symbols-outlined">calendar_today</span>
+                                        </div>
                                         <div class="notif-setting-text">
                                             <div class="notif-setting-label">${t('profile.emailReadingPlans')}</div>
                                             <div class="notif-setting-description">${t('profile.emailReadingPlansSub')}</div>
@@ -3124,23 +3145,23 @@ class MinSideManager {
                         </div>
 
                         <!-- CARD 3: Tidspunkt for daglig oppdatering -->
-                        <div class="notif-settings-card time" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; gap: 20px !important; flex-wrap: wrap !important; margin-bottom: 0;">
-                            <div class="notif-card-header" style="display: flex; align-items: flex-start; gap: 18px; flex: 1; min-width: 200px;">
-                                <div class="notif-icon-circle time" style="margin-top: -11px !important;">
-                                    <span class="material-symbols-outlined" style="font-size: 24px;">schedule</span>
+                        <div class="notif-settings-card time notif-time-card">
+                            <div class="notif-card-header">
+                                <div class="notif-icon-circle time">
+                                    <span class="material-symbols-outlined">schedule</span>
                                 </div>
                                 <div class="notif-card-title-container">
-                                    <h3 class="notif-card-title" style="margin: 0; line-height: 1.25;">Tidspunkt</h3>
-                                    <p class="notif-card-description" style="margin: 0;">Når vil du motta leseplan og push?</p>
+                                    <h3 class="notif-card-title">Tidspunkt</h3>
+                                    <p class="notif-card-description">Når vil du motta leseplan og push?</p>
                                 </div>
                             </div>
                             
-                            <div class="notif-time-select-wrapper" style="position: relative; flex-shrink: 0;">
+                            <div class="notif-time-select-wrapper">
                                 <select id="notification-time-select" class="notif-time-select">
                                     ${[...Array(24).keys()].map(h => {
                                         const padHour = String(h).padStart(2, '0');
                                         const isSelected = (p.readingPlanNotificationHour !== undefined ? p.readingPlanNotificationHour : 7) === h;
-                                        return `<option value="${h}" ${isSelected ? 'selected' : ''}>${padHour}:00</option>`;
+                                        return `<option value="${h}" ${isSelected ? 'selected' : ''}>Kl. ${padHour}:00</option>`;
                                     }).join('')}
                                 </select>
                             </div>
@@ -3150,9 +3171,12 @@ class MinSideManager {
                 
                 <!-- FOOTER ACTIONS -->
                 <div class="notif-settings-footer">
-                    <p class="notif-footer-text">Dine endringer vil tre i kraft umiddelbart.</p>
+                    <div class="notif-footer-status">
+                        <span class="material-symbols-outlined notif-footer-icon">check_circle</span>
+                        <span class="notif-footer-text">Dine endringer vil tre i kraft umiddelbart.</span>
+                    </div>
                     <button class="notif-save-btn" id="save-prefs-btn">
-                        <span class="material-symbols-outlined" style="font-size: 18px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; margin: 0 !important;">save</span> Lagre preferanser
+                        <span class="material-symbols-outlined">save</span> Lagre preferanser
                     </button>
                 </div>
 
