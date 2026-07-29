@@ -2084,9 +2084,9 @@ class CRMManager {
             : `<span style="color: #64748b; font-size: 12.5px; font-weight: 500;">✓ Alle ${contactsWithEmail.length} mottakere er aktive</span>`;
 
         const html = `
-            <div class="crm-send-email-modal" style="display: flex; flex-direction: column; gap: 16px; padding: 2px 0;">
+            <div class="crm-send-email-modal" style="display: flex; flex-direction: column; gap: 16px; padding: 2px 0; width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; overflow: hidden;">
                 <!-- Recipient Header Card -->
-                <div style="background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%); padding: 14px 18px; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                <div style="background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%); padding: 14px 18px; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box;">
                     <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #d17d39, #bd4f2a); color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(209,125,57,0.25);">
                         <span class="material-symbols-outlined" style="font-size: 24px;">mark_email_read</span>
                     </div>
@@ -2103,13 +2103,13 @@ class CRMManager {
                 </div>
 
                 <!-- 2-Column Meta Row: From & Template -->
-                <div class="crm-email-meta-grid" style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; width: 100%; max-width: 100%; box-sizing: border-box;">
+                <div class="crm-email-meta-grid" style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box;">
                     <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0; max-width: 100%; box-sizing: border-box;">
                         <label style="font-weight: 700; font-size: 13px; color: #334155; display: flex; align-items: center; gap: 4px;">
                             <span>Fra:</span>
                             <span class="material-symbols-outlined" style="font-size: 15px; color: #94a3b8;" title="Avsenderadresse">info</span>
                         </label>
-                        <select id="crm-email-from-mode" class="form-control" style="width: 100%; max-width: 100%; height: 42px; padding: 0 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 13.5px; background: white; color: #0f172a; outline: none; cursor: pointer; font-weight: 500; box-sizing: border-box; text-overflow: ellipsis; overflow: hidden;">
+                        <select id="crm-email-from-mode" class="form-control" style="width: 100%; max-width: 100%; min-width: 0; height: 42px; padding: 0 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 13.5px; background: white; color: #0f172a; outline: none; cursor: pointer; font-weight: 500; box-sizing: border-box; text-overflow: ellipsis; overflow: hidden;">
                             <option value="post" selected>His Kingdom Ministry &lt;post@hiskingdomministry.no&gt;</option>
                             <option value="admin">${this.escapeHtml(adminName)} &lt;${this.escapeHtml(adminEmail)}&gt;</option>
                         </select>
@@ -2117,9 +2117,9 @@ class CRMManager {
 
                     <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0; max-width: 100%; box-sizing: border-box;">
                         <label style="font-weight: 700; font-size: 13px; color: #334155;">Mal:</label>
-                        <div style="position: relative; width: 100%; max-width: 100%; box-sizing: border-box;">
+                        <div style="position: relative; width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box;">
                             <span class="material-symbols-outlined" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #94a3b8; pointer-events: none;">search</span>
-                            <select id="crm-email-template-select" class="form-control" style="width: 100%; max-width: 100%; height: 42px; padding: 0 12px 0 36px !important; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 13.5px; background: white; color: #0f172a; outline: none; cursor: pointer; font-weight: 500; box-sizing: border-box; text-overflow: ellipsis; overflow: hidden;">
+                            <select id="crm-email-template-select" class="form-control" style="width: 100%; max-width: 100%; min-width: 0; height: 42px; padding: 0 12px 0 36px !important; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 13.5px; background: white; color: #0f172a; outline: none; cursor: pointer; font-weight: 500; box-sizing: border-box; text-overflow: ellipsis; overflow: hidden;">
                                 <option value="">Velg e-postmal...</option>
                                 <option value="summer_camp">Youth Summer Camp is coming!</option>
                                 <option value="newsletter">Månedsoppdatering & Nyheter</option>
@@ -2131,15 +2131,15 @@ class CRMManager {
                 </div>
 
                 <!-- Subject Input -->
-                <div style="display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 100%; box-sizing: border-box;">
+                <div style="display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box;">
                     <label for="crm-email-subject" style="font-weight: 700; font-size: 13px; color: #334155;">Emne / Tittel:</label>
-                    <input type="text" id="crm-email-subject" class="form-control" placeholder="F.eks. Velkommen til Youth Summer Camp!..." style="width: 100%; max-width: 100%; height: 42px; padding: 0 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 14px; outline: none; background: white; font-weight: 500; color: #0f172a; box-sizing: border-box;">
+                    <input type="text" id="crm-email-subject" class="form-control" placeholder="F.eks. Velkommen til Youth Summer Camp!..." style="width: 100%; max-width: 100%; min-width: 0; height: 42px; padding: 0 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 14px; outline: none; background: white; font-weight: 500; color: #0f172a; box-sizing: border-box;">
                 </div>
 
                 <!-- Rich Editor Section -->
-                <div style="display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 100%; box-sizing: border-box;">
+                <div style="display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box;">
                     <label style="font-weight: 700; font-size: 13px; color: #334155;">Innhold / Melding:</label>
-                    <div style="border: 1px solid #cbd5e1; border-radius: 14px; overflow: hidden; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.02); width: 100%; max-width: 100%; box-sizing: border-box;">
+                    <div style="border: 1px solid #cbd5e1; border-radius: 14px; overflow: hidden; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.02); width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box;">
                         <!-- Formatting Toolbar -->
                         <div class="crm-editor-toolbar">
                             <button type="button" class="editor-btn" data-cmd="bold" title="Fet tekst (B)" style="font-weight: 800; font-size: 15px;">

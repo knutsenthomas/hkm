@@ -6587,14 +6587,14 @@ body.admin-body .template-item:active {
   form .form-group textarea,
   form button[type="submit"],
   .modal-content input:not([type="checkbox"]):not([type="radio"]),
-  .modal-content select,
+  .modal-content select:not(.crm-editor-toolbar select):not(#crm-editor-format-block):not(#crm-email-merge-tag-select),
   .modal-content textarea,
   .modal-content button:not(.close-modal):not(.close-modal-btn):not(.editor-btn):not(.editor-media-btn):not(#btn-toggle-new-label):not(#crm-email-insert-img-btn):not(#crm-email-insert-yt-btn),
   #admin-modal-profile-form input:not([type="checkbox"]):not([type="radio"]),
   #admin-modal-profile-form textarea,
   #admin-modal-profile-form button:not(.close-modal):not(.close-modal-btn),
   .quill-editor-container,
-  .form-control {
+  .form-control:not(.crm-editor-toolbar select) {
     width: 100% !important;
     min-height: 48px !important; /* Touch-friendly size */
     box-sizing: border-box !important;
@@ -6699,33 +6699,89 @@ body.admin-body .template-item:active {
   /* Responsive Email Templates & Editor Container Guard */
   .crm-send-email-modal-wrapper {
     margin: auto !important;
-    max-width: calc(100vw - 12px) !important;
+    max-width: min(720px, calc(100vw - 12px)) !important;
     width: 100% !important;
-    padding: 12px !important;
+    padding: 0 !important;
     box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+
+  .crm-tool-modal-body {
+    padding: 14px 12px 10px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  #crm-tool-modal-content,
+  .crm-send-email-modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
   }
 
   .crm-email-meta-grid {
     grid-template-columns: 1fr !important;
     gap: 10px !important;
     width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .crm-email-meta-grid > div {
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .crm-email-meta-grid select,
+  #crm-email-from-mode,
+  #crm-email-template-select {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    text-overflow: ellipsis !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
   }
 
   .crm-editor-toolbar {
     display: flex !important;
     flex-wrap: nowrap !important;
     overflow-x: auto !important;
+    white-space: nowrap !important;
     -webkit-overflow-scrolling: touch !important;
     padding: 6px 8px !important;
     gap: 4px !important;
+    width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
   }
 
   .crm-editor-toolbar button,
-  .crm-editor-toolbar select,
   .crm-editor-toolbar .editor-btn {
     flex-shrink: 0 !important;
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    box-sizing: border-box !important;
+  }
+
+  .crm-editor-toolbar select,
+  .crm-editor-toolbar #crm-editor-format-block,
+  .crm-editor-toolbar #crm-email-merge-tag-select {
+    width: auto !important;
+    min-width: 80px !important;
+    max-width: 130px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    flex: 0 0 auto !important;
+    box-sizing: border-box !important;
   }
 
   #crm-email-body-editor,

@@ -871,10 +871,13 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
 /* CRM tool dialogs (replaces browser prompt/confirm) */
 .crm-tool-modal-content {
     max-width: 640px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .crm-tool-modal-footer {
     padding: 16px 24px 24px;
+    box-sizing: border-box;
 }
 
 .crm-tool-modal-subtitle {
@@ -886,11 +889,21 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
 
 .crm-tool-modal-body {
     padding: 20px 24px 8px;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
 }
 
 #crm-tool-modal-content {
     display: grid;
     gap: 10px;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
 }
 
 .crm-tool-option-list {
@@ -1967,27 +1980,44 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
         width: 100% !important;
         border-radius: 16px !important;
         box-sizing: border-box !important;
+        overflow-x: hidden !important;
+    }
+
+    .crm-tool-modal-body {
+        padding: 14px 12px 10px !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
     }
 
     .crm-email-meta-grid {
         grid-template-columns: 1fr !important;
         gap: 12px !important;
         width: 100% !important;
+        max-width: 100% !important;
     }
 
     .crm-email-meta-grid > div {
         min-width: 0 !important;
         width: 100% !important;
+        max-width: 100% !important;
     }
 
     .crm-email-meta-grid select {
         width: 100% !important;
         max-width: 100% !important;
+        min-width: 0 !important;
+        text-overflow: ellipsis !important;
+        overflow: hidden !important;
     }
 
     .crm-editor-toolbar {
         padding: 6px 8px !important;
         gap: 4px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     .crm-editor-divider {
