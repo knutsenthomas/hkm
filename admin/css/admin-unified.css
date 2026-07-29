@@ -10369,6 +10369,19 @@ html[data-theme="dark"] .design-ui-callout p {
   --admin-page-max: 100% !important;
 }
 
+body.admin-body .main-header,
+body.crm-body .main-header,
+body.minside-body .main-header,
+body.builder-active .main-header,
+.main-header,
+.main-header > .section-header,
+.main-header > .design-ui-header,
+body.admin-body .main-header > .section-header,
+body.crm-body .main-header > .section-header,
+body.builder-active .main-header > .section-header,
+body.admin-body .main-header .section-header-content,
+body.crm-body .main-header .section-header-content,
+body.builder-active .main-header .section-header-content,
 body.admin-body .main-content,
 body.admin-body .admin-page-container,
 body.admin-body .section-container,
@@ -10377,14 +10390,13 @@ body.crm-body .crm-main,
 body.crm-body .crm-content,
 body.crm-body .content-wrapper,
 body.builder-active .main-content,
-.main-header > .section-header,
-.main-header > .design-ui-header,
 .admin-page-container,
 .crm-main > .section-content,
 .main-content > .section,
 .crm-content {
   max-width: 100% !important;
   width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 
