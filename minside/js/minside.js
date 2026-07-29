@@ -9481,59 +9481,59 @@ class MinSideManager {
                     <div class="hkm-tasks-sidebar">
                         <!-- Stats & Progress Card -->
                         <div class="bento-card" style="padding: 24px; background: var(--bg-card, #ffffff); border-radius: 20px; border: 1px solid var(--border-color, rgba(0,0,0,0.06)); box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
-                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-                                <div style="width: 44px; height: 44px; border-radius: 14px; background: rgba(209, 125, 57, 0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
+                                <div style="width: 48px; height: 48px; border-radius: 16px; background: rgba(209, 125, 57, 0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                     <span class="material-symbols-outlined" style="color: #d17d39; font-size: 26px;">task_alt</span>
                                 </div>
-                                <div>
+                                <div style="display: flex; flex-direction: column; gap: 4px;">
                                     <h2 style="margin: 0; font-size: 20px; font-weight: 700; color: var(--text-main); line-height: 1.2;">Huskeliste</h2>
-                                    <p style="margin: 2px 0 0 0; font-size: 13px; color: var(--text-muted, #64748b);">Dine personlige gjøremål</p>
+                                    <p style="margin: 0; font-size: 13px; color: var(--text-muted, #64748b); line-height: 1.4;">Dine gjøremål og sjekklistepunkter</p>
                                 </div>
                             </div>
 
-                            <div style="margin-bottom: 16px;">
+                            <div style="margin-bottom: 24px;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 8px;">
                                     <span>Framgang</span>
-                                    <span>${completedCount} av ${totalCount} fullført</span>
+                                    <span>${completedCount} av ${totalCount} fullført (${progressPct}%)</span>
                                 </div>
                                 <div style="width: 100%; height: 10px; background: rgba(209, 125, 57, 0.12); border-radius: 99px; overflow: hidden;">
-                                    <div style="width: ${progressPct}%; height: 100%; background: linear-gradient(90deg, #d17d39 0%, #3b82f6 100%); transition: width 0.4s ease; border-radius: 99px;"></div>
+                                    <div style="width: ${progressPct}%; height: 100%; background: linear-gradient(90deg, #d17d39 0%, #bd4f2a 100%); transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 99px;"></div>
                                 </div>
                             </div>
 
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color, rgba(0,0,0,0.06));">
-                                <div style="background: var(--bg-main, #f8fafc); padding: 12px; border-radius: 12px; text-align: center;">
-                                    <span style="display: block; font-size: 20px; font-weight: 700; color: #d17d39;">${activeTasks.length}</span>
-                                    <span style="font-size: 12px; font-weight: 600; color: var(--text-muted, #64748b);">Aktive</span>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding-top: 16px; border-top: 1px solid var(--border-color, rgba(0,0,0,0.06));">
+                                <div style="background: var(--bg-main, #f8fafc); padding: 16px; border-radius: 14px; text-align: center; border: 1px solid var(--border-color, rgba(0,0,0,0.04));">
+                                    <span style="display: block; font-size: 22px; font-weight: 700; color: #d17d39; line-height: 1.2;">${activeTasks.length}</span>
+                                    <span style="font-size: 12px; font-weight: 600; color: var(--text-muted, #64748b); text-transform: uppercase; letter-spacing: 0.04em;">Aktive</span>
                                 </div>
-                                <div style="background: var(--bg-main, #f8fafc); padding: 12px; border-radius: 12px; text-align: center;">
-                                    <span style="display: block; font-size: 20px; font-weight: 700; color: #10b981;">${completedCount}</span>
-                                    <span style="font-size: 12px; font-weight: 600; color: var(--text-muted, #64748b);">Fullførte</span>
+                                <div style="background: var(--bg-main, #f8fafc); padding: 16px; border-radius: 14px; text-align: center; border: 1px solid var(--border-color, rgba(0,0,0,0.04));">
+                                    <span style="display: block; font-size: 22px; font-weight: 700; color: #10b981; line-height: 1.2;">${completedCount}</span>
+                                    <span style="font-size: 12px; font-weight: 600; color: var(--text-muted, #64748b); text-transform: uppercase; letter-spacing: 0.04em;">Fullførte</span>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Add Task Form Card -->
-                        <div class="bento-card" style="padding: 20px; background: var(--bg-card, #ffffff); border-radius: 20px; border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
-                            <h3 style="margin: 0 0 14px 0; font-size: 15px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
-                                <span class="material-symbols-outlined" style="font-size: 20px; color: #d17d39;">add_circle</span>
+                        <div class="bento-card" style="padding: 24px; background: var(--bg-card, #ffffff); border-radius: 20px; border: 1px solid var(--border-color, rgba(0,0,0,0.06)); box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
+                            <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                                <span class="material-symbols-outlined" style="font-size: 22px; color: #d17d39;">add_circle</span>
                                 Ny oppgave
                             </h3>
-                            <form id="hkm-add-task-form" style="display: flex; flex-direction: column; gap: 12px;">
-                                <div>
-                                    <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-muted, #64748b); margin-bottom: 6px;">Beskrivelse</label>
+                            <form id="hkm-add-task-form" style="display: flex; flex-direction: column; gap: 16px;">
+                                <div style="display: flex; flex-direction: column; gap: 6px;">
+                                    <label style="font-size: 12px; font-weight: 700; color: var(--text-muted, #64748b); text-transform: uppercase; letter-spacing: 0.04em;">Beskrivelse</label>
                                     <input type="text" id="task-input-title" placeholder="Hva må gjøres?..." required
-                                        style="width: 100%; padding: 12px 14px; border-radius: 12px; border: 1.5px solid var(--border-color, #e2e8f0); background: var(--bg-main, #f8fafc); font-size: 14px; color: var(--text-main); outline: none; box-sizing: border-box; transition: border-color 0.2s;">
+                                        style="width: 100%; padding: 12px 16px; border-radius: 12px; border: 1.5px solid var(--border-color, #e2e8f0); background: var(--bg-main, #f8fafc); font-size: 14px; color: var(--text-main); outline: none; box-sizing: border-box; transition: border-color 0.2s;">
                                 </div>
-                                <div>
-                                    <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-muted, #64748b); margin-bottom: 6px;">Prioritet</label>
-                                    <select id="task-input-priority" style="width: 100%; padding: 12px 14px; border-radius: 12px; border: 1.5px solid var(--border-color, #e2e8f0); background: var(--bg-main, #f8fafc); font-size: 14px; color: var(--text-main); cursor: pointer; outline: none; box-sizing: border-box;">
+                                <div style="display: flex; flex-direction: column; gap: 6px;">
+                                    <label style="font-size: 12px; font-weight: 700; color: var(--text-muted, #64748b); text-transform: uppercase; letter-spacing: 0.04em;">Prioritet</label>
+                                    <select id="task-input-priority" style="width: 100%; padding: 12px 16px; border-radius: 12px; border: 1.5px solid var(--border-color, #e2e8f0); background: var(--bg-main, #f8fafc); font-size: 14px; color: var(--text-main); cursor: pointer; outline: none; box-sizing: border-box;">
                                         <option value="medium">Medium prioritet</option>
                                         <option value="high">Høy prioritet</option>
                                         <option value="low">Lav prioritet</option>
                                     </select>
                                 </div>
-                                <button type="submit" class="btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; border: none; background: #d17d39; color: #ffffff; margin-top: 4px; transition: transform 0.15s, background-color 0.2s;">
+                                <button type="submit" class="btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 24px; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer; border: none; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; margin-top: 8px; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.3);">
                                     <span class="material-symbols-outlined" style="font-size: 20px;">add_task</span>
                                     Legg til i huskelisten
                                 </button>
@@ -9544,18 +9544,18 @@ class MinSideManager {
                     <!-- Right Main Content Panel -->
                     <div class="hkm-tasks-main">
                         <!-- Top Filter Bar Card -->
-                        <div class="bento-card" style="padding: 16px 20px; background: var(--bg-card, #ffffff); border-radius: 20px; border: 1px solid var(--border-color, rgba(0,0,0,0.06)); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                        <div class="bento-card" style="padding: 16px 24px; background: var(--bg-card, #ffffff); border-radius: 20px; border: 1px solid var(--border-color, rgba(0,0,0,0.06)); box-shadow: 0 4px 20px rgba(0,0,0,0.04); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
                             <div class="hkm-tasks-filters" style="display: flex; gap: 8px; flex-wrap: wrap;">
                                 <button class="task-filter-btn ${currentFilter === 'all' ? 'active' : ''}" data-filter="all"
-                                    style="padding: 8px 18px; border-radius: 20px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; background: ${currentFilter === 'all' ? '#d17d39' : 'rgba(0,0,0,0.05)'}; color: ${currentFilter === 'all' ? '#fff' : 'var(--text-main)'}; transition: all 0.2s;">
+                                    style="padding: 8px 20px; border-radius: 24px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; background: ${currentFilter === 'all' ? '#d17d39' : 'rgba(0,0,0,0.05)'}; color: ${currentFilter === 'all' ? '#fff' : 'var(--text-main)'}; transition: all 0.2s;">
                                     Alle oppgaver (${totalCount})
                                 </button>
                                 <button class="task-filter-btn ${currentFilter === 'active' ? 'active' : ''}" data-filter="active"
-                                    style="padding: 8px 18px; border-radius: 20px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; background: ${currentFilter === 'active' ? '#d17d39' : 'rgba(0,0,0,0.05)'}; color: ${currentFilter === 'active' ? '#fff' : 'var(--text-main)'}; transition: all 0.2s;">
+                                    style="padding: 8px 20px; border-radius: 24px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; background: ${currentFilter === 'active' ? '#d17d39' : 'rgba(0,0,0,0.05)'}; color: ${currentFilter === 'active' ? '#fff' : 'var(--text-main)'}; transition: all 0.2s;">
                                     Aktive (${activeTasks.length})
                                 </button>
                                 <button class="task-filter-btn ${currentFilter === 'completed' ? 'active' : ''}" data-filter="completed"
-                                    style="padding: 8px 18px; border-radius: 20px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; background: ${currentFilter === 'completed' ? '#d17d39' : 'rgba(0,0,0,0.05)'}; color: ${currentFilter === 'completed' ? '#fff' : 'var(--text-main)'}; transition: all 0.2s;">
+                                    style="padding: 8px 20px; border-radius: 24px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; background: ${currentFilter === 'completed' ? '#d17d39' : 'rgba(0,0,0,0.05)'}; color: ${currentFilter === 'completed' ? '#fff' : 'var(--text-main)'}; transition: all 0.2s;">
                                     Fullførte (${completedTasks.length})
                                 </button>
                             </div>
@@ -9564,9 +9564,11 @@ class MinSideManager {
                         <!-- Widescreen Task Grid -->
                         <div class="hkm-tasks-grid">
                             ${filteredTasks.length === 0 ? `
-                                <div class="bento-card" style="grid-column: 1 / -1; padding: 48px 24px; text-align: center; background: var(--bg-card, #ffffff); border-radius: 20px; border: 1px dashed var(--border-color, #e2e8f0);">
-                                    <span class="material-symbols-outlined" style="font-size: 56px; color: #94a3b8; margin-bottom: 12px;">task_alt</span>
-                                    <h3 style="margin: 0 0 6px 0; font-size: 18px; font-weight: 600; color: var(--text-main);">Ingen oppgaver funnet</h3>
+                                <div class="bento-card" style="grid-column: 1 / -1; padding: 64px 24px; text-align: center; background: var(--bg-card, #ffffff); border-radius: 20px; border: 1px dashed var(--border-color, #e2e8f0);">
+                                    <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(209, 125, 57, 0.08); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                                        <span class="material-symbols-outlined" style="font-size: 36px; color: #d17d39;">task_alt</span>
+                                    </div>
+                                    <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 700; color: var(--text-main);">Ingen oppgaver funnet</h3>
                                     <p style="margin: 0; font-size: 14px; color: var(--text-muted, #64748b);">Legg til en ny oppgave i skjemaet til venstre for å komme i gang!</p>
                                 </div>
                             ` : filteredTasks.map(task => {
@@ -9585,19 +9587,19 @@ class MinSideManager {
                                                 <input type="checkbox" class="toggle-task-cb" data-id="${task.id}" ${task.completed ? 'checked' : ''} style="width: 22px; height: 22px; cursor: pointer; accent-color: #d17d39;">
                                             </label>
                                             <div style="flex: 1; min-width: 0;">
-                                                <span class="task-title" style="display: block; font-size: 15px; font-weight: 600; color: var(--text-main); line-height: 1.4; ${task.completed ? 'text-decoration: line-through; color: var(--text-muted);' : ''} word-break: break-word;">
+                                                <span class="task-title" style="display: block; font-size: 15px; font-weight: 600; color: var(--text-main); line-height: 1.5; ${task.completed ? 'text-decoration: line-through; color: var(--text-muted);' : ''} word-break: break-word;">
                                                     ${this._escapeHtml(task.title || '')}
                                                 </span>
                                                 ${timeStr ? `<span style="display: block; font-size: 12px; color: var(--text-muted, #94a3b8); margin-top: 6px;">Opprettet ${timeStr}</span>` : ''}
                                             </div>
                                         </div>
 
-                                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; border-top: 1px solid var(--border-color, rgba(0,0,0,0.05)); padding-top: 12px; margin-top: 4px;">
-                                            <span style="padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; background: ${prio.bg}; color: ${prio.text};">
+                                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; border-top: 1px solid var(--border-color, rgba(0,0,0,0.05)); padding-top: 12px; margin-top: 8px;">
+                                            <span style="padding: 4px 12px; border-radius: 24px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; background: ${prio.bg}; color: ${prio.text};">
                                                 ${prio.label}
                                             </span>
                                             <button class="delete-task-btn" data-id="${task.id}" title="Slett oppgave"
-                                                style="background: transparent; border: none; padding: 6px; cursor: pointer; color: #94a3b8; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: color 0.15s, background-color 0.15s;">
+                                                style="background: transparent; border: none; padding: 6px; cursor: pointer; color: #94a3b8; border-radius: 10px; display: flex; align-items: center; justify-content: center; transition: all 0.15s;">
                                                 <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
                                             </button>
                                         </div>
