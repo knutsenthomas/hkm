@@ -1693,6 +1693,7 @@ class CRMManager {
             form.elements.lastName.value = lastName || '';
             form.elements.email.value = contact.email || '';
             form.elements.phone.value = contact.phone || '';
+            if (form.elements.nationalIdNumber) form.elements.nationalIdNumber.value = contact.nationalIdNumber || contact.ssn || contact.fnr || '';
             if (form.elements.address) form.elements.address.value = contact.address || '';
             if (form.elements.zip) form.elements.zip.value = contact.zip || '';
             if (form.elements.city) form.elements.city.value = contact.city || '';
@@ -1729,6 +1730,7 @@ class CRMManager {
         const lastName = String(formData.get('lastName') || '').trim();
         const email = String(formData.get('email') || '').trim();
         const phone = String(formData.get('phone') || '').trim();
+        const nationalIdNumber = String(formData.get('nationalIdNumber') || '').trim();
         const address = String(formData.get('address') || '').trim();
         const zip = String(formData.get('zip') || '').trim();
         const city = String(formData.get('city') || '').trim();
@@ -1751,6 +1753,8 @@ class CRMManager {
             displayName: `${firstName} ${lastName}`.trim(),
             email,
             phone,
+            nationalIdNumber,
+            ssn: nationalIdNumber,
             address,
             zip,
             city,
@@ -3167,6 +3171,10 @@ class CRMManager {
                     <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
                         <span style="color: var(--text-muted); font-size: 13px;">Telefon</span>
                         <span style="font-weight: 600; font-size: 13px;">${this.escapeHtml(contact.phone || '-')}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                        <span style="color: var(--text-muted); font-size: 13px;">Fødselsnummer</span>
+                        <span style="font-weight: 600; font-size: 13px;">${this.escapeHtml(contact.nationalIdNumber || contact.ssn || contact.fnr || '-')}</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
                         <span style="color: var(--text-muted); font-size: 13px;">Adresse</span>

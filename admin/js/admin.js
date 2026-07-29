@@ -26993,8 +26993,8 @@ class AdminManager {
 
                                                                                         <div class="form-group">
                                                                                             <label>Fødselsnummer (11 siffer - for skattefradrag)</label>
-                                                                                            <input type="password" name="ssn" class="form-control" value="${userData ? (userData.ssn || '') : ''}" placeholder="00000000000" maxlength="11" autocomplete="off">
-                                                                                                <p class="helper-text">Lagres kryptert/sikkert i Firestore for rapportering til Skatteetaten.</p>
+                                                                                            <input type="text" name="ssn" class="form-control" value="${userData ? (userData.ssn || userData.nationalIdNumber || '') : ''}" placeholder="00000000000" maxlength="11" autocomplete="off">
+                                                                                                <p class="helper-text">Lagres sikkert i Firestore for rapportering til Skatteetaten (11 siffer).</p>
                                                                                         </div>
 
                                                                                         <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:8px;">
@@ -27020,6 +27020,7 @@ class AdminManager {
         form.onsubmit = async (e) => {
             e.preventDefault();
             const formData = new FormData(form);
+            const ssnVal = formData.get('ssn') || '';
             const data = {
                 displayName: formData.get('displayName'),
                 email: formData.get('email'),
@@ -27033,7 +27034,8 @@ class AdminManager {
                 birthdate: formData.get('birthdate'),
                 membershipNumber: formData.get('membershipNumber'),
                 adminNotes: formData.get('adminNotes'),
-                ssn: formData.get('ssn')
+                ssn: ssnVal,
+                nationalIdNumber: ssnVal
             };
             const userId = formData.get('id');
             await this.saveUser(userId, data);
@@ -27305,6 +27307,7 @@ class AdminManager {
             saveBtn.onclick = async () => {
                 const form = document.getElementById('user-detail-form');
                 const formData = new FormData(form);
+                const ssnVal = formData.get('ssn') || '';
                 const updates = {
                     displayName: formData.get('displayName'),
                     phone: formData.get('phone'),
@@ -27315,7 +27318,8 @@ class AdminManager {
                     zip: formData.get('zip'),
                     city: formData.get('city'),
                     country: formData.get('country'),
-                    ssn: formData.get('ssn'),
+                    ssn: ssnVal,
+                    nationalIdNumber: ssnVal,
                     membershipNumber: formData.get('membershipNumber'),
                     role: formData.get('role'),
                     adminNotes: formData.get('adminNotes')
