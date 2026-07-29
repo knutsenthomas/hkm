@@ -2044,32 +2044,100 @@ class CRMManager {
             ? `${contactsWithEmail[0].displayName || (contactsWithEmail[0].firstName + ' ' + contactsWithEmail[0].lastName).trim() || contactsWithEmail[0].email} (${contactsWithEmail[0].email})`
             : `${contactsWithEmail.length} kontakter (${contactsWithEmail.slice(0, 3).map(c => c.email).join(', ')}${contactsWithEmail.length > 3 ? '...' : ''})`;
 
+        const attachments = [];
+
         const html = `
-            <div class="crm-send-email-modal" style="display: flex; flex-direction: column; gap: 16px; padding: 4px 0;">
-                <div style="background: #f8fafc; padding: 12px 16px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 13px; color: #334155;">
+            <div class="crm-send-email-modal" style="display: flex; flex-direction: column; gap: 14px; padding: 2px 0;">
+                <div style="background: #f8fafc; padding: 10px 14px; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 13px; color: #334155;">
                     <div style="font-weight: 700; color: #0f172a; margin-bottom: 2px;">Mottakere:</div>
                     <div style="word-break: break-all;">${this.escapeHtml(recipientSummary)}</div>
                 </div>
 
-                <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; flex-direction: column; gap: 4px;">
                     <label style="font-weight: 700; font-size: 13px; color: #334155; display: flex; align-items: center; gap: 6px;">
                         <span class="material-symbols-outlined" style="font-size: 18px; color: #64748b;">alternate_email</span>
                         Send e-post fra (Avsender):
                     </label>
-                    <select id="crm-email-from-mode" class="form-control" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 14px; background: white; color: #0f172a; outline: none; cursor: pointer;">
+                    <select id="crm-email-from-mode" class="form-control" style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; background: white; color: #0f172a; outline: none; cursor: pointer;">
                         <option value="post" selected>His Kingdom Ministry (post@hiskingdomministry.no)</option>
                         <option value="admin">Min egen e-post (${this.escapeHtml(adminName)} - ${this.escapeHtml(adminEmail)})</option>
                     </select>
                 </div>
 
-                <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; flex-direction: column; gap: 4px;">
                     <label style="font-weight: 700; font-size: 13px; color: #334155;">Emne:</label>
-                    <input type="text" id="crm-email-subject" class="form-control" placeholder="Skriv e-postemne her..." style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 14px; outline: none;">
+                    <input type="text" id="crm-email-subject" class="form-control" placeholder="Skriv e-postemne her..." style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 14px; outline: none;">
                 </div>
 
+                <!-- Rich Editor Section -->
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <label style="font-weight: 700; font-size: 13px; color: #334155; display: flex; justify-content: space-between; align-items: center;">
+                        <span>Melding (Innhold & Design):</span>
+                        <span style="font-size: 11px; color: #64748b; font-weight: 500;">Visuell e-posteditor</span>
+                    </label>
+                    
+                    <div style="border: 1px solid #cbd5e1; border-radius: 10px; overflow: hidden; background: #ffffff;">
+                        <!-- Formatting Toolbar -->
+                        <div class="crm-editor-toolbar" style="display: flex; flex-wrap: wrap; align-items: center; gap: 2px; padding: 6px 10px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                            <button type="button" class="editor-btn" data-cmd="bold" title="Fet tekst" style="padding: 4px 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; cursor: pointer; color: #334155;">
+                                <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle;">format_bold</span>
+                            </button>
+                            <button type="button" class="editor-btn" data-cmd="italic" title="Kursiv tekst" style="padding: 4px 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; cursor: pointer; color: #334155;">
+                                <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle;">format_italic</span>
+                            </button>
+                            <button type="button" class="editor-btn" data-cmd="underline" title="Understreket" style="padding: 4px 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; cursor: pointer; color: #334155;">
+                                <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle;">format_underlined</span>
+                            </button>
+                            <div style="width: 1px; height: 16px; background: #cbd5e1; margin: 0 4px;"></div>
+                            <button type="button" class="editor-btn" data-cmd="h2" title="Overskrift (H2)" style="padding: 4px 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; font-weight: 800; font-size: 12px; cursor: pointer; color: #334155;">
+                                H2
+                            </button>
+                            <button type="button" class="editor-btn" data-cmd="h3" title="Underoverskrift (H3)" style="padding: 4px 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; font-weight: 700; font-size: 11px; cursor: pointer; color: #334155;">
+                                H3
+                            </button>
+                            <div style="width: 1px; height: 16px; background: #cbd5e1; margin: 0 4px;"></div>
+                            <button type="button" class="editor-btn" data-cmd="insertUnorderedList" title="Kulepunkter" style="padding: 4px 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; cursor: pointer; color: #334155;">
+                                <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle;">format_list_bulleted</span>
+                            </button>
+                            <button type="button" class="editor-btn" data-cmd="insertOrderedList" title="Nummerert liste" style="padding: 4px 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; cursor: pointer; color: #334155;">
+                                <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle;">format_list_numbered</span>
+                            </button>
+                            <div style="width: 1px; height: 16px; background: #cbd5e1; margin: 0 4px;"></div>
+                            <button type="button" class="editor-btn" data-cmd="createLink" title="Sett inn lenke" style="padding: 4px 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; cursor: pointer; color: #334155;">
+                                <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle;">link</span>
+                            </button>
+                            <button type="button" class="editor-btn" data-cmd="justifyLeft" title="Venstrejuster" style="padding: 4px 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; cursor: pointer; color: #334155;">
+                                <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle;">format_align_left</span>
+                            </button>
+                            <button type="button" class="editor-btn" data-cmd="justifyCenter" title="Midtstill" style="padding: 4px 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; cursor: pointer; color: #334155;">
+                                <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle;">format_align_center</span>
+                            </button>
+                            <div style="width: 1px; height: 16px; background: #cbd5e1; margin: 0 4px;"></div>
+                            <button type="button" class="editor-btn" data-cmd="removeFormat" title="Fjern formatering" style="padding: 4px 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; cursor: pointer; color: #64748b;">
+                                <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle;">format_clear</span>
+                            </button>
+                        </div>
+
+                        <!-- Editable Content Area -->
+                        <div id="crm-email-body-editor" contenteditable="true" style="min-height: 150px; max-height: 280px; overflow-y: auto; padding: 12px; font-size: 14px; line-height: 1.6; color: #0f172a; outline: none;"></div>
+                    </div>
+                </div>
+
+                <!-- Attachments Section -->
                 <div style="display: flex; flex-direction: column; gap: 6px;">
-                    <label style="font-weight: 700; font-size: 13px; color: #334155;">Melding (Innhold):</label>
-                    <textarea id="crm-email-message" class="form-control" rows="6" placeholder="Skriv din melding her..." style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 14px; outline: none; resize: vertical; min-height: 120px;"></textarea>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <label style="font-weight: 700; font-size: 13px; color: #334155; display: flex; align-items: center; gap: 6px;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; color: #64748b;">attach_file</span>
+                            Vedlegg:
+                        </label>
+                        <button type="button" id="crm-email-add-att-btn" style="padding: 4px 10px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; border-radius: 6px; border: 1px solid #cbd5e1; background: #ffffff; color: #334155; cursor: pointer;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">add_circle</span>
+                            Legg til vedlegg
+                        </button>
+                        <input type="file" id="crm-email-file-input" multiple style="display: none;">
+                    </div>
+
+                    <div id="crm-email-attachments-list" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
                 </div>
             </div>
         `;
@@ -2077,23 +2145,24 @@ class CRMManager {
         this.openCrmToolDialog({
             mode: 'custom-html',
             title: contactsWithEmail.length === 1 ? 'Send e-post til kontakt' : `Send e-post til ${contactsWithEmail.length} kontakter`,
-            subtitle: 'Velg avsenderadresse og skriv din e-post.',
+            subtitle: 'Formater e-posten, legg til vedlegg og velg avsender.',
             html: html,
             confirmLabel: 'Send e-post',
             onConfirm: async () => {
                 const fromModeEl = document.getElementById('crm-email-from-mode');
                 const subjectEl = document.getElementById('crm-email-subject');
-                const messageEl = document.getElementById('crm-email-message');
+                const editorEl = document.getElementById('crm-email-body-editor');
 
                 const fromMode = fromModeEl ? fromModeEl.value : 'post';
                 const subject = subjectEl ? subjectEl.value.trim() : '';
-                const message = messageEl ? messageEl.value.trim() : '';
+                const htmlContent = editorEl ? editorEl.innerHTML.trim() : '';
+                const textContent = editorEl ? (editorEl.innerText || editorEl.textContent || '').trim() : '';
 
                 if (!subject) {
                     this.notify('Vennligst oppgi et emne for e-posten.', 'error');
                     return false;
                 }
-                if (!message) {
+                if (!htmlContent || htmlContent === '<br>') {
                     this.notify('Vennligst skriv inn meldingstekst.', 'error');
                     return false;
                 }
@@ -2116,7 +2185,9 @@ class CRMManager {
                             const payload = {
                                 to: contact.email,
                                 subject: subject,
-                                message: message,
+                                message: textContent,
+                                html: htmlContent,
+                                attachments: attachments,
                                 fromMode: fromMode,
                                 fromName: fromName
                             };
@@ -2156,6 +2227,106 @@ class CRMManager {
                 }
             }
         });
+
+        // Attach editor toolbar & attachment upload listeners after modal renders
+        setTimeout(() => {
+            const editor = document.getElementById('crm-email-body-editor');
+            const toolbar = document.querySelector('.crm-editor-toolbar');
+
+            if (toolbar && editor) {
+                toolbar.querySelectorAll('.editor-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        editor.focus();
+                        const cmd = btn.dataset.cmd;
+                        if (!cmd) return;
+
+                        if (cmd === 'createLink') {
+                            const url = window.prompt('Lim inn URL/lenke:');
+                            if (url) document.execCommand('createLink', false, url);
+                        } else if (cmd === 'h2') {
+                            document.execCommand('formatBlock', false, '<h2>');
+                        } else if (cmd === 'h3') {
+                            document.execCommand('formatBlock', false, '<h3>');
+                        } else {
+                            document.execCommand(cmd, false, null);
+                        }
+                    });
+
+                    btn.addEventListener('mouseover', () => btn.style.background = '#e2e8f0');
+                    btn.addEventListener('mouseout', () => btn.style.background = 'transparent');
+                });
+            }
+
+            const addAttBtn = document.getElementById('crm-email-add-att-btn');
+            const fileInput = document.getElementById('crm-email-file-input');
+
+            if (addAttBtn && fileInput) {
+                addAttBtn.addEventListener('click', () => fileInput.click());
+
+                fileInput.addEventListener('change', async (e) => {
+                    const files = Array.from(e.target.files || []);
+                    for (const file of files) {
+                        try {
+                            let fileUrl = '';
+                            if (window.firebaseService?.storage) {
+                                const storageRef = window.firebaseService.storage.ref(`email_attachments/${Date.now()}_${file.name}`);
+                                const snap = await storageRef.put(file);
+                                fileUrl = await snap.ref.getDownloadURL();
+                            } else {
+                                fileUrl = await new Promise((resolve) => {
+                                    const reader = new FileReader();
+                                    reader.onload = (ev) => resolve(ev.target.result);
+                                    reader.readAsDataURL(file);
+                                });
+                            }
+
+                            attachments.push({
+                                name: file.name,
+                                size: (file.size / 1024).toFixed(1) + ' KB',
+                                url: fileUrl,
+                                type: file.type.startsWith('image/') ? 'image' : 'file'
+                            });
+                            renderAttachmentsList();
+                        } catch (err) {
+                            console.error('Vedleggsfeil:', err);
+                            this.notify('Kunne ikke laste opp vedlegget: ' + file.name, 'error');
+                        }
+                    }
+                });
+            }
+
+            function renderAttachmentsList() {
+                const container = document.getElementById('crm-email-attachments-list');
+                if (!container) return;
+
+                if (attachments.length === 0) {
+                    container.innerHTML = '';
+                    return;
+                }
+
+                container.innerHTML = attachments.map((att, idx) => `
+                    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 99px; font-size: 12px; font-weight: 600; color: #334155;">
+                        <span class="material-symbols-outlined" style="font-size: 16px; color: #64748b;">
+                            ${att.type === 'image' ? 'image' : 'description'}
+                        </span>
+                        <span style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${att.name}</span>
+                        <span style="color: #94a3b8; font-size: 11px;">(${att.size})</span>
+                        <button type="button" data-remove-att="${idx}" style="background: none; border: none; padding: 0; cursor: pointer; color: #ef4444; display: inline-flex; align-items: center; justify-content: center; margin-left: 2px;">
+                            <span class="material-symbols-outlined" style="font-size: 15px;">close</span>
+                        </button>
+                    </div>
+                `).join('');
+
+                container.querySelectorAll('[data-remove-att]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const idx = parseInt(btn.dataset.removeAtt, 10);
+                        attachments.splice(idx, 1);
+                        renderAttachmentsList();
+                    });
+                });
+            }
+        }, 80);
     }
 
     async bulkEditLabels() {
