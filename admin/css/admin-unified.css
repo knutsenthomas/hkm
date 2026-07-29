@@ -6589,10 +6589,10 @@ body.admin-body .template-item:active {
   .modal-content input:not([type="checkbox"]):not([type="radio"]),
   .modal-content select,
   .modal-content textarea,
-  .modal-content button,
+  .modal-content button:not(.close-modal):not(.close-modal-btn):not(.editor-btn):not(#btn-toggle-new-label),
   #admin-modal-profile-form input:not([type="checkbox"]):not([type="radio"]),
   #admin-modal-profile-form textarea,
-  #admin-modal-profile-form button,
+  #admin-modal-profile-form button:not(.close-modal):not(.close-modal-btn),
   .quill-editor-container,
   .form-control {
     width: 100% !important;

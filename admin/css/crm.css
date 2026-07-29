@@ -703,30 +703,58 @@ html[data-theme="dark"] .tag-filter-select {
 
 .modal-header {
     background: white;
-    padding: 24px 32px;
+    padding: 20px 24px;
     border-bottom: 1px solid var(--border-color);
     display: flex;
-    justify-content: space-between;
+    flex-direction: row;
     align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.modal-header h2 {
+.modal-header h2,
+#crm-tool-modal-title,
+#contact-modal-title {
     font-size: 20px;
     font-weight: 800;
     margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #0f172a;
 }
 
-.close-modal {
-    background: none;
+.close-modal,
+.close-modal-btn {
+    background: #f1f5f9;
     border: none;
-    font-size: 28px;
-    color: var(--text-muted);
+    width: 36px;
+    min-width: 36px;
+    max-width: 36px;
+    height: 36px;
+    min-height: 36px;
+    max-height: 36px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
+    font-size: 20px;
+    color: #64748b;
+    transition: all 0.2s ease;
     line-height: 1;
+    padding: 0;
+    margin-left: auto;
+    flex: 0 0 36px;
 }
 
-.close-modal:hover {
-    color: var(--text-main);
+.close-modal:hover,
+.close-modal-btn:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+    transform: scale(1.05);
 }
 
 #contact-form {
