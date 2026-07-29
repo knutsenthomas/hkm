@@ -630,7 +630,7 @@ body.crm-body {
     height: 100%;
     background: rgba(15, 23, 42, 0.6);
     backdrop-filter: blur(4px);
-    z-index: 1000;
+    z-index: 15000 !important;
     align-items: center;
     justify-content: center;
     padding: 20px;

@@ -1344,6 +1344,7 @@ class CRMManager {
     }
 
     openEditContactModal(contactId) {
+        this.closeDrawer();
         const contact = this.contacts.find(c => c.id === contactId);
         if (!contact) {
             this.notify('Fant ikke kontakten som skulle redigeres.', 'error');
