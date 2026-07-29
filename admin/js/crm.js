@@ -116,6 +116,66 @@ class CRMManager {
             importFileInput.onchange = (e) => this.handleCsvImport(e);
         }
 
+        // Custom label creation listeners
+        const labelSelect = document.getElementById('contact-label-select');
+        const newLabelContainer = document.getElementById('new-label-input-container');
+        const newLabelInput = document.getElementById('custom-new-label-input');
+        const toggleNewLabelBtn = document.getElementById('btn-toggle-new-label');
+        const addCustomLabelBtn = document.getElementById('btn-add-custom-label');
+
+        const showNewLabelInput = () => {
+            if (newLabelContainer) {
+                newLabelContainer.style.display = 'block';
+                if (newLabelInput) {
+                    newLabelInput.value = '';
+                    newLabelInput.focus();
+                }
+            }
+        };
+
+        if (labelSelect) {
+            labelSelect.addEventListener('change', (e) => {
+                if (e.target.value === '__CREATE_NEW__') {
+                    showNewLabelInput();
+                } else if (newLabelContainer) {
+                    newLabelContainer.style.display = 'none';
+                }
+            });
+        }
+
+        if (toggleNewLabelBtn) {
+            toggleNewLabelBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                showNewLabelInput();
+            });
+        }
+
+        const handleAddNewLabel = () => {
+            if (!newLabelInput) return;
+            const val = newLabelInput.value.trim();
+            if (!val) return;
+
+            this.populateLabelOptions(val);
+            if (newLabelContainer) newLabelContainer.style.display = 'none';
+            this.notify(`Etiketten "${val}" ble lagt til!`, 'success');
+        };
+
+        if (addCustomLabelBtn) {
+            addCustomLabelBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                handleAddNewLabel();
+            });
+        }
+
+        if (newLabelInput) {
+            newLabelInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAddNewLabel();
+                }
+            });
+        }
+
         const crmToolModal = document.getElementById('crm-tool-modal');
         if (crmToolModal) {
             crmToolModal.addEventListener('click', (e) => {
@@ -1283,11 +1343,50 @@ class CRMManager {
         this.toggleModal(true);
     }
 
+    populateLabelOptions(selectedLabel = '') {
+        const labelSelect = document.getElementById('contact-label-select');
+        if (!labelSelect) return;
+
+        const defaultLabels = ['Ny', 'Medlem', 'Frivillig', 'Lovsang', 'Giver', 'Abonnent', 'Leder'];
+        const uniqueLabels = new Set(defaultLabels);
+
+        if (this.contacts && Array.isArray(this.contacts)) {
+            this.contacts.forEach(c => {
+                if (c.label) uniqueLabels.add(c.label);
+                if (Array.isArray(c.labels)) c.labels.forEach(l => l && uniqueLabels.add(l));
+            });
+        }
+
+        if (selectedLabel && selectedLabel !== '__CREATE_NEW__') {
+            uniqueLabels.add(selectedLabel);
+        }
+
+        let html = '';
+        uniqueLabels.forEach(lbl => {
+            html += `<option value="${lbl}">${lbl}</option>`;
+        });
+        html += `<option value="__CREATE_NEW__">+ Lag ny etikett...</option>`;
+
+        labelSelect.innerHTML = html;
+
+        if (selectedLabel && uniqueLabels.has(selectedLabel)) {
+            labelSelect.value = selectedLabel;
+        } else {
+            labelSelect.value = 'Ny';
+        }
+    }
+
     applyContactFormState({ mode, contact = null }) {
         const form = document.getElementById('contact-form');
         const titleEl = document.getElementById('contact-modal-title');
         const submitBtn = form?.querySelector('button[type="submit"]');
+        const newLabelContainer = document.getElementById('new-label-input-container');
+        if (newLabelContainer) newLabelContainer.style.display = 'none';
+
         if (!form) return;
+
+        const currentLabel = contact ? (contact.label || contact.labels?.[0] || 'Ny') : 'Ny';
+        this.populateLabelOptions(currentLabel);
 
         if (mode === 'edit' && contact) {
             let firstName = contact.firstName || '';
@@ -1306,7 +1405,7 @@ class CRMManager {
             if (form.elements.zip) form.elements.zip.value = contact.zip || '';
             if (form.elements.city) form.elements.city.value = contact.city || '';
             if (form.elements.country) form.elements.country.value = contact.country || 'Norge';
-            form.elements.label.value = (contact.label || contact.labels?.[0] || 'Ny');
+            if (form.elements.label) form.elements.label.value = currentLabel;
             form.elements.status.value = contact.status || 'IKKE_MEDLEM';
 
             if (titleEl) titleEl.textContent = 'Rediger kontakt';
@@ -1343,7 +1442,12 @@ class CRMManager {
         const zip = String(formData.get('zip') || '').trim();
         const city = String(formData.get('city') || '').trim();
         const country = String(formData.get('country') || 'Norge').trim();
-        const label = String(formData.get('label') || 'Ny').trim() || 'Ny';
+        let label = String(formData.get('label') || 'Ny').trim() || 'Ny';
+        if (label === '__CREATE_NEW__') {
+            const customInput = document.getElementById('custom-new-label-input');
+            const customVal = customInput ? customInput.value.trim() : '';
+            label = customVal || 'Ny';
+        }
         const status = String(formData.get('status') || 'IKKE_MEDLEM').trim() || 'IKKE_MEDLEM';
 
         if (!firstName || !lastName || !email) {

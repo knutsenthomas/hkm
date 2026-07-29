@@ -535,6 +535,27 @@ button.btn {
   background: #fff;
 }
 
+/* Custom indented arrow for all select dropdowns */
+.form-group select,
+.modal select,
+#contact-modal select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  padding-right: 40px !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 18px center !important;
+  background-size: 14px !important;
+  cursor: pointer;
+}
+
+html[data-theme="dark"] .form-group select,
+html[data-theme="dark"] .modal select,
+html[data-theme="dark"] #contact-modal select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+}
+
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus,

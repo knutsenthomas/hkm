@@ -508,7 +508,13 @@
                     <input type="text" name="country" value="Norge">
                 </div>
                 <div class="form-group">
-                    <label>Etikett</label>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label style="margin-bottom: 0;">Etikett</label>
+                        <button type="button" id="btn-toggle-new-label" style="background: none; border: none; color: var(--accent-orange, #d17d39); font-size: 12.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; padding: 0;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">add</span>
+                            + Ny etikett
+                        </button>
+                    </div>
                     <select name="label" id="contact-label-select">
                         <option value="Ny">Ny</option>
                         <option value="Medlem">Medlem</option>
@@ -517,7 +523,15 @@
                         <option value="Giver">Giver</option>
                         <option value="Abonnent">Abonnent</option>
                         <option value="Leder">Leder</option>
+                        <option value="__CREATE_NEW__">+ Lag ny etikett...</option>
                     </select>
+
+                    <div id="new-label-input-container" style="display: none; margin-top: 8px;">
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" id="custom-new-label-input" placeholder="Skriv navn på ny etikett (f.eks. 'Ungdom')..." style="padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); flex: 1; font-size: 13.5px; outline: none; background: var(--bg-card, #ffffff); color: var(--text-base, #1e293b);">
+                            <button type="button" id="btn-add-custom-label" class="btn btn-primary" style="padding: 0 16px; border-radius: 10px; font-weight: 700; white-space: nowrap; height: auto;">Legg til</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Medlemsstatus</label>
