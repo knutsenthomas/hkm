@@ -1034,7 +1034,7 @@ class MinSideManager {
             giving: this.renderGiving,
             courses: this.renderCourses,
             notes: this.renderNotes,
-            tasks: this.renderNotes,
+            tasks: this.renderTasks,
             'reading-plans': this.renderReadingPlans,
             'prayer-wall': this.renderPrayerWall,
             'course-player': this.renderCoursePlayer,
@@ -9427,6 +9427,248 @@ class MinSideManager {
                             .catch(e => this._notify(t('notes.error') + ': ' + e.message, 'warning'));
                     }
                 });
+            });
+        });
+    }
+
+    // ── Dedicated Huskeliste / Tasks View ──────────────────────────────────
+    async renderTasks(container) {
+        const uid = this.currentUser?.uid;
+        if (!uid) {
+            container.innerHTML = `<div class="bento-card" style="padding: 24px; text-align: center;"><p>Vennligst logg inn for å se din huskeliste.</p></div>`;
+            return;
+        }
+
+        container.innerHTML = `<div class="loading-state"><div class="spinner"></div></div>`;
+
+        let tasks = [];
+        try {
+            const snap = await firebase.firestore()
+                .collection('users')
+                .doc(uid)
+                .collection('user_tasks')
+                .orderBy('createdAt', 'desc')
+                .get();
+
+            snap.forEach(doc => {
+                tasks.push({ id: doc.id, ...doc.data() });
+            });
+        } catch (e) {
+            console.warn('renderTasks fetch error:', e);
+        }
+
+        this._renderTasksUI(container, tasks);
+    }
+
+    _renderTasksUI(container, tasks = []) {
+        const uid = this.currentUser?.uid;
+        const currentFilter = localStorage.getItem('hkm_tasks_filter') || 'all';
+
+        const activeTasks = tasks.filter(t => !t.completed);
+        const completedTasks = tasks.filter(t => t.completed);
+        const totalCount = tasks.length;
+        const completedCount = completedTasks.length;
+        const progressPct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
+        let filteredTasks = tasks;
+        if (currentFilter === 'active') filteredTasks = activeTasks;
+        if (currentFilter === 'completed') filteredTasks = completedTasks;
+
+        const html = `
+            <div class="hkm-tasks-container" style="display: flex; flex-direction: column; gap: 24px; max-width: 900px; margin: 0 auto; padding-bottom: 40px;">
+                <!-- Header Stats Card -->
+                <div class="bento-card tasks-header-card" style="padding: 24px; background: var(--bg-card, #ffffff); border-radius: 20px; border: 1px solid var(--border-color, rgba(0,0,0,0.06)); box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
+                        <div>
+                            <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 10px;">
+                                <span class="material-symbols-outlined" style="color: #d17d39; font-size: 28px;">task_alt</span>
+                                Huskeliste
+                            </h2>
+                            <p style="margin: 4px 0 0 0; font-size: 14px; color: var(--text-muted, #64748b);">Dine personlige oppgaver og sjekklistepunkter</p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span style="font-size: 14px; font-weight: 600; color: var(--text-main);">${completedCount} av ${totalCount} fullført (${progressPct}%)</span>
+                        </div>
+                    </div>
+
+                    <!-- Progress bar -->
+                    <div style="width: 100%; height: 10px; background: rgba(209, 125, 57, 0.12); border-radius: 99px; overflow: hidden;">
+                        <div style="width: ${progressPct}%; height: 100%; background: linear-gradient(90deg, #d17d39 0%, #3b82f6 100%); transition: width 0.4s ease; border-radius: 99px;"></div>
+                    </div>
+                </div>
+
+                <!-- Add Task Form Card -->
+                <div class="bento-card" style="padding: 20px; background: var(--bg-card, #ffffff); border-radius: 20px; border: 1px solid var(--border-color, rgba(0,0,0,0.06));">
+                    <form id="hkm-add-task-form" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+                        <div style="flex: 1; min-width: 220px; position: relative;">
+                            <input type="text" id="task-input-title" placeholder="Hva må gjøres? Legg til ny oppgave..." required
+                                style="width: 100%; padding: 12px 16px; border-radius: 12px; border: 1.5px solid var(--border-color, #e2e8f0); background: var(--bg-main, #f8fafc); font-size: 15px; color: var(--text-main); outline: none; box-sizing: border-box; transition: border-color 0.2s;">
+                        </div>
+                        <select id="task-input-priority" style="padding: 12px 16px; border-radius: 12px; border: 1.5px solid var(--border-color, #e2e8f0); background: var(--bg-main, #f8fafc); font-size: 14px; color: var(--text-main); cursor: pointer; outline: none;">
+                            <option value="medium">Medium prio</option>
+                            <option value="high">Høy prio</option>
+                            <option value="low">Lav prio</option>
+                        </select>
+                        <button type="submit" class="btn-primary" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; border: none; background: #d17d39; color: #ffffff; transition: transform 0.15s, background-color 0.2s;">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">add_task</span>
+                            Legg til
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Filter Tabs -->
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                    <div class="hkm-tasks-filters" style="display: flex; gap: 8px;">
+                        <button class="task-filter-btn ${currentFilter === 'all' ? 'active' : ''}" data-filter="all"
+                            style="padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; background: ${currentFilter === 'all' ? '#d17d39' : 'rgba(0,0,0,0.05)'}; color: ${currentFilter === 'all' ? '#fff' : 'var(--text-main)'}; transition: all 0.2s;">
+                            Alle (${totalCount})
+                        </button>
+                        <button class="task-filter-btn ${currentFilter === 'active' ? 'active' : ''}" data-filter="active"
+                            style="padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; background: ${currentFilter === 'active' ? '#d17d39' : 'rgba(0,0,0,0.05)'}; color: ${currentFilter === 'active' ? '#fff' : 'var(--text-main)'}; transition: all 0.2s;">
+                            Aktive (${activeTasks.length})
+                        </button>
+                        <button class="task-filter-btn ${currentFilter === 'completed' ? 'active' : ''}" data-filter="completed"
+                            style="padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; background: ${currentFilter === 'completed' ? '#d17d39' : 'rgba(0,0,0,0.05)'}; color: ${currentFilter === 'completed' ? '#fff' : 'var(--text-main)'}; transition: all 0.2s;">
+                            Fullførte (${completedTasks.length})
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Task List Items -->
+                <div class="hkm-tasks-list" style="display: flex; flex-direction: column; gap: 12px;">
+                    ${filteredTasks.length === 0 ? `
+                        <div class="bento-card" style="padding: 48px 24px; text-align: center; background: var(--bg-card, #ffffff); border-radius: 20px; border: 1px dashed var(--border-color, #e2e8f0);">
+                            <span class="material-symbols-outlined" style="font-size: 48px; color: #94a3b8; margin-bottom: 12px;">task_alt</span>
+                            <h3 style="margin: 0 0 6px 0; font-size: 18px; font-weight: 600; color: var(--text-main);">Ingen oppgaver funnet</h3>
+                            <p style="margin: 0; font-size: 14px; color: var(--text-muted, #64748b);">Legg til en ny oppgave ovenfor for å komme i gang!</p>
+                        </div>
+                    ` : filteredTasks.map(task => {
+                        const prioColors = {
+                            high: { bg: 'rgba(239, 68, 68, 0.1)', text: '#dc2626', label: 'Høy' },
+                            medium: { bg: 'rgba(245, 158, 11, 0.1)', text: '#d97706', label: 'Medium' },
+                            low: { bg: 'rgba(100, 116, 139, 0.1)', text: '#64748b', label: 'Lav' }
+                        };
+                        const prio = prioColors[task.priority] || prioColors.medium;
+
+                        return `
+                            <div class="bento-card task-item-card ${task.completed ? 'completed' : ''}" data-task-id="${task.id}"
+                                style="padding: 16px 20px; background: var(--bg-card, #ffffff); border-radius: 16px; border: 1px solid var(--border-color, rgba(0,0,0,0.06)); display: flex; align-items: center; justify-content: space-between; gap: 16px; transition: all 0.2s; ${task.completed ? 'opacity: 0.65;' : ''}">
+                                <div style="display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0;">
+                                    <label class="hkm-custom-cb" style="display: flex; align-items: center; cursor: pointer; flex-shrink: 0;">
+                                        <input type="checkbox" class="toggle-task-cb" data-id="${task.id}" ${task.completed ? 'checked' : ''} style="width: 22px; height: 22px; cursor: pointer; accent-color: #d17d39;">
+                                    </label>
+                                    <span class="task-title" style="font-size: 15px; font-weight: 500; color: var(--text-main); ${task.completed ? 'text-decoration: line-through; color: var(--text-muted);' : ''} word-break: break-word;">
+                                        ${this._escapeHtml(task.title || '')}
+                                    </span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+                                    <span style="padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; background: ${prio.bg}; color: ${prio.text};">
+                                        ${prio.label}
+                                    </span>
+                                    <button class="delete-task-btn" data-id="${task.id}" title="Slett oppgave"
+                                        style="background: transparent; border: none; padding: 6px; cursor: pointer; color: #94a3b8; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: color 0.15s, background-color 0.15s;">
+                                        <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+
+        container.innerHTML = html;
+
+        // Wire Event Listeners
+        const form = container.querySelector('#hkm-add-task-form');
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const titleInput = form.querySelector('#task-input-title');
+                const prioInput = form.querySelector('#task-input-priority');
+                const title = titleInput.value.trim();
+                if (!title || !uid) return;
+
+                const submitBtn = form.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+
+                try {
+                    const newTask = {
+                        title,
+                        priority: prioInput.value || 'medium',
+                        completed: false,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        userId: uid
+                    };
+
+                    const docRef = await firebase.firestore()
+                        .collection('users')
+                        .doc(uid)
+                        .collection('user_tasks')
+                        .add(newTask);
+
+                    tasks.unshift({ id: docRef.id, ...newTask, createdAt: new Date() });
+                    this._notify('Oppgave lagt til!', 'success');
+                    this._renderTasksUI(container, tasks);
+                } catch (err) {
+                    console.error('Error adding task:', err);
+                    this._notify('Kunne ikke legge til oppgave', 'warning');
+                }
+            });
+        }
+
+        container.querySelectorAll('.task-filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const filter = btn.dataset.filter;
+                localStorage.setItem('hkm_tasks_filter', filter);
+                this._renderTasksUI(container, tasks);
+            });
+        });
+
+        container.querySelectorAll('.toggle-task-cb').forEach(cb => {
+            cb.addEventListener('change', async (e) => {
+                const taskId = cb.dataset.id;
+                const isChecked = cb.checked;
+                const task = tasks.find(t => t.id === taskId);
+                if (task) {
+                    task.completed = isChecked;
+                    task.completedAt = isChecked ? new Date() : null;
+                    this._renderTasksUI(container, tasks);
+
+                    try {
+                        await firebase.firestore()
+                            .collection('users')
+                            .doc(uid)
+                            .collection('user_tasks')
+                            .doc(taskId)
+                            .update({
+                                completed: isChecked,
+                                completedAt: isChecked ? firebase.firestore.FieldValue.serverTimestamp() : null
+                            });
+                    } catch (err) {
+                        console.error('Error updating task:', err);
+                    }
+                }
+            });
+        });
+
+        container.querySelectorAll('.delete-task-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const taskId = btn.dataset.id;
+                tasks = tasks.filter(t => t.id !== taskId);
+                this._renderTasksUI(container, tasks);
+
+                try {
+                    await firebase.firestore()
+                        .collection('users')
+                        .doc(uid)
+                        .collection('user_tasks')
+                        .doc(taskId)
+                        .delete();
+                    this._notify('Oppgave slettet', 'info');
+                } catch (err) {
+                    console.error('Error deleting task:', err);
+                }
             });
         });
     }
