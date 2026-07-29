@@ -12,12 +12,12 @@ const db = admin.firestore();
 const templates = {
   daily_bible_reading: {
     subject: 'Dagens bibellesing: Dag {{day}} - {{title}}',
-    body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
+    body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
   <!-- Minimal Top Accent -->
   <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
 
   <!-- Editorial Header -->
-  <header style="padding: 40px 32px 24px 32px; text-align: center; background-color: #FCF9F5;">
+  <header style="padding: 32px 20px 24px 20px; box-sizing: border-box; max-width: 100%; text-align: center; background-color: #FCF9F5;">
     <div style="margin-bottom: 16px;">
       <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 48px; width: auto; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
     </div>
@@ -26,7 +26,7 @@ const templates = {
   </header>
 
   <!-- Main Content Wrapper -->
-  <div style="padding: 0 32px 40px 32px; background-color: #FCF9F5;">
+  <div style="padding: 0 20px 32px 20px; box-sizing: border-box; max-width: 100%; background-color: #FCF9F5;">
     <!-- Personal Greeting -->
     <section style="margin-bottom: 32px; text-align: center; max-width: 440px; margin-left: auto; margin-right: auto;">
       <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 32px; line-height: 40px; font-weight: 700; color: #121c2c; margin: 0 0 12px 0; font-style: italic;">Hei {{name}}</h2>
@@ -83,7 +83,7 @@ const templates = {
   </div>
 
   <!-- Footer -->
-  <footer style="padding: 32px 32px 40px 32px; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
+  <footer style="padding: 24px 20px 32px 20px; box-sizing: border-box; max-width: 100%; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
     <div style="margin-bottom: 24px;">
       <a href="https://www.hiskingdomministry.no/" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Hjem</a>
       <a href="https://www.hiskingdomministry.no/minside" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Min Side</a>
@@ -98,12 +98,12 @@ const templates = {
   },
   welcome_email: {
     subject: 'Velkommen til His Kingdom Ministry!',
-    body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
+    body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
   <!-- Minimal Top Accent -->
   <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
 
   <!-- Editorial Header -->
-  <header style="padding: 40px 32px 24px 32px; text-align: center; background-color: #FCF9F5;">
+  <header style="padding: 32px 20px 24px 20px; box-sizing: border-box; max-width: 100%; text-align: center; background-color: #FCF9F5;">
     <div style="margin-bottom: 16px;">
       <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 48px; width: auto; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
     </div>
@@ -112,7 +112,7 @@ const templates = {
   </header>
 
   <!-- Main Content Wrapper -->
-  <div style="padding: 0 32px 40px 32px; background-color: #FCF9F5;">
+  <div style="padding: 0 20px 32px 20px; box-sizing: border-box; max-width: 100%; background-color: #FCF9F5;">
     <!-- Personal Greeting -->
     <section style="margin-bottom: 32px; text-align: center; max-width: 440px; margin-left: auto; margin-right: auto;">
       <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 32px; line-height: 40px; font-weight: 700; color: #121c2c; margin: 0 0 12px 0; font-style: italic;">Velkommen, {{name}}!</h2>
@@ -160,7 +160,7 @@ const templates = {
   </div>
 
   <!-- Footer -->
-  <footer style="padding: 32px 32px 40px 32px; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
+  <footer style="padding: 24px 20px 32px 20px; box-sizing: border-box; max-width: 100%; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
     <div style="margin-bottom: 24px;">
       <a href="https://www.hiskingdomministry.no/" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Hjem</a>
       <a href="https://www.hiskingdomministry.no/minside" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Min Side</a>
@@ -175,12 +175,12 @@ const templates = {
   },
   course_registration: {
     subject: 'Bekreftelse på kursregistrering: {{courseTitle}}',
-    body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
+    body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
   <!-- Minimal Top Accent -->
   <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
 
   <!-- Editorial Header -->
-  <header style="padding: 40px 32px 24px 32px; text-align: center; background-color: #FCF9F5;">
+  <header style="padding: 32px 20px 24px 20px; box-sizing: border-box; max-width: 100%; text-align: center; background-color: #FCF9F5;">
     <div style="margin-bottom: 16px;">
       <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 48px; width: auto; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
     </div>
@@ -189,7 +189,7 @@ const templates = {
   </header>
 
   <!-- Main Content Wrapper -->
-  <div style="padding: 0 32px 40px 32px; background-color: #FCF9F5;">
+  <div style="padding: 0 20px 32px 20px; box-sizing: border-box; max-width: 100%; background-color: #FCF9F5;">
     <!-- Personal Greeting -->
     <section style="margin-bottom: 32px; text-align: center; max-width: 440px; margin-left: auto; margin-right: auto;">
       <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 32px; line-height: 40px; font-weight: 700; color: #121c2c; margin: 0 0 12px 0; font-style: italic;">Hei {{name}}!</h2>
@@ -242,7 +242,7 @@ const templates = {
   </div>
 
   <!-- Footer -->
-  <footer style="padding: 32px 32px 40px 32px; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
+  <footer style="padding: 24px 20px 32px 20px; box-sizing: border-box; max-width: 100%; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
     <div style="margin-bottom: 24px;">
       <a href="https://www.hiskingdomministry.no/" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Hjem</a>
       <a href="https://www.hiskingdomministry.no/minside" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Min Side</a>
@@ -257,12 +257,12 @@ const templates = {
   },
   newsletter_confirmation: {
     subject: 'Bekreftelse: Du er påmeldt nyhetsbrevet vårt!',
-    body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
+    body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
   <!-- Minimal Top Accent -->
   <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
 
   <!-- Editorial Header -->
-  <header style="padding: 40px 32px 24px 32px; text-align: center; background-color: #FCF9F5;">
+  <header style="padding: 32px 20px 24px 20px; box-sizing: border-box; max-width: 100%; text-align: center; background-color: #FCF9F5;">
     <div style="margin-bottom: 16px;">
       <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 48px; width: auto; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
     </div>
@@ -271,7 +271,7 @@ const templates = {
   </header>
 
   <!-- Main Content Wrapper -->
-  <div style="padding: 0 32px 40px 32px; background-color: #FCF9F5;">
+  <div style="padding: 0 20px 32px 20px; box-sizing: border-box; max-width: 100%; background-color: #FCF9F5;">
     <!-- Personal Greeting -->
     <section style="margin-bottom: 32px; text-align: center; max-width: 440px; margin-left: auto; margin-right: auto;">
       <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 32px; line-height: 40px; font-weight: 700; color: #121c2c; margin: 0 0 12px 0; font-style: italic;">Takk for din påmelding!</h2>
@@ -320,7 +320,7 @@ const templates = {
   </div>
 
   <!-- Footer -->
-  <footer style="padding: 32px 32px 40px 32px; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
+  <footer style="padding: 24px 20px 32px 20px; box-sizing: border-box; max-width: 100%; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
     <div style="margin-bottom: 24px;">
       <a href="https://www.hiskingdomministry.no/" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Hjem</a>
       <a href="https://www.hiskingdomministry.no/minside" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Min Side</a>

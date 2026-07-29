@@ -1824,9 +1824,11 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
 
 /* CRM Email Composer Modal Enhancements */
 .crm-send-email-modal-wrapper {
-    max-width: 720px !important;
+    max-width: min(720px, calc(100vw - 16px)) !important;
     width: 100% !important;
     border-radius: 20px !important;
+    box-sizing: border-box !important;
+    margin: auto !important;
 }
 
 /* Responsive Email Templates & Editor Container Guard */
@@ -1838,10 +1840,14 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
     box-sizing: border-box !important;
     overflow-x: auto !important;
     word-break: break-word !important;
+    overflow-wrap: anywhere !important;
 }
 
 #crm-email-body-editor > div,
 #crm-email-body-editor table,
+#crm-email-body-editor header,
+#crm-email-body-editor section,
+#crm-email-body-editor footer,
 .ql-editor > div,
 .ql-editor table,
 .crm-email-preview-container > div,
@@ -1858,6 +1864,8 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
 .crm-email-preview-container * {
     box-sizing: border-box !important;
     max-width: 100% !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
 }
 
 #crm-email-body-editor img,

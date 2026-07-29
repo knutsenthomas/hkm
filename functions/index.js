@@ -4784,12 +4784,12 @@ exports.onUserCreate = onDocumentCreated({
   if (userId.length === 28) {
     const fallback = {
       subject: "Velkommen til His Kingdom Ministry!",
-      body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
+      body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
   <!-- Minimal Top Accent -->
   <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
 
   <!-- Editorial Header -->
-  <header style="padding: 40px 32px 24px 32px; text-align: center; background-color: #FCF9F5;">
+  <header style="padding: 32px 20px 24px 20px; box-sizing: border-box; max-width: 100%; text-align: center; background-color: #FCF9F5;">
     <div style="margin-bottom: 16px;">
       <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 48px; width: auto; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
     </div>
@@ -4798,7 +4798,7 @@ exports.onUserCreate = onDocumentCreated({
   </header>
 
   <!-- Main Content Wrapper -->
-  <div style="padding: 0 32px 40px 32px; background-color: #FCF9F5;">
+  <div style="padding: 0 20px 32px 20px; box-sizing: border-box; max-width: 100%; background-color: #FCF9F5;">
     <!-- Personal Greeting -->
     <section style="margin-bottom: 32px; text-align: center; max-width: 440px; margin-left: auto; margin-right: auto;">
       <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 32px; line-height: 40px; font-weight: 700; color: #121c2c; margin: 0 0 12px 0; font-style: italic;">Velkommen, {{name}}!</h2>
@@ -4846,7 +4846,7 @@ exports.onUserCreate = onDocumentCreated({
   </div>
 
   <!-- Footer -->
-  <footer style="padding: 32px 32px 40px 32px; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
+  <footer style="padding: 24px 20px 32px 20px; box-sizing: border-box; max-width: 100%; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
     <div style="margin-bottom: 24px;">
       <a href="https://www.hiskingdomministry.no/" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Hjem</a>
       <a href="https://www.hiskingdomministry.no/minside" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Min Side</a>
@@ -4867,7 +4867,7 @@ exports.onUserCreate = onDocumentCreated({
     const html = (htmlBody.includes('FCF9F5') || htmlBody.includes('hkm-email-container')) 
       ? htmlBody 
       : `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px;">
+        <div style="font-family: sans-serif; width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; padding: 20px 12px;">
           ${htmlBody}
           <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
             Dette er en automatisk utsendt e-post fra His Kingdom Ministry.
@@ -4910,12 +4910,12 @@ exports.onNewsletterSubscribe = onDocumentCreated({
 
   const fallback = {
     subject: "Bekreftelse: Du er påmeldt nyhetsbrevet vårt!",
-    body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
+    body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
   <!-- Minimal Top Accent -->
   <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
 
   <!-- Editorial Header -->
-  <header style="padding: 40px 32px 24px 32px; text-align: center; background-color: #FCF9F5;">
+  <header style="padding: 32px 20px 24px 20px; box-sizing: border-box; max-width: 100%; text-align: center; background-color: #FCF9F5;">
     <div style="margin-bottom: 16px;">
       <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 48px; width: auto; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
     </div>
@@ -4924,7 +4924,7 @@ exports.onNewsletterSubscribe = onDocumentCreated({
   </header>
 
   <!-- Main Content Wrapper -->
-  <div style="padding: 0 32px 40px 32px; background-color: #FCF9F5;">
+  <div style="padding: 0 20px 32px 20px; box-sizing: border-box; max-width: 100%; background-color: #FCF9F5;">
     <!-- Personal Greeting -->
     <section style="margin-bottom: 32px; text-align: center; max-width: 440px; margin-left: auto; margin-right: auto;">
       <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 32px; line-height: 40px; font-weight: 700; color: #121c2c; margin: 0 0 12px 0; font-style: italic;">Takk for din påmelding!</h2>
@@ -4973,7 +4973,7 @@ exports.onNewsletterSubscribe = onDocumentCreated({
   </div>
 
   <!-- Footer -->
-  <footer style="padding: 32px 32px 40px 32px; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
+  <footer style="padding: 24px 20px 32px 20px; box-sizing: border-box; max-width: 100%; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
     <div style="margin-bottom: 24px;">
       <a href="https://www.hiskingdomministry.no/" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Hjem</a>
       <a href="https://www.hiskingdomministry.no/minside" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Min Side</a>
@@ -4995,7 +4995,7 @@ exports.onNewsletterSubscribe = onDocumentCreated({
     (htmlBody.includes('FCF9F5') || htmlBody.includes('hkm-email-container'))
     ? htmlBody
     : `
-      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px;">
+      <div style="font-family: sans-serif; width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; padding: 20px 12px;">
         ${htmlBody}
         <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
           <a href="${NEWSLETTER_UNSUBSCRIBE_PAGE}" style="color: #d17d39;">Meld deg av nyhetsbrevet</a>
@@ -5133,7 +5133,7 @@ exports.onNewsletterCampaignCreate = onDocumentCreated({
           emailHtml = campaign.englishHtml;
         } else {
           const bodyContent = buildBlocksHtml(englishPayload?.blocksEn || campaign.blocks, 'en');
-          emailHtml = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin: 0; padding: 20px; background-color: #f8fafc; font-family: Arial, sans-serif;"><table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; padding: 24px;"><tr><td>${bodyContent}</td></tr></table></body></html>`;
+          emailHtml = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin: 0; padding: 20px; background-color: #f8fafc; font-family: Arial, sans-serif;"><table border="0" cellpadding="0" cellspacing="0" width="100%" style="width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; padding: 24px;"><tr><td>${bodyContent}</td></tr></table></body></html>`;
         }
       } else {
         norwegianCount++;
@@ -5141,7 +5141,7 @@ exports.onNewsletterCampaignCreate = onDocumentCreated({
           emailHtml = campaign.html;
         } else {
           const bodyContent = buildBlocksHtml(campaign.blocks, 'no');
-          emailHtml = `<!DOCTYPE html><html lang="no"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin: 0; padding: 20px; background-color: #f8fafc; font-family: Arial, sans-serif;"><table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; padding: 24px;"><tr><td>${bodyContent}</td></tr></table></body></html>`;
+          emailHtml = `<!DOCTYPE html><html lang="no"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin: 0; padding: 20px; background-color: #f8fafc; font-family: Arial, sans-serif;"><table border="0" cellpadding="0" cellspacing="0" width="100%" style="width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; padding: 24px;"><tr><td>${bodyContent}</td></tr></table></body></html>`;
         }
       }
 
@@ -5389,7 +5389,7 @@ exports.sendManualEmail = onRequest({ cors: true, secrets: [emailUserParam, emai
         }
       } else {
         html = `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+          <div style="font-family: sans-serif; width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
             <div style="margin-bottom: 20px;">
               ${message.replace(/\n/g, '<br>')}
             </div>
@@ -5599,7 +5599,7 @@ exports.sendBulkEmail = onRequest({ cors: true, secrets: [emailUserParam, emailP
       // For now, lets send in parallel. If there are many users, a batching queue would be better.
       const emailPromises = emails.map(async (email) => {
         const html = `
-                  <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                  <div style="font-family: sans-serif; width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
                     <div style="margin-bottom: 20px;">
                       ${message.replace(/\n/g, '<br>')}
                     </div>
@@ -5982,7 +5982,7 @@ exports.onContactFormSubmit = onDocumentCreated({
   const htmlBody = template.body.replace("{{name}}", name).replace("{{subject}}", msgData.subject || "Kontakt");
 
   const html = `
-    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+    <div style="font-family: sans-serif; width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
       ${htmlBody}
       <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
         Dette er en automatisk bekreftelse. Du trenger ikke svare på denne e-posten.
@@ -7759,7 +7759,7 @@ exports.scheduledAiSuggestions = onSchedule({
         const teachingTitle = data.teaching?.title || "Nytt undervisningstema";
 
         const htmlContent = `
-<div style="font-family: 'Inter', system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px 16px; background-color: #ffffff; color: #1e293b; line-height: 1.6;">
+<div style="font-family: 'Inter', system-ui, -apple-system, sans-serif; width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; padding: 24px 16px; background-color: #ffffff; color: #1e293b; line-height: 1.6;">
   <!-- Studio Badge -->
   <div style="text-align: center; margin-bottom: 24px;">
     <span style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; font-size: 11px; font-weight: 800; padding: 6px 16px; border-radius: 9999px; letter-spacing: 0.08em; text-transform: uppercase; display: inline-block; box-shadow: 0 4px 6px rgba(209, 125, 57, 0.15);">
@@ -8573,12 +8573,12 @@ exports.scheduledReadingNotifications = onSchedule({
         if (wantEmail) {
           console.log(`Sender daglig leseplan-epost til bruker ${userId} (${userData.email})...`);
 
-          const defaultFallbackBody = `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
+          const defaultFallbackBody = `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
   <!-- Minimal Top Accent -->
   <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
 
   <!-- Editorial Header -->
-  <header style="padding: 40px 32px 24px 32px; text-align: center; background-color: #FCF9F5;">
+  <header style="padding: 32px 20px 24px 20px; box-sizing: border-box; max-width: 100%; text-align: center; background-color: #FCF9F5;">
     <div style="margin-bottom: 16px;">
       <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 48px; width: auto; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
     </div>
@@ -8587,7 +8587,7 @@ exports.scheduledReadingNotifications = onSchedule({
   </header>
 
   <!-- Main Content Wrapper -->
-  <div style="padding: 0 32px 40px 32px; background-color: #FCF9F5;">
+  <div style="padding: 0 20px 32px 20px; box-sizing: border-box; max-width: 100%; background-color: #FCF9F5;">
     <!-- Personal Greeting -->
     <section style="margin-bottom: 32px; text-align: center; max-width: 440px; margin-left: auto; margin-right: auto;">
       <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 32px; line-height: 40px; font-weight: 700; color: #121c2c; margin: 0 0 12px 0; font-style: italic;">Hei {{name}}</h2>
@@ -8644,7 +8644,7 @@ exports.scheduledReadingNotifications = onSchedule({
   </div>
 
   <!-- Footer -->
-  <footer style="padding: 32px 32px 40px 32px; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
+  <footer style="padding: 24px 20px 32px 20px; box-sizing: border-box; max-width: 100%; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
     <div style="margin-bottom: 24px;">
       <a href="https://www.hiskingdomministry.no/" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Hjem</a>
       <a href="https://www.hiskingdomministry.no/minside" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Min Side</a>
@@ -8685,7 +8685,7 @@ exports.scheduledReadingNotifications = onSchedule({
             // Backward compatibility with simplified template
             html = html.replace(/\{\{reading_content\}\}/g, readingContentHtml);
             html = `
-              <div class="hkm-email-container" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
+              <div class="hkm-email-container" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
                 <!-- Minimal Top Accent -->
                 <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
 
@@ -9005,12 +9005,12 @@ exports.onCourseEnrollmentCreated = onDocumentCreated({
 
   const fallback = {
     subject: "Bekreftelse på kursregistrering: {{courseTitle}}",
-    body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
+    body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
   <!-- Minimal Top Accent -->
   <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
 
   <!-- Editorial Header -->
-  <header style="padding: 40px 32px 24px 32px; text-align: center; background-color: #FCF9F5;">
+  <header style="padding: 32px 20px 24px 20px; box-sizing: border-box; max-width: 100%; text-align: center; background-color: #FCF9F5;">
     <div style="margin-bottom: 16px;">
       <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 48px; width: auto; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
     </div>
@@ -9019,7 +9019,7 @@ exports.onCourseEnrollmentCreated = onDocumentCreated({
   </header>
 
   <!-- Main Content Wrapper -->
-  <div style="padding: 0 32px 40px 32px; background-color: #FCF9F5;">
+  <div style="padding: 0 20px 32px 20px; box-sizing: border-box; max-width: 100%; background-color: #FCF9F5;">
     <!-- Personal Greeting -->
     <section style="margin-bottom: 32px; text-align: center; max-width: 440px; margin-left: auto; margin-right: auto;">
       <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 32px; line-height: 40px; font-weight: 700; color: #121c2c; margin: 0 0 12px 0; font-style: italic;">Hei {{name}}!</h2>
@@ -9072,7 +9072,7 @@ exports.onCourseEnrollmentCreated = onDocumentCreated({
   </div>
 
   <!-- Footer -->
-  <footer style="padding: 32px 32px 40px 32px; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
+  <footer style="padding: 24px 20px 32px 20px; box-sizing: border-box; max-width: 100%; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
     <div style="margin-bottom: 24px;">
       <a href="https://www.hiskingdomministry.no/" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Hjem</a>
       <a href="https://www.hiskingdomministry.no/minside" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Min Side</a>
@@ -9093,7 +9093,7 @@ exports.onCourseEnrollmentCreated = onDocumentCreated({
   const html = (htmlBody.includes('FCF9F5') || htmlBody.includes('hkm-email-container'))
     ? htmlBody
     : `
-      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px;">
+      <div style="font-family: sans-serif; width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; padding: 20px 12px;">
         ${htmlBody}
         <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
           Dette er en automatisk bekreftelse fra His Kingdom Ministry. Du kan kontakte oss på post@hiskingdomministry.no hvis du har spørsmål.
@@ -9122,10 +9122,10 @@ exports.onCourseEnrollmentCreated = onDocumentCreated({
   // 2. E-post til Admin (thomas@hiskingdomministry.no og post@hiskingdomministry.no)
   const fallbackAdmin = {
     subject: "🎓 Ny kurspåmelding: {{name}} ({{courseTitle}})",
-    body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
+    body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
   <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
 
-  <header style="padding: 40px 32px 24px 32px; text-align: center; background-color: #FCF9F5;">
+  <header style="padding: 32px 20px 24px 20px; box-sizing: border-box; max-width: 100%; text-align: center; background-color: #FCF9F5;">
     <div style="margin-bottom: 16px;">
       <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 48px; width: auto; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
     </div>
@@ -9133,7 +9133,7 @@ exports.onCourseEnrollmentCreated = onDocumentCreated({
     <div style="width: 32px; height: 1px; background-color: rgba(137, 114, 105, 0.4); margin: 20px auto 0 auto;"></div>
   </header>
 
-  <div style="padding: 0 32px 40px 32px; background-color: #FCF9F5;">
+  <div style="padding: 0 20px 32px 20px; box-sizing: border-box; max-width: 100%; background-color: #FCF9F5;">
     <section style="margin-bottom: 32px; text-align: center; max-width: 440px; margin-left: auto; margin-right: auto;">
       <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 28px; line-height: 36px; font-weight: 700; color: #121c2c; margin: 0 0 12px 0; font-style: italic;">Ny kurspåmelding registrert!</h2>
       <p style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 24px; font-weight: 400; color: #56423b; margin: 0; opacity: 0.85;">
@@ -9249,10 +9249,10 @@ exports.onCourseEnrollmentUpdatedTrigger = onDocumentUpdated({
 
     const fallbackApproved = {
       subject: "🎉 Din tilgang er godkjent: {{courseTitle}}",
-      body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
+      body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
   <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
 
-  <header style="padding: 40px 32px 24px 32px; text-align: center; background-color: #FCF9F5;">
+  <header style="padding: 32px 20px 24px 20px; box-sizing: border-box; max-width: 100%; text-align: center; background-color: #FCF9F5;">
     <div style="margin-bottom: 16px;">
       <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 48px; width: auto; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
     </div>
@@ -9260,7 +9260,7 @@ exports.onCourseEnrollmentUpdatedTrigger = onDocumentUpdated({
     <div style="width: 32px; height: 1px; background-color: rgba(137, 114, 105, 0.4); margin: 20px auto 0 auto;"></div>
   </header>
 
-  <div style="padding: 0 32px 40px 32px; background-color: #FCF9F5;">
+  <div style="padding: 0 20px 32px 20px; box-sizing: border-box; max-width: 100%; background-color: #FCF9F5;">
     <section style="margin-bottom: 32px; text-align: center; max-width: 440px; margin-left: auto; margin-right: auto;">
       <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 32px; line-height: 40px; font-weight: 700; color: #121c2c; margin: 0 0 12px 0; font-style: italic;">Tilgang Godkjent! 🎉</h2>
       <p style="font-family: 'Inter', sans-serif; font-size: 16px; line-height: 26px; font-weight: 400; color: #56423b; margin: 0; font-style: italic; opacity: 0.8;">
@@ -9301,7 +9301,7 @@ exports.onCourseEnrollmentUpdatedTrigger = onDocumentUpdated({
     </section>
   </div>
 
-  <footer style="padding: 32px 32px 40px 32px; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
+  <footer style="padding: 24px 20px 32px 20px; box-sizing: border-box; max-width: 100%; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
     <div style="margin-bottom: 24px;">
       <a href="https://www.hiskingdomministry.no/" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Hjem</a>
       <a href="https://www.hiskingdomministry.no/minside" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Min Side</a>
