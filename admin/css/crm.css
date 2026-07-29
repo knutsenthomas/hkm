@@ -387,8 +387,7 @@ body.crm-body {
 }
 
 .tag-filter-select {
-    height: 42px !important;
-    padding: 0 32px 0 14px !important;
+    padding: 10px 16px !important;
     border: 1px solid var(--border-color, #cbd5e1) !important;
     border-radius: 8px !important;
     font-size: 14px !important;
@@ -396,10 +395,11 @@ body.crm-body {
     color: #334155 !important;
     background-color: #ffffff !important;
     cursor: pointer !important;
-    line-height: 40px !important;
     outline: none !important;
     box-sizing: border-box !important;
-    vertical-align: middle !important;
+    line-height: normal !important;
+    height: auto !important;
+    min-height: 42px !important;
     transition: all 0.2s !important;
 }
 
