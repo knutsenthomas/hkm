@@ -1515,7 +1515,7 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
     background: #0f172a; /* Premium Dark Slate */
     border: 1px solid rgba(255, 255, 255, 0.12);
     color: white;
-    padding: 10px 20px;
+    padding: 8px 16px;
     border-radius: 999px;
     box-shadow: 0 20px 40px rgba(15, 23, 42, 0.4), 0 4px 12px rgba(0, 0, 0, 0.2);
     z-index: 1000;
@@ -1524,6 +1524,12 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
     visibility: hidden;
     pointer-events: none;
     display: flex !important;
+    max-width: calc(100vw - 32px);
+    overflow-x: auto;
+}
+
+.hkm-bulk-bar::-webkit-scrollbar {
+    display: none;
 }
 
 .hkm-bulk-bar.active {
@@ -1536,7 +1542,8 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
 .hkm-bulk-bar-content {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
+    white-space: nowrap;
 }
 
 .hkm-bulk-bar-info {
@@ -1547,37 +1554,48 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
     font-size: 14px;
     color: #fff;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .hkm-bulk-bar-divider {
     width: 1px;
-    height: 24px;
-    background: rgba(255, 255, 255, 0.2);
+    height: 20px;
+    background: rgba(255, 255, 255, 0.18);
+    flex-shrink: 0;
 }
 
 .hkm-bulk-bar-buttons {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .hkm-bulk-btn {
     background: transparent;
     border: none;
-    color: rgba(255, 255, 255, 0.85);
-    padding: 8px 16px;
+    color: rgba(255, 255, 255, 0.88);
+    padding: 8px 14px;
     border-radius: 999px;
     font-size: 13px;
     font-weight: 600;
-    display: flex;
-    align-items: center;
+    display: inline-flex !important;
+    align-items: center !important;
     gap: 6px;
     cursor: pointer;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
     transition: all 0.2s ease;
 }
 
+.hkm-bulk-btn .material-symbols-outlined {
+    font-size: 18px !important;
+    flex-shrink: 0;
+}
+
 .hkm-bulk-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.12);
     color: white;
 }
 
@@ -1595,11 +1613,12 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
     border: none;
     color: rgba(255, 255, 255, 0.6);
     cursor: pointer;
-    padding: 4px;
+    padding: 6px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    flex-shrink: 0;
     transition: all 0.2s ease;
 }
 
