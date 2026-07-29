@@ -6657,6 +6657,22 @@ body.admin-body .template-item:active {
     gap: 16px !important;
   }
 
+  /* Modal viewport containment on mobile */
+  .modal {
+    padding: 12px 8px !important;
+    box-sizing: border-box !important;
+    max-width: 100vw !important;
+  }
+
+  .modal-content,
+  .crm-tool-modal-content,
+  .crm-send-email-modal-wrapper {
+    margin: auto !important;
+    max-width: calc(100vw - 16px) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
   /* Interactive modal actions stack vertically for thumb safety */
   .modal-footer {
     flex-direction: column-reverse !important;

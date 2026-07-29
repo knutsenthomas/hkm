@@ -2103,23 +2103,23 @@ class CRMManager {
                 </div>
 
                 <!-- 2-Column Meta Row: From & Template -->
-                <div class="crm-email-meta-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
-                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div class="crm-email-meta-grid" style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; width: 100%; max-width: 100%; box-sizing: border-box;">
+                    <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0; max-width: 100%; box-sizing: border-box;">
                         <label style="font-weight: 700; font-size: 13px; color: #334155; display: flex; align-items: center; gap: 4px;">
                             <span>Fra:</span>
                             <span class="material-symbols-outlined" style="font-size: 15px; color: #94a3b8;" title="Avsenderadresse">info</span>
                         </label>
-                        <select id="crm-email-from-mode" class="form-control" style="width: 100%; height: 42px; padding: 0 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 13.5px; background: white; color: #0f172a; outline: none; cursor: pointer; font-weight: 500;">
+                        <select id="crm-email-from-mode" class="form-control" style="width: 100%; max-width: 100%; height: 42px; padding: 0 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 13.5px; background: white; color: #0f172a; outline: none; cursor: pointer; font-weight: 500; box-sizing: border-box; text-overflow: ellipsis; overflow: hidden;">
                             <option value="post" selected>His Kingdom Ministry &lt;post@hiskingdomministry.no&gt;</option>
                             <option value="admin">${this.escapeHtml(adminName)} &lt;${this.escapeHtml(adminEmail)}&gt;</option>
                         </select>
                     </div>
 
-                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0; max-width: 100%; box-sizing: border-box;">
                         <label style="font-weight: 700; font-size: 13px; color: #334155;">Mal:</label>
-                        <div style="position: relative;">
+                        <div style="position: relative; width: 100%; max-width: 100%; box-sizing: border-box;">
                             <span class="material-symbols-outlined" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #94a3b8; pointer-events: none;">search</span>
-                            <select id="crm-email-template-select" class="form-control" style="width: 100%; height: 42px; padding: 0 12px 0 36px !important; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 13.5px; background: white; color: #0f172a; outline: none; cursor: pointer; font-weight: 500;">
+                            <select id="crm-email-template-select" class="form-control" style="width: 100%; max-width: 100%; height: 42px; padding: 0 12px 0 36px !important; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 13.5px; background: white; color: #0f172a; outline: none; cursor: pointer; font-weight: 500; box-sizing: border-box; text-overflow: ellipsis; overflow: hidden;">
                                 <option value="">Velg e-postmal...</option>
                                 <option value="summer_camp">Youth Summer Camp is coming!</option>
                                 <option value="newsletter">Månedsoppdatering & Nyheter</option>
@@ -2131,15 +2131,15 @@ class CRMManager {
                 </div>
 
                 <!-- Subject Input -->
-                <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 100%; box-sizing: border-box;">
                     <label for="crm-email-subject" style="font-weight: 700; font-size: 13px; color: #334155;">Emne / Tittel:</label>
-                    <input type="text" id="crm-email-subject" class="form-control" placeholder="F.eks. Velkommen til Youth Summer Camp!..." style="width: 100%; height: 42px; padding: 0 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 14px; outline: none; background: white; font-weight: 500; color: #0f172a;">
+                    <input type="text" id="crm-email-subject" class="form-control" placeholder="F.eks. Velkommen til Youth Summer Camp!..." style="width: 100%; max-width: 100%; height: 42px; padding: 0 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 14px; outline: none; background: white; font-weight: 500; color: #0f172a; box-sizing: border-box;">
                 </div>
 
                 <!-- Rich Editor Section -->
-                <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 100%; box-sizing: border-box;">
                     <label style="font-weight: 700; font-size: 13px; color: #334155;">Innhold / Melding:</label>
-                    <div style="border: 1px solid #cbd5e1; border-radius: 14px; overflow: hidden; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                    <div style="border: 1px solid #cbd5e1; border-radius: 14px; overflow: hidden; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.02); width: 100%; max-width: 100%; box-sizing: border-box;">
                         <!-- Formatting Toolbar -->
                         <div class="crm-editor-toolbar">
                             <button type="button" class="editor-btn" data-cmd="bold" title="Fet tekst (B)" style="font-weight: 800; font-size: 15px;">
@@ -2222,27 +2222,27 @@ class CRMManager {
                         </div>
 
                         <!-- Editable Content Area -->
-                        <div id="crm-email-body-editor" contenteditable="true" style="min-height: 220px; max-height: 380px; overflow-y: auto; padding: 16px; font-size: 14px; line-height: 1.6; color: #0f172a; outline: none; background: white;"></div>
+                        <div id="crm-email-body-editor" contenteditable="true" style="min-height: 220px; max-height: 380px; overflow-y: auto; padding: 16px; font-size: 14px; line-height: 1.6; color: #0f172a; outline: none; background: white; width: 100%; box-sizing: border-box;"></div>
                     </div>
                 </div>
 
                 <!-- Attachments List Container -->
-                <div id="crm-email-attachments-list" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: -4px;"></div>
+                <div id="crm-email-attachments-list" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: -4px; width: 100%; box-sizing: border-box;"></div>
 
                 <!-- Send Options Card -->
-                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 4px; padding: 14px 16px; background: #f8fafc; border-radius: 14px; border: 1px solid #e2e8f0;">
-                    <label style="display: flex; align-items: center; gap: 12px; font-size: 13.5px; font-weight: 600; color: #334155; cursor: pointer; user-select: none; margin: 0;">
-                        <input type="checkbox" id="crm-email-send-copy" style="width: 18px !important; min-width: 18px !important; height: 18px !important; min-height: 18px !important; accent-color: #d17d39 !important; cursor: pointer;">
-                        <span>Send en kopi av denne e-posten til meg selv (${this.escapeHtml(adminEmail)})</span>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 4px; padding: 14px 16px; background: #f8fafc; border-radius: 14px; border: 1px solid #e2e8f0; width: 100%; max-width: 100%; box-sizing: border-box;">
+                    <label style="display: flex; align-items: center; gap: 12px; font-size: 13.5px; font-weight: 600; color: #334155; cursor: pointer; user-select: none; margin: 0; width: 100%; box-sizing: border-box;">
+                        <input type="checkbox" id="crm-email-send-copy" style="width: 18px !important; min-width: 18px !important; height: 18px !important; min-height: 18px !important; accent-color: #d17d39 !important; cursor: pointer; flex-shrink: 0;">
+                        <span style="word-break: break-word; min-width: 0; flex: 1;">Send en kopi av denne e-posten til meg selv (${this.escapeHtml(adminEmail)})</span>
                     </label>
                     
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label style="display: flex; align-items: center; gap: 12px; font-size: 13.5px; font-weight: 600; color: #334155; cursor: pointer; user-select: none; margin: 0;">
-                            <input type="checkbox" id="crm-email-schedule-delivery" style="width: 18px !important; min-width: 18px !important; height: 18px !important; min-height: 18px !important; accent-color: #d17d39 !important; cursor: pointer;">
-                            <span>Planlegg utsending til et senere tidspunkt</span>
+                    <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; box-sizing: border-box;">
+                        <label style="display: flex; align-items: center; gap: 12px; font-size: 13.5px; font-weight: 600; color: #334155; cursor: pointer; user-select: none; margin: 0; width: 100%; box-sizing: border-box;">
+                            <input type="checkbox" id="crm-email-schedule-delivery" style="width: 18px !important; min-width: 18px !important; height: 18px !important; min-height: 18px !important; accent-color: #d17d39 !important; cursor: pointer; flex-shrink: 0;">
+                            <span style="word-break: break-word; min-width: 0; flex: 1;">Planlegg utsending til et senere tidspunkt</span>
                         </label>
-                        <div id="crm-email-schedule-picker-container" style="display: none; padding-left: 30px; margin-top: 2px;">
-                            <input type="datetime-local" id="crm-email-schedule-time" style="padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; color: #0f172a; outline: none; background: white; width: auto; min-width: 220px;">
+                        <div id="crm-email-schedule-picker-container" style="display: none; padding-left: 30px; margin-top: 2px; width: 100%; box-sizing: border-box;">
+                            <input type="datetime-local" id="crm-email-schedule-time" style="padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; color: #0f172a; outline: none; background: white; width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box;">
                         </div>
                     </div>
                 </div>

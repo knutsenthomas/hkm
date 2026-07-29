@@ -1319,10 +1319,20 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
 }
 
 /* Responsive Send Email Modal & Rich Editor Toolbar */
-.crm-send-email-modal-wrapper .modal-content {
-    max-width: 680px !important;
+.modal {
+    box-sizing: border-box !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+}
+
+.modal-content,
+.crm-tool-modal-content,
+.crm-send-email-modal-wrapper {
+    max-width: min(680px, calc(100vw - 20px)) !important;
     width: 100% !important;
+    box-sizing: border-box !important;
     border-radius: 20px !important;
+    overflow-x: hidden !important;
 }
 
 .crm-editor-toolbar {
@@ -1887,16 +1897,37 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
     transform: scale(0.95);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+    .modal {
+        padding: 12px 8px !important;
+        box-sizing: border-box !important;
+        max-width: 100vw !important;
+    }
+
+    .modal-content,
+    .crm-tool-modal-content,
     .crm-send-email-modal-wrapper {
-        margin: 10px auto !important;
-        max-width: calc(100vw - 20px) !important;
+        margin: auto !important;
+        max-width: calc(100vw - 16px) !important;
+        width: 100% !important;
         border-radius: 16px !important;
+        box-sizing: border-box !important;
     }
 
     .crm-email-meta-grid {
         grid-template-columns: 1fr !important;
-        gap: 10px !important;
+        gap: 12px !important;
+        width: 100% !important;
+    }
+
+    .crm-email-meta-grid > div {
+        min-width: 0 !important;
+        width: 100% !important;
+    }
+
+    .crm-email-meta-grid select {
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
     .crm-editor-toolbar {
