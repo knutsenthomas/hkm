@@ -1,17 +1,19 @@
-/* HKM Studio Premium - Material 3 sliding Task Drawer Stylesheet */
-/* Complies strictly with the 8px Grid Rule, Brand Aesthetics, and Chrome Jitter Safeguards */
+/* ==========================================================================
+   HKM Studio - Ultra-Modern Task Drawer Stylesheet (todo-drawer.css)
+   Complies strictly with 8px Grid Rule, HKM Brand Aesthetics, and User Rules
+   ========================================================================== */
 
 /* 1. Backdrop Overlay */
 .todo-drawer-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.25);
+    background: rgba(15, 23, 42, 0.45);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     z-index: 10000;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s;
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.35s;
     transform: translateZ(0);
     backface-visibility: hidden;
 }
@@ -21,102 +23,114 @@
     visibility: visible;
 }
 
-/* 2. Slide-out Side Sheet (Material 3 side sheet) */
+/* 2. Slide-out Side Drawer Sheet */
 .hkm-todo-drawer {
     position: fixed;
     top: 0;
     right: 0;
     width: 100%;
-    max-width: 440px; /* Golden standard sidebar width */
+    max-width: 440px;
     height: 100vh;
-    background: rgba(248, 250, 252, 0.95); /* Soft surface color */
-    backdrop-filter: blur(32px) saturate(180%);
-    -webkit-backdrop-filter: blur(32px) saturate(180%);
-    box-shadow: -16px 0 64px -16px rgba(27, 73, 101, 0.16);
+    background: #f8fafc;
+    box-shadow: -16px 0 48px -12px rgba(15, 23, 42, 0.18);
     z-index: 10001;
     transform: translateX(100%) translateZ(0) !important;
     backface-visibility: hidden !important;
     will-change: transform;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
     flex-direction: column;
-    border-left: 1px solid rgba(27, 73, 101, 0.08);
-    border-radius: 0 !important; /* Completely square corner as requested by user */
-    overflow: hidden; /* Prevent child content from leaking outside rounded corners */
+    border-left: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 0 !important;
+    overflow: hidden;
 }
 
 .hkm-todo-drawer.active {
     transform: translateX(0) translateZ(0) !important;
 }
 
-/* 3. Header - Bold Premium Brand Identity */
+/* 3. Header - Deep Navy Brand Bar */
 .todo-drawer-header {
-    background: linear-gradient(135deg, #d17d39, #bd4f2a) !important; /* Premium brand orange gradient */
-    color: white;
-    padding: 24px 32px; /* Strict 8px grid */
+    background: linear-gradient(135deg, #1B4965 0%, #2b5f7e 100%) !important;
+    color: #ffffff;
+    padding: 20px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 32px -16px rgba(15, 23, 42, 0.2);
-    border-radius: 0 !important; /* Completely square corners */
+    box-shadow: 0 4px 20px rgba(27, 73, 101, 0.12);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.todo-drawer-header h3 {
-    margin: 0;
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
+.todo-drawer-header-content {
     display: flex;
     align-items: center;
-    gap: 16px; /* 8px multiple */
-    line-height: 1.2;
+    gap: 12px;
 }
 
-.todo-drawer-header h3 span {
-    font-size: 28px;
-    color: #ffffff !important; /* White icon for pristine contrast on orange background */
+.todo-drawer-header-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.todo-drawer-header-title {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+}
+
+.todo-drawer-header-subtitle {
+    margin: 2px 0 0 0;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
 }
 
 .todo-drawer-close {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.12);
     border: none;
-    color: white;
+    color: #ffffff;
     cursor: pointer;
-    width: 40px; /* 8px multiple */
-    height: 40px; /* 8px multiple */
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.2s ease;
+    flex-shrink: 0;
 }
 
 .todo-drawer-close:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.22);
+    transform: scale(1.08);
 }
 
 .todo-drawer-close:active {
-    transform: scale(0.9);
+    transform: scale(0.92);
 }
 
-/* 4. Body Content - Scrollable Isolation */
+/* 4. Body Content Container */
 .todo-drawer-body {
-    position: relative !important; /* Offset-kontekst */
     flex: 1;
     overflow-y: auto;
-    padding: 32px; /* Strict 8px grid */
+    padding: 20px 24px 32px 24px;
     display: flex;
     flex-direction: column;
-    gap: 32px; /* 8px grid */
-    transform: translateZ(0);
+    gap: 24px;
 }
 
-/* Custom scrollbar */
 .todo-drawer-body::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
 }
 
 .todo-drawer-body::-webkit-scrollbar-track {
@@ -128,149 +142,135 @@
     border-radius: 99px;
 }
 
-.todo-drawer-body::-webkit-scrollbar-thumb:hover {
-    background: rgba(27, 73, 101, 0.3);
-}
-
-/* 5. Quick Add Form - Material 3 Outlined Card */
+/* 5. Quick Add Form Card */
 .todo-drawer-quick-add {
     display: flex;
     flex-direction: column;
-    gap: 16px; /* 8px multiple */
-    background: #FFFFFF;
-    border: 1px solid rgba(27, 73, 101, 0.12);
-    border-radius: 24px; /* Highly rounded M3 container */
-    padding: 24px; /* Strict 8px grid */
-    box-shadow: 0 8px 32px -8px rgba(27, 73, 101, 0.06);
+    gap: 14px;
+    background: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 16px -4px rgba(27, 73, 101, 0.05);
 }
 
-/* Outlined form fields with complete jitter fix */
+.todo-drawer-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+}
+
+.todo-quick-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #64748b;
+    padding-left: 2px;
+}
+
 .todo-drawer-quick-add input[type="text"],
 .todo-drawer-quick-add select,
 .todo-drawer-quick-add input[type="date"] {
-    display: block !important;
-    width: 100% !important;
-    padding: 16px 24px !important; /* Strict 8px grid */
-    border-radius: 16px !important; /* Golden ratio rounded corner */
-    border: 2px solid rgba(27, 73, 101, 0.12) !important;
-    background: #FFFFFF !important;
-    font-size: 14px !important;
-    font-weight: 500 !important;
-    color: #0f172a !important;
-    outline: none !important;
-    box-sizing: border-box !important;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    transform: translateZ(0) !important;
-    backface-visibility: hidden !important;
-}
-
-/* Field labels */
-.todo-quick-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #475569;
-    margin-bottom: 6px;
-    padding-left: 4px;
+    width: 100%;
+    height: 42px;
+    padding: 0 14px;
+    border-radius: 12px;
+    border: 1.5px solid #e2e8f0;
+    background: #ffffff;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1e293b;
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
 }
 
 .todo-drawer-quick-add input[type="text"]:focus,
 .todo-drawer-quick-add select:focus,
 .todo-drawer-quick-add input[type="date"]:focus {
-    border-color: #d17d39 !important;
-    box-shadow: 0 0 0 4px rgba(209, 125, 57, 0.12) !important;
+    border-color: #d17d39;
+    box-shadow: 0 0 0 3px rgba(209, 125, 57, 0.12);
 }
 
-/* Legg til oppgave Button - Pill Shaped */
 .todo-drawer-quick-add button {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 12px !important; /* Strict 8px spacing */
-    background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
-    color: #FFFFFF !important;
-    border: none !important;
-    border-radius: 9999px !important; /* Fully pill-shaped */
-    padding: 16px 24px !important; /* Multiples of 8px */
-    font-weight: 700 !important;
-    font-size: 14px !important;
-    cursor: pointer !important;
-    box-shadow: 0 8px 24px -4px rgba(209, 125, 57, 0.3) !important;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    transform: translateZ(0) !important;
-    backface-visibility: hidden !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 44px;
+    background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    padding: 0 20px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(209, 125, 57, 0.25);
+    transition: all 0.2s ease;
+    margin-top: 4px;
 }
 
 .todo-drawer-quick-add button:hover {
-    transform: translateY(-2px) scale(1.02) translateZ(0) !important;
-    box-shadow: 0 12px 32px -4px rgba(209, 125, 57, 0.4) !important;
-    filter: brightness(1.05);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(209, 125, 57, 0.35);
 }
 
 .todo-drawer-quick-add button:active {
-    transform: translateY(1px) scale(0.98) translateZ(0) !important;
-    box-shadow: 0 4px 12px -2px rgba(209, 125, 57, 0.2) !important;
+    transform: translateY(1px);
 }
 
-/* 6. List Titles */
+/* 6. Section Titles */
 .todo-drawer-list-title {
-    font-size: 12px;
+    font-size: 11px;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     color: #1B4965;
-    font-weight: 800;
-    margin: 0 0 16px 0;
+    font-weight: 700;
+    margin: 0 0 12px 0;
     display: flex;
     align-items: center;
-    gap: 12px;
-    opacity: 0.85;
+    gap: 8px;
 }
 
 .todo-drawer-list-title::after {
     content: '';
     flex: 1;
     height: 1px;
-    background: rgba(27, 73, 101, 0.12);
+    background: #e2e8f0;
 }
 
 .todo-drawer-list {
     display: flex;
     flex-direction: column;
-    gap: 16px; /* Strict 8px spacing */
+    gap: 10px;
 }
 
-/* 7. Task Items - Sleek Outlined Cards */
+/* 7. Task Items */
 .todo-drawer-item {
     display: flex;
     align-items: flex-start;
-    gap: 16px; /* 8px multiple */
-    background: #FFFFFF;
-    border: 1px solid rgba(27, 73, 101, 0.08);
-    border-radius: 20px; /* M3 elegant corners */
-    padding: 20px; /* Strict 8px multiple */
-    box-shadow: 0 4px 16px -4px rgba(27, 73, 101, 0.02);
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    transform: translateZ(0);
-    backface-visibility: hidden;
+    gap: 12px;
+    background: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 16px;
+    padding: 14px 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    transition: all 0.25s ease;
 }
 
 .todo-drawer-item:hover {
-    transform: translateY(-2px) translateZ(0);
-    box-shadow: 0 12px 32px -12px rgba(27, 73, 101, 0.12);
-    border-color: rgba(27, 73, 101, 0.16);
-}
-
-.todo-drawer-item:active {
-    transform: scale(0.99) translateZ(0);
+    border-color: rgba(209, 125, 57, 0.3);
+    box-shadow: 0 6px 16px rgba(27, 73, 101, 0.06);
+    transform: translateY(-1px);
 }
 
 .todo-drawer-item.completed {
-    opacity: 0.6;
-    background: rgba(248, 250, 252, 0.7);
-    border-color: rgba(27, 73, 101, 0.04);
-    box-shadow: none;
+    opacity: 0.65;
+    background: #f8fafc;
+    border-color: #f1f5f9;
 }
 
 .todo-drawer-item.completed .todo-drawer-item-title {
@@ -278,40 +278,40 @@
     color: #94a3b8;
 }
 
-/* 8. Circular Material 3 Checkboxes */
+/* 8. Checkboxes */
 .todo-drawer-checkbox {
-    width: 24px; /* Golden standard M3 sizing */
-    height: 24px;
-    border-radius: 50%; /* Fully circular */
-    border: 2px solid rgba(27, 73, 101, 0.25);
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid #cbd5e1;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    background: #FFFFFF;
+    transition: all 0.2s ease;
+    background: #ffffff;
     flex-shrink: 0;
-    margin-top: 2px;
+    margin-top: 1px;
     box-sizing: border-box;
 }
 
 .todo-drawer-checkbox:hover {
     border-color: #d17d39;
-    background: rgba(209, 125, 57, 0.05);
+    background: rgba(209, 125, 57, 0.06);
 }
 
 .todo-drawer-checkbox.checked {
-    background: #d17d39;
-    border-color: #d17d39;
+    background: #10b981;
+    border-color: #10b981;
 }
 
 .todo-drawer-checkbox.checked span {
-    font-size: 16px;
-    color: #FFFFFF;
+    font-size: 13px;
+    color: #ffffff;
     font-weight: 700;
 }
 
-/* 9. Card Content & Metadata */
+/* 9. Task Content */
 .todo-drawer-item-content {
     flex: 1;
     min-width: 0;
@@ -319,18 +319,18 @@
 
 .todo-drawer-item-title {
     font-weight: 600;
-    font-size: 15px;
-    color: #0f172a;
-    margin: 0 0 6px 0;
+    font-size: 13px;
+    color: #1e293b;
+    margin: 0 0 4px 0;
     line-height: 1.4;
     word-break: break-word;
 }
 
 .todo-drawer-item-desc {
-    font-size: 13px;
+    font-size: 12px;
     color: #64748b;
-    line-height: 1.5;
-    margin: 0 0 12px 0;
+    line-height: 1.4;
+    margin: 0 0 8px 0;
     word-break: break-word;
 }
 
@@ -338,97 +338,81 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 8px; /* Multi-badge spacing */
+    gap: 6px;
 }
 
-/* 10. Tonal M3 Badges */
+/* 10. Tonal Badges */
 .todo-drawer-badge {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
-    padding: 6px 12px;
-    border-radius: 12px; /* Golden ratio badge rounding */
+    padding: 3px 8px;
+    border-radius: 99px;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     line-height: 1.2;
 }
 
 .todo-drawer-badge.priority-high {
-    background: #fee2e2; /* Red tonal container */
-    color: #ef4444;
+    background: rgba(239, 68, 68, 0.08);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.15);
 }
 
 .todo-drawer-badge.priority-medium {
-    background: #fff7ed; /* Orange tonal container */
-    color: #f97316;
+    background: rgba(245, 158, 11, 0.08);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.15);
 }
 
 .todo-drawer-badge.priority-low {
-    background: #f0fdf4; /* Green tonal container */
-    color: #16a34a;
+    background: rgba(16, 185, 129, 0.08);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.15);
 }
 
 .todo-drawer-badge.due-date {
-    background: #eff6ff; /* Blue tonal date badge */
-    color: #2563eb;
+    background: rgba(27, 73, 101, 0.06);
+    color: #1B4965;
+    border: 1px solid rgba(27, 73, 101, 0.12);
 }
 
 .todo-drawer-badge.assignee {
     background: #f1f5f9;
     color: #475569;
+    border: 1px solid #e2e8f0;
 }
 
-/* 11. Premium Empty States */
+/* 11. Empty State Cards */
 .todo-drawer-empty {
     text-align: center;
-    padding: 48px 24px; /* Strict 8px grid */
-    background: rgba(255, 255, 255, 0.4);
-    border: 1px dashed rgba(27, 73, 101, 0.16);
-    border-radius: 24px; /* Rounded corners */
-    color: #94a3b8;
-    transition: all 0.3s ease;
-    box-shadow: inset 0 2px 8px rgba(27, 73, 101, 0.01);
+    padding: 32px 20px;
+    background: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 16px;
+    color: #64748b;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .todo-drawer-empty span.icon {
-    font-size: 48px;
-    display: block;
-    margin-bottom: 12px;
-    color: rgba(27, 73, 101, 0.25);
-    transition: transform 0.4s ease;
-}
-
-.todo-drawer-empty:hover span.icon {
-    transform: scale(1.1) rotate(5deg);
+    font-size: 32px;
+    color: #cbd5e1;
+    margin-bottom: 8px;
 }
 
 .todo-drawer-empty p {
     margin: 0;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
-    color: #64748b;
+    color: #334155;
 }
 
-/* 12. Landscape & Mobile Viewport Protection */
+/* Responsive safeguard */
 @media (max-width: 480px) {
     .hkm-todo-drawer {
         max-width: 100%;
-        border-radius: 0; /* Fullscreen on extra small mobile */
-    }
-    .todo-drawer-body {
-        padding: 24px;
-    }
-}
-
-@media (orientation: landscape) and (max-height: 520px) {
-    .todo-drawer-body {
-        padding: 16px;
-        gap: 16px;
-    }
-    .todo-drawer-quick-add {
-        padding: 16px;
-    }
-    .todo-drawer-header {
-        padding: 16px 24px;
     }
 }

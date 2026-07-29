@@ -434,23 +434,23 @@ export default function TodoApp() {
     const isCompletedViewActive = viewMode === 'completed';
 
     return (
-        <div className="flex flex-col lg:flex-row gap-8 w-full items-start transform translate-z-0 backface-hidden">
+        <div className="todo-app-container">
             
             {/* Left Sidebar Navigation */}
-            <div className="w-full lg:w-64 flex-shrink-0 flex flex-col gap-6">
+            <div className="todo-sidebar">
                 
-                {/* floating brand-styled Add Button */}
+                {/* Add Task Button */}
                 <button 
                     onClick={() => setShowAddTaskModal(true)} 
-                    className="flex items-center justify-center gap-3 w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#d17d39] to-[#bd4f2a] hover:from-[#e28e4a] hover:to-[#ce5d37] hover:shadow-lg hover:shadow-orange-500/20 text-white font-bold transition-all duration-300 transform active:scale-[0.98] border-none text-sm cursor-pointer"
+                    className="todo-add-btn"
                 >
-                    <span className="material-symbols-outlined text-xl">add</span>
+                    <span className="material-symbols-outlined">add</span>
                     Ny oppgave
                 </button>
 
                 {/* Sidebar Navigation Options */}
-                <div className="bg-white rounded-3xl p-4 border border-slate-200/80 shadow-sm flex flex-col gap-1 todo-sidebar-card">
-                    <span className="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider select-none">Hurtigvalg</span>
+                <div className="todo-sidebar-card">
+                    <span className="todo-sidebar-section-title">Hurtigvalg</span>
                     
                     <button 
                         onClick={() => {
@@ -458,30 +458,11 @@ export default function TodoApp() {
                             setFilterAssignee('all');
                             setFilterPriority('all');
                         }}
-                        className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isAllActive ? 'bg-[#1B4965]/5 text-[#1B4965] active-filter' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+                        className={`todo-nav-btn ${isAllActive ? 'active' : ''}`}
                     >
-                        <span 
-                            className={`material-symbols-outlined text-base ${isAllActive ? 'text-[#1B4965]' : 'text-slate-400'}`}
-                            style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                width: '16px',
-                                height: '16px',
-                                minWidth: '16px',
-                                minHeight: '16px',
-                                maxWidth: '16px',
-                                maxHeight: '16px',
-                                aspectRatio: '1/1',
-                                flexShrink: 0,
-                                fontSize: '16px',
-                                lineHeight: 1
-                            }}
-                        >
-                            playlist_add_check
-                        </span>
+                        <span className="material-symbols-outlined">playlist_add_check</span>
                         <span className="flex-1 truncate">Alle gjøremål</span>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isAllActive ? 'bg-[#1B4965]/10 text-[#1B4965]' : 'bg-slate-100 text-slate-500'}`}>{counts.all}</span>
+                        <span className="todo-count-badge">{counts.all}</span>
                     </button>
 
                     <button 
@@ -490,30 +471,11 @@ export default function TodoApp() {
                             setFilterAssignee('me');
                             setFilterPriority('all');
                         }}
-                        className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isMeActive ? 'bg-[#1B4965]/5 text-[#1B4965] active-filter' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+                        className={`todo-nav-btn ${isMeActive ? 'active' : ''}`}
                     >
-                        <span 
-                            className={`material-symbols-outlined text-base ${isMeActive ? 'text-[#1B4965]' : 'text-slate-400'}`}
-                            style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                width: '16px',
-                                height: '16px',
-                                minWidth: '16px',
-                                minHeight: '16px',
-                                maxWidth: '16px',
-                                maxHeight: '16px',
-                                aspectRatio: '1/1',
-                                flexShrink: 0,
-                                fontSize: '16px',
-                                lineHeight: 1
-                            }}
-                        >
-                            account_circle
-                        </span>
+                        <span className="material-symbols-outlined">account_circle</span>
                         <span className="flex-1 truncate">Tildelt meg</span>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isMeActive ? 'bg-[#1B4965]/10 text-[#1B4965]' : 'bg-slate-100 text-slate-500'}`}>{counts.me}</span>
+                        <span className="todo-count-badge">{counts.me}</span>
                     </button>
 
                     <button 
@@ -522,30 +484,11 @@ export default function TodoApp() {
                             setFilterAssignee('global');
                             setFilterPriority('all');
                         }}
-                        className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isGlobalActive ? 'bg-[#1B4965]/5 text-[#1B4965] active-filter' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+                        className={`todo-nav-btn ${isGlobalActive ? 'active' : ''}`}
                     >
-                        <span 
-                            className={`material-symbols-outlined text-base ${isGlobalActive ? 'text-[#1B4965]' : 'text-slate-400'}`}
-                            style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                width: '16px',
-                                height: '16px',
-                                minWidth: '16px',
-                                minHeight: '16px',
-                                maxWidth: '16px',
-                                maxHeight: '16px',
-                                aspectRatio: '1/1',
-                                flexShrink: 0,
-                                fontSize: '16px',
-                                lineHeight: 1
-                            }}
-                        >
-                            group
-                        </span>
+                        <span className="material-symbols-outlined">group</span>
                         <span className="flex-1 truncate">Globale oppgaver</span>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isGlobalActive ? 'bg-[#1B4965]/10 text-[#1B4965]' : 'bg-slate-100 text-slate-500'}`}>{counts.global}</span>
+                        <span className="todo-count-badge">{counts.global}</span>
                     </button>
 
                     <button 
@@ -554,30 +497,11 @@ export default function TodoApp() {
                             setFilterAssignee('all');
                             setFilterPriority('high');
                         }}
-                        className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isStarredActive ? 'bg-[#1B4965]/5 text-[#1B4965] active-filter' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+                        className={`todo-nav-btn ${isStarredActive ? 'active' : ''}`}
                     >
-                        <span 
-                            className={`material-symbols-outlined text-base ${isStarredActive ? 'text-[#1B4965]' : 'text-slate-400'}`}
-                            style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                width: '16px',
-                                height: '16px',
-                                minWidth: '16px',
-                                minHeight: '16px',
-                                maxWidth: '16px',
-                                maxHeight: '16px',
-                                aspectRatio: '1/1',
-                                flexShrink: 0,
-                                fontSize: '16px',
-                                lineHeight: 1
-                            }}
-                        >
-                            star
-                        </span>
+                        <span className="material-symbols-outlined">star</span>
                         <span className="flex-1 truncate">Viktige oppgaver</span>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isStarredActive ? 'bg-[#1B4965]/10 text-[#1B4965]' : 'bg-slate-100 text-slate-500'}`}>{counts.starred}</span>
+                        <span className="todo-count-badge">{counts.starred}</span>
                     </button>
 
                     <button 
@@ -586,34 +510,15 @@ export default function TodoApp() {
                             setFilterAssignee('all');
                             setFilterPriority('all');
                         }}
-                        className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isCompletedViewActive ? 'bg-[#1B4965]/5 text-[#1B4965] active-filter' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+                        className={`todo-nav-btn ${isCompletedViewActive ? 'active' : ''}`}
                     >
-                        <span 
-                            className={`material-symbols-outlined text-base ${isCompletedViewActive ? 'text-[#1B4965]' : 'text-slate-400'}`}
-                            style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                width: '16px',
-                                height: '16px',
-                                minWidth: '16px',
-                                minHeight: '16px',
-                                maxWidth: '16px',
-                                maxHeight: '16px',
-                                aspectRatio: '1/1',
-                                flexShrink: 0,
-                                fontSize: '16px',
-                                lineHeight: 1
-                            }}
-                        >
-                            check_circle
-                        </span>
+                        <span className="material-symbols-outlined">check_circle</span>
                         <span className="flex-1 truncate">Fullførte oppgaver</span>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isCompletedViewActive ? 'bg-[#1B4965]/10 text-[#1B4965]' : 'bg-slate-100 text-slate-500'}`}>{counts.completed}</span>
+                        <span className="todo-count-badge">{counts.completed}</span>
                     </button>
 
                     {/* Lists sub-header */}
-                    <span className="px-3 py-2 mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider select-none">Lister</span>
+                    <span className="todo-sidebar-section-title" style={{ marginTop: '12px' }}>Lister</span>
 
                     {users.map(u => {
                         const isUserActive = filterAssignee === u.uid && viewMode === 'active';
@@ -627,30 +532,11 @@ export default function TodoApp() {
                                     setFilterAssignee(u.uid);
                                     setFilterPriority('all');
                                 }}
-                                className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isUserActive ? 'bg-[#1B4965]/5 text-[#1B4965] active-filter' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+                                className={`todo-nav-btn ${isUserActive ? 'active' : ''}`}
                             >
-                                <span 
-                                    className={`material-symbols-outlined text-base ${isUserActive ? 'text-[#1B4965]' : 'text-slate-400'}`}
-                                    style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        width: '16px',
-                                        height: '16px',
-                                        minWidth: '16px',
-                                        minHeight: '16px',
-                                        maxWidth: '16px',
-                                        maxHeight: '16px',
-                                        aspectRatio: '1/1',
-                                        flexShrink: 0,
-                                        fontSize: '16px',
-                                        lineHeight: 1
-                                    }}
-                                >
-                                    assignment
-                                </span>
+                                <span className="material-symbols-outlined">assignment</span>
                                 <span className="flex-1 truncate">{u.displayName}'s liste</span>
-                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isUserActive ? 'bg-[#1B4965]/10 text-[#1B4965]' : 'bg-slate-100 text-slate-500'}`}>{userActiveCount}</span>
+                                <span className="todo-count-badge">{userActiveCount}</span>
                             </button>
                         );
                     })}
@@ -658,103 +544,48 @@ export default function TodoApp() {
             </div>
 
             {/* Right Main Content Panel */}
-            <div className="flex-grow bg-[#f8fafc]/50 rounded-3xl p-6 lg:p-8 border border-slate-200/80 shadow-sm flex flex-col gap-6 w-full todo-main-card">
+            <div className="todo-workspace todo-main-card">
                 
-                {/* Style tag for butter-smooth CSS animations */}
-                <style dangerouslySetInnerHTML={{ __html: `
-                    @keyframes taskAppear {
-                        from { opacity: 0; transform: translateY(12px) scale(0.98); }
-                        to { opacity: 1; transform: translateY(0) scale(1); }
-                    }
-                    .animate-task-appear {
-                        animation: taskAppear 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-                    }
-                    .hkm-checkbox-round {
-                        width: 20px !important;
-                        height: 20px !important;
-                        min-width: 20px !important;
-                        min-height: 20px !important;
-                        max-width: 20px !important;
-                        max-height: 20px !important;
-                        border-radius: 50% !important;
-                        aspect-ratio: 1 / 1 !important;
-                        overflow: hidden !important;
-                        flex-shrink: 0 !important;
-                        display: flex !important;
-                        align-items: center !important;
-                        justify-content: center !important;
-                        box-sizing: border-box !important;
-                    }
-                    .hkm-checkbox-completed .hkm-close-icon {
-                        display: none !important;
-                    }
-                    .hkm-checkbox-completed .hkm-check-icon {
-                        display: block !important;
-                    }
-                    .hkm-checkbox-completed:hover .hkm-close-icon {
-                        display: block !important;
-                    }
-                    .hkm-checkbox-completed:hover .hkm-check-icon {
-                        display: none !important;
-                    }
-                `}} />
-
                 {/* Header view title and Search Bar */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-6">
-                    <div className="flex-shrink-0">
-                        <div className="flex items-center gap-3 flex-nowrap">
-                            <h3 className="m-0 font-bold text-2xl text-[#1B4965] tracking-tight whitespace-nowrap">{activeViewTitle}</h3>
-                            <span className="todo-badge text-[10px] font-bold px-3 py-1 rounded-full bg-[#1B4965]/10 text-[#1B4965] shadow-sm whitespace-nowrap flex-shrink-0">
+                <div className="todo-workspace-header">
+                    <div>
+                        <div className="todo-header-title-group">
+                            <h3 className="todo-header-title">{activeViewTitle}</h3>
+                            <span className="todo-badge todo-badge-assignee">
                                 {viewMode === 'completed' 
                                     ? `${completedTasks.length} ${completedTasks.length === 1 ? 'fullført' : 'fullførte'}` 
                                     : `${activeTasks.length} ${activeTasks.length === 1 ? 'oppgave' : 'oppgaver'}`
                                 }
                             </span>
                         </div>
-                        <p className="m-0 text-xs text-slate-400 font-medium mt-2">Administrer og deleger oppgavene dine effektivt.</p>
+                        <p className="todo-header-subtitle">Administrer og deleger oppgavene dine effektivt.</p>
                     </div>
 
                     {/* Integrated Search Box */}
-                    <div className="relative w-full sm:w-72 todo-search-wrapper">
-                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg select-none" style={{ zIndex: 2 }}>search</span>
+                    <div className="todo-search-box">
+                        <span className="material-symbols-outlined">search</span>
                         <input 
                             type="text" 
                             value={filterSearch} 
                             onChange={e => setFilterSearch(e.target.value)} 
                             placeholder="Søk i oppgaver..." 
-                            className="w-full pr-4 py-2.5 rounded-2xl border border-slate-200 focus:border-[#d17d39] focus:ring-4 focus:ring-[#d17d39]/10 outline-none font-semibold text-slate-700 text-xs box-sizing-border-box transition-all duration-250 bg-white shadow-sm todo-search-input" 
-                            style={{ paddingLeft: '48px' }}
+                            className="todo-search-input" 
                         />
                     </div>
                 </div>
 
                 {viewMode === 'completed' ? (
-                    /* Completed Tasks View (Primary display) */
-                    <div className="flex flex-col gap-4">
+                    /* Completed Tasks View */
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         {completedTasks.length === 0 ? (
-                            /* Premium completed empty state vector illustration */
-                            <div className="bg-white rounded-3xl border border-slate-200/60 p-16 text-center w-full shadow-sm flex flex-col items-center justify-center todo-empty-card">
-                                <div className="w-28 h-28 mb-6 relative flex items-center justify-center bg-slate-50 rounded-full border border-slate-100">
-                                    <svg viewBox="0 0 120 120" className="w-16 h-16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <circle cx="60" cy="60" r="50" fill="url(#completedEmptyGrad)" fillOpacity="0.06" />
-                                        <circle cx="60" cy="60" r="50" stroke="url(#completedEmptyGrad)" strokeWidth="1.5" strokeDasharray="4 4" strokeOpacity="0.4" />
-                                        <path d="M40 60L53 73L80 46" stroke="#d17d39" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" opacity="0.3" />
-                                        <path d="M48 68 L60 56 L72 68 M60 56 L60 80" stroke="#1B4965" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                                        <circle cx="95" cy="38" r="4" fill="#d17d39" fillOpacity="0.6" />
-                                        <circle cx="25" cy="80" r="3" fill="#1B4965" fillOpacity="0.4" />
-                                        <defs>
-                                            <linearGradient id="completedEmptyGrad" x1="10" y1="10" x2="110" y2="110" gradientUnits="userSpaceOnUse">
-                                                <stop stopColor="#d17d39" />
-                                                <stop offset="1" stopColor="#1B4965" />
-                                            </linearGradient>
-                                        </defs>
-                                    </svg>
+                            <div className="todo-empty-container">
+                                <div className="todo-empty-icon-wrap">
+                                    <span className="material-symbols-outlined">task_alt</span>
                                 </div>
-                                <h4 className="font-bold text-base text-slate-800 tracking-tight">Ingen fullførte gjøremål</h4>
-                                <p className="text-xs text-slate-400 mt-2 font-medium max-w-[280px] leading-relaxed">Du har ikke fullført noen oppgaver i denne listen ennå. Start med å fullføre en oppgave!</p>
+                                <h4 className="todo-empty-title">Ingen fullførte gjøremål</h4>
+                                <p className="todo-empty-desc">Du har ikke fullført noen oppgaver i denne listen ennå. Start med å fullføre en oppgave!</p>
                             </div>
                         ) : (
-                            /* Completed Task Row Cards (Primary Style) */
                             completedTasks.map(t => {
                                 const assigneeName = t.tildelt_til && t.tildelt_til.length > 0 ? getAssigneeName(t.tildelt_til[0]) : '';
                                 const getInitials = (name) => {
@@ -771,85 +602,48 @@ export default function TodoApp() {
                                     : null;
 
                                 return (
-                                    <div 
-                                        key={t.id} 
-                                        className="flex gap-4 items-start bg-white border border-slate-100 hover:border-emerald-200/80 rounded-2xl p-5 shadow-[0_2px_8px_-3px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.06)] hover:-translate-y-0.5 transition-all duration-300 group w-full relative animate-task-appear"
-                                    >
-                                        {/* Checked status checkbox */}
-                                        <div 
+                                    <div key={t.id} className="todo-task-card completed">
+                                        <button 
                                             onClick={() => handleToggleTask(t)} 
-                                            className="hkm-checkbox-completed hkm-checkbox-round w-5 h-5 rounded-full bg-emerald-500 border-2 border-emerald-500 flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 select-none shadow-sm shadow-emerald-500/10 hover:scale-105"
-                                            style={{
-                                                width: '20px',
-                                                height: '20px',
-                                                minWidth: '20px',
-                                                minHeight: '20px',
-                                                maxWidth: '20px',
-                                                maxHeight: '20px',
-                                                borderRadius: '50%',
-                                                aspectRatio: '1/1',
-                                                flexShrink: 0,
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                boxSizing: 'border-box'
-                                            }}
+                                            className="todo-checkbox-btn"
                                             title="Marker som ugjort"
                                         >
-                                            <span className="material-symbols-outlined text-[10px] text-white font-bold select-none hkm-check-icon">check</span>
-                                            <span className="material-symbols-outlined text-[10px] text-white font-bold select-none hkm-close-icon">close</span>
-                                        </div>
+                                            <span className="material-symbols-outlined">check</span>
+                                        </button>
 
-                                        {/* Content body */}
-                                        <div className="flex-grow min-w-0">
-                                            <div className="flex justify-between items-start gap-3">
-                                                <h4 className="m-0 font-bold text-xs text-slate-400 line-through leading-snug break-words">{t.title}</h4>
-                                                
-                                                {/* Slett oppgave icon */}
+                                        <div className="todo-task-body">
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
+                                                <h4 className="todo-task-title">{t.title}</h4>
                                                 <button 
                                                     onClick={() => handleDeleteTask(t.id)} 
-                                                    className="border-none bg-transparent p-1 cursor-pointer text-slate-300 hover:text-red-500 transition-colors duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 flex-shrink-0" 
+                                                    className="todo-icon-btn delete" 
                                                     title="Slett oppgave"
                                                 >
-                                                    <span className="material-symbols-outlined text-base">delete</span>
+                                                    <span className="material-symbols-outlined">delete</span>
                                                 </button>
                                             </div>
 
                                             {t.description && (
-                                                <p className="m-0 text-[11px] text-slate-400 line-through mt-2 leading-relaxed break-words font-medium">{t.description}</p>
+                                                <p className="todo-task-desc">{t.description}</p>
                                             )}
 
-                                            {/* Minimal SaaS Tags line */}
-                                            <div className="flex flex-wrap items-center gap-2.5 mt-3.5 text-[10px] font-bold text-slate-400">
-                                                
-                                                {/* Priority badge */}
-                                                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border bg-slate-50 text-slate-500 border-slate-200/60">
-                                                    <span className={`w-1.5 h-1.5 rounded-full ${
-                                                        t.priority === 'high' ? 'bg-red-400/60' : t.priority === 'medium' ? 'bg-orange-400/60' : 'bg-green-400/60'
-                                                    }`}></span>
+                                            <div className="todo-task-tags">
+                                                <span className={`todo-badge ${
+                                                    t.priority === 'high' ? 'todo-badge-priority-high' : t.priority === 'medium' ? 'todo-badge-priority-medium' : 'todo-badge-priority-low'
+                                                }`}>
                                                     {{ low: 'Lav', medium: 'Medium', high: 'Høy' }[t.priority || 'medium']} prioritet
                                                 </span>
 
-                                                {/* Completed date badge */}
                                                 {completedDateStr && (
-                                                    <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border bg-emerald-500/[0.04] text-emerald-700 border-emerald-500/10">
-                                                        <span className="material-symbols-outlined text-[13px]">done_all</span>
-                                                        <span>Fullført: {completedDateStr}</span>
+                                                    <span className="todo-badge todo-badge-date">
+                                                        Fullført: {completedDateStr}
                                                     </span>
                                                 )}
 
-                                                {/* Assignee badge */}
-                                                {t.tildelt_til && t.tildelt_til.length > 0 ? (
-                                                    <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full border bg-slate-50 text-slate-500 border-slate-200/60" title={`Tildelt: ${assigneeName}`}>
-                                                        <span className="w-4.5 h-4.5 rounded-full bg-slate-400 text-white font-bold text-[8px] flex items-center justify-center select-none shadow-sm">
-                                                            {initials}
-                                                        </span>
-                                                        <span>{assigneeName}</span>
-                                                    </span>
-                                                ) : (
-                                                    <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border bg-slate-50 text-slate-500 border-slate-200/60">
-                                                        <span className="material-symbols-outlined text-[13px]">group</span>
-                                                        <span>Felles</span>
+                                                {assigneeName && (
+                                                    <span className="todo-badge todo-badge-assignee">
+                                                        <span className="todo-user-avatar">{initials}</span>
+                                                        {assigneeName}
                                                     </span>
                                                 )}
                                             </div>
@@ -862,191 +656,119 @@ export default function TodoApp() {
                 ) : (
                     /* Active Tasks View */
                     <>
-                        {/* Premium Standalone Inline Quick-Add Card */}
+                        {/* Quick-Add Box */}
                         <form 
                             onSubmit={handleInlineQuickAdd} 
-                            className={`bg-white rounded-2xl border transition-all duration-300 flex flex-col shadow-sm todo-quick-add-form ${
-                                isQuickAddExpanded 
-                                    ? 'p-6 ring-2 ring-[#d17d39]/15 border-[#d17d39]/40 gap-4' 
-                                    : 'py-3 px-4 hover:border-slate-300/80 hover:shadow-md cursor-pointer'
-                            }`}
+                            className="todo-quick-add-card"
                             onClick={() => {
                                 if (!isQuickAddExpanded) setIsQuickAddExpanded(true);
                             }}
                         >
-                            <div className="flex items-center gap-3.5">
-                                <span className="material-symbols-outlined text-slate-400 select-none text-xl">playlist_add</span>
+                            <div className="todo-quick-add-input-row">
+                                <span className="material-symbols-outlined todo-quick-add-icon">add_task</span>
                                 <input 
                                     type="text" 
                                     value={inlineTitle} 
                                     onChange={e => setInlineTitle(e.target.value)} 
                                     placeholder="Legg til et nytt gjøremål her..." 
-                                    className="w-full border-none outline-none bg-transparent font-bold text-slate-700 text-xs placeholder-slate-400" 
+                                    className="todo-quick-add-input" 
                                 />
                                 {!isQuickAddExpanded && inlineTitle.trim() && (
                                     <button 
                                         type="submit" 
-                                        className="flex items-center justify-center w-7 h-7 rounded-full bg-[#1B4965] hover:bg-[#25638c] text-white cursor-pointer border-none scale-100 hover:scale-105 active:scale-95 transition-all duration-200 flex-shrink-0"
+                                        className="todo-quick-submit-btn"
                                         title="Lagre oppgave"
                                     >
-                                        <span className="material-symbols-outlined text-sm font-bold">check</span>
+                                        Lagre
                                     </button>
                                 )}
                             </div>
 
                             {isQuickAddExpanded && (
-                                <div className="flex flex-col gap-4 mt-2 border-t border-slate-100 pt-4 animate-in fade-in duration-200">
-                                    {/* Optional Description Input */}
+                                <div className="todo-quick-add-meta-row">
                                     <textarea 
                                         value={inlineDesc}
                                         onChange={e => setInlineDesc(e.target.value)}
                                         placeholder="Legg til en beskrivelse (valgfritt)..."
                                         rows={2}
-                                        className="w-full border-none outline-none text-xs text-slate-600 placeholder-slate-400 bg-transparent resize-none leading-relaxed"
+                                        className="todo-quick-add-input"
+                                        style={{ width: '100%', marginBottom: '8px' }}
                                     />
 
-                                    {/* Metadata Selectors & Action Buttons */}
-                                    <div className="flex flex-wrap items-center gap-2 mt-2 w-full">
-                                        {/* Priority dropdown */}
-                                        <div className="relative flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl px-3 py-2 text-[11px] font-bold text-slate-600 transition-colors cursor-pointer select-none">
-                                            <span className={`w-2 h-2 rounded-full ${
-                                                inlinePriority === 'high' ? 'bg-red-500' : inlinePriority === 'medium' ? 'bg-orange-500' : 'bg-green-500'
-                                            }`}></span>
-                                            <span>{inlinePriority === 'high' ? 'Høy prioritet' : inlinePriority === 'medium' ? 'Medium prioritet' : 'Lav prioritet'}</span>
-                                            <span className="material-symbols-outlined text-[14px] text-slate-400">expand_more</span>
-                                            <select 
-                                                value={inlinePriority} 
-                                                onChange={e => setInlinePriority(e.target.value)}
-                                                onClick={e => e.stopPropagation()}
-                                                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                                            >
-                                                <option value="low">Lav prioritet</option>
-                                                <option value="medium">Medium prioritet</option>
-                                                <option value="high">Høy prioritet</option>
-                                            </select>
-                                        </div>
+                                    <select 
+                                        value={inlinePriority} 
+                                        onChange={e => setInlinePriority(e.target.value)}
+                                        onClick={e => e.stopPropagation()}
+                                        className="todo-quick-select"
+                                    >
+                                        <option value="low">Lav prioritet</option>
+                                        <option value="medium">Medium prioritet</option>
+                                        <option value="high">Høy prioritet</option>
+                                    </select>
 
-                                        {/* Due Date selector */}
-                                        <div className="relative flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl px-3 py-2 text-[11px] font-bold text-slate-600 transition-colors cursor-pointer select-none">
-                                            <span className="material-symbols-outlined text-[15px] text-slate-400">calendar_today</span>
-                                            <span>
-                                                {inlineDueDate 
-                                                    ? new Date(inlineDueDate).toLocaleDateString('no-NO', { day: 'numeric', month: 'short' }) 
-                                                    : 'Sett forfallsdato'}
-                                            </span>
-                                            <input 
-                                                type="date" 
-                                                value={inlineDueDate} 
-                                                onChange={e => setInlineDueDate(e.target.value)}
-                                                onClick={e => e.stopPropagation()}
-                                                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" 
-                                            />
-                                            {inlineDueDate && (
-                                                <button 
-                                                    type="button"
-                                                    onClick={(e) => { e.stopPropagation(); setInlineDueDate(''); }}
-                                                    className="p-0 border-none bg-transparent hover:text-red-500 text-slate-400 flex items-center justify-center cursor-pointer ml-1"
-                                                    title="Fjern dato"
-                                                >
-                                                    <span className="material-symbols-outlined text-[13px]">close</span>
-                                                </button>
-                                            )}
-                                        </div>
+                                    <input 
+                                        type="date" 
+                                        value={inlineDueDate} 
+                                        onChange={e => setInlineDueDate(e.target.value)}
+                                        onClick={e => e.stopPropagation()}
+                                        className="todo-quick-date-input" 
+                                    />
 
-                                        {/* Assignee selector */}
-                                        <div className="relative flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl px-3 py-2 text-[11px] font-bold text-slate-600 transition-colors cursor-pointer select-none">
-                                            <span className="material-symbols-outlined text-[15px] text-slate-400">account_circle</span>
-                                            <span className="max-w-[120px] truncate">
-                                                {inlineAssignee ? getAssigneeName(inlineAssignee) : 'Deleger (Felles)'}
-                                            </span>
-                                            <span className="material-symbols-outlined text-[14px] text-slate-400">expand_more</span>
-                                            <select 
-                                                value={inlineAssignee} 
-                                                onChange={e => setInlineAssignee(e.target.value)}
-                                                onClick={e => e.stopPropagation()}
-                                                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                                            >
-                                                <option value="">Felles (Ingen)</option>
-                                                {users.map(u => (
-                                                    <option key={u.uid} value={u.uid}>{u.displayName}</option>
-                                                ))}
-                                            </select>
-                                        </div>
+                                    <select 
+                                        value={inlineAssignee} 
+                                        onChange={e => setInlineAssignee(e.target.value)}
+                                        onClick={e => e.stopPropagation()}
+                                        className="todo-quick-select"
+                                    >
+                                        <option value="">Felles (Ingen)</option>
+                                        {users.map(u => (
+                                            <option key={u.uid} value={u.uid}>{u.displayName}</option>
+                                        ))}
+                                    </select>
 
-                                        {/* Action Buttons */}
-                                        <div className="ml-auto flex items-center gap-2">
-                                            <button 
-                                                type="button" 
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setInlineTitle('');
-                                                    setInlineDesc('');
-                                                    setInlineDueDate('');
-                                                    setIsQuickAddExpanded(false);
-                                                }}
-                                                className="px-4 py-2 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 active:scale-[0.97] transition-all duration-200 border-none cursor-pointer text-xs"
-                                            >
-                                                Avbryt
-                                            </button>
-                                            <button 
-                                                type="submit" 
-                                                disabled={!inlineTitle.trim()}
-                                                onClick={(e) => e.stopPropagation()}
-                                                className="px-4 py-2 rounded-xl font-bold text-white bg-gradient-to-r from-[#d17d39] to-[#bd4f2a] hover:from-[#e28e4a] hover:to-[#ce5d37] hover:shadow-md hover:shadow-orange-500/10 active:scale-[0.97] transition-all duration-200 border-none cursor-pointer text-xs disabled:opacity-80 disabled:cursor-not-allowed"
-                                            >
-                                                Lagre
-                                            </button>
-                                        </div>
+                                    <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
+                                        <button 
+                                            type="button" 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setInlineTitle('');
+                                                setInlineDesc('');
+                                                setInlineDueDate('');
+                                                setIsQuickAddExpanded(false);
+                                            }}
+                                            className="todo-icon-btn"
+                                            style={{ fontSize: '13px', width: 'auto', padding: '0 12px' }}
+                                        >
+                                            Avbryt
+                                        </button>
+                                        <button 
+                                            type="submit" 
+                                            disabled={!inlineTitle.trim()}
+                                            onClick={(e) => e.stopPropagation()}
+                                            className="todo-quick-submit-btn"
+                                        >
+                                            Lagre
+                                        </button>
                                     </div>
                                 </div>
                             )}
                         </form>
 
                         {/* Active Tasks List Area */}
-                        <div className="flex flex-col gap-4">
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                             {activeTasks.length === 0 ? (
-                                /* Premium empty state vector drawing illustration */
-                                <div className="bg-white rounded-3xl border border-slate-200/60 p-16 text-center w-full shadow-sm flex flex-col items-center justify-center todo-empty-card">
-                                    <div className="w-28 h-28 mb-6 relative flex items-center justify-center bg-slate-50 rounded-full border border-slate-100">
-                                        <svg viewBox="0 0 120 120" className="w-16 h-16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <circle cx="60" cy="60" r="50" fill="url(#circleGrad)" fillOpacity="0.06" />
-                                            <circle cx="60" cy="60" r="50" stroke="url(#circleGrad)" strokeWidth="1.5" strokeDasharray="4 4" strokeOpacity="0.4" />
-                                            <path d="M40 60L53 73L80 46" stroke="#d17d39" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-                                            <path d="M28 35C28 35 30 40 33 40C36 40 38 35 38 35C38 35 36 30 33 30C30 30 28 35 28 35Z" fill="#1B4965" fillOpacity="0.3" />
-                                            <path d="M82 85C82 85 84 90 87 90C90 90 92 85 92 85C92 85 90 80 87 80C84 80 82 85 82 85Z" fill="#1B4965" fillOpacity="0.3" />
-                                            <circle cx="95" cy="38" r="4" fill="#d17d39" fillOpacity="0.6" />
-                                            <circle cx="25" cy="80" r="3" fill="#1B4965" fillOpacity="0.4" />
-                                            <defs>
-                                                <linearGradient id="circleGrad" x1="10" y1="10" x2="110" y2="110" gradientUnits="userSpaceOnUse">
-                                                    <stop stopColor="#d17d39" />
-                                                    <stop offset="1" stopColor="#1B4965" />
-                                                </linearGradient>
-                                            </defs>
-                                        </svg>
-                                        <div className="absolute top-2 right-4 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center shadow-sm">
-                                            <span className="material-symbols-outlined text-[9px] text-white font-bold">check</span>
-                                        </div>
-                                        <div className="absolute bottom-4 left-4 w-4.5 h-4.5 bg-orange-500 rounded-full flex items-center justify-center shadow-sm">
-                                            <span className="material-symbols-outlined text-[10px] text-white font-bold">star</span>
-                                        </div>
+                                <div className="todo-empty-container">
+                                    <div className="todo-empty-icon-wrap">
+                                        <span className="material-symbols-outlined">task_alt</span>
                                     </div>
-                                    <h4 className="font-bold text-base text-slate-800 tracking-tight">Alle gjøremålene er fullført</h4>
-                                    <p className="text-xs text-slate-400 mt-2 font-medium max-w-[280px] leading-relaxed">Fantastisk jobb! Det er ingenting utestående på denne oppgavelisten.</p>
+                                    <h4 className="todo-empty-title">Alle gjøremålene er fullført</h4>
+                                    <p className="todo-empty-desc">Fantastisk jobb! Det er ingenting utestående på denne oppgavelisten.</p>
                                 </div>
                             ) : (
-                                /* Task Row Cards */
                                 activeTasks.map(t => {
                                     const prioLabel = { low: 'Lav', medium: 'Medium', high: 'Høy' }[t.priority] || 'Medium';
-                                    const prioDotColor = {
-                                        high: 'bg-red-500',
-                                        medium: 'bg-orange-500',
-                                        low: 'bg-green-500'
-                                    }[t.priority || 'medium'];
-
-                                    // Check if task is overdue
                                     const isOverdue = t.dueDate ? new Date(t.dueDate).setHours(0,0,0,0) < new Date().setHours(0,0,0,0) : false;
 
-                                    // Calculate initials for tildelt user avatar
                                     const assigneeName = t.tildelt_til && t.tildelt_til.length > 0 ? getAssigneeName(t.tildelt_til[0]) : '';
                                     const getInitials = (name) => {
                                         if (!name) return '';
@@ -1059,93 +781,53 @@ export default function TodoApp() {
                                     const initials = getInitials(assigneeName);
 
                                     return (
-                                        <div 
-                                            key={t.id} 
-                                            className="flex gap-4 items-start bg-white border border-slate-100 hover:border-slate-200/80 rounded-2xl p-5 shadow-[0_2px_8px_-3px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-300 group w-full relative animate-task-appear todo-task-item"
-                                        >
-                                            {/* Styled circular Checkbox */}
-                                            <div 
+                                        <div key={t.id} className="todo-task-card">
+                                            <button 
                                                 onClick={() => handleToggleTask(t)} 
-                                                className="hkm-checkbox-round w-5 h-5 rounded-full border-2 border-slate-300 hover:border-[#d17d39] hover:bg-orange-500/5 flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 bg-white shadow-sm hover:scale-105 group/checkbox"
-                                                style={{
-                                                    width: '20px',
-                                                    height: '20px',
-                                                    minWidth: '20px',
-                                                    minHeight: '20px',
-                                                    maxWidth: '20px',
-                                                    maxHeight: '20px',
-                                                    borderRadius: '50%',
-                                                    aspectRatio: '1/1',
-                                                    flexShrink: 0,
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    boxSizing: 'border-box'
-                                                }}
+                                                className="todo-checkbox-btn"
                                                 title="Fullfør oppgave"
                                             >
-                                                <span className="material-symbols-outlined text-[10px] text-transparent group-hover/checkbox:text-slate-400 select-none">check</span>
-                                            </div>
+                                                <span className="material-symbols-outlined" style={{ display: 'none' }}>check</span>
+                                            </button>
 
-                                            {/* Content body */}
-                                            <div className="flex-grow min-w-0">
-                                                <div className="flex justify-between items-start gap-3">
-                                                    <h4 className="m-0 font-bold text-xs text-slate-800 leading-snug break-words">{t.title}</h4>
-                                                    
-                                                    {/* Slett oppgave icon */}
+                                            <div className="todo-task-body">
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
+                                                    <h4 className="todo-task-title">{t.title}</h4>
                                                     <button 
                                                         onClick={() => handleDeleteTask(t.id)} 
-                                                        className="border-none bg-transparent p-1 cursor-pointer text-slate-300 hover:text-red-500 transition-colors duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 flex-shrink-0" 
+                                                        className="todo-icon-btn delete" 
                                                         title="Slett oppgave"
                                                     >
-                                                        <span className="material-symbols-outlined text-base">delete</span>
+                                                        <span className="material-symbols-outlined">delete</span>
                                                     </button>
                                                 </div>
 
                                                 {t.description && (
-                                                    <p className="m-0 text-[11px] text-slate-500 mt-2 leading-relaxed break-words font-medium">{t.description}</p>
+                                                    <p className="todo-task-desc">{t.description}</p>
                                                 )}
 
-                                                {/* Minimal SaaS Tags line */}
-                                                <div className="flex flex-wrap items-center gap-2.5 mt-3.5 text-[10px] font-bold text-slate-500">
-                                                    
-                                                    {/* Priority badge with translucent pastel styling */}
-                                                    <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border ${
-                                                        t.priority === 'high' 
-                                                            ? 'bg-red-500/[0.06] text-red-700 border-red-500/10' 
-                                                            : t.priority === 'medium'
-                                                            ? 'bg-amber-500/[0.06] text-amber-700 border-amber-500/10'
-                                                            : 'bg-emerald-500/[0.06] text-emerald-700 border-emerald-500/10'
+                                                <div className="todo-task-tags">
+                                                    <span className={`todo-badge ${
+                                                        t.priority === 'high' ? 'todo-badge-priority-high' : t.priority === 'medium' ? 'todo-badge-priority-medium' : 'todo-badge-priority-low'
                                                     }`}>
-                                                        <span className={`w-1.5 h-1.5 rounded-full ${prioDotColor}`}></span>
                                                         {prioLabel} prioritet
                                                     </span>
 
-                                                    {/* Due date badge */}
                                                     {t.dueDate && (
-                                                        <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border ${
-                                                            isOverdue 
-                                                                ? 'bg-rose-500/[0.06] text-rose-700 border-rose-500/10 font-bold animate-pulse' 
-                                                                : 'bg-[#1B4965]/[0.06] text-[#1B4965] border-[#1B4965]/10'
-                                                        }`}>
-                                                            <span className="material-symbols-outlined text-[13px]">{isOverdue ? 'error' : 'calendar_today'}</span>
-                                                            <span>{isOverdue ? 'Forfalt: ' : 'Forfaller: '}</span>
-                                                            <span>{new Date(t.dueDate).toLocaleDateString('no-NO', { day: 'numeric', month: 'short' })}</span>
+                                                        <span className={`todo-badge todo-badge-date ${isOverdue ? 'overdue' : ''}`}>
+                                                            {isOverdue ? 'Forfalt: ' : 'Forfaller: '}
+                                                            {new Date(t.dueDate).toLocaleDateString('no-NO', { day: 'numeric', month: 'short' })}
                                                         </span>
                                                     )}
 
-                                                    {/* Assignee badge with actual circular initials avatar */}
-                                                    {t.tildelt_til && t.tildelt_til.length > 0 ? (
-                                                        <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full border bg-indigo-500/[0.06] text-indigo-700 border-indigo-500/10" title={`Tildelt: ${assigneeName}`}>
-                                                            <span className="w-4.5 h-4.5 rounded-full bg-[#1B4965] text-white font-bold text-[8px] flex items-center justify-center select-none shadow-sm shadow-indigo-600/10">
-                                                                {initials}
-                                                            </span>
-                                                            <span>{assigneeName}</span>
+                                                    {assigneeName ? (
+                                                        <span className="todo-badge todo-badge-assignee">
+                                                            <span className="todo-user-avatar">{initials}</span>
+                                                            {assigneeName}
                                                         </span>
                                                     ) : (
-                                                        <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border bg-slate-500/[0.06] text-slate-600 border-slate-500/10">
-                                                            <span className="material-symbols-outlined text-[13px]">group</span>
-                                                            <span>Felles</span>
+                                                        <span className="todo-badge todo-badge-date">
+                                                            Felles
                                                         </span>
                                                     )}
                                                 </div>
@@ -1158,65 +840,41 @@ export default function TodoApp() {
 
                         {/* Collapsible Completed Tasks List Accordion */}
                         {completedTasks.length > 0 && (
-                            <div className="mt-4">
-                                <button 
-                                    type="button"
+                            <div style={{ marginTop: '16px' }}>
+                                <div 
                                     onClick={() => setShowCompleted(!showCompleted)} 
-                                    className="flex items-center gap-2 text-slate-500 hover:text-slate-800 font-bold text-xs bg-white hover:bg-slate-50 border border-slate-200/60 hover:border-slate-300 cursor-pointer px-4 py-2.5 rounded-xl transition-all duration-300 select-none outline-none transform active:scale-95 shadow-sm"
+                                    className={`todo-accordion-header ${showCompleted ? 'open' : ''}`}
                                 >
-                                    <span className="material-symbols-outlined text-base transform transition-transform duration-300" style={{ transform: showCompleted ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                                        expand_more
-                                    </span>
+                                    <span className="material-symbols-outlined">chevron_right</span>
                                     <span>Fullførte gjøremål ({completedTasks.length})</span>
-                                </button>
+                                </div>
                                 
                                 {showCompleted && (
-                                    <div className="flex flex-col gap-3 mt-4 animate-in fade-in slide-in-from-top-4 duration-300">
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '12px' }}>
                                         {completedTasks.map(t => (
-                                            <div 
-                                                key={t.id} 
-                                                className="flex gap-4 items-start bg-slate-50/40 border border-slate-100 hover:border-slate-200/80 rounded-2xl p-4 opacity-60 hover:opacity-85 transition-all duration-200 group w-full relative todo-completed-item"
-                                            >
-                                                {/* Checked status checkbox */}
-                                                <div 
+                                            <div key={t.id} className="todo-task-card completed">
+                                                <button 
                                                     onClick={() => handleToggleTask(t)} 
-                                                    className="hkm-checkbox-completed hkm-checkbox-round w-5 h-5 rounded-full bg-emerald-500 border-2 border-emerald-500 flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 select-none shadow-sm shadow-emerald-500/10 hover:scale-105"
-                                                    style={{
-                                                        width: '20px',
-                                                        height: '20px',
-                                                        minWidth: '20px',
-                                                        minHeight: '20px',
-                                                        maxWidth: '20px',
-                                                        maxHeight: '20px',
-                                                        borderRadius: '50%',
-                                                        aspectRatio: '1/1',
-                                                        flexShrink: 0,
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        boxSizing: 'border-box'
-                                                    }}
+                                                    className="todo-checkbox-btn"
                                                     title="Marker som ugjort"
                                                 >
-                                                    <span className="material-symbols-outlined text-[10px] text-white font-bold select-none hkm-check-icon">check</span>
-                                                    <span className="material-symbols-outlined text-[10px] text-white font-bold select-none hkm-close-icon">close</span>
-                                                </div>
+                                                    <span className="material-symbols-outlined">check</span>
+                                                </button>
 
-                                                {/* Content */}
-                                                <div className="flex-grow min-w-0">
-                                                    <div className="flex justify-between items-start gap-3">
-                                                        <h4 className="m-0 font-bold text-xs text-slate-400 line-through leading-snug break-words">{t.title}</h4>
+                                                <div className="todo-task-body">
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
+                                                        <h4 className="todo-task-title">{t.title}</h4>
                                                         <button 
                                                             onClick={() => handleDeleteTask(t.id)} 
-                                                            className="border-none bg-transparent p-1 cursor-pointer text-slate-300 hover:text-red-500 transition-colors duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 flex-shrink-0" 
+                                                            className="todo-icon-btn delete" 
                                                             title="Slett oppgave"
                                                         >
-                                                            <span className="material-symbols-outlined text-base">delete</span>
+                                                            <span className="material-symbols-outlined">delete</span>
                                                         </button>
                                                     </div>
 
                                                     {t.description && (
-                                                        <p className="m-0 text-[11px] text-slate-400 line-through mt-1.5 leading-relaxed break-words font-medium">{t.description}</p>
+                                                        <p className="todo-task-desc">{t.description}</p>
                                                     )}
                                                 </div>
                                             </div>
@@ -1231,28 +889,24 @@ export default function TodoApp() {
 
             {/* Popup Modal for adding a new task */}
             {showAddTaskModal && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-                    {/* Backdrop with elegant blur */}
+                <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyCenter: 'center', padding: '16px' }}>
                     <div 
-                        className="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity duration-300"
+                        style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(8px)' }}
                         onClick={() => {
                             setFormError('');
                             setShowAddTaskModal(false);
                         }}
                     />
                     
-                    {/* Modal Content container */}
-                    <div className="relative w-full max-w-lg bg-white rounded-[32px] shadow-2xl border border-slate-100 overflow-hidden transform transition-all duration-300 max-h-[90vh] flex flex-col animate-in fade-in zoom-in-95 todo-modal-container">
-                        
-                        {/* Header */}
-                        <div className="flex items-center justify-between px-8 py-6 border-b border-slate-100 bg-slate-50/50">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-orange-50 text-[#d17d39] flex items-center justify-center">
+                    <div style={{ position: 'relative', width: '100%', maxWidth: '500px', background: '#ffffff', borderRadius: '24px', boxShadow: '0 20px 50px rgba(0,0,0,0.15)', overflow: 'hidden', margin: 'auto', display: 'flex', flexDirection: 'column', zIndex: 10 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', borderBottom: '1px solid #f1f5f9' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#fff7ed', color: '#d17d39', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <span className="material-symbols-outlined">playlist_add</span>
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-bold text-[#1B4965]">Ny oppgave</h3>
-                                    <p className="text-xs text-slate-400 font-medium">Opprett en ny oppgave i listen din</p>
+                                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: '#1B4965' }}>Ny oppgave</h3>
+                                    <p style={{ margin: 0, fontSize: '12px', color: '#64748b' }}>Opprett en ny oppgave i listen din</p>
                                 </div>
                             </div>
                             <button 
@@ -1260,75 +914,79 @@ export default function TodoApp() {
                                     setFormError('');
                                     setShowAddTaskModal(false);
                                 }} 
-                                className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-all duration-200 border-none cursor-pointer"
+                                className="todo-icon-btn"
                             >
-                                <span className="material-symbols-outlined text-xl">close</span>
+                                <span className="material-symbols-outlined">close</span>
                             </button>
                         </div>
 
-                        {/* Form Body with scrollable content */}
-                        <div className="p-8 overflow-y-auto flex-1">
+                        <div style={{ padding: '24px', overflowY: 'auto', flex: 1 }}>
                             {formError && (
-                                <div className="bg-red-50 text-red-500 px-4 py-3 rounded-2xl text-xs font-semibold mb-6 flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-lg">error</span>
+                                <div style={{ background: '#fef2f2', color: '#ef4444', padding: '12px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: 600, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <span className="material-symbols-outlined">error</span>
                                     {formError}
                                 </div>
                             )}
 
-                            <form onSubmit={handleAddTask} className="flex flex-col gap-6">
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-1 select-none">Tittel *</label>
+                            <form onSubmit={handleAddTask} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                    <label style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tittel *</label>
                                     <input 
                                         type="text" 
                                         value={newTitle} 
                                         onChange={e => setNewTitle(e.target.value)} 
                                         placeholder="Hva må gjøres?" 
                                         required 
-                                        className="w-full px-5 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] focus:ring-4 focus:ring-[#d17d39]/10 transition-all duration-300 outline-none font-medium text-slate-800 text-sm box-sizing-border-box" 
+                                        className="todo-search-input"
+                                        style={{ paddingLeft: '14px !important' }}
                                     />
                                 </div>
 
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-1 select-none">Beskrivelse</label>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                    <label style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Beskrivelse</label>
                                     <textarea 
                                         value={newDesc} 
                                         onChange={e => setNewDesc(e.target.value)} 
                                         placeholder="Detaljer om oppgaven..." 
                                         rows={3} 
-                                        className="w-full px-5 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] focus:ring-4 focus:ring-[#d17d39]/10 transition-all duration-300 outline-none font-medium text-slate-800 text-sm resize-none fontFamily-inherit box-sizing-border-box" 
+                                        className="todo-search-input"
+                                        style={{ paddingLeft: '14px !important', height: 'auto', resize: 'vertical' }}
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="flex flex-col gap-2">
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-1 select-none">Prioritet</label>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                        <label style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Prioritet</label>
                                         <select 
                                             value={newPriority} 
                                             onChange={e => setNewPriority(e.target.value)} 
-                                            className="w-full px-4 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] outline-none font-semibold text-slate-700 bg-white text-sm cursor-pointer transition-colors duration-250"
+                                            className="todo-quick-select"
+                                            style={{ width: '100%', height: '42px' }}
                                         >
                                             <option value="low">Lav</option>
                                             <option value="medium">Medium</option>
                                             <option value="high">Høy</option>
                                         </select>
                                     </div>
-                                    <div className="flex flex-col gap-2">
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-1 select-none">Forfallsdato</label>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                        <label style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Forfallsdato</label>
                                         <input 
                                             type="date" 
                                             value={newDueDate} 
                                             onChange={e => setNewDueDate(e.target.value)} 
-                                            className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] outline-none font-semibold text-slate-700 text-sm transition-colors duration-250" 
+                                            className="todo-quick-date-input"
+                                            style={{ width: '100%', height: '42px', boxSizing: 'border-box' }}
                                         />
                                     </div>
                                 </div>
 
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-1 select-none">Tildel til (Valgfritt)</label>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                    <label style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tildel til (Valgfritt)</label>
                                     <select 
                                         value={newAssignee} 
                                         onChange={e => setNewAssignee(e.target.value)} 
-                                        className="w-full px-4 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] outline-none font-semibold text-slate-700 bg-white text-sm cursor-pointer transition-colors duration-250"
+                                        className="todo-quick-select"
+                                        style={{ width: '100%', height: '42px' }}
                                     >
                                         <option value="">Alle administratorer (Global)</option>
                                         {users.map(u => (
@@ -1337,22 +995,23 @@ export default function TodoApp() {
                                     </select>
                                 </div>
 
-                                <div className="flex gap-4 mt-4">
+                                <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
                                     <button 
                                         type="button" 
                                         onClick={() => {
                                             setFormError('');
                                             setShowAddTaskModal(false);
                                         }}
-                                        className="flex-1 px-6 py-4 rounded-full font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 active:scale-95 transition-all duration-300 cursor-pointer border-none text-base"
+                                        className="todo-icon-btn"
+                                        style={{ flex: 1, height: '44px', width: 'auto', background: '#f1f5f9', fontWeight: 700 }}
                                     >
                                         Avbryt
                                     </button>
                                     <button 
                                         type="submit" 
-                                        className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-full font-bold text-white bg-gradient-to-r from-[#d17d39] to-[#bd4f2a] hover:from-[#e28e4a] hover:to-[#ce5d37] hover:-translate-y-0.5 active:translate-y-0.5 active:scale-95 shadow-md shadow-orange-500/15 hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-300 cursor-pointer border-none text-base"
+                                        className="todo-add-btn"
+                                        style={{ flex: 1, padding: '0 20px', height: '44px' }}
                                     >
-                                        <span className="material-symbols-outlined text-lg">save</span>
                                         Lagre oppgave
                                     </button>
                                 </div>

@@ -34,23 +34,28 @@ import '../css/todo-drawer.css';
         
         drawer.innerHTML = `
             <div class="todo-drawer-header">
-                <h3>
-                    <span class="material-symbols-outlined">playlist_add_check</span>
-                    Huskeliste
-                </h3>
+                <div class="todo-drawer-header-content">
+                    <div class="todo-drawer-header-icon">
+                        <span class="material-symbols-outlined">playlist_add_check</span>
+                    </div>
+                    <div>
+                        <h3 class="todo-drawer-header-title">Huskeliste</h3>
+                        <p class="todo-drawer-header-subtitle">Hurtigoppgaver og gjøremål</p>
+                    </div>
+                </div>
                 <button id="todo-drawer-close-btn" class="todo-drawer-close" title="Lukk meny">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
             <div class="todo-drawer-body">
-                <!-- Quick Add Form - Vertically Stacked to Prevent Chrome Jitter -->
-                <div class="todo-drawer-quick-add" style="transform: translateZ(0); backface-visibility: hidden;">
-                    <div style="display: block !important; width: 100% !important;">
+                <!-- Quick Add Form -->
+                <div class="todo-drawer-quick-add">
+                    <div class="todo-drawer-field">
                         <label class="todo-quick-label" for="todo-quick-title">Ny oppgave *</label>
                         <input type="text" id="todo-quick-title" placeholder="Hva må gjøres?..." required autocomplete="off">
                     </div>
                     
-                    <div style="display: block !important; width: 100% !important;">
+                    <div class="todo-drawer-field">
                         <label class="todo-quick-label" for="todo-quick-priority">Prioritet</label>
                         <select id="todo-quick-priority">
                             <option value="low">Lav prioritet</option>
@@ -59,12 +64,12 @@ import '../css/todo-drawer.css';
                         </select>
                     </div>
 
-                    <div style="display: block !important; width: 100% !important;">
+                    <div class="todo-drawer-field">
                         <label class="todo-quick-label" for="todo-quick-duedate">Forfallsdato</label>
                         <input type="date" id="todo-quick-duedate" title="Forfallsdato">
                     </div>
 
-                    <div style="display: block !important; width: 100% !important;">
+                    <div class="todo-drawer-field">
                         <label class="todo-quick-label" for="todo-quick-assignee">Tildel til</label>
                         <select id="todo-quick-assignee">
                             <option value="">Alle (Global oppgave)</option>
@@ -93,8 +98,8 @@ import '../css/todo-drawer.css';
                 <div>
                     <h4 class="todo-drawer-list-title">Fullførte oppgaver</h4>
                     <div id="todo-completed-list" class="todo-drawer-list">
-                        <div class="todo-drawer-empty" style="background: transparent; border: 1px dashed rgba(27, 73, 101, 0.08); box-shadow: none;">
-                            <p style="font-size: 13px; color: #94a3b8;">Ingen fullførte oppgaver</p>
+                        <div class="todo-drawer-empty" style="padding: 20px;">
+                            <p style="font-size: 12px; color: #94a3b8;">Ingen fullførte oppgaver</p>
                         </div>
                     </div>
                 </div>
@@ -275,9 +280,9 @@ import '../css/todo-drawer.css';
         if (activeTasks.length === 0) {
             activeList.innerHTML = `
                 <div class="todo-drawer-empty">
-                    <span class="material-symbols-outlined icon">verified</span>
+                    <span class="material-symbols-outlined icon" style="color: #10b981;">task_alt</span>
                     <p>Ingen gjeldende oppgaver</p>
-                    <span style="font-size: 12px; color: #94a3b8; display: block; margin-top: 4px;">Alt er unnagjort! Godt jobbet.</span>
+                    <span style="font-size: 11px; color: #94a3b8; display: block; margin-top: 4px; font-weight: 500;">Alt er unnagjort! Godt jobbet.</span>
                 </div>
             `;
         } else {
@@ -287,9 +292,8 @@ import '../css/todo-drawer.css';
         // Render Completed List
         if (completedTasks.length === 0) {
             completedList.innerHTML = `
-                <div class="todo-drawer-empty" style="background: transparent; border: 1px dashed rgba(27, 73, 101, 0.08); box-shadow: none; padding: 24px 16px;">
-                    <span class="material-symbols-outlined icon" style="font-size: 32px; color: rgba(27, 73, 101, 0.15);">playlist_add_check</span>
-                    <p style="font-size: 13px; color: #94a3b8;">Ingen fullførte oppgaver</p>
+                <div class="todo-drawer-empty" style="padding: 20px;">
+                    <p style="font-size: 12px; color: #94a3b8; font-weight: 500;">Ingen fullførte oppgaver</p>
                 </div>
             `;
         } else {
