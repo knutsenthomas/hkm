@@ -5668,8 +5668,8 @@ body.builder-active .main-header [id="admin-avatar"].has-initials {
 .threads-search {
   position: relative !important;
   display: block !important;
-  width: 380px !important;
-  max-width: 450px !important;
+  width: 100% !important;
+  max-width: 280px !important;
 }
 
 .search-box input,

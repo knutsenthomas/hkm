@@ -361,10 +361,10 @@ body.crm-body {
     gap: 12px;
 }
 
-.search-box {
+.table-header .search-box {
     position: relative;
-    width: 380px !important;
-    max-width: 450px !important;
+    width: 300px !important;
+    max-width: 360px !important;
 }
 
 .search-box span {
