@@ -2090,22 +2090,30 @@ class BibleReader {
                                     }
                                 }
                             }
-                        } else {
-                            // Toggle selected state
-                            const existingIdx = this.selectedVerses.findIndex(v => v.verseNum === verseNum && v.paragraph === paragraph);
-                            if (existingIdx >= 0) {
-                                this.selectedVerses.splice(existingIdx, 1);
-                                paragraph.classList.remove('selected-verse');
-                                if (this.lastSelectedVerse && this.lastSelectedVerse.paragraph === paragraph) {
-                                    this.lastSelectedVerse = this.selectedVerses[this.selectedVerses.length - 1] || null;
-                                }
-                            } else {
-                                const newSelection = { paragraph, verseNum };
-                                this.selectedVerses.push(newSelection);
-                                paragraph.classList.add('selected-verse');
-                                this.lastSelectedVerse = newSelection;
-                            }
-                        }
+                             // Toggle selected state
+                             const existingIdx = this.selectedVerses.findIndex(v => v.verseNum === verseNum && v.paragraph === paragraph);
+                             const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || document.body.classList.contains('dark') || document.body.classList.contains('bible-theme-dark');
+                             const underlineColor = isDark ? '#cbd5e1' : '#475569';
+
+                             if (existingIdx >= 0) {
+                                 this.selectedVerses.splice(existingIdx, 1);
+                                 paragraph.classList.remove('selected-verse');
+                                 paragraph.style.textDecoration = 'none';
+                                 paragraph.style.textUnderlineOffset = '';
+                                 paragraph.style.textDecorationThickness = '';
+                                 if (this.lastSelectedVerse && this.lastSelectedVerse.paragraph === paragraph) {
+                                     this.lastSelectedVerse = this.selectedVerses[this.selectedVerses.length - 1] || null;
+                                 }
+                             } else {
+                                 const newSelection = { paragraph, verseNum };
+                                 this.selectedVerses.push(newSelection);
+                                 paragraph.classList.add('selected-verse');
+                                 paragraph.style.textDecoration = `underline dotted ${underlineColor}`;
+                                 paragraph.style.textUnderlineOffset = '6px';
+                                 paragraph.style.textDecorationThickness = '2px';
+                                 this.lastSelectedVerse = newSelection;
+                             }
+                         }
 
                         if (this.selectedVerses.length === 0) {
                             if (this.dom.verseToolbar) this.dom.verseToolbar.style.display = 'none';
@@ -2159,7 +2167,15 @@ class BibleReader {
 
     clearSelection() {
         if (this.selectedVerses) {
-            this.selectedVerses.forEach(v => v.paragraph.classList.remove('selected-verse'));
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || document.body.classList.contains('dark') || document.body.classList.contains('bible-theme-dark');
+            this.selectedVerses.forEach(v => {
+                if (v && v.paragraph) {
+                    v.paragraph.classList.remove('selected-verse');
+                    v.paragraph.style.textDecoration = 'none';
+                    v.paragraph.style.textUnderlineOffset = '';
+                    v.paragraph.style.textDecorationThickness = '';
+                }
+            });
             this.selectedVerses = [];
         }
         if (this.dom.verseToolbar) this.dom.verseToolbar.style.display = 'none';
@@ -10434,12 +10450,21 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                 if (!this.selectedVerses) this.selectedVerses = [];
                 
                 const existingIdx = this.selectedVerses.findIndex(v => v.paragraph === p);
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || document.body.classList.contains('dark') || document.body.classList.contains('bible-theme-dark');
+                const underlineColor = isDark ? '#cbd5e1' : '#475569';
+
                 if (existingIdx >= 0) {
                     this.selectedVerses.splice(existingIdx, 1);
                     p.classList.remove('selected-verse');
+                    p.style.textDecoration = 'none';
+                    p.style.textUnderlineOffset = '';
+                    p.style.textDecorationThickness = '';
                 } else {
                     this.selectedVerses.push({ paragraph: p, verseNum: vNum });
                     p.classList.add('selected-verse');
+                    p.style.textDecoration = `underline dotted ${underlineColor}`;
+                    p.style.textUnderlineOffset = '6px';
+                    p.style.textDecorationThickness = '2px';
                 }
 
                 if (this.selectedVerses.length > 0) {
