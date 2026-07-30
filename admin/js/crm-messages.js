@@ -429,10 +429,26 @@ class MessagesManager {
     }
 
 
+    closeMobileThread() {
+        this.activeThreadId = null;
+        const container = document.getElementById('unified-inbox');
+        if (container) {
+            container.classList.remove('thread-view-active');
+            container.classList.remove('view-open');
+        }
+        this.renderThreadList();
+    }
+
     async selectThread(id, type) {
         this.activeThreadId = id;
         this.activeThreadType = type;
         
+        const container = document.getElementById('unified-inbox');
+        if (container) {
+            container.classList.add('thread-view-active');
+            container.classList.add('view-open');
+        }
+
         // UI feedback
         this.renderThreadList();
         
@@ -841,8 +857,13 @@ class MessagesManager {
 
         viewEl.innerHTML = `
             <div class="view-header" style="padding: 18px 28px; border-bottom: 1px solid #e2e8f0; background: #ffffff; display: flex; justify-content: space-between; align-items: center;">
-                <h1 class="email-subject-title" style="font-size: 19px; font-weight: 800; color: #0f172a; margin: 0; letter-spacing: -0.01em;">${this.escapeHtml(msg.subject || 'Seerkurs med aktivering')}</h1>
-                <div class="view-actions" style="display:flex; gap:8px;">
+                <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; margin-right: 12px;">
+                    <button class="mobile-back-btn" onclick="window.messagesManager.closeMobileThread()" title="Tilbake til meldinger">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
+                    </button>
+                    <h1 class="email-subject-title" style="font-size: 19px; font-weight: 800; color: #0f172a; margin: 0; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${this.escapeHtml(msg.subject || 'Seerkurs med aktivering')}</h1>
+                </div>
+                <div class="view-actions" style="display:flex; gap:8px; flex-shrink: 0;">
                     <button class="btn btn-outline btn-sm" onclick="window.messagesManager.deleteMessage('${msgId}')" style="padding: 6px 16px; border-radius: 8px; font-size: 13px; border: 1.5px solid #cbd5e1; color: #334155; background: #ffffff; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
                         Delete
                     </button>
