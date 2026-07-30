@@ -296,8 +296,15 @@ class MessagesManager {
     }
 
     buildUnifiedThreads() {
+        // Filter out empty 0-message chat attempts to keep inbox clean & readable like Gmail
+        const activeChats = (this.visitorChats || []).filter(c => {
+            if (!c.lastMessage) return false;
+            if (c.lastMessage.text === 'Ingen meldinger enda') return false;
+            return true;
+        });
+
         // Merge and sort by most recent activity
-        const combined = [...this.messages, ...this.visitorChats, ...this.pushNotifications];
+        const combined = [...this.messages, ...activeChats, ...this.pushNotifications];
         
         combined.sort((a, b) => {
             const timeA = (a.updatedAt || a.createdAt)?.toDate?.() || new Date(a.updatedAt || a.createdAt || 0);
@@ -787,98 +794,121 @@ class MessagesManager {
         const replySubject = /^re:/i.test(msg.subject || '') ? (msg.subject || '') : `Re: ${msg.subject || 'Kontakt'}`;
         const adminEmail = this.currentAdminEmail || window.firebaseService?.auth?.currentUser?.email || '';
 
+        // Compute initials for person avatar
+        const getInitials = (n) => {
+            if (!n || n === 'Anonym' || n === 'Ukjent') return '';
+            const parts = n.trim().split(/\s+/);
+            if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+            return n.substring(0, 2).toUpperCase();
+        };
+        const initials = getInitials(msg.name || '');
+
         viewEl.innerHTML = `
-            <div class="view-header">
-                <div class="view-contact-info">
-                    <div class="thread-avatar">
-                        <span class="material-symbols-outlined">mail</span>
+            <div class="view-header" style="padding: 18px 28px; border-bottom: 1px solid #e2e8f0; background: #ffffff; display: flex; justify-content: space-between; align-items: center;">
+                <div class="view-contact-info" style="display: flex; align-items: center; gap: 14px;">
+                    <div style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #d17d39, #b95d20); color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; box-shadow: 0 4px 12px rgba(209, 125, 57, 0.25); flex-shrink: 0;">
+                        ${initials || '<span class="material-symbols-outlined" style="font-size: 20px;">person</span>'}
                     </div>
                     <div>
-                        <div class="view-name">${this.escapeHtml(msg.name || 'Ukjent')}</div>
-                        <div style="font-size: 13px; color: var(--text-muted);">${this.escapeHtml(msg.email || '')}</div>
+                        <div class="view-name" style="font-size: 16px; font-weight: 700; color: #0f172a; line-height: 1.2;">${this.escapeHtml(msg.name || 'Ukjent')}</div>
+                        <div style="font-size: 13px; color: #64748b; font-weight: 500; margin-top: 2px;">&lt;${this.escapeHtml(msg.email || '')}&gt; • <span style="color:#94a3b8;">${date}</span></div>
                     </div>
                 </div>
-                <div class="view-actions">
-                    <button class="btn btn-outline btn-sm" onclick="window.messagesManager.deleteMessage('${msgId}')">
-                        <span class="material-symbols-outlined">delete</span> Slett
+                <div class="view-actions" style="display:flex; gap:8px;">
+                    <button class="btn btn-outline btn-sm" onclick="window.messagesManager.deleteMessage('${msgId}')" style="padding: 8px 16px; border-radius: 10px; font-size: 13px; border: 1px solid #fee2e2; color: #dc2626; background: #fff5f5; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">delete</span> Slett
                     </button>
                 </div>
             </div>
-            <div class="threads-scroll">
-                <div class="email-view-container">
-                    <div class="email-header">
-                        <h1 class="email-subject">${this.escapeHtml(msg.subject || '(Ingen emne)')}</h1>
-                        <div class="email-meta-row">
-                            <span class="email-meta-label">Fra:</span>
-                            <span>${this.escapeHtml(msg.name)} &lt;${this.escapeHtml(msg.email)}&gt;</span>
+            
+            <div class="threads-scroll" style="flex: 1; padding: 28px; background: #f8fafc; overflow-y: auto;">
+                <div class="email-view-container" style="max-width: 800px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 20px rgba(0,0,0,0.03); padding: 28px 32px;">
+                    <h1 class="email-subject" style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 0 0 16px 0; letter-spacing: -0.01em; line-height: 1.3;">${this.escapeHtml(msg.subject || '(Ingen emne)')}</h1>
+                    
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 16px; margin-bottom: 24px; border-bottom: 1px solid #f1f5f9;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: #fff7ed; color: #d17d39; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(209, 125, 57, 0.25);">
+                                ${initials || 'HK'}
+                            </div>
+                            <div>
+                                <div style="font-size: 14px; font-weight: 700; color: #1e293b;">${this.escapeHtml(msg.name)} <span style="font-weight: 400; color: #64748b;">&lt;${this.escapeHtml(msg.email)}&gt;</span></div>
+                                <div style="font-size: 12px; color: #94a3b8;">til meg</div>
+                            </div>
                         </div>
-                        <div class="email-meta-row">
-                            <span class="email-meta-label">Dato:</span>
-                            <span>${date}</span>
-                        </div>
+                        <div style="font-size: 12px; color: #94a3b8; font-weight: 500;">${date}</div>
                     </div>
-                    <div class="email-body">${this.escapeHtml(msg.message || '')}</div>
+
+                    <div class="email-body" style="font-size: 15px; line-height: 1.65; color: #334155; white-space: pre-wrap; margin: 0; background: transparent; padding: 0; border: none;">${this.escapeHtml(msg.message || '')}</div>
                 </div>
             </div>
-            <div class="view-reply">
-                <div class="email-composer">
-                    <div class="email-composer-grid">
-                        <label>
-                            <span>Fra</span>
-                            <select id="email-from-mode">
+
+            <!-- Gmail-style Sleek Reply Composer -->
+            <div class="view-reply" style="padding: 16px 28px 24px; border-top: 1px solid #e2e8f0; background: #ffffff;">
+                <div class="email-composer" style="max-width: 800px; margin: 0 auto; background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.04); overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s;">
+                    <!-- Sleek Header Line -->
+                    <div style="padding: 10px 18px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #475569;">
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <span style="font-weight: 600; color: #1e293b;">Fra:</span>
+                            <select id="email-from-mode" style="border: none; background: transparent; font-size: 13px; font-weight: 600; color: #d17d39; cursor: pointer; outline: none; padding: 2px 4px;">
                                 <option value="post">His Kingdom Ministry &lt;post@hiskingdomministry.no&gt;</option>
                                 ${adminEmail ? `<option value="admin">${this.escapeHtml(adminEmail)}</option>` : ''}
                             </select>
-                        </label>
-                        <label>
-                            <span>Til</span>
-                            <input id="email-to" type="email" value="${this.escapeHtml(msg.email || '')}">
-                        </label>
-                        <label>
-                            <span>Cc</span>
-                            <input id="email-cc" type="text" placeholder="Cc">
-                        </label>
-                        <label>
-                            <span>Bcc</span>
-                            <input id="email-bcc" type="text" placeholder="Bcc">
-                        </label>
-                    </div>
-                    <label class="email-subject-field">
-                        <span>Emne</span>
-                        <input id="email-subject" type="text" value="${this.escapeHtml(replySubject)}">
-                    </label>
-                    <div class="reply-box email-reply-box">
-                        <div
-                            id="inbox-reply-text"
-                            class="reply-editor"
-                            contenteditable="true"
-                            role="textbox"
-                            aria-multiline="true"
-                            data-placeholder="Skriv e-postsvaret..."></div>
-                        <div class="reply-attachments" id="inbox-reply-attachments"></div>
-                        <div class="reply-toolbar">
-                            <div class="reply-actions">
-                                <button type="button" class="reply-tool-btn" data-command="bold" title="Fet"><span class="material-symbols-outlined">format_bold</span></button>
-                                <button type="button" class="reply-tool-btn" data-command="italic" title="Kursiv"><span class="material-symbols-outlined">format_italic</span></button>
-                                <button type="button" class="reply-tool-btn" data-command="underline" title="Understrek"><span class="material-symbols-outlined">format_underlined</span></button>
-                                <button type="button" class="reply-tool-btn" data-command="insertUnorderedList" title="Punktliste"><span class="material-symbols-outlined">format_list_bulleted</span></button>
-                                <button type="button" class="reply-tool-btn" data-command="insertOrderedList" title="Nummerert liste"><span class="material-symbols-outlined">format_list_numbered</span></button>
-                                <button type="button" class="reply-tool-btn" data-command="createLink" title="Lenke"><span class="material-symbols-outlined">link</span></button>
-                                <button type="button" class="reply-tool-btn" data-emoji-toggle title="Emoji"><span class="material-symbols-outlined">mood</span></button>
-                                <label class="reply-tool-btn" title="Vedlegg">
-                                    <span class="material-symbols-outlined">attach_file</span>
-                                    <input type="file" id="inbox-image-upload" multiple hidden>
-                                </label>
-                                <button type="button" class="reply-tool-btn" data-video-link title="Video-lenke"><span class="material-symbols-outlined">smart_display</span></button>
-                            </div>
-                            <button class="btn btn-primary" id="inbox-send-btn">Send e-post</button>
+                            <span style="color: #cbd5e1;">|</span>
+                            <span style="font-weight: 600; color: #1e293b;">Til:</span>
+                            <span style="color: #0f172a; font-weight: 600;">${this.escapeHtml(msg.email || '')}</span>
+                            <input id="email-to" type="hidden" value="${this.escapeHtml(msg.email || '')}">
                         </div>
-                        <div class="reply-emoji-panel" id="inbox-emoji-panel" hidden>
-                            ${['😀','😊','🙏','❤️','🔥','🙌','👍','🎉','✨','☀️','📌','📷','🎥'].map(emoji => `<button type="button" data-emoji="${emoji}">${emoji}</button>`).join('')}
+                        <div style="display: flex; gap: 10px;">
+                            <button type="button" onclick="const row = document.getElementById('cc-bcc-row'); if(row) row.style.display = row.style.display === 'none' ? 'flex' : 'none';" style="background: none; border: none; font-size: 12px; color: #64748b; font-weight: 600; cursor: pointer; text-decoration: underline;">Cc / Bcc</button>
                         </div>
                     </div>
-                    <div id="inbox-reply-status" style="margin-top: 8px; font-size: 12px;"></div>
+
+                    <!-- Optional Collapsible Cc / Bcc Row -->
+                    <div id="cc-bcc-row" style="display: none; padding: 8px 18px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; gap: 12px; align-items: center;">
+                        <input id="email-cc" type="text" placeholder="Cc (kommaseparert)" style="flex: 1; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-size: 12px; outline: none;">
+                        <input id="email-bcc" type="text" placeholder="Bcc" style="flex: 1; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-size: 12px; outline: none;">
+                    </div>
+
+                    <!-- Hidden subject field (auto-populated with Re: subject) -->
+                    <input id="email-subject" type="hidden" value="${this.escapeHtml(replySubject)}">
+
+                    <!-- Clean Editor Area -->
+                    <div
+                        id="inbox-reply-text"
+                        class="reply-editor"
+                        contenteditable="true"
+                        role="textbox"
+                        aria-multiline="true"
+                        data-placeholder="Skriv svar til ${this.escapeHtml(msg.name || 'kunden')}..."
+                        style="padding: 16px 20px; min-height: 100px; max-height: 220px; font-size: 14.5px; line-height: 1.6; outline: none; border: none; color: #0f172a;"></div>
+
+                    <div class="reply-attachments" id="inbox-reply-attachments" style="padding: 0 18px 8px;"></div>
+
+                    <!-- Toolbar & Send Button -->
+                    <div class="reply-toolbar" style="padding: 10px 18px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+                        <div class="reply-actions" style="display: flex; gap: 4px; align-items: center;">
+                            <button type="button" class="reply-tool-btn" data-command="bold" title="Fet"><span class="material-symbols-outlined">format_bold</span></button>
+                            <button type="button" class="reply-tool-btn" data-command="italic" title="Kursiv"><span class="material-symbols-outlined">format_italic</span></button>
+                            <button type="button" class="reply-tool-btn" data-command="underline" title="Understrek"><span class="material-symbols-outlined">format_underlined</span></button>
+                            <button type="button" class="reply-tool-btn" data-command="insertUnorderedList" title="Punktliste"><span class="material-symbols-outlined">format_list_bulleted</span></button>
+                            <button type="button" class="reply-tool-btn" data-command="createLink" title="Lenke"><span class="material-symbols-outlined">link</span></button>
+                            <button type="button" class="reply-tool-btn" data-emoji-toggle title="Emoji"><span class="material-symbols-outlined">mood</span></button>
+                            <label class="reply-tool-btn" title="Vedlegg" style="cursor: pointer; display: inline-flex; align-items: center; margin: 0;">
+                                <span class="material-symbols-outlined">attach_file</span>
+                                <input type="file" id="inbox-image-upload" multiple hidden>
+                            </label>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="inbox-send-btn" style="background: linear-gradient(135deg, #d17d39, #bd4f2a); color: white; border: none; padding: 10px 22px; border-radius: 10px; font-weight: 700; font-size: 13.5px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.3); transition: all 0.2s;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">send</span> Send e-post
+                        </button>
+                    </div>
+                    
+                    <div class="reply-emoji-panel" id="inbox-emoji-panel" hidden>
+                        ${['😀','😊','🙏','❤️','🔥','🙌','👍','🎉','✨','☀️','📌','📷','🎥'].map(emoji => `<button type="button" data-emoji="${emoji}">${emoji}</button>`).join('')}
+                    </div>
                 </div>
+                <div id="inbox-reply-status" style="max-width: 800px; margin: 8px auto 0; font-size: 13px; font-weight: 600;"></div>
             </div>
         `;
 
