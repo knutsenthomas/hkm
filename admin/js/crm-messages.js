@@ -479,7 +479,10 @@ class MessagesManager {
         const chatData = this.visitorChats.find(c => c.id === chatId) || {};
 
         viewEl.innerHTML = `
-            <div class="view-header">
+            <div class="view-header" style="display: flex; align-items: center;">
+                <button class="mobile-back-btn" onclick="window.messagesManager.closeMobileThread()" title="Tilbake til meldinger">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
+                </button>
                 <div class="view-contact-info">
                     <div class="thread-avatar">
                         <span class="material-symbols-outlined">person</span>

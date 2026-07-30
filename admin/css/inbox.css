@@ -35,6 +35,38 @@
     display: none;
 }
 
+.mobile-back-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
+    border-radius: 50% !important;
+    background: #f1f5f9 !important;
+    border: none !important;
+    outline: none !important;
+    color: #334155 !important;
+    cursor: pointer;
+    margin-right: 10px;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+    box-shadow: none !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    padding: 0 !important;
+}
+
+.mobile-back-btn:hover {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+.mobile-back-btn:active {
+    transform: scale(0.92);
+}
+
 .inbox-folders {
     width: var(--inbox-sidebar-width);
     flex-shrink: 0;
