@@ -1029,7 +1029,7 @@
     }
 
     .threads-search {
-        flex: 1 1 100% !important;
+        flex: 1 1 auto !important;
         width: 100% !important;
         max-width: 100% !important;
         position: relative !important;
@@ -1057,7 +1057,7 @@
 
     #mark-all-read-btn {
         flex-shrink: 0 !important;
-        margin-left: auto !important;
+        margin: 0 !important;
     }
 
     /* Mobile Slide-Out Drawer for Folders */
