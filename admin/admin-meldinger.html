@@ -525,10 +525,11 @@
                             <div class="bulk-actions" id="bulk-actions" style="display: none;">
                                 <div class="bulk-actions-left">
                                     <input type="checkbox" id="select-all-threads">
-                                    <span id="selected-count">0 valgt</span>
+                                    <label for="select-all-threads" style="font-size: 13px; font-weight: 600; color: #334155; cursor: pointer; user-select: none;">Velg alle</label>
+                                    <span id="selected-count" class="selected-count-badge">0 valgt</span>
                                 </div>
-                                <button class="btn btn-outline btn-sm delete-selected-btn" id="bulk-delete-btn">
-                                    <span class="material-symbols-outlined">delete</span> Slett markerte
+                                <button class="delete-selected-btn" id="bulk-delete-btn">
+                                    <span class="material-symbols-outlined" style="font-size: 17px;">delete</span> Slett markerte
                                 </button>
                             </div>
                         </div>

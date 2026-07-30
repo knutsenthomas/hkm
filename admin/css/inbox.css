@@ -298,18 +298,19 @@
 }
 
 .bulk-actions {
-    padding: 10px 16px;
-    border-top: 1px solid var(--inbox-border);
-    border-bottom: 1px solid var(--inbox-border);
+    padding: 8px 16px;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
     background: #f8fafc;
     display: none; /* Controlled by JS: flex */
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    flex-wrap: nowrap;
     animation: toolbarSlideDown 0.2s ease-out;
     box-sizing: border-box;
     width: 100%;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 @keyframes toolbarSlideDown {
@@ -322,48 +323,59 @@
     align-items: center;
     gap: 8px;
     flex-shrink: 0;
+    min-width: 0;
 }
 
 .bulk-actions-left input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     cursor: pointer;
-    accent-color: var(--inbox-orange);
+    accent-color: var(--inbox-orange, #d17d39);
+    margin: 0;
+    flex-shrink: 0;
 }
 
-#selected-count {
-    font-size: 13px;
+.selected-count-badge {
+    background: rgba(209, 125, 57, 0.12);
+    color: #bd4f2a;
+    font-size: 12px;
     font-weight: 700;
-    color: var(--inbox-orange);
-    line-height: 1;
+    padding: 2px 8px;
+    border-radius: 999px;
     white-space: nowrap;
+    line-height: 1.2;
 }
 
 .delete-selected-btn {
-    color: #ef4444 !important;
-    border: 1px solid #fee2e2 !important;
-    background: #ffffff !important;
-    padding: 6px 12px !important;
+    color: #dc2626 !important;
+    border: 1px solid #fca5a5 !important;
+    background: #fef2f2 !important;
+    padding: 5px 12px !important;
     font-size: 12.5px !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     display: inline-flex !important;
     align-items: center !important;
+    justify-content: center !important;
     gap: 6px !important;
-    border-radius: 8px !important;
+    border-radius: 999px !important;
     white-space: nowrap !important;
     flex-shrink: 0 !important;
     cursor: pointer !important;
     transition: all 0.2s ease !important;
+    box-shadow: none !important;
+    height: 32px !important;
+    box-sizing: border-box !important;
 }
 
 .delete-selected-btn:hover {
-    background: #fef2f2 !important;
-    border-color: #ef4444 !important;
-    transform: scale(1.02);
+    background: #dc2626 !important;
+    color: #ffffff !important;
+    border-color: #dc2626 !important;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.25) !important;
 }
 
 .delete-selected-btn:active {
-    transform: scale(0.98);
+    transform: scale(0.96) !important;
 }
 
 .thread-item.unread {
