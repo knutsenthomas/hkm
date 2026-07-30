@@ -2047,3 +2047,88 @@ html[data-theme="dark"] .inbox-empty-view {
     color: #64748b !important;
 }
 
+/* Email View specific dark mode overrides for inline-styled elements */
+html[data-theme="dark"] .email-view-container {
+    background: #0f172a !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .email-subject-title {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .email-view-container div[style*="color: #0f172a"],
+html[data-theme="dark"] .email-view-container span[style*="color: #0f172a"],
+html[data-theme="dark"] .email-view-container h1[style*="color: #0f172a"],
+html[data-theme="dark"] .email-view-container h2[style*="color: #0f172a"] {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .email-view-container div[style*="color: #334155"],
+html[data-theme="dark"] .email-view-container span[style*="color: #334155"],
+html[data-theme="dark"] .email-view-container p[style*="color: #334155"] {
+    color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .email-view-container div[style*="color: #64748b"],
+html[data-theme="dark"] .email-view-container span[style*="color: #64748b"] {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .email-body {
+    color: #cbd5e1 !important;
+}
+
+/* Sent replies cards & container */
+html[data-theme="dark"] .email-thread-replies {
+    border-top-color: #334155 !important;
+}
+
+html[data-theme="dark"] .email-thread-replies > div[style*="background: #f8fafc"],
+html[data-theme="dark"] .email-thread-replies > div {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+}
+
+html[data-theme="dark"] .email-thread-replies div[style*="border-bottom"] {
+    border-bottom-color: #334155 !important;
+}
+
+html[data-theme="dark"] .email-thread-replies div[style*="color: #0f172a"] {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .email-thread-replies div[style*="color: #334155"] {
+    color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .email-thread-replies div[style*="color: #64748b"] {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .email-thread-replies div[style*="background: #fff7ed"] {
+    background: rgba(209, 125, 57, 0.2) !important;
+    border-color: rgba(209, 125, 57, 0.4) !important;
+    color: #f97316 !important;
+}
+
+/* Action buttons at bottom of email view */
+html[data-theme="dark"] .thread-action-buttons {
+    border-top-color: #334155 !important;
+}
+
+html[data-theme="dark"] .thread-action-buttons button,
+html[data-theme="dark"] .view-actions button {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .thread-action-buttons button:hover,
+html[data-theme="dark"] .view-actions button:hover {
+    background: #334155 !important;
+    color: #ffffff !important;
+}
+
