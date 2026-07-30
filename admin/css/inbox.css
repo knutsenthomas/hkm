@@ -1868,7 +1868,7 @@ html[data-theme="dark"] .folder-item:hover {
 }
 
 html[data-theme="dark"] .folder-item.active {
-    background: rgba(209, 125, 57, 0.2) !important;
+    background: rgba(209, 125, 57, 0.12) !important;
     color: #f97316 !important;
 }
 
@@ -1877,8 +1877,13 @@ html[data-theme="dark"] .folder-item.active .material-symbols-outlined {
 }
 
 html[data-theme="dark"] .folder-badge {
-    background: #334155 !important;
-    color: #f8fafc !important;
+    background: #1e293b !important;
+    color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .folder-item.active .folder-badge {
+    background: rgba(249, 115, 22, 0.2) !important;
+    color: #f97316 !important;
 }
 
 /* Thread List Container */

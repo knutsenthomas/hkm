@@ -8909,16 +8909,16 @@ html[data-theme="dark"] .folder-item:hover {
   color: var(--admin-text, #f8fafc) !important;
 }
 html[data-theme="dark"] .folder-item.active {
-  background: #2d1e18 !important;
-  color: var(--admin-accent-color, #d17d39) !important;
+  background: rgba(209, 125, 57, 0.12) !important;
+  color: #f97316 !important;
 }
 html[data-theme="dark"] .folder-badge {
   background: var(--admin-surface-muted, #0f172a) !important;
   color: var(--admin-text-muted, #94a3b8) !important;
 }
 html[data-theme="dark"] .folder-item.active .folder-badge {
-  background: rgba(209, 125, 57, 0.2) !important;
-  color: var(--admin-accent-color, #d17d39) !important;
+  background: rgba(249, 115, 22, 0.2) !important;
+  color: #f97316 !important;
 }
 html[data-theme="dark"] .threads-search input {
   background: var(--admin-surface, #1e293b) !important;
