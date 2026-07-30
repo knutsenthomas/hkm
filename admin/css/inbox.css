@@ -938,16 +938,7 @@
 /* Mobile responsive */
 @media (max-width: 1024px) {
     .inbox-folders {
-        width: 64px;
-    }
-    .folder-item span:not(.material-symbols-outlined) {
-        display: none;
-    }
-    .folder-badge {
-        position: absolute;
-        top: 4px;
-        right: 4px;
-        margin: 0;
+        width: 220px;
     }
 }
 
@@ -1089,19 +1080,56 @@
 
     .folder-item {
         flex-shrink: 0 !important;
-        height: 36px !important;
-        padding: 0 14px !important;
-        font-size: 13px !important;
+        height: 38px !important;
+        padding: 0 16px !important;
+        font-size: 13.5px !important;
         font-weight: 600 !important;
         border-radius: 999px !important;
         white-space: nowrap !important;
         background: #f1f5f9 !important;
         border: none !important;
         color: #475569 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        position: relative !important;
+        width: auto !important;
+    }
+
+    .folder-item span {
+        display: inline-block !important;
+        font-size: 13.5px !important;
+        line-height: 1 !important;
+    }
+
+    .folder-item .material-symbols-outlined {
+        font-size: 18px !important;
+        margin: 0 !important;
+    }
+
+    .folder-badge {
+        position: static !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin-left: 4px !important;
+        padding: 2px 8px !important;
+        border-radius: 999px !important;
+        font-size: 11.5px !important;
+        font-weight: 700 !important;
+        background: #e2e8f0 !important;
+        color: #334155 !important;
+        height: auto !important;
+        width: auto !important;
     }
 
     .folder-item.active {
         background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
+        color: #ffffff !important;
+    }
+
+    .folder-item.active .folder-badge {
+        background: rgba(255, 255, 255, 0.25) !important;
         color: #ffffff !important;
     }
 
