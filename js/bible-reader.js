@@ -6822,25 +6822,25 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                 }
             }
 
-            /* Desktop/Tablet landscape: Full screen reading plan */
-            @media (min-width: 1025px) {
-                #bible-sidebar.reading-plan-active {
-                    width: 100% !important;
-                    max-width: 100% !important;
-                    left: 0 !important;
-                    position: relative !important;
-                    flex: 1 !important;
-                    border-right: none !important;
-                }
-                #bible-sidebar.reading-plan-active + .bible-reading-area {
-                    display: none !important;
-                }
-                #bible-sidebar.reading-plan-active ~ #bible-nav-right {
-                    display: none !important;
-                }
-                .hkm-rp-sidebar-title {
-                    max-width: 600px !important;
-                }
+            /* Full screen reading plan layout across desktop and mobile */
+            #bible-sidebar.reading-plan-active {
+                width: 100% !important;
+                max-width: 100% !important;
+                left: 0 !important;
+                position: relative !important;
+                flex: 1 !important;
+                display: block !important;
+                border-right: none !important;
+                z-index: 10 !important;
+            }
+            #bible-sidebar.reading-plan-active + .bible-reading-area {
+                display: none !important;
+            }
+            #bible-sidebar.reading-plan-active ~ #bible-nav-right {
+                display: none !important;
+            }
+            .hkm-rp-sidebar-title {
+                max-width: 600px !important;
             }
 
             @media (max-width: 767px) {
@@ -6861,12 +6861,16 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                     left: 0 !important;
                 }
                 #bible-sidebar.reading-plan-active {
-                    left: -100% !important;
-                }
-                #bible-sidebar.reading-plan-active.active {
+                    position: relative !important;
+                    top: 0 !important;
                     left: 0 !important;
+                    width: 100% !important;
+                    height: auto !important;
+                    min-height: 100vh !important;
+                    display: block !important;
+                    z-index: 10 !important;
                 }
-                #bible-sidebar.reading-plan-active.active + .bible-reading-area {
+                #bible-sidebar.reading-plan-active + .bible-reading-area {
                     display: none !important;
                 }
                 .reading-plan-active #sidebar-mobile-controls {
@@ -7824,9 +7828,7 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
         }
         if (this.dom.sidebar) {
             this.dom.sidebar.classList.add('reading-plan-active');
-            if (openSidebarOnMobile && window.innerWidth <= 1024) {
-                this.dom.sidebar.classList.add('active');
-            }
+            this.dom.sidebar.classList.add('active');
         }
 
         // 1. Hide books list and search in left sidebar
