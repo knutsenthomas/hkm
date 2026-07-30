@@ -9553,3 +9553,19 @@ html[data-theme="dark"] .skeleton-text::after {
     -webkit-tap-highlight-color: transparent !important;
 }
 
+/* Hide cross-reference button text on mobile screens (icon-only button) */
+@media (max-width: 768px) {
+    #hkm-yv-btn-crossref-header .crossref-btn-label,
+    #btn-crossref-chapter-dynamic .crossref-btn-label,
+    #toolbar-btn-crossref .crossref-btn-label,
+    .crossref-btn-label {
+        display: none !important;
+    }
+    #hkm-yv-btn-crossref-header,
+    #btn-crossref-chapter-dynamic {
+        padding: 8px 10px !important;
+    }
+}
+
+
+

@@ -5743,6 +5743,15 @@ class BibleReader {
                 @media (max-width: 767px) {
                     .hkm-yv-header-text-full { display: none !important; }
                     .hkm-yv-header-text-short { display: inline-block !important; max-width: 220px !important; }
+                    #hkm-yv-btn-crossref-header .crossref-btn-label,
+                    #btn-crossref-chapter-dynamic .crossref-btn-label,
+                    #toolbar-btn-crossref .crossref-btn-label {
+                        display: none !important;
+                    }
+                    #hkm-yv-btn-crossref-header,
+                    #btn-crossref-chapter-dynamic {
+                        padding: 8px 10px !important;
+                    }
                 }
                 .hkm-yv-header-actions { display: flex !important; align-items: center !important; gap: 4px !important; }
                 .hkm-yv-action-btn { background: none !important; border: none !important; padding: 8px !important; cursor: pointer !important; color: #64748b !important; display: flex !important; align-items: center !important; justify-content: center !important; border-radius: 8px !important; transition: all 0.2s !important; }
@@ -9968,9 +9977,9 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                                 <span>Lytt til kapittelet</span>
                             </button>
 
-                            <button id="hkm-yv-btn-crossref-header" onclick="window.bibleReader.openVerseCrossReferenceModal('1', '${escapedHeading}')" class="nav-btn" style="font-size: 13px; padding: 8px 16px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #0f172a); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                            <button id="hkm-yv-btn-crossref-header" onclick="window.bibleReader.openVerseCrossReferenceModal('1', '${escapedHeading}')" class="nav-btn" style="font-size: 13px; padding: 8px 16px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #0f172a); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04);" title="${lang === 'en' ? 'Cross References' : (lang === 'es' ? 'Referencias cruzadas' : 'Kryssreferanser')}">
                                 <span class="material-symbols-outlined" style="font-size: 18px; color: #d17d39;">link</span>
-                                <span>Kryssreferanser</span>
+                                <span class="crossref-btn-label">${lang === 'en' ? 'Cross References' : (lang === 'es' ? 'Referencias cruzadas' : 'Kryssreferanser')}</span>
                             </button>
 
                             <button onclick="window.bibleReader.openBookIntroModal('${devBookId}')" class="nav-btn" style="font-size: 13px; padding: 8px 16px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #0f172a); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
