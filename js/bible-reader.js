@@ -10422,7 +10422,10 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                 voice: this.audioVoice || 'onyx'
             })
             .then(result => {
-                if (!this.audioIsPlaying) return;
+                if (!this.audioIsPlaying) {
+                    this.stopAudioPlayback();
+                    return;
+                }
                 const audioUrl = result.data ? result.data.audioUrl : null;
                 if (!audioUrl) throw new Error("Ingen lyd-URL mottatt fra serveren.");
 
@@ -10430,70 +10433,61 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                 this.bibleAudio = new Audio(audioUrl);
                 this.bibleAudio.playbackRate = this.audioSpeed || 1.0;
                 this.bibleAudio.onended = async () => {
-                    console.log("[BibleAudio] Chapter finished. Auto-advancing to next chapter for continuous reading...");
-                    try {
-                        document.querySelectorAll('.audio-playing-highlight').forEach(el => el.classList.remove('audio-playing-highlight'));
-                        if (this.audioIsPlaying) {
-                            await this.navigateChapter(1);
-                            setTimeout(() => {
-                                if (this.audioIsPlaying) {
-                                    this.playAudioForCurrentChapter();
-                                }
-                            }, 300);
-                        }
-                    } catch (err) {
-                        console.error("[BibleAudio] Error auto-advancing to next chapter:", err);
-                    }
+                    console.log("[BibleAudio] Chapter finished.");
+                    document.querySelectorAll('.audio-playing-highlight').forEach(el => el.classList.remove('audio-playing-highlight'));
+                    this.stopAudioPlayback();
                 };
                 this.bibleAudio.onerror = (err) => {
                     console.error("[BibleAudio] Audio playback error:", err);
-                    alert("Feil under avspilling av ChatGPT AI-lydfilen.");
                     this.stopAudioPlayback();
                 };
-                
+
+                // Set up dynamic text highlighting as audio plays
+                const paragraphLengths = paragraphs.map(p => p.innerText.trim().length);
+                const totalCharCount = paragraphLengths.reduce((a, b) => a + b, 0);
+
+                this.bibleAudio.ontimeupdate = () => {
+                    if (!this.bibleAudio || !this.bibleAudio.duration || totalCharCount === 0) return;
+                    const currentTime = this.bibleAudio.currentTime;
+                    const duration = this.bibleAudio.duration;
+                    const progress = currentTime / duration;
+                    const targetCharIndex = progress * totalCharCount;
+
+                    let accumulated = 0;
+                    let activeIdx = 0;
+
+                    for (let i = 0; i < paragraphLengths.length; i++) {
+                        accumulated += paragraphLengths[i];
+                        if (targetCharIndex <= accumulated) {
+                            activeIdx = i;
+                            break;
+                        }
+                    }
+
+                    paragraphs.forEach((p, idx) => {
+                        if (idx === activeIdx) {
+                            if (!p.classList.contains('audio-playing-highlight')) {
+                                p.classList.add('audio-playing-highlight');
+                                this.scrollToVerseElement(p);
+                            }
+                        } else {
+                            p.classList.remove('audio-playing-highlight');
+                        }
+                    });
+                };
+
                 this.bibleAudio.play().then(() => {
+                    if (!this.audioIsPlaying) {
+                        if (this.bibleAudio) this.bibleAudio.pause();
+                        this.stopAudioPlayback();
+                        return;
+                    }
                     if (infoDisplay) {
                         infoDisplay.textContent = 'Spiller av ChatGPT AI-stemme...';
                     }
-
-                    // Set up dynamic text highlighting as audio plays
-                    const paragraphLengths = paragraphs.map(p => p.innerText.trim().length);
-                    const totalCharCount = paragraphLengths.reduce((a, b) => a + b, 0);
-
-                    this.bibleAudio.ontimeupdate = () => {
-                        if (!this.bibleAudio || !this.bibleAudio.duration || totalCharCount === 0) return;
-                        const currentTime = this.bibleAudio.currentTime;
-                        const duration = this.bibleAudio.duration;
-                        const progress = currentTime / duration;
-                        const targetCharIndex = progress * totalCharCount;
-
-                        let accumulated = 0;
-                        let activeIdx = 0;
-
-                        for (let i = 0; i < paragraphLengths.length; i++) {
-                            accumulated += paragraphLengths[i];
-                            if (targetCharIndex <= accumulated) {
-                                activeIdx = i;
-                                break;
-                            }
-                        }
-
-                        paragraphs.forEach((p, idx) => {
-                            if (idx === activeIdx) {
-                                if (!p.classList.contains('audio-playing-highlight')) {
-                                    p.classList.add('audio-playing-highlight');
-                                    this.scrollToVerseElement(p);
-                                }
-                            } else {
-                                p.classList.remove('audio-playing-highlight');
-                            }
-                        });
-                    };
-
                     this.updateAudioPlayerUI();
                 }).catch(playErr => {
-                    console.error("[BibleAudio] Audio play failed:", playErr);
-                    alert("Kunne ikke starte avspilling av AI-lydfilen.");
+                    console.warn("[BibleAudio] Play call interrupted or rejected:", playErr);
                     this.stopAudioPlayback();
                 });
             })
