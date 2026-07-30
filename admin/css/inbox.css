@@ -1284,7 +1284,11 @@
 
     .thread-item {
         padding: 14px 16px !important;
-        border-bottom: 1px solid #f8fafc !important;
+        border: none !important;
+        border-bottom: none !important;
+        border-top: none !important;
+        border-left: none !important;
+        border-right: none !important;
         border-radius: 0 !important;
         margin: 0 !important;
         background: #ffffff !important;
@@ -1292,6 +1296,7 @@
         gap: 12px !important;
         align-items: center !important;
         width: 100% !important;
+        max-width: 100% !important;
         box-sizing: border-box !important;
         overflow: hidden !important;
     }
