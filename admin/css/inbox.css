@@ -952,21 +952,25 @@
 }
 
 @media (max-width: 768px) {
-    html, body {
-        overflow-x: hidden !important;
-    }
-
-    .inbox-container,
+    html,
+    body,
+    .admin-layout,
+    .admin-wrapper,
     .admin-main-content,
     .admin-content,
     .content-wrapper,
     .content-area,
     .admin-page-container,
-    main {
+    .inbox-container,
+    .unified-inbox-container {
+        background: #ffffff !important;
         padding: 0 !important;
         margin: 0 !important;
         width: 100% !important;
         max-width: 100% !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
         box-sizing: border-box !important;
     }
 
