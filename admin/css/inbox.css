@@ -2194,6 +2194,10 @@ html[data-theme="dark"] .view-actions button:hover {
     cursor: pointer !important;
     padding: 0 !important;
     margin: 0 !important;
+    flex: 1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
 }
 
 .composer-from-select:focus,
