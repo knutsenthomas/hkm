@@ -9,7 +9,12 @@
     --inbox-bg-light: #fdfdfd;
     --inbox-selected: #fff7ed;
     --inbox-unread-bg: #fffbf7;
-    --font-main: 'Work Sans', sans-serif;
+    --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.unified-inbox-container,
+.unified-inbox-container * {
+    font-family: var(--font-main) !important;
 }
 
 .unified-inbox-container {
@@ -23,7 +28,6 @@
     overflow: hidden;
     margin: 0;
     width: 100%;
-    font-family: var(--font-main);
 }
 
 .inbox-folders {
