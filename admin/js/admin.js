@@ -29625,30 +29625,43 @@ class AdminManager {
             const paidLessonsCount = Array.isArray(item.paidLessons) ? item.paidLessons.length : 0;
             const courseObj = (this.coursesItems || []).find(c => c.id === item.courseId || c.title === item.courseTitle);
             const totalLessons = courseObj && Array.isArray(courseObj.lessons) ? courseObj.lessons.length : 0;
-            const accessText = paidLessonsCount > 0 && paidLessonsCount < totalLessons
-                ? `${paidLessonsCount}/${totalLessons} deler`
-                : 'Full tilgang';
+
+            let accessIcon = 'lock';
+            let accessColor = '#ef4444';
+            let accessText = 'Ingen tilgang (Venter)';
+
+            if (isApproved) {
+                accessIcon = 'lock_open';
+                accessColor = '#16a34a';
+                accessText = paidLessonsCount > 0 && paidLessonsCount < totalLessons
+                    ? `${paidLessonsCount}/${totalLessons} deler`
+                    : 'Full tilgang';
+            } else if (paidLessonsCount > 0) {
+                accessIcon = 'lock_open';
+                accessColor = '#d17d39';
+                accessText = `${paidLessonsCount}/${totalLessons} deler godkjent`;
+            }
 
             return `
                 <tr>
-                    <td>
+                    <td style="min-width: 180px;">
                         <div style="font-weight: 600; color: #1e293b;">${name}</div>
-                        <div style="font-size: 0.85rem; color: #64748b;">${email}</div>
+                        <div style="font-size: 0.85rem; color: #64748b; word-break: break-all;">${email}</div>
                         <div style="font-size: 0.85rem; color: #64748b;">${phone}</div>
                     </td>
-                    <td>
+                    <td style="min-width: 160px;">
                         <div style="font-weight: 600; color: #1e293b;">${courseTitle}</div>
-                        <div style="font-size: 0.85rem; color: #d17d39; font-weight: 500; display: inline-flex; align-items: center; gap: 4px;">
-                            <span class="material-symbols-outlined" style="font-size: 14px;">lock_open</span> ${accessText}
+                        <div style="font-size: 0.85rem; color: ${accessColor}; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                            <span class="material-symbols-outlined" style="font-size: 14px;">${accessIcon}</span> ${accessText}
                         </div>
                     </td>
-                    <td>
+                    <td style="min-width: 110px;">
                         <div style="font-weight: 600; color: #1e293b;">kr ${amount.toLocaleString('no-NO')}</div>
                         <div style="font-size: 0.85rem; color: #64748b;">${method}</div>
                     </td>
-                    <td style="font-size: 0.9rem; color: #475569;">${dateStr}</td>
-                    <td><span class="badge ${badgeClass}">${badgeText}</span></td>
-                    <td class="col-actions" style="text-align:right;white-space:nowrap;">
+                    <td style="font-size: 0.9rem; color: #475569; min-width: 110px;">${dateStr}</td>
+                    <td style="min-width: 100px;"><span class="badge ${badgeClass}">${badgeText}</span></td>
+                    <td class="col-actions" style="text-align:right;white-space:nowrap; min-width: 150px;">
                         <div style="display:flex;gap:6px;justify-content:flex-end;align-items:center;">
                             ${approveBtn}
                             <button class="btn-secondary" onclick="window.adminManager._openLessonAccessModal('${item.id}')" style="padding:6px 10px;border-radius:6px;font-size:12px;display:inline-flex;align-items:center;gap:4px;cursor:pointer;font-weight:600;">
@@ -29665,16 +29678,16 @@ class AdminManager {
         }).join('');
 
         list.innerHTML = `
-            <div class="table-container full-bleed">
-                <table class="crm-table">
+            <div class="table-container full-bleed" style="overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%;">
+                <table class="crm-table" style="min-width: 700px; width: 100%;">
                     <thead>
                         <tr>
-                            <th>Deltaker</th>
-                            <th>Kurs & Tilgang</th>
-                            <th>Beløp / Metode</th>
-                            <th>Dato registrert</th>
-                            <th>Status</th>
-                            <th style="text-align:right;">Handlinger</th>
+                            <th style="min-width: 180px;">Deltaker</th>
+                            <th style="min-width: 160px;">Kurs & Tilgang</th>
+                            <th style="min-width: 110px;">Beløp / Metode</th>
+                            <th style="min-width: 110px;">Dato registrert</th>
+                            <th style="min-width: 100px;">Status</th>
+                            <th style="text-align:right; min-width: 150px;">Handlinger</th>
                         </tr>
                     </thead>
                     <tbody>${rows}</tbody>
