@@ -10344,9 +10344,15 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
     }
 
     async startAudioPlayback(targetContainer = null, customBookId = null, customChapterNum = null) {
-        if (this.audioIsPlaying && !targetContainer) {
-            this.toggleAudioPause();
+        if (this.audioIsPlaying) {
+            this.stopAudioPlayback();
             return;
+        }
+
+        // Unconditionally stop any previous audio or speech synthesis
+        this.stopAudioPlayback();
+        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+            try { window.speechSynthesis.cancel(); } catch (e) {}
         }
 
         let paragraphs = [];
@@ -10558,17 +10564,24 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
     }
 
     stopAudioPlayback() {
-        if (!this.audioIsPlaying) return;
-        
         this.audioIsPlaying = false;
         this.audioIsPaused = false;
         
         if (this.bibleAudio) {
-            this.bibleAudio.pause();
+            try {
+                this.bibleAudio.pause();
+                this.bibleAudio.currentTime = 0;
+            } catch (e) {}
             this.bibleAudio.onended = null;
             this.bibleAudio.onerror = null;
             this.bibleAudio.ontimeupdate = null;
             this.bibleAudio = null;
+        }
+
+        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+            try {
+                window.speechSynthesis.cancel();
+            } catch (e) {}
         }
 
         document.querySelectorAll('.audio-playing-highlight').forEach(el => el.classList.remove('audio-playing-highlight'));
