@@ -2998,7 +2998,7 @@ class BibleReader {
             background: rgba(15, 23, 42, 0.55) !important;
             backdrop-filter: blur(6px) !important;
             -webkit-backdrop-filter: blur(6px) !important;
-            z-index: 35000 !important;
+            z-index: 3000000 !important;
             display: flex !important;
             align-items: flex-end !important;
             justify-content: center !important;
@@ -4008,7 +4008,7 @@ class BibleReader {
         const dictDrawer = this.ensureDictionaryDrawerExists();
         dictDrawer.classList.add('active');
         dictDrawer.style.setProperty('right', '0px', 'important');
-        dictDrawer.style.setProperty('z-index', '35000', 'important');
+        dictDrawer.style.setProperty('z-index', '3000000', 'important');
         
         this.pushModalHistoryState('dictionary-drawer');
         let backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
@@ -4019,7 +4019,7 @@ class BibleReader {
             document.body.appendChild(backdrop);
         }
         backdrop.classList.add('active');
-        backdrop.style.setProperty('z-index', '34000', 'important');
+        backdrop.style.setProperty('z-index', '2999999', 'important');
 
         const dictBody = dictDrawer ? dictDrawer.querySelector('.dict-body') : null;
         if (dictBody) dictBody.scrollTop = 0;
