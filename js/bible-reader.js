@@ -9129,6 +9129,7 @@ class BibleReader {
     }
 
     async openDevotionalWizard(planId, dayNumber, startStep = 1) {
+        this.ensureDevotionalStyles();
         const targetDay = parseInt(dayNumber, 10) || 1;
         let globalPlan = this.activePlanData;
 
@@ -9149,7 +9150,7 @@ class BibleReader {
 
         if (!dayConfig && planId) {
             try {
-                const db = await this.getFirestoreAsync(5000);
+                const db = await this.getFirestoreAsync(4000);
                 if (db) {
                     let globalPlanSnap = await db.collection('reading_plans').doc(planId).get();
                     if (!globalPlanSnap.exists) {
@@ -9182,6 +9183,11 @@ class BibleReader {
             dayConfig = { dayNumber: targetDay, verses: 'Rut 4', prayerFocus: 'Reflekter over ordene du har lest.' };
         }
 
+        // Close mobile sidebar so user is not stuck on mobile sidebar overview
+        if (this.dom && this.dom.sidebar) {
+            this.dom.sidebar.classList.remove('active');
+        }
+
         let modal = document.getElementById('hkm-devotional-modal');
         if (modal) modal.remove();
 
@@ -9196,30 +9202,21 @@ class BibleReader {
         modal = document.createElement('div');
         modal.id = 'hkm-devotional-modal';
         modal.className = 'hkm-devotional-overlay';
-        modal.style.cssText = 'position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; background: #ffffff !important; z-index: 15000 !important; display: flex !important; align-items: center !important; justify-content: center !important;';
+        modal.style.cssText = 'position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; background: #ffffff !important; z-index: 25000 !important; display: flex !important; align-items: center !important; justify-content: center !important;';
 
         document.body.appendChild(modal);
 
-        // Render step IMMEDIATELY with initial loading text so modal opens in 0ms
-        const initialScripture = '<p style="text-align: center; color: #64748b; padding: 40px 0;">Henter bibeltekst...</p>';
-        this.renderDevotionalStep(modal, globalPlan, targetDay, dayConfig, startStep, initialScripture);
-
-        // Asynchronously load scripture text and update DOM
+        let scriptureHtml = '<p style="text-align: center; color: #64748b; padding: 40px 0;">Henter bibeltekst...</p>';
         if (dayConfig.verses) {
-            this.fetchAndFilterVersesText(dayConfig.verses).then(html => {
-                const textEl = modal.querySelector('.hkm-devotional-text-serif');
-                if (textEl && html) {
-                    textEl.innerHTML = html;
-                    this.attachStep2VerseInteractions(modal, dayConfig.verses);
-                }
-            }).catch(e => {
-                console.error("Failed to load scripture text:", e);
-                const textEl = modal.querySelector('.hkm-devotional-text-serif');
-                if (textEl) {
-                    textEl.innerHTML = `<p style="text-align: center; color: #ef4444; padding: 20px;">Kunne ikke hente bibelteksten for <strong>${dayConfig.verses}</strong>.</p>`;
-                }
-            });
+            try {
+                scriptureHtml = await this.fetchAndFilterVersesText(dayConfig.verses);
+            } catch (e) {
+                console.error("Failed to fetch scripture text for devotional:", e);
+                scriptureHtml = `<p style="text-align: center; color: #ef4444; padding: 20px;">Kunne ikke hente bibelteksten for <strong>${dayConfig.verses}</strong>.</p>`;
+            }
         }
+
+        this.renderDevotionalStep(modal, globalPlan, targetDay, dayConfig, startStep, scriptureHtml);
     }
 
     async fetchAndFilterVersesText(versesText) {
@@ -9705,7 +9702,7 @@ class BibleReader {
             const heading = isPrayerApp 
                 ? (lang === 'en' ? 'Prayer Focus' : (lang === 'es' ? 'Enfoque de oración' : 'Bønnefokus'))
                 : (lang === 'en' ? 'Daily Devotional' : (lang === 'es' ? 'Devocional' : 'Dagens Andakt'));
-            const text = dayConfig.prayerFocus || (isPrayerApp ? 'Be over skriftstedene du leser i dag.' : 'Reflekter over ordene du har lest.');
+            const text = dayConfig.devotionalText || dayConfig.devotional || dayConfig.content || dayConfig.prayerFocus || (isPrayerApp ? 'Be over skriftstedene du leser i dag.' : 'Reflekter over ordene du har lest.');
             
             if (isPrayerApp) {
                 stepContentHtml = `
