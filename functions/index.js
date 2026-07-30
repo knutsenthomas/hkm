@@ -5509,7 +5509,7 @@ exports.sendInboxEmail = onRequest({ cors: true, secrets: [emailUserParam, email
         replyTo,
         sentByUid: (req.user && req.user.uid) ? req.user.uid : "admin",
         sentByEmail: adminEmail || (req.user && req.user.email) || null,
-        sentAt: admin.firestore.FieldValue.serverTimestamp(),
+        sentAt: new Date().toISOString(),
       };
 
       if (messageId) {
