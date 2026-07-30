@@ -10432,6 +10432,15 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                 console.log("Playing ChatGPT AI audio:", audioUrl);
                 this.bibleAudio = new Audio(audioUrl);
                 this.bibleAudio.playbackRate = this.audioSpeed || 1.0;
+                this.bibleAudio.onpause = () => {
+                    this.audioIsPaused = true;
+                    this.updateAudioPlayerUI();
+                };
+                this.bibleAudio.onplay = () => {
+                    this.audioIsPaused = false;
+                    this.audioIsPlaying = true;
+                    this.updateAudioPlayerUI();
+                };
                 this.bibleAudio.onended = async () => {
                     console.log("[BibleAudio] Chapter finished.");
                     document.querySelectorAll('.audio-playing-highlight').forEach(el => el.classList.remove('audio-playing-highlight'));
