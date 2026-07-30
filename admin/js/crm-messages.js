@@ -931,52 +931,52 @@ class MessagesManager {
             : (msg.subject ? `Re: ${msg.subject.replace(/^(Re|Fwd):\s*/i, '')}` : 'Re: Din henvendelse til His Kingdom Ministry');
 
         viewEl.innerHTML = `
-            <div class="view-header" style="padding: 14px 24px; border-bottom: 1px solid #e2e8f0; background: #ffffff; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+            <div class="view-header composer-view-header" style="padding: 14px 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <button class="mobile-back-btn" onclick="window.messagesManager.selectThread('${msgId}', 'email')" title="Tilbake til tråden" style="display: inline-flex;">
                         <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
                     </button>
-                    <h1 style="font-size: 17.5px; font-weight: 800; color: #0f172a; margin: 0; letter-spacing: -0.01em;">
+                    <h1 class="composer-title" style="font-size: 17.5px; font-weight: 800; margin: 0; letter-spacing: -0.01em;">
                         ${isForward ? 'Videresend e-post' : 'Svar på e-post'}
                     </h1>
                 </div>
-                <button onclick="window.messagesManager.selectThread('${msgId}', 'email')" style="background: none; border: none; font-size: 13.5px; font-weight: 600; color: #64748b; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                <button onclick="window.messagesManager.selectThread('${msgId}', 'email')" class="composer-cancel-btn" style="background: none; border: none; font-size: 13.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px;">
                     <span class="material-symbols-outlined" style="font-size: 18px;">close</span> Avbryt
                 </button>
             </div>
             
-            <div class="composer-full-container" style="flex: 1; background: #ffffff; display: flex; flex-direction: column; overflow: hidden; height: 100%;">
+            <div class="composer-full-container" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; height: 100%;">
                 
                 <!-- Fields Header -->
-                <div style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; flex-direction: column; flex-shrink: 0;">
-                    <div style="padding: 10px 24px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 10px; font-size: 13.5px;">
-                        <span style="font-weight: 600; color: #475569; width: 44px; flex-shrink: 0;">Fra:</span>
-                        <select id="email-from-mode" style="border: none; background: transparent; font-size: 13.5px; font-weight: 600; color: #d17d39; cursor: pointer; outline: none; padding: 2px 0;">
+                <div class="composer-header-panel" style="display: flex; flex-direction: column; flex-shrink: 0;">
+                    <div class="composer-field-row" style="padding: 10px 24px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 10px; font-size: 13.5px;">
+                        <span class="composer-field-label" style="font-weight: 600; width: 44px; flex-shrink: 0;">Fra:</span>
+                        <select id="email-from-mode" class="composer-from-select" style="border: none; font-size: 13.5px; font-weight: 600; cursor: pointer; outline: none; padding: 2px 0;">
                             <option value="post">His Kingdom Ministry &lt;post@hiskingdomministry.no&gt;</option>
                             ${adminEmail ? `<option value="admin">${this.escapeHtml(adminEmail)}</option>` : ''}
                         </select>
                     </div>
-                    <div style="padding: 10px 24px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 10px; font-size: 13.5px;">
-                        <span style="font-weight: 600; color: #475569; width: 44px; flex-shrink: 0;">Til:</span>
+                    <div class="composer-field-row" style="padding: 10px 24px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 10px; font-size: 13.5px;">
+                        <span class="composer-field-label" style="font-weight: 600; width: 44px; flex-shrink: 0;">Til:</span>
                         ${isForward ? `
-                            <input id="email-to" type="email" placeholder="Skriv inn e-postadresse..." value="" style="flex: 1; border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 12px; font-size: 13.5px; outline: none; background: #ffffff;">
+                            <input id="email-to" class="composer-input-field" type="email" placeholder="Skriv inn e-postadresse..." value="" style="flex: 1; border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 12px; font-size: 13.5px; outline: none;">
                         ` : `
-                            <span style="color: #0f172a; font-weight: 600;">${this.escapeHtml(msg.email || '')}</span>
+                            <span class="composer-field-value" style="font-weight: 600;">${this.escapeHtml(msg.email || '')}</span>
                             <input id="email-to" type="hidden" value="${this.escapeHtml(msg.email || '')}">
                         `}
-                        <button type="button" onclick="const row = document.getElementById('cc-bcc-row'); if(row) row.style.display = row.style.display === 'none' ? 'flex' : 'none';" style="background: none; border: none; font-size: 12.5px; color: #64748b; font-weight: 600; cursor: pointer; text-decoration: underline; margin-left: auto;">Cc / Bcc</button>
+                        <button type="button" onclick="const row = document.getElementById('cc-bcc-row'); if(row) row.style.display = row.style.display === 'none' ? 'flex' : 'none';" class="composer-cc-btn" style="background: none; border: none; font-size: 12.5px; font-weight: 600; cursor: pointer; text-decoration: underline; margin-left: auto;">Cc / Bcc</button>
                     </div>
 
                     <!-- Collapsible Cc / Bcc Row -->
                     <div id="cc-bcc-row" style="display: none; padding: 8px 24px; border-bottom: 1px solid #f1f5f9; gap: 12px; align-items: center;">
-                        <input id="email-cc" type="text" placeholder="Cc (kommaseparert)" style="flex: 1; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px; font-size: 12.5px; outline: none; background: #ffffff;">
-                        <input id="email-bcc" type="text" placeholder="Bcc" style="flex: 1; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px; font-size: 12.5px; outline: none; background: #ffffff;">
+                        <input id="email-cc" class="composer-input-field" type="text" placeholder="Cc (kommaseparert)" style="flex: 1; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px; font-size: 12.5px; outline: none;">
+                        <input id="email-bcc" class="composer-input-field" type="text" placeholder="Bcc" style="flex: 1; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px; font-size: 12.5px; outline: none;">
                     </div>
 
                     <!-- Subject Field -->
-                    <div style="padding: 10px 24px; display: flex; align-items: center; gap: 10px; font-size: 13.5px;">
-                        <span style="font-weight: 600; color: #475569; width: 44px; flex-shrink: 0;">Emne:</span>
-                        <input id="email-subject" type="text" value="${this.escapeHtml(replySubject)}" style="flex: 1; border: none; font-size: 14px; font-weight: 600; color: #0f172a; outline: none; background: transparent;">
+                    <div class="composer-field-row" style="padding: 10px 24px; display: flex; align-items: center; gap: 10px; font-size: 13.5px;">
+                        <span class="composer-field-label" style="font-weight: 600; width: 44px; flex-shrink: 0;">Emne:</span>
+                        <input id="email-subject" class="composer-subject-input" type="text" value="${this.escapeHtml(replySubject)}" style="flex: 1; border: none; font-size: 14px; font-weight: 600; outline: none; background: transparent;">
                     </div>
                 </div>
 
@@ -988,12 +988,12 @@ class MessagesManager {
                     role="textbox"
                     aria-multiline="true"
                     data-placeholder="${isForward ? 'Skriv en melding for videresending...' : 'Skriv svar her...'}"
-                    style="padding: 24px; flex: 1; font-size: 15px; line-height: 1.65; outline: none; border: none; color: #0f172a; overflow-y: auto; background: #ffffff;">${isForward ? `<br><br><div style="border-left: 2px solid #cbd5e1; padding-left: 12px; color: #64748b; margin-top: 12px;"><strong>---------- Videresendt melding ----------</strong><br><strong>Fra:</strong> ${this.escapeHtml(msg.name || '')} &lt;${this.escapeHtml(msg.email || '')}&gt;<br><strong>Emne:</strong> ${this.escapeHtml(msg.subject || '')}<br><br>${this.escapeHtml(msg.message || '')}</div>` : ''}</div>
+                    style="padding: 24px; flex: 1; font-size: 15px; line-height: 1.65; outline: none; border: none; overflow-y: auto;">${isForward ? `<br><br><div style="border-left: 2px solid #cbd5e1; padding-left: 12px; color: #64748b; margin-top: 12px;"><strong>---------- Videresendt melding ----------</strong><br><strong>Fra:</strong> ${this.escapeHtml(msg.name || '')} &lt;${this.escapeHtml(msg.email || '')}&gt;<br><strong>Emne:</strong> ${this.escapeHtml(msg.subject || '')}<br><br>${this.escapeHtml(msg.message || '')}</div>` : ''}</div>
 
                 <div class="reply-attachments" id="inbox-reply-attachments" style="padding: 0 24px 8px;"></div>
 
                 <!-- Bottom Toolbar & Send Button -->
-                <div class="reply-toolbar" style="padding: 14px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+                <div class="reply-toolbar" style="padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
                     <div class="reply-actions" style="display: flex; gap: 8px; align-items: center;">
                         <button type="button" class="reply-tool-btn" data-command="bold" title="Fet" style="font-weight: 800;">B</button>
                         <button type="button" class="reply-tool-btn" data-command="italic" title="Kursiv" style="font-style: italic; font-weight: 700;">I</button>
@@ -1006,7 +1006,7 @@ class MessagesManager {
                         </label>
                     </div>
                     
-                    <button class="btn btn-primary" id="inbox-send-btn" style="background: linear-gradient(135deg, #d17d39, #bd4f2a); color: #ffffff; border: none; padding: 10px 26px; border-radius: 999px; font-weight: 700; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.3); transition: all 0.2s;">
+                    <button class="btn btn-primary" id="inbox-send-btn" style="background: linear-gradient(135deg, #d17d39, #bd4f2a); color: #ffffff; border: none; padding: 9px 24px; border-radius: 999px; font-weight: 700; font-size: 13.5px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.3); transition: all 0.2s; flex-shrink: 0;">
                         Send e-post
                     </button>
                 </div>

@@ -2145,3 +2145,138 @@ html[data-theme="dark"] .view-actions button:hover {
     color: #ffffff !important;
 }
 
+/* Base Composer Styles */
+.composer-view-header {
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.composer-title {
+    color: #0f172a;
+}
+
+.composer-cancel-btn {
+    color: #64748b;
+}
+
+.composer-header-panel {
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.composer-field-row {
+    border-bottom-color: #f1f5f9;
+}
+
+.composer-field-label {
+    color: #475569;
+}
+
+.composer-field-value {
+    color: #0f172a;
+}
+
+.composer-from-select {
+    color: #d17d39;
+    background: transparent;
+}
+
+.composer-cc-btn {
+    color: #64748b;
+}
+
+.composer-subject-input {
+    color: #0f172a;
+}
+
+.reply-editor {
+    color: #0f172a;
+    background: #ffffff;
+}
+
+.reply-toolbar {
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+}
+
+.reply-tool-btn {
+    color: #475569;
+    background: transparent;
+}
+
+/* Dark Mode Composer Overrides */
+html[data-theme="dark"] .composer-view-header {
+    background: #1e293b !important;
+    border-bottom-color: #334155 !important;
+}
+
+html[data-theme="dark"] .composer-title {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .composer-cancel-btn {
+    color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .composer-header-panel {
+    background: #1e293b !important;
+    border-bottom-color: #334155 !important;
+}
+
+html[data-theme="dark"] .composer-field-row {
+    border-bottom-color: #334155 !important;
+}
+
+html[data-theme="dark"] .composer-field-label {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .composer-field-value {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .composer-from-select {
+    color: #f97316 !important;
+    background: #1e293b !important;
+}
+
+html[data-theme="dark"] .composer-from-select option {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .composer-cc-btn {
+    color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .composer-subject-input {
+    color: #f8fafc !important;
+    background: transparent !important;
+}
+
+html[data-theme="dark"] .composer-input-field {
+    background: #0f172a !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .reply-editor {
+    color: #f8fafc !important;
+    background: #0f172a !important;
+}
+
+html[data-theme="dark"] .reply-toolbar {
+    background: #1e293b !important;
+    border-top-color: #334155 !important;
+}
+
+html[data-theme="dark"] .reply-tool-btn {
+    color: #cbd5e1 !important;
+    background: transparent !important;
+}
+
+html[data-theme="dark"] .reply-tool-btn:hover {
+    color: #ffffff !important;
+    background: #334155 !important;
+}
+
