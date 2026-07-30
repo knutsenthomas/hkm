@@ -776,6 +776,7 @@ export function mountSiteShell() {
     document.documentElement.dataset.hkmSiteShell = 'mounted';
     initCookieSettingsLink();
     bindSiteShellMenu(header, megaMenu);
+    if (typeof window.hkmApplyTheme === 'function') window.hkmApplyTheme();
     document.dispatchEvent(new CustomEvent('hkm:site-shell-mounted', { detail: { language } }));
     return true;
 }

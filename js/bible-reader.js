@@ -2302,6 +2302,13 @@ class BibleReader {
         // Theme classes
         document.body.classList.remove('bible-theme-light', 'bible-theme-cream', 'bible-theme-dark');
         document.body.classList.add(`bible-theme-${this.settings.theme}`);
+        const isDark = this.settings.theme === 'dark';
+        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        document.documentElement.classList.toggle('dark', isDark);
+        document.body.classList.toggle('dark', isDark);
+        try {
+            localStorage.setItem('hkm_theme', isDark ? 'dark' : 'light');
+        } catch (e) {}
 
         this.dom.themeSelectors.forEach(btn => {
             if (btn.dataset.theme === this.settings.theme) {
