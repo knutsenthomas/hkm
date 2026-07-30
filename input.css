@@ -8887,7 +8887,7 @@ html[data-theme="dark"] .hkm-chat-field textarea:focus {
 }
 .dictionary-drawer.active {
     right: 0 !important;
-    z-index: 35000 !important;
+    z-index: 3000000 !important;
 }
 .dictionary-drawer.expanded {
     width: 100vw !important;
@@ -8911,7 +8911,7 @@ html[data-theme="dark"] .hkm-chat-field textarea:focus {
     height: 100vh !important;
     height: 100dvh !important;
     background: #ffffff !important;
-    z-index: 15000 !important;
+    z-index: 2000000 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;

@@ -3981,7 +3981,7 @@ class BibleReader {
             document.body.appendChild(dictDrawer);
         }
 
-        dictDrawer.style.setProperty('z-index', '35000', 'important');
+        dictDrawer.style.setProperty('z-index', '3000000', 'important');
 
         const closeBtn = dictDrawer.querySelector('#close-dict-btn');
         if (closeBtn && !closeBtn._hkmBound) {
@@ -5708,7 +5708,7 @@ class BibleReader {
                 .hkm-rp-day-checkbox { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; color: transparent; transition: all 0.2s; flex-shrink: 0; }
                 .hkm-rp-day-checkbox.completed { background: #10b981; border-color: #10b981; color: #ffffff; }
                 .hkm-rp-day-checkbox.completed .material-symbols-outlined { font-size: 14px; font-weight: bold; }
-                .hkm-devotional-overlay { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; background: #ffffff !important; z-index: 15000 !important; display: flex !important; align-items: center !important; justify-content: center !important; transform: translateZ(0) !important; backface-visibility: hidden !important; }
+                .hkm-devotional-overlay { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; background: #ffffff !important; z-index: 2000000 !important; display: flex !important; align-items: center !important; justify-content: center !important; transform: translateZ(0) !important; backface-visibility: hidden !important; }
                 .hkm-audio-player-bar { z-index: 40000 !important; }
                 .hkm-devotional-content { background: #ffffff !important; width: 100% !important; max-width: 100% !important; height: 100% !important; height: 100dvh !important; border-radius: 0 !important; padding: 0 !important; box-shadow: none !important; display: flex !important; flex-direction: column !important; position: relative !important; transform: translateZ(0) !important; backface-visibility: hidden !important; overflow: hidden !important; }
                 .hkm-devotional-step-title { font-size: 22px !important; font-weight: 700 !important; color: #1B4965 !important; margin-bottom: 16px !important; line-height: 1.3 !important; }
@@ -9202,7 +9202,7 @@ class BibleReader {
         modal = document.createElement('div');
         modal.id = 'hkm-devotional-modal';
         modal.className = 'hkm-devotional-overlay';
-        modal.style.cssText = 'position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; background: #ffffff !important; z-index: 25000 !important; display: flex !important; align-items: center !important; justify-content: center !important;';
+        modal.style.cssText = 'position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; background: #ffffff !important; z-index: 2000000 !important; display: flex !important; align-items: center !important; justify-content: center !important;';
 
         document.body.appendChild(modal);
 
