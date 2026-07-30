@@ -956,14 +956,19 @@
     .inbox-container,
     .unified-inbox-container,
     .crm-content,
-    .section-container {
+    .crm-main,
+    .section-container,
+    .section-content,
+    .main-content {
         background: #ffffff !important;
         padding: 0 !important;
         padding-left: 0 !important;
         padding-right: 0 !important;
         margin: 0 !important;
-        width: 100% !important;
-        max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
         box-shadow: none !important;
         border: none !important;
         border-radius: 0 !important;
@@ -974,8 +979,8 @@
         display: flex !important;
         flex-direction: column !important;
         height: calc(100vh - 60px) !important;
-        width: 100% !important;
-        max-width: 100% !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
         overflow: hidden !important;
         border-radius: 0 !important;
         border: none !important;
