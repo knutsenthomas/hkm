@@ -310,7 +310,7 @@
     padding: 0 16px;
     border-top: 1px solid transparent;
     border-bottom: 1px solid transparent;
-    background: #f8fafc;
+    background: transparent !important;
     display: none;
     align-items: center;
     justify-content: space-between;
