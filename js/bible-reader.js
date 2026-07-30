@@ -9311,10 +9311,42 @@ class BibleReader {
                 });
             }
 
-            if (!matchedBook && typeof norwegianBookToId !== 'undefined') {
-                const id = norwegianBookToId[q];
-                if (id && this.books) {
-                    matchedBook = this.books.find(b => String(b.id) === String(id));
+            if (!matchedBook) {
+                const norwegianMap = {
+                    "1 mosebok": "gen", "1. mosebok": "gen", "1mos": "gen", "1. mos": "gen", "1 mose": "gen",
+                    "2 mosebok": "exo", "2. mosebok": "exo", "2mos": "exo", "2. mos": "exo", "2 mose": "exo",
+                    "3 mosebok": "lev", "3. mosebok": "lev", "3mos": "lev", "3. mos": "lev", "3 mose": "lev",
+                    "4 mosebok": "num", "4. mosebok": "num", "4mos": "num", "4. mos": "num", "4 mose": "num",
+                    "5 mosebok": "deu", "5. mosebok": "deu", "5mos": "deu", "5. mos": "deu", "5 mose": "deu",
+                    "josva": "jos", "jos": "jos", "dommerne": "jdg", "dom": "jdg",
+                    "rut": "ruth", "ru": "ruth", "ruth": "ruth", "ruts bok": "ruth", "ruths bok": "ruth", "ruts": "ruth",
+                    "1 samuelsbok": "1sa", "1. samuelsbok": "1sa", "1sam": "1sa", "1. sam": "1sa",
+                    "2 samuelsbok": "2sa", "2. samuelsbok": "2sa", "2sam": "2sa", "2. sam": "2sa",
+                    "1 kongebok": "1ki", "1. kongebok": "1ki", "1kong": "1ki", "1. kong": "1ki",
+                    "2 kongebok": "2ki", "2. kongebok": "2ki", "2kong": "2ki", "2. kong": "2ki",
+                    "esra": "ezr", "esr": "ezr", "nehemja": "neh", "neh": "neh",
+                    "ester": "est", "est": "est", "esters": "est", "job": "job",
+                    "salmene": "psa", "salme": "psa", "sal": "psa", "ordspråkene": "pro", "ords": "pro",
+                    "forkynneren": "ecc", "fork": "ecc", "høysangen": "sng", "jesaja": "isa", "jes": "isa",
+                    "jeremia": "jer", "jer": "jer", "klagesangene": "lam", "esekiel": "ezk", "esek": "ezk",
+                    "daniel": "dan", "dan": "dan", "hosea": "hos", "joel": "jol", "amos": "amo",
+                    "obadja": "oba", "jona": "jon", "mika": "mic", "nahum": "nam", "habakkuk": "hab",
+                    "sefanja": "zep", "haggai": "hag", "sakarja": "zec", "malaki": "mal",
+                    "matteus": "mat", "matt": "mat", "markus": "mrk", "mark": "mrk",
+                    "lukas": "luk", "johannes": "jhn", "joh": "jhn",
+                    "apostlenes gjerninger": "act", "apg": "act", "apostlenes": "act",
+                    "romerne": "rom", "rom": "rom", "1 korinter": "1co", "1. korinter": "1co",
+                    "2 korinter": "2co", "2. korinter": "2co", "galaterne": "gal", "efeserne": "eph",
+                    "filipperne": "php", "kolosserne": "col", "1 tessaloniker": "1th", "2 tessaloniker": "2th",
+                    "1 timoteus": "1ti", "2 timoteus": "2ti", "titus": "tit", "filemon": "phm",
+                    "hebreerne": "heb", "jakob": "jas", "1 peter": "1pe", "2 peter": "2pe",
+                    "1 johannes": "1jn", "2 johannes": "2jn", "3 johannes": "3jn", "judas": "jud",
+                    "åpenbaringen": "rev", "åpenb": "rev"
+                };
+
+                const foundId = norwegianMap[q] || norwegianMap[q.split(' ')[0]];
+                if (foundId) {
+                    matchedBook = { id: foundId, name: q.charAt(0).toUpperCase() + q.slice(1) };
                 }
             }
 
