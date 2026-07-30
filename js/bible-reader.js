@@ -5755,6 +5755,22 @@ class BibleReader {
                 .hkm-yv-action-btn:hover { background: #f1f5f9 !important; color: #1e293b !important; }
                 .hkm-yv-action-btn.speaking { color: #d17d39 !important; background: rgba(209, 125, 57, 0.08) !important; }
                 
+                /* Dotted text underline for selected verses in Devotional Wizard (Matching reference design) */
+                .hkm-devotional-text-serif p.selected-verse,
+                .hkm-devotional-body p.selected-verse,
+                .hkm-yv-body p.selected-verse,
+                .selected-verse {
+                    text-decoration: underline dotted #475569 !important;
+                    text-underline-offset: 6px !important;
+                    text-decoration-thickness: 2px !important;
+                }
+                .hkm-devotional-text-serif p.selected-verse:not([data-highlight-color]),
+                .hkm-devotional-body p.selected-verse:not([data-highlight-color]),
+                .hkm-yv-body p.selected-verse:not([data-highlight-color]),
+                .selected-verse:not([data-highlight-color]) {
+                    background: transparent !important;
+                }
+
                 .hkm-yv-body { flex: 1 !important; overflow-y: auto !important; padding: 24px 20px !important; background: #ffffff !important; display: flex !important; flex-direction: column !important; }
                 .hkm-yv-body-inner { max-width: 600px !important; margin: 0 auto !important; width: 100% !important; }
                 

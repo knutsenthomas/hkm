@@ -9567,5 +9567,55 @@ html[data-theme="dark"] .skeleton-text::after {
     }
 }
 
+/* Dotted text underline for selected verses in Bible reader & Reading plan (Matching reference design) */
+.selected-verse,
+p.selected-verse,
+span.selected-verse,
+.hkm-devotional-text-serif p.selected-verse,
+.hkm-devotional-body p.selected-verse,
+.hkm-yv-body p.selected-verse,
+.bible-reading-pane p.selected-verse,
+.bible-reading-pane.layout-paragraph p.selected-verse {
+    text-decoration: underline dotted #475569 !important;
+    text-underline-offset: 6px !important;
+    text-decoration-thickness: 2px !important;
+}
+
+.selected-verse:not([data-highlight-color]),
+p.selected-verse:not([data-highlight-color]),
+span.selected-verse:not([data-highlight-color]),
+.hkm-devotional-text-serif p.selected-verse:not([data-highlight-color]),
+.hkm-devotional-body p.selected-verse:not([data-highlight-color]),
+.hkm-yv-body p.selected-verse:not([data-highlight-color]),
+.bible-reading-pane p.selected-verse:not([data-highlight-color]),
+.bible-reading-pane.layout-paragraph p.selected-verse:not([data-highlight-color]) {
+    background: transparent !important;
+}
+
+/* Dark Mode Dotted Underline */
+html[data-theme="dark"] .selected-verse,
+html[data-theme="dark"] p.selected-verse,
+.bible-theme-dark .selected-verse,
+.bible-theme-dark p.selected-verse,
+.bible-theme-dark .hkm-devotional-text-serif p.selected-verse,
+.bible-theme-dark .hkm-yv-body p.selected-verse,
+body.dark .selected-verse,
+body.dark p.selected-verse {
+    text-decoration: underline dotted #cbd5e1 !important;
+}
+
+/* Cream Mode Dotted Underline */
+html[data-theme="cream"] .selected-verse,
+html[data-theme="cream"] p.selected-verse,
+.bible-theme-cream .selected-verse,
+.bible-theme-cream p.selected-verse,
+.bible-theme-cream .hkm-devotional-text-serif p.selected-verse,
+.bible-theme-cream .hkm-yv-body p.selected-verse,
+body.cream .selected-verse,
+body.cream p.selected-verse {
+    text-decoration: underline dotted #475569 !important;
+}
+
+
 
 
