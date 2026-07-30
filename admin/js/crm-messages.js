@@ -943,11 +943,11 @@ class MessagesManager {
                 </button>
             </div>
             
-            <div class="threads-scroll" style="flex: 1; padding: 24px; background: #ffffff; overflow-y: auto;">
-                <div class="email-view-container" style="width: 100%; max-width: 820px; margin: 0 auto;">
+            <div class="threads-scroll" style="flex: 1; padding: 16px; background: #ffffff; display: flex; flex-direction: column; overflow-y: auto;">
+                <div class="email-view-container" style="width: 100%; max-width: 100%; flex: 1; display: flex; flex-direction: column;">
                     
-                    <!-- Dedicated Composer Card -->
-                    <div class="view-reply-card" style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); overflow: hidden; margin-top: 8px;">
+                    <!-- Dedicated Full-Screen Composer Card -->
+                    <div class="view-reply-card" style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); overflow: hidden; margin-top: 0; width: 100%; flex: 1; display: flex; flex-direction: column;">
                         
                         <!-- Sender & Receiver Header -->
                         <div style="padding: 12px 18px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: #475569;">
@@ -982,7 +982,7 @@ class MessagesManager {
                             <input id="email-subject" type="text" value="${this.escapeHtml(replySubject)}" style="flex: 1; border: none; font-size: 13.5px; font-weight: 600; color: #0f172a; outline: none; background: transparent;">
                         </div>
 
-                        <!-- Editor Area -->
+                        <!-- Full Height Editor Area -->
                         <div
                             id="inbox-reply-text"
                             class="reply-editor"
@@ -990,12 +990,12 @@ class MessagesManager {
                             role="textbox"
                             aria-multiline="true"
                             data-placeholder="${isForward ? 'Skriv en melding for videresending...' : 'Skriv svar her...'}"
-                            style="padding: 18px 20px; min-height: 160px; max-height: 350px; font-size: 14.5px; line-height: 1.6; outline: none; border: none; color: #0f172a;">${isForward ? `<br><br><div style="border-left: 2px solid #cbd5e1; padding-left: 12px; color: #64748b; margin-top: 12px;"><strong>---------- Videresendt melding ----------</strong><br><strong>Fra:</strong> ${this.escapeHtml(msg.name || '')} &lt;${this.escapeHtml(msg.email || '')}&gt;<br><strong>Emne:</strong> ${this.escapeHtml(msg.subject || '')}<br><br>${this.escapeHtml(msg.message || '')}</div>` : ''}</div>
+                            style="padding: 18px 20px; flex: 1; min-height: 250px; font-size: 15px; line-height: 1.6; outline: none; border: none; color: #0f172a; overflow-y: auto;">${isForward ? `<br><br><div style="border-left: 2px solid #cbd5e1; padding-left: 12px; color: #64748b; margin-top: 12px;"><strong>---------- Videresendt melding ----------</strong><br><strong>Fra:</strong> ${this.escapeHtml(msg.name || '')} &lt;${this.escapeHtml(msg.email || '')}&gt;<br><strong>Emne:</strong> ${this.escapeHtml(msg.subject || '')}<br><br>${this.escapeHtml(msg.message || '')}</div>` : ''}</div>
 
                         <div class="reply-attachments" id="inbox-reply-attachments" style="padding: 0 18px 8px;"></div>
 
                         <!-- Toolbar & Send Button -->
-                        <div class="reply-toolbar" style="padding: 12px 18px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+                        <div class="reply-toolbar" style="padding: 12px 18px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
                             <div class="reply-actions" style="display: flex; gap: 6px; align-items: center;">
                                 <button type="button" class="reply-tool-btn" data-command="bold" title="Fet" style="font-weight: 800;">B</button>
                                 <button type="button" class="reply-tool-btn" data-command="italic" title="Kursiv" style="font-style: italic; font-weight: 700;">I</button>
