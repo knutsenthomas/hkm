@@ -974,13 +974,16 @@ class MessagesManager {
 
                 const result = await response.json().catch(() => ({}));
                 if (!response.ok || !result.success) {
-                    throw new Error(result.error || 'Kunne ikke sende e-post.');
+                    throw new Error(result.error || `Serverfeil (HTTP ${response.status}) ved sending av e-post.`);
                 }
 
                 replyArea.innerHTML = '';
                 this.replyAttachments = [];
                 this.renderReplyAttachments();
-                if (statusEl) statusEl.textContent = 'E-post sendt!';
+                if (statusEl) {
+                    statusEl.style.color = '#16a34a';
+                    statusEl.textContent = 'E-post sendt!';
+                }
                 setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 2200);
                 this.messages = this.messages.map((message) =>
                     message.id === this.activeThreadId ? { ...message, status: 'besvart' } : message
@@ -990,7 +993,10 @@ class MessagesManager {
             }
         } catch (err) {
             console.error("Error sending reply:", err);
-            if (statusEl) statusEl.textContent = 'Feil ved sending.';
+            if (statusEl) {
+                statusEl.style.color = '#ef4444';
+                statusEl.textContent = 'Feil ved sending: ' + (err.message || 'Ukjent feil');
+            }
         } finally {
             this.isSendingReply = false;
         }
