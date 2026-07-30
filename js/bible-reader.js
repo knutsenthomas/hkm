@@ -6161,6 +6161,12 @@ class BibleReader {
     }
 
     async shiftPlanDates(planId) {
+        const targetPlanId = planId || (this.userPlanProgress ? (this.userPlanProgress.planId || this.userPlanProgress.id) : null) || this.activePlanId;
+        if (!targetPlanId) {
+            console.warn("[BibleReader] shiftPlanDates called without planId");
+            return;
+        }
+
         const userPlan = this.userPlanProgress || {};
         const completedDays = userPlan.completedDays || [];
         
@@ -6171,8 +6177,8 @@ class BibleReader {
 
         const today = new Date();
         const midnightToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 0, 0);
-        const newStartedAt = new Date(midnightToday.getTime() - (lastCompletedDay * 24 * 60 * 60 * 1000));
-        const nextDayToRead = lastCompletedDay + 1;
+        const newStartedAtDate = new Date(midnightToday.getTime() - (lastCompletedDay * 24 * 60 * 60 * 1000));
+        const nextDayToRead = Math.max(1, lastCompletedDay + 1);
 
         const db = this.getFirestore();
         if (this.currentUser && db) {
@@ -6180,9 +6186,9 @@ class BibleReader {
                 await db.collection('users')
                     .doc(this.currentUser.uid)
                     .collection('reading_plans')
-                    .doc(planId)
+                    .doc(targetPlanId)
                     .set({
-                        startedAt: firebase.firestore.Timestamp.fromDate(newStartedAt),
+                        startedAt: firebase.firestore.Timestamp.fromDate(newStartedAtDate),
                         currentDay: nextDayToRead,
                         lastActiveAt: firebase.firestore.FieldValue.serverTimestamp()
                     }, { merge: true });
@@ -6191,13 +6197,25 @@ class BibleReader {
             }
         }
 
-        if (this.userPlanProgress && (this.userPlanProgress.planId === planId || this.userPlanProgress.id === planId)) {
-            this.userPlanProgress.startedAt = newStartedAt;
-            this.userPlanProgress.currentDay = nextDayToRead;
-            this.saveReadingPlanProgressLocally(planId, this.userPlanProgress);
+        if (!this.userPlanProgress) {
+            this.userPlanProgress = {
+                planId: targetPlanId,
+                completedDays: completedDays,
+                reflections: {}
+            };
         }
 
-        this.setupReadingPlanUI(true);
+        this.userPlanProgress.startedAt = newStartedAtDate.toISOString();
+        this.userPlanProgress.currentDay = nextDayToRead;
+
+        try {
+            this.safeSetLocalStorage('hkm_reading_plan_progress_' + targetPlanId, JSON.stringify(this.userPlanProgress));
+        } catch (e) {
+            console.warn("[BibleReader] Failed to save shifted dates in localStorage:", e);
+        }
+
+        this.activePlanDay = nextDayToRead;
+        await this.setupReadingPlanUI(true);
     }
 
     async jumpToToday(planId, expectedDay) {
@@ -6273,8 +6291,14 @@ class BibleReader {
         confirmBtn.onclick = async () => {
             confirmBtn.disabled = true;
             confirmBtn.style.opacity = '0.5';
-            await this.shiftPlanDates(planId);
-            modalOverlay.remove();
+            try {
+                await this.shiftPlanDates(planId);
+            } catch (err) {
+                console.error("[BibleReader] Error during shiftPlanDates:", err);
+            }
+            if (modalOverlay.parentNode) {
+                modalOverlay.remove();
+            }
         };
 
         cancelBtn.onclick = () => {
