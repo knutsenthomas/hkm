@@ -9086,7 +9086,7 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
     }
 
     async openDevotionalWizard(planId, dayNumber, startStep = 1) {
-        this.ensureDevotionalStyles();
+        this.injectReadingPlanStyles();
         const targetDay = parseInt(dayNumber, 10) || 1;
         let globalPlan = this.activePlanData;
 
