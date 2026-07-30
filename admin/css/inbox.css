@@ -954,6 +954,7 @@
 @media (max-width: 768px) {
     html,
     body,
+    main,
     .admin-layout,
     .admin-wrapper,
     .admin-main-content,
@@ -962,9 +963,13 @@
     .content-area,
     .admin-page-container,
     .inbox-container,
-    .unified-inbox-container {
+    .unified-inbox-container,
+    .crm-content,
+    .section-container {
         background: #ffffff !important;
         padding: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
         margin: 0 !important;
         width: 100% !important;
         max-width: 100% !important;
