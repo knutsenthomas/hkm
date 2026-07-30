@@ -6746,7 +6746,7 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                 justify-content: center !important;
                 padding: 0 !important;
                 margin: 0 !important;
-                z-index: 35000 !important;
+                z-index: 3000000 !important;
             }
 
             @media (max-width: 768px) {
