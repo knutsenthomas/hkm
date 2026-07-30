@@ -2084,30 +2084,34 @@ html[data-theme="dark"] .email-thread-replies {
     border-top-color: #334155 !important;
 }
 
-html[data-theme="dark"] .email-thread-replies > div[style*="background: #f8fafc"],
-html[data-theme="dark"] .email-thread-replies > div {
+html[data-theme="dark"] .email-replies-header {
+    background: transparent !important;
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .sent-reply-card {
     background: #1e293b !important;
     border-color: #334155 !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
 }
 
-html[data-theme="dark"] .email-thread-replies div[style*="border-bottom"] {
+html[data-theme="dark"] .sent-reply-card div[style*="border-bottom"] {
     border-bottom-color: #334155 !important;
 }
 
-html[data-theme="dark"] .email-thread-replies div[style*="color: #0f172a"] {
+html[data-theme="dark"] .sent-reply-card div[style*="color: #0f172a"] {
     color: #f8fafc !important;
 }
 
-html[data-theme="dark"] .email-thread-replies div[style*="color: #334155"] {
+html[data-theme="dark"] .sent-reply-card div[style*="color: #334155"] {
     color: #cbd5e1 !important;
 }
 
-html[data-theme="dark"] .email-thread-replies div[style*="color: #64748b"] {
+html[data-theme="dark"] .sent-reply-card div[style*="color: #64748b"] {
     color: #94a3b8 !important;
 }
 
-html[data-theme="dark"] .email-thread-replies div[style*="background: #fff7ed"] {
+html[data-theme="dark"] .sent-reply-card div[style*="background: #fff7ed"] {
     background: rgba(209, 125, 57, 0.2) !important;
     border-color: rgba(209, 125, 57, 0.4) !important;
     color: #f97316 !important;

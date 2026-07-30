@@ -829,7 +829,7 @@ class MessagesManager {
         if (Array.isArray(msg.replies) && msg.replies.length > 0) {
             repliesHtml = `
                 <div class="email-thread-replies" style="margin: 24px 0; border-top: 1px dashed #cbd5e1; padding-top: 24px; display: flex; flex-direction: column; gap: 16px;">
-                    <div style="font-size: 12px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px;">
+                    <div class="email-replies-header" style="font-size: 12px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px; background: transparent;">
                         <span class="material-symbols-outlined" style="font-size: 16px; color: #16a34a;">check_circle</span>
                         Sendte svar (${msg.replies.length})
                     </div>
@@ -839,7 +839,7 @@ class MessagesManager {
                         const replyText = reply.html || (reply.text ? this.escapeHtml(reply.text).replace(/\n/g, '<br>') : '');
                         
                         return `
-                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                            <div class="sent-reply-card" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
                                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #e2e8f0;">
                                     <div style="display: flex; align-items: center; gap: 10px;">
                                         <div style="width: 32px; height: 32px; border-radius: 50%; background: #fff7ed; color: #d17d39; font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(209, 125, 57, 0.3);">
