@@ -998,14 +998,17 @@
         border-bottom: 1px solid #f1f5f9 !important;
         flex-shrink: 0 !important;
         width: 100% !important;
+        max-width: 100% !important;
         box-sizing: border-box !important;
     }
 
     .threads-search-row {
         display: flex !important;
         align-items: center !important;
+        justify-content: space-between !important;
         gap: 10px !important;
         width: 100% !important;
+        max-width: 100% !important;
         box-sizing: border-box !important;
     }
 
@@ -1024,7 +1027,8 @@
     }
 
     .threads-search {
-        flex: 1 !important;
+        flex: 1 1 auto !important;
+        width: 100% !important;
         position: relative !important;
         min-width: 0 !important;
     }
@@ -1038,6 +1042,7 @@
         border-radius: 999px !important;
         color: #0f172a !important;
         width: 100% !important;
+        max-width: 100% !important;
         box-sizing: border-box !important;
     }
 
@@ -1045,6 +1050,11 @@
         left: 14px !important;
         font-size: 20px !important;
         color: #64748b !important;
+    }
+
+    #mark-all-read-btn {
+        flex-shrink: 0 !important;
+        margin-left: auto !important;
     }
 
     /* Folder Menu Drawer on Mobile */
