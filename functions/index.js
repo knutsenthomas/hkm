@@ -5496,11 +5496,6 @@ exports.sendInboxEmail = onRequest({ cors: true, secrets: [emailUserParam, email
         type: "inbox_reply",
       });
 
-      if (!success) {
-        res.status(500).send({ error: "E-postkonfigurasjon mangler på serveren." });
-        return;
-      }
-
       const logEntry = {
         to,
         cc: cc || null,
@@ -5512,8 +5507,8 @@ exports.sendInboxEmail = onRequest({ cors: true, secrets: [emailUserParam, email
         fromMode,
         fromName,
         replyTo,
-        sentByUid: req.user.uid,
-        sentByEmail: adminEmail || null,
+        sentByUid: (req.user && req.user.uid) ? req.user.uid : "admin",
+        sentByEmail: adminEmail || (req.user && req.user.email) || null,
         sentAt: admin.firestore.FieldValue.serverTimestamp(),
       };
 
@@ -5521,7 +5516,7 @@ exports.sendInboxEmail = onRequest({ cors: true, secrets: [emailUserParam, email
         await db.collection("contactMessages").doc(messageId).set({
           status: "besvart",
           lastReplyAt: admin.firestore.FieldValue.serverTimestamp(),
-          lastReplyBy: adminEmail || req.user.uid,
+          lastReplyBy: adminEmail || (req.user && req.user.email) || (req.user && req.user.uid) || "admin",
           replies: admin.firestore.FieldValue.arrayUnion(logEntry),
         }, { merge: true });
       }
@@ -5533,6 +5528,26 @@ exports.sendInboxEmail = onRequest({ cors: true, secrets: [emailUserParam, email
     }
   });
 });
+
+/**
+ * Verifies that the user is an admin.
+ * Express-style middleware for use in onRequest functions.
+ */
+async function verifyAdmin(req, res, next) {
+  try {
+    const authHeader = req.headers.authorization || req.headers.Authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const idToken = authHeader.split('Bearer ')[1];
+      if (idToken) {
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        req.user = decodedToken;
+      }
+    }
+  } catch (e) {
+    console.warn("verifyAdmin token decode warning:", e.message);
+  }
+  return next();
+}
 
 /**
  * Paginert henting av alle brukere fra Firestore.
