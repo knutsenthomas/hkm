@@ -134,6 +134,7 @@ class MessagesManager {
                 folder.classList.add('active');
                 this.activeFilter = folder.dataset.filter;
                 
+                if (unifiedContainer) unifiedContainer.classList.remove('mobile-menu-open');
                 document.body.classList.remove('mobile-menu-open');
                 if (this.activeFilter === 'push') {
                     unifiedContainer.classList.add('push-active');

@@ -463,6 +463,17 @@
                 <div class="unified-inbox-container" id="unified-inbox">
                     <!-- 1. Folders Sidebar -->
                     <aside class="inbox-folders">
+                        <!-- Mobile Drawer Header -->
+                        <div class="inbox-folders-header">
+                            <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 16px; color: #0f172a;">
+                                <span class="material-symbols-outlined" style="color: var(--inbox-orange, #d17d39);">folder_open</span>
+                                <span>Meny</span>
+                            </div>
+                            <button class="folder-drawer-close-btn" onclick="document.getElementById('unified-inbox').classList.remove('mobile-menu-open')" title="Lukk meny" style="background: #f1f5f9; border: none; border-radius: 50%; width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; color: #475569; cursor: pointer; transition: all 0.2s ease;">
+                                <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
+                            </button>
+                        </div>
+
                         <button id="btn-compose-email" onclick="if(window.messagesManager && window.messagesManager.openComposeModal){ window.messagesManager.openComposeModal(); } else { alert('Vennligst velg en e-post fra listen for å besvare.'); }" style="margin: 0 0 16px 0; width: 100%; height: 44px; padding: 0 20px; border-radius: 999px; background: linear-gradient(135deg, #d17d39, #bd4f2a); color: #ffffff; border: none; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.25); transition: all 0.2s ease;">
                             <span class="material-symbols-outlined" style="font-size: 18px;">edit</span> Skriv ny
                         </button>
@@ -489,6 +500,9 @@
                             <span>Push-varslinger</span>
                         </div>
                     </aside>
+
+                    <!-- Backdrop overlay to tap outside drawer and close menu -->
+                    <div class="inbox-drawer-backdrop" id="inbox-drawer-backdrop" onclick="document.getElementById('unified-inbox').classList.remove('mobile-menu-open')"></div>
 
                     <!-- 2. Thread List -->
                     <section class="inbox-threads">

@@ -67,6 +67,11 @@
     transform: scale(0.92);
 }
 
+.inbox-folders-header,
+.inbox-drawer-backdrop {
+    display: none !important;
+}
+
 .inbox-folders {
     width: var(--inbox-sidebar-width);
     flex-shrink: 0;
@@ -1061,6 +1066,37 @@
     }
 
     /* Mobile Slide-Out Drawer for Folders */
+    .inbox-folders-header {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        margin-bottom: 16px !important;
+        padding-bottom: 12px !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+    }
+
+    .inbox-drawer-backdrop {
+        display: none;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background: rgba(15, 23, 42, 0.45) !important;
+        backdrop-filter: blur(2px) !important;
+        -webkit-backdrop-filter: blur(2px) !important;
+        z-index: 99998 !important;
+        opacity: 0 !important;
+        transition: opacity 0.3s ease !important;
+        pointer-events: none !important;
+    }
+
+    .mobile-menu-open .inbox-drawer-backdrop {
+        display: block !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+
     .inbox-folders {
         position: fixed !important;
         top: 0 !important;
@@ -1071,7 +1107,7 @@
         z-index: 99999 !important;
         display: flex !important;
         flex-direction: column !important;
-        padding: 24px 16px !important;
+        padding: 20px 16px !important;
         box-shadow: 4px 0 24px rgba(0,0,0,0.14) !important;
         transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
         box-sizing: border-box !important;
