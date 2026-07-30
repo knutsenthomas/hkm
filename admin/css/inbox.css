@@ -1873,12 +1873,12 @@ html[data-theme="dark"] .folder-badge {
 /* Thread List Container */
 html[data-theme="dark"] .inbox-threads {
     background: #0f172a !important;
-    border-right-color: #334155 !important;
+    border-right-color: #1e293b !important;
 }
 
 html[data-theme="dark"] .threads-header {
-    background: #1e293b !important;
-    border-bottom-color: #334155 !important;
+    background: #0f172a !important;
+    border-bottom-color: #1e293b !important;
 }
 
 html[data-theme="dark"] .mobile-menu-btn {
@@ -1886,7 +1886,7 @@ html[data-theme="dark"] .mobile-menu-btn {
 }
 
 html[data-theme="dark"] .threads-search input {
-    background: #0f172a !important;
+    background: #1e293b !important;
     color: #f8fafc !important;
     border-color: #334155 !important;
 }
