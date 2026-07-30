@@ -4753,7 +4753,7 @@ class BibleReader {
             el.classList.remove('plan-highlighted');
         });
 
-        if (!this.activePlanMode || !this.activePlanData || !this.activePlanDay) return;
+        if (!this.activePlanMode || !this.activePlanData || !this.activePlanData.days || !Array.isArray(this.activePlanData.days) || !this.activePlanDay) return;
 
         const dayConfig = this.activePlanData.days.find(d => d.dayNumber === this.activePlanDay);
         if (!dayConfig || !dayConfig.verses) return;
@@ -5452,7 +5452,8 @@ class BibleReader {
         let planResourcesHtml = '';
         if (this.activePlanMode && this.activePlanData) {
             const currentDayNum = this.activePlanDay;
-            const dayConfig = this.activePlanData.days.find(d => d.dayNumber === currentDayNum) || this.activePlanData.days[0];
+            const daysList = (this.activePlanData && Array.isArray(this.activePlanData.days)) ? this.activePlanData.days : [];
+            const dayConfig = daysList.find(d => d.dayNumber === currentDayNum) || daysList[0];
             if (dayConfig) {
                 let dayResourcesHtml = '';
                 if (dayConfig.resources && dayConfig.resources.length > 0) {
@@ -10458,7 +10459,7 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
             userPlan.completedDays.push(dayNumber);
         }
         
-        const totalDays = plan.durationDays || plan.days.length;
+        const totalDays = plan ? (plan.durationDays || (plan.days ? plan.days.length : 1)) : 1;
         if (userPlan.completedDays.length >= totalDays) {
             userPlan.completed = true;
             setTimeout(() => {
