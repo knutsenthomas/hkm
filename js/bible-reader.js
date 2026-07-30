@@ -3449,10 +3449,10 @@ class BibleReader {
                     crossrefBtn = document.createElement('button');
                     crossrefBtn.id = 'btn-crossref-chapter-dynamic';
                     crossrefBtn.className = 'nav-btn';
-                    crossrefBtn.style.cssText = 'font-size: 12px; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04); transition: all 0.2s ease; margin: 0;';
+                    crossrefBtn.title = this.t('cross_references');
+                    crossrefBtn.style.cssText = 'width: 36px; height: 36px; aspect-ratio: 1 / 1; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); box-shadow: 0 2px 6px rgba(0,0,0,0.04); transition: all 0.2s ease; margin: 0; flex-shrink: 0;';
                     crossrefBtn.innerHTML = `
-                        <span class="material-symbols-outlined" style="font-size: 16px; color: var(--hkm-terracotta, #d17d39);">article</span>
-                        <span class="crossref-btn-label">${this.t('cross_references')}</span>
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: var(--hkm-terracotta, #d17d39);">article</span>
                     `;
 
                     crossrefBtn.addEventListener('click', () => {
@@ -3463,9 +3463,6 @@ class BibleReader {
                     });
 
                     actionBar.appendChild(crossrefBtn);
-                } else {
-                    const labelSpan = crossrefBtn.querySelector('.crossref-btn-label');
-                    if (labelSpan) labelSpan.textContent = this.t('cross_references');
                 }
             }
         } catch (btnErr) {
@@ -9961,30 +9958,29 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
 
             const escapedHeading = heading.replace(/'/g, "\\'");
             const chapterHeaderHtml = `
-                <div class="reference-header" style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 24px; text-align: center;">
-                    <div class="book-badge" style="background: rgba(209, 125, 57, 0.12); color: #d17d39; font-weight: 800; font-size: 11px; padding: 4px 12px; border-radius: 20px; letter-spacing: 0.1em; text-transform: uppercase;">${bookBadgeText}</div>
+                <div class="reference-header" style="display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 24px; text-align: center;">
+                    <div class="book-badge" style="background: rgba(226, 232, 240, 0.7); color: #475569; font-weight: 700; font-size: 12px; padding: 6px 16px; border-radius: 20px; letter-spacing: 0.08em; text-transform: uppercase;">${bookBadgeText}</div>
                     <h1 class="chapter-number" style="font-size: 56px; font-weight: 900; color: var(--text-base, #0f172a); margin: 0; line-height: 1;">${chapNumText}</h1>
                     
-                    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 6px;">
-                        <button id="hkm-yv-btn-lookup-header" onclick="window.bibleReader.lookupWord('${escapedHeading}', '', '${escapedHeading}', true)" class="nav-btn" style="font-size: 13px; padding: 8px 16px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #0f172a); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
-                            <span class="material-symbols-outlined" style="font-size: 18px; color: #d17d39;">menu_book</span>
-                            <span>Forklar kapittelet i Bibeleksikon</span>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 8px; width: 100%;">
+                        <button id="hkm-yv-btn-lookup-header" onclick="window.bibleReader.lookupWord('${escapedHeading}', '', '${escapedHeading}', true)" class="nav-btn" style="font-size: 13.5px; padding: 8px 18px; border-radius: 20px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #0f172a); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+                            <span class="material-symbols-outlined" style="font-size: 18px; color: var(--text-base, #0f172a);">menu_book</span>
+                            <span>${lang === 'en' ? 'Explain Chapter in Lexicon' : (lang === 'es' ? 'Explicar capítulo en Lexicón' : 'Forklar kapittelet i Bibeleksikon')}</span>
                         </button>
 
-                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;">
-                            <button id="hkm-yv-btn-audio-header" class="nav-btn" style="font-size: 13px; padding: 8px 16px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #0f172a); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
-                                <span class="material-symbols-outlined" style="font-size: 18px; color: #d17d39;">play_circle</span>
-                                <span>Lytt til kapittelet</span>
+                        <div style="display: flex; align-items: center; gap: 8px; justify-content: center; flex-wrap: nowrap; max-width: 100%;">
+                            <button id="hkm-yv-btn-audio-header" class="nav-btn" style="font-size: 13.5px; padding: 8px 18px; border-radius: 20px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #0f172a); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+                                <span class="material-symbols-outlined" style="font-size: 18px; color: var(--text-base, #0f172a);">play_circle</span>
+                                <span>${lang === 'en' ? 'Listen to Chapter' : (lang === 'es' ? 'Escuchar capítulo' : 'Lytt til kapittelet')}</span>
                             </button>
 
-                            <button id="hkm-yv-btn-crossref-header" onclick="window.bibleReader.openVerseCrossReferenceModal('1', '${escapedHeading}')" class="nav-btn" style="font-size: 13px; padding: 8px 16px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #0f172a); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04);" title="${lang === 'en' ? 'Cross References' : (lang === 'es' ? 'Referencias cruzadas' : 'Kryssreferanser')}">
-                                <span class="material-symbols-outlined" style="font-size: 18px; color: #d17d39;">link</span>
-                                <span class="crossref-btn-label">${lang === 'en' ? 'Cross References' : (lang === 'es' ? 'Referencias cruzadas' : 'Kryssreferanser')}</span>
-                            </button>
-
-                            <button onclick="window.bibleReader.openBookIntroModal('${devBookId}')" class="nav-btn" style="font-size: 13px; padding: 8px 16px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #0f172a); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                            <button onclick="window.bibleReader.openBookIntroModal('${devBookId}')" class="nav-btn" style="font-size: 13.5px; padding: 8px 18px; border-radius: 20px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #0f172a); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
                                 <span class="material-symbols-outlined" style="font-size: 18px; color: #d17d39;">auto_stories</span>
-                                <span>Bokintroduksjon</span>
+                                <span>${lang === 'en' ? 'Book Intro' : (lang === 'es' ? 'Introducción al libro' : 'Bokintroduksjon')}</span>
+                            </button>
+
+                            <button id="hkm-yv-btn-crossref-header" onclick="window.bibleReader.openVerseCrossReferenceModal('1', '${escapedHeading}')" class="nav-btn" style="width: 38px; height: 38px; aspect-ratio: 1 / 1; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); box-shadow: 0 2px 6px rgba(0,0,0,0.03); flex-shrink: 0;" title="${lang === 'en' ? 'Cross References' : (lang === 'es' ? 'Referencias cruzadas' : 'Kryssreferanser')}">
+                                <span class="material-symbols-outlined" style="font-size: 18px; color: #d17d39;">article</span>
                             </button>
                         </div>
                     </div>
