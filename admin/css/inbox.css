@@ -1790,3 +1790,260 @@
     box-shadow: 0 10px 28px rgba(15, 23, 42, 0.22) !important;
 }
 
+/* ==================== DARK MODE OVERRIDES FOR UNIFIED INBOX ==================== */
+html[data-theme="dark"],
+html[data-theme="dark"] body,
+html[data-theme="dark"] main,
+html[data-theme="dark"] .admin-layout,
+html[data-theme="dark"] .admin-wrapper,
+html[data-theme="dark"] .admin-main-content,
+html[data-theme="dark"] .admin-content,
+html[data-theme="dark"] .content-wrapper,
+html[data-theme="dark"] .content-area,
+html[data-theme="dark"] .admin-page-container,
+html[data-theme="dark"] .inbox-container,
+html[data-theme="dark"] .unified-inbox-container,
+html[data-theme="dark"] .crm-content,
+html[data-theme="dark"] .crm-main,
+html[data-theme="dark"] .section-container,
+html[data-theme="dark"] .section-content,
+html[data-theme="dark"] .main-content {
+    background: #0f172a !important;
+    color: #f8fafc !important;
+}
+
+/* Sidebar & Folders */
+html[data-theme="dark"] .inbox-folders {
+    background: #1e293b !important;
+    border-right-color: #334155 !important;
+}
+
+html[data-theme="dark"] .inbox-folders-header {
+    border-bottom-color: #334155 !important;
+}
+
+html[data-theme="dark"] .inbox-folders-header span {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .folder-drawer-close-btn {
+    background: #334155 !important;
+    color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .folder-item {
+    color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .folder-item .material-symbols-outlined {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .folder-item:hover {
+    background: #334155 !important;
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .folder-item.active {
+    background: rgba(209, 125, 57, 0.2) !important;
+    color: #f97316 !important;
+}
+
+html[data-theme="dark"] .folder-item.active .material-symbols-outlined {
+    color: #f97316 !important;
+}
+
+html[data-theme="dark"] .folder-badge {
+    background: #334155 !important;
+    color: #f8fafc !important;
+}
+
+/* Thread List Container */
+html[data-theme="dark"] .inbox-threads {
+    background: #0f172a !important;
+    border-right-color: #334155 !important;
+}
+
+html[data-theme="dark"] .threads-header {
+    background: #1e293b !important;
+    border-bottom-color: #334155 !important;
+}
+
+html[data-theme="dark"] .mobile-menu-btn {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .threads-search input {
+    background: #0f172a !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .threads-search input::placeholder {
+    color: #64748b !important;
+}
+
+html[data-theme="dark"] .threads-search .material-symbols-outlined {
+    color: #64748b !important;
+}
+
+html[data-theme="dark"] .btn-icon-square {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+    color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .bulk-actions {
+    background: transparent !important;
+}
+
+html[data-theme="dark"] .bulk-actions.visible {
+    border-top-color: #334155 !important;
+    border-bottom-color: #334155 !important;
+}
+
+html[data-theme="dark"] .bulk-actions-left label {
+    color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .selected-count-badge {
+    background: rgba(209, 125, 57, 0.2) !important;
+    color: #f97316 !important;
+}
+
+/* Thread Items */
+html[data-theme="dark"] .threads-scroll {
+    background: #0f172a !important;
+}
+
+html[data-theme="dark"] .thread-item {
+    background: #0f172a !important;
+    border-bottom-color: #1e293b !important;
+}
+
+html[data-theme="dark"] .thread-item:hover {
+    background: #1e293b !important;
+}
+
+html[data-theme="dark"] .thread-item.active {
+    background: #334155 !important;
+}
+
+html[data-theme="dark"] .thread-item.unread {
+    background: rgba(30, 41, 59, 0.9) !important;
+}
+
+html[data-theme="dark"] .thread-name {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .thread-snippet {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .thread-time {
+    color: #64748b !important;
+}
+
+html[data-theme="dark"] .thread-avatar {
+    background: #334155 !important;
+    color: #f8fafc !important;
+}
+
+/* Thread Detail View */
+html[data-theme="dark"] .inbox-thread-view {
+    background: #0f172a !important;
+}
+
+html[data-theme="dark"] .view-header {
+    background: #1e293b !important;
+    border-bottom-color: #334155 !important;
+}
+
+html[data-theme="dark"] .mobile-back-btn {
+    background: #334155 !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .email-subject-title,
+html[data-theme="dark"] .message-subject,
+html[data-theme="dark"] .view-name {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .message-meta,
+html[data-theme="dark"] .view-status {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .message-detail {
+    background: #0f172a !important;
+}
+
+html[data-theme="dark"] .message-detail-header {
+    background: #1e293b !important;
+    border-bottom-color: #334155 !important;
+}
+
+html[data-theme="dark"] .message-body {
+    background: #0f172a !important;
+}
+
+html[data-theme="dark"] .message-card,
+html[data-theme="dark"] .email-card,
+html[data-theme="dark"] .view-reply-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+html[data-theme="dark"] .message-body-text,
+html[data-theme="dark"] .email-content-text {
+    color: #cbd5e1 !important;
+}
+
+/* Composer Window in Dark Mode */
+html[data-theme="dark"] .composer-full-container {
+    background: #0f172a !important;
+}
+
+html[data-theme="dark"] .composer-field {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .composer-field label {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .composer-field input,
+html[data-theme="dark"] .composer-field textarea {
+    background: transparent !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .rich-editor-toolbar {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .rich-editor-toolbar button {
+    color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .rich-editor-toolbar button:hover {
+    background: #334155 !important;
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .rich-editor-content {
+    background: #0f172a !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .inbox-empty-view {
+    background: #0f172a !important;
+    color: #64748b !important;
+}
+
