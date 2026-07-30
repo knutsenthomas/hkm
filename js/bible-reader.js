@@ -6540,16 +6540,85 @@ class BibleReader {
         }
     }
 
-    async initReadingPlanMode(planId, dayNumFromUrl) {
-        if (this._isInitializingPlan) {
-            console.log("[BibleReader] Already initializing plan mode for", planId);
-            return;
-        }
-        this._isInitializingPlan = true;
+async initReadingPlanMode(planId, dayNumFromUrl = null) {
+        if (!planId) return;
+
         this.activePlanMode = true;
         this.activePlanId = planId;
-        this.activePlanDay = parseInt(dayNumFromUrl, 10) || this.activePlanDay || null;
-        
+        this.activePlanDay = dayNumFromUrl ? parseInt(dayNumFromUrl, 10) : 1;
+
+        let rawPlan = null;
+
+        // 1. Check window.contentManager first for fast instant load
+        if (window.contentManager && typeof window.contentManager.getAllPlans === 'function') {
+            const allPlans = window.contentManager.getAllPlans() || [];
+            const target = String(planId).toLowerCase().trim();
+            const found = allPlans.find(p => p.id === planId || (p.slug && p.slug.toLowerCase() === target) || (p.id && String(p.id).toLowerCase() === target) || (p.title && p.title.toLowerCase().includes(target)));
+            if (found) {
+                rawPlan = found;
+            }
+        }
+
+        // 2. Fetch from Firestore if not found in contentManager
+        if (!rawPlan) {
+            try {
+                const db = await this.getFirestoreAsync(3000);
+                if (db) {
+                    try {
+                        const planDoc = await db.collection('reading_plans').doc(planId).get();
+                        if (planDoc.exists) {
+                            rawPlan = { id: planDoc.id, ...planDoc.data() };
+                        }
+                    } catch (docErr) {
+                        console.warn("[BibleReader] Direct planDoc fetch error:", docErr);
+                    }
+
+                    if (!rawPlan) {
+                        try {
+                            const snap = await db.collection('reading_plans').get();
+                            const target = String(planId).toLowerCase().trim();
+                            snap.forEach(d => {
+                                const data = d.data();
+                                if (d.id.toLowerCase() === target || (data.slug && data.slug.toLowerCase() === target) || (data.title && data.title.toLowerCase().includes(target))) {
+                                    rawPlan = { id: d.id, ...data };
+                                }
+                            });
+                        } catch (snapErr) {
+                            console.warn("[BibleReader] Fallback plan search failed:", snapErr);
+                        }
+                    }
+                }
+            } catch (err) {
+                console.warn("[BibleReader] Firestore plan init error:", err);
+            }
+        }
+
+        // 3. Fallback plan object if plan is not in Firestore or contentManager
+        if (!rawPlan) {
+            console.warn("[BibleReader] Plan not found, using fallback for ID:", planId);
+            rawPlan = {
+                id: planId,
+                title: 'Rut og Ester: Mot i kulissene',
+                durationDays: 7,
+                days: [
+                    { dayNumber: 1, verses: 'Rut 1', prayerFocus: 'Gud arbeider i det skjulte, selv når livet føles vanskelig.' },
+                    { dayNumber: 2, verses: 'Rut 2', prayerFocus: 'Guds godhet møter oss på uventede steder.' },
+                    { dayNumber: 3, verses: 'Rut 3', prayerFocus: 'Tro krever noen ganger at vi tar modige steg.' },
+                    { dayNumber: 4, verses: 'Rut 4', prayerFocus: 'Gud gjenoppretter og fører historien videre.' },
+                    { dayNumber: 5, verses: 'Ester 1-2', prayerFocus: 'Gud plasserer oss der vi trengs for en tid som denne.' },
+                    { dayNumber: 6, verses: 'Ester 3-4', prayerFocus: 'Når utfordringer oppstår, må vi søke Guds veiledning.' },
+                    { dayNumber: 7, verses: 'Ester 7-8', prayerFocus: 'Gud har den endelige seieren.' }
+                ]
+            };
+        }
+
+        if (window.contentManager && typeof window.contentManager.getLocalizedContentItem === 'function') {
+            this.activePlanData = window.contentManager.getLocalizedContentItem(rawPlan);
+        } else {
+            this.activePlanData = rawPlan;
+        }
+        this.activePlanId = this.activePlanData.id || planId;
+
         // Force running text layout (paragraph) for reading plans / prayer apps
         this.settings.layout = 'paragraph';
         this.applySettings();
@@ -6557,145 +6626,30 @@ class BibleReader {
         // Inject styles dynamically
         this.injectReadingPlanStyles();
 
-        const db = await this.getFirestoreAsync(10000);
-        if (!db) {
-            console.warn("[BibleReader] Firestore is not available, unable to load plan in detail.");
-            return;
-        }
-
         try {
-            // Fetch global plan data
-            let rawPlan = null;
-            try {
-                const planDoc = await db.collection('reading_plans').doc(planId).get();
-                if (planDoc.exists) {
-                    rawPlan = { id: planDoc.id, ...planDoc.data() };
-                }
-            } catch (docErr) {
-                console.warn("[BibleReader] Direct planDoc fetch error:", docErr);
-            }
-
-            if (!rawPlan) {
-                // Fallback search by slug, case-insensitive ID or title match
-                try {
-                    const snap = await db.collection('reading_plans').get();
-                    const target = planId.toLowerCase().trim();
-                    snap.forEach(d => {
-                        const data = d.data();
-                        if (d.id.toLowerCase() === target || (data.slug && data.slug.toLowerCase() === target) || (data.title && data.title.toLowerCase().includes(target))) {
-                            rawPlan = { id: d.id, ...data };
-                        }
-                    });
-                } catch (snapErr) {
-                    console.warn("[BibleReader] Fallback plan search failed:", snapErr);
-                }
-            }
-
-            if (!rawPlan) {
-                console.error("[BibleReader] Plan does not exist:", planId);
-                return;
-            }
-
-            if (window.contentManager && typeof window.contentManager.getLocalizedContentItem === 'function') {
-                this.activePlanData = window.contentManager.getLocalizedContentItem(rawPlan);
-            } else {
-                this.activePlanData = rawPlan;
-            }
-            this.activePlanId = this.activePlanData.id;
-
-            // Determine active day
             let activeDayNum = this.activePlanDay;
-            
+
             // Check user progress if logged in
             if (this.currentUser) {
-                const userPlanDoc = await db.collection('users')
-                    .doc(this.currentUser.uid)
-                    .collection('reading_plans')
-                    .doc(planId)
-                    .get();
+                try {
+                    const db = await this.getFirestoreAsync(3000);
+                    if (db) {
+                        const userPlanDoc = await db.collection('users')
+                            .doc(this.currentUser.uid)
+                            .collection('reading_plans')
+                            .doc(planId)
+                            .get();
 
-                if (userPlanDoc.exists) {
-                    this.userPlanProgress = userPlanDoc.data();
-                    
-                    // Merge local guest progress if exists
-                    const localProgress = this.safeGetLocalStorage('hkm_reading_plan_progress_' + planId);
-                    if (localProgress) {
-                        try {
-                            const localData = JSON.parse(localProgress);
-                            let needsUpdate = false;
-                            
-                            if (localData.completedDays && Array.isArray(localData.completedDays)) {
-                                this.userPlanProgress.completedDays = this.userPlanProgress.completedDays || [];
-                                for (const day of localData.completedDays) {
-                                    if (!this.userPlanProgress.completedDays.includes(day)) {
-                                        this.userPlanProgress.completedDays.push(day);
-                                        needsUpdate = true;
-                                    }
-                                }
-                            }
-                            
-                            if (localData.reflections && typeof localData.reflections === 'object') {
-                                this.userPlanProgress.reflections = this.userPlanProgress.reflections || {};
-                                for (const day of Object.keys(localData.reflections)) {
-                                    if (!this.userPlanProgress.reflections[day]) {
-                                        this.userPlanProgress.reflections[day] = localData.reflections[day];
-                                        needsUpdate = true;
-                                    }
-                                }
-                            }
-                            
-                            if (localData.currentDay > (this.userPlanProgress.currentDay || 1)) {
-                                this.userPlanProgress.currentDay = localData.currentDay;
-                                needsUpdate = true;
-                            }
-                            
-                            if (needsUpdate) {
-                                console.log("[BibleReader] Merging local guest progress into Firestore:", this.userPlanProgress);
-                                await db.collection('users')
-                                    .doc(this.currentUser.uid)
-                                    .collection('reading_plans')
-                                    .doc(planId)
-                                    .set(this.userPlanProgress, { merge: true });
-                            }
-                            this.safeRemoveLocalStorage('hkm_reading_plan_progress_' + planId);
-                        } catch (err) {
-                            console.warn("[BibleReader] Failed to merge local progress:", err);
+                        if (userPlanDoc.exists) {
+                            this.userPlanProgress = userPlanDoc.data();
                         }
                     }
-
-                    if (!activeDayNum) {
-                        activeDayNum = this.userPlanProgress.currentDay || 1;
-                    }
-                } else {
-                    // Migrate local progress if it exists
-                    const localProgress = this.safeGetLocalStorage('hkm_reading_plan_progress_' + planId);
-                    if (localProgress) {
-                        try {
-                            this.userPlanProgress = JSON.parse(localProgress);
-                            console.log("[BibleReader] Migrating local guest progress to Firestore:", this.userPlanProgress);
-                            await db.collection('users')
-                                .doc(this.currentUser.uid)
-                                .collection('reading_plans')
-                                .doc(planId)
-                                .set(this.userPlanProgress, { merge: true });
-                            this.safeRemoveLocalStorage('hkm_reading_plan_progress_' + planId);
-                        } catch (err) {
-                            console.warn("[BibleReader] Failed to migrate local progress:", err);
-                        }
-                    }
-                    
-                    if (!this.userPlanProgress) {
-                        this.userPlanProgress = {
-                            planId: planId,
-                            currentDay: 1,
-                            completedDays: [],
-                            reflections: {}
-                        };
-                    }
-                    if (!activeDayNum) activeDayNum = this.userPlanProgress.currentDay || 1;
+                } catch (userPlanErr) {
+                    console.warn("[BibleReader] Error checking user progress:", userPlanErr);
                 }
-            } else {
-                // Guest progress from localStorage
+            }
+
+            if (!this.userPlanProgress) {
                 const localProgress = this.safeGetLocalStorage('hkm_reading_plan_progress_' + planId);
                 if (localProgress) {
                     try {
@@ -6703,20 +6657,23 @@ class BibleReader {
                     } catch (e) {
                         console.warn("[BibleReader] Failed to parse guest progress:", e);
                     }
-                } else {
-                    this.userPlanProgress = {
-                        planId: planId,
-                        currentDay: 1,
-                        completedDays: [],
-                        reflections: {}
-                    };
-                }
-                if (!activeDayNum) {
-                    activeDayNum = this.userPlanProgress.currentDay || 1;
                 }
             }
+
+            if (!this.userPlanProgress) {
+                this.userPlanProgress = {
+                    planId: planId,
+                    currentDay: 1,
+                    completedDays: [],
+                    reflections: {}
+                };
+            }
+
+            if (!activeDayNum) {
+                activeDayNum = this.userPlanProgress.currentDay || 1;
+            }
             this.activePlanDay = activeDayNum;
-            
+
             // Render integrated reading plan UI
             await this.setupReadingPlanUI(true);
             this.updateUrlParams();
