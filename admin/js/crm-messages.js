@@ -1225,6 +1225,29 @@ class MessagesManager {
     }
 
     // Selection Methods
+    toggleBulkSelectionMode() {
+        this.isBulkMode = !this.isBulkMode;
+        const container = document.getElementById('unified-inbox');
+        const toggleBtn = document.getElementById('toggle-bulk-mode-btn');
+        
+        if (this.isBulkMode) {
+            if (container) container.classList.add('bulk-mode-active');
+            if (toggleBtn) {
+                toggleBtn.style.background = '#fee2e2';
+                toggleBtn.style.borderColor = '#ef4444';
+            }
+            this.updateBulkToolbar();
+        } else {
+            if (container) container.classList.remove('bulk-mode-active');
+            if (toggleBtn) {
+                toggleBtn.style.background = '';
+                toggleBtn.style.borderColor = '';
+            }
+            this.selectedThreads.clear();
+            this.renderThreadList();
+        }
+    }
+
     toggleThreadSelection(id, isSelected) {
         if (isSelected) {
             this.selectedThreads.add(id);
@@ -1262,7 +1285,7 @@ class MessagesManager {
 
         const selectedCount = this.selectedThreads.size;
         
-        if (selectedCount > 0) {
+        if (selectedCount > 0 || this.isBulkMode) {
             toolbar.style.display = 'flex';
             countEl.textContent = `${selectedCount} valgt`;
             

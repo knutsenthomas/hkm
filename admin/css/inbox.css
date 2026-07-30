@@ -269,6 +269,23 @@
     border-left: none;
 }
 
+.thread-item-checkbox {
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.bulk-mode-active .thread-item-checkbox {
+    display: flex !important;
+}
+
+.thread-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--inbox-orange, #d17d39);
+}
+
 /* Push Thread Specifics */
 .thread-avatar.push {
     background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%) !important;
@@ -1243,7 +1260,14 @@
     }
 
     .thread-item-checkbox {
-        display: none !important;
+        display: none;
+    }
+
+    .bulk-mode-active .thread-item-checkbox {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin-right: 8px !important;
     }
 
     .thread-avatar {
