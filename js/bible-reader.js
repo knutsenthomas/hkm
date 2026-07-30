@@ -503,7 +503,7 @@ class BibleReader {
                             if (!this._isInitializingPlan && (!this.activePlanData || !this.activePlanData.id)) {
                                 this.initReadingPlanMode(this.activePlanId, this.activePlanDay);
                             } else if (this.activePlanMode) {
-                                this.renderLeftSidebarReadingPlan();
+                                this.setupReadingPlanUI();
                             }
                         }
                     });
