@@ -8890,8 +8890,11 @@ html[data-theme="dark"] .crm-tool-confirm-card {
 }
 
 /* 4. Unified Inbox / Messaging Page */
-html[data-theme="dark"] .unified-inbox-container {
-  background: var(--admin-surface, #1e293b) !important;
+html[data-theme="dark"] .unified-inbox-container,
+html[data-theme="dark"] .inbox-container,
+html[data-theme="dark"] .inbox-threads,
+html[data-theme="dark"] .threads-header {
+  background: var(--admin-bg, #0f172a) !important;
   color: var(--admin-text, #f8fafc) !important;
 }
 html[data-theme="dark"] .inbox-folders {
@@ -8917,16 +8920,8 @@ html[data-theme="dark"] .folder-item.active .folder-badge {
   background: rgba(209, 125, 57, 0.2) !important;
   color: var(--admin-accent-color, #d17d39) !important;
 }
-html[data-theme="dark"] .inbox-threads {
-  background: var(--admin-surface, #1e293b) !important;
-  border-right-color: var(--admin-border, #334155) !important;
-}
-html[data-theme="dark"] .threads-header {
-  background: var(--admin-surface, #1e293b) !important;
-  border-bottom-color: var(--admin-border, #334155) !important;
-}
 html[data-theme="dark"] .threads-search input {
-  background: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface, #1e293b) !important;
   border-color: var(--admin-border, #334155) !important;
   color: var(--admin-text, #f8fafc) !important;
 }
