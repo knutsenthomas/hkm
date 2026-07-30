@@ -1005,7 +1005,6 @@
     .threads-search-row {
         display: flex !important;
         align-items: center !important;
-        justify-content: space-between !important;
         gap: 10px !important;
         width: 100% !important;
         max-width: 100% !important;
@@ -1027,7 +1026,7 @@
     }
 
     .threads-search {
-        flex: 1 1 auto !important;
+        flex: 1 1 0% !important;
         width: 100% !important;
         position: relative !important;
         min-width: 0 !important;
@@ -1054,7 +1053,7 @@
 
     #mark-all-read-btn {
         flex-shrink: 0 !important;
-        margin-left: auto !important;
+        margin: 0 !important;
     }
 
     /* Folder Menu Drawer on Mobile */
