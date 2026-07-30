@@ -218,8 +218,9 @@
 }
 
 .thread-item.active {
-    background: #fff7ed;
-    border-left: 3px solid var(--inbox-orange);
+    background: #e2e8f0;
+    border-radius: 12px;
+    border-left: none;
 }
 
 /* Push Thread Specifics */
