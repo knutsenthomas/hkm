@@ -803,6 +803,42 @@ class MessagesManager {
         };
         const initials = getInitials(msg.name || '');
 
+        // Render replies thread if any replies exist
+        let repliesHtml = '';
+        if (Array.isArray(msg.replies) && msg.replies.length > 0) {
+            repliesHtml = `
+                <div class="email-thread-replies" style="margin: 24px 0; border-top: 1px dashed #cbd5e1; padding-top: 24px; display: flex; flex-direction: column; gap: 16px;">
+                    <div style="font-size: 12px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px;">
+                        <span class="material-symbols-outlined" style="font-size: 16px; color: #16a34a;">check_circle</span>
+                        Sendte svar (${msg.replies.length})
+                    </div>
+                    ${msg.replies.map(reply => {
+                        const replyDate = reply.sentAt ? (new Date(reply.sentAt)).toLocaleString('no-NO') : 'Nylig';
+                        const replySender = reply.fromName || reply.sentByEmail || 'His Kingdom Ministry';
+                        const replyText = reply.html || (reply.text ? this.escapeHtml(reply.text).replace(/\n/g, '<br>') : '');
+                        
+                        return `
+                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #e2e8f0;">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div style="width: 32px; height: 32px; border-radius: 50%; background: #fff7ed; color: #d17d39; font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(209, 125, 57, 0.3);">
+                                            HK
+                                        </div>
+                                        <div>
+                                            <div style="font-size: 14px; font-weight: 700; color: #0f172a;">${this.escapeHtml(replySender)}</div>
+                                            <div style="font-size: 12px; color: #64748b;">Til: ${this.escapeHtml(reply.to || msg.email || '')}</div>
+                                        </div>
+                                    </div>
+                                    <div style="font-size: 12px; color: #94a3b8; font-weight: 500;">${replyDate}</div>
+                                </div>
+                                <div style="font-size: 14.5px; line-height: 1.6; color: #334155;">${replyText}</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
         viewEl.innerHTML = `
             <div class="view-header" style="padding: 18px 28px; border-bottom: 1px solid #e2e8f0; background: #ffffff; display: flex; justify-content: space-between; align-items: center;">
                 <h1 class="email-subject-title" style="font-size: 19px; font-weight: 800; color: #0f172a; margin: 0; letter-spacing: -0.01em;">${this.escapeHtml(msg.subject || 'Seerkurs med aktivering')}</h1>
@@ -836,11 +872,14 @@ class MessagesManager {
                     </div>
 
                     <!-- Email Body -->
-                    <div class="email-body" style="font-size: 15px; line-height: 1.65; color: #334155; white-space: pre-wrap; margin: 0 0 32px 0; background: transparent; padding: 0; border: none; flex: 1;">${this.escapeHtml(msg.message || '')}</div>
+                    <div class="email-body" style="font-size: 15px; line-height: 1.65; color: #334155; white-space: pre-wrap; margin: 0; background: transparent; padding: 0; border: none;">${this.escapeHtml(msg.message || '')}</div>
                     
+                    <!-- Sent Replies Thread -->
+                    ${repliesHtml}
+
                     <!-- Sleek Minimalist Reply Box -->
-                    <div class="view-reply-card" style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); overflow: hidden; margin-top: auto; transition: border-color 0.2s;">
-                        <!-- Optional Header for Sender Email -->
+                    <div class="view-reply-card" style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); overflow: hidden; margin-top: 24px; transition: border-color 0.2s;">
+                        <!-- Header for Sender Email -->
                         <div style="padding: 10px 18px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #475569;">
                             <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                 <span style="font-weight: 600; color: #1e293b;">Fra:</span>
@@ -928,7 +967,10 @@ class MessagesManager {
 
         this.isSendingReply = true;
         const statusEl = document.getElementById('inbox-reply-status');
-        if (statusEl) statusEl.textContent = 'Sender...';
+        if (statusEl) {
+            statusEl.style.color = '#3b82f6';
+            statusEl.textContent = 'Sender e-post...';
+        }
 
         try {
             if (this.activeThreadType === 'chat') {
@@ -1002,17 +1044,39 @@ class MessagesManager {
                     throw new Error(result.error || `Serverfeil (HTTP ${response.status}) ved sending av e-post.`);
                 }
 
+                // Update local thread message replies
+                const activeMsg = this.messages.find(m => m.id === this.activeThreadId);
+                if (activeMsg) {
+                    if (!activeMsg.replies) activeMsg.replies = [];
+                    activeMsg.replies.push({
+                        to,
+                        fromName: fromMode === 'admin' ? (this.currentAdminEmail || 'HKM Team') : 'His Kingdom Ministry',
+                        text,
+                        html,
+                        sentByEmail: user?.email || '',
+                        sentAt: new Date().toISOString()
+                    });
+                    activeMsg.status = 'besvart';
+                }
+
                 replyArea.innerHTML = '';
                 this.replyAttachments = [];
                 this.renderReplyAttachments();
-                if (statusEl) {
-                    statusEl.style.color = '#16a34a';
-                    statusEl.textContent = 'E-post sendt!';
+                
+                // Re-render email view to instantly show the sent reply in the thread list!
+                await this.renderEmailView(this.activeThreadId);
+                
+                const newStatusEl = document.getElementById('inbox-reply-status');
+                if (newStatusEl) {
+                    newStatusEl.style.color = '#16a34a';
+                    newStatusEl.textContent = 'E-post sendt!';
                 }
-                setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 2200);
-                this.messages = this.messages.map((message) =>
-                    message.id === this.activeThreadId ? { ...message, status: 'besvart' } : message
-                );
+                setTimeout(() => { 
+                    const s = document.getElementById('inbox-reply-status');
+                    if (s) s.textContent = ''; 
+                }, 3000);
+                
+                this.updateBadges();
                 this.updateBadges();
                 this.renderThreadList();
             }
