@@ -1194,7 +1194,7 @@
         align-items: center !important;
         justify-content: center !important;
         gap: 8px !important;
-        box-shadow: 0 4px 14px rgba(209, 125, 57, 0.25) !important;
+        box-shadow: none !important;
     }
 
     .folder-item {
