@@ -6160,82 +6160,214 @@ class BibleReader {
         }
     }
 
-    async shiftPlanDates(planId, currentDay) {
+    async shiftPlanDates(planId) {
+        const userPlan = this.userPlanProgress || {};
+        const completedDays = userPlan.completedDays || [];
+        
+        let lastCompletedDay = 0;
+        if (completedDays.length > 0) {
+            lastCompletedDay = Math.max(...completedDays.map(n => Number(n) || 0));
+        }
+
+        const today = new Date();
+        const midnightToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 0, 0);
+        const newStartedAt = new Date(midnightToday.getTime() - (lastCompletedDay * 24 * 60 * 60 * 1000));
+        const nextDayToRead = lastCompletedDay + 1;
+
         const db = this.getFirestore();
         if (this.currentUser && db) {
             try {
-                const today = new Date();
-                const daysToSubtract = currentDay - 1;
-                const newStartedAt = new Date(today.getFullYear(), today.getMonth(), today.getDate() - daysToSubtract, 12, 0, 0);
-
-                // Update Firestore
                 await db.collection('users')
                     .doc(this.currentUser.uid)
                     .collection('reading_plans')
                     .doc(planId)
-                    .update({
-                        currentDay: currentDay,
+                    .set({
                         startedAt: firebase.firestore.Timestamp.fromDate(newStartedAt),
+                        currentDay: nextDayToRead,
                         lastActiveAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-
-                // Update Local progress object
-                if (this.userPlanProgress && this.userPlanProgress.planId === planId) {
-                    this.userPlanProgress.currentDay = currentDay;
-                    this.userPlanProgress.startedAt = newStartedAt;
-                }
-
-                // Refresh UI
-                this.setupReadingPlanUI(true);
+                    }, { merge: true });
             } catch (err) {
-                console.error("Failed to shift plan dates:", err);
+                console.warn("[BibleReader] Failed to update shifted dates in Firestore:", err);
             }
         }
+
+        if (this.userPlanProgress && (this.userPlanProgress.planId === planId || this.userPlanProgress.id === planId)) {
+            this.userPlanProgress.startedAt = newStartedAt;
+            this.userPlanProgress.currentDay = nextDayToRead;
+            this.saveReadingPlanProgressLocally(planId, this.userPlanProgress);
+        }
+
+        this.setupReadingPlanUI(true);
     }
 
     async jumpToToday(planId, expectedDay) {
         await this.syncToExpectedDay(planId, expectedDay);
     }
 
-    openAdjustPlanDatesModal(planId, currentDay) {
+    openCatchMeUpModal(planId) {
+        const existing = document.getElementById('hkm-catch-me-up-modal');
+        if (existing) existing.remove();
+
         const lang = document.documentElement.lang || 'no';
-        const t_title = {
-            no: 'Tilpass leseplanen',
-            en: 'Adjust Reading Plan',
-            es: 'Ajustar Plan de Lectura'
-        }[lang] || 'Tilpass leseplanen';
         
-        const t_desc = {
-            no: `Vil du forskyve leseplanens kalender? Dette setter <strong>Dag ${currentDay}</strong> til å være i dag. Planens tidsplan justeres fremover slik at du blir "i rute", uten at du mister fremdriften din.`,
-            en: `Do you want to shift the reading plan's calendar? This sets <strong>Day ${currentDay}</strong> to today. The plan schedule will be adjusted forward so you are on track, without losing your progress.`,
-            es: `¿Quieres ajustar el calendario del plan? Esto establece el <strong>Día ${currentDay}</strong> como hoy. El calendario del plan se ajustará hacia adelante para que estés al día, sin perder tu progreso.`
-        }[lang] || `Vil du forskyve leseplanens kalender? Dette setter <strong>Dag ${currentDay}</strong> til å være i dag. Planens tidsplan justeres fremover slik at du blir "i rute", uten at du mister fremdriften din.`;
+        const t = {
+            no: {
+                title: 'Henger du litt etter?',
+                desc: 'Tilpass start- og sluttdatoer. Siste fullførte dag blir satt til i går. Påbegynte dager vil fortsatt vise ufullførte oppgaver.',
+                shiftBtn: 'Forskyv datoer fremover',
+                cancelBtn: 'AVBRYT'
+            },
+            en: {
+                title: 'Falling a bit behind?',
+                desc: 'Shift start and end dates. Last fully completed day becomes yesterday. Partially completed days still reflect unfinished selections.',
+                shiftBtn: 'Shift Dates Forward',
+                cancelBtn: 'CANCEL'
+            },
+            es: {
+                title: '¿Te has atrasado un poco?',
+                desc: 'Ajusta las fechas de inicio y fin. El último día completado pasa a ser ayer. Los días parcialmente completados seguirán mostrando las tareas pendientes.',
+                shiftBtn: 'Adelantar fechas',
+                cancelBtn: 'CANCELAR'
+            }
+        }[lang] || {
+            title: 'Henger du litt etter?',
+            desc: 'Tilpass start- og sluttdatoer. Siste fullførte dag blir satt til i går. Påbegynte dager vil fortsatt vise ufullførte oppgaver.',
+            shiftBtn: 'Forskyv datoer fremover',
+            cancelBtn: 'AVBRYT'
+        };
 
-        const t_cancel = { no: 'Avbryt', en: 'Cancel', es: 'Cancelar' }[lang] || 'Avbryt';
-        const t_adjust = { no: 'Juster datoer', en: 'Adjust dates', es: 'Ajustar fechas' }[lang] || 'Juster datoer';
+        const modalOverlay = document.createElement('div');
+        modalOverlay.id = 'hkm-catch-me-up-modal';
+        modalOverlay.className = 'hkm-modal-overlay active';
+        modalOverlay.style.cssText = 'position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important; display: flex !important; align-items: center !important; justify-content: center !important; z-index: 3000000 !important; padding: 20px !important; box-sizing: border-box !important;';
 
-        const modal = document.createElement('div');
-        modal.className = 'modal modal-open';
-        modal.style.cssText = 'position:fixed; inset:0; background:rgba(15,23,42,0.4); display:flex; align-items:center; justify-content:center; z-index:9999; padding:16px;';
-        
-        modal.innerHTML = `
-            <div style="background:#ffffff; border-radius:20px; max-width:450px; width:100%; padding:24px; box-shadow:0 10px 25px rgba(0,0,0,0.1); border:1px solid #e2e8f0; text-align:left;">
-                <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
-                    <div style="background:#fffbeb; border-radius:50%; width:40px; height:40px; aspect-ratio: 1 / 1; display:flex; align-items:center; justify-content:center; flex-shrink: 0; box-sizing: border-box;">
-                        <span class="material-symbols-outlined" style="color:#d97706; font-size:24px;">restore</span>
-                    </div>
-                    <h3 style="font-size:18px; font-weight:700; color:#1b4965; margin:0;">${t_title}</h3>
-                </div>
-                <p style="font-size:14px; color:#475569; line-height:1.5; margin:0 0 20px 0;">
-                    ${t_desc}
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || document.body.classList.contains('dark') || document.body.classList.contains('bible-theme-dark');
+
+        modalOverlay.innerHTML = `
+            <div class="hkm-catch-me-up-card" style="background: ${isDark ? '#1e293b' : '#ffffff'}; color: ${isDark ? '#f8fafc' : '#0f172a'}; border-radius: 28px; max-width: 380px; width: 100%; padding: 32px 28px 24px 28px; box-shadow: 0 20px 40px rgba(0,0,0,0.25); border: 1px solid ${isDark ? '#334155' : 'rgba(0,0,0,0.06)'}; box-sizing: border-box; display: flex; flex-direction: column;">
+                <h2 style="margin: 0 0 16px 0; font-size: 23px; font-weight: 800; line-height: 1.25; color: ${isDark ? '#f8fafc' : '#0f172a'}; font-family: 'Inter', system-ui, sans-serif;">
+                    ${t.title}
+                </h2>
+                
+                <p style="margin: 0 0 32px 0; font-size: 15px; line-height: 1.5; color: ${isDark ? '#cbd5e1' : '#475569'}; font-family: 'Inter', system-ui, sans-serif;">
+                    ${t.desc}
                 </p>
-                <div style="display:flex; justify-content:flex-end; gap:12px;">
-                    <button class="hkm-btn-secondary" onclick="this.closest('.modal').remove()" style="height:36px !important; padding:0 16px !important; font-size:13px !important; border-radius:8px !important; margin: 0 !important;">${t_cancel}</button>
-                    <button class="hkm-btn-primary" onclick="window.bibleReader.shiftPlanDates('${planId}', ${currentDay}); this.closest('.modal').remove()" style="background:#d97706 !important; border-color:#d97706 !important; color:#ffffff !important; height:36px !important; padding:0 16px !important; font-size:13px !important; border-radius:8px !important; margin: 0 !important;">${t_adjust}</button>
+
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 14px; width: 100%; font-family: 'Inter', system-ui, sans-serif;">
+                    <button id="hkm-catch-up-confirm-btn" style="background: none; border: none; padding: 10px 14px; font-size: 15px; font-weight: 700; color: ${isDark ? '#60a5fa' : '#0f172a'}; cursor: pointer; border-radius: 8px; transition: background 0.15s ease; text-transform: uppercase; letter-spacing: 0.2px;">
+                        ${t.shiftBtn}
+                    </button>
+                    
+                    <button id="hkm-catch-up-cancel-btn" style="background: none; border: none; padding: 8px 14px; font-size: 14px; font-weight: 700; color: ${isDark ? '#94a3b8' : '#64748b'}; cursor: pointer; border-radius: 8px; transition: background 0.15s ease; text-transform: uppercase; letter-spacing: 0.2px;">
+                        ${t.cancelBtn}
+                    </button>
                 </div>
             </div>
         `;
-        document.body.appendChild(modal);
+
+        document.body.appendChild(modalOverlay);
+
+        const confirmBtn = modalOverlay.querySelector('#hkm-catch-up-confirm-btn');
+        const cancelBtn = modalOverlay.querySelector('#hkm-catch-up-cancel-btn');
+
+        confirmBtn.onclick = async () => {
+            confirmBtn.disabled = true;
+            confirmBtn.style.opacity = '0.5';
+            await this.shiftPlanDates(planId);
+            modalOverlay.remove();
+        };
+
+        cancelBtn.onclick = () => {
+            modalOverlay.remove();
+        };
+
+        modalOverlay.onclick = (e) => {
+            if (e.target === modalOverlay) modalOverlay.remove();
+        };
+    }
+
+    openAdjustPlanDatesModal(planId) {
+        this.openCatchMeUpModal(planId);
+    }
+
+    openReadingPlanOptionsMenu(planId) {
+        const existing = document.getElementById('hkm-rp-options-sheet');
+        if (existing) {
+            existing.remove();
+            return;
+        }
+
+        const lang = document.documentElement.lang || 'no';
+        const t = {
+            no: {
+                catchUp: 'Henger du litt etter? (Kom i rute)',
+                reset: 'Tilbakestill leseplan',
+                cancel: 'Avbryt'
+            },
+            en: {
+                catchUp: 'Falling a bit behind? (Catch Up)',
+                reset: 'Reset Reading Plan',
+                cancel: 'Cancel'
+            },
+            es: {
+                catchUp: '¿Te has atrasado un poco? (Adelantar)',
+                reset: 'Reiniciar Plan de Lectura',
+                cancel: 'Cancelar'
+            }
+        }[lang] || {
+            catchUp: 'Henger du litt etter? (Kom i rute)',
+            reset: 'Tilbakestill leseplan',
+            cancel: 'Avbryt'
+        };
+
+        const sheet = document.createElement('div');
+        sheet.id = 'hkm-rp-options-sheet';
+        sheet.className = 'hkm-modal-overlay active';
+        sheet.style.cssText = 'position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5) !important; backdrop-filter: blur(4px) !important; -webkit-backdrop-filter: blur(4px) !important; display: flex !important; align-items: flex-end !important; justify-content: center !important; z-index: 3000000 !important; padding: 0 !important; margin: 0 !important;';
+
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || document.body.classList.contains('dark') || document.body.classList.contains('bible-theme-dark');
+
+        sheet.innerHTML = `
+            <div style="background: ${isDark ? '#1e293b' : '#ffffff'}; color: ${isDark ? '#f8fafc' : '#0f172a'}; border-top-left-radius: 24px; border-top-right-radius: 24px; width: 100%; max-width: 500px; padding: 24px 20px; box-shadow: 0 -10px 30px rgba(0,0,0,0.2); box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; animation: hkmSheetSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
+                <div style="width: 36px; height: 4px; background: ${isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)'}; border-radius: 2px; margin: 0 auto 16px auto;"></div>
+                
+                <button id="hkm-opt-catch-up" style="display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: none; background: ${isDark ? '#334155' : 'rgba(209, 125, 57, 0.08)'}; color: ${isDark ? '#f8fafc' : '#d17d39'}; font-size: 15px; font-weight: 700; border-radius: 14px; cursor: pointer; text-align: left; transition: all 0.2s;">
+                    <span class="material-symbols-outlined" style="font-size: 22px; color: #d17d39;">restore</span>
+                    <span>${t.catchUp}</span>
+                </button>
+
+                <button id="hkm-opt-reset" style="display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: none; background: transparent; color: #ef4444; font-size: 15px; font-weight: 600; border-radius: 14px; cursor: pointer; text-align: left; transition: all 0.2s;">
+                    <span class="material-symbols-outlined" style="font-size: 22px; color: #ef4444;">restart_alt</span>
+                    <span>${t.reset}</span>
+                </button>
+
+                <button id="hkm-opt-cancel" style="display: flex; align-items: center; justify-content: center; padding: 14px 16px; border: none; background: ${isDark ? 'rgba(255,255,255,0.06)' : '#f1f5f9'}; color: ${isDark ? '#cbd5e1' : '#64748b'}; font-size: 14px; font-weight: 700; border-radius: 14px; cursor: pointer; margin-top: 8px;">
+                    ${t.cancel}
+                </button>
+            </div>
+        `;
+
+        document.body.appendChild(sheet);
+
+        sheet.querySelector('#hkm-opt-catch-up').onclick = () => {
+            sheet.remove();
+            this.openCatchMeUpModal(planId);
+        };
+
+        sheet.querySelector('#hkm-opt-reset').onclick = () => {
+            sheet.remove();
+            if (confirm(lang === 'en' ? 'Are you sure you want to reset your reading plan progress?' : 'Er du sikker på at du vil tilbakestille fremdriften i leseplanen?')) {
+                this.resetReadingPlanProgress(planId);
+            }
+        };
+
+        sheet.querySelector('#hkm-opt-cancel').onclick = () => {
+            sheet.remove();
+        };
+
+        sheet.onclick = (e) => {
+            if (e.target === sheet) sheet.remove();
+        };
     }
 
     async getStartedPlanIds() {
@@ -8121,7 +8253,7 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                             <h2 class="hkm-rp-sidebar-title" style="margin: 0; font-size: 15px; font-weight: 800; color: var(--text-base); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${displayTitle}</h2>
                         </div>
                         <div style="display: flex; align-items: center; gap: 4px;">
-                            <button class="hkm-rp-action-btn" style="background: none; border: none; padding: 8px; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='var(--highlight-bg)'" onmouseout="this.style.backgroundColor='transparent'" onclick="window.bibleReader.toggleLeftSidebarMode()">
+                            <button class="hkm-rp-action-btn" style="background: none; border: none; padding: 8px; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='var(--highlight-bg)'" onmouseout="this.style.backgroundColor='transparent'" onclick="window.bibleReader.openReadingPlanOptionsMenu('${globalPlan.id}')">
                                 <span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
                             </button>
                             <button class="hkm-rp-close-btn-mobile" onclick="document.getElementById('bible-sidebar').classList.remove('active')">
@@ -8142,6 +8274,37 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                                 <span class="material-symbols-outlined" style="font-size: 20px; color: rgba(255,255,255,0.95);">book_2</span>
                             </div>
                         </div>
+
+                        ${(() => {
+                            if (!userPlan.startedAt || totalDays <= 0) return '';
+                            const startedDate = userPlan.startedAt.toDate ? userPlan.startedAt.toDate() : new Date(userPlan.startedAt);
+                            const today = new Date();
+                            const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                            const startMidnight = new Date(startedDate.getFullYear(), startedDate.getMonth(), startedDate.getDate());
+                            const daysSinceStart = Math.floor((todayMidnight - startMidnight) / (1000 * 60 * 60 * 24)) + 1;
+                            const completedCount = userPlan.completedDays ? userPlan.completedDays.length : 0;
+                            if (daysSinceStart > (completedCount + 1)) {
+                                return `
+                                <div class="hkm-rp-behind-banner" onclick="window.bibleReader.openCatchMeUpModal('${globalPlan.id}')" style="background: rgba(209, 125, 57, 0.08); border: 1px solid rgba(209, 125, 57, 0.25); border-radius: 14px; padding: 14px 18px; margin-bottom: 16px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; transition: all 0.2s;">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div style="background: rgba(209, 125, 57, 0.15); width: 36px; height: 36px; aspect-ratio: 1 / 1; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-sizing: border-box;">
+                                            <span class="material-symbols-outlined" style="color: #d17d39; font-size: 20px;">restore</span>
+                                        </div>
+                                        <div style="display: flex; flex-direction: column; gap: 2px;">
+                                            <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: var(--text-base);">
+                                                ${lang === 'en' ? 'Falling a bit behind?' : (lang === 'es' ? '¿Te has atrasado un poco?' : 'Henger du litt etter?')}
+                                            </h4>
+                                            <p style="margin: 0; font-size: 12.5px; color: var(--text-muted); line-height: 1.35;">
+                                                ${lang === 'en' ? 'Tap to shift dates forward and get back on track' : (lang === 'es' ? 'Toca para adelantar las fechas y ponerte al día' : 'Trykk her for å tilpasse datoene og komme i rute igjen')}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <span class="material-symbols-outlined" style="color: #d17d39; font-size: 20px;">chevron_right</span>
+                                </div>
+                                `;
+                            }
+                            return '';
+                        })()}
 
                         ${!this.currentUser ? `
                         <!-- Premium Sign-in Reminder -->
