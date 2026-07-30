@@ -10393,6 +10393,7 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
         this.audioIsPlaying = true;
         this.audioIsPaused = false;
         this.showAudioPlayerBar();
+        this.updateAudioPlayerUI();
         
         const infoDisplay = document.getElementById('audio-info-display');
         if (infoDisplay) {
@@ -10720,12 +10721,59 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
 
     updateAudioPlayerUI() {
         const infoDisplay = document.getElementById('audio-info-display');
-        if (!infoDisplay) return;
+        if (infoDisplay) {
+            if (this.audioIsPaused) {
+                infoDisplay.textContent = this.t('paused') || 'Pauset';
+            } else {
+                infoDisplay.textContent = (this.t('playing_verse') || 'Spiller av') + '...';
+            }
+        }
 
-        if (this.audioIsPaused) {
-            infoDisplay.textContent = this.t('paused') || 'Pauset';
-        } else {
-            infoDisplay.textContent = (this.t('playing_verse') || 'Spiller av') + '...';
+        const lang = document.documentElement.lang || 'no';
+
+        // Update Devotional Step 2 Header Audio Button (#hkm-yv-btn-audio-header)
+        const audioHeaderBtn = document.getElementById('hkm-yv-btn-audio-header');
+        if (audioHeaderBtn) {
+            const iconSpan = audioHeaderBtn.querySelector('.material-symbols-outlined');
+            const textSpan = audioHeaderBtn.querySelector('span:not(.material-symbols-outlined)');
+            
+            if (this.audioIsPlaying && !this.audioIsPaused) {
+                if (iconSpan) iconSpan.textContent = 'pause_circle';
+                if (textSpan) textSpan.textContent = lang === 'en' ? 'Pause audio' : (lang === 'es' ? 'Pausar audio' : 'Paus lyd');
+                audioHeaderBtn.style.background = 'rgba(209, 125, 57, 0.12)';
+                audioHeaderBtn.style.borderColor = '#d17d39';
+                audioHeaderBtn.style.color = '#d17d39';
+            } else if (this.audioIsPaused) {
+                if (iconSpan) iconSpan.textContent = 'play_circle';
+                if (textSpan) textSpan.textContent = lang === 'en' ? 'Resume audio' : (lang === 'es' ? 'Reanudar audio' : 'Fortsett lyd');
+                audioHeaderBtn.style.background = 'var(--bg-card, #ffffff)';
+                audioHeaderBtn.style.borderColor = '#d17d39';
+                audioHeaderBtn.style.color = 'var(--text-base, #0f172a)';
+            } else {
+                if (iconSpan) iconSpan.textContent = 'play_circle';
+                if (textSpan) textSpan.textContent = lang === 'en' ? 'Listen to chapter' : (lang === 'es' ? 'Escuchar capítulo' : 'Lytt til kapittelet');
+                audioHeaderBtn.style.background = 'var(--bg-card, #ffffff)';
+                audioHeaderBtn.style.borderColor = 'var(--border-color, #e2e8f0)';
+                audioHeaderBtn.style.color = 'var(--text-base, #0f172a)';
+            }
+        }
+
+        // Update Devotional Top Header Action Button (#hkm-yv-btn-audio)
+        const audioYvBtn = document.getElementById('hkm-yv-btn-audio');
+        if (audioYvBtn) {
+            const iconSpan = audioYvBtn.querySelector('.material-symbols-outlined');
+            if (iconSpan) {
+                if (this.audioIsPlaying && !this.audioIsPaused) {
+                    iconSpan.textContent = 'pause';
+                    audioYvBtn.style.color = '#d17d39';
+                } else if (this.audioIsPaused) {
+                    iconSpan.textContent = 'play_arrow';
+                    audioYvBtn.style.color = '#d17d39';
+                } else {
+                    iconSpan.textContent = 'volume_up';
+                    audioYvBtn.style.color = '';
+                }
+            }
         }
     }
     // ==========================================
