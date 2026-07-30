@@ -3,6 +3,55 @@ const FACEBOOK_URL = 'https://www.facebook.com/hiskingdomministry777?locale=nb_N
 const INSTAGRAM_URL = 'https://www.instagram.com/freedomisathand/';
 const YOUTUBE_URL = 'https://www.youtube.com/@HisKingdomMinistry';
 
+if (typeof window !== 'undefined') {
+    window.hkmApplyTheme = function (theme) {
+        const activeTheme = theme || (typeof localStorage !== 'undefined' && localStorage.getItem('hkm_theme')) || document.documentElement.getAttribute('data-theme') || 'light';
+        
+        document.documentElement.setAttribute('data-theme', activeTheme);
+        document.documentElement.classList.toggle('dark', activeTheme === 'dark');
+        
+        if (document.body) {
+            document.body.classList.toggle('dark', activeTheme === 'dark');
+            document.body.classList.toggle('bible-theme-dark', activeTheme === 'dark');
+            document.body.classList.toggle('bible-theme-light', activeTheme !== 'dark');
+        }
+        
+        try {
+            if (typeof localStorage !== 'undefined') localStorage.setItem('hkm_theme', activeTheme);
+        } catch (e) {}
+
+        document.querySelectorAll('.theme-toggle-icon').forEach(icon => {
+            icon.textContent = activeTheme === 'dark' ? 'light_mode' : 'dark_mode';
+        });
+
+        if (window.bibleReader) {
+            window.bibleReader.settings.theme = activeTheme === 'dark' ? 'dark' : 'light';
+            if (typeof window.bibleReader.saveSettings === 'function') window.bibleReader.saveSettings();
+            if (typeof window.bibleReader.applySettings === 'function') window.bibleReader.applySettings();
+        }
+
+        window.dispatchEvent(new CustomEvent('hkm-theme-changed', { detail: { theme: activeTheme } }));
+    };
+
+    window.hkmToggleTheme = function () {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+        const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        window.hkmApplyTheme(nextTheme);
+    };
+
+    if (!window.hkmThemeClickBound) {
+        window.hkmThemeClickBound = true;
+        document.addEventListener('click', function (e) {
+            const btn = e.target.closest('#theme-toggle-btn, .mobile-theme-toggle-btn, .theme-toggle-btn, [data-action="toggle-theme"]');
+            if (btn) {
+                e.preventDefault();
+                e.stopPropagation();
+                window.hkmToggleTheme();
+            }
+        });
+    }
+}
+
 const ROUTES = {
     no: {
         home: '/',
