@@ -1185,24 +1185,29 @@ class MessagesManager {
         
         viewEl.innerHTML = `
             <div class="message-detail">
-                <div class="message-detail-header">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start; width:100%;">
-                        <div>
-                            <h2 class="message-subject">${this.escapeHtml(push.title || 'Push-varsling')}</h2>
-                            <div class="message-meta">
-                                <span>Sendt av: ${this.escapeHtml(push.sentBy || 'Admin')}</span>
-                                <span class="meta-separator">•</span>
-                                <span>Målgruppe: ${this.escapeHtml(push.targetRole || 'alle')}</span>
-                                <span class="meta-separator">•</span>
-                                <span>Dato: ${time.toLocaleString('no-NO')}</span>
+                <div class="message-detail-header" style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0; background: #ffffff;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                        <div style="display:flex; align-items:center; gap:12px; min-width:0; flex:1; margin-right:12px;">
+                            <button class="mobile-back-btn" onclick="window.messagesManager.closeMobileThread()" title="Tilbake til meldinger" style="display: inline-flex !important; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: #f1f5f9; border: none; color: #334155; cursor: pointer; flex-shrink: 0;">
+                                <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
+                            </button>
+                            <div style="min-width:0; flex:1;">
+                                <h2 class="message-subject" style="margin:0; font-size:18px; font-weight:800; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${this.escapeHtml(push.title || 'Push-varsling')}</h2>
+                                <div class="message-meta" style="margin-top:2px; font-size:13px; color:#64748b;">
+                                    <span>Sendt av: ${this.escapeHtml(push.sentBy || 'Admin')}</span>
+                                    <span class="meta-separator">•</span>
+                                    <span>Målgruppe: ${this.escapeHtml(push.targetRole || 'alle')}</span>
+                                    <span class="meta-separator">•</span>
+                                    <span>Dato: ${time.toLocaleString('no-NO')}</span>
+                                </div>
                             </div>
                         </div>
-                        <button class="btn-icon delete-btn" onclick="window.messagesManager.deleteMessage('${push.id}', 'push')">
-                            <span class="material-symbols-outlined">delete</span>
+                        <button class="btn-icon delete-btn" onclick="window.messagesManager.deleteMessage('${push.id}', 'push')" style="flex-shrink:0; background:none; border:1px solid #e2e8f0; border-radius:50%; width:36px; height:36px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; color:#64748b;">
+                            <span class="material-symbols-outlined" style="font-size:20px;">delete</span>
                         </button>
                     </div>
                 </div>
-                <div class="message-body">
+                <div class="message-body" style="padding: 24px;">
                     <div class="message-card">
                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; color: #4338ca; font-weight: 700; font-size: 13px; letter-spacing: 0.5px;">
                             <span class="material-symbols-outlined" style="font-size: 20px;">send_to_mobile</span>
@@ -1212,7 +1217,7 @@ class MessagesManager {
                         <div style="font-size: 15px; color: #334155; line-height: 1.7;">${this.escapeHtml(push.body)}</div>
                         ${push.link ? `<div style="margin-top:20px; padding-top:15px; border-top:1px solid #e2e8f0; font-size: 13px;"><span style="color:#64748b; margin-right:8px;">Link:</span><a href="${push.link}" target="_blank" style="color:var(--inbox-orange); text-decoration:none; font-weight:600;">${push.link}</a></div>` : ''}
                     </div>
-                    <p style="color: #94a3b8; font-size: 13px; font-style: italic;">Denne loggføringen viser en push-varsling som ble sendt til brukere via administrasjonspanelet.</p>
+                    <p style="color: #94a3b8; font-size: 13px; font-style: italic; margin-top: 16px;">Denne loggføringen viser en push-varsling som ble sendt til brukere via administrasjonspanelet.</p>
                 </div>
             </div>
         `;
@@ -1300,10 +1305,7 @@ class MessagesManager {
             
             this.selectedThreads.clear();
             await this.loadUnifiedInbox();
-            
-            // Clear view if active thread was deleted
-            const viewEl = document.getElementById('inbox-thread-view');
-            if (viewEl) viewEl.innerHTML = '<div class="inbox-empty-view">Ingen samtale valgt</div>';
+            this.closeMobileThread();
 
         } catch (error) {
             console.error("Bulk delete error:", error);
@@ -1323,9 +1325,7 @@ class MessagesManager {
             
             this.selectedThreads.delete(id);
             await this.loadUnifiedInbox();
-            
-            const viewEl = document.getElementById('inbox-thread-view');
-            if (viewEl) viewEl.innerHTML = '<div class="inbox-empty-view">Ingen samtale valgt</div>';
+            this.closeMobileThread();
             
         } catch (error) {
             console.error("Delete error:", error);
