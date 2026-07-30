@@ -849,8 +849,10 @@
 
 .reply-actions {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 6px;
 }
 
 .reply-tool-btn {
@@ -2280,5 +2282,33 @@ html[data-theme="dark"] .reply-tool-btn {
 html[data-theme="dark"] .reply-tool-btn:hover {
     color: #ffffff !important;
     background: #334155 !important;
+}
+
+@media (max-width: 640px) {
+    .reply-toolbar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+        padding: 12px 16px !important;
+    }
+
+    .reply-actions {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        justify-content: flex-start !important;
+        align-items: center !important;
+        gap: 8px !important;
+        width: 100% !important;
+        overflow-x: auto !important;
+    }
+
+    #inbox-send-btn {
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 11px !important;
+        font-size: 14px !important;
+        border-radius: 12px !important;
+    }
 }
 
