@@ -494,9 +494,12 @@
                     <section class="inbox-threads">
                         <div class="threads-header">
                             <div class="threads-search-row">
+                                <button class="mobile-menu-btn" onclick="document.getElementById('unified-inbox').classList.toggle('mobile-menu-open')" title="Meny">
+                                    <span class="material-symbols-outlined">menu</span>
+                                </button>
                                 <div class="threads-search">
                                     <span class="material-symbols-outlined">search</span>
-                                    <input type="text" id="inbox-search" placeholder="Søk i innboks...">
+                                    <input type="text" id="inbox-search" placeholder="Søk i meldinger...">
                                 </div>
                                 <button class="btn-icon-square" id="mark-all-read-btn" onclick="window.messagesManager.markAllAsRead()" title="Marker alle meldinger som lest">
                                     <span class="material-symbols-outlined" style="color: #10b981;">done_all</span>
@@ -517,6 +520,11 @@
                             <div class="loader"></div>
                         </div>
                     </section>
+
+                    <!-- Floating Mobile Compose Button -->
+                    <button id="mobile-compose-fab" class="mobile-compose-fab" onclick="if(window.messagesManager && window.messagesManager.openComposeModal){ window.messagesManager.openComposeModal(); } else { alert('Vennligst velg en e-post fra listen for å besvare.'); }" title="Skriv ny">
+                        <span class="material-symbols-outlined" style="font-size: 24px;">edit</span>
+                    </button>
 
                     <!-- 3. Thread View -->
                     <section class="inbox-view" id="inbox-thread-view">

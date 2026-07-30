@@ -30,6 +30,11 @@
     width: 100%;
 }
 
+.mobile-menu-btn,
+.mobile-compose-fab {
+    display: none;
+}
+
 .inbox-folders {
     width: var(--inbox-sidebar-width);
     flex-shrink: 0;
@@ -921,141 +926,201 @@
         height: calc(100vh - 64px) !important;
         overflow: hidden !important;
         border-top: none;
-    }
-    .inbox-folders {
-        display: flex;
-        flex-direction: row;
-        width: 100% !important;
-        height: 60px !important;
-        min-height: 60px !important;
-        overflow-x: auto;
-        padding: 0 16px !important;
-        background: #fff !important;
-        border-right: none;
-        border-bottom: 1px solid var(--inbox-border) !important;
-        gap: 10px;
-        scrollbar-width: none;
+        background: #ffffff;
         position: relative;
-        z-index: 100;
-        align-items: center;
+    }
+
+    /* Mobile Header & Search Bar */
+    .threads-header {
+        padding: 10px 16px !important;
+        background: #ffffff !important;
+        border-bottom: 1px solid #f1f5f9 !important;
         flex-shrink: 0 !important;
     }
-    .inbox-folders::-webkit-scrollbar {
-        display: none;
-    }
-    #btn-new-push, .folder-item {
-        box-sizing: border-box !important;
-        height: 36px !important;
-        min-height: 36px !important;
-        max-height: 36px !important;
+
+    .threads-search-row {
         display: flex !important;
         align-items: center !important;
-        justify-content: flex-start !important;
-        padding: 0 14px 0 14px !important;
-        padding-right: 22px !important; /* Extra room for badge */
-        font-size: 13px !important;
-        font-weight: 700 !important;
-        border-radius: 999px !important;
-        white-space: nowrap !important;
-        flex: 0 0 auto !important;
-        width: auto !important;
-        min-width: 110px !important;
-        gap: 8px !important;
-        margin: 0 !important;
-        cursor: pointer !important;
+        gap: 10px !important;
+        width: 100% !important;
     }
 
-    #btn-new-push .btn-text-desktop,
-    #btn-new-push .btn-text-mobile {
-        display: inline !important;
+    .mobile-menu-btn {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border: none;
+        background: transparent;
+        color: #334155;
+        cursor: pointer;
+        border-radius: 50%;
+        flex-shrink: 0;
     }
 
-    #btn-new-push {
-        appearance: none !important;
-        -webkit-appearance: none !important;
-        border: none !important;
-        background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
-        color: #fff !important;
-        box-shadow: none !important;
-        outline: none !important;
+    .threads-search {
+        flex: 1 !important;
         position: relative !important;
-        min-width: 176px !important;
+    }
+
+    .threads-search input {
+        height: 42px !important;
+        padding: 0 16px 0 44px !important;
+        font-size: 14.5px !important;
+        background: #f1f5f9 !important;
+        border: none !important;
+        border-radius: 999px !important;
+        color: #0f172a !important;
+    }
+
+    .threads-search .material-symbols-outlined {
+        left: 14px !important;
+        font-size: 20px !important;
+        color: #64748b !important;
+    }
+
+    /* Folder Menu Drawer on Mobile */
+    .inbox-folders {
+        display: none !important;
+    }
+
+    .mobile-menu-open .inbox-folders {
+        display: flex !important;
+        flex-direction: row !important;
+        width: 100% !important;
+        height: 52px !important;
+        min-height: 52px !important;
+        overflow-x: auto !important;
+        padding: 6px 12px !important;
+        background: #ffffff !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        gap: 8px !important;
+        align-items: center !important;
+        flex-shrink: 0 !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #btn-compose-email {
+        display: none !important;
     }
 
     .folder-item {
-        background: #f1f5f9;
-        border: 1px solid var(--inbox-border) !important;
-        color: #475569;
-        transition: all 0.2s ease;
-    }
-
-    #btn-new-push .material-symbols-outlined,
-    .folder-item .material-symbols-outlined {
-        font-size: 18px !important;
-        line-height: 1 !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
+        flex-shrink: 0 !important;
+        height: 36px !important;
+        padding: 0 14px !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        border-radius: 999px !important;
+        white-space: nowrap !important;
+        background: #f1f5f9 !important;
+        border: none !important;
+        color: #475569 !important;
     }
 
     .folder-item.active {
-        background: var(--brand-gradient) !important;
-        color: #fff !important;
-        border: none !important;
-        box-shadow: 0 4px 12px rgba(209, 125, 57, 0.3) !important;
-    }
-    .folder-item.active::before {
-        display: none;
-    }
-    .folder-item span:not(.material-symbols-outlined) {
-        display: block !important;
-    }
-    .folder-badge {
-        display: inline-block !important;
-        width: 18px !important;
-        height: 18px !important;
-        min-width: 18px !important;
-        max-width: 18px !important;
-        min-height: 18px !important;
-        max-height: 18px !important;
-        line-height: 18px !important;
-        background-color: #ef4444 !important;
+        background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
         color: #ffffff !important;
-        border-radius: 50% !important;
-        font-size: 10px !important;
-        font-weight: 900 !important;
-        text-align: center !important;
-        margin-left: 8px !important;
-        padding: 0 !important;
-        vertical-align: middle !important;
-        position: relative !important;
-        top: -1px !important;
-        box-sizing: border-box !important;
-        overflow: hidden !important;
     }
-    .folder-item.active .folder-badge {
-        background-color: #ffffff !important;
-        color: var(--inbox-orange) !important;
-    }
+
+    /* Clean Mobile Thread List Rows */
     .inbox-threads {
         width: 100% !important;
         flex: 1 !important;
         display: flex !important;
         flex-direction: column !important;
-        min-height: 0;
         overflow: hidden;
     }
-    .threads-header {
-        padding: 12px 16px !important;
-        background: #fff !important;
-        border-bottom: 1px solid var(--inbox-border) !important;
+
+    .threads-scroll {
+        flex: 1 !important;
+        padding: 0 !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .thread-item {
+        padding: 14px 16px !important;
+        border-bottom: 1px solid #f8fafc !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        background: #ffffff !important;
+        display: flex !important;
+        gap: 14px !important;
+        align-items: center !important;
+    }
+
+    .thread-item:hover, .thread-item.active {
+        background: #f8fafc !important;
+    }
+
+    .thread-item-checkbox {
+        display: none !important;
+    }
+
+    .thread-avatar {
+        width: 44px !important;
+        height: 44px !important;
+        border-radius: 50% !important;
+        font-size: 15px !important;
+        font-weight: 700 !important;
+        box-shadow: none !important;
         flex-shrink: 0 !important;
     }
-    .threads-search input {
-        padding: 8px 12px 8px 48px !important;
-        font-size: 14px !important;
-        background: #f8fafc !important;
-        border: 1px solid #e2e8f0 !important;
+
+    .thread-info {
+        flex: 1 !important;
+        min-width: 0 !important;
+    }
+
+    .thread-name {
+        font-size: 15px !important;
+        font-weight: 700 !important;
+        color: #0f172a !important;
+    }
+
+    .thread-time {
+        font-size: 12px !important;
+        color: #94a3b8 !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+        margin-left: 8px !important;
+    }
+
+    .thread-preview {
+        font-size: 13.5px !important;
+        color: #64748b !important;
+        margin-top: 2px !important;
+    }
+
+    /* Floating Compose FAB at Bottom Right */
+    .mobile-compose-fab {
+        display: flex !important;
+        position: fixed !important;
+        bottom: 24px !important;
+        right: 24px !important;
+        width: 56px !important;
+        height: 56px !important;
+        border-radius: 50% !important;
+        background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
+        color: #ffffff !important;
+        border: none !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: 0 8px 24px rgba(209, 125, 57, 0.4) !important;
+        z-index: 9999 !important;
+        cursor: pointer !important;
+        transition: transform 0.2s ease !important;
+    }
+
+    .mobile-compose-fab:active {
+        transform: scale(0.92) !important;
+    }
+
+    /* View active toggles on mobile */
+    .unified-inbox-container.thread-view-active .mobile-compose-fab,
+    .unified-inbox-container.view-open .mobile-compose-fab {
+        display: none !important;
     }
     .threads-scroll {
         flex: 1 !important;
