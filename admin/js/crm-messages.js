@@ -1287,6 +1287,7 @@ class MessagesManager {
         
         if (selectedCount > 0 || this.isBulkMode) {
             toolbar.style.display = 'flex';
+            requestAnimationFrame(() => toolbar.classList.add('visible'));
             countEl.textContent = `${selectedCount} valgt`;
             
             // Update select all state
@@ -1295,7 +1296,12 @@ class MessagesManager {
                 selectAllCb.checked = allSelected;
             }
         } else {
-            toolbar.style.display = 'none';
+            toolbar.classList.remove('visible');
+            setTimeout(() => {
+                if (!this.isBulkMode && this.selectedThreads.size === 0) {
+                    toolbar.style.display = 'none';
+                }
+            }, 300);
             if (selectAllCb) selectAllCb.checked = false;
         }
     }
