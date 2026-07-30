@@ -2874,6 +2874,8 @@ class BibleReader {
 
         if (!modal || !listEl) return;
 
+        modal.style.setProperty('z-index', '3000000', 'important');
+
         this.crossrefCache = this.crossrefCache || {};
 
         const currentBook = this.books ? this.books.find(b => b.id === this.selectedBookId) : null;
@@ -9765,10 +9767,15 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                             <span>Forklar kapittelet i Bibeleksikon</span>
                         </button>
 
-                        <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;">
                             <button id="hkm-yv-btn-audio-header" class="nav-btn" style="font-size: 13px; padding: 8px 16px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #0f172a); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
                                 <span class="material-symbols-outlined" style="font-size: 18px; color: #d17d39;">play_circle</span>
                                 <span>Lytt til kapittelet</span>
+                            </button>
+
+                            <button id="hkm-yv-btn-crossref-header" onclick="window.bibleReader.openVerseCrossReferenceModal('1', '${escapedHeading}')" class="nav-btn" style="font-size: 13px; padding: 8px 16px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #0f172a); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                                <span class="material-symbols-outlined" style="font-size: 18px; color: #d17d39;">link</span>
+                                <span>Kryssreferanser</span>
                             </button>
 
                             <button onclick="window.bibleReader.openBookIntroModal('${devBookId}')" class="nav-btn" style="font-size: 13px; padding: 8px 16px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #0f172a); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
