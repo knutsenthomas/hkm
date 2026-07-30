@@ -24524,15 +24524,15 @@ class AdminManager {
                                 <div class="design-ui-main-column">
                                     <!-- System Status Panel -->
                                     <div class="design-ui-panel" style="border-left: 4px solid #10b981;">
-                                        <div class="design-ui-panel-header">
-                                            <div class="design-ui-panel-header-icon" style="background: #ecfdf5; color: #10b981;">
+                                        <div class="design-ui-panel-header" style="flex-wrap: wrap; gap: 16px;">
+                                            <div class="design-ui-panel-header-icon" style="background: #ecfdf5; color: #10b981; flex-shrink: 0;">
                                                 <span class="material-symbols-outlined">check_circle</span>
                                             </div>
-                                            <div style="flex: 1;">
-                                                <h3 class="design-ui-panel-title">SYSTEMSTATUS: NORMAL</h3>
-                                                <p class="design-ui-panel-subtitle">Alle systemer fungerer optimalt. Siste backup ble kjørt automatisk i natt.</p>
+                                            <div style="flex: 1 1 200px; min-width: 180px; word-break: normal; overflow-wrap: break-word;">
+                                                <h3 class="design-ui-panel-title" style="margin: 0; font-size: 16px; font-weight: 700; color: #1e293b; word-break: normal; white-space: normal;">SYSTEMSTATUS: NORMAL</h3>
+                                                <p class="design-ui-panel-subtitle" style="margin: 4px 0 0; font-size: 13.5px; color: #64748b; word-break: normal; white-space: normal; line-height: 1.45;">Alle systemer fungerer optimalt. Siste backup ble kjørt automatisk i natt.</p>
                                             </div>
-                                            <a href="admin-logger.html" class="btn btn-outline" style="text-decoration: none;">Se logger</a>
+                                            <a href="admin-logger.html" class="btn btn-outline" style="text-decoration: none; flex-shrink: 0; margin-left: auto;">Se logger</a>
                                         </div>
                                     </div>
 

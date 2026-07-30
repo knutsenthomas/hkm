@@ -1384,6 +1384,9 @@ body.admin-body .welcome-subtitle {
   color: #0f172a;
   line-height: 1.2;
   letter-spacing: -0.02em;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+  white-space: normal !important;
 }
 
 .design-ui-panel-subtitle {
@@ -1391,6 +1394,9 @@ body.admin-body .welcome-subtitle {
   color: #64748b;
   font-size: 14px;
   line-height: 1.5;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+  white-space: normal !important;
 }
 
 .design-ui-panel-body {
