@@ -9561,10 +9561,21 @@ html[data-theme="dark"] .skeleton-text::after {
     .crossref-btn-label {
         display: none !important;
     }
-    #hkm-yv-btn-crossref-header,
-    #btn-crossref-chapter-dynamic {
-        padding: 8px 10px !important;
-    }
+}
+
+/* Ensure cross-reference round buttons remain 100% perfectly circular on all screen sizes */
+#hkm-yv-btn-crossref-header,
+#btn-crossref-chapter-dynamic,
+.round-crossref-icon-btn {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    flex-shrink: 0 !important;
 }
 
 /* Dotted text underline for selected verses in Bible reader & Reading plan (Matching reference design) */

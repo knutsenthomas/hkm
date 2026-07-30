@@ -5761,10 +5761,19 @@ class BibleReader {
                     #toolbar-btn-crossref .crossref-btn-label {
                         display: none !important;
                     }
-                    #hkm-yv-btn-crossref-header,
-                    #btn-crossref-chapter-dynamic {
-                        padding: 8px 10px !important;
-                    }
+                }
+                #hkm-yv-btn-crossref-header,
+                #btn-crossref-chapter-dynamic,
+                .round-crossref-icon-btn {
+                    width: 38px !important;
+                    height: 38px !important;
+                    min-width: 38px !important;
+                    min-height: 38px !important;
+                    aspect-ratio: 1 / 1 !important;
+                    border-radius: 50% !important;
+                    padding: 0 !important;
+                    box-sizing: border-box !important;
+                    flex-shrink: 0 !important;
                 }
                 .hkm-yv-header-actions { display: flex !important; align-items: center !important; gap: 4px !important; }
                 .hkm-yv-action-btn { background: none !important; border: none !important; padding: 8px !important; cursor: pointer !important; color: #64748b !important; display: flex !important; align-items: center !important; justify-content: center !important; border-radius: 8px !important; transition: all 0.2s !important; }
