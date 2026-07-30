@@ -1039,53 +1039,16 @@ const initAdminHeader = () => {
             });
         }
 
-        // 2. Inject language switcher if missing
-        let langSwitcher = actionsContainer.querySelector('.header-lang-switcher');
-        if (!langSwitcher) {
-            langSwitcher = document.createElement('div');
-            langSwitcher.className = 'lang-switcher header-lang-switcher';
-            langSwitcher.innerHTML = `
-                <button class="lang-btn" aria-label="Velg språk">
-                    <span class="material-symbols-outlined">language</span>
-                    <span>NO</span>
-                </button>
-                <div class="lang-dropdown" style="display: none; position: absolute; top: calc(100% + 6px); right: 0; width: 150px; background: var(--card-bg, #ffffff); border: 1px solid rgba(27, 73, 101, 0.08); border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); z-index: 500; overflow: hidden; padding: 4px 0;">
-                    <a href="javascript:void(0)" class="actions-item lang-switch-btn" data-lang="no" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; text-decoration: none; color: #1B4965; font-size: 13.5px; font-weight: 500;">Norsk</a>
-                    <a href="javascript:void(0)" class="actions-item lang-switch-btn" data-lang="en" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; text-decoration: none; color: #1B4965; font-size: 13.5px; font-weight: 500;">English</a>
-                    <a href="javascript:void(0)" class="actions-item lang-switch-btn" data-lang="es" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; text-decoration: none; color: #1B4965; font-size: 13.5px; font-weight: 500;">Español</a>
-                </div>
-            `;
-            
-            const profileLink = actionsContainer.querySelector('.user-profile-link');
-            if (profileLink) {
-                actionsContainer.insertBefore(langSwitcher, profileLink);
-            } else {
-                actionsContainer.appendChild(langSwitcher);
-            }
-
-            // Bind click logic for language switcher
-            const langBtn = langSwitcher.querySelector('.lang-btn');
-            const dropdown = langSwitcher.querySelector('.lang-dropdown');
-            langBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                langSwitcher.classList.toggle('active');
-                const isVisible = langSwitcher.classList.contains('active');
-                dropdown.style.display = isVisible ? 'block' : 'none';
-            });
-
-            document.addEventListener('click', () => {
-                langSwitcher.classList.remove('active');
-                dropdown.style.display = 'none';
-            });
-            
-            // Allow changing active text to selected language for visual feedback
-            langSwitcher.querySelectorAll('.lang-switch-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const selectedLang = btn.getAttribute('data-lang').toUpperCase();
-                    langBtn.querySelector('span:not(.material-symbols-outlined)').textContent = selectedLang;
-                });
-            });
+        // 2. Remove language switcher from admin header (language is inherited from main website preference)
+        const langSwitcher = actionsContainer.querySelector('.header-lang-switcher, .lang-switcher');
+        if (langSwitcher) {
+            langSwitcher.remove();
         }
+
+        // Inherit preferred language from main website (defaulting to 'no')
+        const siteLang = localStorage.getItem('hkm_preferred_lang') || 'no';
+        document.documentElement.lang = siteLang;
+        window.hkmAdminLanguage = siteLang;
     };
 
     normalizeTopbarHeader();
