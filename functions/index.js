@@ -4594,6 +4594,13 @@ async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Mini
   }
 }
 
+function clampText(value, maxLen = 1000) {
+  if (value === null || value === undefined) return "";
+  const str = String(value);
+  if (str.length <= maxLen) return str;
+  return str.slice(0, maxLen);
+}
+
 function normalizeEmailList(value, maxCount = 20) {
   if (Array.isArray(value)) {
     return value
