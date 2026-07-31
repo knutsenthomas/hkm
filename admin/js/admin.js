@@ -21334,7 +21334,7 @@ class AdminManager {
                 return;
             }
 
-            const userMap = this.buildDonationUserMap();
+            const userMap = this.adminUserMap || new Map();
             tbody.innerHTML = displayRecords.map(r => {
                 const date = this.getDonationDate(r);
                 const name = this.escapeHtml(this.getDonationDonorName(r, userMap));
