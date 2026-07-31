@@ -279,7 +279,7 @@ export default function TodoApp() {
                                         </label>
 
                                         <div style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
-                                            <div style={{ fontWeight: 700, fontSize: '14px', color: 'var(--text-main, #1e293b)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', textDecoration: comp ? 'line-through' : 'none', color: comp ? 'var(--text-muted)' : 'var(--text-main)' }}>
+                                            <div style={{ fontWeight: 700, fontSize: '14px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', textDecoration: comp ? 'line-through' : 'none', color: comp ? 'var(--text-muted)' : 'var(--text-main)' }}>
                                                 {task.title}
                                             </div>
                                             <div style={{ fontSize: '12px', color: 'var(--text-muted, #64748b)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>

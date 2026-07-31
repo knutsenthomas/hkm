@@ -10845,6 +10845,7 @@ html[data-theme="dark"] .hkm-task-card.completed {
         position: static;
         width: 100%;
     }
+}
 
 /* Recent Course Signups Card Styles */
 .dashboard-course-signups-card {
