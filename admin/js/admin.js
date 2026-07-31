@@ -26816,128 +26816,44 @@ class AdminManager {
             return;
         }
 
-        const ROLES = window.HKM_ROLES || {
-            MEDLEM: 'medlem',
-            EDITOR: 'editor',
-            ADMIN: 'admin',
-            SUPERADMIN: 'superadmin'
-        };
-
-        const rolesOptions = Object.values(ROLES).map(role =>
-            `<option value="${role}">${role.charAt(0).toUpperCase() + role.slice(1)}</option>`
-        ).join('');
+        const actionsHtml = `
+            <button type="button" id="add-user-btn" class="btn btn-primary" onclick="window.adminManager.openAddUserModal()" style="display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13.5px; border-radius: 999px; padding: 9px 22px; background: linear-gradient(135deg, #d17d39, #bd4f2a); color: #ffffff; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(209,125,57,0.3); transition: all 0.2s ease;">
+                <span class="material-symbols-outlined" style="font-size: 19px;">person_add</span>
+                Ny bruker
+            </button>
+        `;
 
         section.innerHTML = `
-            ${this.renderSectionHeader('person_search', 'Brukeradministrasjon', 'Oversikt over alle registrerte brukere og deres tilgangsnivåer.', '')}
+            ${this.renderSectionHeader('person_search', 'Brukeradministrasjon', 'Oversikt over alle registrerte brukere og deres tilgangsnivåer.', actionsHtml)}
 
-                                                                            <div class="design-ui-shell">
-                                                                                <div class="design-ui-workspace">
-                                                                                    <div class="design-ui-top-grid">
-                                                                                        <div class="design-ui-main-column">
-                                                                                            <div class="design-ui-panel">
-                                                                                                <div class="design-ui-panel-header" style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;">
-                                                                                                    <div style="display: flex; align-items: center; gap: 8px;">
-                                                                                                        <h3 class="design-ui-panel-title" style="margin: 0;">Aktive brukere</h3>
-                                                                                                        <span class="status-badge" id="user-count-badge" style="background: #f1f5f9; color: #475569; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 12px;">- BRUKERE</span>
-                                                                                                    </div>
-                                                                                                    <div style="position: relative; width: 240px; margin-left: auto;">
-                                                                                                        <span class="material-symbols-outlined" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 18px; pointer-events: none;">search</span>
-                                                                                                        <input type="text" id="user-search-input" class="form-control" placeholder="Søk etter brukere..." style="padding: 8px 12px 8px 36px !important; height: 32px; font-size: 12px; border-radius: 6px; border: 1px solid #cbd5e1; width: 100%; outline: none; transition: all 0.2s ease;">
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                                <div class="design-ui-panel-body p-0" id="users-list-container" style="padding: 0;">
-                                                                                                    <div class="loader" style="margin: 24px auto;"></div>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-
-                                                                                        <aside class="design-ui-side-column">
-                                                                                            <div class="design-ui-panel">
-                                                                                                <div class="design-ui-panel-header design-ui-panel-header--compact">
-                                                                                                    <div class="design-ui-panel-header-icon" style="background: #e0f2fe; color: #0ea5e9;">
-                                                                                                        <span class="material-symbols-outlined">person_add</span>
-                                                                                                    </div>
-                                                                                                    <div style="flex: 1;">
-                                                                                                        <h3 class="design-ui-panel-title">Ny bruker</h3>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                                <div class="design-ui-panel-body">
-                                                                                                    <form id="side-add-user-form" class="user-add-form">
-                                                                                                        <div class="form-group">
-                                                                                                            <label class="form-label-sm">Fullt navn</label>
-                                                                                                            <input type="text" name="displayName" class="form-control" placeholder="f.eks. Ola Nordmann" required>
-                                                                                                        </div>
-                                                                                                        <div class="form-group">
-                                                                                                            <label class="form-label-sm">E-post *</label>
-                                                                                                            <input type="email" name="email" class="form-control" placeholder="ola@eksempel.no" required>
-                                                                                                        </div>
-                                                                                                        <div class="form-group">
-                                                                                                            <label class="form-label-sm">Telefonnr</label>
-                                                                                                            <input type="tel" name="phone" class="form-control" placeholder="900 00 000">
-                                                                                                        </div>
-                                                                                                        <div class="form-group">
-                                                                                                            <label class="form-label-sm">Rolle / Tilgang</label>
-                                                                                                            <select name="role" class="form-control">
-                                                                                                                ${rolesOptions}
-                                                                                                            </select>
-                                                                                                        </div>
-                                                                                                        <button type="submit" class="btn btn-primary btn-full">
-                                                                                                            <span class="material-symbols-outlined">add</span>
-                                                                                                            Legg til bruker
-                                                                                                        </button>
-                                                                                                    </form>
-                                                                                                </div>
-                                                                                            </div>
-
-                                                                                            <div class="design-ui-panel" style="background: #fffbeb; border: 1px solid #fde68a;">
-                                                                                                <div class="design-ui-panel-body" style="display: flex; gap: 12px; align-items: flex-start; padding: 16px;">
-                                                                                                    <span class="material-symbols-outlined" style="color: #d97706; font-size: 20px;">priority_high</span>
-                                                                                                    <div>
-                                                                                                        <h4 style="font-size: 13px; font-weight: 600; color: #92400e; margin: 0 0 4px 0;">VIKTIG!</h4>
-                                                                                                        <p style="font-size: 12px; line-height: 1.5; color: #b45309; margin: 0;">Når du legger til en bruker her, må de fortsatt registrere seg eller du må sende dem en invitasjon for at de skal kunne logge inn.</p>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </aside>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                            `;
+            <div class="design-ui-shell">
+                <div class="design-ui-workspace">
+                    <div class="design-ui-panel">
+                        <div class="design-ui-panel-header" style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <h3 class="design-ui-panel-title" style="margin: 0;">Aktive brukere</h3>
+                                <span class="status-badge" id="user-count-badge" style="background: #f1f5f9; color: #475569; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 12px;">- BRUKERE</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
+                                <div style="position: relative; width: 260px;">
+                                    <span class="material-symbols-outlined" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 18px; pointer-events: none;">search</span>
+                                    <input type="text" id="user-search-input" class="form-control" placeholder="Søk etter brukere..." style="padding: 8px 12px 8px 36px !important; height: 36px; font-size: 13px; border-radius: 8px; border: 1px solid #cbd5e1; width: 100%; outline: none; transition: all 0.2s ease;">
+                                </div>
+                                <button type="button" class="btn btn-primary" onclick="window.adminManager.openAddUserModal()" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 13px; border-radius: 8px; padding: 8px 16px; background: linear-gradient(135deg, #d17d39, #bd4f2a); color: #ffffff; border: none; cursor: pointer; white-space: nowrap;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+                                    Ny bruker
+                                </button>
+                            </div>
+                        </div>
+                        <div class="design-ui-panel-body p-0" id="users-list-container" style="padding: 0;">
+                            <div class="loader" style="margin: 24px auto;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
 
         section.setAttribute('data-rendered', 'true');
-
-        const addUserForm = document.getElementById('side-add-user-form');
-        if (addUserForm) {
-            addUserForm.onsubmit = async (e) => {
-                e.preventDefault();
-                const formData = new FormData(addUserForm);
-                const data = {
-                    displayName: formData.get('displayName'),
-                    email: formData.get('email'),
-                    role: formData.get('role'),
-                    phone: formData.get('phone'),
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-
-                const btn = addUserForm.querySelector('button[type="submit"]');
-                const origText = btn.innerHTML;
-                btn.disabled = true;
-                btn.textContent = 'Lagrer...';
-
-                try {
-                    await this.saveUser(null, data);
-                    addUserForm.reset();
-                    this.showToast('Ny bruker lagt til.', 'success');
-                    await this.loadUsersList();
-                } catch (err) {
-                    console.error("Feil ved lagring av bruker:", err);
-                    this.showToast("Kunne ikke legge til bruker: " + err.message, "error");
-                } finally {
-                    btn.disabled = false;
-                    btn.innerHTML = origText;
-                }
-            };
-        }
 
         const searchInput = document.getElementById('user-search-input');
         if (searchInput) {
@@ -26949,6 +26865,137 @@ class AdminManager {
 
         this._ensureUsersRealtimeSubscription();
         await this.loadUsersList();
+    }
+
+    openAddUserModal() {
+        const existing = document.getElementById('add-user-modal');
+        if (existing) existing.remove();
+
+        const ROLES = window.HKM_ROLES || {
+            MEDLEM: 'medlem',
+            EDITOR: 'editor',
+            ADMIN: 'admin',
+            SUPERADMIN: 'superadmin'
+        };
+
+        const rolesOptions = Object.values(ROLES).map(role =>
+            `<option value="${role}">${role.charAt(0).toUpperCase() + role.slice(1)}</option>`
+        ).join('');
+
+        const modal = document.createElement('div');
+        modal.id = 'add-user-modal';
+        modal.className = 'hkm-add-user-modal-overlay';
+        modal.style.cssText = `
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(4px);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        `;
+
+        modal.innerHTML = `
+            <div class="hkm-add-user-modal-card" style="background: #ffffff; border-radius: 20px; width: 100%; max-width: 520px; box-shadow: 0 20px 50px rgba(0,0,0,0.25); overflow: hidden; display: flex; flex-direction: column; animation: modalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
+                <div class="modal-card-header" style="padding: 20px 24px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; background: #f8fafc;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(209, 125, 57, 0.12); color: #d17d39; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <span class="material-symbols-outlined" style="font-size: 22px;">person_add</span>
+                        </div>
+                        <div>
+                            <h3 style="margin: 0; font-size: 17px; font-weight: 800; color: #0f172a;" class="modal-card-title">Legg til ny bruker</h3>
+                            <p style="margin: 2px 0 0 0; font-size: 12.5px; color: #64748b;" class="modal-card-desc">Opprett profil og tildel rettigheter</p>
+                        </div>
+                    </div>
+                    <button type="button" class="modal-close-btn" style="background: #f1f5f9; border: none; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748b; transition: all 0.2s ease;">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                    </button>
+                </div>
+                
+                <form id="modal-add-user-form" style="padding: 24px; display: flex; flex-direction: column; gap: 18px; margin: 0;">
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; margin: 0;">
+                        <label style="font-size: 13px; font-weight: 700; color: #334155;" class="form-label-txt">Fullt navn</label>
+                        <input type="text" name="displayName" class="form-control add-user-input" placeholder="f.eks. Ola Nordmann" required style="padding: 10px 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 14px; outline: none;">
+                    </div>
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; margin: 0;">
+                        <label style="font-size: 13px; font-weight: 700; color: #334155;" class="form-label-txt">E-post *</label>
+                        <input type="email" name="email" class="form-control add-user-input" placeholder="ola@eksempel.no" required style="padding: 10px 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 14px; outline: none;">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; margin: 0;">
+                            <label style="font-size: 13px; font-weight: 700; color: #334155;" class="form-label-txt">Telefonnr</label>
+                            <input type="tel" name="phone" class="form-control add-user-input" placeholder="900 00 000" style="padding: 10px 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 14px; outline: none;">
+                        </div>
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; margin: 0;">
+                            <label style="font-size: 13px; font-weight: 700; color: #334155;" class="form-label-txt">Rolle / Tilgang</label>
+                            <select name="role" class="form-control add-user-input" style="padding: 10px 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 14px; outline: none; background: #ffffff;">
+                                ${rolesOptions}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 14px; display: flex; gap: 12px; align-items: flex-start;" class="add-user-warning-box">
+                        <span class="material-symbols-outlined" style="color: #d97706; font-size: 20px; flex-shrink: 0; margin-top: 1px;">priority_high</span>
+                        <div>
+                            <h4 style="font-size: 12.5px; font-weight: 800; color: #92400e; margin: 0 0 2px 0;" class="warning-title">VIKTIG!</h4>
+                            <p style="font-size: 12px; line-height: 1.5; color: #b45309; margin: 0;" class="warning-desc">Når du legger til en bruker her, må de fortsatt registrere seg eller du må sende dem en invitasjon for at de skal kunne logge inn.</p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 6px; padding-top: 16px; border-top: 1px solid #f1f5f9;" class="modal-card-footer">
+                        <button type="button" class="modal-cancel-btn" style="padding: 10px 20px; border-radius: 999px; border: 1px solid #cbd5e1; background: transparent; font-weight: 600; font-size: 13.5px; color: #475569; cursor: pointer; transition: all 0.2s ease;">
+                            Avbryt
+                        </button>
+                        <button type="submit" class="btn btn-primary" style="padding: 10px 24px; border-radius: 999px; border: none; background: linear-gradient(135deg, #d17d39, #bd4f2a); font-weight: 700; font-size: 13.5px; color: #ffffff; cursor: pointer; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.3); display: flex; align-items: center; gap: 6px;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">add</span> Legg til bruker
+                        </button>
+                    </div>
+                </form>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        const closeModal = () => modal.remove();
+        modal.querySelector('.modal-close-btn').onclick = closeModal;
+        modal.querySelector('.modal-cancel-btn').onclick = closeModal;
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        const form = modal.querySelector('#modal-add-user-form');
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const data = {
+                displayName: formData.get('displayName'),
+                email: formData.get('email'),
+                role: formData.get('role'),
+                phone: formData.get('phone'),
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const origText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Lagrer...';
+
+            try {
+                await this.saveUser(null, data);
+                closeModal();
+            } catch (err) {
+                console.error("Feil ved lagring av bruker:", err);
+                this.showToast("Kunne ikke legge til bruker: " + err.message, "error");
+            } finally {
+                if (document.body.contains(modal)) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = origText;
+                }
+            }
+        };
     }
 
     async loadUsersList() {
