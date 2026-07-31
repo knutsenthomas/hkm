@@ -1278,17 +1278,11 @@ class MessagesManager {
         
         if (this.isBulkMode) {
             if (container) container.classList.add('bulk-mode-active');
-            if (toggleBtn) {
-                toggleBtn.style.background = '#fee2e2';
-                toggleBtn.style.borderColor = '#ef4444';
-            }
+            if (toggleBtn) toggleBtn.classList.add('active');
             this.updateBulkToolbar();
         } else {
             if (container) container.classList.remove('bulk-mode-active');
-            if (toggleBtn) {
-                toggleBtn.style.background = '';
-                toggleBtn.style.borderColor = '';
-            }
+            if (toggleBtn) toggleBtn.classList.remove('active');
             this.selectedThreads.clear();
             this.renderThreadList();
         }

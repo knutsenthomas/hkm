@@ -2652,3 +2652,115 @@ html[data-theme="dark"] #confirm-modal-cancel {
     color: #cbd5e1 !important;
 }
 
+/* Active state for bulk delete toggle button */
+.btn-icon-square.active,
+#toggle-bulk-mode-btn.active {
+    background: rgba(239, 68, 68, 0.12) !important;
+    border-color: #ef4444 !important;
+}
+
+.btn-icon-square.active .material-symbols-outlined,
+#toggle-bulk-mode-btn.active .material-symbols-outlined {
+    color: #ef4444 !important;
+}
+
+html[data-theme="dark"] .btn-icon-square.active,
+html[data-theme="dark"] #toggle-bulk-mode-btn.active {
+    background: rgba(239, 68, 68, 0.22) !important;
+    border-color: #f87171 !important;
+}
+
+html[data-theme="dark"] .btn-icon-square.active .material-symbols-outlined,
+html[data-theme="dark"] #toggle-bulk-mode-btn.active .material-symbols-outlined {
+    color: #f87171 !important;
+}
+
+/* Comprehensive Dark Mode Overrides for Push Dashboard, Cards, and Log List */
+html[data-theme="dark"] .inbox-push-dashboard {
+    background: #0f172a !important;
+}
+
+html[data-theme="dark"] .push-dashboard-header {
+    background: #1e293b !important;
+    border-bottom-color: #334155 !important;
+}
+
+html[data-theme="dark"] .push-title-text h3 {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .push-title-text p {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .push-icon-box {
+    background: rgba(209, 125, 57, 0.2) !important;
+    color: #f97316 !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .design-ui-panel {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+html[data-theme="dark"] .design-ui-panel-header {
+    background: #0f172a !important;
+    border-bottom-color: #334155 !important;
+}
+
+html[data-theme="dark"] .design-ui-panel-title {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .form-group label {
+    color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] #push-target-role,
+html[data-theme="dark"] #push-title,
+html[data-theme="dark"] #push-body,
+html[data-theme="dark"] #push-click-action {
+    background: #0f172a !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .log-filter-btn {
+    background: #0f172a !important;
+    color: #cbd5e1 !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .log-filter-btn.active {
+    background: #d17d39 !important;
+    color: #ffffff !important;
+    border-color: #d17d39 !important;
+}
+
+html[data-theme="dark"] .activity-log-item {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .inbox-empty-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .inbox-empty-title {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .inbox-empty-desc {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .inbox-empty-icon-wrap {
+    background: rgba(209, 125, 57, 0.2) !important;
+    color: #f97316 !important;
+}
+
+

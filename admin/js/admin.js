@@ -378,16 +378,54 @@ class AdminManager {
      */
     showConfirm(title, message, confirmText = 'Bekreft', cancelText = 'Avbryt') {
         return new Promise((resolve) => {
-            const modal = document.getElementById('hkm-confirm-modal');
+            let modal = document.getElementById('hkm-confirm-modal');
             if (!modal) {
-                resolve(confirm(message));
-                return;
+                modal = document.createElement('div');
+                modal.id = 'hkm-confirm-modal';
+                modal.className = 'profile-modal';
+                modal.style.cssText = `
+                    display: none;
+                    z-index: 999999;
+                    position: fixed;
+                    inset: 0;
+                    background: rgba(15, 23, 42, 0.65);
+                    align-items: center;
+                    justify-content: center;
+                    backdrop-filter: blur(8px);
+                    -webkit-backdrop-filter: blur(8px);
+                    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+                    padding: 16px;
+                `;
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                const cardBg = isDark ? '#1e293b' : '#ffffff';
+                const subTextColor = isDark ? '#cbd5e1' : '#475569';
+                const footerBg = isDark ? '#0f172a' : '#f8fafc';
+                const borderColor = isDark ? '#334155' : '#e2e8f0';
+
+                modal.innerHTML = `
+                    <div class="profile-modal-content card modern" style="max-width: 420px; width: 100%; height: auto !important; min-height: 0 !important; flex: 0 1 auto !important; margin: auto !important; padding: 0; overflow: hidden; border-radius: 20px; background: ${cardBg}; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35); display: flex; flex-direction: column; border: 1px solid ${borderColor};">
+                        <div class="modal-header" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 20px 24px; display: flex; align-items: center; gap: 14px; border-bottom: none;">
+                            <div style="background: rgba(255,255,255,0.2); width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <span class="material-symbols-outlined" style="font-size: 22px; color: white;">delete</span>
+                            </div>
+                            <h3 id="confirm-modal-title" style="margin: 0; font-size: 18px; font-weight: 700; color: white; letter-spacing: -0.01em;">${this.escapeHtml ? this.escapeHtml(title) : title}</h3>
+                        </div>
+                        <div class="modal-body" style="padding: 24px; font-size: 15px; line-height: 1.5; color: ${subTextColor};">
+                            <p id="confirm-modal-message" style="margin: 0; font-weight: 500;">${this.escapeHtml ? this.escapeHtml(message) : message}</p>
+                        </div>
+                        <div class="modal-footer" style="padding: 16px 24px; background: ${footerBg}; display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid ${borderColor};">
+                            <button id="confirm-modal-cancel" type="button" class="btn-secondary" style="padding: 10px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: 1px solid ${borderColor}; background: transparent; color: ${subTextColor}; font-size: 14px;">${cancelText}</button>
+                            <button id="confirm-modal-confirm" type="button" class="btn-primary" style="padding: 10px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s; background: #ef4444; color: white; border: none; font-size: 14px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);">${confirmText}</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
             }
 
-            const titleEl = document.getElementById('confirm-modal-title');
-            const messageEl = document.getElementById('confirm-modal-message');
-            const confirmBtn = document.getElementById('confirm-modal-confirm');
-            const cancelBtn = document.getElementById('confirm-modal-cancel');
+            const titleEl = modal.querySelector('#confirm-modal-title');
+            const messageEl = modal.querySelector('#confirm-modal-message');
+            const confirmBtn = modal.querySelector('#confirm-modal-confirm');
+            const cancelBtn = modal.querySelector('#confirm-modal-cancel');
             const headerEl = modal.querySelector('.modal-header');
 
             if (titleEl) titleEl.textContent = title;
@@ -404,28 +442,37 @@ class AdminManager {
             
             if (confirmBtn) {
                 confirmBtn.textContent = confirmText;
-                const orangeGradient = 'linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%)';
-                confirmBtn.style.background = orangeGradient;
-                if (headerEl) headerEl.style.background = orangeGradient;
+                if (/slett/i.test(confirmText) || /slett/i.test(title)) {
+                    confirmBtn.style.background = '#ef4444';
+                    if (headerEl) headerEl.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                } else {
+                    const orangeGradient = 'linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%)';
+                    confirmBtn.style.background = orangeGradient;
+                    if (headerEl) headerEl.style.background = orangeGradient;
+                }
             }
 
             const cleanup = () => {
                 modal.style.display = 'none';
-                confirmBtn.onclick = null;
-                cancelBtn.onclick = null;
+                if (confirmBtn) confirmBtn.onclick = null;
+                if (cancelBtn) cancelBtn.onclick = null;
             };
 
-            confirmBtn.onclick = (e) => {
-                e.preventDefault();
-                cleanup();
-                resolve(true);
-            };
+            if (confirmBtn) {
+                confirmBtn.onclick = (e) => {
+                    e.preventDefault();
+                    cleanup();
+                    resolve(true);
+                };
+            }
 
-            cancelBtn.onclick = (e) => {
-                e.preventDefault();
-                cleanup();
-                resolve(false);
-            };
+            if (cancelBtn) {
+                cancelBtn.onclick = (e) => {
+                    e.preventDefault();
+                    cleanup();
+                    resolve(false);
+                };
+            }
 
             modal.style.display = 'flex';
         });
@@ -4674,26 +4721,26 @@ class AdminManager {
                 }
 
                 const status = String(item.status || 'godkjent').toLowerCase();
-                let statusBadge = '<span class="status-pill status-approved" style="background:#dcfce7;color:#16a34a;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;">🟢 Påmeldt</span>';
+                let statusBadge = '<span class="status-pill status-approved"><span class="status-dot"></span>Påmeldt</span>';
                 if (['pending', 'venter'].includes(status)) {
-                    statusBadge = '<span class="status-pill status-pending" style="background:#fff7ed;color:#d17d39;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;">🟡 Venter</span>';
+                    statusBadge = '<span class="status-pill status-pending"><span class="status-dot"></span>Venter</span>';
                 } else if (['fullført', 'completed'].includes(status)) {
-                    statusBadge = '<span class="status-pill status-completed" style="background:#e0f2fe;color:#0284c7;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;">🔵 Fullført</span>';
+                    statusBadge = '<span class="status-pill status-completed"><span class="status-dot"></span>Fullført</span>';
                 }
 
                 return `
-                    <div class="recent-signup-item" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #ffffff; border: 1.5px solid #f1f5f9; border-radius: 14px; transition: all 0.2s ease;">
+                    <div class="recent-signup-item">
                         <div style="display: flex; align-items: center; gap: 14px; min-width: 0;">
-                            <div style="width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); color: #d17d39; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid #ffedd5;">
+                            <div class="recent-signup-avatar">
                                 ${initials}
                             </div>
                             <div style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                <div style="font-weight: 700; font-size: 14px; color: #1e293b; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${name}</div>
-                                <div style="font-size: 12px; color: #64748b; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${email ? email + ' • ' : ''}<span style="color: #d17d39; font-weight: 600;">${course}</span></div>
+                                <div class="recent-signup-name" style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${name}</div>
+                                <div class="recent-signup-course" style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${email ? email + ' • ' : ''}<span class="recent-signup-course-tag">${course}</span></div>
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0; margin-left: 12px;">
-                            <span style="font-size: 11px; color: #94a3b8; font-weight: 500;">${dateStr}</span>
+                            <span class="recent-signup-date">${dateStr}</span>
                             ${statusBadge}
                         </div>
                     </div>
@@ -4702,7 +4749,7 @@ class AdminManager {
         } else {
             courseSignupsItemsHtml = `
                 <div style="text-align: center; padding: 32px 24px; background: #f8fafc; border-radius: 14px; border: 1.5px dashed #e2e8f0;">
-                    <div style="width: 52px; height: 52px; border-radius: 16px; background: #fff7ed; color: #d17d39; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; border: 1px solid #ffedd5;">
+                    <div style="width: 52px; height: 52px; border-radius: 16px; background: rgba(209, 125, 57, 0.1); color: #d17d39; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; border: 1px solid rgba(209, 125, 57, 0.2);">
                         <span class="material-symbols-outlined" style="font-size: 28px;">school</span>
                     </div>
                     <h4 style="margin: 0; font-size: 15px; font-weight: 700; color: #1e293b;">Ingen nye kurspåmeldinger enda</h4>
@@ -4712,23 +4759,23 @@ class AdminManager {
         }
 
         const courseSignupsCardHtml = `
-            <div class="dashboard-course-signups-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px; margin-top: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 44px; height: 44px; border-radius: 14px; background: #fff7ed; color: #d17d39; display: flex; align-items: center; justify-content: center; border: 1px solid #ffedd5;">
+            <div class="dashboard-course-signups-card">
+                <div class="dashboard-course-signups-header">
+                    <div class="header-left-info">
+                        <div class="header-icon-badge">
                             <span class="material-symbols-outlined" style="font-size: 24px;">school</span>
                         </div>
                         <div>
-                            <h3 style="margin: 0; font-size: 17px; font-weight: 800; color: #1e293b;">Siste kurspåmeldinger</h3>
-                            <p style="margin: 2px 0 0 0; font-size: 12px; color: #64748b; font-weight: 500;">Nylig registrert deltakelse på HKM Kurs</p>
+                            <h3>Siste kurspåmeldinger</h3>
+                            <p>Nylig registrert deltakelse på HKM Kurs</p>
                         </div>
                     </div>
-                    <a href="/admin/index.html#courses" class="nav-link" data-section="courses" style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #d17d39; text-decoration: none; background: #fff7ed; padding: 8px 14px; border-radius: 10px; border: 1px solid #ffedd5; transition: all 0.2s ease;">
+                    <a href="/admin/index.html#courses" class="dashboard-see-all-link" data-section="courses">
                         <span>Se alle påmeldinger</span>
-                        <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+                        <span class="material-symbols-outlined">arrow_forward</span>
                     </a>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; flex-direction: column; gap: 8px;">
                     ${courseSignupsItemsHtml}
                 </div>
             </div>
