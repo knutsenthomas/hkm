@@ -15563,13 +15563,10 @@ class AdminManager {
 
         return records.filter((record) => {
             if (record.isInKind) return false;
-            // Exclude shop and course transactions from the donations list unless type is 'all' or specifically requested
+            // Gaver section is strictly for donations - exclude shop and course purchases
             const recTypeLower = String(record.type || '').toLowerCase();
-            if (recTypeLower === 'butikk') {
-                if (type !== 'all' && type !== 'butikk') return false;
-            }
-            if (recTypeLower === 'kurs' || recTypeLower === 'course') {
-                if (type !== 'all' && type !== 'kurs' && type !== 'course') return false;
+            if (['butikk', 'kurs', 'course', 'product'].includes(recTypeLower)) {
+                return false;
             }
 
             const date = this.getDonationDate(record);
@@ -19677,6 +19674,7 @@ class AdminManager {
             this.renderGiftsDashboard();
             this.renderInKindDonations();
             this.renderWixStats();
+            this.renderKursShopViews();
         };
 
         // Legacy period listeners
@@ -20242,8 +20240,6 @@ class AdminManager {
                                     <option value="all">Alle typer</option>
                                     <option value="gave">Enkeltgave</option>
                                     <option value="fast">Fast avtale</option>
-                                    <option value="butikk">Butikk</option>
-                                    <option value="kurs">Kurs</option>
                                 </select>
                             </div>
 
@@ -20768,6 +20764,7 @@ class AdminManager {
                         <button class="automation-tab active" data-tab="wix">Oversikt</button>
                         <button class="automation-tab" data-tab="wix-orders">Ordrehistorikk</button>
                         <button class="automation-tab" data-tab="shop">Manuelle ordre</button>
+                        <button class="automation-tab" data-tab="kurs">Kurskjøp</button>
                     </div>
                     
                     <!-- Global Period Selector -->
@@ -20994,6 +20991,87 @@ class AdminManager {
                 </div>
             </div>
 
+            <!-- Tab: Kurskjøp Content -->
+            <div id="cause-tab-content-kurs" class="cause-tab-pane" style="display: none;">
+                <div class="stats-grid causes-stats-grid" style="margin-bottom: 32px;">
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap green">
+                            <span class="material-symbols-outlined">school</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Kursomsetning i perioden</h3>
+                            <p class="stat-value" id="kurs-shop-total-amount">0 kr</p>
+                            <p class="stat-trend" style="padding-left: 0 !important; margin-left: 0 !important;">Fullførte kurskjøp i perioden</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap blue">
+                            <span class="material-symbols-outlined">auto_stories</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Antall kurskjøp</h3>
+                            <p class="stat-value" id="kurs-shop-total-count">0</p>
+                            <span class="stat-meta">Registrerte kurskjøp i perioden</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap mint">
+                            <span class="material-symbols-outlined">trending_up</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Snittkurspris</h3>
+                            <p class="stat-value" id="kurs-shop-average-amount">0 kr</p>
+                            <span class="stat-meta">Gjennomsnitt per kurskjøp</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap purple">
+                            <span class="material-symbols-outlined">today</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Dagens kurskjøp</h3>
+                            <p class="stat-value" id="kurs-shop-today-amount">0 kr</p>
+                            <span class="stat-meta" id="kurs-shop-today-count">0 kjøp</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-header flex-between" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                        <div>
+                            <h3 class="card-title" style="margin:0;">Kurstransaksjoner</h3>
+                            <p class="card-subtitle" style="margin:4px 0 0 0; color:#64748b; font-size:13px;">Oversikt over alle betalte og registrerte kurskjøp</p>
+                        </div>
+                        <div style="position:relative; width:260px; max-width:100%;">
+                            <span class="material-symbols-outlined" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:18px;">search</span>
+                            <input type="text" id="kurs-shop-search" class="form-control" placeholder="Søk i kurskjøp..." style="padding:8px 12px 8px 38px !important; height:38px; font-size:13px; border-radius:8px; border:1px solid #cbd5e1; width:100%;">
+                        </div>
+                    </div>
+                    <div class="table-container" style="overflow-x:auto; width:100%;">
+                        <table class="crm-table" style="min-width:620px; width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>Dato</th>
+                                    <th>Kunde / Student</th>
+                                    <th>Kurs</th>
+                                    <th>Metode</th>
+                                    <th>Status</th>
+                                    <th>Beløp</th>
+                                </tr>
+                            </thead>
+                            <tbody id="kurs-shop-transactions-body">
+                                <tr>
+                                    <td colspan="6" style="text-align:center; padding:32px; color:#94a3b8;">Laster kurstransaksjoner...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <!-- Manual Sale Modal -->
             <div id="manual-sale-modal" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:24px;">
                 <div class="modal-backdrop" onclick="window.adminManager?.closeManualSaleModal?.()" style="position:absolute;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(8px);"></div>
@@ -21172,15 +21250,116 @@ class AdminManager {
                     this.renderWixStats();
                 } else if (target === 'shop') {
                     this.renderDonationAdminViews();
+                } else if (target === 'kurs') {
+                    this.renderKursShopViews();
                 }
             });
         });
         
+        const kursSearch = document.getElementById('kurs-shop-search');
+        if (kursSearch) {
+            kursSearch.oninput = () => this.renderKursShopViews();
+        }
+
         const activeTab = document.querySelector('#shop-section .automation-tab.active')?.dataset.tab || 'wix';
         if (activeTab === 'wix' || activeTab === 'wix-orders') {
             this.renderWixStats();
+        } else if (activeTab === 'kurs') {
+            this.renderKursShopViews();
         } else {
             this.renderDonationAdminViews();
+        }
+    }
+
+    renderKursShopViews() {
+        const records = (this.allDonationRecords || []).filter(r => {
+            const recType = String(r.type || '').toLowerCase();
+            return recType === 'kurs' || recType === 'course';
+        });
+
+        const presetEl = document.getElementById('shop-date-preset');
+        const preset = presetEl ? presetEl.value : '30';
+        const startVal = document.getElementById('shop-start-date')?.value || '';
+        const endVal = document.getElementById('shop-end-date')?.value || '';
+        const { start, end } = this.buildDonationDateRange(preset, startVal, endVal);
+
+        const filteredRecords = records.filter(r => {
+            const d = this.getDonationDate(r);
+            if (start && (!d || d < start)) return false;
+            if (end && (!d || d > end)) return false;
+            return true;
+        });
+
+        const isCompleted = (r) => ['completed', 'succeeded', 'captured'].includes(String(r.status || '').toLowerCase());
+        const completedRecords = filteredRecords.filter(isCompleted);
+        const totalAmount = completedRecords.reduce((sum, r) => sum + this.normalizeDonationAmountNok(r), 0);
+        const averageAmount = completedRecords.length ? totalAmount / completedRecords.length : 0;
+
+        const todayRange = this.buildDonationDateRange('today');
+        const todayRecords = records.filter(r => {
+            const d = this.getDonationDate(r);
+            return d && d >= todayRange.start && d <= todayRange.end;
+        });
+        const todayAmount = todayRecords.filter(isCompleted).reduce((sum, r) => sum + this.normalizeDonationAmountNok(r), 0);
+
+        const totalEl = document.getElementById('kurs-shop-total-amount');
+        const countEl = document.getElementById('kurs-shop-total-count');
+        const avgEl = document.getElementById('kurs-shop-average-amount');
+        const todayAmountEl = document.getElementById('kurs-shop-today-amount');
+        const todayCountEl = document.getElementById('kurs-shop-today-count');
+
+        if (totalEl) totalEl.textContent = this.formatDonationCurrency(totalAmount);
+        if (countEl) countEl.textContent = filteredRecords.length.toLocaleString('no-NO');
+        if (avgEl) avgEl.textContent = this.formatDonationCurrency(averageAmount);
+        if (todayAmountEl) todayAmountEl.textContent = this.formatDonationCurrency(todayAmount);
+        if (todayCountEl) todayCountEl.textContent = `${todayRecords.length} kjøp`;
+
+        const searchInput = document.getElementById('kurs-shop-search');
+        const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+        
+        let displayRecords = filteredRecords;
+        if (query) {
+            displayRecords = filteredRecords.filter(r => {
+                const name = (r.donorName || r.name || '').toLowerCase();
+                const email = (r.donorEmail || r.email || '').toLowerCase();
+                const course = (r.courseTitle || r.courseName || r.itemTitle || r.title || '').toLowerCase();
+                return name.includes(query) || email.includes(query) || course.includes(query);
+            });
+        }
+
+        const tbody = document.getElementById('kurs-shop-transactions-body');
+        if (tbody) {
+            if (displayRecords.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:32px; color:#64748b;">Ingen kurstransaksjoner funnet for valgt periode.</td></tr>`;
+                return;
+            }
+
+            const userMap = this.buildDonationUserMap();
+            tbody.innerHTML = displayRecords.map(r => {
+                const date = this.getDonationDate(r);
+                const name = this.escapeHtml(this.getDonationDonorName(r, userMap));
+                const email = this.escapeHtml(this.getDonationDonorEmail(r, userMap) || 'Ingen e-post');
+                const courseTitle = this.escapeHtml(r.courseTitle || r.courseName || r.itemTitle || r.title || 'HKM Kurs');
+                const method = this.escapeHtml(this.getDonationMethodLabel(r.method));
+                const status = this.escapeHtml(this.getDonationStatusLabel(r.status));
+                const amount = this.formatDonationCurrency(this.normalizeDonationAmountNok(r));
+
+                return `
+                    <tr>
+                        <td style="white-space:nowrap;">${date ? date.toLocaleString('no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent'}</td>
+                        <td style="white-space:nowrap;">
+                            <div style="font-weight:700; color:#0f172a;">${name}</div>
+                            <div style="font-size:12px; color:#64748b;">${email}</div>
+                        </td>
+                        <td style="white-space:nowrap;">
+                            <span class="badge" style="background:#f0fdf4; color:#16a34a; font-weight:700; padding:4px 8px; border-radius:6px;">${courseTitle}</span>
+                        </td>
+                        <td style="white-space:nowrap;">${method}</td>
+                        <td style="white-space:nowrap;">${status}</td>
+                        <td style="white-space:nowrap; font-weight:700; color:#0f172a;">${amount}</td>
+                    </tr>
+                `;
+            }).join('');
         }
     }
 
@@ -23352,6 +23531,9 @@ class AdminManager {
             <!-- VIEW 1: COURSES VIEW -->
             <div id="courses-tab-view">
                 ${this.renderSectionHeader('menu_book', 'Kursliste', 'Opprett og administrer kurs med leksjoner – Udemy-stil.', `
+                    <button class="btn btn-secondary" style="display:inline-flex; align-items:center; gap:6px; margin-right:8px; background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px;" onclick="if(window.handleSectionSwitch){window.handleSectionSwitch('shop'); setTimeout(() => { document.querySelector('#shop-section [data-tab=\\'kurs\\']')?.click(); }, 150);}">
+                        <span class="material-symbols-outlined" style="font-size:18px;">payments</span> Se kurskjøp
+                    </button>
                     <button class="btn btn-primary" id="create-course-btn">
                         <span class="material-symbols-outlined">add</span> Nytt kurs
                     </button>
