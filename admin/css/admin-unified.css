@@ -4575,8 +4575,13 @@ body.minside-body textarea {
   pointer-events: none !important;
 }
 
-.user-admin-search-wrap .user-search-input {
-  padding: 10px 14px 10px 42px !important;
+.user-admin-search-wrap .user-search-input,
+.user-admin-search-wrap input.user-search-input,
+body.admin-body .user-admin-search-wrap #user-search-input {
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+  padding-right: 14px !important;
+  padding-left: 46px !important;
   height: 46px !important;
   min-height: 46px !important;
   font-size: 14px !important;
@@ -4658,10 +4663,14 @@ body.minside-body textarea {
     order: 3 !important;
   }
 
-  .user-admin-search-wrap .user-search-input {
+  .user-admin-search-wrap .user-search-input,
+  .user-admin-search-wrap input.user-search-input,
+  body.admin-body .user-admin-search-wrap #user-search-input {
     height: 44px !important;
     min-height: 44px !important;
     font-size: 14px !important;
+    padding-left: 46px !important;
+    padding-right: 14px !important;
   }
 }
 
