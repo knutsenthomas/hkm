@@ -2807,7 +2807,9 @@ html[data-theme="dark"] .sent-reply-date {
 
 /* Inline Style & Deep Element Dark Mode Contrast Guards */
 html[data-theme="dark"] .email-view-container,
-html[data-theme="dark"] .email-view-container p {
+html[data-theme="dark"] .email-view-container p,
+html[data-theme="dark"] .email-view-container div,
+html[data-theme="dark"] .email-view-container span {
     color: #cbd5e1;
 }
 
@@ -2819,13 +2821,10 @@ html[data-theme="dark"] .sent-reply-sender-name {
 
 html[data-theme="dark"] .email-view-container [style*="color: #0f172a"],
 html[data-theme="dark"] .email-view-container [style*="color:#0f172a"],
-html[data-theme="dark"] .sent-reply-card [style*="color: #0f172a"],
-html[data-theme="dark"] .sent-reply-card [style*="color:#0f172a"] {
-    color: #f8fafc !important;
-}
-
 html[data-theme="dark"] .email-view-container [style*="color: #334155"],
 html[data-theme="dark"] .email-view-container [style*="color:#334155"],
+html[data-theme="dark"] .sent-reply-card [style*="color: #0f172a"],
+html[data-theme="dark"] .sent-reply-card [style*="color:#0f172a"],
 html[data-theme="dark"] .sent-reply-card [style*="color: #334155"],
 html[data-theme="dark"] .sent-reply-card [style*="color:#334155"] {
     color: #cbd5e1 !important;
@@ -2839,3 +2838,31 @@ html[data-theme="dark"] .email-replies-header {
 html[data-theme="dark"] .email-replies-header .material-symbols-outlined {
     color: #22c55e !important;
 }
+
+html[data-theme="dark"] .email-thread-replies {
+    border-top-color: #334155 !important;
+}
+
+html[data-theme="dark"] .email-view-container blockquote {
+    background: #1e293b !important;
+    border-left-color: #d17d39 !important;
+    color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .email-view-container hr {
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .thread-reply-btn,
+html[data-theme="dark"] .thread-forward-btn {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .thread-reply-btn:hover,
+html[data-theme="dark"] .thread-forward-btn:hover {
+    background: #334155 !important;
+    color: #ffffff !important;
+}
+
