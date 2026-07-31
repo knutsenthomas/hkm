@@ -2076,31 +2076,38 @@ html[data-theme="dark"] .inbox-empty-view {
     color: #64748b !important;
 }
 
-/* Email View specific dark mode overrides for inline-styled elements */
-html[data-theme="dark"] .email-view-container {
+/* Email & Detail View specific dark mode overrides */
+html[data-theme="dark"] .inbox-thread-view,
+html[data-theme="dark"] .email-view-container,
+html[data-theme="dark"] .message-detail,
+html[data-theme="dark"] .message-body,
+html[data-theme="dark"] .threads-scroll {
     background: #0f172a !important;
-    color: #f8fafc !important;
-}
-
-html[data-theme="dark"] .email-subject-title {
-    color: #f8fafc !important;
-}
-
-html[data-theme="dark"] .email-view-container div[style*="color: #0f172a"],
-html[data-theme="dark"] .email-view-container span[style*="color: #0f172a"],
-html[data-theme="dark"] .email-view-container h1[style*="color: #0f172a"],
-html[data-theme="dark"] .email-view-container h2[style*="color: #0f172a"] {
-    color: #f8fafc !important;
-}
-
-html[data-theme="dark"] .email-view-container div[style*="color: #334155"],
-html[data-theme="dark"] .email-view-container span[style*="color: #334155"],
-html[data-theme="dark"] .email-view-container p[style*="color: #334155"] {
     color: #cbd5e1 !important;
 }
 
+html[data-theme="dark"] .view-header,
+html[data-theme="dark"] .message-detail-header {
+    background: #1e293b !important;
+    border-bottom-color: #334155 !important;
+}
+
+html[data-theme="dark"] .email-subject-title,
+html[data-theme="dark"] .message-subject,
+html[data-theme="dark"] .view-name,
+html[data-theme="dark"] .email-view-container div,
+html[data-theme="dark"] .email-view-container h1,
+html[data-theme="dark"] .email-view-container h2,
+html[data-theme="dark"] .email-view-container h3,
+html[data-theme="dark"] .sent-reply-card div {
+    color: #f8fafc !important;
+}
+
 html[data-theme="dark"] .email-view-container div[style*="color: #64748b"],
-html[data-theme="dark"] .email-view-container span[style*="color: #64748b"] {
+html[data-theme="dark"] .email-view-container span[style*="color: #64748b"],
+html[data-theme="dark"] .sent-reply-card div[style*="color: #64748b"],
+html[data-theme="dark"] .message-meta,
+html[data-theme="dark"] .view-status {
     color: #94a3b8 !important;
 }
 
@@ -2118,26 +2125,16 @@ html[data-theme="dark"] .email-replies-header {
     color: #94a3b8 !important;
 }
 
-html[data-theme="dark"] .sent-reply-card {
+html[data-theme="dark"] .sent-reply-card,
+html[data-theme="dark"] .message-card {
     background: #1e293b !important;
     border-color: #334155 !important;
+    color: #cbd5e1 !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
 }
 
 html[data-theme="dark"] .sent-reply-card div[style*="border-bottom"] {
     border-bottom-color: #334155 !important;
-}
-
-html[data-theme="dark"] .sent-reply-card div[style*="color: #0f172a"] {
-    color: #f8fafc !important;
-}
-
-html[data-theme="dark"] .sent-reply-card div[style*="color: #334155"] {
-    color: #cbd5e1 !important;
-}
-
-html[data-theme="dark"] .sent-reply-card div[style*="color: #64748b"] {
-    color: #94a3b8 !important;
 }
 
 html[data-theme="dark"] .sent-reply-card div[style*="background: #fff7ed"] {
@@ -2146,13 +2143,14 @@ html[data-theme="dark"] .sent-reply-card div[style*="background: #fff7ed"] {
     color: #f97316 !important;
 }
 
-/* Action buttons at bottom of email view */
+/* Action buttons at bottom of email view & push view */
 html[data-theme="dark"] .thread-action-buttons {
     border-top-color: #334155 !important;
 }
 
 html[data-theme="dark"] .thread-action-buttons button,
-html[data-theme="dark"] .view-actions button {
+html[data-theme="dark"] .view-actions button,
+html[data-theme="dark"] .delete-btn {
     background: #1e293b !important;
     border-color: #334155 !important;
     color: #f8fafc !important;
@@ -2160,7 +2158,8 @@ html[data-theme="dark"] .view-actions button {
 }
 
 html[data-theme="dark"] .thread-action-buttons button:hover,
-html[data-theme="dark"] .view-actions button:hover {
+html[data-theme="dark"] .view-actions button:hover,
+html[data-theme="dark"] .delete-btn:hover {
     background: #334155 !important;
     color: #ffffff !important;
 }

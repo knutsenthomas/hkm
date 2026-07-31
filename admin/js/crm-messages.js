@@ -891,21 +891,21 @@ class MessagesManager {
         }
 
         viewEl.innerHTML = `
-            <div class="view-header" style="padding: 18px 28px; border-bottom: 1px solid #e2e8f0; background: #ffffff; display: flex; justify-content: space-between; align-items: center;">
+            <div class="view-header" style="padding: 18px 28px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
                 <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; margin-right: 12px;">
                     <button class="mobile-back-btn" onclick="window.messagesManager.closeMobileThread()" title="Tilbake til meldinger">
                         <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
                     </button>
-                    <h1 class="email-subject-title" style="font-size: 19px; font-weight: 800; color: #0f172a; margin: 0; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${this.escapeHtml(msg.subject || 'Seerkurs med aktivering')}</h1>
+                    <h1 class="email-subject-title" style="font-size: 19px; font-weight: 800; margin: 0; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${this.escapeHtml(msg.subject || 'Seerkurs med aktivering')}</h1>
                 </div>
                 <div class="view-actions" style="display:flex; gap:8px; flex-shrink: 0;">
-                    <button class="btn btn-outline btn-sm" onclick="window.messagesManager.deleteMessage('${msgId}')" style="padding: 6px 16px; border-radius: 8px; font-size: 13px; border: 1.5px solid #cbd5e1; color: #334155; background: #ffffff; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                    <button class="btn btn-outline btn-sm" onclick="window.messagesManager.deleteMessage('${msgId}')" style="padding: 6px 16px; border-radius: 8px; font-size: 13px; border: 1.5px solid #cbd5e1; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
                         Delete
                     </button>
                 </div>
             </div>
             
-            <div class="threads-scroll" style="flex: 1; padding: 28px; background: #ffffff; overflow-y: auto; display: flex; flex-direction: column;">
+            <div class="threads-scroll" style="flex: 1; padding: 28px; overflow-y: auto; display: flex; flex-direction: column;">
                 <div class="email-view-container" style="width: 100%; max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; flex: 1;">
                     
                     <!-- Sender Row -->
@@ -915,7 +915,7 @@ class MessagesManager {
                                 ${initials || 'BK'}
                             </div>
                             <div>
-                                <div style="font-size: 15px; font-weight: 700; color: #0f172a; line-height: 1.2;">${this.escapeHtml(msg.name || 'Bente Klevberg Tynes')}</div>
+                                <div style="font-size: 15px; font-weight: 700; line-height: 1.2;">${this.escapeHtml(msg.name || 'Bente Klevberg Tynes')}</div>
                                 <div style="font-size: 13px; color: #64748b; font-weight: 500; margin-top: 2px;">${this.escapeHtml(msg.email || 'bent@klevbergtynes.no')}</div>
                             </div>
                         </div>
@@ -928,17 +928,17 @@ class MessagesManager {
                     </div>
 
                     <!-- Email Body -->
-                    <div class="email-body" style="font-size: 15px; line-height: 1.65; color: #334155; white-space: pre-wrap; margin: 0; background: transparent; padding: 0; border: none;">${this.escapeHtml(msg.message || '')}</div>
+                    <div class="email-body" style="font-size: 15px; line-height: 1.65; white-space: pre-wrap; margin: 0; background: transparent; padding: 0; border: none;">${this.escapeHtml(msg.message || '')}</div>
                     
                     <!-- Sent Replies Thread -->
                     ${repliesHtml}
 
                     <!-- 2 Action Buttons: Svar & Videresend -->
                     <div class="thread-action-buttons" style="display: flex; gap: 12px; margin-top: 28px; padding-top: 20px; border-top: 1px solid #f1f5f9;">
-                        <button type="button" class="btn btn-outline" onclick="window.messagesManager.openReplyComposer('${msgId}', 'reply')" style="padding: 10px 24px; border-radius: 999px; font-weight: 700; font-size: 14px; border: 1.5px solid #cbd5e1; color: #334155; background: #ffffff; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+                        <button type="button" class="btn btn-outline" onclick="window.messagesManager.openReplyComposer('${msgId}', 'reply')" style="padding: 10px 24px; border-radius: 999px; font-weight: 700; font-size: 14px; border: 1.5px solid #cbd5e1; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
                             <span class="material-symbols-outlined" style="font-size: 20px; color: #d17d39;">reply</span> Svar
                         </button>
-                        <button type="button" class="btn btn-outline" onclick="window.messagesManager.openReplyComposer('${msgId}', 'forward')" style="padding: 10px 24px; border-radius: 999px; font-weight: 700; font-size: 14px; border: 1.5px solid #cbd5e1; color: #334155; background: #ffffff; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+                        <button type="button" class="btn btn-outline" onclick="window.messagesManager.openReplyComposer('${msgId}', 'forward')" style="padding: 10px 24px; border-radius: 999px; font-weight: 700; font-size: 14px; border: 1.5px solid #cbd5e1; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
                             <span class="material-symbols-outlined" style="font-size: 20px; color: #64748b;">forward</span> Videresend
                         </button>
                     </div>
@@ -1352,6 +1352,105 @@ class MessagesManager {
         }
     }
 
+    showConfirm(title, message, confirmText = 'Slett', cancelText = 'Avbryt') {
+        if (window.adminManager && typeof window.adminManager.showConfirm === 'function') {
+            return window.adminManager.showConfirm(title, message, confirmText, cancelText);
+        }
+        return new Promise((resolve) => {
+            let modal = document.getElementById('hkm-confirm-modal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'hkm-confirm-modal';
+                modal.className = 'profile-modal';
+                modal.style.cssText = `
+                    display: none;
+                    z-index: 999999;
+                    position: fixed;
+                    inset: 0;
+                    background: rgba(15, 23, 42, 0.65);
+                    align-items: center;
+                    justify-content: center;
+                    backdrop-filter: blur(8px);
+                    -webkit-backdrop-filter: blur(8px);
+                    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+                    padding: 16px;
+                `;
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                const cardBg = isDark ? '#1e293b' : '#ffffff';
+                const subTextColor = isDark ? '#cbd5e1' : '#475569';
+                const footerBg = isDark ? '#0f172a' : '#f8fafc';
+                const borderColor = isDark ? '#334155' : '#e2e8f0';
+
+                modal.innerHTML = `
+                    <div class="profile-modal-content card modern" style="max-width: 420px; padding: 0; overflow: hidden; border-radius: 20px; background: ${cardBg}; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35); width: 100%; display: flex; flex-direction: column; border: 1px solid ${borderColor}; margin: auto;">
+                        <div class="modal-header" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 20px 24px; display: flex; align-items: center; gap: 14px; border-bottom: none;">
+                            <div style="background: rgba(255,255,255,0.2); width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <span class="material-symbols-outlined" style="font-size: 22px; color: white;">delete</span>
+                            </div>
+                            <h3 id="confirm-modal-title" style="margin: 0; font-size: 18px; font-weight: 700; color: white; letter-spacing: -0.01em;">${this.escapeHtml(title)}</h3>
+                        </div>
+                        <div class="modal-body" style="padding: 24px; font-size: 15px; line-height: 1.5; color: ${subTextColor};">
+                            <p id="confirm-modal-message" style="margin: 0; font-weight: 500;">${this.escapeHtml(message)}</p>
+                        </div>
+                        <div class="modal-footer" style="padding: 16px 24px; background: ${footerBg}; display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid ${borderColor};">
+                            <button id="confirm-modal-cancel" type="button" class="btn-secondary" style="padding: 10px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: 1px solid ${borderColor}; background: transparent; color: ${subTextColor}; font-size: 14px;">${cancelText}</button>
+                            <button id="confirm-modal-confirm" type="button" class="btn-primary" style="padding: 10px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s; background: #ef4444; color: white; border: none; font-size: 14px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);">${confirmText}</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+
+            const titleEl = modal.querySelector('#confirm-modal-title');
+            const messageEl = modal.querySelector('#confirm-modal-message');
+            const confirmBtn = modal.querySelector('#confirm-modal-confirm');
+            const cancelBtn = modal.querySelector('#confirm-modal-cancel');
+            const headerEl = modal.querySelector('.modal-header');
+
+            if (titleEl) titleEl.textContent = title;
+            if (messageEl) messageEl.textContent = message;
+            if (cancelBtn) {
+                cancelBtn.style.display = cancelText ? 'block' : 'none';
+                cancelBtn.textContent = cancelText;
+            }
+            if (confirmBtn) {
+                confirmBtn.textContent = confirmText;
+                if (/slett/i.test(confirmText) || /slett/i.test(title)) {
+                    confirmBtn.style.background = '#ef4444';
+                    if (headerEl) headerEl.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                } else {
+                    const orangeGradient = 'linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%)';
+                    confirmBtn.style.background = orangeGradient;
+                    if (headerEl) headerEl.style.background = orangeGradient;
+                }
+            }
+
+            const cleanup = () => {
+                modal.style.display = 'none';
+                if (confirmBtn) confirmBtn.onclick = null;
+                if (cancelBtn) cancelBtn.onclick = null;
+            };
+
+            if (confirmBtn) {
+                confirmBtn.onclick = (e) => {
+                    e.preventDefault();
+                    cleanup();
+                    resolve(true);
+                };
+            }
+
+            if (cancelBtn) {
+                cancelBtn.onclick = (e) => {
+                    e.preventDefault();
+                    cleanup();
+                    resolve(false);
+                };
+            }
+
+            modal.style.display = 'flex';
+        });
+    }
+
     async deleteSelectedThreads() {
         const count = this.selectedThreads.size;
         if (count === 0) return;
@@ -1360,12 +1459,15 @@ class MessagesManager {
             ? "Er du sikker på at du vil slette denne meldingen?" 
             : `Er du sikker på at du vil slette ${count} valgte meldinger?`;
 
-        if (!confirm(confirmText)) return;
+        const confirmed = await this.showConfirm("Slett meldinger", confirmText, "Slett", "Avbryt");
+        if (!confirmed) return;
 
         const btn = document.getElementById('bulk-delete-btn');
-        const originalText = btn.innerHTML;
-        btn.disabled = true;
-        btn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span> Sletter...';
+        const originalText = btn ? btn.innerHTML : '';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span> Sletter...';
+        }
 
         try {
             const promises = [];
@@ -1387,13 +1489,16 @@ class MessagesManager {
             console.error("Bulk delete error:", error);
             window.showToast?.("Kunne ikke slette alle meldinger", 'error');
         } finally {
-            btn.disabled = false;
-            btn.innerHTML = originalText;
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
         }
     }
 
     async deleteMessage(id, type) {
-        if (!confirm("Er du sikker på at du vil slette denne meldingen?")) return;
+        const confirmed = await this.showConfirm("Slett melding", "Er du sikker på at du vil slette denne meldingen?", "Slett", "Avbryt");
+        if (!confirmed) return;
         
         try {
             await this.performDelete(id, type);
