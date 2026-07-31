@@ -4532,6 +4532,127 @@ body.minside-body textarea {
   transform: scale(0.96);
 }
 
+/* User Admin Panel Header & Controls (PC & Mobile Parity) */
+.user-admin-panel-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px 16px !important;
+  padding: 16px 20px !important;
+  border-bottom: 1px solid var(--border-color, #e2e8f0) !important;
+  background: #ffffff !important;
+  border-top-left-radius: 16px !important;
+  border-top-right-radius: 16px !important;
+  flex-wrap: wrap !important;
+}
+
+.user-admin-header-title-wrap {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.user-admin-header-title-wrap h3 {
+  margin: 0 !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+}
+
+.user-admin-search-wrap {
+  position: relative !important;
+  width: 240px !important;
+  max-width: 100% !important;
+}
+
+.user-admin-search-wrap .search-icon {
+  position: absolute !important;
+  left: 12px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  color: #94a3b8 !important;
+  font-size: 18px !important;
+  pointer-events: none !important;
+}
+
+.user-admin-search-wrap .user-search-input {
+  padding: 8px 12px 8px 38px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  font-size: 13.5px !important;
+  border-radius: 10px !important;
+  border: 1px solid #cbd5e1 !important;
+  width: 100% !important;
+  outline: none !important;
+  background: #f8fafc !important;
+  transition: all 0.2s ease !important;
+  box-sizing: border-box !important;
+}
+
+.user-admin-search-wrap .user-search-input:focus {
+  background: #ffffff !important;
+  border-color: #d17d39 !important;
+  box-shadow: 0 0 0 3px rgba(209, 125, 57, 0.12) !important;
+}
+
+.add-user-header-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  border-radius: 10px !important;
+  padding: 8px 16px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  width: auto !important;
+  background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
+  color: #ffffff !important;
+  border: none !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 3px 10px rgba(209, 125, 57, 0.25) !important;
+  transition: all 0.2s ease !important;
+  margin: 0 !important;
+}
+
+.add-user-header-btn:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 5px 14px rgba(209, 125, 57, 0.35) !important;
+}
+
+.add-user-header-btn:active {
+  transform: translateY(0) !important;
+}
+
+@media (max-width: 640px) {
+  .user-admin-panel-header {
+    padding: 14px 16px !important;
+    gap: 12px !important;
+  }
+
+  .user-admin-header-title-wrap {
+    flex: 1 1 auto !important;
+  }
+
+  .add-user-header-btn {
+    margin-left: auto !important;
+    font-size: 12.5px !important;
+    padding: 6px 14px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    width: auto !important;
+  }
+
+  .user-admin-search-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+    order: 3 !important;
+  }
+}
+
+
 
 /* Sidebar brand logo: use the raw logo without a boxed badge background */
 body.admin-body .sidebar-header .logo,

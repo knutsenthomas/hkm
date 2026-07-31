@@ -26822,20 +26822,18 @@ class AdminManager {
             <div class="design-ui-shell">
                 <div class="design-ui-workspace">
                     <div class="design-ui-panel">
-                        <div class="design-ui-panel-header" style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
-                            <div style="display: flex; align-items: center; gap: 8px;">
+                        <div class="user-admin-panel-header">
+                            <div class="user-admin-header-title-wrap">
                                 <h3 class="design-ui-panel-title" style="margin: 0;">Aktive brukere</h3>
                                 <span class="status-badge" id="user-count-badge" style="background: #f1f5f9; color: #475569; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 12px;">- BRUKERE</span>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: wrap; max-width: 100%;">
-                                <div style="position: relative; width: 220px; max-width: 100%; flex: 1 1 auto;">
-                                    <span class="material-symbols-outlined" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 18px; pointer-events: none;">search</span>
-                                    <input type="text" id="user-search-input" class="form-control" placeholder="Søk etter brukere..." style="padding: 8px 12px 8px 36px !important; height: 36px; font-size: 13px; border-radius: 8px; border: 1px solid #cbd5e1; width: 100%; outline: none; transition: all 0.2s ease;">
-                                </div>
-                                <button type="button" id="add-user-btn" class="btn btn-primary" onclick="window.adminManager.openAddUserModal()" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 13px; border-radius: 8px; padding: 8px 16px; background: linear-gradient(135deg, #d17d39, #bd4f2a); color: #ffffff; border: none; cursor: pointer; white-space: nowrap; flex-shrink: 0;">
-                                    <span class="material-symbols-outlined" style="font-size: 18px;">add</span>
-                                    Ny bruker
-                                </button>
+                            <button type="button" id="add-user-btn" class="btn btn-primary add-user-header-btn" onclick="window.adminManager.openAddUserModal()">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+                                Ny bruker
+                            </button>
+                            <div class="user-admin-search-wrap">
+                                <span class="material-symbols-outlined search-icon">search</span>
+                                <input type="text" id="user-search-input" class="form-control user-search-input" placeholder="Søk etter brukere...">
                             </div>
                         </div>
                         <div class="design-ui-panel-body p-0" id="users-list-container" style="padding: 0;">
