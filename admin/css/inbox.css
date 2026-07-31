@@ -2763,4 +2763,47 @@ html[data-theme="dark"] .inbox-empty-icon-wrap {
     color: #f97316 !important;
 }
 
+/* Deep Dark Mode Overrides for Email Threads, Bodies & Sent Replies */
+html[data-theme="dark"] .email-body,
+html[data-theme="dark"] .email-body *,
+html[data-theme="dark"] .sent-reply-text,
+html[data-theme="dark"] .sent-reply-text * {
+    color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .email-body strong,
+html[data-theme="dark"] .sent-reply-text strong,
+html[data-theme="dark"] .email-body b,
+html[data-theme="dark"] .sent-reply-text b,
+html[data-theme="dark"] .email-body h1,
+html[data-theme="dark"] .email-body h2,
+html[data-theme="dark"] .email-body h3,
+html[data-theme="dark"] .sent-reply-card-header,
+html[data-theme="dark"] .sent-reply-sender-name {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .email-body a,
+html[data-theme="dark"] .sent-reply-text a {
+    color: #f97316 !important;
+}
+
+html[data-theme="dark"] .email-thread-replies > div,
+html[data-theme="dark"] .sent-reply-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #cbd5e1 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+}
+
+html[data-theme="dark"] .sent-reply-card-header {
+    border-bottom-color: #334155 !important;
+}
+
+html[data-theme="dark"] .sent-reply-to,
+html[data-theme="dark"] .sent-reply-date {
+    color: #94a3b8 !important;
+}
+
+
 
