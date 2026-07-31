@@ -449,7 +449,7 @@ const initAdminHeader = () => {
             { label: 'Segmenter', icon: 'segment', href: '/admin/admin-segmenter.html', path: 'admin-segmenter', category: 'kommunikasjon' },
             { label: 'Meldinger', icon: 'inbox', href: '/admin/admin-meldinger.html', path: 'admin-meldinger', category: 'kommunikasjon', badgeId: 'messages-badge' },
             { label: 'Kommentarer', icon: 'forum', section: 'comments', category: 'kommunikasjon' },
-            { label: 'HKM Studio', icon: 'auto_awesome', href: '/admin/index.html', path: 'admin-index', category: 'kommunikasjon' },
+            { label: 'HKM Studio', icon: 'auto_awesome', href: '/admin/admin-nyhetsbrev.html', path: 'admin-nyhetsbrev', category: 'kommunikasjon' },
             { label: 'Nyhetsbrev', icon: 'mail', href: '/admin/admin-nyhetsbrev.html', path: 'admin-nyhetsbrev', category: 'kommunikasjon' },
             { header: 'administrasjon', label: 'Administrasjon' },
             { label: 'Huskeliste', icon: 'playlist_add_check', section: 'todo', category: 'administrasjon', alwaysVisible: true },
