@@ -4058,6 +4058,18 @@ body.admin-body .table-container:not(.full-bleed) {
   box-sizing: border-box;
 }
 
+/* Panel bodies with p-0 and user list container should be flush with card borders */
+body.admin-body .design-ui-panel-body.p-0,
+body.admin-body #users-list-container {
+  padding: 0 !important;
+}
+
+body.admin-body #users-list-container .table-container,
+body.admin-body .design-ui-panel .table-container {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
 .table-container.full-bleed {
   width: 100% !important;
   padding-left: 0 !important;
