@@ -21352,8 +21352,8 @@ class AdminManager {
                     <tr>
                         <td style="white-space:nowrap;">${date ? date.toLocaleString('no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent'}</td>
                         <td style="white-space:nowrap;">
-                            <div style="font-weight:700; color:#0f172a;">${name}</div>
-                            <div style="font-size:12px; color:#64748b;">${email}</div>
+                            <strong class="table-customer-name" style="font-weight:700; color:#000000; font-size:13.5px; display:block;">${name}</strong>
+                            <span style="font-size:12px; color:#64748b; display:block; margin-top:2px;">${email}</span>
                         </td>
                         <td style="white-space:nowrap;">
                             <span class="badge" style="background:#f0fdf4; color:#16a34a; font-weight:700; padding:4px 8px; border-radius:6px;">${courseTitle}</span>

@@ -6610,15 +6610,16 @@ body.admin-body .template-item:active {
   color: #334155 !important;
 }
 
+.table-customer-name,
 #donation-transactions-body td strong,
 #donation-donors-body td strong,
 #shop-transactions-body td strong,
 #kurs-shop-transactions-body td strong,
 #wix-transactions-body td strong,
 #inkind-transactions-body td strong {
-  font-size: 13.5px !important; /* Mer balansert størrelse for navn og beløp */
-  font-weight: 600 !important; /* Mindre aggressiv skrifttykkelse */
-  color: #0f172a !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  color: #000000 !important;
 }
 
 #donation-transactions-body td div,
