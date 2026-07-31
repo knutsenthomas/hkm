@@ -2249,8 +2249,8 @@ body.crm-body .crm-table {
 
 .crm-table th {
   background: transparent;
-  padding: 0 24px;
-  height: 52px;
+  padding: 0 16px;
+  height: 46px;
   font-size: 12px;
   font-weight: 700;
   color: var(--admin-text-muted, #64748b);
@@ -2262,11 +2262,21 @@ body.crm-body .crm-table {
 }
 
 .crm-table td {
-  padding: 16px 24px;
+  padding: 12px 16px;
   font-size: 14px;
   color: var(--admin-text, #0f172a);
   border-bottom: 1px solid var(--admin-border, #e2e8f0);
   vertical-align: middle;
+}
+
+.crm-table th:first-child,
+.crm-table td:first-child {
+  padding-left: 16px !important;
+}
+
+.crm-table th:last-child,
+.crm-table td:last-child {
+  padding-right: 16px !important;
 }
 
 .crm-table tr:last-child td {
@@ -4538,7 +4548,7 @@ body.minside-body textarea {
   align-items: center !important;
   justify-content: space-between !important;
   gap: 12px 16px !important;
-  padding: 16px 20px !important;
+  padding: 14px 16px !important;
   border-bottom: 1px solid var(--border-color, #e2e8f0) !important;
   background: #ffffff !important;
   border-top-left-radius: 16px !important;
@@ -4639,8 +4649,8 @@ body.admin-body .user-admin-search-wrap #user-search-input {
 
 @media (max-width: 640px) {
   .user-admin-panel-header {
-    padding: 16px !important;
-    gap: 14px !important;
+    padding: 12px 14px !important;
+    gap: 12px !important;
   }
 
   .user-admin-header-title-wrap {
