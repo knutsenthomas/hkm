@@ -113,15 +113,13 @@ class MessagesManager {
         const bell = document.getElementById('messages-bell');
         if (bell) {
             bell.onclick = () => {
-                if (this.unreadInboxMessages === 0 && this.unreadUserNotifications > 0) {
-                    const pushFolder = document.querySelector('.folder-item[data-filter="push"]');
-                    if (pushFolder) {
-                        pushFolder.click();
-                        return;
-                    }
-                }
                 const unreadFolder = document.querySelector('.folder-item[data-filter="unread"]');
                 if (unreadFolder) unreadFolder.click();
+                
+                const hasUnreadEmail = (this.messages || []).some(m => m.status !== 'lest');
+                if (!hasUnreadEmail) {
+                    this.markAllAsRead();
+                }
             };
         }
 
@@ -1430,28 +1428,31 @@ class MessagesManager {
 
     async markAllAsRead() {
         try {
-            // 1. Mark unread contactMessages as read in Firestore
-            const unreadMessages = this.messages.filter(m => m.status !== 'lest');
-            for (const msg of unreadMessages) {
-                await window.firebaseService.db.collection('contactMessages').doc(msg.id).update({ status: 'lest' });
-                msg.status = 'lest';
+            if (!window.firebaseService?.db) return;
+            const db = window.firebaseService.db;
+
+            // 1. Mark ALL contactMessages with status == 'ny' as read in Firestore
+            const nySnap = await db.collection('contactMessages').where('status', '==', 'ny').get();
+            if (!nySnap.empty) {
+                const batch = db.batch();
+                nySnap.forEach(doc => {
+                    batch.update(doc.ref, { status: 'lest', readAt: firebase.firestore.FieldValue.serverTimestamp() });
+                });
+                await batch.commit();
             }
 
-            // 2. Mark unread user_notifications as read for the logged in user
-            if (window.firebaseService.auth?.currentUser?.uid) {
-                const unreadNotifsSnap = await window.firebaseService.db
-                    .collection('user_notifications')
-                    .where('userId', '==', window.firebaseService.auth.currentUser.uid)
-                    .where('read', '==', false)
-                    .get();
-                
-                if (!unreadNotifsSnap.empty) {
-                    const batch = window.firebaseService.db.batch();
-                    unreadNotifsSnap.forEach(doc => {
-                        batch.update(doc.ref, { read: true });
-                    });
-                    await batch.commit();
-                }
+            // Update local memory states
+            this.messages.forEach(m => m.status = 'lest');
+            this.unifiedThreads.forEach(t => { if (t.type === 'email') t.status = 'lest'; });
+
+            // 2. Mark ALL unread user_notifications in Firestore as read
+            const notifSnap = await db.collection('user_notifications').where('read', '==', false).get();
+            if (!notifSnap.empty) {
+                const batch = db.batch();
+                notifSnap.forEach(doc => {
+                    batch.update(doc.ref, { read: true });
+                });
+                await batch.commit();
             }
 
             this.unreadInboxMessages = 0;
