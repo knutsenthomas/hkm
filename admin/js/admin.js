@@ -26816,30 +26816,23 @@ class AdminManager {
             return;
         }
 
-        const actionsHtml = `
-            <button type="button" id="add-user-btn" class="btn btn-primary" onclick="window.adminManager.openAddUserModal()" style="display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13.5px; border-radius: 999px; padding: 9px 22px; background: linear-gradient(135deg, #d17d39, #bd4f2a); color: #ffffff; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(209,125,57,0.3); transition: all 0.2s ease;">
-                <span class="material-symbols-outlined" style="font-size: 19px;">person_add</span>
-                Ny bruker
-            </button>
-        `;
-
         section.innerHTML = `
-            ${this.renderSectionHeader('person_search', 'Brukeradministrasjon', 'Oversikt over alle registrerte brukere og deres tilgangsnivåer.', actionsHtml)}
+            ${this.renderSectionHeader('person_search', 'Brukeradministrasjon', 'Oversikt over alle registrerte brukere og deres tilgangsnivåer.')}
 
             <div class="design-ui-shell">
                 <div class="design-ui-workspace">
                     <div class="design-ui-panel">
-                        <div class="design-ui-panel-header" style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;">
+                        <div class="design-ui-panel-header" style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <h3 class="design-ui-panel-title" style="margin: 0;">Aktive brukere</h3>
                                 <span class="status-badge" id="user-count-badge" style="background: #f1f5f9; color: #475569; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 12px;">- BRUKERE</span>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
-                                <div style="position: relative; width: 260px;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: wrap; max-width: 100%;">
+                                <div style="position: relative; width: 220px; max-width: 100%; flex: 1 1 auto;">
                                     <span class="material-symbols-outlined" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 18px; pointer-events: none;">search</span>
                                     <input type="text" id="user-search-input" class="form-control" placeholder="Søk etter brukere..." style="padding: 8px 12px 8px 36px !important; height: 36px; font-size: 13px; border-radius: 8px; border: 1px solid #cbd5e1; width: 100%; outline: none; transition: all 0.2s ease;">
                                 </div>
-                                <button type="button" class="btn btn-primary" onclick="window.adminManager.openAddUserModal()" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 13px; border-radius: 8px; padding: 8px 16px; background: linear-gradient(135deg, #d17d39, #bd4f2a); color: #ffffff; border: none; cursor: pointer; white-space: nowrap;">
+                                <button type="button" id="add-user-btn" class="btn btn-primary" onclick="window.adminManager.openAddUserModal()" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 13px; border-radius: 8px; padding: 8px 16px; background: linear-gradient(135deg, #d17d39, #bd4f2a); color: #ffffff; border: none; cursor: pointer; white-space: nowrap; flex-shrink: 0;">
                                     <span class="material-symbols-outlined" style="font-size: 18px;">add</span>
                                     Ny bruker
                                 </button>
@@ -27104,51 +27097,51 @@ class AdminManager {
                 : '—';
 
             return `
-                                                                            <tr data-user-id="${user.id}">
-                                                                                <td>
-                                                                                    <div class="user-info-cell">
-                                                                                        <div class="user-avatar-sm">
-                                                                                            ${user.photoURL
+                <tr data-user-id="${user.id}">
+                    <td style="white-space: nowrap; min-width: 180px;">
+                        <div class="user-info-cell" style="display: flex; align-items: center; gap: 10px; white-space: nowrap;">
+                            <div class="user-avatar-sm" style="width: 36px; height: 36px; min-width: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #e2e8f0; font-weight: 700; font-size: 13px; color: #475569; overflow: hidden; flex-shrink: 0;">
+                                ${user.photoURL
                     ? `<img src="${this.escapeHtml(user.photoURL)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
                     : this.escapeHtml(initials)}
-                                                                                        </div>
-                                                                                        <div>
-                                                                                            <div class="user-name">${this.escapeHtml(name)}</div>
-                                                                                            <div class="text-muted">${this.escapeHtml(email)}</div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </td>
-                                                                                <td><span class="badge status-automated">${this.escapeHtml(roleLabel)}</span></td>
-                                                                                <td>${phoneText ? this.escapeHtml(phoneText) : '<span class="text-muted">—</span>'}</td>
-                                                                                <td>${createdText}</td>
-                                                                                <td class="col-actions">
-                                                                                    <button class="btn btn-outline edit-user-btn" type="button" data-id="${user.id}">Rediger</button>
-                                                                                    ${canDelete ? `
+                            </div>
+                            <div style="min-width: 0; white-space: nowrap;">
+                                <div class="user-name" style="font-weight: 700; font-size: 13.5px; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${this.escapeHtml(name)}</div>
+                                <div class="text-muted" style="font-size: 12px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${this.escapeHtml(email)}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="white-space: nowrap;"><span class="badge status-automated" style="white-space: nowrap;">${this.escapeHtml(roleLabel)}</span></td>
+                    <td style="white-space: nowrap;">${phoneText ? this.escapeHtml(phoneText) : '<span class="text-muted">—</span>'}</td>
+                    <td style="white-space: nowrap;">${createdText}</td>
+                    <td class="col-actions" style="white-space: nowrap; text-align: right;">
+                        <button class="btn btn-outline edit-user-btn" type="button" data-id="${user.id}" style="white-space: nowrap;">Rediger</button>
+                        ${canDelete ? `
                             <button class="icon-btn delete-user-btn danger" type="button" data-id="${user.id}" title="Slett">
                                 <span class="material-symbols-outlined">delete</span>
                             </button>
                         ` : ''}
-                                                                                </td>
-                                                                            </tr>
-                                                                            `;
+                    </td>
+                </tr>
+            `;
         }).join('');
 
         container.innerHTML = `
-                                                                            <div class="table-container">
-                                                                                <table class="crm-table">
-                                                                                    <thead>
-                                                                                        <tr>
-                                                                                            <th>Bruker</th>
-                                                                                            <th>Rolle</th>
-                                                                                            <th>Telefon</th>
-                                                                                            <th>Opprettet</th>
-                                                                                            <th class="col-actions">Handlinger</th>
-                                                                                        </tr>
-                                                                                    </thead>
-                                                                                    <tbody>${rowsHtml}</tbody>
-                                                                                </table>
-                                                                            </div>
-                                                                            `;
+            <div class="table-container" style="overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch;">
+                <table class="crm-table" style="min-width: 620px; width: 100%;">
+                    <thead>
+                        <tr>
+                            <th style="white-space: nowrap;">Bruker</th>
+                            <th style="white-space: nowrap;">Rolle</th>
+                            <th style="white-space: nowrap;">Telefon</th>
+                            <th style="white-space: nowrap;">Opprettet</th>
+                            <th class="col-actions" style="white-space: nowrap; text-align: right;">Handlinger</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rowsHtml}</tbody>
+                </table>
+            </div>
+        `;
 
         container.querySelectorAll('.edit-user-btn').forEach((btn) => {
             btn.onclick = () => {
