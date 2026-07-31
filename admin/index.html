@@ -1480,9 +1480,9 @@
             const mobileSidebarClose = document.getElementById('mobile-sidebar-close');
             if (mobileSidebarClose) {
                 mobileSidebarClose.addEventListener('click', () => {
-                    sidebar.classList.remove('active');
+                    sidebar?.classList.remove('active');
                     const overlay = document.querySelector('.sidebar-overlay');
-                    if (overlay) {
+                    if (overlay && overlay.classList) {
                         overlay.classList.remove('active');
                         overlay.style.removeProperty('display');
                         overlay.style.removeProperty('opacity');
@@ -1511,10 +1511,12 @@
                 const sections = document.querySelectorAll('.section-content');
                 console.log(`[Navigation] Found ${sections.length} sections. Hiding all, showing ${targetSectionId}-section.`);
                 sections.forEach(section => {
-                    section.classList.remove('active');
-                    if (section.id === `${targetSectionId}-section`) {
-                        section.classList.add('active');
-                        console.log(`[Navigation] Activated section: ${section.id}`);
+                    if (section && section.classList) {
+                        section.classList.remove('active');
+                        if (section.id === `${targetSectionId}-section`) {
+                            section.classList.add('active');
+                            console.log(`[Navigation] Activated section: ${section.id}`);
+                        }
                     }
                 });
 
@@ -1525,8 +1527,10 @@
 
                 // Update Active Link UI
                 document.querySelectorAll('.nav-link, .mobile-nav-item').forEach(l => {
-                    const isMatch = l.getAttribute('data-section') === targetSectionId;
-                    l.classList.toggle('active', isMatch);
+                    if (l && l.classList) {
+                        const isMatch = l.getAttribute('data-section') === targetSectionId;
+                        l.classList.toggle('active', isMatch);
+                    }
                 });
 
                 // Sync topbar
@@ -1536,7 +1540,7 @@
                 // Close sidebar on mobile
                 sidebar?.classList.remove('active');
                 const overlay = document.querySelector('.sidebar-overlay');
-                if (overlay) {
+                if (overlay && overlay.classList) {
                     overlay.classList.remove('active');
                 }
             }

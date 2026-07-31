@@ -1982,7 +1982,12 @@ class AdminManager {
 
     applyRoleRestrictions(role) {
         console.log(`Applying restrictions for role: ${role}`);
-        const ROLES = window.HKM_ROLES;
+        const ROLES = window.HKM_ROLES || {
+            MEDLEM: 'medlem',
+            EDITOR: 'editor',
+            ADMIN: 'admin',
+            SUPERADMIN: 'superadmin'
+        };
 
         // 1. Sidebar Menu Filtering
         document.querySelectorAll('.nav-item').forEach(item => {
@@ -4721,25 +4726,31 @@ class AdminManager {
                 }
 
                 const status = String(item.status || 'godkjent').toLowerCase();
-                let statusBadge = '<span class="status-pill status-approved"><span class="status-dot"></span>Påmeldt</span>';
+                let statusBadge = '<span class="status-pill status-approved"><span class="material-symbols-outlined" style="font-size: 14px; display: block;">check_circle</span>Påmeldt</span>';
                 if (['pending', 'venter'].includes(status)) {
-                    statusBadge = '<span class="status-pill status-pending"><span class="status-dot"></span>Venter</span>';
+                    statusBadge = '<span class="status-pill status-pending"><span class="material-symbols-outlined" style="font-size: 14px; display: block;">hourglass_empty</span>Venter</span>';
                 } else if (['fullført', 'completed'].includes(status)) {
-                    statusBadge = '<span class="status-pill status-completed"><span class="status-dot"></span>Fullført</span>';
+                    statusBadge = '<span class="status-pill status-completed"><span class="material-symbols-outlined" style="font-size: 14px; display: block;">verified</span>Fullført</span>';
                 }
 
                 return `
                     <div class="recent-signup-item">
-                        <div style="display: flex; align-items: center; gap: 14px; min-width: 0;">
+                        <div class="recent-signup-left">
                             <div class="recent-signup-avatar">
                                 ${initials}
                             </div>
-                            <div style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                <div class="recent-signup-name" style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${name}</div>
-                                <div class="recent-signup-course" style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${email ? email + ' • ' : ''}<span class="recent-signup-course-tag">${course}</span></div>
+                            <div class="recent-signup-info">
+                                <div class="recent-signup-name">${name}</div>
+                                <div class="recent-signup-meta-row">
+                                    ${email ? `<span class="recent-signup-email">${email}</span><span class="meta-dot">•</span>` : ''}
+                                    <span class="recent-signup-course-tag">
+                                        <span class="material-symbols-outlined" style="font-size: 13px; display: block;">school</span>
+                                        ${course}
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0; margin-left: 12px;">
+                        <div class="recent-signup-right">
                             <span class="recent-signup-date">${dateStr}</span>
                             ${statusBadge}
                         </div>
@@ -4748,12 +4759,12 @@ class AdminManager {
             }).join('');
         } else {
             courseSignupsItemsHtml = `
-                <div style="text-align: center; padding: 32px 24px; background: #f8fafc; border-radius: 14px; border: 1.5px dashed #e2e8f0;">
-                    <div style="width: 52px; height: 52px; border-radius: 16px; background: rgba(209, 125, 57, 0.1); color: #d17d39; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; border: 1px solid rgba(209, 125, 57, 0.2);">
-                        <span class="material-symbols-outlined" style="font-size: 28px;">school</span>
+                <div class="recent-signups-empty">
+                    <div class="empty-icon-wrap">
+                        <span class="material-symbols-outlined" style="font-size: 28px; display: block;">school</span>
                     </div>
-                    <h4 style="margin: 0; font-size: 15px; font-weight: 700; color: #1e293b;">Ingen nye kurspåmeldinger enda</h4>
-                    <p style="margin: 6px 0 0 0; font-size: 13px; color: #64748b;">Når nye studenter melder seg på et kurs, vil deres registreringer vises her i sanntid.</p>
+                    <h4>Ingen nye kurspåmeldinger enda</h4>
+                    <p>Når nye studenter melder seg på et kurs, vil deres registreringer vises her i sanntid.</p>
                 </div>
             `;
         }
@@ -4763,7 +4774,7 @@ class AdminManager {
                 <div class="dashboard-course-signups-header">
                     <div class="header-left-info">
                         <div class="header-icon-badge">
-                            <span class="material-symbols-outlined" style="font-size: 24px;">school</span>
+                            <span class="material-symbols-outlined" style="font-size: 24px; display: block;">school</span>
                         </div>
                         <div>
                             <h3>Siste kurspåmeldinger</h3>
@@ -4772,10 +4783,10 @@ class AdminManager {
                     </div>
                     <a href="/admin/index.html#courses" class="dashboard-see-all-link" data-section="courses">
                         <span>Se alle påmeldinger</span>
-                        <span class="material-symbols-outlined">arrow_forward</span>
+                        <span class="material-symbols-outlined" style="font-size: 16px; display: block;">arrow_forward</span>
                     </a>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div class="recent-signups-list">
                     ${courseSignupsItemsHtml}
                 </div>
             </div>
@@ -27187,7 +27198,12 @@ class AdminManager {
             document.body.appendChild(modal);
         }
 
-        const ROLES = window.HKM_ROLES;
+        const ROLES = window.HKM_ROLES || {
+            MEDLEM: 'medlem',
+            EDITOR: 'editor',
+            ADMIN: 'admin',
+            SUPERADMIN: 'superadmin'
+        };
         const rolesOptions = Object.values(ROLES).map(role =>
             `<option value="${role}" ${userData && userData.role === role ? 'selected' : ''}>${role.charAt(0).toUpperCase() + role.slice(1)}</option>`
         ).join('');
@@ -27357,7 +27373,9 @@ class AdminManager {
                 return;
             }
             const userData = { id: doc.id, ...doc.data() };
-            container.classList.remove('loader');
+            if (container && container.classList) {
+                container.classList.remove('loader');
+            }
             this.renderUserDetailLayout(container, userData);
         } catch (err) {
             console.error('Error loading user details:', err);
@@ -27368,7 +27386,12 @@ class AdminManager {
     renderUserDetailLayout(container, userData) {
         const name = userData.displayName || userData.fullName || 'Ukjent Navn';
         const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-        const ROLES = window.HKM_ROLES;
+        const ROLES = window.HKM_ROLES || {
+            MEDLEM: 'medlem',
+            EDITOR: 'editor',
+            ADMIN: 'admin',
+            SUPERADMIN: 'superadmin'
+        };
         const rolesOptions = Object.values(ROLES).map(role =>
             `<option value="${role}" ${userData.role === role ? 'selected' : ''}>${role.charAt(0).toUpperCase() + role.slice(1)}</option>`
         ).join('');
