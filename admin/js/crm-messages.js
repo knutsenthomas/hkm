@@ -447,8 +447,20 @@ class MessagesManager {
         
         const container = document.getElementById('unified-inbox');
         if (container) {
+            container.classList.remove('push-active');
             container.classList.add('thread-view-active');
             container.classList.add('view-open');
+            container.classList.add('mobile-thread-open');
+        }
+        document.body.classList.add('mobile-thread-open');
+
+        // If user was viewing activity log (push-active mode), switch active folder back to 'all' so thread view is visible
+        if (this.activeFilter === 'push') {
+            this.activeFilter = 'all';
+            document.querySelectorAll('.folder-item').forEach(f => {
+                if (f.dataset.filter === 'all') f.classList.add('active');
+                else f.classList.remove('active');
+            });
         }
 
         // UI feedback
@@ -457,7 +469,7 @@ class MessagesManager {
         const viewEl = document.getElementById('inbox-thread-view');
         if (!viewEl) return;
 
-        viewEl.innerHTML = '<div class="loader"></div>';
+        viewEl.innerHTML = '<div class="loader">Laster melding...</div>';
         
         if (type === 'chat') {
             await this.renderChatView(id);
@@ -469,7 +481,7 @@ class MessagesManager {
 
         // If it was unread email, mark as read
         if (type === 'email') {
-            const msg = this.messages.find(m => m.id === id);
+            const msg = this.messages.find(m => m.id === id) || this.unifiedThreads.find(m => m.id === id);
             if (msg && msg.status !== 'lest') {
                 this.markAsRead(id);
             }
@@ -808,8 +820,28 @@ class MessagesManager {
 
     async renderEmailView(msgId) {
         const viewEl = document.getElementById('inbox-thread-view');
-        const msg = this.messages.find(m => m.id === msgId);
-        if (!msg) return;
+        if (!viewEl) return;
+
+        let msg = this.messages.find(m => m.id === msgId);
+        if (!msg) {
+            msg = this.unifiedThreads.find(m => m.id === msgId);
+        }
+        if (!msg && window.firebaseService?.db) {
+            try {
+                const doc = await window.firebaseService.db.collection('contactMessages').doc(msgId).get();
+                if (doc.exists) {
+                    msg = { id: doc.id, type: 'email', ...doc.data() };
+                    this.messages.push(msg);
+                }
+            } catch (e) {
+                console.error("Error fetching contact message doc:", e);
+            }
+        }
+
+        if (!msg) {
+            viewEl.innerHTML = '<div style="padding: 24px; color: #ef4444; font-weight: 600; text-align: center;">Kunne ikke finne eller laste denne e-posten.</div>';
+            return;
+        }
 
         const date = msg.createdAt ? (msg.createdAt.toDate ? msg.createdAt.toDate() : new Date(msg.createdAt)).toLocaleString('no-NO') : 'Ukjent';
         const replySubject = /^re:/i.test(msg.subject || '') ? (msg.subject || '') : `Re: ${msg.subject || 'Kontakt'}`;
@@ -1178,9 +1210,25 @@ class MessagesManager {
     }
 
     async renderPushView(id) {
-        const push = this.pushNotifications.find(p => p.id === id);
         const viewEl = document.getElementById('inbox-thread-view');
-        if (!push || !viewEl) return;
+        if (!viewEl) return;
+
+        let push = this.pushNotifications.find(p => p.id === id) || this.unifiedThreads.find(p => p.id === id);
+        if (!push && window.firebaseService?.db) {
+            try {
+                const doc = await window.firebaseService.db.collection('push_log').doc(id).get();
+                if (doc.exists) {
+                    push = { id: doc.id, type: 'push', ...doc.data() };
+                    this.pushNotifications.push(push);
+                }
+            } catch (e) {
+                console.error("Error fetching push log doc:", e);
+            }
+        }
+        if (!push) {
+            viewEl.innerHTML = '<div style="padding: 24px; color: #ef4444; font-weight: 600; text-align: center;">Kunne ikke finne eller laste denne push-varslingen.</div>';
+            return;
+        }
 
         const time = (push.sentAt || push.createdAt)?.toDate?.() || new Date(push.sentAt || push.createdAt || 0);
         
