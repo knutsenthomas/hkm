@@ -4561,26 +4561,26 @@ body.minside-body textarea {
 
 .user-admin-search-wrap {
   position: relative !important;
-  width: 240px !important;
+  width: 260px !important;
   max-width: 100% !important;
 }
 
 .user-admin-search-wrap .search-icon {
   position: absolute !important;
-  left: 12px !important;
+  left: 14px !important;
   top: 50% !important;
   transform: translateY(-50%) !important;
   color: #94a3b8 !important;
-  font-size: 18px !important;
+  font-size: 20px !important;
   pointer-events: none !important;
 }
 
 .user-admin-search-wrap .user-search-input {
-  padding: 8px 12px 8px 38px !important;
-  height: 38px !important;
-  min-height: 38px !important;
-  font-size: 13.5px !important;
-  border-radius: 10px !important;
+  padding: 10px 14px 10px 42px !important;
+  height: 46px !important;
+  min-height: 46px !important;
+  font-size: 14px !important;
+  border-radius: 12px !important;
   border: 1px solid #cbd5e1 !important;
   width: 100% !important;
   outline: none !important;
@@ -4592,19 +4592,20 @@ body.minside-body textarea {
 .user-admin-search-wrap .user-search-input:focus {
   background: #ffffff !important;
   border-color: #d17d39 !important;
-  box-shadow: 0 0 0 3px rgba(209, 125, 57, 0.12) !important;
+  box-shadow: 0 0 0 3px rgba(209, 125, 57, 0.15) !important;
 }
 
 .add-user-header-btn {
   display: inline-flex !important;
   align-items: center !important;
-  gap: 6px !important;
+  justify-content: center !important;
+  gap: 8px !important;
   font-weight: 700 !important;
-  font-size: 13px !important;
-  border-radius: 10px !important;
-  padding: 8px 16px !important;
-  height: 38px !important;
-  min-height: 38px !important;
+  font-size: 14px !important;
+  border-radius: 12px !important;
+  padding: 11px 22px !important;
+  height: 46px !important;
+  min-height: 46px !important;
   width: auto !important;
   background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
   color: #ffffff !important;
@@ -4612,24 +4613,29 @@ body.minside-body textarea {
   cursor: pointer !important;
   white-space: nowrap !important;
   flex-shrink: 0 !important;
-  box-shadow: 0 3px 10px rgba(209, 125, 57, 0.25) !important;
+  box-shadow: 0 4px 14px rgba(209, 125, 57, 0.3) !important;
   transition: all 0.2s ease !important;
   margin: 0 !important;
 }
 
+.add-user-header-btn .material-symbols-outlined {
+  font-size: 20px !important;
+}
+
 .add-user-header-btn:hover {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 5px 14px rgba(209, 125, 57, 0.35) !important;
+  transform: translateY(-1.5px) !important;
+  box-shadow: 0 6px 18px rgba(209, 125, 57, 0.4) !important;
 }
 
 .add-user-header-btn:active {
   transform: translateY(0) !important;
+  box-shadow: 0 2px 8px rgba(209, 125, 57, 0.25) !important;
 }
 
 @media (max-width: 640px) {
   .user-admin-panel-header {
-    padding: 14px 16px !important;
-    gap: 12px !important;
+    padding: 16px !important;
+    gap: 14px !important;
   }
 
   .user-admin-header-title-wrap {
@@ -4638,11 +4644,12 @@ body.minside-body textarea {
 
   .add-user-header-btn {
     margin-left: auto !important;
-    font-size: 12.5px !important;
-    padding: 6px 14px !important;
-    height: 36px !important;
-    min-height: 36px !important;
+    font-size: 13.5px !important;
+    padding: 10px 18px !important;
+    height: 44px !important;
+    min-height: 44px !important;
     width: auto !important;
+    border-radius: 12px !important;
   }
 
   .user-admin-search-wrap {
@@ -4650,7 +4657,14 @@ body.minside-body textarea {
     max-width: 100% !important;
     order: 3 !important;
   }
+
+  .user-admin-search-wrap .user-search-input {
+    height: 44px !important;
+    min-height: 44px !important;
+    font-size: 14px !important;
+  }
 }
+
 
 
 
