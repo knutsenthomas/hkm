@@ -10846,12 +10846,323 @@ html[data-theme="dark"] .hkm-task-card.completed {
         width: 100%;
     }
 
-    .hkm-tasks-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
+/* Recent Course Signups Card Styles */
+.dashboard-course-signups-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 24px;
+    margin-top: 32px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    transition: all 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.dashboard-course-signups-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.dashboard-course-signups-header .header-left-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.dashboard-course-signups-header .header-icon-badge {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    background: #fff7ed;
+    color: #d17d39;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ffedd5;
+    flex-shrink: 0;
+}
+
+.dashboard-course-signups-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.01em;
+}
+
+.dashboard-course-signups-header p {
+    margin: 3px 0 0 0;
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.dashboard-see-all-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #d17d39;
+    text-decoration: none;
+    background: #fff7ed;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid #ffedd5;
+    transition: all 0.2s ease;
+}
+
+.dashboard-see-all-link:hover {
+    background: #ffedd5;
+    border-color: #fed7aa;
+    transform: translateY(-1px);
+}
+
+.recent-signups-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.recent-signup-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 18px;
+    background: #ffffff;
+    border: 1.5px solid #f1f5f9;
+    border-radius: 16px;
+    transition: all 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.recent-signup-item:hover {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.recent-signup-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+    flex: 1;
+}
+
+.recent-signup-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #d17d39, #b95d20);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2);
+}
+
+.recent-signup-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.recent-signup-name {
+    font-weight: 700;
+    font-size: 14.5px;
+    color: #0f172a;
+    line-height: 1.3;
+    margin: 0;
+}
+
+.recent-signup-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #64748b;
+    flex-wrap: wrap;
+}
+
+.recent-signup-email {
+    color: #64748b;
+    font-weight: 500;
+}
+
+.meta-dot {
+    color: #cbd5e1;
+    font-weight: 700;
+    font-size: 10px;
+}
+
+.recent-signup-course-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #d17d39;
+    font-weight: 600;
+    background: #fff7ed;
+    padding: 3px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    border: 1px solid #ffedd5;
+}
+
+.recent-signup-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+}
+
+.recent-signup-date {
+    font-size: 12px;
+    color: #94a3b8;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.status-pill.status-approved {
+    background: #dcfce7;
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
+}
+
+.status-pill.status-pending {
+    background: #fff7ed;
+    color: #d17d39;
+    border: 1px solid #ffedd5;
+}
+
+.status-pill.status-completed {
+    background: #e0f2fe;
+    color: #0284c7;
+    border: 1px solid #bae6fd;
+}
+
+/* Dark Mode Overrides for Recent Signups */
+html[data-theme="dark"] .dashboard-course-signups-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+html[data-theme="dark"] .dashboard-course-signups-header h3 {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .dashboard-course-signups-header p {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .dashboard-course-signups-header .header-icon-badge {
+    background: rgba(209, 125, 57, 0.2) !important;
+    color: #f97316 !important;
+    border-color: rgba(209, 125, 57, 0.4) !important;
+}
+
+html[data-theme="dark"] .dashboard-see-all-link {
+    background: rgba(209, 125, 57, 0.2) !important;
+    color: #f97316 !important;
+    border-color: rgba(209, 125, 57, 0.4) !important;
+}
+
+html[data-theme="dark"] .recent-signup-item {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .recent-signup-item:hover {
+    background: #1e293b !important;
+    border-color: #475569 !important;
+}
+
+html[data-theme="dark"] .recent-signup-avatar {
+    background: linear-gradient(135deg, #d17d39, #b95d20) !important;
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .recent-signup-name {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .recent-signup-email {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .recent-signup-course-tag {
+    background: rgba(209, 125, 57, 0.2) !important;
+    color: #f97316 !important;
+    border-color: rgba(209, 125, 57, 0.4) !important;
+}
+
+html[data-theme="dark"] .recent-signup-date {
+    color: #64748b !important;
+}
+
+html[data-theme="dark"] .meta-dot {
+    color: #475569 !important;
+}
+
+@media (max-width: 640px) {
+    .recent-signup-item {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+    }
+    .recent-signup-right {
+        width: 100% !important;
+        justify-content: space-between !important;
+        border-top: 1px dashed #e2e8f0 !important;
+        padding-top: 10px !important;
+    }
+    html[data-theme="dark"] .recent-signup-right {
+        border-top-color: #334155 !important;
     }
 }
+
+
+html[data-theme="dark"] .status-pill.status-approved {
+    background: rgba(22, 163, 74, 0.2) !important;
+    color: #4ade80 !important;
+}
+
+html[data-theme="dark"] .status-pill.status-pending {
+    background: rgba(209, 125, 57, 0.2) !important;
+    color: #f97316 !important;
+}
+
+html[data-theme="dark"] .status-pill.status-completed {
+    background: rgba(2, 132, 199, 0.2) !important;
+    color: #38bdf8 !important;
+}
+
 
 
 
