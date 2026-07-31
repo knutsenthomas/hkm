@@ -21040,34 +21040,38 @@ class AdminManager {
                 </div>
 
                 <div class="card" style="margin-bottom: 24px;">
-                    <div class="card-header flex-between" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                    <div class="card-header flex-between">
                         <div>
-                            <h3 class="card-title" style="margin:0;">Kurstransaksjoner</h3>
-                            <p class="card-subtitle" style="margin:4px 0 0 0; color:#64748b; font-size:13px;">Oversikt over alle betalte og registrerte kurskjøp</p>
+                            <h3 class="card-title">Kurstransaksjoner</h3>
+                            <p class="section-subtitle" style="margin-bottom: 0;">Oversikt over alle betalte og registrerte kurskjøp.</p>
                         </div>
-                        <div style="position:relative; width:260px; max-width:100%;">
-                            <span class="material-symbols-outlined" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:18px;">search</span>
-                            <input type="text" id="kurs-shop-search" class="form-control" placeholder="Søk i kurskjøp..." style="padding:8px 12px 8px 38px !important; height:38px; font-size:13px; border-radius:8px; border:1px solid #cbd5e1; width:100%;">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div style="position:relative; width:220px;">
+                                <span class="material-symbols-outlined" style="position:absolute; left:10px; top:50%; transform:translateY(-50%) !important; font-size:18px; color:#64748b; pointer-events:none;">search</span>
+                                <input id="kurs-shop-search" class="form-control" type="search" placeholder="Søk i kurskjøp..." style="padding-left:36px !important; height:40px; font-size:13px; border-radius:8px; border:1px solid #cbd5e1; width:100%; margin:0;">
+                            </div>
                         </div>
                     </div>
-                    <div class="table-container" style="overflow-x:auto; width:100%;">
-                        <table class="crm-table" style="min-width:620px; width:100%;">
-                            <thead>
-                                <tr>
-                                    <th>Dato</th>
-                                    <th>Kunde / Student</th>
-                                    <th>Kurs</th>
-                                    <th>Metode</th>
-                                    <th>Status</th>
-                                    <th>Beløp</th>
-                                </tr>
-                            </thead>
-                            <tbody id="kurs-shop-transactions-body">
-                                <tr>
-                                    <td colspan="6" style="text-align:center; padding:32px; color:#94a3b8;">Laster kurstransaksjoner...</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="card-body">
+                        <div style="overflow-x:auto;">
+                            <table class="data-table" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th>Dato</th>
+                                        <th>Kunde / Student</th>
+                                        <th>Kurs</th>
+                                        <th>Metode</th>
+                                        <th>Status</th>
+                                        <th class="text-right">Beløp</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="kurs-shop-transactions-body">
+                                    <tr>
+                                        <td colspan="6" style="padding:28px; text-align:center; color:#64748b;">Laster kurstransaksjoner...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -21356,7 +21360,7 @@ class AdminManager {
                         </td>
                         <td style="white-space:nowrap;">${method}</td>
                         <td style="white-space:nowrap;">${status}</td>
-                        <td style="white-space:nowrap; font-weight:700; color:#0f172a;">${amount}</td>
+                        <td class="text-right" style="white-space:nowrap; font-weight:700; color:#0f172a;">${amount}</td>
                     </tr>
                 `;
             }).join('');
