@@ -4581,6 +4581,13 @@ body.minside-body textarea {
   color: #0f172a !important;
 }
 
+.user-admin-controls {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin-left: auto !important;
+}
+
 .user-admin-search-wrap {
   position: relative !important;
   width: 260px !important;
@@ -4665,6 +4672,10 @@ body.admin-body .user-admin-search-wrap #user-search-input {
     gap: 12px !important;
   }
 
+  .user-admin-controls {
+    display: contents !important;
+  }
+
   .user-admin-header-title-wrap {
     flex: 1 1 auto !important;
   }
@@ -4677,6 +4688,7 @@ body.admin-body .user-admin-search-wrap #user-search-input {
     min-height: 44px !important;
     width: auto !important;
     border-radius: 12px !important;
+    order: 2 !important;
   }
 
   .user-admin-search-wrap {

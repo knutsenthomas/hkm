@@ -26827,13 +26827,15 @@ class AdminManager {
                                 <h3 class="design-ui-panel-title" style="margin: 0;">Aktive brukere</h3>
                                 <span class="status-badge" id="user-count-badge" style="background: #f1f5f9; color: #475569; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 12px;">- BRUKERE</span>
                             </div>
-                            <button type="button" id="add-user-btn" class="btn btn-primary add-user-header-btn" onclick="window.adminManager.openAddUserModal()">
-                                <span class="material-symbols-outlined" style="font-size: 18px;">add</span>
-                                Ny bruker
-                            </button>
-                            <div class="user-admin-search-wrap">
-                                <span class="material-symbols-outlined search-icon">search</span>
-                                <input type="text" id="user-search-input" class="form-control user-search-input" placeholder="Søk etter brukere...">
+                            <div class="user-admin-controls">
+                                <div class="user-admin-search-wrap">
+                                    <span class="material-symbols-outlined search-icon">search</span>
+                                    <input type="text" id="user-search-input" class="form-control user-search-input" placeholder="Søk etter brukere...">
+                                </div>
+                                <button type="button" id="add-user-btn" class="btn btn-primary add-user-header-btn" onclick="window.adminManager.openAddUserModal()">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+                                    Ny bruker
+                                </button>
                             </div>
                         </div>
                         <div class="design-ui-panel-body p-0" id="users-list-container" style="padding: 0;">
