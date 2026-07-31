@@ -859,7 +859,7 @@ class MessagesManager {
         if (Array.isArray(msg.replies) && msg.replies.length > 0) {
             repliesHtml = `
                 <div class="email-thread-replies" style="margin: 24px 0; border-top: 1px dashed #cbd5e1; padding-top: 24px; display: flex; flex-direction: column; gap: 16px;">
-                    <div class="email-replies-header" style="font-size: 12px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px; background: transparent;">
+                    <div class="email-replies-header" style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px; background: transparent;">
                         <span class="material-symbols-outlined" style="font-size: 16px; color: #16a34a;">check_circle</span>
                         Sendte svar (${msg.replies.length})
                     </div>
@@ -869,20 +869,20 @@ class MessagesManager {
                         const replyText = reply.html || (reply.text ? this.escapeHtml(reply.text).replace(/\n/g, '<br>') : '');
                         
                         return `
-                            <div class="sent-reply-card" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
-                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #e2e8f0;">
+                            <div class="sent-reply-card">
+                                <div class="sent-reply-card-header">
                                     <div style="display: flex; align-items: center; gap: 10px;">
-                                        <div style="width: 32px; height: 32px; border-radius: 50%; background: #fff7ed; color: #d17d39; font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(209, 125, 57, 0.3);">
+                                        <div class="sent-reply-avatar">
                                             HK
                                         </div>
                                         <div>
-                                            <div style="font-size: 14px; font-weight: 700; color: #0f172a;">${this.escapeHtml(replySender)}</div>
-                                            <div style="font-size: 12px; color: #64748b;">Til: ${this.escapeHtml(reply.to || msg.email || '')}</div>
+                                            <div class="sent-reply-sender-name">${this.escapeHtml(replySender)}</div>
+                                            <div class="sent-reply-to">Til: ${this.escapeHtml(reply.to || msg.email || '')}</div>
                                         </div>
                                     </div>
-                                    <div style="font-size: 12px; color: #94a3b8; font-weight: 500;">${replyDate}</div>
+                                    <div class="sent-reply-date">${replyDate}</div>
                                 </div>
-                                <div style="font-size: 14.5px; line-height: 1.6; color: #334155;">${replyText}</div>
+                                <div class="sent-reply-text">${replyText}</div>
                             </div>
                         `;
                     }).join('')}
@@ -891,7 +891,7 @@ class MessagesManager {
         }
 
         viewEl.innerHTML = `
-            <div class="view-header" style="padding: 18px 28px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+            <div class="view-header" style="padding: 18px 28px; display: flex; justify-content: space-between; align-items: center;">
                 <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; margin-right: 12px;">
                     <button class="mobile-back-btn" onclick="window.messagesManager.closeMobileThread()" title="Tilbake til meldinger">
                         <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
@@ -899,7 +899,7 @@ class MessagesManager {
                     <h1 class="email-subject-title" style="font-size: 19px; font-weight: 800; margin: 0; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${this.escapeHtml(msg.subject || 'Seerkurs med aktivering')}</h1>
                 </div>
                 <div class="view-actions" style="display:flex; gap:8px; flex-shrink: 0;">
-                    <button class="btn btn-outline btn-sm" onclick="window.messagesManager.deleteMessage('${msgId}')" style="padding: 6px 16px; border-radius: 8px; font-size: 13px; border: 1.5px solid #cbd5e1; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                    <button class="btn btn-outline btn-sm delete-btn" onclick="window.messagesManager.deleteMessage('${msgId}')" style="padding: 6px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
                         Delete
                     </button>
                 </div>
@@ -909,36 +909,36 @@ class MessagesManager {
                 <div class="email-view-container" style="width: 100%; max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; flex: 1;">
                     
                     <!-- Sender Row -->
-                    <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #f1f5f9;">
+                    <div class="email-sender-row" style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px;">
                         <div style="display: flex; align-items: center; gap: 14px;">
                             <div style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #d17d39, #b95d20); color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; box-shadow: 0 4px 12px rgba(209, 125, 57, 0.25); flex-shrink: 0;">
                                 ${initials || 'BK'}
                             </div>
                             <div>
-                                <div style="font-size: 15px; font-weight: 700; line-height: 1.2;">${this.escapeHtml(msg.name || 'Bente Klevberg Tynes')}</div>
-                                <div style="font-size: 13px; color: #64748b; font-weight: 500; margin-top: 2px;">${this.escapeHtml(msg.email || 'bent@klevbergtynes.no')}</div>
+                                <div class="email-sender-name" style="font-size: 15px; font-weight: 700; line-height: 1.2;">${this.escapeHtml(msg.name || 'Bente Klevberg Tynes')}</div>
+                                <div class="email-sender-email" style="font-size: 13px; font-weight: 500; margin-top: 2px;">${this.escapeHtml(msg.email || 'bent@klevbergtynes.no')}</div>
                             </div>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 10px; color: #94a3b8; font-size: 13px; font-weight: 500;">
+                        <div class="email-sender-date-col" style="display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500;">
                             <span>${date}</span>
-                            <button onclick="window.messagesManager.deleteMessage('${msgId}')" title="Slett" style="background: none; border: none; color: #94a3b8; cursor: pointer; padding: 4px; display: inline-flex; align-items: center;">
+                            <button onclick="window.messagesManager.deleteMessage('${msgId}')" title="Slett" class="email-delete-btn" style="background: none; border: none; cursor: pointer; padding: 4px; display: inline-flex; align-items: center;">
                                 <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- Email Body -->
-                    <div class="email-body" style="font-size: 15px; line-height: 1.65; white-space: pre-wrap; margin: 0; background: transparent; padding: 0; border: none;">${this.escapeHtml(msg.message || '')}</div>
+                    <div class="email-body" style="font-size: 15px; line-height: 1.65; white-space: pre-wrap; margin: 0; padding: 0; border: none;">${this.escapeHtml(msg.message || '')}</div>
                     
                     <!-- Sent Replies Thread -->
                     ${repliesHtml}
 
                     <!-- 2 Action Buttons: Svar & Videresend -->
-                    <div class="thread-action-buttons" style="display: flex; gap: 12px; margin-top: 28px; padding-top: 20px; border-top: 1px solid #f1f5f9;">
-                        <button type="button" class="btn btn-outline" onclick="window.messagesManager.openReplyComposer('${msgId}', 'reply')" style="padding: 10px 24px; border-radius: 999px; font-weight: 700; font-size: 14px; border: 1.5px solid #cbd5e1; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+                    <div class="thread-action-buttons" style="display: flex; gap: 12px; margin-top: 28px; padding-top: 20px;">
+                        <button type="button" class="btn btn-outline thread-reply-btn" onclick="window.messagesManager.openReplyComposer('${msgId}', 'reply')" style="padding: 10px 24px; border-radius: 999px; font-weight: 700; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
                             <span class="material-symbols-outlined" style="font-size: 20px; color: #d17d39;">reply</span> Svar
                         </button>
-                        <button type="button" class="btn btn-outline" onclick="window.messagesManager.openReplyComposer('${msgId}', 'forward')" style="padding: 10px 24px; border-radius: 999px; font-weight: 700; font-size: 14px; border: 1.5px solid #cbd5e1; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+                        <button type="button" class="btn btn-outline thread-forward-btn" onclick="window.messagesManager.openReplyComposer('${msgId}', 'forward')" style="padding: 10px 24px; border-radius: 999px; font-weight: 700; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
                             <span class="material-symbols-outlined" style="font-size: 20px; color: #64748b;">forward</span> Videresend
                         </button>
                     </div>
@@ -1232,15 +1232,15 @@ class MessagesManager {
         
         viewEl.innerHTML = `
             <div class="message-detail">
-                <div class="message-detail-header" style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0; background: #ffffff;">
+                <div class="message-detail-header" style="padding: 16px 20px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
                         <div style="display:flex; align-items:center; gap:12px; min-width:0; flex:1; margin-right:12px;">
-                            <button class="mobile-back-btn" onclick="window.messagesManager.closeMobileThread()" title="Tilbake til meldinger" style="display: inline-flex !important; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: #f1f5f9; border: none; color: #334155; cursor: pointer; flex-shrink: 0;">
+                            <button class="mobile-back-btn" onclick="window.messagesManager.closeMobileThread()" title="Tilbake til meldinger">
                                 <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
                             </button>
                             <div style="min-width:0; flex:1;">
-                                <h2 class="message-subject" style="margin:0; font-size:18px; font-weight:800; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${this.escapeHtml(push.title || 'Push-varsling')}</h2>
-                                <div class="message-meta" style="margin-top:2px; font-size:13px; color:#64748b;">
+                                <h2 class="message-subject" style="margin:0; font-size:18px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${this.escapeHtml(push.title || 'Push-varsling')}</h2>
+                                <div class="message-meta" style="margin-top:2px; font-size:13px;">
                                     <span>Sendt av: ${this.escapeHtml(push.sentBy || 'Admin')}</span>
                                     <span class="meta-separator">•</span>
                                     <span>Målgruppe: ${this.escapeHtml(push.targetRole || 'alle')}</span>
@@ -1249,22 +1249,22 @@ class MessagesManager {
                                 </div>
                             </div>
                         </div>
-                        <button class="btn-icon delete-btn" onclick="window.messagesManager.deleteMessage('${push.id}', 'push')" style="flex-shrink:0; background:none; border:1px solid #e2e8f0; border-radius:50%; width:36px; height:36px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; color:#64748b;">
+                        <button class="btn-icon delete-btn" onclick="window.messagesManager.deleteMessage('${push.id}', 'push')" style="flex-shrink:0; border-radius:50%; width:36px; height:36px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;">
                             <span class="material-symbols-outlined" style="font-size:20px;">delete</span>
                         </button>
                     </div>
                 </div>
                 <div class="message-body" style="padding: 24px;">
                     <div class="message-card">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; color: #4338ca; font-weight: 700; font-size: 13px; letter-spacing: 0.5px;">
+                        <div class="push-card-badge" style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; font-weight: 700; font-size: 13px; letter-spacing: 0.5px;">
                             <span class="material-symbols-outlined" style="font-size: 20px;">send_to_mobile</span>
                             Push-varsling kampanje
                         </div>
-                        <div style="font-weight: 700; font-size: 18px; margin-bottom: 12px; color: #1e293b;">${this.escapeHtml(push.title)}</div>
-                        <div style="font-size: 15px; color: #334155; line-height: 1.7;">${this.escapeHtml(push.body)}</div>
-                        ${push.link ? `<div style="margin-top:20px; padding-top:15px; border-top:1px solid #e2e8f0; font-size: 13px;"><span style="color:#64748b; margin-right:8px;">Link:</span><a href="${push.link}" target="_blank" style="color:var(--inbox-orange); text-decoration:none; font-weight:600;">${push.link}</a></div>` : ''}
+                        <div class="push-card-title" style="font-weight: 700; font-size: 18px; margin-bottom: 12px;">${this.escapeHtml(push.title)}</div>
+                        <div class="push-card-body" style="font-size: 15px; line-height: 1.7;">${this.escapeHtml(push.body)}</div>
+                        ${push.link ? `<div class="push-card-link-row" style="margin-top:20px; padding-top:15px; font-size: 13px;"><span style="margin-right:8px;" class="push-card-link-label">Link:</span><a href="${push.link}" target="_blank" style="color:var(--inbox-orange); text-decoration:none; font-weight:600;">${push.link}</a></div>` : ''}
                     </div>
-                    <p style="color: #94a3b8; font-size: 13px; font-style: italic; margin-top: 16px;">Denne loggføringen viser en push-varsling som ble sendt til brukere via administrasjonspanelet.</p>
+                    <p class="push-note" style="font-size: 13px; font-style: italic; margin-top: 16px;">Denne loggføringen viser en push-varsling som ble sendt til brukere via administrasjonspanelet.</p>
                 </div>
             </div>
         `;
@@ -1382,7 +1382,7 @@ class MessagesManager {
                 const borderColor = isDark ? '#334155' : '#e2e8f0';
 
                 modal.innerHTML = `
-                    <div class="profile-modal-content card modern" style="max-width: 420px; padding: 0; overflow: hidden; border-radius: 20px; background: ${cardBg}; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35); width: 100%; display: flex; flex-direction: column; border: 1px solid ${borderColor}; margin: auto;">
+                    <div class="profile-modal-content card modern" style="max-width: 420px; width: 100%; height: auto !important; min-height: 0 !important; flex: 0 1 auto !important; margin: auto !important; padding: 0; overflow: hidden; border-radius: 20px; background: ${cardBg}; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35); display: flex; flex-direction: column; border: 1px solid ${borderColor};">
                         <div class="modal-header" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 20px 24px; display: flex; align-items: center; gap: 14px; border-bottom: none;">
                             <div style="background: rgba(255,255,255,0.2); width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                 <span class="material-symbols-outlined" style="font-size: 22px; color: white;">delete</span>

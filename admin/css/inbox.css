@@ -2095,17 +2095,12 @@ html[data-theme="dark"] .message-detail-header {
 html[data-theme="dark"] .email-subject-title,
 html[data-theme="dark"] .message-subject,
 html[data-theme="dark"] .view-name,
-html[data-theme="dark"] .email-view-container div,
 html[data-theme="dark"] .email-view-container h1,
 html[data-theme="dark"] .email-view-container h2,
-html[data-theme="dark"] .email-view-container h3,
-html[data-theme="dark"] .sent-reply-card div {
+html[data-theme="dark"] .email-view-container h3 {
     color: #f8fafc !important;
 }
 
-html[data-theme="dark"] .email-view-container div[style*="color: #64748b"],
-html[data-theme="dark"] .email-view-container span[style*="color: #64748b"],
-html[data-theme="dark"] .sent-reply-card div[style*="color: #64748b"],
 html[data-theme="dark"] .message-meta,
 html[data-theme="dark"] .view-status {
     color: #94a3b8 !important;
@@ -2115,7 +2110,110 @@ html[data-theme="dark"] .email-body {
     color: #cbd5e1 !important;
 }
 
+/* Email Sender Row & Details */
+.email-sender-row {
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.email-sender-name {
+    color: #0f172a;
+}
+
+.email-sender-email {
+    color: #64748b;
+}
+
+.email-sender-date-col {
+    color: #94a3b8;
+}
+
+.email-delete-btn {
+    color: #94a3b8;
+}
+
+.email-delete-btn:hover {
+    color: #ef4444;
+}
+
+html[data-theme="dark"] .email-sender-row {
+    border-bottom-color: #334155 !important;
+}
+
+html[data-theme="dark"] .email-sender-name {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .email-sender-email {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .email-sender-date-col {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .email-delete-btn {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .email-delete-btn:hover {
+    color: #f87171 !important;
+}
+
 /* Sent replies cards & container */
+.sent-reply-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.sent-reply-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.sent-reply-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #fff7ed;
+    color: #d17d39;
+    font-weight: 700;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(209, 125, 57, 0.3);
+}
+
+.sent-reply-sender-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.sent-reply-to {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.sent-reply-date {
+    font-size: 12px;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.sent-reply-text {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: #334155;
+}
+
 html[data-theme="dark"] .email-thread-replies {
     border-top-color: #334155 !important;
 }
@@ -2133,17 +2231,92 @@ html[data-theme="dark"] .message-card {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
 }
 
-html[data-theme="dark"] .sent-reply-card div[style*="border-bottom"] {
+html[data-theme="dark"] .sent-reply-card-header {
     border-bottom-color: #334155 !important;
 }
 
-html[data-theme="dark"] .sent-reply-card div[style*="background: #fff7ed"] {
+html[data-theme="dark"] .sent-reply-avatar {
     background: rgba(209, 125, 57, 0.2) !important;
-    border-color: rgba(209, 125, 57, 0.4) !important;
     color: #f97316 !important;
+    border-color: rgba(209, 125, 57, 0.4) !important;
+}
+
+html[data-theme="dark"] .sent-reply-sender-name {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .sent-reply-to {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .sent-reply-date {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .sent-reply-text {
+    color: #cbd5e1 !important;
+}
+
+/* Push Card Base & Dark Mode */
+.push-card-badge {
+    color: #4338ca;
+}
+
+.push-card-title {
+    color: #1e293b;
+}
+
+.push-card-body {
+    color: #334155;
+}
+
+.push-card-link-row {
+    border-top: 1px solid #e2e8f0;
+}
+
+.push-card-link-label {
+    color: #64748b;
+}
+
+.push-note {
+    color: #94a3b8;
+}
+
+html[data-theme="dark"] .push-card-badge {
+    color: #818cf8 !important;
+}
+
+html[data-theme="dark"] .push-card-title {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .push-card-body {
+    color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .push-card-link-row {
+    border-top-color: #334155 !important;
+}
+
+html[data-theme="dark"] .push-card-link-label {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .push-note {
+    color: #64748b !important;
 }
 
 /* Action buttons at bottom of email view & push view */
+.thread-action-buttons {
+    border-top: 1px solid #f1f5f9;
+}
+
+.thread-action-buttons button {
+    border: 1.5px solid #cbd5e1;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+}
+
 html[data-theme="dark"] .thread-action-buttons {
     border-top-color: #334155 !important;
 }
@@ -2162,6 +2335,72 @@ html[data-theme="dark"] .view-actions button:hover,
 html[data-theme="dark"] .delete-btn:hover {
     background: #334155 !important;
     color: #ffffff !important;
+}
+
+/* Chat Bubbles Dark Mode */
+html[data-theme="dark"] .msg-bubble.visitor {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    border: 1px solid #334155 !important;
+}
+
+html[data-theme="dark"] .msg-bubble.visitor .msg-time {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .msg-bubble.agent {
+    background: #d17d39 !important;
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .msg-bubble.agent .msg-time {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+html[data-theme="dark"] .view-reply {
+    background: #0f172a !important;
+    border-top-color: #334155 !important;
+}
+
+html[data-theme="dark"] .reply-box {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .reply-editor {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .reply-toolbar {
+    background: #0f172a !important;
+    border-top-color: #334155 !important;
+}
+
+html[data-theme="dark"] .reply-tool-btn {
+    color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .reply-tool-btn:hover {
+    background: #334155 !important;
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] #inbox-emoji-panel {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+/* Mobile Drawer Header & Backdrop Dark Mode Overrides */
+html[data-theme="dark"] .inbox-folders-header {
+    background: #1e293b !important;
+    border-bottom-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .folder-drawer-close-btn {
+    background: #334155 !important;
+    color: #f8fafc !important;
 }
 
 /* Base Composer Styles */
@@ -2364,5 +2603,52 @@ html[data-theme="dark"] .reply-tool-btn:hover {
         font-size: 14px !important;
         border-radius: 12px !important;
     }
+}
+
+/* Strict Confirm & Prompt Modal Sizing Guard (Prevents tall empty modal containers) */
+#hkm-confirm-modal,
+#hkm-prompt-modal {
+    z-index: 999999 !important;
+    position: fixed !important;
+    inset: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 16px !important;
+    box-sizing: border-box !important;
+}
+
+#hkm-confirm-modal .profile-modal-content,
+#hkm-prompt-modal .profile-modal-content {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: calc(100vh - 32px) !important;
+    flex: 0 1 auto !important;
+    margin: auto !important;
+    align-self: center !important;
+}
+
+html[data-theme="dark"] #hkm-confirm-modal .profile-modal-content,
+html[data-theme="dark"] #hkm-prompt-modal .profile-modal-content {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] #hkm-confirm-modal .modal-body,
+html[data-theme="dark"] #hkm-prompt-modal .modal-body {
+    background: #1e293b !important;
+    color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] #hkm-confirm-modal .modal-footer,
+html[data-theme="dark"] #hkm-prompt-modal .modal-footer {
+    background: #0f172a !important;
+    border-top-color: #334155 !important;
+}
+
+html[data-theme="dark"] #confirm-modal-cancel {
+    background: transparent !important;
+    border-color: #334155 !important;
+    color: #cbd5e1 !important;
 }
 
