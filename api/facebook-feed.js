@@ -127,6 +127,7 @@ function getFallbackImageByContent(text) {
 function normalizeFacebookPost(post, index, fallbackPageUrl) {
     const message = typeof post.message === "string" ? post.message.trim() : "";
     const story = typeof post.story === "string" ? post.story.trim() : "";
+    const fullPicture = resolveFacebookPostImage(post);
     
     // Extract attachment title or description if message text is empty (e.g. photo uploads or shared posts)
     let attachmentTitle = "";
@@ -139,17 +140,23 @@ function normalizeFacebookPost(post, index, fallbackPageUrl) {
         attachmentUrl = att.url || "";
     }
 
-    const combinedText = `${message} ${story} ${attachmentTitle} ${attachmentDesc}`;
-    if (/Når dette skjer|skyldes det vanligvis|liten gruppe mennesker|har endret hvem som kan se det|har slettet det/i.test(combinedText)) {
+    const isDummyErrorText = /dette innholdet er ikke tilgjengelig|når dette skjer|skyldes det vanligvis|liten gruppe mennesker|har endret hvem som kan se det|har slettet det/i.test(`${message} ${story} ${attachmentTitle} ${attachmentDesc}`);
+
+    // Discard only if it has NO image AND contains dummy error text
+    if (!fullPicture && isDummyErrorText) {
         return null;
     }
 
-    const cleanStory = (story && !/oppdatert statusen sin|updated (their|its) status/i.test(story)) ? story : '';
-    const effectiveText = message || attachmentTitle || attachmentDesc || cleanStory || "";
+    const cleanMessage = isDummyErrorText ? "" : message;
+    const cleanTitle = (attachmentTitle && !isDummyErrorText) ? attachmentTitle : "";
+    const cleanDesc = (attachmentDesc && !isDummyErrorText) ? attachmentDesc : "";
+    const cleanStory = (story && !/oppdatert statusen sin|updated (their|its) status|dette innholdet er ikke tilgjengelig/i.test(story)) ? story : "";
+
+    const effectiveText = cleanMessage || cleanTitle || cleanDesc || cleanStory || "";
     const lines = effectiveText.split(/\n+/).map((line) => line.trim()).filter(Boolean);
-    const rawTitle = lines[0] || attachmentTitle || cleanStory || "Oppdatering fra Facebook";
+    const rawTitle = lines[0] || cleanTitle || cleanStory || "Siste fra Facebook";
     const title = trimText(rawTitle, 78);
-    const excerptSource = lines.length > 1 ? lines.slice(1).join(" ") : (attachmentDesc || cleanStory || effectiveText);
+    const excerptSource = lines.length > 1 ? lines.slice(1).join(" ") : (cleanDesc || cleanStory || effectiveText);
     const excerpt = trimText(
         excerptSource || "Se nyeste bilde og oppdatering direkte på Facebook-siden vår.",
         180
@@ -164,7 +171,7 @@ function normalizeFacebookPost(post, index, fallbackPageUrl) {
         link: (typeof post.permalink_url === "string" && post.permalink_url.trim())
             ? post.permalink_url.trim()
             : (attachmentUrl ? attachmentUrl.trim() : fallbackPageUrl),
-        image: resolveFacebookPostImage(post),
+        image: fullPicture,
         source: 'Facebook'
     };
 }
