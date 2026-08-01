@@ -1432,9 +1432,29 @@ exports.facebookFeed = onRequest({ invoker: "public" }, (req, res) => {
               continue;
             }
 
-            const validItems = rawItems
-              .map((post, index) => normalizeFacebookPost(post, index, target.pageUrl))
-              .filter((item) => item && (item.link || item.title || item.excerpt));
+            const items = await Promise.all(rawItems.map(async (post, index) => {
+              let enrichedPost = post;
+              const hasDirectImage = resolveFacebookPostImage(post);
+              if (!hasDirectImage && post && post.id) {
+                try {
+                  const detailLookup = await fetchFacebookGraphJson(
+                    config.graphVersion,
+                    encodeURIComponent(post.id),
+                    config.accessToken,
+                    { fields },
+                  );
+                  if (detailLookup.response.ok && detailLookup.payload && !detailLookup.payload.error) {
+                    enrichedPost = { ...post, ...detailLookup.payload };
+                  }
+                } catch (e) {
+                  // Ignore detail fetch error
+                }
+              }
+
+              return normalizeFacebookPost(enrichedPost, index, target.pageUrl);
+            }));
+
+            const validItems = items.filter((item) => item && (item.link || item.title || item.excerpt));
 
             const finalItems = validItems.slice(0, limit);
 

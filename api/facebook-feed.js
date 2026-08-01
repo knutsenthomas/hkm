@@ -302,7 +302,24 @@ export default async function handler(req, res) {
         }
 
         const items = await Promise.all(rawItems.map(async (post, idx) => {
-            const item = normalizeFacebookPost(post, idx, pageUrl);
+            let enrichedPost = post;
+            const hasDirectImage = resolveFacebookPostImage(post);
+            if (!hasDirectImage && post && post.id) {
+                try {
+                    const detailUrl = `https://graph.facebook.com/v20.0/${encodeURIComponent(post.id)}?fields=${fields}&access_token=${accessToken}`;
+                    const detailRes = await fetch(detailUrl);
+                    if (detailRes.ok) {
+                        const detailData = await detailRes.json();
+                        if (detailData && !detailData.error) {
+                            enrichedPost = { ...post, ...detailData };
+                        }
+                    }
+                } catch (e) {
+                    // Ignore single post detail fetch error
+                }
+            }
+
+            const item = normalizeFacebookPost(enrichedPost, idx, pageUrl);
             if (item) {
                 if (!item.image && item.link) {
                     const ogImage = await fetchOpenGraphImage(item.link);
