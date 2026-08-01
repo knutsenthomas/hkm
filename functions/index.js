@@ -1303,13 +1303,31 @@ function normalizeFacebookPost(post, index, fallbackPageUrl) {
   const cleanDesc = (attachmentDesc && !isDummyErrorText) ? attachmentDesc : "";
   const cleanStory = (story && !/oppdatert statusen sin|updated (their|its) status|dette innholdet er ikke tilgjengelig/i.test(story)) ? story : "";
 
+  const fallbackTitles = [
+    "Nytt bilde og oppdatering",
+    "Glimt fra tjenesten",
+    "Deling fra Facebook",
+    "Oppdatering fra arbeidet",
+    "Siste fra Facebook",
+  ];
+  const fallbackExcerpts = [
+    "Se det nyeste bildet og oppdateringen direkte fra Facebook-siden vår.",
+    "Nye bilder og øyeblikk som vi deler på Facebook.",
+    "Bilder, inspirasjon og refleksjoner fra arbeidet vårt.",
+    "Følg med på oppdateringer og meldinger direkte fra tidslinjen vår.",
+    "Se nyeste oppdateringer fra Facebook-siden vår.",
+  ];
+
+  const fallbackTitle = fallbackTitles[index % fallbackTitles.length];
+  const fallbackExcerpt = fallbackExcerpts[index % fallbackExcerpts.length];
+
   const mainText = cleanMessage || cleanTitle || cleanDesc || cleanStory || "";
   const lines = mainText.split(/\n+/).map((line) => line.trim()).filter(Boolean);
-  const rawTitle = lines[0] || cleanTitle || cleanStory || "Siste fra Facebook";
+  const rawTitle = lines[0] || cleanTitle || cleanStory || fallbackTitle;
   const title = trimText(rawTitle, 78);
-  const excerptSource = lines.length > 1 ? lines.slice(1).join(" ") : (cleanDesc || cleanStory || mainText);
+  const excerptSource = lines.length > 1 ? lines.slice(1).join(" ") : (cleanDesc || cleanStory || (mainText !== rawTitle ? mainText : ""));
   const excerpt = trimText(
-    excerptSource || "Se nyeste bilde og oppdatering direkte på Facebook-siden vår.",
+    excerptSource || fallbackExcerpt,
     180,
   );
 
