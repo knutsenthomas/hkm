@@ -1279,10 +1279,12 @@ function normalizeFacebookPost(post, index, fallbackPageUrl) {
   const attachmentTitle = attachment && typeof attachment.title === "string" ? attachment.title.trim() : "";
   const attachmentDesc = attachment && typeof attachment.description === "string" ? attachment.description.trim() : "";
 
-  const mainText = message || story || attachmentTitle || attachmentDesc || "";
-  if (/Når dette skjer, skyldes det vanligvis|har endret hvem som kan se det|eller har slettet det/i.test(mainText)) {
+  const combinedText = `${message} ${story} ${attachmentTitle} ${attachmentDesc}`;
+  if (/oppdatert statusen sin|updated (their|its) status|Når dette skjer|skyldes det vanligvis|liten gruppe mennesker|har endret hvem som kan se det|har slettet det/i.test(combinedText)) {
     return null;
   }
+
+  const mainText = message || attachmentTitle || attachmentDesc || story || "";
   const lines = mainText.split(/\n+/).map((line) => line.trim()).filter(Boolean);
   const rawTitle = lines[0] || mainText || "Nytt innlegg fra Facebook";
   const title = trimText(rawTitle, 78);

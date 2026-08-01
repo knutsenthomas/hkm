@@ -132,10 +132,12 @@ function normalizeFacebookPost(post, index, fallbackPageUrl) {
         attachmentUrl = att.url || "";
     }
 
-    const effectiveText = message || story || attachmentTitle || attachmentDesc || "";
-    if (/Når dette skjer, skyldes det vanligvis|har endret hvem som kan se det|eller har slettet det/i.test(effectiveText)) {
+    const combinedText = `${message} ${story} ${attachmentTitle} ${attachmentDesc}`;
+    if (/oppdatert statusen sin|updated (their|its) status|Når dette skjer|skyldes det vanligvis|liten gruppe mennesker|har endret hvem som kan se det|har slettet det/i.test(combinedText)) {
         return null;
     }
+
+    const effectiveText = message || attachmentTitle || attachmentDesc || story || "";
     const lines = effectiveText.split(/\n+/).map((line) => line.trim()).filter(Boolean);
     const rawTitle = lines[0] || attachmentTitle || story || "Nytt innlegg fra Facebook";
     const title = trimText(rawTitle, 78);
