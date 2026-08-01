@@ -21,6 +21,7 @@ const { onRequest, onCall, HttpsError } = require('firebase-functions/v2/https')
 const { onDocumentCreated, onDocumentUpdated, onDocumentWritten } = require('firebase-functions/v2/firestore');
 const { onSchedule } = require('firebase-functions/v2/scheduler');
 const admin = require('firebase-admin');
+const { getFirestore, FieldValue, Timestamp, FieldPath } = require('firebase-admin/firestore');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { GoogleAIFileManager } = require('@google/generative-ai/server');
 const fs = require('fs');
@@ -32,12 +33,15 @@ const textToSpeech = require('@google-cloud/text-to-speech');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 
-if (admin.apps.length === 0) {
+if (!admin.apps || admin.apps.length === 0) {
   admin.initializeApp();
 }
 
-const db = admin.firestore();
-const { FieldValue, Timestamp } = admin.firestore;
+const db = getFirestore();
+admin.firestore = getFirestore;
+admin.firestore.FieldValue = FieldValue;
+admin.firestore.Timestamp = Timestamp;
+admin.firestore.FieldPath = FieldPath;
 const cors = require("cors")({ origin: true });
 
 async function resolveDonationUserId(customerDetails = {}) {
@@ -1116,9 +1120,17 @@ function formatFacebookPostDate(dateValue) {
 }
 
 function resolveFacebookPostImage(post) {
+  const isValidImageUrl = (url) => {
+    if (typeof url !== "string") return false;
+    const str = url.trim();
+    if (!str || !/^https?:\/\//i.test(str)) return false;
+    if (/facebook\.com\/(posts|permalink|photo|groups|story|events|watch|profile)/i.test(str)) return false;
+    return true;
+  };
+
   const pickFirstString = (...values) => {
     for (const value of values) {
-      if (typeof value === "string" && value.trim()) return value.trim();
+      if (typeof value === "string" && isValidImageUrl(value)) return value.trim();
     }
     return "";
   };
@@ -1130,7 +1142,6 @@ function resolveFacebookPostImage(post) {
       attachment.media && attachment.media.image && attachment.media.image.src,
       attachment.media && attachment.media.source,
       attachment.media && attachment.media.src,
-      attachment.url,
     );
     if (directImage) return directImage;
 

@@ -51,9 +51,17 @@ function formatFacebookPostDate(dateValue) {
 }
 
 function resolveFacebookPostImage(post) {
+    const isValidImageUrl = (url) => {
+        if (typeof url !== "string") return false;
+        const str = url.trim();
+        if (!str || !/^https?:\/\//i.test(str)) return false;
+        if (/facebook\.com\/(posts|permalink|photo|groups|story|events|watch|profile)/i.test(str)) return false;
+        return true;
+    };
+
     const pickFirstString = (...values) => {
         for (const value of values) {
-            if (typeof value === "string" && value.trim()) return value.trim();
+            if (typeof value === "string" && isValidImageUrl(value)) return value.trim();
         }
         return "";
     };
@@ -63,8 +71,7 @@ function resolveFacebookPostImage(post) {
         const directImage = pickFirstString(
             attachment.media && attachment.media.image && attachment.media.image.src,
             attachment.media && attachment.media.source,
-            attachment.media && attachment.media.src,
-            attachment.url
+            attachment.media && attachment.media.src
         );
         if (directImage) return directImage;
 
@@ -156,7 +163,7 @@ function normalizeFacebookPost(post, index, fallbackPageUrl) {
         link: (typeof post.permalink_url === "string" && post.permalink_url.trim())
             ? post.permalink_url.trim()
             : (attachmentUrl ? attachmentUrl.trim() : fallbackPageUrl),
-        image: resolveFacebookPostImage(post) || getFallbackImageByContent(effectiveText + " " + title),
+        image: resolveFacebookPostImage(post),
         source: 'Facebook'
     };
 }
@@ -288,10 +295,15 @@ export default async function handler(req, res) {
 
         const items = await Promise.all(rawItems.map(async (post, idx) => {
             const item = normalizeFacebookPost(post, idx, pageUrl);
-            if (item && !item.image && item.link) {
-                const ogImage = await fetchOpenGraphImage(item.link);
-                if (ogImage) {
-                    item.image = ogImage;
+            if (item) {
+                if (!item.image && item.link) {
+                    const ogImage = await fetchOpenGraphImage(item.link);
+                    if (ogImage) {
+                        item.image = ogImage;
+                    }
+                }
+                if (!item.image) {
+                    item.image = getFallbackImageByContent((item.title || '') + ' ' + (item.excerpt || ''));
                 }
             }
             return item;
