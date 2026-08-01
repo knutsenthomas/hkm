@@ -1318,6 +1318,7 @@ exports.facebookFeed = onRequest({ invoker: "public" }, (req, res) => {
     }
 
     const limit = Math.min(Math.max(Number(req.query.limit) || 3, 1), 6);
+    const fetchLimit = Math.max(limit * 3, 10);
     const queryPageId = typeof req.query.pageId === "string" ? req.query.pageId : "";
     const queryPageUrl = typeof req.query.pageUrl === "string" ? req.query.pageUrl : "";
     const config = getFacebookPageConfig({
@@ -1393,7 +1394,7 @@ exports.facebookFeed = onRequest({ invoker: "public" }, (req, res) => {
               config.accessToken,
               {
                 fields,
-                limit,
+                limit: fetchLimit,
               },
             );
 
@@ -1410,11 +1411,13 @@ exports.facebookFeed = onRequest({ invoker: "public" }, (req, res) => {
               continue;
             }
 
-            const items = rawItems
+            const validItems = rawItems
               .map((post, index) => normalizeFacebookPost(post, index, target.pageUrl))
               .filter((item) => item && (item.link || item.title || item.excerpt));
 
-            if (!items.length) {
+            const finalItems = validItems.slice(0, limit);
+
+            if (!finalItems.length) {
               continue;
             }
 
@@ -1423,8 +1426,8 @@ exports.facebookFeed = onRequest({ invoker: "public" }, (req, res) => {
               pageUrl: target.pageUrl,
               resolvedPageId: target.id,
               sourceEdge: edge,
-              count: items.length,
-              items,
+              count: finalItems.length,
+              items: finalItems,
             });
           }
         }

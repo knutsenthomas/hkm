@@ -205,6 +205,7 @@ export default async function handler(req, res) {
     }
 
     const limit = Math.min(Math.max(Number(req.query.limit) || 3, 1), 6);
+    const fetchLimit = Math.max(limit * 3, 10);
     let pageId = typeof req.query.pageId === 'string' ? req.query.pageId.trim() : '';
     let pageUrl = typeof req.query.pageUrl === 'string' ? req.query.pageUrl.trim() : '';
 
@@ -260,7 +261,7 @@ export default async function handler(req, res) {
         let lastError = "";
 
         for (const edge of ["feed", "published_posts", "posts"]) {
-            const metaUrl = `https://graph.facebook.com/v20.0/${encodeURIComponent(pageId)}/${edge}?fields=${fields}&limit=${limit}&access_token=${accessToken}`;
+            const metaUrl = `https://graph.facebook.com/v20.0/${encodeURIComponent(pageId)}/${edge}?fields=${fields}&limit=${fetchLimit}&access_token=${accessToken}`;
             const metaRes = await fetch(metaUrl);
             const payload = await metaRes.json();
 
@@ -293,7 +294,8 @@ export default async function handler(req, res) {
             }
             return item;
         }));
-        const filteredItems = items.filter(item => item && (item.link || item.title || item.excerpt));
+        const validItems = items.filter(item => item && (item.link || item.title || item.excerpt));
+        const finalItems = validItems.slice(0, limit);
 
         // Cache-Control header: Cache at the Edge for 60 seconds, serve stale up to 30s while revalidating
         res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=30');
@@ -301,8 +303,8 @@ export default async function handler(req, res) {
             ok: true,
             pageUrl: pageUrl,
             resolvedPageId: pageId,
-            count: filteredItems.length,
-            items: filteredItems
+            count: finalItems.length,
+            items: finalItems
         });
     } catch (err) {
         console.error('[Facebook API Proxy] Internal Server Error:', err);
