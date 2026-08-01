@@ -1273,10 +1273,17 @@ async function fetchFacebookGraphJson(graphVersion, pathName, accessToken, param
 
 function normalizeFacebookPost(post, index, fallbackPageUrl) {
   const message = typeof post.message === "string" ? post.message.trim() : "";
-  const lines = message.split(/\n+/).map((line) => line.trim()).filter(Boolean);
-  const rawTitle = lines[0] || message || "Nytt innlegg fra Facebook";
+  const story = typeof post.story === "string" ? post.story.trim() : "";
+  const attachment = Array.isArray(post && post.attachments && post.attachments.data) && post.attachments.data[0] ?
+    post.attachments.data[0] : null;
+  const attachmentTitle = attachment && typeof attachment.title === "string" ? attachment.title.trim() : "";
+  const attachmentDesc = attachment && typeof attachment.description === "string" ? attachment.description.trim() : "";
+
+  const mainText = message || story || attachmentTitle || attachmentDesc || "Nytt innlegg fra Facebook";
+  const lines = mainText.split(/\n+/).map((line) => line.trim()).filter(Boolean);
+  const rawTitle = lines[0] || mainText || "Nytt innlegg fra Facebook";
   const title = trimText(rawTitle, 78);
-  const excerptSource = lines.length > 1 ? lines.slice(1).join(" ") : message;
+  const excerptSource = lines.length > 1 ? lines.slice(1).join(" ") : (attachmentDesc || story || message);
   const excerpt = trimText(
     excerptSource || "Se siste oppdatering, bilder og meldinger fra Facebook-siden vår.",
     180,
@@ -1290,6 +1297,8 @@ function normalizeFacebookPost(post, index, fallbackPageUrl) {
     cta: "Les på Facebook",
     link: (typeof post.permalink_url === "string" && post.permalink_url.trim()) ?
       post.permalink_url.trim() :
+      (attachment && typeof attachment.url === "string" && attachment.url.trim()) ?
+      attachment.url.trim() :
       fallbackPageUrl,
     image: resolveFacebookPostImage(post),
   };
@@ -1325,10 +1334,11 @@ exports.facebookFeed = onRequest({ invoker: "public" }, (req, res) => {
     try {
       const fields = [
         "message",
+        "story",
         "permalink_url",
         "created_time",
         "full_picture",
-        "attachments{media,media_type,subattachments,url}",
+        "attachments{media,media_type,subattachments,url,title,description,target}",
       ].join(",");
       const pageCandidates = buildFacebookPageCandidates(config);
       let lastError = "";
@@ -1373,7 +1383,7 @@ exports.facebookFeed = onRequest({ invoker: "public" }, (req, res) => {
         }
 
         for (const target of resolvedTargets) {
-          for (const edge of ["published_posts", "posts"]) {
+          for (const edge of ["feed", "published_posts", "posts"]) {
             const { response, payload } = await fetchFacebookGraphJson(
               config.graphVersion,
               `${encodeURIComponent(target.id)}/${edge}`,
