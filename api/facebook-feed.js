@@ -119,19 +119,24 @@ function getFallbackImageByContent(text) {
 
 function normalizeFacebookPost(post, index, fallbackPageUrl) {
     const message = typeof post.message === "string" ? post.message.trim() : "";
+    const story = typeof post.story === "string" ? post.story.trim() : "";
     
-    // Extract attachment title or description if message text is empty (e.g. photo uploads)
-    let attachmentText = "";
+    // Extract attachment title or description if message text is empty (e.g. photo uploads or shared posts)
+    let attachmentTitle = "";
+    let attachmentDesc = "";
+    let attachmentUrl = "";
     if (post.attachments && Array.isArray(post.attachments.data) && post.attachments.data[0]) {
         const att = post.attachments.data[0];
-        attachmentText = att.title || att.description || "";
+        attachmentTitle = att.title || "";
+        attachmentDesc = att.description || "";
+        attachmentUrl = att.url || "";
     }
 
-    const effectiveText = message || attachmentText || "";
+    const effectiveText = message || story || attachmentTitle || attachmentDesc || "";
     const lines = effectiveText.split(/\n+/).map((line) => line.trim()).filter(Boolean);
-    const rawTitle = lines[0] || "Nytt bilde / oppdatering fra Facebook";
+    const rawTitle = lines[0] || attachmentTitle || story || "Nytt innlegg fra Facebook";
     const title = trimText(rawTitle, 78);
-    const excerptSource = lines.length > 1 ? lines.slice(1).join(" ") : effectiveText;
+    const excerptSource = lines.length > 1 ? lines.slice(1).join(" ") : (attachmentDesc || story || effectiveText);
     const excerpt = trimText(
         excerptSource || "Se nyeste bilde og oppdatering direkte på Facebook-siden vår.",
         180
@@ -145,8 +150,8 @@ function normalizeFacebookPost(post, index, fallbackPageUrl) {
         cta: "Les på Facebook",
         link: (typeof post.permalink_url === "string" && post.permalink_url.trim())
             ? post.permalink_url.trim()
-            : fallbackPageUrl,
-        image: resolveFacebookPostImage(post) || getFallbackImageByContent(message + " " + title),
+            : (attachmentUrl ? attachmentUrl.trim() : fallbackPageUrl),
+        image: resolveFacebookPostImage(post) || getFallbackImageByContent(effectiveText + " " + title),
         source: 'Facebook'
     };
 }
@@ -241,29 +246,40 @@ export default async function handler(req, res) {
     try {
         const fields = [
             "message",
+            "story",
             "permalink_url",
             "created_time",
             "full_picture",
-            "attachments{media,media_type,subattachments,url}"
+            "attachments{media,media_type,subattachments,url,title,description,target}"
         ].join(",");
 
-        const metaUrl = `https://graph.facebook.com/v20.0/${encodeURIComponent(pageId)}/posts?fields=${fields}&limit=${limit}&access_token=${accessToken}`;
-        const metaRes = await fetch(metaUrl);
-        const payload = await metaRes.json();
+        let rawItems = [];
+        let lastError = "";
 
-        if (!metaRes.ok || payload.error) {
-            const errMsg = payload?.error?.message || `Meta Graph API responded with status ${metaRes.status}`;
-            console.error(`[Facebook API Proxy] Meta API Error:`, errMsg);
+        for (const edge of ["feed", "published_posts", "posts"]) {
+            const metaUrl = `https://graph.facebook.com/v20.0/${encodeURIComponent(pageId)}/${edge}?fields=${fields}&limit=${limit}&access_token=${accessToken}`;
+            const metaRes = await fetch(metaUrl);
+            const payload = await metaRes.json();
+
+            if (metaRes.ok && !payload.error && Array.isArray(payload.data) && payload.data.length > 0) {
+                rawItems = payload.data;
+                break;
+            } else if (payload && payload.error && payload.error.message) {
+                lastError = payload.error.message;
+            }
+        }
+
+        if (!rawItems.length && lastError) {
+            console.error(`[Facebook API Proxy] Meta API Error:`, lastError);
             res.status(200).json({
                 ok: false,
-                error: errMsg,
+                error: lastError,
                 pageUrl: pageUrl,
                 items: []
             });
             return;
         }
 
-        const rawItems = Array.isArray(payload.data) ? payload.data : [];
         const items = await Promise.all(rawItems.map(async (post, idx) => {
             const item = normalizeFacebookPost(post, idx, pageUrl);
             if (item && !item.image && item.link) {
