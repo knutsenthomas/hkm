@@ -1119,7 +1119,7 @@ function formatFacebookPostDate(dateValue) {
   }
 }
 
-function resolveFacebookPostImage(post) {
+function resolveFacebookPostImages(post) {
   const isValidImageUrl = (url) => {
     if (typeof url !== "string") return false;
     const str = url.trim();
@@ -1128,43 +1128,54 @@ function resolveFacebookPostImage(post) {
     return true;
   };
 
-  const pickFirstString = (...values) => {
-    for (const value of values) {
-      if (typeof value === "string" && isValidImageUrl(value)) return value.trim();
+  const images = [];
+  const addImage = (url) => {
+    if (typeof url === "string" && isValidImageUrl(url)) {
+      const trimmed = url.trim();
+      if (!images.includes(trimmed)) {
+        images.push(trimmed);
+      }
     }
-    return "";
   };
 
-  const walkAttachment = (attachment) => {
-    if (!attachment || typeof attachment !== "object") return "";
+  if (post && post.full_picture) {
+    addImage(post.full_picture);
+  }
 
-    const directImage = pickFirstString(
-      attachment.media && attachment.media.image && attachment.media.image.src,
-      attachment.media && attachment.media.source,
-      attachment.media && attachment.media.src,
-    );
-    if (directImage) return directImage;
+  const walkAttachment = (attachment) => {
+    if (!attachment || typeof attachment !== "object") return;
+
+    if (attachment.media && attachment.media.image && attachment.media.image.src) {
+      addImage(attachment.media.image.src);
+    } else if (attachment.media && attachment.media.source) {
+      addImage(attachment.media.source);
+    } else if (attachment.media && attachment.media.src) {
+      addImage(attachment.media.src);
+    }
 
     const subattachments = Array.isArray(attachment.subattachments && attachment.subattachments.data) ?
       attachment.subattachments.data :
       [];
 
     for (const item of subattachments) {
-      const nested = walkAttachment(item);
-      if (nested) return nested;
+      walkAttachment(item);
     }
-
-    return "";
   };
 
   const attachments = Array.isArray(post && post.attachments && post.attachments.data) ?
     post.attachments.data :
     [];
 
-  return pickFirstString(
-    post && post.full_picture,
-    ...attachments.map((attachment) => walkAttachment(attachment)),
-  );
+  for (const attachment of attachments) {
+    walkAttachment(attachment);
+  }
+
+  return images;
+}
+
+function resolveFacebookPostImage(post) {
+  const images = resolveFacebookPostImages(post);
+  return images[0] || "";
 }
 
 function extractFacebookPageIdentifier(value) {
@@ -1285,7 +1296,8 @@ async function fetchFacebookGraphJson(graphVersion, pathName, accessToken, param
 function normalizeFacebookPost(post, index, fallbackPageUrl) {
   const message = typeof post.message === "string" ? post.message.trim() : "";
   const story = typeof post.story === "string" ? post.story.trim() : "";
-  const fullPicture = resolveFacebookPostImage(post);
+  const allImages = resolveFacebookPostImages(post);
+  const fullPicture = allImages[0] || "";
   const attachment = Array.isArray(post && post.attachments && post.attachments.data) && post.attachments.data[0] ?
     post.attachments.data[0] : null;
   const attachmentTitle = attachment && typeof attachment.title === "string" ? attachment.title.trim() : "";
@@ -1343,6 +1355,8 @@ function normalizeFacebookPost(post, index, fallbackPageUrl) {
       attachment.url.trim() :
       fallbackPageUrl,
     image: fullPicture,
+    images: allImages,
+    source: "Facebook",
   };
 }
 

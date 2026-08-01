@@ -2878,19 +2878,108 @@ class ContentManager {
                 }
             }
 
-            if (imageEl) {
-                const fallbackSrc = imageEl.getAttribute('data-fallback-src') || '';
-                const liveImage = typeof post.image === 'string' ? post.image.trim() : '';
-                const effectiveImage = liveImage || fallbackSrc;
+            if (imageWrap) {
+                const imagesList = Array.isArray(post.images) && post.images.length > 0 ? post.images : (post.image ? [post.image] : []);
+                let carouselEl = imageWrap.querySelector('.fb-post-carousel');
 
-                if (effectiveImage) {
-                    if (imageEl.getAttribute('src') !== effectiveImage) {
-                        imageEl.setAttribute('src', effectiveImage);
+                if (imagesList.length > 1) {
+                    if (imageEl) imageEl.style.display = 'none';
+                    imageWrap.classList.remove('is-empty');
+
+                    if (!carouselEl) {
+                        carouselEl = document.createElement('div');
+                        carouselEl.className = 'fb-post-carousel';
+                        imageWrap.appendChild(carouselEl);
                     }
-                    imageWrap?.classList.remove('is-empty');
+
+                    carouselEl.style.display = 'block';
+                    let currentIndex = parseInt(carouselEl.getAttribute('data-index') || '0', 10);
+                    if (isNaN(currentIndex) || currentIndex < 0 || currentIndex >= imagesList.length) {
+                        currentIndex = 0;
+                    }
+                    carouselEl.setAttribute('data-index', String(currentIndex));
+
+                    const trackHTML = imagesList.map((src, i) => `
+                        <div class="fb-carousel-slide">
+                            <img src="${src}" alt="Facebook bilde ${i + 1}" loading="lazy" />
+                        </div>
+                    `).join('');
+
+                    const dotsHTML = imagesList.map((_, i) => `
+                        <span class="dot ${i === currentIndex ? 'active' : ''}" data-slide-index="${i}"></span>
+                    `).join('');
+
+                    carouselEl.innerHTML = `
+                        <div class="fb-carousel-track" style="transform: translateX(-${currentIndex * 100}%);">
+                            ${trackHTML}
+                        </div>
+                        <button class="fb-carousel-btn fb-prev" aria-label="Forrige bilde"><i class="fas fa-chevron-left"></i></button>
+                        <button class="fb-carousel-btn fb-next" aria-label="Neste bilde"><i class="fas fa-chevron-right"></i></button>
+                        <div class="fb-carousel-dots">
+                            ${dotsHTML}
+                        </div>
+                    `;
+
+                    const updateCarousel = (newIndex) => {
+                        if (newIndex < 0) newIndex = imagesList.length - 1;
+                        if (newIndex >= imagesList.length) newIndex = 0;
+                        carouselEl.setAttribute('data-index', String(newIndex));
+
+                        const track = carouselEl.querySelector('.fb-carousel-track');
+                        if (track) track.style.transform = `translateX(-${newIndex * 100}%)`;
+
+                        const dots = carouselEl.querySelectorAll('.fb-carousel-dots .dot');
+                        dots.forEach((dot, idx) => {
+                            if (idx === newIndex) dot.classList.add('active');
+                            else dot.classList.remove('active');
+                        });
+                    };
+
+                    const prevBtn = carouselEl.querySelector('.fb-prev');
+                    const nextBtn = carouselEl.querySelector('.fb-next');
+                    const dotsContainer = carouselEl.querySelector('.fb-carousel-dots');
+
+                    prevBtn?.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const idx = parseInt(carouselEl.getAttribute('data-index') || '0', 10);
+                        updateCarousel(idx - 1);
+                    });
+
+                    nextBtn?.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const idx = parseInt(carouselEl.getAttribute('data-index') || '0', 10);
+                        updateCarousel(idx + 1);
+                    });
+
+                    dotsContainer?.addEventListener('click', (e) => {
+                        const target = e.target.closest('.dot');
+                        if (target) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const slideIdx = parseInt(target.getAttribute('data-slide-index') || '0', 10);
+                            updateCarousel(slideIdx);
+                        }
+                    });
                 } else {
-                    imageEl.removeAttribute('src');
-                    imageWrap?.classList.add('is-empty');
+                    if (carouselEl) carouselEl.style.display = 'none';
+                    if (imageEl) {
+                        imageEl.style.display = '';
+                        const fallbackSrc = imageEl.getAttribute('data-fallback-src') || '';
+                        const liveImage = typeof post.image === 'string' ? post.image.trim() : '';
+                        const effectiveImage = liveImage || fallbackSrc;
+
+                        if (effectiveImage) {
+                            if (imageEl.getAttribute('src') !== effectiveImage) {
+                                imageEl.setAttribute('src', effectiveImage);
+                            }
+                            imageWrap.classList.remove('is-empty');
+                        } else {
+                            imageEl.removeAttribute('src');
+                            imageWrap.classList.add('is-empty');
+                        }
+                    }
                 }
             }
         });
