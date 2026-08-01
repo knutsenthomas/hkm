@@ -140,15 +140,16 @@ function normalizeFacebookPost(post, index, fallbackPageUrl) {
     }
 
     const combinedText = `${message} ${story} ${attachmentTitle} ${attachmentDesc}`;
-    if (/oppdatert statusen sin|updated (their|its) status|Når dette skjer|skyldes det vanligvis|liten gruppe mennesker|har endret hvem som kan se det|har slettet det/i.test(combinedText)) {
+    if (/Når dette skjer|skyldes det vanligvis|liten gruppe mennesker|har endret hvem som kan se det|har slettet det/i.test(combinedText)) {
         return null;
     }
 
-    const effectiveText = message || attachmentTitle || attachmentDesc || story || "";
+    const cleanStory = (story && !/oppdatert statusen sin|updated (their|its) status/i.test(story)) ? story : '';
+    const effectiveText = message || attachmentTitle || attachmentDesc || cleanStory || "";
     const lines = effectiveText.split(/\n+/).map((line) => line.trim()).filter(Boolean);
-    const rawTitle = lines[0] || attachmentTitle || story || "Nytt innlegg fra Facebook";
+    const rawTitle = lines[0] || attachmentTitle || cleanStory || "Oppdatering fra Facebook";
     const title = trimText(rawTitle, 78);
-    const excerptSource = lines.length > 1 ? lines.slice(1).join(" ") : (attachmentDesc || story || effectiveText);
+    const excerptSource = lines.length > 1 ? lines.slice(1).join(" ") : (attachmentDesc || cleanStory || effectiveText);
     const excerpt = trimText(
         excerptSource || "Se nyeste bilde og oppdatering direkte på Facebook-siden vår.",
         180

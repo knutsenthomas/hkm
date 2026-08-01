@@ -1291,17 +1291,18 @@ function normalizeFacebookPost(post, index, fallbackPageUrl) {
   const attachmentDesc = attachment && typeof attachment.description === "string" ? attachment.description.trim() : "";
 
   const combinedText = `${message} ${story} ${attachmentTitle} ${attachmentDesc}`;
-  if (/oppdatert statusen sin|updated (their|its) status|Når dette skjer|skyldes det vanligvis|liten gruppe mennesker|har endret hvem som kan se det|har slettet det/i.test(combinedText)) {
+  if (/Når dette skjer|skyldes det vanligvis|liten gruppe mennesker|har endret hvem som kan se det|har slettet det/i.test(combinedText)) {
     return null;
   }
 
-  const mainText = message || attachmentTitle || attachmentDesc || story || "";
+  const cleanStory = (story && !/oppdatert statusen sin|updated (their|its) status/i.test(story)) ? story : '';
+  const mainText = message || attachmentTitle || attachmentDesc || cleanStory || "";
   const lines = mainText.split(/\n+/).map((line) => line.trim()).filter(Boolean);
-  const rawTitle = lines[0] || mainText || "Nytt innlegg fra Facebook";
+  const rawTitle = lines[0] || attachmentTitle || cleanStory || "Oppdatering fra Facebook";
   const title = trimText(rawTitle, 78);
-  const excerptSource = lines.length > 1 ? lines.slice(1).join(" ") : (attachmentDesc || story || message);
+  const excerptSource = lines.length > 1 ? lines.slice(1).join(" ") : (attachmentDesc || cleanStory || mainText);
   const excerpt = trimText(
-    excerptSource || "Se siste oppdatering, bilder og meldinger fra Facebook-siden vår.",
+    excerptSource || "Se nyeste bilde og oppdatering direkte på Facebook-siden vår.",
     180,
   );
 
