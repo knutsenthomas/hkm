@@ -39,6 +39,7 @@ const minsideTranslations = {
         'sidebar.readingPlans': 'Leseplaner',
         'sidebar.gaver': 'Gaver',
         'sidebar.aktivitet': 'AKTIVITET',
+        'sidebar.historikk': 'Aktivitet',
         'sidebar.varslinger': 'Varslinger',
         'sidebar.logg': 'Logg',
         'sidebar.notater': 'Notater',
@@ -1313,8 +1314,8 @@ class MinSideManager {
         const viewInfo = {
             overview: { title: t('view.overview'), icon: 'grid_view' },
             profile: { title: t('view.profile'), icon: 'person' },
-            history: { title: 'Historikk & Aktivitet', icon: 'history' },
-            activity: { title: 'Historikk & Aktivitet', icon: 'history' },
+            history: { title: t('sidebar.historikk') || 'Aktivitet', icon: 'history' },
+            activity: { title: t('sidebar.historikk') || 'Aktivitet', icon: 'history' },
             notifications: { title: t('view.notifications'), icon: 'notifications' },
             giving: { title: t('view.giving'), icon: 'volunteer_activism' },
             courses: { title: t('view.courses'), icon: 'school' },
