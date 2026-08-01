@@ -133,6 +133,9 @@ function normalizeFacebookPost(post, index, fallbackPageUrl) {
     }
 
     const effectiveText = message || story || attachmentTitle || attachmentDesc || "";
+    if (/Når dette skjer, skyldes det vanligvis|har endret hvem som kan se det|eller har slettet det/i.test(effectiveText)) {
+        return null;
+    }
     const lines = effectiveText.split(/\n+/).map((line) => line.trim()).filter(Boolean);
     const rawTitle = lines[0] || attachmentTitle || story || "Nytt innlegg fra Facebook";
     const title = trimText(rawTitle, 78);
