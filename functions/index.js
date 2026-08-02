@@ -1530,7 +1530,7 @@ exports.facebookFeed = onRequest({ invoker: "public" }, (req, res) => {
  */
 async function saveToStorageCache(path, data) {
   try {
-    const bucket = getStorage().bucket();
+    const bucket = (typeof admin.storage === 'function' ? admin.storage() : getStorage()).bucket();
     const file = bucket.file(path);
     await file.save(JSON.stringify(data), {
       contentType: "application/json",
@@ -1549,7 +1549,7 @@ async function saveToStorageCache(path, data) {
  */
 async function loadFromStorageCache(path) {
   try {
-    const bucket = getStorage().bucket();
+    const bucket = (typeof admin.storage === 'function' ? admin.storage() : getStorage()).bucket();
     const file = bucket.file(path);
     const [exists] = await file.exists();
     if (!exists) return null;
@@ -8298,8 +8298,7 @@ exports.getBibleChapterAudio = onCall({
   const cleanChapterNum = String(chapterNum);
   const cleanText = String(text).trim();
   let cleanVoice = String(voice || 'onyx').toLowerCase();
-  const validVoices = ['onyx', 'nova', 'echo', 'alloy', 'fable', 'shimmer', 'ash', 'sage', 'coral'];
-  if (!validVoices.includes(cleanVoice)) {
+  if (!['onyx', 'nova', 'alloy', 'echo', 'shimmer', 'fable'].includes(cleanVoice)) {
     cleanVoice = 'onyx';
   }
 
@@ -8307,7 +8306,7 @@ exports.getBibleChapterAudio = onCall({
     throw new HttpsError("invalid-argument", "Teksten er for kort til å generere lyd.");
   }
 
-  const bucket = getStorage().bucket();
+  const bucket = (typeof admin.storage === 'function' ? admin.storage() : getStorage()).bucket();
   const filePath = `bible_audio/${cleanLang}/${cleanBookId}_${cleanChapterNum}_${cleanVoice}.mp3`;
   const file = bucket.file(filePath);
 
@@ -8405,7 +8404,7 @@ exports.getBibleChapterAudio = onCall({
   // 2. Fallback til Google Cloud Text-to-Speech (GCTS)
   if (!success) {
     try {
-      const isFemale = ['nova', 'shimmer', 'coral', 'sage'].includes(cleanVoice);
+      const isFemale = cleanVoice === 'nova';
       let primaryConfig;
       let fallbackConfig;
 

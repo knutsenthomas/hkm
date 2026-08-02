@@ -10911,11 +10911,8 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                     ${this.t('playing_verse')}...
                 </div>
                 <select class="audio-voice-select" id="audio-voice-select" title="${labelVoice}">
-                    <option value="onyx">Onyx (Mann - Dyp)</option>
-                    <option value="nova">Nova (Kvinne - Tydelig)</option>
-                    <option value="ash">Ash (Mann - Myk & Naturtro ✨)</option>
-                    <option value="coral">Coral (Kvinne - Varm ✨)</option>
-                    <option value="sage">Sage (Kvinne - Ro ✨)</option>
+                    <option value="onyx">Onyx (Mann)</option>
+                    <option value="nova">Nova (Kvinne)</option>
                     <option value="echo">Echo (Mann)</option>
                     <option value="alloy">Alloy (Nøytral)</option>
                     <option value="fable">Fable (Forteller)</option>
@@ -10959,7 +10956,7 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
         const speedSelect = document.getElementById('audio-speed-select');
         if (speedSelect) speedSelect.value = String(this.audioSpeed || 1.0);
 
-        const validVoices = ['onyx', 'nova', 'echo', 'alloy', 'fable', 'shimmer', 'ash', 'sage', 'coral'];
+        const validVoices = ['onyx', 'nova', 'echo', 'alloy', 'fable', 'shimmer'];
         if (!validVoices.includes(this.audioVoice)) {
             this.audioVoice = 'onyx';
         }
