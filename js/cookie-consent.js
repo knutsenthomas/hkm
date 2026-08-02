@@ -1,5 +1,3 @@
-import './event-visibility-fix.js';
-
 /**
  * Cookie Consent Manager
  * Handles GDPR compliance by managing user consent for different categories of cookies.
@@ -80,7 +78,6 @@ function showCookieBanner() {
     const isAnalyticsChecked = saved ? saved.analytics === true : false;
     const isMarketingChecked = saved ? saved.marketing === true : false;
 
-    // Inject HTML
     const bannerHTML = `
     <div id="cookie-consent-backdrop"></div>
     <div id="cookie-consent-banner">
@@ -90,7 +87,6 @@ function showCookieBanner() {
                 ${t.text} 
                 <a href="${t.privacyUrl}" class="cookie-details-link">${t.privacyLinkText}</a>
             </p>
-            
             <div class="cookie-options">
                 <div class="cookie-option">
                     <input type="checkbox" id="cookie-necessary" class="cookie-toggle" checked disabled>
@@ -105,7 +101,6 @@ function showCookieBanner() {
                     <label for="cookie-marketing">${t.marketing}</label>
                 </div>
             </div>
-
             <div class="cookie-buttons">
                 <button id="btn-accept-all" class="btn-cookie btn-cookie-accept">${t.acceptAll}</button>
                 <button id="btn-accept-selection" class="btn-cookie btn-cookie-selection">${t.acceptSelected}</button>
@@ -161,7 +156,6 @@ function hideBanner() {
 async function saveConsent(consent) {
     localStorage.setItem('hkm_cookie_consent', JSON.stringify(consent));
 
-    // Persistence logic (Firestore)
     if (window.firebaseService && window.firebaseService.isInitialized) {
         const payload = {
             choices: consent,
@@ -189,14 +183,9 @@ async function saveConsent(consent) {
     applyConsent(consent);
 }
 
-/**
- * Applies the consent choices by enabling/disabling specific scripts
- * @param {object} consent 
- */
 function applyConsent(consent) {
     console.log('[HKM Consent] Applying Cookie Consent:', consent);
 
-    // Statistikk (Analytics)
     if (consent && consent.analytics) {
         const measurementId = window.firebaseConfig?.measurementId || 'G-5CH82CHQ0B';
         const loadGAWithInteraction = () => {
@@ -204,30 +193,22 @@ function applyConsent(consent) {
             window.removeEventListener('mousemove', loadGAWithInteraction);
             window.removeEventListener('touchstart', loadGAWithInteraction);
             window.removeEventListener('keydown', loadGAWithInteraction);
-            
             loadGA4(measurementId);
         };
-        
+
         window.addEventListener('scroll', loadGAWithInteraction, { passive: true });
         window.addEventListener('mousemove', loadGAWithInteraction, { passive: true });
         window.addEventListener('touchstart', loadGAWithInteraction, { passive: true });
         window.addEventListener('keydown', loadGAWithInteraction, { passive: true });
     }
 
-    // Markedsføring
     if (consent && consent.marketing) {
         console.log('[HKM Consent] Marketing Enabled');
     }
 }
 
-/**
- * Dynamically loads Google Analytics (GA4)
- * @param {string} measurementId 
- */
 function loadGA4(measurementId) {
     if (window.gtagLoaded) return;
-    
-    console.log(`[HKM Consent] Loading Google Analytics (${measurementId})...`);
 
     const script = document.createElement('script');
     script.async = true;
@@ -248,17 +229,16 @@ function loadGA4(measurementId) {
     window.gtagLoaded = true;
 }
 
-// Lazy load Font Awesome on user interaction to avoid render blocking
 (function() {
     const loadFontAwesome = () => {
         window.removeEventListener('scroll', loadFontAwesome);
         window.removeEventListener('mousemove', loadFontAwesome);
         window.removeEventListener('touchstart', loadFontAwesome);
         window.removeEventListener('keydown', loadFontAwesome);
-        
+
         if (window.fontAwesomeLoaded) return;
         window.fontAwesomeLoaded = true;
-        
+
         const link = document.createElement('link');
         link.rel = 'stylesheet';
         link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
@@ -270,4 +250,3 @@ function loadGA4(measurementId) {
     window.addEventListener('touchstart', loadFontAwesome, { passive: true });
     window.addEventListener('keydown', loadFontAwesome, { passive: true });
 })();
-
