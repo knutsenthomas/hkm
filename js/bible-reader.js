@@ -10911,15 +10911,11 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                     ${this.t('playing_verse')}...
                 </div>
                 <select class="audio-voice-select" id="audio-voice-select" title="${labelVoice}">
-                    <option value="cedar">Cedar (Mann - Varm ✨)</option>
-                    <option value="marin">Marin (Kvinne - Klar ✨)</option>
                     <option value="onyx">Onyx (Mann - Dyp)</option>
                     <option value="nova">Nova (Kvinne - Tydelig)</option>
-                    <option value="coral">Coral (Kvinne - Varm)</option>
-                    <option value="sage">Sage (Kvinne - Ro)</option>
-                    <option value="ash">Ash (Mann - Myk)</option>
-                    <option value="verse">Verse (Mann - Dynamisk)</option>
-                    <option value="ballad">Ballad (Mann - Melodiøs)</option>
+                    <option value="ash">Ash (Mann - Myk & Naturtro ✨)</option>
+                    <option value="coral">Coral (Kvinne - Varm ✨)</option>
+                    <option value="sage">Sage (Kvinne - Ro ✨)</option>
                     <option value="echo">Echo (Mann)</option>
                     <option value="alloy">Alloy (Nøytral)</option>
                     <option value="fable">Fable (Forteller)</option>
@@ -10963,9 +10959,9 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
         const speedSelect = document.getElementById('audio-speed-select');
         if (speedSelect) speedSelect.value = String(this.audioSpeed || 1.0);
 
-        const validVoices = ['onyx', 'nova', 'echo', 'alloy', 'fable', 'shimmer', 'ash', 'ballad', 'coral', 'sage', 'verse', 'cedar', 'marin'];
+        const validVoices = ['onyx', 'nova', 'echo', 'alloy', 'fable', 'shimmer', 'ash', 'sage', 'coral'];
         if (!validVoices.includes(this.audioVoice)) {
-            this.audioVoice = 'cedar';
+            this.audioVoice = 'onyx';
         }
 
         const voiceSelect = document.getElementById('audio-voice-select');
