@@ -1,3 +1,14 @@
+if (typeof document !== 'undefined' && document.head) {
+    if (!document.querySelector('link[rel="preload"][href="/img/logo-hkm.png"]')) {
+        const logoPreload = document.createElement('link');
+        logoPreload.rel = 'preload';
+        logoPreload.as = 'image';
+        logoPreload.href = '/img/logo-hkm.png';
+        logoPreload.setAttribute('fetchpriority', 'high');
+        document.head.appendChild(logoPreload);
+    }
+}
+
 const STORE_URL = 'https://www.hiskingdomdesigns.no/';
 const FACEBOOK_URL = 'https://www.facebook.com/hiskingdomministry777?locale=nb_NO';
 const INSTAGRAM_URL = 'https://www.instagram.com/freedomisathand/';
@@ -430,7 +441,7 @@ export function renderSiteHeader(language = getLanguage()) {
             <div class="header-content" id="header-container">
                 <a href="${routes.home}" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
                     <div class="w-[45px] h-[45px] flex items-center justify-center rounded-lg overflow-hidden shrink-0 logo-icon">
-                        <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover"
+                        <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover" width="45" height="45" fetchpriority="high" decoding="async"
                             ${contentAttributes('brand.logoAlt', 'alt')}>
                     </div>
                     <span class="text-xl" ${contentAttributes('brand.name')}>His Kingdom Ministry</span>
