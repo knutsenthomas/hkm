@@ -8296,9 +8296,10 @@ exports.getBibleChapterAudio = onCall({
   const cleanBookId = String(bookId).toLowerCase();
   const cleanChapterNum = String(chapterNum);
   const cleanText = String(text).trim();
-  let cleanVoice = String(voice || 'onyx').toLowerCase();
-  if (!['onyx', 'nova', 'alloy', 'echo', 'shimmer', 'fable'].includes(cleanVoice)) {
-    cleanVoice = 'onyx';
+  let cleanVoice = String(voice || 'cedar').toLowerCase();
+  const validVoices = ['onyx', 'nova', 'echo', 'alloy', 'fable', 'shimmer', 'ash', 'ballad', 'coral', 'sage', 'verse', 'cedar', 'marin'];
+  if (!validVoices.includes(cleanVoice)) {
+    cleanVoice = 'cedar';
   }
 
   if (cleanText.length < 5) {
@@ -8403,7 +8404,7 @@ exports.getBibleChapterAudio = onCall({
   // 2. Fallback til Google Cloud Text-to-Speech (GCTS)
   if (!success) {
     try {
-      const isFemale = cleanVoice === 'nova';
+      const isFemale = ['nova', 'shimmer', 'coral', 'sage', 'marin'].includes(cleanVoice);
       let primaryConfig;
       let fallbackConfig;
 
