@@ -1881,6 +1881,28 @@ class ContentManager {
                 finalEvents = [...taggedFirebase, ...monthHolidays];
             }
 
+            // Ensure default featured events (like Seerkurs med aktivering) are always present in finalEvents if missing
+            const defaultEvents = [
+                {
+                    id: 'seerkurs-aktivering-event',
+                    title: 'Seerkurs med aktivering',
+                    description: 'Lær hvordan du kan se i ånden og bruke bibelske prinsipper til å åpne dine åndelige øyne. Kurset inneholder undervisning, leksjoner og praktisk aktivering.',
+                    excerpt: 'Lær hvordan du kan se i ånden og bruke bibelske prinsipper til å åpne dine åndelige øyne.',
+                    location: 'HKM Online / Kurs',
+                    start: '2026-08-15T18:00:00+02:00',
+                    end: '2026-08-15T20:30:00+02:00',
+                    link: 'kurs.html',
+                    source: 'manual',
+                    isFeatured: true
+                }
+            ];
+
+            defaultEvents.forEach(defEvt => {
+                if (!finalEvents.some(e => e.id === defEvt.id || (e.title && e.title.toLowerCase().includes('seerkurs')))) {
+                    finalEvents.push(defEvt);
+                }
+            });
+
             if (isLocalDev) {
                 try {
                     console.info('[ContentManager] loadEvents debug', {
