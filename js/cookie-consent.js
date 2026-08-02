@@ -1,3 +1,5 @@
+import './event-visibility-fix.js';
+
 /**
  * Cookie Consent Manager
  * Handles GDPR compliance by managing user consent for different categories of cookies.
