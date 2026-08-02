@@ -22,6 +22,7 @@ const { onDocumentCreated, onDocumentUpdated, onDocumentWritten } = require('fir
 const { onSchedule } = require('firebase-functions/v2/scheduler');
 const admin = require('firebase-admin');
 const { getFirestore, FieldValue, Timestamp, FieldPath } = require('firebase-admin/firestore');
+const { getStorage } = require('firebase-admin/storage');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { GoogleAIFileManager } = require('@google/generative-ai/server');
 const fs = require('fs');
@@ -1529,7 +1530,7 @@ exports.facebookFeed = onRequest({ invoker: "public" }, (req, res) => {
  */
 async function saveToStorageCache(path, data) {
   try {
-    const bucket = admin.storage().bucket();
+    const bucket = getStorage().bucket();
     const file = bucket.file(path);
     await file.save(JSON.stringify(data), {
       contentType: "application/json",
@@ -1548,7 +1549,7 @@ async function saveToStorageCache(path, data) {
  */
 async function loadFromStorageCache(path) {
   try {
-    const bucket = admin.storage().bucket();
+    const bucket = getStorage().bucket();
     const file = bucket.file(path);
     const [exists] = await file.exists();
     if (!exists) return null;
@@ -8306,7 +8307,7 @@ exports.getBibleChapterAudio = onCall({
     throw new HttpsError("invalid-argument", "Teksten er for kort til å generere lyd.");
   }
 
-  const bucket = admin.storage().bucket();
+  const bucket = getStorage().bucket();
   const filePath = `bible_audio/${cleanLang}/${cleanBookId}_${cleanChapterNum}_${cleanVoice}.mp3`;
   const file = bucket.file(filePath);
 
