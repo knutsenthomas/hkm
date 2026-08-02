@@ -7748,47 +7748,101 @@ exports.scheduledSync = onSchedule("every 15 minutes", async (event) => {
     // Keep manual events created in CMS / Admin
     const manualItems = existingItems.filter(item => item.source !== 'google_calendar');
 
-    // Ensure default featured events (Seerkurs med aktivering 7, 14 og 21. august fra kl. 19:00 til 20:30) are always present if missing
+    // Dynamic fetching of courses and lessons from siteContent/collection_courses
+    let courseFeaturedEvents = [];
+    try {
+      const courseDocRef = db.collection('siteContent').doc('collection_courses');
+      const courseSnap = await courseDocRef.get();
+      if (courseSnap.exists && Array.isArray(courseSnap.data()?.items)) {
+        const courseItems = courseSnap.data().items;
+        courseItems.forEach(course => {
+          if (Array.isArray(course.lessons)) {
+            course.lessons.forEach((lesson, index) => {
+              if (lesson.date) {
+                let startIso = lesson.date;
+                if (startIso.length === 16) {
+                  startIso += ':00+02:00';
+                } else if (!startIso.includes('+') && !startIso.endsWith('Z')) {
+                  startIso += '+02:00';
+                }
+                const startDateObj = new Date(startIso);
+                const endDateObj = new Date(startDateObj.getTime() + 90 * 60 * 1000);
+                const endIso = endDateObj.toISOString();
+
+                const courseEvtId = `course-event-${course.id || 'c'}-${lesson.id || index}`;
+                const lessonTitle = lesson.title || `Leksjon ${index + 1}`;
+                const fullTitle = course.title ? `${course.title} – ${lessonTitle}` : lessonTitle;
+
+                courseFeaturedEvents.push({
+                  id: courseEvtId,
+                  title: fullTitle,
+                  description: lesson.description || course.description || '',
+                  excerpt: lesson.description || course.description || '',
+                  location: 'HKM Online / Kurs',
+                  start: startIso,
+                  end: endIso,
+                  date: startIso,
+                  link: `kurs-detaljer.html?id=${course.id || ''}`,
+                  source: 'manual',
+                  isFeatured: true
+                });
+              }
+            });
+          }
+        });
+      }
+    } catch (err) {
+      console.warn('Error reading collection_courses in scheduledSync:', err);
+    }
+
+    // Default fallback featured events from course page if collection_courses is empty
     const defaultFeaturedEvents = [
       {
         id: 'seerkurs-del1-2026-08-07',
-        title: 'Seerkurs med aktivering – Del 1',
-        description: 'Lær hvordan du kan se i ånden og bruke bibelske prinsipper til å åpne dine åndelige øyne. Kurset inneholder undervisning, leksjoner og praktisk aktivering.',
-        excerpt: 'Lær hvordan du kan se i ånden og bruke bibelske prinsipper til å åpne dine åndelige øyne.',
+        title: 'Seerkurs med aktivering – Leksjon 1: Hvordan se i ånden',
+        description: 'Hvordan se i ånden og hvordan bruke bibelvers til å se i ånden.',
+        excerpt: 'Hvordan se i ånden og hvordan bruke bibelvers til å se i ånden.',
         location: 'HKM Online / Kurs',
         start: '2026-08-07T19:00:00+02:00',
         end: '2026-08-07T20:30:00+02:00',
-        link: 'kurs.html',
+        link: 'kurs-detaljer.html?id=course_1783677988451',
         source: 'manual',
         isFeatured: true
       },
       {
         id: 'seerkurs-del2-2026-08-14',
-        title: 'Seerkurs med aktivering – Del 2',
-        description: 'Lær hvordan du kan se i ånden og bruke bibelske prinsipper til å åpne dine åndelige øyne. Kurset inneholder undervisning, leksjoner og praktisk aktivering.',
-        excerpt: 'Lær hvordan du kan se i ånden og bruke bibelske prinsipper til å åpne dine åndelige øyne.',
+        title: 'Seerkurs med aktivering – Leksjon 2: Hvordan tre foran nådens trone',
+        description: 'Hvordan tre foran nådens trone.',
+        excerpt: 'Hvordan tre foran nådens trone.',
         location: 'HKM Online / Kurs',
         start: '2026-08-14T19:00:00+02:00',
         end: '2026-08-14T20:30:00+02:00',
-        link: 'kurs.html',
+        link: 'kurs-detaljer.html?id=course_1783677988451',
         source: 'manual',
         isFeatured: true
       },
       {
         id: 'seerkurs-del3-2026-08-21',
-        title: 'Seerkurs med aktivering – Del 3',
-        description: 'Lær hvordan du kan se i ånden og bruke bibelske prinsipper til å åpne dine åndelige øyne. Kurset inneholder undervisning, leksjoner og praktisk aktivering.',
-        excerpt: 'Lær hvordan du kan se i ånden og bruke bibelske prinsipper til å åpne dine åndelige øyne.',
+        title: 'Seerkurs med aktivering – Leksjon 3: Møte med Jesus',
+        description: 'Møte med Jesus.',
+        excerpt: 'Møte med Jesus.',
         location: 'HKM Online / Kurs',
         start: '2026-08-21T19:00:00+02:00',
         end: '2026-08-21T20:30:00+02:00',
-        link: 'kurs.html',
+        link: 'kurs-detaljer.html?id=course_1783677988451',
         source: 'manual',
         isFeatured: true
       }
     ];
 
+    const allCourseEvents = [...courseFeaturedEvents];
     defaultFeaturedEvents.forEach(defEvt => {
+      if (!allCourseEvents.some(e => e.id === defEvt.id || (e.title && e.title.includes('Seerkurs med aktivering') && e.start === defEvt.start))) {
+        allCourseEvents.push(defEvt);
+      }
+    });
+
+    allCourseEvents.forEach(defEvt => {
       if (!manualItems.some(item => item.id === defEvt.id || item.title === defEvt.title)) {
         manualItems.push(defEvt);
       }
