@@ -4,6 +4,15 @@
  * Sleek, premium, and non-disruptive modern design.
  */
 
+/* Prevent Material Symbols ligature names from flashing before the icon font is ready. */
+html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
+    visibility: hidden;
+}
+
+html.fonts-loaded .material-symbols-outlined {
+    visibility: visible;
+}
+
 .toast-container {
     position: fixed;
     bottom: 24px;
