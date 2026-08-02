@@ -19,3 +19,24 @@ window.firebaseConfig = {
     appId: "1:791237361706:web:63516ba3d74436f23ac353",
     measurementId: "G-28GVKTMCZE"
 };
+
+// Clear stale event data once after the event visibility rollback.
+// This runs before content-manager.js and forces a fresh calendar fetch.
+(function invalidateEventCache() {
+    const cacheVersion = '2026-08-02-events-v4';
+    const versionKey = 'hkm_events_cache_version';
+
+    try {
+        if (localStorage.getItem(versionKey) === cacheVersion) return;
+
+        Object.keys(localStorage).forEach((key) => {
+            if (key.startsWith('hkm_events_')) {
+                localStorage.removeItem(key);
+            }
+        });
+
+        localStorage.setItem(versionKey, cacheVersion);
+    } catch (error) {
+        console.warn('[HKM] Kunne ikke nullstille arrangement-cache:', error);
+    }
+})();
