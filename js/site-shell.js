@@ -729,6 +729,20 @@ function replaceOrInsert(selector, markup, insert) {
     const replacement = elementFromMarkup(markup);
     const existing = document.querySelector(selector);
     if (existing) {
+        // Preserve already loaded/painted image elements (such as logo) to prevent re-decoding flash
+        const existingImgs = existing.querySelectorAll('img');
+        const replacementImgs = replacement.querySelectorAll('img');
+        if (existingImgs.length > 0 && replacementImgs.length > 0) {
+            existingImgs.forEach((oldImg) => {
+                const oldSrc = oldImg.getAttribute('src');
+                if (!oldSrc) return;
+                replacementImgs.forEach((newImg) => {
+                    if (newImg.getAttribute('src') === oldSrc && newImg.parentNode) {
+                        newImg.replaceWith(oldImg);
+                    }
+                });
+            });
+        }
         existing.replaceWith(replacement);
     } else {
         insert(replacement);
