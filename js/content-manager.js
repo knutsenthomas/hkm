@@ -1791,7 +1791,7 @@ class ContentManager {
     async loadEvents(forceRefresh = false) {
         try {
             const { startIso, endIso } = this.getMonthRangeIso(this.currentDate);
-            const cacheKey = `hkm_events_v6_${startIso}_${endIso}`;
+            const cacheKey = `hkm_events_v7_${startIso}_${endIso}`;
             const isLocalDev = ['localhost', '127.0.0.1'].includes(String(window.location.hostname || '').toLowerCase());
             const integrations = await this.getContentDoc('settings_integrations', { silent: true }) || {};
             let finalEvents = [];
@@ -1904,6 +1904,8 @@ class ContentManager {
                                 const lessonTitle = lesson.title || `Leksjon ${index + 1}`;
                                 const fullTitle = course.title ? `${course.title} – ${lessonTitle}` : lessonTitle;
 
+                                const imgUrl = lesson.imageUrl || lesson.image || lesson.thumbnail || course.imageUrl || course.image || course.thumbnail || 'https://images.unsplash.com/photo-1553729784-e91953dec042?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MzIzNjJ8MHwxfHNlYXJjaHwxM3x8QmlibGV8ZW58MHx8fHwxNzgzNjc3NTk3fDA&ixlib=rb-4.1.0&q=80&w=1080';
+
                                 const courseEvent = {
                                     id: courseEvtId,
                                     title: fullTitle,
@@ -1913,6 +1915,9 @@ class ContentManager {
                                     start: startIso,
                                     end: endIso,
                                     date: startIso,
+                                    imageUrl: imgUrl,
+                                    image: imgUrl,
+                                    dashboardImage: imgUrl,
                                     link: `kurs-detaljer.html?id=${course.id || ''}`,
                                     source: 'manual',
                                     isFeatured: true
@@ -1929,6 +1934,8 @@ class ContentManager {
                 console.warn('Could not load course events from collection_courses:', err);
             }
 
+            const fallbackCourseImg = 'https://images.unsplash.com/photo-1553729784-e91953dec042?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MzIzNjJ8MHwxfHNlYXJjaHwxM3x8QmlibGV8ZW58MHx8fHwxNzgzNjc3NTk3fDA&ixlib=rb-4.1.0&q=80&w=1080';
+
             // Fallback default events from course page if collection_courses fails or is empty
             const defaultEvents = [
                 {
@@ -1939,6 +1946,9 @@ class ContentManager {
                     location: 'HKM Online / Kurs',
                     start: '2026-08-07T19:00:00+02:00',
                     end: '2026-08-07T20:30:00+02:00',
+                    imageUrl: fallbackCourseImg,
+                    image: fallbackCourseImg,
+                    dashboardImage: fallbackCourseImg,
                     link: 'kurs-detaljer.html?id=course_1783677988451',
                     source: 'manual',
                     isFeatured: true
@@ -1951,6 +1961,9 @@ class ContentManager {
                     location: 'HKM Online / Kurs',
                     start: '2026-08-14T19:00:00+02:00',
                     end: '2026-08-14T20:30:00+02:00',
+                    imageUrl: fallbackCourseImg,
+                    image: fallbackCourseImg,
+                    dashboardImage: fallbackCourseImg,
                     link: 'kurs-detaljer.html?id=course_1783677988451',
                     source: 'manual',
                     isFeatured: true
@@ -1963,6 +1976,9 @@ class ContentManager {
                     location: 'HKM Online / Kurs',
                     start: '2026-08-21T19:00:00+02:00',
                     end: '2026-08-21T20:30:00+02:00',
+                    imageUrl: fallbackCourseImg,
+                    image: fallbackCourseImg,
+                    dashboardImage: fallbackCourseImg,
                     link: 'kurs-detaljer.html?id=course_1783677988451',
                     source: 'manual',
                     isFeatured: true

@@ -7773,6 +7773,8 @@ exports.scheduledSync = onSchedule("every 15 minutes", async (event) => {
                 const lessonTitle = lesson.title || `Leksjon ${index + 1}`;
                 const fullTitle = course.title ? `${course.title} – ${lessonTitle}` : lessonTitle;
 
+                const imgUrl = lesson.imageUrl || lesson.image || lesson.thumbnail || course.imageUrl || course.image || course.thumbnail || 'https://images.unsplash.com/photo-1553729784-e91953dec042?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MzIzNjJ8MHwxfHNlYXJjaHwxM3x8QmlibGV8ZW58MHx8fHwxNzgzNjc3NTk3fDA&ixlib=rb-4.1.0&q=80&w=1080';
+
                 courseFeaturedEvents.push({
                   id: courseEvtId,
                   title: fullTitle,
@@ -7782,6 +7784,9 @@ exports.scheduledSync = onSchedule("every 15 minutes", async (event) => {
                   start: startIso,
                   end: endIso,
                   date: startIso,
+                  imageUrl: imgUrl,
+                  image: imgUrl,
+                  dashboardImage: imgUrl,
                   link: `kurs-detaljer.html?id=${course.id || ''}`,
                   source: 'manual',
                   isFeatured: true
@@ -7795,6 +7800,8 @@ exports.scheduledSync = onSchedule("every 15 minutes", async (event) => {
       console.warn('Error reading collection_courses in scheduledSync:', err);
     }
 
+    const fallbackCourseImg = 'https://images.unsplash.com/photo-1553729784-e91953dec042?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MzIzNjJ8MHwxfHNlYXJjaHwxM3x8QmlibGV8ZW58MHx8fHwxNzgzNjc3NTk3fDA&ixlib=rb-4.1.0&q=80&w=1080';
+
     // Default fallback featured events from course page if collection_courses is empty
     const defaultFeaturedEvents = [
       {
@@ -7805,6 +7812,9 @@ exports.scheduledSync = onSchedule("every 15 minutes", async (event) => {
         location: 'HKM Online / Kurs',
         start: '2026-08-07T19:00:00+02:00',
         end: '2026-08-07T20:30:00+02:00',
+        imageUrl: fallbackCourseImg,
+        image: fallbackCourseImg,
+        dashboardImage: fallbackCourseImg,
         link: 'kurs-detaljer.html?id=course_1783677988451',
         source: 'manual',
         isFeatured: true
@@ -7817,6 +7827,9 @@ exports.scheduledSync = onSchedule("every 15 minutes", async (event) => {
         location: 'HKM Online / Kurs',
         start: '2026-08-14T19:00:00+02:00',
         end: '2026-08-14T20:30:00+02:00',
+        imageUrl: fallbackCourseImg,
+        image: fallbackCourseImg,
+        dashboardImage: fallbackCourseImg,
         link: 'kurs-detaljer.html?id=course_1783677988451',
         source: 'manual',
         isFeatured: true
@@ -7829,6 +7842,9 @@ exports.scheduledSync = onSchedule("every 15 minutes", async (event) => {
         location: 'HKM Online / Kurs',
         start: '2026-08-21T19:00:00+02:00',
         end: '2026-08-21T20:30:00+02:00',
+        imageUrl: fallbackCourseImg,
+        image: fallbackCourseImg,
+        dashboardImage: fallbackCourseImg,
         link: 'kurs-detaljer.html?id=course_1783677988451',
         source: 'manual',
         isFeatured: true
