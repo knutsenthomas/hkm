@@ -1881,16 +1881,40 @@ class ContentManager {
                 finalEvents = [...taggedFirebase, ...monthHolidays];
             }
 
-            // Ensure default featured events (like Seerkurs med aktivering) are always present in finalEvents if missing
+            // Ensure default featured events (Seerkurs med aktivering 7, 14 og 21. august) are always present
             const defaultEvents = [
                 {
-                    id: 'seerkurs-aktivering-event',
-                    title: 'Seerkurs med aktivering',
+                    id: 'seerkurs-del1-2026-08-07',
+                    title: 'Seerkurs med aktivering – Del 1',
                     description: 'Lær hvordan du kan se i ånden og bruke bibelske prinsipper til å åpne dine åndelige øyne. Kurset inneholder undervisning, leksjoner og praktisk aktivering.',
                     excerpt: 'Lær hvordan du kan se i ånden og bruke bibelske prinsipper til å åpne dine åndelige øyne.',
                     location: 'HKM Online / Kurs',
-                    start: '2026-08-15T18:00:00+02:00',
-                    end: '2026-08-15T20:30:00+02:00',
+                    start: '2026-08-07T18:00:00+02:00',
+                    end: '2026-08-07T20:30:00+02:00',
+                    link: 'kurs.html',
+                    source: 'manual',
+                    isFeatured: true
+                },
+                {
+                    id: 'seerkurs-del2-2026-08-14',
+                    title: 'Seerkurs med aktivering – Del 2',
+                    description: 'Lær hvordan du kan se i ånden og bruke bibelske prinsipper til å åpne dine åndelige øyne. Kurset inneholder undervisning, leksjoner og praktisk aktivering.',
+                    excerpt: 'Lær hvordan du kan se i ånden og bruke bibelske prinsipper til å åpne dine åndelige øyne.',
+                    location: 'HKM Online / Kurs',
+                    start: '2026-08-14T18:00:00+02:00',
+                    end: '2026-08-14T20:30:00+02:00',
+                    link: 'kurs.html',
+                    source: 'manual',
+                    isFeatured: true
+                },
+                {
+                    id: 'seerkurs-del3-2026-08-21',
+                    title: 'Seerkurs med aktivering – Del 3',
+                    description: 'Lær hvordan du kan se i ånden og bruke bibelske prinsipper til å åpne dine åndelige øyne. Kurset inneholder undervisning, leksjoner og praktisk aktivering.',
+                    excerpt: 'Lær hvordan du kan se i ånden og bruke bibelske prinsipper til å åpne dine åndelige øyne.',
+                    location: 'HKM Online / Kurs',
+                    start: '2026-08-21T18:00:00+02:00',
+                    end: '2026-08-21T20:30:00+02:00',
                     link: 'kurs.html',
                     source: 'manual',
                     isFeatured: true
@@ -1898,7 +1922,7 @@ class ContentManager {
             ];
 
             defaultEvents.forEach(defEvt => {
-                if (!finalEvents.some(e => e.id === defEvt.id || (e.title && e.title.toLowerCase().includes('seerkurs')))) {
+                if (!finalEvents.some(e => e.id === defEvt.id || (e.title && e.title === defEvt.title))) {
                     finalEvents.push(defEvt);
                 }
             });
