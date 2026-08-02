@@ -3208,21 +3208,34 @@ class ContentManager {
     }
 
     isEventPast(event) {
-        const startValue = event.end || event.start || event.date;
-        const endDate = this.parseEventDate(startValue);
-        if (!endDate) return false;
-
+        if (!event) return false;
+        const startRaw = event.start || event.date;
+        const endRaw = event.end;
         const now = new Date();
 
-        // If it's a date-only string (no time set), treat it as an all-day event
-        // and only count it as "past" once the day is completely over.
-        if (!this.eventHasTime(startValue)) {
-            const endOfDay = new Date(endDate);
-            endOfDay.setHours(23, 59, 59, 999);
-            return endOfDay < now;
+        // 1. Timed event (e.g. ISO date-time string)
+        if (this.eventHasTime(startRaw) || this.eventHasTime(endRaw)) {
+            const endDate = this.parseEventDate(endRaw || startRaw);
+            return endDate ? endDate < now : false;
         }
 
-        return endDate < now;
+        // 2. All-day event ("YYYY-MM-DD")
+        // Note: Google Calendar / iCal all-day end dates are EXCLUSIVE (e.g., start: "2026-08-01", end: "2026-08-02" is a 1-day event on Aug 1).
+        const startDate = this.parseEventDate(startRaw);
+        if (!startDate) return false;
+
+        let lastActiveDay = new Date(startDate);
+        if (endRaw && !this.eventHasTime(endRaw)) {
+            const endDate = this.parseEventDate(endRaw);
+            if (endDate && endDate > startDate) {
+                // Exclusive end date: subtract 1 day to get the last active day
+                lastActiveDay = new Date(endDate.getTime() - 24 * 60 * 60 * 1000);
+            }
+        }
+
+        const endOfLastActiveDay = new Date(lastActiveDay);
+        endOfLastActiveDay.setHours(23, 59, 59, 999);
+        return endOfLastActiveDay < now;
     }
 
     eventHasTime(value) {
