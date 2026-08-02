@@ -7729,7 +7729,7 @@ exports.scheduledSync = onSchedule("every 15 minutes", async (event) => {
       throw new Error(`GCal API Error: ${data.error.message}`);
     }
 
-    const events = (data.items || []).map(item => ({
+    const gcalEvents = (data.items || []).map(item => ({
       id: item.id,
       title: item.summary || 'Uten navn',
       description: item.description || '',
@@ -7741,12 +7741,43 @@ exports.scheduledSync = onSchedule("every 15 minutes", async (event) => {
       syncedAt: admin.firestore.FieldValue.serverTimestamp()
     }));
 
-    await db.collection("content").doc("collection_events").set({
-      items: events,
-      lastSync: admin.firestore.FieldValue.serverTimestamp()
+    const docRef = db.collection("content").doc("collection_events");
+    const docSnap = await docRef.get();
+    const existingItems = (docSnap.exists && Array.isArray(docSnap.data()?.items)) ? docSnap.data().items : [];
+
+    // Keep manual events created in CMS / Admin
+    const manualItems = existingItems.filter(item => item.source !== 'google_calendar');
+
+    // Ensure default featured events (like Seerkurs med aktivering) are always present if missing
+    const defaultFeaturedEvents = [
+      {
+        id: 'seerkurs-aktivering-event',
+        title: 'Seerkurs med aktivering',
+        description: 'Lær hvordan du kan se i ånden og bruke bibelske prinsipper til å åpne dine åndelige øyne. Kurset inneholder undervisning, leksjoner og praktisk aktivering.',
+        excerpt: 'Lær hvordan du kan se i ånden og bruke bibelske prinsipper til å åpne dine åndelige øyne.',
+        location: 'HKM Online / Kurs',
+        start: '2026-08-15T18:00:00+02:00',
+        end: '2026-08-15T20:30:00+02:00',
+        link: 'kurs.html',
+        source: 'manual',
+        isFeatured: true
+      }
+    ];
+
+    defaultFeaturedEvents.forEach(defEvt => {
+      if (!manualItems.some(item => item.id === defEvt.id || item.title === defEvt.title)) {
+        manualItems.push(defEvt);
+      }
     });
 
-    console.log(`✅ Synkronisering fullført. ${events.length} arrangementer lagret.`);
+    const finalEvents = [...gcalEvents, ...manualItems];
+
+    await docRef.set({
+      items: finalEvents,
+      lastSync: admin.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    console.log(`✅ Synkronisering fullført. ${finalEvents.length} arrangementer lagret.`);
   } catch (error) {
     console.error("❌ Feil under synkronisering:", error);
   }

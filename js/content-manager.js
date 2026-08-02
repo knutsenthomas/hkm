@@ -2393,6 +2393,7 @@ class ContentManager {
         cutoffDate.setHours(0, 0, 0, 0);
 
         const visibleEvents = sorted.filter(e => {
+            if (this.isEventPast(e)) return false;
             const d = this.parseEventDate(e.start || e.date);
             return d && d < cutoffDate;
         });
