@@ -1791,7 +1791,7 @@ class ContentManager {
     async loadEvents(forceRefresh = false) {
         try {
             const { startIso, endIso } = this.getMonthRangeIso(this.currentDate);
-            const cacheKey = `hkm_events_v3_${startIso}_${endIso}`;
+            const cacheKey = `hkm_events_v4_${startIso}_${endIso}`;
             const isLocalDev = ['localhost', '127.0.0.1'].includes(String(window.location.hostname || '').toLowerCase());
             const integrations = await this.getContentDoc('settings_integrations', { silent: true }) || {};
             let finalEvents = [];
@@ -2348,7 +2348,7 @@ class ContentManager {
                         ? cleanExcerpt.slice(0, 117) + '...' 
                         : cleanExcerpt;
 
-                    const detailsUrl = this.getLocalizedLink('arrangement-detaljer.html') + '?id=' + encodeURIComponent(eventKey);
+                    const detailsUrl = event.link || (this.getLocalizedLink('arrangement-detaljer.html') + '?id=' + encodeURIComponent(eventKey));
 
                     return `
                         <a href="${detailsUrl}" class="event-card">
