@@ -7748,7 +7748,7 @@ exports.scheduledSync = onSchedule("every 15 minutes", async (event) => {
     // Keep manual events created in CMS / Admin
     const manualItems = existingItems.filter(item => item.source !== 'google_calendar');
 
-    // Ensure default featured events (Seerkurs med aktivering 7, 14 og 21. august) are always present if missing
+    // Ensure default featured events (Seerkurs med aktivering 7, 14 og 21. august fra kl. 19:00) are always present if missing
     const defaultFeaturedEvents = [
       {
         id: 'seerkurs-del1-2026-08-07',
@@ -7756,8 +7756,8 @@ exports.scheduledSync = onSchedule("every 15 minutes", async (event) => {
         description: 'Lær hvordan du kan se i ånden og bruke bibelske prinsipper til å åpne dine åndelige øyne. Kurset inneholder undervisning, leksjoner og praktisk aktivering.',
         excerpt: 'Lær hvordan du kan se i ånden og bruke bibelske prinsipper til å åpne dine åndelige øyne.',
         location: 'HKM Online / Kurs',
-        start: '2026-08-07T18:00:00+02:00',
-        end: '2026-08-07T20:30:00+02:00',
+        start: '2026-08-07T19:00:00+02:00',
+        end: '2026-08-07T21:30:00+02:00',
         link: 'kurs.html',
         source: 'manual',
         isFeatured: true
@@ -7768,8 +7768,8 @@ exports.scheduledSync = onSchedule("every 15 minutes", async (event) => {
         description: 'Lær hvordan du kan se i ånden og bruke bibelske prinsipper til å åpne dine åndelige øyne. Kurset inneholder undervisning, leksjoner og praktisk aktivering.',
         excerpt: 'Lær hvordan du kan se i ånden og bruke bibelske prinsipper til å åpne dine åndelige øyne.',
         location: 'HKM Online / Kurs',
-        start: '2026-08-14T18:00:00+02:00',
-        end: '2026-08-14T20:30:00+02:00',
+        start: '2026-08-14T19:00:00+02:00',
+        end: '2026-08-14T21:30:00+02:00',
         link: 'kurs.html',
         source: 'manual',
         isFeatured: true
@@ -7780,8 +7780,8 @@ exports.scheduledSync = onSchedule("every 15 minutes", async (event) => {
         description: 'Lær hvordan du kan se i ånden og bruke bibelske prinsipper til å åpne dine åndelige øyne. Kurset inneholder undervisning, leksjoner og praktisk aktivering.',
         excerpt: 'Lær hvordan du kan se i ånden og bruke bibelske prinsipper til å åpne dine åndelige øyne.',
         location: 'HKM Online / Kurs',
-        start: '2026-08-21T18:00:00+02:00',
-        end: '2026-08-21T20:30:00+02:00',
+        start: '2026-08-21T19:00:00+02:00',
+        end: '2026-08-21T21:30:00+02:00',
         link: 'kurs.html',
         source: 'manual',
         isFeatured: true
