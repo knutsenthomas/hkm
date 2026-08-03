@@ -3568,8 +3568,9 @@ class MinSideManager {
             }
             await firebase.firestore().collection('users').doc(this.currentUser.uid).set(updates, { merge: true });
 
-            // Automatically sync contact with TextMagic in background if phone is provided
+            // Automatically sync contact with TextMagic & Planning Center in background
             this._syncTextMagicContact(updates);
+            this._syncPlanningCenterContact(updates);
 
             badge.innerHTML = `<span class="material-symbols-outlined" style="font-size:16px;">check_circle</span> Endringer lagret i skyen`;
             setTimeout(() => { if (badge) badge.style.opacity = '0'; }, 2500);
@@ -3604,6 +3605,35 @@ class MinSideManager {
           })
           .catch(err => {
               console.warn('TextMagic synk feilet (bakgrunn):', err);
+          });
+    }
+
+    _syncPlanningCenterContact(data = {}) {
+        const name = (data.displayName || this.profileData?.displayName || this.currentUser?.displayName || '').trim();
+        const email = data.email || this.profileData?.email || this.currentUser?.email || '';
+        const phone = data.phone || this.profileData?.phone || '';
+
+        if (!name && !email) return;
+
+        const nameParts = name.split(' ');
+        const firstName = nameParts[0] || 'Medlem';
+        const lastName = nameParts.slice(1).join(' ') || '';
+
+        fetch('/api/pco-people', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                firstName,
+                lastName,
+                email,
+                phone
+            })
+        }).then(res => res.json())
+          .then(resData => {
+              if (window.hkmLogger) window.hkmLogger.log('Planning Center synkronisert:', resData);
+          })
+          .catch(err => {
+              console.warn('Planning Center synk feilet (bakgrunn):', err);
           });
     }
 
