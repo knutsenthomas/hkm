@@ -10892,7 +10892,7 @@ class MinSideManager {
                 a: isNo ? 'Under «Profil» finner du fanen «Varsler». Der kan du enkelt slå av eller på push-varsler for ny undervisning, podcast, blogg og generelle nyhetsbrev.' : 'Under "Profile" click the "Notifications" tab to enable or disable push and email notifications.'
             },
             {
-                q: isNo ? 'Hvor finner jeg kvittering for gaver og skattefradragsrapport?' : (isEs ? '¿Dónde encuentro mis recibos de donación?' : 'Where do I find my donation receipts?'),
+                q: isNo ? 'Hvor finner jeg kvittering for gaver og årsrapport?' : (isEs ? '¿Dónde encuentro mis recibos de donación?' : 'Where do I find my donation receipts?'),
                 a: isNo ? 'Klikk på «Gaver» i menyen. Der ser du en fullstendig historikk over alle dine gaver. Trykk på en enkelt gave for å se kvittering, eller bruk knappen «Skriv ut rapport» øverst for å laste ned samlerapport.' : 'Click "Giving" in the menu to view all donations and print reports.'
             },
             {
