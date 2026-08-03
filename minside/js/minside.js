@@ -5628,9 +5628,41 @@ class MinSideManager {
             return coursePaid.paidLessons.includes(lesson.id);
         };
 
-        container.innerHTML = `<div class="courses-grid-list" style="display:flex; flex-direction:column; gap:24px; width: 100%;">
+        const userCompletedLessons = this.profileData?.completedLessons || [];
+
+        const activeCourseInfo = courses.map(c => {
+            const lessons = c.lessons || [];
+            const doneCount = lessons.filter((l, lIdx) => userCompletedLessons.includes(`${c.id}_${lIdx}`) || userCompletedLessons.includes(l.id)).length;
+            const pct = lessons.length > 0 ? Math.round((doneCount / lessons.length) * 100) : 0;
+            return { course: c, total: lessons.length, done: doneCount, pct };
+        });
+
+        const inProgress = activeCourseInfo.find(ci => ci.total > 0 && ci.done > 0 && ci.pct < 100) || activeCourseInfo.find(ci => ci.total > 0 && ci.pct < 100);
+
+        const continueHeroHtml = inProgress ? `
+            <div class="continue-course-hero" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 20px; padding: 24px; color: #fff; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(209, 125, 57, 0.2); color: #d17d39; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <span class="material-symbols-outlined" style="font-size: 26px;">play_circle</span>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #d17d39;">Fortsett der du slapp</div>
+                        <h3 style="font-size: 1.1rem; font-weight: 800; color: #fff; margin: 2px 0;">${this._escapeHtml(inProgress.course.title || '')}</h3>
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin: 0;">${inProgress.done} av ${inProgress.total} leksjoner fullført (${inProgress.pct}%)</p>
+                    </div>
+                </div>
+                <a href="/kurs-detaljer.html?id=${encodeURIComponent(inProgress.course.id)}" class="btn btn-primary btn-sm" style="border-radius: 10px; font-weight: 700; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border: none; padding: 8px 18px; text-decoration: none; color: #fff; display: inline-flex; align-items: center; gap: 6px;">
+                    <span class="material-symbols-outlined">play_arrow</span> Fortsett leksjon
+                </a>
+            </div>
+        ` : '';
+
+        container.innerHTML = `
+        ${continueHeroHtml}
+        <div class="courses-grid-list" style="display:flex; flex-direction:column; gap:24px; width: 100%;">
             ${courses.map((c, cIdx) => {
                 const courseLessons = c.lessons || [];
+                const ci = activeCourseInfo.find(info => info.course.id === c.id) || { total: courseLessons.length, done: 0, pct: 0 };
                 
                 return `
                 <div class="course-card-premium">
@@ -5642,6 +5674,16 @@ class MinSideManager {
                             <span class="course-category-tag">${c.category || 'Generelt'}</span>
                             <h3 style="font-size:1.25rem; font-weight:800; color:var(--text-main); margin:4px 0 6px;">${c.title || t('courses.untitled')}</h3>
                             <p style="font-size:0.88rem; color:var(--text-muted); margin:0; line-height:1.5;">${c.excerpt || c.intro || ''}</p>
+                            
+                            <div style="margin-top:12px; width: 100%;">
+                                <div style="display:flex; justify-content:space-between; font-size:0.75rem; font-weight:700; color:var(--text-muted); margin-bottom:4px;">
+                                    <span>Fremdrift</span>
+                                    <span>${ci.done} av ${ci.total} leksjoner (${ci.pct}%)</span>
+                                </div>
+                                <div style="width:100%; height:7px; background:#e2e8f0; border-radius:99px; overflow:hidden;">
+                                    <div style="width:${ci.pct}%; height:100%; background:linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border-radius:99px; transition:width 0.4s ease;"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     

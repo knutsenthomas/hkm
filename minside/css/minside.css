@@ -2817,6 +2817,14 @@ body.sidebar-collapsed .nav-link .material-symbols-outlined {
     .courses-grid {
         grid-template-columns: 1fr;
     }
+
+    .header-notif-btn, 
+    #notif-bell-btn, 
+    #notif-badge-header-bell-wrap, 
+    .notif-bell-icon,
+    #notif-badge-header-bell {
+        display: none !important;
+    }
 }
 
 @media (max-width: 480px) {
