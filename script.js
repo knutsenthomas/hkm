@@ -3027,15 +3027,6 @@ window.addEventListener('load', () => {
 	                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
 	                });
 
-	                // Send instant push notification to TextMagic App
-	                fetch('/api/send-sms', {
-	                    method: 'POST',
-	                    headers: { 'Content-Type': 'application/json' },
-	                    body: JSON.stringify({
-	                        text: `💬 Ny melding fra chatten på HKM!\nNavn: ${name}\nE-post: ${email}${phone ? '\nTlf: ' + phone : ''}\nMelding: ${message.substring(0, 160)}`
-	                    })
-	                }).catch(err => console.warn('TextMagic push failed:', err));
-
 	                // Best-effort Google Form (backup log)
 	                const FIELD_MAP = {
 	                    name: 'entry.599509457',
@@ -3716,15 +3707,6 @@ window.addEventListener('load', () => {
                         targetMode: 'google_chat',
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
-
-                    // Instant TextMagic notification
-                    fetch('/api/send-sms', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            text: `⚠ En besøkende på HKM nettside ber om å snakke med en person i chatten! Side: ${window.location.pathname}`
-                        })
-                    }).catch(() => {});
                     
                     addSystemMessage('En veileder er varslet og vil svare deg her i chatten om kort tid.');
                 } catch (error) {
