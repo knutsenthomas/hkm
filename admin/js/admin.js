@@ -7955,31 +7955,31 @@ class AdminManager {
                 <div id="google-tasks-integration-card" style="width: 100%;"></div>
 
                 <!-- HKM Mobilapp Card inside Integrasjoner -->
-                <div class="card modern" style="height: 100%; display: flex; flex-direction: column; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; border-radius: 16px; padding: 24px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px;">
+                <div class="card modern" style="height: 100%; display: flex; flex-direction: column; border-radius: 16px; padding: 24px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid var(--border-color, #e2e8f0); padding-bottom: 12px;">
                         <div style="display: flex; align-items: center; gap: 12px;">
-                            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(209, 125, 57, 0.2); border: 1px solid rgba(209, 125, 57, 0.4); display: flex; align-items: center; justify-content: center;">
+                            <div style="width: 36px; height: 36px; border-radius: 10px; background: #fff7ed; border: 1px solid rgba(209, 125, 57, 0.2); display: flex; align-items: center; justify-content: center;">
                                 <span class="material-symbols-outlined" style="font-size: 22px; color: #d17d39;&display=block">smartphone</span>
                             </div>
-                            <h3 class="card-title" style="color: white; margin: 0; font-size: 17px; font-weight: 700;">HKM Mobilapp & PWA</h3>
+                            <h3 class="card-title" style="margin: 0; font-size: 17px; font-weight: 700;">HKM Mobilapp & PWA</h3>
                         </div>
                         <span class="status-badge" style="background: #dcfce7; color: #15803d; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 10px;">Synkronisert</span>
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
                         <div>
-                            <p style="font-size: 13px; color: #94a3b8; margin: 0 0 16px 0; line-height: 1.5;">
+                            <p style="font-size: 13px; color: var(--text-secondary, #64748b); margin: 0 0 16px 0; line-height: 1.5;">
                                 Sanntidssynkronisering av bibeloversettelser, leseplaner, undervisning og podcaster til mobilappen (PWA).
                             </p>
-                            <div style="font-size: 12px; color: #cbd5e1; margin-bottom: 16px;">
-                                Sist synkronisert: <span id="integ-pwa-last-sync" style="color: #38bdf8; font-weight: 600;">Henter...</span>
+                            <div style="font-size: 12px; color: var(--text-muted, #64748b); margin-bottom: 16px;">
+                                Sist synkronisert: <span id="integ-pwa-last-sync" style="color: #d17d39; font-weight: 600;">Henter...</span>
                             </div>
                         </div>
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                            <button class="btn" id="btn-integ-force-app-sync" style="background: #d17d39; color: white; font-weight: 700; border: none; padding: 10px 16px; border-radius: 10px; cursor: pointer; flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                            <button class="btn btn-primary" id="btn-integ-force-app-sync" style="background: #d17d39; color: white; font-weight: 700; border: none; padding: 10px 16px; border-radius: 10px; cursor: pointer; flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;">
                                 <span class="material-symbols-outlined" style="font-size: 18px;&display=block">sync</span>
                                 Tving app-synk
                             </button>
-                            <button class="btn" onclick="window.location.hash='app'" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 14px; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                            <button class="btn btn-secondary" onclick="window.location.hash='app'" style="padding: 10px 14px; border-radius: 10px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px;">
                                 Åpne app-panel
                             </button>
                         </div>
