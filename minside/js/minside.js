@@ -4402,30 +4402,30 @@ class MinSideManager {
                     : (isNo ? 'Arkiver varsel' : (isEs ? 'Archivar' : 'Archive'));
                 const deleteTitle = isNo ? 'Slett permanent' : (isEs ? 'Eliminar permanentemente' : 'Delete permanently');
 
-                return `<div class="activity-item${!n.read ? ' unread' : ''}" data-id="${n.id}" style="cursor:pointer; display:flex; align-items:center; width:100%; position:relative;">
-                    <div class="notif-cb-wrap" style="display:flex; align-items:center; margin-right:12px; flex-shrink:0;" onclick="event.stopPropagation();">
-                        <input type="checkbox" class="notif-item-cb" data-id="${n.id}" style="width:18px; height:18px; cursor:pointer; accent-color:var(--accent-color);">
+                return `<div class="activity-item${!n.read ? ' unread' : ''}" data-id="${n.id}">
+                    <div class="notif-cb-wrap" onclick="event.stopPropagation();">
+                        <input type="checkbox" class="notif-item-cb" data-id="${n.id}">
                     </div>
-                    <div class="activity-icon ${iconCls}" style="flex-shrink:0;">
+                    <div class="activity-icon ${iconCls}">
                         <span class="material-symbols-outlined">${m.icon}</span>
                     </div>
-                    <div class="activity-content" style="flex:1; min-width:0; margin-right:12px; margin-left:8px;">
-                        <div class="activity-title" style="font-weight:700; color:var(--text-main); font-size:14px;">${this._escapeHtml(n.title)}</div>
-                        ${n.body ? `<div class="activity-body" style="font-size:13px; color:var(--text-muted); margin-top:2px;">${this._escapeHtml(n.body)}</div>` : ''}
-                        <div class="activity-time" style="font-size:11px; color:var(--text-muted); margin-top:4px;">${this._timeAgo(date)}</div>
-                    </div>
-                    
-                    <div class="activity-right-section" style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
-                        ${!n.read ? `<div class="ms-unread-dot" style="margin-right:4px;"></div>` : ''}
-                        
-                        <div class="notif-actions" style="display:flex; gap:4px; align-items:center;">
-                            <button type="button" class="btn-archive-notif" data-id="${n.id}" title="${archiveTitle}" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; padding:6px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; transition: background-color 0.2s, color 0.2s;">
-                                <span class="material-symbols-outlined" style="font-size:18px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; line-height:1 !important; margin:0 !important;">${archiveIcon}</span>
-                            </button>
-                            <button type="button" class="btn-delete-notif" data-id="${n.id}" title="${deleteTitle}" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; padding:6px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; transition: background-color 0.2s, color 0.2s;">
-                                <span class="material-symbols-outlined" style="font-size:18px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; line-height:1 !important; color:#ef4444 !important; margin:0 !important;">delete</span>
-                            </button>
+                    <div class="activity-content">
+                        <div class="activity-header-row">
+                            <div class="activity-title">${this._escapeHtml(n.title)}</div>
+                            <div class="activity-right-section">
+                                ${!n.read ? `<div class="ms-unread-dot"></div>` : ''}
+                                <div class="notif-actions">
+                                    <button type="button" class="btn-archive-notif" data-id="${n.id}" title="${archiveTitle}">
+                                        <span class="material-symbols-outlined">${archiveIcon}</span>
+                                    </button>
+                                    <button type="button" class="btn-delete-notif" data-id="${n.id}" title="${deleteTitle}">
+                                        <span class="material-symbols-outlined">delete</span>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
+                        ${n.body ? `<div class="activity-body">${this._escapeHtml(n.body)}</div>` : ''}
+                        <div class="activity-time">${this._timeAgo(date)}</div>
                     </div>
                 </div>`;
             }).join('');
