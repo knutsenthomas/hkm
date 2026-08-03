@@ -4237,7 +4237,7 @@ class ContentManager {
         // 2b. Podcast item (Fetch newest via proxy)
         let podcastHtml = '';
         try {
-            const proxyUrl = 'https://getpodcast-42bhgdjkcq-uc.a.run.app';
+            const proxyUrl = '/api/podcast';
             const response = await fetch(proxyUrl);
             const data = await response.json();
             const channel = Array.isArray(data.rss?.channel) ? data.rss.channel[0] : data.rss?.channel;

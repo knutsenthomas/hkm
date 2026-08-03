@@ -75,6 +75,7 @@ const ROUTES = {
         contact: '/kontakt',
         bible: '/bibel',
         media: '/media',
+        podcast: '/podcast',
         courses: '/kurs',
         readingPlans: '/leseplaner',
         events: '/arrangementer',
@@ -94,6 +95,7 @@ const ROUTES = {
         contact: '/en/contact',
         bible: '/en/bibel',
         media: '/en/media',
+        podcast: '/en/podcast',
         courses: '/en/courses',
         readingPlans: '/en/leseplaner',
         events: '/en/events',
@@ -113,6 +115,7 @@ const ROUTES = {
         contact: '/es/contacto',
         bible: '/es/bibel',
         media: '/es/media',
+        podcast: '/es/podcast',
         courses: '/es/cursos',
         readingPlans: '/es/leseplaner',
         events: '/es/eventos',
@@ -628,7 +631,7 @@ export function renderSiteFooter(language = getLanguage()) {
                             <div class="nav-col">
                                 <h4 ${contentAttributes('footer.title_media')}>${footer.mediaTitle}</h4>
                                 <ul>
-                                    <li><a href="${routes.media}" ${contentAttributes('footer.links.media.podcast')}>${footer.podcast}</a></li>
+                                    <li><a href="${routes.podcast}" ${contentAttributes('footer.links.media.podcast')}>${footer.podcast}</a></li>
                                     <li><a href="${routes.media}" ${contentAttributes('footer.links.media.videos')}>${footer.videos}</a></li>
                                     <li><a href="${YOUTUBE_URL}" target="_blank" rel="noopener noreferrer" ${contentAttributes('footer.links.media.youtube')}>YouTube</a></li>
                                 </ul>

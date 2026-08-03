@@ -37,8 +37,6 @@
     { "source": "/nyheter", "destination": "/blogg", "permanent": true },
     { "source": "/en/nyheter/(.*)", "destination": "/en/blog.html", "permanent": true },
     { "source": "/es/nyheter/(.*)", "destination": "/es/blog.html", "permanent": true },
-    { "source": "/podcast/(.*)", "destination": "/om-oss", "permanent": true },
-    { "source": "/podcast", "destination": "/om-oss", "permanent": true },
     { "source": "/personvererklæring", "destination": "/personvern", "permanent": true },
     { "source": "/personvernerkl", "destination": "/personvern", "permanent": true },
     { "source": "/es/personvererklæring", "destination": "/es/privacidad", "permanent": true },
@@ -55,6 +53,10 @@
     { "source": "/hvem-vi-er", "destination": "/om-oss", "permanent": true }
   ],
   "rewrites": [
+    { "source": "/api/getPodcast", "destination": "/api/podcast" },
+    { "source": "/podcast", "destination": "/podcast.html" },
+    { "source": "/en/podcast", "destination": "/en/podcast.html" },
+    { "source": "/es/podcast", "destination": "/es/podcast.html" },
     { "source": "/__/auth/:path*", "destination": "https://his-kingdom-ministry.firebaseapp.com/__/auth/:path*" },
     { "source": "/api/newsletter-unsubscribe", "destination": "https://us-central1-his-kingdom-ministry.cloudfunctions.net/unsubscribeNewsletter" },
     { "source": "/api/bible/:path*", "destination": "/api/bible" },

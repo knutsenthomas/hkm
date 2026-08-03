@@ -1124,9 +1124,48 @@ async function initPodcastRSS() {
             }
         }
 
-        const proxyUrl = 'https://getpodcast-42bhgdjkcq-uc.a.run.app';
-        const response = await fetch(proxyUrl);
-        const data = await response.json();
+        let data = null;
+        try {
+            const response = await fetch('/api/getPodcast');
+            if (response.ok) {
+                data = await response.json();
+            }
+        } catch (err) {
+            console.warn('[Podcast] Primary /api/getPodcast fetch error:', err);
+        }
+
+        if (!data || !data.rss || (!data.rss.channel && !data.rss.items)) {
+            try {
+                console.log('[Podcast] Falling back to RSS-to-JSON service...');
+                const fbResponse = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fanchor.fm%2Fs%2Ff7a13dec%2Fpodcast%2Frss');
+                const fbData = await fbResponse.json();
+                if (fbData && fbData.status === 'ok' && Array.isArray(fbData.items)) {
+                    data = {
+                        rss: {
+                            channel: {
+                                title: fbData.feed?.title || 'Tro og Liv',
+                                description: fbData.feed?.description || '',
+                                image: { url: fbData.feed?.image || '' },
+                                item: fbData.items.map(item => ({
+                                    title: item.title,
+                                    pubDate: item.pubDate,
+                                    link: item.link,
+                                    description: item.description,
+                                    author: item.author || 'His Kingdom Ministry',
+                                    enclosure: item.enclosure ? { $: { url: item.enclosure.link || item.enclosure } } : null
+                                }))
+                            }
+                        }
+                    };
+                }
+            } catch (fbErr) {
+                console.error('[Podcast] Fallback RSS fetch failed:', fbErr);
+            }
+        }
+
+        if (!data || !data.rss) {
+            throw new Error('Failed to fetch podcast or no items found.');
+        }
         const channel = Array.isArray(data.rss?.channel) ? data.rss.channel[0] : data.rss?.channel;
         const items = channel?.item;
 
