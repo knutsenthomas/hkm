@@ -11037,10 +11037,10 @@ class MinSideManager {
         container.innerHTML = `
         <div class="ms-full-width help-page-container" style="width: 100%; margin: 0 auto; padding-bottom: 30px;">
             <!-- Hero banner -->
-            <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 20px; padding: 28px 32px; color: #fff; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15); display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+            <div class="ms-help-hero">
                 <div>
-                    <h2 style="font-size: 1.5rem; font-weight: 800; margin: 0 0 6px 0; color: #fff;">${isNo ? 'Hjelp & Support' : (isEs ? 'Ayuda y Soporte' : 'Help & Support')}</h2>
-                    <p style="font-size: 0.9rem; color: #94a3b8; margin: 0; max-width: 600px; line-height: 1.5;">${isNo ? 'Finn svar på ofte stilte spørsmål eller send en melding direkte til teamet vårt i His Kingdom Ministry.' : 'Find answers to common questions or send a message directly to our team.'}</p>
+                    <h2 style="font-size: 1.5rem; font-weight: 800; margin: 0 0 6px 0;">${isNo ? 'Hjelp & Support' : (isEs ? 'Ayuda y Soporte' : 'Help & Support')}</h2>
+                    <p style="font-size: 0.9rem; margin: 0; max-width: 600px; line-height: 1.5;">${isNo ? 'Finn svar på ofte stilte spørsmål eller send en melding direkte til teamet vårt i His Kingdom Ministry.' : 'Find answers to common questions or send a message directly to our team.'}</p>
                 </div>
                 <div style="display: flex; gap: 10px;">
                     <a href="https://www.hiskingdomministry.no/kontakt" target="_blank" class="btn btn-primary" style="background: linear-gradient(135deg, #d17d39, #bd4f2a); border: none; border-radius: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; text-decoration: none; color: #fff;">

@@ -6274,3 +6274,42 @@ html[data-theme="dark"] .continue-course-hero .hero-icon-box {
     color: #f97316;
 }
 
+/* Help & Support Hero Banner (Adaptive Light/Dark Mode) */
+.ms-help-hero {
+    background: var(--card-bg, #ffffff);
+    border: 1.5px solid var(--border-solid, #e2e8f0);
+    border-radius: 20px;
+    padding: 28px 32px;
+    color: var(--text-main, #0f172a);
+    margin-bottom: 24px;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.ms-help-hero h2 {
+    color: var(--text-main, #0f172a) !important;
+}
+
+.ms-help-hero p {
+    color: var(--text-muted, #64748b) !important;
+}
+
+html[data-theme="dark"] .ms-help-hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+}
+
+html[data-theme="dark"] .ms-help-hero h2 {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .ms-help-hero p {
+    color: #94a3b8 !important;
+}
+
