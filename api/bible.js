@@ -491,52 +491,53 @@ export default async function handler(req, res) {
   try {
     // 1. GET /api/bible/bibles
     if (pathname === '/api/bible/bibles') {
-      return res.status(200).json({
-        data: [
-          {
-            id: "OPENBIBLE_NB",
-            name: "Open Translation Bible (Norsk Bokmål)",
-            abbreviation: "OTB-NB",
-            language: { id: "nor", name: "Norsk (Bokmål)" }
-          },
-          {
-            id: "DNB",
-            name: "Norsk Bokmål (1930)",
-            abbreviation: "Bokmål 1930",
-            language: { id: "nor", name: "Norsk (Bokmål)" }
-          },
-          {
-            id: "NOR1921",
-            name: "Norsk Nynorsk (1921)",
-            abbreviation: "Nynorsk 1921",
-            language: { id: "nor", name: "Norsk (Nynorsk)" }
-          },
-          {
-            id: "WEB",
-            name: "World English Bible (WEB)",
-            abbreviation: "WEB",
-            language: { id: "eng", name: "English" }
-          },
-          {
-            id: "KJV",
-            name: "King James Version (KJV)",
-            abbreviation: "KJV",
-            language: { id: "eng", name: "English" }
-          },
-          {
-            id: "RV1960",
-            name: "Reina Valera 1960",
-            abbreviation: "RVR1960",
-            language: { id: "spa", name: "Español" }
-          },
-          {
-            id: "NVI",
-            name: "Nueva Versión Internacional",
-            abbreviation: "NVI",
-            language: { id: "spa", name: "Español" }
-          }
-        ]
-      });
+      const defaultBibles = [
+        {
+          id: "OPENBIBLE_NB",
+          name: "Open Translation Bible (Norsk Bokmål)",
+          abbreviation: "OTB-NB",
+          language: { id: "nor", name: "Norsk (Bokmål)" }
+        },
+        {
+          id: "DNB",
+          name: "Norsk Bokmål (1930)",
+          abbreviation: "Bokmål 1930",
+          language: { id: "nor", name: "Norsk (Bokmål)" }
+        },
+        {
+          id: "NOR1921",
+          name: "Norsk Nynorsk (1921)",
+          abbreviation: "Nynorsk 1921",
+          language: { id: "nor", name: "Norsk (Nynorsk)" }
+        },
+        {
+          id: "WEB",
+          name: "World English Bible (WEB)",
+          abbreviation: "WEB",
+          language: { id: "eng", name: "English" }
+        },
+        {
+          id: "KJV",
+          name: "King James Version (KJV)",
+          abbreviation: "KJV",
+          language: { id: "eng", name: "English" }
+        },
+        {
+          id: "RV1960",
+          name: "Reina Valera 1960",
+          abbreviation: "RVR1960",
+          language: { id: "spa", name: "Español" }
+        },
+        {
+          id: "NVI",
+          name: "Nueva Versión Internacional",
+          abbreviation: "NVI",
+          language: { id: "spa", name: "Español" }
+        }
+      ];
+
+      res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=600');
+      return res.status(200).json({ data: defaultBibles });
     }
 
     // 2. GET /api/bible/dictionary
