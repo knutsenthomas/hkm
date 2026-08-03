@@ -2775,6 +2775,33 @@ class MinSideManager {
         const activeTab = this._activeProfileTab || 'my-profile';
 
         container.innerHTML = `
+        <!-- EXECUTIVE PROFILE HERO CARD -->
+        <div class="ms-profile-hero-card">
+            <div class="ms-profile-hero-left">
+                <div class="ms-profile-hero-avatar-wrap">
+                    <div class="ms-profile-hero-avatar" id="ph-hero-avatar"></div>
+                    <button type="button" class="ms-profile-avatar-upload-btn" id="ph-upload-hero-trigger" title="Endre profilbilde">
+                        <span class="material-symbols-outlined">photo_camera</span>
+                    </button>
+                    <input type="file" id="ph-hero-file-input" accept="image/*" style="display: none;">
+                </div>
+                <div class="ms-profile-hero-info">
+                    <h1 class="ms-profile-hero-name">${esc(p.displayName || this.currentUser.displayName || 'Bruker')}</h1>
+                    <div class="ms-profile-hero-email">${esc(this.currentUser.email)}</div>
+                    <div class="ms-profile-hero-badges">
+                        <span class="ms-profile-badge active-member">
+                            <span class="material-symbols-outlined" style="font-size: 14px;">verified</span>
+                            <span>${isNo ? 'Aktivt medlem' : (isEs ? 'Miembro activo' : 'Active member')}</span>
+                        </span>
+                        <span class="ms-profile-badge">
+                            <span class="material-symbols-outlined" style="font-size: 14px;">calendar_today</span>
+                            <span>${isNo ? 'Siden ' : (isEs ? 'Desde ' : 'Since ')}${joinYear}</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="profile-tabs-container">
             <button class="profile-tab-btn ${activeTab === 'my-profile' ? 'active' : ''}" data-profile-tab="my-profile">
                 <span class="material-symbols-outlined profile-tab-icon">person</span>
@@ -2801,7 +2828,7 @@ class MinSideManager {
                     </div>
                     <div class="info-rows">
                         <div class="info-row editable-info-row">
-                            <span class="material-symbols-outlined info-row-icon">badge</span>
+                            <span class="material-symbols-outlined info-row-icon" style="color: #f97316 !important; background: rgba(249, 115, 22, 0.1) !important;">badge</span>
                             <div class="info-row-content">
                                 <div class="info-row-label">${t('profile.fullName')}</div>
                                 <div class="info-row-display">${val(p.displayName || this.currentUser.displayName)}</div>
@@ -2811,14 +2838,14 @@ class MinSideManager {
                             </div>
                         </div>
                         <div class="info-row">
-                            <span class="material-symbols-outlined info-row-icon">mail</span>
+                            <span class="material-symbols-outlined info-row-icon" style="color: #f97316 !important; background: rgba(249, 115, 22, 0.1) !important;">mail</span>
                             <div class="info-row-content">
                                 <div class="info-row-label">${t('profile.email')}</div>
                                 <div class="info-row-display">${val(this.currentUser.email)}</div>
                             </div>
                         </div>
                         <div class="info-row editable-info-row">
-                            <span class="material-symbols-outlined info-row-icon">phone</span>
+                            <span class="material-symbols-outlined info-row-icon" style="color: #f97316 !important; background: rgba(249, 115, 22, 0.1) !important;">phone</span>
                             <div class="info-row-content">
                                 <div class="info-row-label">${t('profile.phone')}</div>
                                 <div class="info-row-display">${val(phoneDisplay)}</div>
@@ -2831,7 +2858,7 @@ class MinSideManager {
                             </div>
                         </div>
                         <div class="info-row editable-info-row">
-                            <span class="material-symbols-outlined info-row-icon">location_on</span>
+                            <span class="material-symbols-outlined info-row-icon" style="color: #f97316 !important; background: rgba(249, 115, 22, 0.1) !important;">location_on</span>
                             <div class="info-row-content">
                                 <div class="info-row-label">${t('profile.address')}</div>
                                 <div class="info-row-display">${p.address || p.zip || p.city || p.country
@@ -2868,7 +2895,7 @@ class MinSideManager {
                     </div>
                     <div class="info-rows">
                         <div class="info-row editable-info-row">
-                            <span class="material-symbols-outlined info-row-icon">person</span>
+                            <span class="material-symbols-outlined info-row-icon" style="color: #0d9488 !important; background: rgba(13, 148, 136, 0.1) !important;">person</span>
                             <div class="info-row-content">
                                 <div class="info-row-label">${t('profile.gender')}</div>
                                 <div class="info-row-display">${val(genderVal)}</div>
@@ -2883,7 +2910,7 @@ class MinSideManager {
                             </div>
                         </div>
                         <div class="info-row editable-info-row">
-                            <span class="material-symbols-outlined info-row-icon">cake</span>
+                            <span class="material-symbols-outlined info-row-icon" style="color: #0d9488 !important; background: rgba(13, 148, 136, 0.1) !important;">cake</span>
                             <div class="info-row-content">
                                 <div class="info-row-label">${t('profile.birthday')}</div>
                                 <div class="info-row-display">${val(p.birthday ? new Date(p.birthday).toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : document.documentElement.lang === 'es' ? 'es-ES' : 'no-NO', { day: 'numeric', month: 'long', year: 'numeric' }) : '')}</div>
@@ -2893,7 +2920,7 @@ class MinSideManager {
                             </div>
                         </div>
                         <div class="info-row editable-info-row">
-                            <span class="material-symbols-outlined info-row-icon">favorite</span>
+                            <span class="material-symbols-outlined info-row-icon" style="color: #0d9488 !important; background: rgba(13, 148, 136, 0.1) !important;">favorite</span>
                             <div class="info-row-content">
                                 <div class="info-row-label">${t('profile.maritalStatus')}</div>
                                 <div class="info-row-display">${val(maritalVal)}</div>
@@ -2910,7 +2937,7 @@ class MinSideManager {
                             </div>
                         </div>
                         <div class="info-row">
-                            <span class="material-symbols-outlined info-row-icon">calendar_today</span>
+                            <span class="material-symbols-outlined info-row-icon" style="color: #0d9488 !important; background: rgba(13, 148, 136, 0.1) !important;">calendar_today</span>
                             <div class="info-row-content">
                                 <div class="info-row-label">${t('profile.memberSince')}</div>
                                 <div class="info-row-display"><span class="info-row-value">${joinYear}</span></div>
@@ -2932,12 +2959,12 @@ class MinSideManager {
                     </div>
                     <div class="info-rows">
                         <div class="info-row">
-                            <span class="material-symbols-outlined info-row-icon">lock_reset</span>
+                            <span class="material-symbols-outlined info-row-icon" style="color: #7c3aed !important; background: rgba(124, 58, 237, 0.1) !important;">lock_reset</span>
                             <div class="info-row-content">
                                 <div class="info-row-label">${isNo ? 'Passord' : (isEs ? 'Contraseña' : 'Password')}</div>
                                 <div class="info-row-display" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 4px;">
-                                    <span class="info-row-value" style="font-size: 0.85rem; color: var(--text-muted);">••••••••••••</span>
-                                    <button type="button" class="btn btn-ghost btn-sm" id="reset-password-btn" style="border-radius: 8px; font-size: 0.78rem;">
+                                    <span class="info-row-value" style="font-weight: 700; letter-spacing: 0.15em;">••••••••••••</span>
+                                    <button type="button" class="btn btn-ghost btn-sm" id="reset-password-btn" style="border-radius: 10px; font-weight: 700;">
                                         <span class="material-symbols-outlined" style="font-size: 16px;">key</span>
                                         <span>${isNo ? 'Endre passord' : (isEs ? 'Cambiar contraseña' : 'Change password')}</span>
                                     </button>
@@ -2946,15 +2973,15 @@ class MinSideManager {
                         </div>
 
                         <div class="info-row">
-                            <span class="material-symbols-outlined info-row-icon">devices</span>
+                            <span class="material-symbols-outlined info-row-icon" style="color: #0284c7 !important; background: rgba(2, 132, 199, 0.1) !important;">devices</span>
                             <div class="info-row-content">
                                 <div class="info-row-label">${isNo ? 'Innlogget enhet & økt' : (isEs ? 'Dispositivo y sesión' : 'Active session & device')}</div>
-                                <div class="info-row-display" style="margin-top: 4px;">
-                                    <div style="font-size: 0.86rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+                                <div class="info-row-display" style="margin-top: 6px;">
+                                    <div style="font-size: 0.88rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
                                         <span class="material-symbols-outlined" style="font-size: 16px; color: #16a34a;">check_circle</span>
                                         <span>${esc(navigator.platform || 'Nettleser')} • ${esc(this.currentUser.providerData[0]?.providerId === 'google.com' ? 'Google Login' : 'E-post')}</span>
                                     </div>
-                                    <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 2px;">
+                                    <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 3px;">
                                         ${isNo ? 'Aktiv sesjon (Sist innlogget: ' : 'Active session (Last sign-in: '}${this.currentUser.metadata?.lastSignInTime ? new Date(this.currentUser.metadata.lastSignInTime).toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : 'no-NO') : 'Akkurat nå'})
                                     </div>
                                 </div>
@@ -2962,17 +2989,21 @@ class MinSideManager {
                         </div>
                     </div>
 
-                    <div class="ms-card-body-pad" style="padding: 16px 20px 18px 20px !important; border-top: 1px solid var(--border-color, #e2e8f0); display: block !important;">
-                        <div style="font-size: 0.78rem; font-weight: 700; color: #ef4444; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;">
-                            ${isNo ? 'Permanentsletting (GDPR)' : 'Permanent account deletion'}
+                    <!-- GDPR Danger Alert Box -->
+                    <div class="ms-security-danger-box">
+                        <div class="ms-security-danger-header">
+                            <span class="material-symbols-outlined">warning</span>
+                            <span>${isNo ? 'Permanentsletting (GDPR)' : 'Permanent account deletion'}</span>
                         </div>
-                        <p class="ms-danger-copy" style="margin-bottom: 12px !important;">
+                        <p class="ms-danger-copy" style="margin: 0 !important; font-size: 0.83rem; line-height: 1.5; color: #475569;">
                             ${t('profile.deleteAccountNotice')}
                         </p>
-                        <button class="btn btn-danger" id="delete-account-btn" style="margin: 0 !important;">
-                            <span class="material-symbols-outlined">delete_forever</span>
-                            ${t('profile.deleteAccountBtn')}
-                        </button>
+                        <div>
+                            <button class="btn btn-danger btn-sm" id="delete-account-btn" style="margin: 0 !important; border-radius: 10px; font-weight: 700;">
+                                <span class="material-symbols-outlined">delete_forever</span>
+                                ${t('profile.deleteAccountBtn')}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -3232,6 +3263,20 @@ class MinSideManager {
 
             </div>
         </div>`;
+
+        // Populate Hero Avatar
+        const heroAvatarEl = container.querySelector('#ph-hero-avatar');
+        if (heroAvatarEl) {
+            this._setAvatarEl(heroAvatarEl, p.photoURL, p.displayName || this.currentUser.displayName);
+        }
+
+        // Wire up Hero Avatar upload
+        container.querySelector('#ph-upload-hero-trigger')?.addEventListener('click', () => {
+            container.querySelector('#ph-hero-file-input')?.click();
+        });
+        container.querySelector('#ph-hero-file-input')?.addEventListener('change', e => {
+            this.handlePhotoUpload(e);
+        });
 
         // Tab switching events
         const tabBtns = container.querySelectorAll('.profile-tab-btn');
