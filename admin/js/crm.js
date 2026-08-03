@@ -110,6 +110,9 @@ class CRMManager {
         const filterContactsBtn = document.getElementById('filter-contacts-btn');
         if (filterContactsBtn) filterContactsBtn.onclick = () => this.openFilterDialog();
 
+        const syncPcoBtn = document.getElementById('sync-pco-btn');
+        if (syncPcoBtn) syncPcoBtn.onclick = () => this.syncAllContactsWithPlanningCenter();
+
         const contactTagFilter = document.getElementById('contact-tag-filter');
         if (contactTagFilter) {
             contactTagFilter.onchange = (e) => {
@@ -3259,6 +3262,60 @@ class CRMManager {
         } catch (error) {
             console.error("Timeline error:", error);
             timelineEl.innerHTML = '<p style="color: red; font-size: 12px;">Kunne ikke laste tidslinje.</p>';
+        }
+    }
+
+    async syncAllContactsWithPlanningCenter() {
+        const btn = document.getElementById('sync-pco-btn');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = `<span class="material-symbols-outlined spin" style="font-size: 18px;">sync</span> Synkroniserer...`;
+        }
+
+        try {
+            // 1. Export local Firestore contacts to Planning Center
+            const contactsToSync = (this.contacts || []).map(c => {
+                const nameStr = (c.name || c.displayName || `${c.firstName || ''} ${c.lastName || ''}`).trim();
+                const nameParts = nameStr.split(' ');
+                return {
+                    firstName: nameParts[0] || 'Medlem',
+                    lastName: nameParts.slice(1).join(' ') || '',
+                    email: c.email || '',
+                    phone: c.phone || c.phoneNumber || ''
+                };
+            }).filter(c => c.firstName || c.email);
+
+            if (contactsToSync.length === 0) {
+                alert('Ingen kontakter funnet i HKM for synkronisering.');
+                return;
+            }
+
+            const syncRes = await fetch('/api/pco-people', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contacts: contactsToSync })
+            });
+
+            const syncData = await syncRes.json();
+            if (!syncRes.ok || !syncData.success) {
+                throw new Error(syncData.error || 'Kunne ikke overføre kontakter til Planning Center');
+            }
+
+            // 2. Fetch people from Planning Center People to check for any new contacts in PCO
+            const getRes = await fetch('/api/pco-people', { method: 'GET' });
+            const getData = await getRes.json();
+            const pcoPeopleCount = getData.count || 0;
+
+            alert(`✅ Synkronisering fullført!\n- ${syncData.syncedCount} av ${contactsToSync.length} HKM-kontakter ble overført/oppdatert i Planning Center People.\n- Det finnes totalt ${pcoPeopleCount} registreringer i din Planning Center-konto.`);
+
+        } catch (err) {
+            console.error('Planning Center sync error:', err);
+            alert(`⚠️ Synkronisering feilet: ${err.message}`);
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px;">cloud_sync</span> <span>Planning Center Synk</span>`;
+            }
         }
     }
 }

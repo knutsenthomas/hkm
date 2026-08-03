@@ -23,92 +23,51 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === 'GET') {
-      const pcoRes = await fetch('https://api.planningcenteronline.com/people/v2/people?per_page=100', {
+      const pcoRes = await fetch('https://api.planningcenteronline.com/people/v2/people?per_page=100&include=emails,phone_numbers', {
         headers: { Authorization: authHeader }
       });
       const data = await pcoRes.json();
       if (!pcoRes.ok) {
         return res.status(pcoRes.status).json({ error: data.errors?.[0]?.detail || 'Planning Center API error', details: data });
       }
-      return res.status(200).json({ success: true, count: data.meta?.total_count || 0, data: data.data || [] });
+      return res.status(200).json({ success: true, count: data.meta?.total_count || 0, data: data.data || [], included: data.included || [] });
     }
 
     if (req.method === 'POST') {
-      const { firstName, lastName, email, phone, note, createFollowupTask } = req.body || {};
+      const body = req.body || {};
+
+      // Handle Bulk Sync Array
+      if (Array.isArray(body.contacts)) {
+        let syncedCount = 0;
+        const results = [];
+        for (const c of body.contacts) {
+          const fn = c.firstName || (c.name ? c.name.split(' ')[0] : 'Medlem');
+          const ln = c.lastName || (c.name ? c.name.split(' ').slice(1).join(' ') : '');
+          try {
+            const syncRes = await createOrSyncPerson(authHeader, {
+              firstName: fn,
+              lastName: ln,
+              email: c.email,
+              phone: c.phone,
+              createFollowupTask: false
+            });
+            if (syncRes.success) syncedCount++;
+            results.push(syncRes);
+          } catch (e) {
+            console.warn('Bulk sync error for item:', c, e);
+          }
+        }
+        return res.status(200).json({ success: true, syncedCount, total: body.contacts.length, results });
+      }
+
+      // Handle Single Contact Sync
+      const { firstName, lastName, email, phone, note, createFollowupTask } = body;
       if (!firstName && !lastName) {
         return res.status(400).json({ error: 'firstName eller lastName er påkrevd.' });
       }
 
-      const pcoRes = await fetch('https://api.planningcenteronline.com/people/v2/people', {
-        method: 'POST',
-        headers: {
-          Authorization: authHeader,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          data: {
-            type: 'Person',
-            attributes: {
-              first_name: firstName || 'Medlem',
-              last_name: lastName || ''
-            }
-          }
-        })
-      });
-
-      const data = await pcoRes.json();
-      if (!pcoRes.ok) {
-        return res.status(pcoRes.status).json({ error: data.errors?.[0]?.detail || 'Kunne ikke opprette person i Planning Center', details: data });
-      }
-
-      const personId = data.data?.id;
-
-      // Add email if provided
-      if (email && personId) {
-        await fetch(`https://api.planningcenteronline.com/people/v2/people/${personId}/emails`, {
-          method: 'POST',
-          headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            data: {
-              type: 'Email',
-              attributes: { address: email, location: 'Home' }
-            }
-          })
-        }).catch(() => {});
-      }
-
-      // Add phone if provided
-      if (phone && personId) {
-        let cleanPhone = String(phone).trim().replace(/[^0-9+]/g, '');
-        if (!cleanPhone.startsWith('+') && cleanPhone.length === 8) {
-          cleanPhone = '+47' + cleanPhone;
-        }
-        await fetch(`https://api.planningcenteronline.com/people/v2/people/${personId}/phone_numbers`, {
-          method: 'POST',
-          headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            data: {
-              type: 'PhoneNumber',
-              attributes: { number: cleanPhone, location: 'Mobile' }
-            }
-          })
-        }).catch(() => {});
-      }
-
-      // Automatically create a Follow-up Workflow Task in Planning Center if requested or by default for new members
-      let taskData = null;
-      if (createFollowupTask !== false && personId) {
-        const workflowId = await ensureWorkflow(authHeader);
-        if (workflowId) {
-          taskData = await createWorkflowCard(authHeader, workflowId, personId, note || `Ny oppfølgingsoppgave for ${firstName} ${lastName}`.trim());
-        }
-      }
-
-      return res.status(200).json({
-        success: true,
-        person: data.data,
-        taskCreated: !!taskData
-      });
+      const syncRes = await createOrSyncPerson(authHeader, { firstName, lastName, email, phone, note, createFollowupTask });
+      return res.status(200).json(syncRes);
     }
 
     return res.status(405).json({ error: 'Method not allowed' });
@@ -116,6 +75,79 @@ export default async function handler(req, res) {
     console.error('Planning Center People API Error:', err);
     return res.status(500).json({ error: err.message || 'Serverfeil ved koble mot Planning Center' });
   }
+}
+
+async function createOrSyncPerson(authHeader, { firstName, lastName, email, phone, note, createFollowupTask }) {
+  const pcoRes = await fetch('https://api.planningcenteronline.com/people/v2/people', {
+    method: 'POST',
+    headers: {
+      Authorization: authHeader,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      data: {
+        type: 'Person',
+        attributes: {
+          first_name: firstName || 'Medlem',
+          last_name: lastName || ''
+        }
+      }
+    })
+  });
+
+  const data = await pcoRes.json();
+  if (!pcoRes.ok) {
+    return { success: false, error: data.errors?.[0]?.detail || 'Kunne ikke opprette person i Planning Center', details: data };
+  }
+
+  const personId = data.data?.id;
+
+  // Add email if provided
+  if (email && personId) {
+    await fetch(`https://api.planningcenteronline.com/people/v2/people/${personId}/emails`, {
+      method: 'POST',
+      headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        data: {
+          type: 'Email',
+          attributes: { address: email, location: 'Home' }
+        }
+      })
+    }).catch(() => {});
+  }
+
+  // Add phone if provided
+  if (phone && personId) {
+    let cleanPhone = String(phone).trim().replace(/[^0-9+]/g, '');
+    if (!cleanPhone.startsWith('+') && cleanPhone.length === 8) {
+      cleanPhone = '+47' + cleanPhone;
+    }
+    await fetch(`https://api.planningcenteronline.com/people/v2/people/${personId}/phone_numbers`, {
+      method: 'POST',
+      headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        data: {
+          type: 'PhoneNumber',
+          attributes: { number: cleanPhone, location: 'Mobile' }
+        }
+      })
+    }).catch(() => {});
+  }
+
+  // Automatically create a Follow-up Workflow Task in Planning Center if requested
+  let taskData = null;
+  if (createFollowupTask !== false && personId) {
+    const workflowId = await ensureWorkflow(authHeader);
+    if (workflowId) {
+      taskData = await createWorkflowCard(authHeader, workflowId, personId, note || `Ny oppfølgingsoppgave for ${firstName} ${lastName}`.trim());
+    }
+  }
+
+  return {
+    success: true,
+    person: data.data,
+    taskCreated: !!taskData
+  };
 }
 
 async function ensureWorkflow(authHeader) {
