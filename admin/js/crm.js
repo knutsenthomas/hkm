@@ -110,6 +110,9 @@ class CRMManager {
         const filterContactsBtn = document.getElementById('filter-contacts-btn');
         if (filterContactsBtn) filterContactsBtn.onclick = () => this.openFilterDialog();
 
+        const syncTextmagicBtn = document.getElementById('sync-textmagic-btn');
+        if (syncTextmagicBtn) syncTextmagicBtn.onclick = () => this.syncAllContactsWithTextMagic();
+
         const contactTagFilter = document.getElementById('contact-tag-filter');
         if (contactTagFilter) {
             contactTagFilter.onchange = (e) => {
@@ -3259,6 +3262,48 @@ class CRMManager {
         } catch (error) {
             console.error("Timeline error:", error);
             timelineEl.innerHTML = '<p style="color: red; font-size: 12px;">Kunne ikke laste tidslinje.</p>';
+        }
+    }
+
+    async syncAllContactsWithTextMagic() {
+        const btn = document.getElementById('sync-textmagic-btn');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = `<span class="material-symbols-outlined spin" style="font-size: 18px;">sync</span> Synkroniserer...`;
+        }
+
+        try {
+            const contactsToSync = (this.contacts || []).filter(c => c.phone || c.phoneNumber).map(c => ({
+                name: c.name || c.displayName || `${c.firstName || ''} ${c.lastName || ''}`.trim(),
+                phone: c.phone || c.phoneNumber,
+                email: c.email || ''
+            }));
+
+            if (contactsToSync.length === 0) {
+                alert('Ingen kontakter har registrert telefonnummer å synkronisere.');
+                return;
+            }
+
+            const res = await fetch('/api/sync-contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contacts: contactsToSync })
+            });
+
+            const data = await res.json();
+            if (res.ok && data.success) {
+                alert(`✅ Synkronisering fullført!\n${data.syncedCount} av ${contactsToSync.length} kontakter ble synkronisert med TextMagic.`);
+            } else {
+                alert(`⚠️ Synkronisering feilet: ${data.error || 'Ukjent feil'}`);
+            }
+        } catch (err) {
+            console.error('TextMagic bulk sync error:', err);
+            alert(`Feil ved kobling til TextMagic: ${err.message}`);
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px;">sms</span> <span>TextMagic Synk</span>`;
+            }
         }
     }
 }

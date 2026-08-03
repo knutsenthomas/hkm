@@ -3568,6 +3568,9 @@ class MinSideManager {
             }
             await firebase.firestore().collection('users').doc(this.currentUser.uid).set(updates, { merge: true });
 
+            // Automatically sync contact with TextMagic in background if phone is provided
+            this._syncTextMagicContact(updates);
+
             badge.innerHTML = `<span class="material-symbols-outlined" style="font-size:16px;">check_circle</span> Endringer lagret i skyen`;
             setTimeout(() => { if (badge) badge.style.opacity = '0'; }, 2500);
         } catch (e) {
@@ -3576,6 +3579,32 @@ class MinSideManager {
         } finally {
             if (btn) { btn.disabled = false; }
         }
+    }
+
+    _syncTextMagicContact(data = {}) {
+        const rawPhone = data.phone || this.profileData?.phone;
+        if (!rawPhone) return;
+
+        const countryCode = data.phoneCountryCode || this.profileData?.phoneCountryCode || '+47';
+        const fullPhone = String(rawPhone).startsWith('+') ? rawPhone : `${countryCode} ${rawPhone}`;
+        const name = data.displayName || this.profileData?.displayName || this.currentUser?.displayName || '';
+        const email = data.email || this.profileData?.email || this.currentUser?.email || '';
+
+        fetch('/api/sync-contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: name,
+                phone: fullPhone,
+                email: email
+            })
+        }).then(res => res.json())
+          .then(resData => {
+              if (window.hkmLogger) window.hkmLogger.log('TextMagic kontakt synkronisert:', resData);
+          })
+          .catch(err => {
+              console.warn('TextMagic synk feilet (bakgrunn):', err);
+          });
     }
 
     _wireAddressAutocomplete() {
