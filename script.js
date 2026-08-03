@@ -3027,6 +3027,16 @@ window.addEventListener('load', () => {
 	                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
 	                });
 
+	                // Instant notification to Pushbullet on Android
+	                fetch('/api/send-pushbullet', {
+	                    method: 'POST',
+	                    headers: { 'Content-Type': 'application/json' },
+	                    body: JSON.stringify({
+	                        title: `💬 Chatmelding fra ${name}`,
+	                        body: `Melding: ${message}\nE-post: ${email}${phone ? '\nTlf: ' + phone : ''}`
+	                    })
+	                }).catch(err => console.warn('Pushbullet notification error:', err));
+
 	                // Best-effort Google Form (backup log)
 	                const FIELD_MAP = {
 	                    name: 'entry.599509457',
@@ -3707,6 +3717,16 @@ window.addEventListener('load', () => {
                         targetMode: 'google_chat',
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
+
+                    // Pushbullet notification to Android phone
+                    fetch('/api/send-pushbullet', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            title: '⚠ Menneskelig hjelp forespurt!',
+                            body: `En besøkende på HKM-nettsiden ønsker å snakke i chatten akkurat nå.\nSide: ${window.location.pathname}`
+                        })
+                    }).catch(() => {});
                     
                     addSystemMessage('En veileder er varslet og vil svare deg her i chatten om kort tid.');
                 } catch (error) {
