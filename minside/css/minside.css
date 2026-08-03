@@ -1282,13 +1282,13 @@ html[data-theme="dark"] .member-row:hover {
 .ms-notifications-container .activity-item {
     display: flex;
     align-items: flex-start;
-    gap: 14px;
-    padding: 16px 20px;
-    background: var(--card-bg);
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    margin-bottom: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+    gap: 16px;
+    padding: 18px 22px;
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-solid, #e2e8f0);
+    border-radius: 20px;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 16px -4px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
     overflow: hidden;
@@ -1297,83 +1297,91 @@ html[data-theme="dark"] .member-row:hover {
 }
 
 .ms-notifications-container .activity-item:hover {
-    box-shadow: 0 12px 25px -5px rgba(209, 125, 57, 0.08), 0 8px 10px -6px rgba(209, 125, 57, 0.08);
-    border-color: rgba(209, 125, 57, 0.25);
+    box-shadow: 0 12px 28px -6px rgba(209, 125, 57, 0.12), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
+    border-color: rgba(209, 125, 57, 0.35);
     transform: translateY(-2px);
 }
 
-/* Checkbox Wrapper */
+/* Unread Notification Styling */
+.ms-notifications-container .activity-item.unread {
+    border-left: 4px solid var(--accent-color, #d17d39);
+    background: linear-gradient(135deg, #fffcf9 0%, #ffffff 100%);
+    box-shadow: 0 4px 16px -2px rgba(209, 125, 57, 0.08);
+}
+
+/* Left Side Group (Checkbox + Icon) */
+.ms-notifications-container .notif-left-side {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
 .ms-notifications-container .notif-cb-wrap {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 40px;
+    height: 42px;
     flex-shrink: 0;
 }
 
 .ms-notifications-container .notif-item-cb {
-    width: 18px;
-    height: 18px;
+    width: 19px;
+    height: 19px;
+    border-radius: 6px;
     cursor: pointer;
-    accent-color: var(--accent-color);
+    accent-color: var(--accent-color, #d17d39);
+    transition: transform 0.15s ease;
 }
 
-/* Unread Activity Card Styling */
-.ms-notifications-container .activity-item.unread {
-    border-left: 4px solid var(--accent-color);
-    background: linear-gradient(90deg, #fffcf9 0%, #ffffff 100%);
-    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.03);
+.ms-notifications-container .notif-item-cb:hover {
+    transform: scale(1.1);
 }
 
-/* Modern Icons Backing system */
+/* Icon Badges */
 .ms-notifications-container .activity-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
     transition: all 0.25s ease;
-    background: var(--activity-icon-bg, var(--main-bg));
+    background: var(--activity-icon-bg, #f8fafc);
 }
 
 .ms-notifications-container .activity-icon .material-symbols-outlined {
-    font-size: 20px;
+    font-size: 21px;
     color: var(--activity-icon-color, #475569);
 }
 
-.ms-notifications-container .activity-icon-tone-push {
-    --activity-icon-bg: rgba(209, 125, 57, 0.08);
+.ms-notifications-container .activity-icon-tone-reading,
+.ms-notifications-container .activity-icon-tone-push,
+.ms-notifications-container .activity-icon-tone-notif-unread {
+    --activity-icon-bg: rgba(209, 125, 57, 0.1);
     --activity-icon-color: #d17d39;
 }
 
 .ms-notifications-container .activity-icon-tone-message {
-    --activity-icon-bg: rgba(13, 148, 136, 0.08);
+    --activity-icon-bg: rgba(13, 148, 136, 0.1);
     --activity-icon-color: #0d9488;
 }
 
 .ms-notifications-container .activity-icon-tone-default {
-    --activity-icon-bg: rgba(124, 58, 237, 0.08);
+    --activity-icon-bg: rgba(124, 58, 237, 0.1);
     --activity-icon-color: #7c3aed;
 }
 
-.ms-notifications-container .activity-icon-tone-notif-unread {
-    --activity-icon-bg: rgba(209, 125, 57, 0.08);
-    --activity-icon-color: #d17d39;
-}
-
 .ms-notifications-container .activity-icon-tone-notif-read {
-    --activity-icon-bg: var(--main-bg);
-    --activity-icon-color: #475569;
+    --activity-icon-bg: #f1f5f9;
+    --activity-icon-color: #64748b;
 }
 
-/* Refined Text Typography inside Card */
+/* Main Content Column */
 .ms-notifications-container .activity-content {
     flex: 1;
     min-width: 0;
-    word-break: break-word;
-    overflow-wrap: anywhere;
 }
 
 .ms-notifications-container .activity-header-row {
@@ -1384,17 +1392,57 @@ html[data-theme="dark"] .member-row:hover {
     width: 100%;
 }
 
-.ms-notifications-container .activity-title {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--text-main, #1e293b);
-    line-height: 1.35;
-    letter-spacing: -0.01em;
+.ms-notifications-container .activity-title-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
     flex: 1;
     min-width: 0;
+}
+
+/* Category Pill / Tag */
+.ms-notifications-container .notif-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border-radius: 99px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.ms-notifications-container .notif-tag-reading,
+.ms-notifications-container .notif-tag-push {
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid rgba(249, 115, 22, 0.2);
+}
+
+.ms-notifications-container .notif-tag-message {
+    background: #f0fdf4;
+    color: #15803d;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.ms-notifications-container .notif-tag-default {
+    background: #f5f3ff;
+    color: #6d28d9;
+    border: 1px solid rgba(124, 58, 237, 0.2);
+}
+
+.ms-notifications-container .activity-title {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--text-main, #0f172a);
+    line-height: 1.35;
+    margin: 0;
     word-break: break-word;
 }
 
+/* Right Section & Action Capsule */
 .ms-notifications-container .activity-right-section {
     display: flex;
     align-items: center;
@@ -1404,130 +1452,174 @@ html[data-theme="dark"] .member-row:hover {
 
 .ms-notifications-container .notif-actions {
     display: flex;
-    gap: 4px;
     align-items: center;
+    gap: 2px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 3px;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.ms-notifications-container .activity-item:hover .notif-actions {
+    background: #ffffff;
+    border-color: #cbd5e1;
 }
 
 .ms-notifications-container .btn-archive-notif,
 .ms-notifications-container .btn-delete-notif {
     background: transparent;
     border: none;
-    color: var(--text-muted);
+    color: #64748b;
     cursor: pointer;
-    padding: 6px;
-    border-radius: 10px;
+    border-radius: 8px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
-    min-height: 36px;
-    transition: background-color 0.2s, color 0.2s, transform 0.15s;
+    width: 32px;
+    height: 32px;
+    transition: all 0.2s ease;
 }
 
 .ms-notifications-container .btn-archive-notif:hover {
-    background: rgba(148, 163, 184, 0.12);
-    color: var(--text-main);
+    background: #f1f5f9;
+    color: #0f172a;
 }
 
 .ms-notifications-container .btn-delete-notif:hover {
-    background: rgba(239, 68, 68, 0.12);
+    background: #fef2f2;
     color: #ef4444;
 }
 
 .ms-notifications-container .btn-archive-notif:active,
 .ms-notifications-container .btn-delete-notif:active {
-    transform: scale(0.95);
+    transform: scale(0.92);
 }
 
 .ms-notifications-container .btn-archive-notif .material-symbols-outlined,
 .ms-notifications-container .btn-delete-notif .material-symbols-outlined {
     font-size: 18px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    line-height: 1 !important;
-    margin: 0 !important;
 }
 
+/* Body Text */
 .ms-notifications-container .activity-body {
-    font-size: 0.85rem;
-    color: var(--text-muted, #475569);
-    line-height: 1.5;
-    margin-top: 4px;
-    margin-bottom: 6px;
+    font-size: 0.88rem;
+    color: #475569;
+    line-height: 1.55;
+    margin-top: 6px;
+    margin-bottom: 8px;
     word-break: break-word;
 }
 
-.ms-notifications-container .activity-time {
-    font-size: 0.75rem;
-    color: #94a3b8;
-    font-weight: 500;
-    margin-top: 2px;
+/* Footer Row & Time */
+.ms-notifications-container .activity-footer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 4px;
 }
 
-/* Pulsing Unread Dot Indicator */
+.ms-notifications-container .activity-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.76rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.ms-notifications-container .activity-time .material-symbols-outlined {
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+.ms-notifications-container .notif-link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--accent-color, #d17d39);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.ms-notifications-container .notif-link-btn:hover {
+    color: #b45309;
+    transform: translateX(2px);
+}
+
+.ms-notifications-container .notif-link-btn .material-symbols-outlined {
+    font-size: 14px;
+}
+
+/* Unread Pulse Dot */
 .ms-notifications-container .ms-unread-dot {
-    width: 10px;
-    height: 10px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
-    background: var(--accent-color);
+    background: var(--accent-color, #d17d39);
     box-shadow: 0 0 0 3px rgba(209, 125, 57, 0.2);
     animation: hkm-unread-pulse-orange 2s infinite;
     flex-shrink: 0;
-    margin-left: 4px;
-    align-self: center;
 }
 
+/* Mobile Responsive Optimization */
 @media (max-width: 640px) {
     .ms-notifications-container .activity-item {
-        padding: 12px 14px;
+        padding: 14px 14px;
         gap: 10px;
-        border-radius: 14px;
+        border-radius: 16px;
     }
-    
+
+    .ms-notifications-container .notif-left-side {
+        gap: 8px;
+    }
+
     .ms-notifications-container .notif-cb-wrap {
         height: 36px;
     }
-    
+
     .ms-notifications-container .activity-icon {
         width: 36px;
         height: 36px;
-        border-radius: 10px;
+        border-radius: 12px;
     }
-    
+
     .ms-notifications-container .activity-icon .material-symbols-outlined {
-        font-size: 18px;
+        font-size: 19px;
     }
-    
+
     .ms-notifications-container .activity-header-row {
         gap: 8px;
     }
-    
+
     .ms-notifications-container .activity-title {
-        font-size: 0.9rem;
+        font-size: 0.92rem;
     }
-    
+
     .ms-notifications-container .activity-body {
-        font-size: 0.82rem;
-        margin-top: 3px;
-        line-height: 1.45;
+        font-size: 0.84rem;
+        margin-top: 5px;
+        line-height: 1.48;
     }
-    
-    .ms-notifications-container .btn-archive-notif,
-    .ms-notifications-container .btn-delete-notif {
-        width: 40px;
-        height: 40px;
-        min-width: 40px;
-        min-height: 40px;
-        padding: 8px;
+
+    .ms-notifications-container .notif-actions {
+        padding: 2px;
         border-radius: 10px;
     }
-    
+
+    .ms-notifications-container .btn-archive-notif,
+    .ms-notifications-container .btn-delete-notif {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+    }
+
     .ms-notifications-container .btn-archive-notif .material-symbols-outlined,
     .ms-notifications-container .btn-delete-notif .material-symbols-outlined {
-        font-size: 20px !important;
+        font-size: 18px !important;
     }
 }
 

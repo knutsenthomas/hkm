@@ -4354,20 +4354,40 @@ class MinSideManager {
 
         const inner = container.querySelector('#notifs-inner');
 
-        const getNotifIcon = (n) => {
-                if (n.isReading || n.type === 'reading') {
-                    return { icon: 'auto_stories', cls: 'activity-icon-tone-push' };
-                }
-                if (n.type === 'message') {
-                    return { icon: 'mail', cls: 'activity-icon-tone-message' };
-                }
-                if (n.type === 'push') {
-                    return { icon: 'campaign', cls: 'activity-icon-tone-push' };
-                }
-                return { icon: 'notifications', cls: 'activity-icon-tone-default' };
+        const getNotifMeta = (n) => {
+            if (n.isReading || n.type === 'reading') {
+                return { 
+                    icon: 'auto_stories', 
+                    cls: 'activity-icon-tone-reading',
+                    tag: isNo ? 'Leseplan' : (isEs ? 'Plan de lectura' : 'Reading Plan'),
+                    tagCls: 'notif-tag-reading'
+                };
+            }
+            if (n.type === 'message') {
+                return { 
+                    icon: 'mail', 
+                    cls: 'activity-icon-tone-message',
+                    tag: isNo ? 'Melding' : (isEs ? 'Mensaje' : 'Message'),
+                    tagCls: 'notif-tag-message'
+                };
+            }
+            if (n.type === 'push') {
+                return { 
+                    icon: 'campaign', 
+                    cls: 'activity-icon-tone-push',
+                    tag: isNo ? 'Kunngjøring' : (isEs ? 'Anuncio' : 'Announcement'),
+                    tagCls: 'notif-tag-push'
+                };
+            }
+            return { 
+                icon: 'notifications', 
+                cls: 'activity-icon-tone-default',
+                tag: isNo ? 'Varsel' : (isEs ? 'Aviso' : 'Notice'),
+                tagCls: 'notif-tag-default'
             };
+        };
 
-            const renderList = (allItems) => {
+        const renderList = (allItems) => {
             let items = allItems;
             
             if (activeFilter === 'archived') {
@@ -4393,8 +4413,8 @@ class MinSideManager {
 
             inner.innerHTML = items.map(n => {
                 const date = n.createdAt?.toDate ? n.createdAt.toDate() : new Date(0);
-                const m = getNotifIcon(n);
-                const iconCls = !n.read ? 'activity-icon-tone-notif-unread' : m.cls;
+                const meta = getNotifMeta(n);
+                const iconCls = !n.read ? 'activity-icon-tone-notif-unread' : meta.cls;
                 
                 const archiveIcon = n.archived ? 'unarchive' : 'archive';
                 const archiveTitle = n.archived 
@@ -4403,17 +4423,24 @@ class MinSideManager {
                 const deleteTitle = isNo ? 'Slett permanent' : (isEs ? 'Eliminar permanentemente' : 'Delete permanently');
 
                 return `<div class="activity-item${!n.read ? ' unread' : ''}" data-id="${n.id}">
-                    <div class="notif-cb-wrap" onclick="event.stopPropagation();">
-                        <input type="checkbox" class="notif-item-cb" data-id="${n.id}">
+                    <div class="notif-left-side">
+                        <div class="notif-cb-wrap" onclick="event.stopPropagation();">
+                            <input type="checkbox" class="notif-item-cb" data-id="${n.id}">
+                        </div>
+                        <div class="activity-icon ${iconCls}">
+                            <span class="material-symbols-outlined">${meta.icon}</span>
+                        </div>
                     </div>
-                    <div class="activity-icon ${iconCls}">
-                        <span class="material-symbols-outlined">${m.icon}</span>
-                    </div>
+                    
                     <div class="activity-content">
                         <div class="activity-header-row">
-                            <div class="activity-title">${this._escapeHtml(n.title)}</div>
+                            <div class="activity-title-group">
+                                <span class="notif-tag ${meta.tagCls}">${meta.tag}</span>
+                                <h4 class="activity-title">${this._escapeHtml(n.title)}</h4>
+                            </div>
+                            
                             <div class="activity-right-section">
-                                ${!n.read ? `<div class="ms-unread-dot"></div>` : ''}
+                                ${!n.read ? `<div class="ms-unread-dot" title="${isNo ? 'Ulest' : 'Unread'}"></div>` : ''}
                                 <div class="notif-actions">
                                     <button type="button" class="btn-archive-notif" data-id="${n.id}" title="${archiveTitle}">
                                         <span class="material-symbols-outlined">${archiveIcon}</span>
@@ -4424,8 +4451,16 @@ class MinSideManager {
                                 </div>
                             </div>
                         </div>
+                        
                         ${n.body ? `<div class="activity-body">${this._escapeHtml(n.body)}</div>` : ''}
-                        <div class="activity-time">${this._timeAgo(date)}</div>
+                        
+                        <div class="activity-footer-row">
+                            <div class="activity-time">
+                                <span class="material-symbols-outlined">schedule</span>
+                                <span>${this._timeAgo(date)}</span>
+                            </div>
+                            ${n.link ? `<a href="${this._escapeHtml(n.link)}" class="notif-link-btn" onclick="event.stopPropagation();">${isNo ? 'Åpne lenke' : (isEs ? 'Abrir enlace' : 'Open link')} <span class="material-symbols-outlined">arrow_forward</span></a>` : ''}
+                        </div>
                     </div>
                 </div>`;
             }).join('');
