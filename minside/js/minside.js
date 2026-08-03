@@ -5410,6 +5410,10 @@ class MinSideManager {
             <head>
                 <title>${title} - His Kingdom Ministry</title>
                 <style>
+                    @page {
+                        margin: 12mm;
+                        size: auto;
+                    }
                     body {
                         font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
                         color: #1e293b;
