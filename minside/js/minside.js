@@ -2092,18 +2092,33 @@ class MinSideManager {
         <div class="ms-overview-wrap">
 
             <!-- Welcome banner -->
-            <div class="ms-overview-banner">
-                <div>
+            <div class="ms-overview-banner" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 0;">
                     <h2 class="ms-overview-banner-title">
                         ${greeting}, ${name}! 👋
                     </h2>
-                    <p class="ms-overview-banner-quote">
-                        ${this._getDailyVerse(document.documentElement.lang || 'no')}
-                    </p>
+                    <div style="display: flex; align-items: flex-start; gap: 8px; margin-top: 6px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: var(--accent-color, #d17d39); flex-shrink: 0; margin-top: 2px;">format_quote</span>
+                        <p class="ms-overview-banner-quote" style="margin: 0; line-height: 1.45;">
+                            ${this._getDailyVerse(document.documentElement.lang || 'no')}
+                        </p>
+                    </div>
                 </div>
-                <div class="ms-overview-banner-chip">
-                    <div class="ms-overview-banner-chip-label">${t('overview.memberSince')}</div>
-                    <div class="ms-overview-banner-chip-value" id="ov-member-since">—</div>
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0;">
+                    <div class="ms-overview-banner-chip">
+                        <div class="ms-overview-banner-chip-label">${t('overview.memberSince')}</div>
+                        <div class="ms-overview-banner-chip-value" id="ov-member-since">—</div>
+                    </div>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                        <button type="button" class="btn btn-ghost btn-sm ov-action-btn" data-view="reading-plans" style="font-size: 0.78rem; border-radius: 99px; background: rgba(255,255,255,0.7); backdrop-filter: blur(4px); padding: 5px 12px; height: 30px;">
+                            <span class="material-symbols-outlined" style="font-size: 15px;">auto_stories</span>
+                            <span>Leseplaner</span>
+                        </button>
+                        <button type="button" class="btn btn-ghost btn-sm ov-action-btn" data-view="notes" style="font-size: 0.78rem; border-radius: 99px; background: rgba(255,255,255,0.7); backdrop-filter: blur(4px); padding: 5px 12px; height: 30px;">
+                            <span class="material-symbols-outlined" style="font-size: 15px;">edit_note</span>
+                            <span>Notater</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -5164,6 +5179,27 @@ class MinSideManager {
 
         container.innerHTML = `
         <div>
+            <!-- Recurring Donation / Fast Giveravtale Promo Banner -->
+            <div style="background: linear-gradient(135deg, #fffcf9 0%, #ffffff 100%); border: 1px solid rgba(209, 125, 57, 0.25); border-radius: 20px; padding: 20px 24px; margin-bottom: 20px; box-shadow: 0 4px 16px -4px rgba(209, 125, 57, 0.08); display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(209, 125, 57, 0.1); color: var(--accent-color, #d17d39); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <span class="material-symbols-outlined" style="font-size: 22px;">sync</span>
+                    </div>
+                    <div>
+                        <h4 style="font-size: 1rem; font-weight: 700; color: var(--text-main, #0f172a); margin: 0 0 2px 0;">
+                            ${isNo ? 'Fast månedlig giveravtale' : (isEs ? 'Donación mensual recurrente' : 'Monthly recurring donation')}
+                        </h4>
+                        <p style="font-size: 0.84rem; color: var(--text-muted, #475569); margin: 0; line-height: 1.4;">
+                            ${isNo ? 'Støtt His Kingdom Ministry fast hver måned via Vipps eller kort.' : 'Support His Kingdom Ministry monthly via Vipps or card.'}
+                        </p>
+                    </div>
+                </div>
+                <a href="/bli-fast-giver.html" class="btn btn-primary" style="background: linear-gradient(135deg, #d17d39, #bd4f2a); border: none; border-radius: 10px; font-weight: 700; text-decoration: none; color: #fff; display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; font-size: 0.85rem;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">favorite</span>
+                    <span>${isNo ? 'Bli Fastgiver' : 'Become a Supporter'}</span>
+                </a>
+            </div>
+
             <div class="giving-stats">
                 <!-- Gitt i år -->
                 <div class="stat-chip bento-orange">
