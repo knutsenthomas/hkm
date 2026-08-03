@@ -1,4 +1,4 @@
-export const maxDuration = 60; // Set Vercel serverless timeout to 60s
+export const maxDuration = 60; // Allow Vercel serverless function up to 60s
 
 export default async function handler(req, res) {
   // CORS headers
@@ -25,7 +25,7 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === 'GET') {
-      const pcoRes = await fetch('https://api.planningcenteronline.com/people/v2/people?per_page=100&include=emails,phone_numbers', {
+      const pcoRes = await fetchPCO('https://api.planningcenteronline.com/people/v2/people?per_page=100&include=emails,phone_numbers', {
         headers: { Authorization: authHeader }
       });
       const data = await pcoRes.json();
@@ -48,32 +48,25 @@ export default async function handler(req, res) {
         let syncedCount = 0;
         const results = [];
 
-        // Process batch with concurreny limit of 4 to stay well within PCO rate limits and Vercel execution window
-        const batchSize = 4;
-        for (let i = 0; i < body.contacts.length; i += batchSize) {
-          const chunk = body.contacts.slice(i, i + batchSize);
-          const chunkPromises = chunk.map(async (c) => {
-            const fn = c.firstName || (c.name ? c.name.split(' ')[0] : 'Medlem');
-            const ln = c.lastName || (c.name ? c.name.split(' ').slice(1).join(' ') : '');
-            try {
-              return await createOrSyncPerson(authHeader, {
-                firstName: fn,
-                lastName: ln,
-                email: c.email,
-                phone: c.phone,
-                createFollowupTask: false
-              });
-            } catch (e) {
-              console.warn('Bulk sync item error:', c, e);
-              return { success: false, error: e.message };
-            }
-          });
-
-          const chunkResults = await Promise.all(chunkPromises);
-          chunkResults.forEach((resItem) => {
-            if (resItem && resItem.success) syncedCount++;
-            results.push(resItem);
-          });
+        for (const c of body.contacts) {
+          const fn = c.firstName || (c.name ? c.name.split(' ')[0] : 'Medlem');
+          const ln = c.lastName || (c.name ? c.name.split(' ').slice(1).join(' ') : '');
+          try {
+            const syncRes = await createOrSyncPerson(authHeader, {
+              firstName: fn,
+              lastName: ln,
+              email: c.email,
+              phone: c.phone,
+              createFollowupTask: false
+            });
+            if (syncRes && syncRes.success) syncedCount++;
+            results.push(syncRes);
+          } catch (e) {
+            console.warn('Bulk sync item error:', c, e);
+            results.push({ success: false, error: e.message });
+          }
+          // Small 150ms delay between items to respect Planning Center rate limits
+          await new Promise(resolve => setTimeout(resolve, 150));
         }
 
         return res.status(200).json({ success: true, syncedCount, total: body.contacts.length, results });
@@ -96,8 +89,24 @@ export default async function handler(req, res) {
   }
 }
 
+// Robust fetch helper with automatic 429 Rate Limit retries
+async function fetchPCO(url, options, retries = 4) {
+  for (let attempt = 0; attempt < retries; attempt++) {
+    const res = await fetch(url, options);
+    if (res.status === 429) {
+      const retryHeader = res.headers.get('retry-after');
+      const waitMs = retryHeader ? parseInt(retryHeader, 10) * 1000 + 800 : 2500;
+      console.warn(`PCO API Rate Limit 429 hit. Retrying in ${waitMs}ms (Attempt ${attempt + 1}/${retries})...`);
+      await new Promise(r => setTimeout(r, waitMs));
+      continue;
+    }
+    return res;
+  }
+  return await fetch(url, options);
+}
+
 async function createOrSyncPerson(authHeader, { firstName, lastName, email, phone, note, createFollowupTask }) {
-  const pcoRes = await fetch('https://api.planningcenteronline.com/people/v2/people', {
+  const pcoRes = await fetchPCO('https://api.planningcenteronline.com/people/v2/people', {
     method: 'POST',
     headers: {
       Authorization: authHeader,
@@ -120,22 +129,19 @@ async function createOrSyncPerson(authHeader, { firstName, lastName, email, phon
   }
 
   const personId = data.data?.id;
-  const childRequests = [];
 
   // Add email if provided
   if (email && personId) {
-    childRequests.push(
-      fetch(`https://api.planningcenteronline.com/people/v2/people/${personId}/emails`, {
-        method: 'POST',
-        headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          data: {
-            type: 'Email',
-            attributes: { address: email, location: 'Home' }
-          }
-        })
-      }).catch(() => {})
-    );
+    await fetchPCO(`https://api.planningcenteronline.com/people/v2/people/${personId}/emails`, {
+      method: 'POST',
+      headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        data: {
+          type: 'Email',
+          attributes: { address: email, location: 'Home' }
+        }
+      })
+    }).catch(() => {});
   }
 
   // Add phone if provided
@@ -144,22 +150,16 @@ async function createOrSyncPerson(authHeader, { firstName, lastName, email, phon
     if (!cleanPhone.startsWith('+') && cleanPhone.length === 8) {
       cleanPhone = '+47' + cleanPhone;
     }
-    childRequests.push(
-      fetch(`https://api.planningcenteronline.com/people/v2/people/${personId}/phone_numbers`, {
-        method: 'POST',
-        headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          data: {
-            type: 'PhoneNumber',
-            attributes: { number: cleanPhone, location: 'Mobile' }
-          }
-        })
-      }).catch(() => {})
-    );
-  }
-
-  if (childRequests.length > 0) {
-    await Promise.all(childRequests);
+    await fetchPCO(`https://api.planningcenteronline.com/people/v2/people/${personId}/phone_numbers`, {
+      method: 'POST',
+      headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        data: {
+          type: 'PhoneNumber',
+          attributes: { number: cleanPhone, location: 'Mobile' }
+        }
+      })
+    }).catch(() => {});
   }
 
   // Automatically create a Follow-up Workflow Task in Planning Center if requested
@@ -180,7 +180,7 @@ async function createOrSyncPerson(authHeader, { firstName, lastName, email, phon
 
 async function ensureWorkflow(authHeader) {
   try {
-    const listRes = await fetch('https://api.planningcenteronline.com/people/v2/workflows', {
+    const listRes = await fetchPCO('https://api.planningcenteronline.com/people/v2/workflows', {
       headers: { Authorization: authHeader }
     });
     const listData = await listRes.json();
@@ -188,7 +188,7 @@ async function ensureWorkflow(authHeader) {
     
     if (wf) return wf.id;
 
-    const createRes = await fetch('https://api.planningcenteronline.com/people/v2/workflows', {
+    const createRes = await fetchPCO('https://api.planningcenteronline.com/people/v2/workflows', {
       method: 'POST',
       headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -211,7 +211,7 @@ async function ensureWorkflow(authHeader) {
 async function createWorkflowCard(authHeader, workflowId, personId, note = '') {
   if (!workflowId || !personId) return null;
   try {
-    const cardRes = await fetch(`https://api.planningcenteronline.com/people/v2/workflows/${workflowId}/cards`, {
+    const cardRes = await fetchPCO(`https://api.planningcenteronline.com/people/v2/workflows/${workflowId}/cards`, {
       method: 'POST',
       headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
       body: JSON.stringify({

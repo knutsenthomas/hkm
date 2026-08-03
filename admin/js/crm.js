@@ -3291,7 +3291,7 @@ class CRMManager {
             }
 
             let totalSynced = 0;
-            const batchSize = 15;
+            const batchSize = 5;
 
             for (let i = 0; i < contactsToSync.length; i += batchSize) {
                 const batch = contactsToSync.slice(i, i + batchSize);
@@ -3299,15 +3299,24 @@ class CRMManager {
                     btn.innerHTML = `<span class="material-symbols-outlined spin" style="font-size: 18px;">sync</span> Synk (${Math.min(i + batchSize, contactsToSync.length)}/${contactsToSync.length})...`;
                 }
 
-                const syncRes = await fetch('/api/pco-people', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contacts: batch })
-                });
+                try {
+                    const syncRes = await fetch('/api/pco-people', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contacts: batch })
+                    });
 
-                const syncData = await syncRes.json();
-                if (syncRes.ok && syncData.success) {
-                    totalSynced += (syncData.syncedCount || 0);
+                    const syncData = await syncRes.json();
+                    if (syncRes.ok && syncData.success) {
+                        totalSynced += (syncData.syncedCount || 0);
+                    }
+                } catch (e) {
+                    console.warn('PCO batch sync warning:', e);
+                }
+
+                // Pause 1.2s between batches to stay well under Planning Center's 100 req / 20s rate limit
+                if (i + batchSize < contactsToSync.length) {
+                    await new Promise(resolve => setTimeout(resolve, 1200));
                 }
             }
 
