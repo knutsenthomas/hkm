@@ -37,10 +37,17 @@ export default async function handler(req, res) {
       });
       const signupsData = await signupsRes.json();
 
+      // 3. Fetch Attendees / Registrations from Planning Center Registrations
+      const attendeesRes = await fetchPCO('https://api.planningcenteronline.com/registrations/v2/attendees', {
+        headers: { Authorization: authHeader }
+      });
+      const attendeesData = await attendeesRes.json();
+
       return res.status(200).json({
         success: true,
         groups: groupsData.data || [],
-        pcoSignups: signupsData.data || []
+        pcoSignups: signupsData.data || [],
+        pcoAttendees: attendeesData.data || []
       });
     }
 
@@ -73,11 +80,15 @@ export default async function handler(req, res) {
         taskData = await createWorkflowCard(authHeader, workflowId, personId, `Påmelding til kurs: "${courseName}"`);
       }
 
+      // 4. Register in Planning Center Registrations (Signups) if signup event exists
+      const pcoSignup = await findOrCreatePCOSignup(authHeader, courseName);
+
       return res.status(200).json({
         success: true,
         course: courseName,
         personId,
         groupId,
+        pcoSignupId: pcoSignup?.id || null,
         addedToGroup: !!membershipData,
         taskCreated: !!taskData
       });
@@ -283,6 +294,20 @@ async function createWorkflowCard(authHeader, workflowId, personId, note = '') {
     });
     return await cardRes.json();
   } catch (err) {
+    return null;
+  }
+}
+
+async function findOrCreatePCOSignup(authHeader, courseName) {
+  try {
+    const listRes = await fetchPCO('https://api.planningcenteronline.com/registrations/v2/signups', {
+      headers: { Authorization: authHeader }
+    });
+    const listData = await listRes.json();
+    let signup = (listData.data || []).find(s => s.attributes?.name?.toLowerCase() === courseName.toLowerCase());
+    return signup || null;
+  } catch (err) {
+    console.warn('PCO Registrations Signup lookup error:', err);
     return null;
   }
 }
