@@ -960,15 +960,34 @@ class FirebaseService {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
         await this.ensureAuthPersistence();
         const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+
+        const isMobile = typeof navigator !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent || '');
+
+        // Mobile browsers (Safari/Chrome on iOS/Android) block popups or fail in webviews.
+        // Use signInWithRedirect for mobile devices or when explicitly requested.
+        if (isMobile || options.useRedirect) {
+            console.log("[FirebaseService] Mobile device or useRedirect -> using signInWithRedirect");
+            await this.auth.signInWithRedirect(provider);
+            return null;
+        }
+
         try {
             return await this.auth.signInWithPopup(provider);
         } catch (error) {
+            console.warn("[FirebaseService] signInWithPopup error:", error?.code, error?.message);
+
             const redirectFallbackCodes = new Set([
-                'auth/operation-not-supported-in-this-environment'
+                'auth/operation-not-supported-in-this-environment',
+                'auth/popup-blocked',
+                'auth/popup-closed-by-user',
+                'auth/cancelled-popup-request',
+                'auth/internal-error'
             ]);
 
-            if (options.redirectFallback && redirectFallbackCodes.has(error?.code)) {
+            if (options.redirectFallback || redirectFallbackCodes.has(error?.code)) {
                 try {
+                    console.log("[FirebaseService] Falling back to signInWithRedirect...");
                     await this.auth.signInWithRedirect(provider);
                     return null;
                 } catch (redirectErr) {
@@ -985,13 +1004,8 @@ class FirebaseService {
         if (!this.isInitialized || !this.auth) return null;
         try {
             await this.ensureAuthPersistence();
-            const search = window.location.search || '';
-            const hash = window.location.hash || '';
-            const isRedirectReturn = search.includes('apiKey') || search.includes('state=') || hash.includes('state=') || hash.includes('access_token');
-            if (!isRedirectReturn) {
-                return null;
-            }
-            return await this.auth.getRedirectResult();
+            const result = await this.auth.getRedirectResult();
+            return result || null;
         } catch (err) {
             console.warn("[FirebaseService] getRedirectResult error handled safely:", err);
             return null;
