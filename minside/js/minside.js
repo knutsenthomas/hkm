@@ -3416,15 +3416,9 @@ class MinSideManager {
         // Wire automatic auto-save on input changes
         if (contactCard) {
             bindFormAutoSave(contactCard, async () => {
-                await this._saveProfileFields(contactCard, ['displayName', 'phoneCountryCode', 'phone', 'address', 'zip', 'city', 'country']);
+                await this._saveProfileFields(contactCard, ['displayName', 'phoneCountryCode', 'phone', 'address', 'zip', 'city', 'country', 'ssn', 'gender', 'maritalStatus', 'birthday']);
                 this.profileData = await this.getMergedProfile(this.currentUser);
                 this.updateHeader();
-            }, 600);
-        }
-
-        if (personalCard) {
-            bindFormAutoSave(personalCard, async () => {
-                await this._saveProfileFields(personalCard, ['gender', 'maritalStatus', 'birthday']);
             }, 600);
         }
 
