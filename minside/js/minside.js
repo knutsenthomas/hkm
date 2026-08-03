@@ -2092,33 +2092,18 @@ class MinSideManager {
         <div class="ms-overview-wrap">
 
             <!-- Welcome banner -->
-            <div class="ms-overview-banner" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
-                <div style="flex: 1; min-width: 0;">
+            <div class="ms-overview-banner">
+                <div>
                     <h2 class="ms-overview-banner-title">
                         ${greeting}, ${name}! 👋
                     </h2>
-                    <div style="display: flex; align-items: flex-start; gap: 8px; margin-top: 6px;">
-                        <span class="material-symbols-outlined" style="font-size: 18px; color: var(--accent-color, #d17d39); flex-shrink: 0; margin-top: 2px;">format_quote</span>
-                        <p class="ms-overview-banner-quote" style="margin: 0; line-height: 1.45;">
-                            ${this._getDailyVerse(document.documentElement.lang || 'no')}
-                        </p>
-                    </div>
+                    <p class="ms-overview-banner-quote">
+                        ${this._getDailyVerse(document.documentElement.lang || 'no')}
+                    </p>
                 </div>
-                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0;">
-                    <div class="ms-overview-banner-chip">
-                        <div class="ms-overview-banner-chip-label">${t('overview.memberSince')}</div>
-                        <div class="ms-overview-banner-chip-value" id="ov-member-since">—</div>
-                    </div>
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                        <button type="button" class="ms-banner-quick-btn" onclick="window.minSideManager.loadView('reading-plans')">
-                            <span class="material-symbols-outlined">auto_stories</span>
-                            <span>Leseplaner</span>
-                        </button>
-                        <button type="button" class="ms-banner-quick-btn" onclick="window.minSideManager.loadView('notes')">
-                            <span class="material-symbols-outlined">edit_note</span>
-                            <span>Notater</span>
-                        </button>
-                    </div>
+                <div class="ms-overview-banner-chip">
+                    <div class="ms-overview-banner-chip-label">${t('overview.memberSince')}</div>
+                    <div class="ms-overview-banner-chip-value" id="ov-member-since">—</div>
                 </div>
             </div>
 
