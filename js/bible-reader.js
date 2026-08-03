@@ -293,6 +293,15 @@ class BibleReader {
         }
         this.history = history;
 
+        let verseHighlights = {};
+        try {
+            const rawHighlights = this.safeGetLocalStorage('hkm_verse_highlights');
+            if (rawHighlights) verseHighlights = JSON.parse(rawHighlights) || {};
+        } catch (e) {
+            console.warn("[BibleReader] Failed to parse verse highlights:", e);
+        }
+        this.verseHighlights = verseHighlights;
+
         this.selectedVerses = [];
         this.dictCache = {};
 
@@ -2090,30 +2099,31 @@ class BibleReader {
                                     }
                                 }
                             }
-                             // Toggle selected state
-                             const existingIdx = this.selectedVerses.findIndex(v => v.verseNum === verseNum && v.paragraph === paragraph);
-                             const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || document.body.classList.contains('dark') || document.body.classList.contains('bible-theme-dark');
-                             const underlineColor = isDark ? '#cbd5e1' : '#475569';
+                        } else {
+                            // Toggle single verse selected state
+                            const existingIdx = this.selectedVerses.findIndex(v => v.verseNum === verseNum && v.paragraph === paragraph);
+                            const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || document.body.classList.contains('dark') || document.body.classList.contains('bible-theme-dark');
+                            const underlineColor = isDark ? '#cbd5e1' : '#475569';
 
-                             if (existingIdx >= 0) {
-                                 this.selectedVerses.splice(existingIdx, 1);
-                                 paragraph.classList.remove('selected-verse');
-                                 paragraph.style.textDecoration = 'none';
-                                 paragraph.style.textUnderlineOffset = '';
-                                 paragraph.style.textDecorationThickness = '';
-                                 if (this.lastSelectedVerse && this.lastSelectedVerse.paragraph === paragraph) {
-                                     this.lastSelectedVerse = this.selectedVerses[this.selectedVerses.length - 1] || null;
-                                 }
-                             } else {
-                                 const newSelection = { paragraph, verseNum };
-                                 this.selectedVerses.push(newSelection);
-                                 paragraph.classList.add('selected-verse');
-                                 paragraph.style.textDecoration = `underline dotted ${underlineColor}`;
-                                 paragraph.style.textUnderlineOffset = '6px';
-                                 paragraph.style.textDecorationThickness = '2px';
-                                 this.lastSelectedVerse = newSelection;
-                             }
-                         }
+                            if (existingIdx >= 0) {
+                                this.selectedVerses.splice(existingIdx, 1);
+                                paragraph.classList.remove('selected-verse');
+                                paragraph.style.textDecoration = 'none';
+                                paragraph.style.textUnderlineOffset = '';
+                                paragraph.style.textDecorationThickness = '';
+                                if (this.lastSelectedVerse && this.lastSelectedVerse.paragraph === paragraph) {
+                                    this.lastSelectedVerse = this.selectedVerses[this.selectedVerses.length - 1] || null;
+                                }
+                            } else {
+                                const newSelection = { paragraph, verseNum };
+                                this.selectedVerses.push(newSelection);
+                                paragraph.classList.add('selected-verse');
+                                paragraph.style.textDecoration = `underline dotted ${underlineColor}`;
+                                paragraph.style.textUnderlineOffset = '6px';
+                                paragraph.style.textDecorationThickness = '2px';
+                                this.lastSelectedVerse = newSelection;
+                            }
+                        }
 
                         if (this.selectedVerses.length === 0) {
                             if (this.dom.verseToolbar) this.dom.verseToolbar.style.display = 'none';
@@ -4662,12 +4672,14 @@ class BibleReader {
     saveVerseHighlight(verseNum, color, customHex = null) {
         if (!this.verseHighlights) {
             try {
-                this.verseHighlights = JSON.parse(localStorage.getItem('hkm_verse_highlights') || '{}');
+                const raw = this.safeGetLocalStorage('hkm_verse_highlights');
+                this.verseHighlights = raw ? JSON.parse(raw) : {};
             } catch(e) {
                 this.verseHighlights = {};
             }
         }
-        const key = `${this.selectedBibleId}_${this.selectedBookId}_${this.selectedChapterId}_v${verseNum}`;
+        const bookId = this.selectedBookId || (this.selectedChapterId ? this.selectedChapterId.split('_')[0] : '');
+        const key = `${this.selectedBibleId}_${bookId}_${this.selectedChapterId}_v${verseNum}`;
         if (color === 'none' || !color) {
             delete this.verseHighlights[key];
         } else {
@@ -4679,7 +4691,8 @@ class BibleReader {
     restoreHighlights() {
         if (!this.verseHighlights) {
             try {
-                this.verseHighlights = JSON.parse(localStorage.getItem('hkm_verse_highlights') || '{}');
+                const raw = this.safeGetLocalStorage('hkm_verse_highlights');
+                this.verseHighlights = raw ? JSON.parse(raw) : {};
             } catch(e) {
                 this.verseHighlights = {};
             }
@@ -4702,7 +4715,12 @@ class BibleReader {
             verses.forEach(v => bookmarkedVerses.add(v));
         });
         
-        const paragraphs = this.dom.readingPane.querySelectorAll('p');
+        const readingPane = this.dom.readingPane || document.getElementById('bible-reading-pane');
+        if (!readingPane) return;
+
+        const paragraphs = readingPane.querySelectorAll('p');
+        const bookId = this.selectedBookId || (this.selectedChapterId ? this.selectedChapterId.split('_')[0] : '');
+
         paragraphs.forEach(p => {
             const sup = p.querySelector('sup.v');
             if (sup) {
@@ -4715,12 +4733,14 @@ class BibleReader {
                 }
 
                 // Restore saved color highlights
-                const key = `${this.selectedBibleId}_${this.selectedBookId}_${this.selectedChapterId}_v${verseStr}`;
+                const key = `${this.selectedBibleId}_${bookId}_${this.selectedChapterId}_v${verseStr}`;
                 const hl = this.verseHighlights[key];
                 if (hl) {
                     p.setAttribute('data-highlight-color', hl.color);
                     if (hl.hex) {
                         p.style.setProperty('--custom-highlight-bg', hexToRgba(hl.hex, 0.35));
+                    } else {
+                        p.style.removeProperty('--custom-highlight-bg');
                     }
                 } else {
                     p.removeAttribute('data-highlight-color');
@@ -10350,6 +10370,26 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                         <span class="material-symbols-outlined" style="font-size: 20px;">content_copy</span>
                         <span>Kopier</span>
                     </button>
+
+                    <button id="toolbar-btn-lookup" class="sheet-action-btn" style="display: flex; flex-direction: column; align-items: center; background: none; border: none; font-size: 11px; font-weight: 700; color: var(--text-base, #0f172a); cursor: pointer; padding: 4px 8px;" title="Forklar i Bibeleksikon">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">menu_book</span>
+                        <span>Leksikon</span>
+                    </button>
+
+                    <button id="toolbar-btn-image" class="sheet-action-btn" style="display: flex; flex-direction: column; align-items: center; background: none; border: none; font-size: 11px; font-weight: 700; color: var(--text-base, #0f172a); cursor: pointer; padding: 4px 8px;" title="Lag bilde av vers">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">image</span>
+                        <span>Bilde</span>
+                    </button>
+
+                    <button id="toolbar-btn-share" class="sheet-action-btn" style="display: flex; flex-direction: column; align-items: center; background: none; border: none; font-size: 11px; font-weight: 700; color: var(--text-base, #0f172a); cursor: pointer; padding: 4px 8px;" title="Del vers">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">share</span>
+                        <span>Del</span>
+                    </button>
+
+                    <button id="toolbar-btn-clear" class="sheet-action-btn" style="display: flex; flex-direction: column; align-items: center; background: none; border: none; font-size: 11px; font-weight: 700; color: #94a3b8; cursor: pointer; padding: 4px 8px;" title="Lukk">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                        <span>Lukk</span>
+                    </button>
                 </div>
             `;
             document.body.appendChild(mainToolbar);
@@ -10366,6 +10406,10 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                 swatch.onclick = (e) => {
                     e.stopPropagation();
                     const color = swatch.getAttribute('data-color');
+                    if (color === 'custom' || color === 'multi') {
+                        if (typeof openColorWheelModal === 'function') openColorWheelModal();
+                        return;
+                    }
                     if (this.selectedVerses && this.selectedVerses.length > 0) {
                         this.selectedVerses.forEach(v => {
                             if (color === 'none') {
@@ -10388,11 +10432,15 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                 btnBookmark.onclick = (e) => {
                     e.stopPropagation();
                     if (this.selectedVerses && this.selectedVerses.length > 0) {
-                        this.selectedVerses.forEach(v => {
-                            const vNum = parseInt(v.verseNum, 10);
-                            if (!isNaN(vNum)) this.toggleBookmark(vNum);
-                        });
-                        this.clearSelection();
+                        if (this.dom && this.dom.toolbarBtnBookmark) {
+                            this.dom.toolbarBtnBookmark.click();
+                        } else {
+                            this.selectedVerses.forEach(v => {
+                                const vNum = parseInt(v.verseNum, 10);
+                                if (!isNaN(vNum)) this.toggleBookmark(vNum);
+                            });
+                            this.clearSelection();
+                        }
                     }
                 };
             }
@@ -10403,12 +10451,17 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                 btnCopy.onclick = async (e) => {
                     e.stopPropagation();
                     if (this.selectedVerses && this.selectedVerses.length > 0) {
-                        const text = this.selectedVerses.map(v => v.paragraph.innerText.trim()).join('\n\n');
-                        if (text) {
-                            await navigator.clipboard.writeText(text);
-                            alert('Verstekst kopiert til utklippstavlen!');
+                        if (this.dom && this.dom.toolbarBtnDownload) {
+                            this.dom.toolbarBtnDownload.click();
+                        } else {
+                            const sorted = [...this.selectedVerses].sort((a, b) => parseInt(a.verseNum, 10) - parseInt(b.verseNum, 10));
+                            const text = sorted.map(v => `${v.verseNum}. ${v.paragraph.innerText.trim()}`).join('\n');
+                            if (text) {
+                                await navigator.clipboard.writeText(text);
+                                this.showToast('Verstekst kopiert til utklippstavlen!');
+                            }
+                            this.clearSelection();
                         }
-                        this.clearSelection();
                     }
                 };
             }
@@ -10419,8 +10472,12 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                 btnNote.onclick = (e) => {
                     e.stopPropagation();
                     if (this.selectedVerses && this.selectedVerses.length > 0) {
-                        const first = this.selectedVerses[0];
-                        this.openVerseNoteModal(first.verseNum, first.paragraph.innerText.trim());
+                        if (this.dom && this.dom.toolbarBtnSaveUser) {
+                            this.dom.toolbarBtnSaveUser.click();
+                        } else {
+                            const first = this.selectedVerses[0];
+                            this.openVerseNoteModal(first.verseNum, first.paragraph.innerText.trim());
+                        }
                     }
                 };
             }
@@ -10431,9 +10488,65 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                 btnCrossRef.onclick = (e) => {
                     e.stopPropagation();
                     if (this.selectedVerses && this.selectedVerses.length > 0) {
-                        const first = this.selectedVerses[0];
-                        this.openVerseCrossReferenceModal(first.verseNum, first.paragraph.innerText.trim());
+                        if (this.dom && this.dom.toolbarBtnCrossref) {
+                            this.dom.toolbarBtnCrossref.click();
+                        } else {
+                            const first = this.selectedVerses[0];
+                            this.openVerseCrossReferenceModal(first.verseNum, first.paragraph.innerText.trim());
+                        }
                     }
+                };
+            }
+
+            // Lexicon button
+            const btnLookup = mainToolbar.querySelector('#toolbar-btn-lookup');
+            if (btnLookup) {
+                btnLookup.onclick = (e) => {
+                    e.stopPropagation();
+                    if (this.selectedVerses && this.selectedVerses.length > 0) {
+                        if (this.dom && this.dom.toolbarBtnLookup) {
+                            this.dom.toolbarBtnLookup.click();
+                        } else {
+                            const first = this.selectedVerses[0];
+                            const ref = this.getSelectedVersesReference();
+                            this.lookupWord(ref, first.paragraph.innerText.trim(), ref);
+                        }
+                    }
+                };
+            }
+
+            // Image button
+            const btnImage = mainToolbar.querySelector('#toolbar-btn-image');
+            if (btnImage) {
+                btnImage.onclick = (e) => {
+                    e.stopPropagation();
+                    if (this.dom && this.dom.toolbarBtnImage) {
+                        this.dom.toolbarBtnImage.click();
+                    } else if (typeof this.openVerseImageModal === 'function') {
+                        this.openVerseImageModal();
+                    }
+                };
+            }
+
+            // Share button
+            const btnShare = mainToolbar.querySelector('#toolbar-btn-share');
+            if (btnShare) {
+                btnShare.onclick = (e) => {
+                    e.stopPropagation();
+                    if (this.dom && this.dom.toolbarBtnShare) {
+                        this.dom.toolbarBtnShare.click();
+                    } else if (typeof this.openVerseShareChoiceModal === 'function') {
+                        this.openVerseShareChoiceModal();
+                    }
+                };
+            }
+
+            // Clear / Close button
+            const btnClear = mainToolbar.querySelector('#toolbar-btn-clear');
+            if (btnClear) {
+                btnClear.onclick = (e) => {
+                    e.stopPropagation();
+                    this.clearSelection();
                 };
             }
         }
