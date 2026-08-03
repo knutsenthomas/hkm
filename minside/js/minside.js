@@ -2774,6 +2774,19 @@ class MinSideManager {
 
         const activeTab = this._activeProfileTab || 'my-profile';
 
+        const ssnVal = p.ssn || p.nationalIdNumber || p.personnummer || '';
+        const ssnDisplayFormatted = ssnVal
+            ? (ssnVal.length === 11
+                ? `<div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="info-row-value" id="ssn-masked-val" style="font-family: monospace; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.08em;">${esc(ssnVal.substring(0, 6))} •••••</span>
+                    <span class="info-row-value" id="ssn-full-val" style="display: none; font-family: monospace; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.08em;">${esc(ssnVal.substring(0, 6))} ${esc(ssnVal.substring(6))}</span>
+                    <button type="button" id="toggle-ssn-eye" style="background: none; border: none; cursor: pointer; color: var(--text-muted); display: inline-flex; align-items: center; padding: 3px 6px; border-radius: 6px; transition: color 0.2s;" title="Vis/skjul fødselsnummer">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">visibility</span>
+                    </button>
+                   </div>`
+                : `<span class="info-row-value" style="font-family: monospace; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.08em;">${esc(ssnVal)}</span>`)
+            : `<span class="info-row-value empty">—</span>`;
+
         container.innerHTML = `
         <!-- EXECUTIVE PROFILE HERO CARD -->
         <div class="ms-profile-hero-card">
@@ -2818,10 +2831,10 @@ class MinSideManager {
                 <!-- ── LEFT COLUMN ── -->
                 <div class="profile-left">
 
-                <!-- Contact information -->
+                <!-- Unified Profile Information -->
                 <div class="info-card profile-edit-card" id="contact-card">
                     <div class="info-card-header">
-                        <h3>${t('profile.contactInfo')}</h3>
+                        <h3>${isNo ? 'Profilopplysninger' : (isEs ? 'Detalles del perfil' : 'Profile details')}</h3>
                         <button class="edit-icon-btn profile-edit-toggle" id="toggle-contact-edit" title="${t('common.edit')}" type="button">
                             <span class="material-symbols-outlined">edit</span>
                         </button>
@@ -2858,6 +2871,16 @@ class MinSideManager {
                             </div>
                         </div>
                         <div class="info-row editable-info-row">
+                            <span class="material-symbols-outlined info-row-icon" style="color: #7c3aed !important; background: rgba(124, 58, 237, 0.1) !important;">fingerprint</span>
+                            <div class="info-row-content">
+                                <div class="info-row-label">${isNo ? 'Fødselsnummer (11 siffer)' : (isEs ? 'Número de identidad (11 dígitos)' : 'National ID number (11 digits)')}</div>
+                                <div class="info-row-display">${ssnDisplayFormatted}</div>
+                                <div class="info-row-edit">
+                                    <input name="ssn" type="text" value="${inputValue(ssnVal)}" maxlength="11" placeholder="11 siffer (f.eks. 12039512345)" autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row editable-info-row">
                             <span class="material-symbols-outlined info-row-icon" style="color: #f97316 !important; background: rgba(249, 115, 22, 0.1) !important;">location_on</span>
                             <div class="info-row-content">
                                 <div class="info-row-label">${t('profile.address')}</div>
@@ -2876,24 +2899,6 @@ class MinSideManager {
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="profile-edit-actions">
-                        <button class="btn btn-ghost btn-sm" id="cancel-contact-edit" type="button">${t('common.cancel')}</button>
-                        <button class="btn btn-primary btn-sm" id="save-contact-btn" type="button">
-                            <span class="material-symbols-outlined">save</span> ${t('common.save')}
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Personal information -->
-                <div class="info-card profile-edit-card" id="personal-card">
-                    <div class="info-card-header">
-                        <h3>${t('profile.personalInfo')}</h3>
-                        <button class="edit-icon-btn profile-edit-toggle" id="toggle-personal-edit" title="${t('common.edit')}" type="button">
-                            <span class="material-symbols-outlined">edit</span>
-                        </button>
-                    </div>
-                    <div class="info-rows">
                         <div class="info-row editable-info-row">
                             <span class="material-symbols-outlined info-row-icon" style="color: #0d9488 !important; background: rgba(13, 148, 136, 0.1) !important;">person</span>
                             <div class="info-row-content">
@@ -2945,8 +2950,8 @@ class MinSideManager {
                         </div>
                     </div>
                     <div class="profile-edit-actions">
-                        <button class="btn btn-ghost btn-sm" id="cancel-personal-edit" type="button">${t('common.cancel')}</button>
-                        <button class="btn btn-primary btn-sm" id="save-personal-btn" type="button">
+                        <button class="btn btn-ghost btn-sm" id="cancel-contact-edit" type="button">${t('common.cancel')}</button>
+                        <button class="btn btn-primary btn-sm" id="save-contact-btn" type="button">
                             <span class="material-symbols-outlined">save</span> ${t('common.save')}
                         </button>
                     </div>
@@ -3311,6 +3316,22 @@ class MinSideManager {
             }
         });
 
+        // Wire up SSN Eye Visibility Toggle
+        const toggleSsnEye = container.querySelector('#toggle-ssn-eye');
+        if (toggleSsnEye) {
+            toggleSsnEye.addEventListener('click', () => {
+                const maskedVal = container.querySelector('#ssn-masked-val');
+                const fullVal = container.querySelector('#ssn-full-val');
+                const icon = toggleSsnEye.querySelector('.material-symbols-outlined');
+                if (maskedVal && fullVal && icon) {
+                    const isShowing = fullVal.style.display !== 'none';
+                    maskedVal.style.display = isShowing ? 'inline' : 'none';
+                    fullVal.style.display = isShowing ? 'none' : 'inline';
+                    icon.textContent = isShowing ? 'visibility' : 'visibility_off';
+                }
+            });
+        }
+
         // Contact edit toggle
         const toggleContact = document.getElementById('toggle-contact-edit');
         const contactCard = document.getElementById('contact-card');
@@ -3322,24 +3343,9 @@ class MinSideManager {
             contactCard?.classList.remove('is-editing');
         });
         document.getElementById('save-contact-btn')?.addEventListener('click', async () => {
-            await this._saveProfileFields(contactCard, ['displayName', 'phoneCountryCode', 'phone', 'address', 'zip', 'city', 'country']);
+            await this._saveProfileFields(contactCard, ['displayName', 'phoneCountryCode', 'phone', 'address', 'zip', 'city', 'country', 'ssn', 'gender', 'maritalStatus', 'birthday']);
             this.profileData = await this.getMergedProfile(this.currentUser);
             this.updateHeader();
-            this.loadView('profile');
-        });
-
-        // Personal edit toggle
-        const togglePersonal = document.getElementById('toggle-personal-edit');
-        const personalCard = document.getElementById('personal-card');
-        togglePersonal?.addEventListener('click', () => {
-            personalCard?.classList.toggle('is-editing');
-            personalCard?.querySelector('[name="gender"]')?.focus();
-        });
-        document.getElementById('cancel-personal-edit')?.addEventListener('click', () => {
-            personalCard?.classList.remove('is-editing');
-        });
-        document.getElementById('save-personal-btn')?.addEventListener('click', async () => {
-            await this._saveProfileFields(personalCard, ['gender', 'maritalStatus', 'birthday']);
             this.loadView('profile');
         });
 
