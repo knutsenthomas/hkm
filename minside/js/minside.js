@@ -1039,6 +1039,7 @@ class MinSideManager {
             'reading-plans': this.renderReadingPlans,
             'prayer-wall': this.renderPrayerWall,
             'course-player': this.renderCoursePlayer,
+            help: this.renderHelp,
         };
 
 
@@ -1323,7 +1324,8 @@ class MinSideManager {
             tasks: { title: t('sidebar.huskeliste') || 'Huskeliste', icon: 'task_alt' },
             'reading-plans': { title: t('view.readingPlans'), icon: 'auto_stories' },
             'prayer-wall': { title: t('view.prayerWall'), icon: 'favorite' },
-            'course-player': { title: 'Kurs-spiller', icon: 'school' }
+            'course-player': { title: 'Kurs-spiller', icon: 'school' },
+            help: { title: t('sidebar.hjelp') || 'Hjelp & Support', icon: 'help' }
         };
 
         // Update Header Title and Icon (Admin Style)
@@ -2920,12 +2922,47 @@ class MinSideManager {
                     </div>
                 </div>
 
-                <!-- Danger Zone -->
+                <!-- Security & Danger Zone -->
                 <div class="info-card">
                     <div class="info-card-header">
-                        <h3>${t('profile.accountAdmin')}</h3>
+                        <h3>${isNo ? 'Sikkerhet & kontoadministrasjon' : (isEs ? 'Seguridad y cuenta' : 'Security & Account')}</h3>
                     </div>
-                    <div class="ms-card-body-pad" style="padding: 16px 20px 18px 20px !important; display: block !important;">
+                    <div class="info-rows">
+                        <div class="info-row">
+                            <span class="material-symbols-outlined info-row-icon">lock_reset</span>
+                            <div class="info-row-content">
+                                <div class="info-row-label">${isNo ? 'Passord' : (isEs ? 'Contraseña' : 'Password')}</div>
+                                <div class="info-row-display" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 4px;">
+                                    <span class="info-row-value" style="font-size: 0.85rem; color: var(--text-muted);">••••••••••••</span>
+                                    <button type="button" class="btn btn-ghost btn-sm" id="reset-password-btn" style="border-radius: 8px; font-size: 0.78rem;">
+                                        <span class="material-symbols-outlined" style="font-size: 16px;">key</span>
+                                        <span>${isNo ? 'Endre passord' : (isEs ? 'Cambiar contraseña' : 'Change password')}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="material-symbols-outlined info-row-icon">devices</span>
+                            <div class="info-row-content">
+                                <div class="info-row-label">${isNo ? 'Innlogget enhet & økt' : (isEs ? 'Dispositivo y sesión' : 'Active session & device')}</div>
+                                <div class="info-row-display" style="margin-top: 4px;">
+                                    <div style="font-size: 0.86rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+                                        <span class="material-symbols-outlined" style="font-size: 16px; color: #16a34a;">check_circle</span>
+                                        <span>${esc(navigator.platform || 'Nettleser')} • ${esc(this.currentUser.providerData[0]?.providerId === 'google.com' ? 'Google Login' : 'E-post')}</span>
+                                    </div>
+                                    <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 2px;">
+                                        ${isNo ? 'Aktiv sesjon (Sist innlogget: ' : 'Active session (Last sign-in: '}${this.currentUser.metadata?.lastSignInTime ? new Date(this.currentUser.metadata.lastSignInTime).toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : 'no-NO') : 'Akkurat nå'})
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ms-card-body-pad" style="padding: 16px 20px 18px 20px !important; border-top: 1px solid var(--border-color, #e2e8f0); display: block !important;">
+                        <div style="font-size: 0.78rem; font-weight: 700; color: #ef4444; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;">
+                            ${isNo ? 'Permanentsletting (GDPR)' : 'Permanent account deletion'}
+                        </div>
                         <p class="ms-danger-copy" style="margin-bottom: 12px !important;">
                             ${t('profile.deleteAccountNotice')}
                         </p>
@@ -3214,6 +3251,18 @@ class MinSideManager {
         });
 
         // ── Wire up events ──
+        container.querySelector('#reset-password-btn')?.addEventListener('click', async () => {
+            const email = this.currentUser?.email;
+            if (!email) return;
+            try {
+                await firebase.auth().sendPasswordResetEmail(email);
+                this._notify(isNo ? `E-post for å tilbakestille passord er sendt til ${email}!` : `Password reset email sent to ${email}!`, 'success');
+            } catch (err) {
+                console.error('Password reset error:', err);
+                this._notify(isNo ? 'Kunne ikke sende e-post for passordtilbakestilling.' : 'Failed to send password reset email.', 'warning');
+            }
+        });
+
         // Contact edit toggle
         const toggleContact = document.getElementById('toggle-contact-edit');
         const contactCard = document.getElementById('contact-card');
@@ -10827,6 +10876,152 @@ class MinSideManager {
             return;
         }
         this.loadView(type);
+    }
+
+    async renderHelp(container) {
+        const isNo = document.documentElement.lang === 'no' || !document.documentElement.lang;
+        const isEs = document.documentElement.lang === 'es';
+
+        const faqs = [
+            {
+                q: isNo ? 'Hvordan endrer jeg kontaktinformasjonen min?' : (isEs ? '¿Cómo cambio mi información de contacto?' : 'How do I change my contact info?'),
+                a: isNo ? 'Gå til «Profil» i menyen og trykk på redigeringsikonet (blyant) øverst på kortet for kontaktinformasjon. Husk å trykke «Lagre» etter at du har oppdatert opplysningene dine.' : 'Go to "Profile" in the menu and click the edit icon on the contact info card.'
+            },
+            {
+                q: isNo ? 'Hvordan tilpasser jeg Push- og e-postvarsler?' : (isEs ? '¿Cómo personalizo mis notificaciones?' : 'How do I customize my notification preferences?'),
+                a: isNo ? 'Under «Profil» finner du fanen «Varsler». Der kan du enkelt slå av eller på push-varsler for ny undervisning, podcast, blogg og generelle nyhetsbrev.' : 'Under "Profile" click the "Notifications" tab to enable or disable push and email notifications.'
+            },
+            {
+                q: isNo ? 'Hvor finner jeg kvittering for gaver og skattefradragsrapport?' : (isEs ? '¿Dónde encuentro mis recibos de donación?' : 'Where do I find my donation receipts?'),
+                a: isNo ? 'Klikk på «Gaver» i menyen. Der ser du en fullstendig historikk over alle dine gaver. Trykk på en enkelt gave for å se kvittering, eller bruk knappen «Skriv ut rapport» øverst for å laste ned samlerapport.' : 'Click "Giving" in the menu to view all donations and print reports.'
+            },
+            {
+                q: isNo ? 'Hvordan fungerer leseplaner?' : (isEs ? '¿Cómo funcionan los planes de lectura?' : 'How do reading plans work?'),
+                a: isNo ? 'Gå til «Leseplaner» i menyen for å se dine aktive og tilgjengelige leseplaner. Du kan trykke på dagslesningen for å åpne bibelteksten direkte i leseren.' : 'Go to "Reading Plans" in the menu to track your active plans and read daily scripture.'
+            },
+            {
+                q: isNo ? 'Hvordan kan jeg endre passord eller slette kontoen min?' : (isEs ? '¿Cómo puedo cambiar la contraseña o eliminar mi cuenta?' : 'How can I change my password or delete my account?'),
+                a: isNo ? 'Under «Profil» finner du kortet «Sikkerhet & kontoadministrasjon». Du kan be om tilbakestilling av passord på e-post, eller slette kontoen din permanent i tråd med GDPR.' : 'Under "Profile" you can request a password reset link or permanently delete your account.'
+            }
+        ];
+
+        container.innerHTML = `
+        <div class="ms-full-width help-page-container" style="max-width: 960px; margin: 0 auto; padding-bottom: 30px;">
+            <!-- Hero banner -->
+            <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 20px; padding: 28px 32px; color: #fff; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15); display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+                <div>
+                    <h2 style="font-size: 1.5rem; font-weight: 800; margin: 0 0 6px 0; color: #fff;">${isNo ? 'Hjelp & Support' : (isEs ? 'Ayuda y Soporte' : 'Help & Support')}</h2>
+                    <p style="font-size: 0.9rem; color: #94a3b8; margin: 0; max-width: 520px; line-height: 1.5;">${isNo ? 'Finn svar på ofte stilte spørsmål eller send en melding direkte til teamet vårt i His Kingdom Ministry.' : 'Find answers to common questions or send a message directly to our team.'}</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <a href="https://www.hiskingdomministry.no/kontakt" target="_blank" class="btn btn-primary" style="background: linear-gradient(135deg, #d17d39, #bd4f2a); border: none; border-radius: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; text-decoration: none; color: #fff;">
+                        <span class="material-symbols-outlined">support_agent</span>
+                        <span>${isNo ? 'Kontakt HKM' : 'Contact HKM'}</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Grid layout: FAQ Left, Contact Right -->
+            <div style="display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start;" class="help-grid">
+                
+                <!-- Left: FAQ Accordion -->
+                <div>
+                    <div class="info-card">
+                        <div class="info-card-header" style="padding: 18px 22px;">
+                            <h3 style="display: flex; align-items: center; gap: 8px; font-size: 1rem; margin: 0;">
+                                <span class="material-symbols-outlined" style="color: var(--accent-color, #d17d39);">quiz</span>
+                                <span>${isNo ? 'Ofte stilte spørsmål (FAQ)' : (isEs ? 'Preguntas Frecuentes' : 'Frequently Asked Questions')}</span>
+                            </h3>
+                        </div>
+                        <div class="faq-list" style="padding: 12px 20px 20px 20px;">
+                            ${faqs.map((faq) => `
+                                <details class="faq-item" style="border: 1px solid var(--border-solid, #e2e8f0); border-radius: 12px; margin-bottom: 10px; background: var(--card-bg, #fff); overflow: hidden; transition: all 0.2s ease;">
+                                    <summary style="padding: 14px 16px; font-weight: 700; font-size: 0.92rem; color: var(--text-main, #0f172a); cursor: pointer; display: flex; align-items: center; justify-content: space-between; user-select: none;">
+                                        <span>${faq.q}</span>
+                                        <span class="material-symbols-outlined faq-arrow" style="font-size: 20px; color: var(--text-muted); transition: transform 0.2s ease;">expand_more</span>
+                                    </summary>
+                                    <div style="padding: 0 16px 16px 16px; font-size: 0.86rem; color: var(--text-muted, #475569); line-height: 1.6; border-top: 1px solid var(--border-color, #f1f5f9); margin-top: 4px; padding-top: 12px;">
+                                        ${faq.a}
+                                    </div>
+                                </details>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Quick Support Form -->
+                <div>
+                    <div class="info-card">
+                        <div class="info-card-header" style="padding: 18px 22px;">
+                            <h3 style="display: flex; align-items: center; gap: 8px; font-size: 1rem; margin: 0;">
+                                <span class="material-symbols-outlined" style="color: var(--accent-color, #d17d39);">send</span>
+                                <span>${isNo ? 'Send melding til support' : 'Send message to support'}</span>
+                            </h3>
+                        </div>
+                        <form id="help-support-form" style="padding: 20px; display: grid; gap: 12px;">
+                            <div class="form-group">
+                                <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">${isNo ? 'Ditt navn' : 'Your name'}</label>
+                                <input type="text" value="${this._escapeHtml(this.currentUser?.displayName || '')}" readonly disabled style="background: var(--main-bg, #f8fafc); opacity: 0.8; width: 100%; padding: 10px 12px; border: 1.5px solid var(--border-solid, #e2e8f0); border-radius: 10px;">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">${isNo ? 'E-post' : 'Email'}</label>
+                                <input type="email" value="${this._escapeHtml(this.currentUser?.email || '')}" readonly disabled style="background: var(--main-bg, #f8fafc); opacity: 0.8; width: 100%; padding: 10px 12px; border: 1.5px solid var(--border-solid, #e2e8f0); border-radius: 10px;">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">${isNo ? 'Emne' : 'Subject'}</label>
+                                <input type="text" id="support-subject" placeholder="${isNo ? 'Hva gjelder meldingen?' : 'Subject'}" required style="width: 100%; padding: 10px 12px; border: 1.5px solid var(--border-solid, #e2e8f0); border-radius: 10px; font-family: inherit; font-size: 0.88rem;">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">${isNo ? 'Melding' : 'Message'}</label>
+                                <textarea id="support-message" rows="4" placeholder="${isNo ? 'Beskriv det du trenger hjelp med...' : 'Describe what you need help with...'}" required style="width: 100%; padding: 10px 12px; border: 1.5px solid var(--border-solid, #e2e8f0); border-radius: 10px; font-family: inherit; font-size: 0.88rem; resize: vertical;"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="support-submit-btn" style="width: 100%; justify-content: center; margin-top: 4px; background: linear-gradient(135deg, #d17d39, #bd4f2a); border: none; border-radius: 10px; font-weight: 700; height: 42px; display: inline-flex; align-items: center; gap: 6px;">
+                                <span class="material-symbols-outlined">send</span>
+                                <span>${isNo ? 'Send melding' : 'Send message'}</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>`;
+
+        // Handle Support Form Submit
+        const form = container.querySelector('#help-support-form');
+        form?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = form.querySelector('#support-submit-btn');
+            const subjectInput = form.querySelector('#support-subject');
+            const messageInput = form.querySelector('#support-message');
+            const subject = subjectInput ? subjectInput.value.trim() : '';
+            const message = messageInput ? messageInput.value.trim() : '';
+
+            if (!subject || !message) return;
+
+            btn.disabled = true;
+            btn.innerHTML = `<div class="spinner" style="width: 16px; height: 16px; border-width: 2px;"></div> <span>${isNo ? 'Sender...' : 'Sending...'}</span>`;
+
+            try {
+                await firebase.firestore().collection('support_tickets').add({
+                    userId: this.currentUser?.uid || '',
+                    userName: this.currentUser?.displayName || '',
+                    userEmail: this.currentUser?.email || '',
+                    subject: subject,
+                    message: message,
+                    status: 'open',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                this._notify(isNo ? 'Meldingen din er sendt til support! Vi svarer så fort som mulig.' : 'Your message has been sent to support!', 'success');
+                form.reset();
+            } catch (err) {
+                console.error('Support ticket error:', err);
+                this._notify(isNo ? 'Kunne ikke sende melding. Prøv igjen senere.' : 'Could not send message. Please try again.', 'warning');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<span class="material-symbols-outlined">send</span> <span>${isNo ? 'Send melding' : 'Send message'}</span>`;
+            }
+        });
     }
 }
 
