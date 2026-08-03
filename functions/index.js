@@ -6803,7 +6803,7 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
 
     // 1. Hent kontekst om nettstedet, butikk, arrangementer og innhold in parallel
     const firestoreReads = [
-      db.collection("siteContent").doc("settings_seo").get(),
+      db.collection("content").doc("settings_seo").get(),
       db.collection("content").doc("ekstern_products").get(),
       db.collection("content").doc("collection_events").get(),
       db.collection("content").doc("collection_blog").get(),
@@ -7748,10 +7748,10 @@ exports.scheduledSync = onSchedule("every 15 minutes", async (event) => {
     // Keep manual events created in CMS / Admin
     const manualItems = existingItems.filter(item => item.source !== 'google_calendar');
 
-    // Dynamic fetching of courses and lessons from siteContent/collection_courses
+    // Dynamic fetching of courses and lessons from content/collection_courses
     let courseFeaturedEvents = [];
     try {
-      const courseDocRef = db.collection('siteContent').doc('collection_courses');
+      const courseDocRef = db.collection('content').doc('collection_courses');
       const courseSnap = await courseDocRef.get();
       if (courseSnap.exists && Array.isArray(courseSnap.data()?.items)) {
         const courseItems = courseSnap.data().items;
