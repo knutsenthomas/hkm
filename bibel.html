@@ -2385,7 +2385,7 @@
             color: #fed7aa !important;
         }
 
-        /* Bottom Action Sheet Verse Toolbar (Pinned Bottom Modal) */
+        /* Bottom Action Sheet Verse Toolbar (Pinned Bottom Modal / Floating Popover) */
         #verse-context-toolbar,
         #verse-context-toolbar.position-below {
             position: fixed !important;
@@ -2411,8 +2411,8 @@
         @media (min-width: 769px) {
             #verse-context-toolbar,
             #verse-context-toolbar.position-below {
-                position: fixed !important;
-                bottom: 24px !important;
+                position: absolute !important;
+                bottom: calc(100% + 16px) !important;
                 left: 50% !important;
                 right: auto !important;
                 top: auto !important;
@@ -2421,9 +2421,9 @@
                 max-width: 90vw !important;
                 border-radius: 20px !important;
                 border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12)) !important;
-                box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2) !important;
+                box-shadow: 0 12px 36px rgba(0, 0, 0, 0.16) !important;
                 padding: 14px 20px !important;
-                z-index: 999999 !important;
+                z-index: 20000 !important;
             }
             #verse-context-toolbar .sheet-handle-bar {
                 display: none !important;
@@ -4028,69 +4028,68 @@
             <!-- Backdrop Overlay for Floating Sheets & Popovers -->
             <div id="hkm-sheet-backdrop-overlay" class="sheet-overlay-backdrop" onclick="document.querySelectorAll('.floating-settings-popover, .floating-chapter-popover, .dictionary-drawer').forEach(el => el.classList.remove('active', 'expanded')); this.classList.remove('active');"></div>
 
-            <!-- Verse Context Actions Toolbar (Centered Popover / Bottom Sheet) -->
-            <div id="verse-context-toolbar">
-                <div class="sheet-handle-bar"></div>
-                <div id="sheet-verse-reference" class="sheet-verse-reference">Velg vers</div>
-
-                <div class="sheet-scrollable-row">
-                    <!-- Color Pickers -->
-                    <button class="color-swatch-circle" data-color="none" style="background: var(--bg-card, #ffffff); border: 2px dashed #94a3b8; display: flex; align-items: center; justify-content: center;" title="Fjern farge">
-                        <span class="material-symbols-outlined" style="font-size: 15px; color: #94a3b8;">block</span>
-                    </button>
-                    <button class="color-swatch-circle" data-color="yellow" style="background: #facc15;" title="Gul"></button>
-                    <button class="color-swatch-circle" data-color="green" style="background: #4ade80;" title="Grønn"></button>
-                    <button class="color-swatch-circle" data-color="cyan" style="background: #38bdf8;" title="Blå"></button>
-                    <div class="color-swatch-wrapper" style="position: relative; display: inline-flex; flex-shrink: 0;">
-                        <button class="color-swatch-circle" id="custom-color-swatch-btn" data-color="custom" style="background: linear-gradient(135deg, #facc15, #4ade80, #38bdf8, #f472b6);" title="Velg egendefinert farge"></button>
-                    </div>
-
-                    <div class="sheet-divider-v"></div>
-
-                    <!-- Action Buttons -->
-                    <button id="toolbar-btn-bookmark" class="sheet-action-btn" title="Lagre vers">
-                        <span class="material-symbols-outlined">bookmark</span>
-                        <span id="toolbar-bookmark-text">Lagre</span>
-                    </button>
-
-                    <button id="toolbar-btn-save-user" class="sheet-action-btn" title="Skriv notat">
-                        <span class="material-symbols-outlined">edit_note</span>
-                        <span>Notat</span>
-                    </button>
-
-                    <button id="toolbar-btn-crossref" class="sheet-action-btn" title="Kryssreferanser">
-                        <span class="material-symbols-outlined">link</span>
-                        <span>Kryssref</span>
-                    </button>
-
-                    <button id="toolbar-btn-download" class="sheet-action-btn" title="Kopier vers">
-                        <span class="material-symbols-outlined">content_copy</span>
-                        <span>Kopier</span>
-                    </button>
-
-                    <button id="toolbar-btn-lookup" class="sheet-action-btn" title="Forklar i Bibeleksikon">
-                        <span class="material-symbols-outlined">menu_book</span>
-                        <span>Leksikon</span>
-                    </button>
-
-                    <button id="toolbar-btn-image" class="sheet-action-btn" title="Lag bilde av vers">
-                        <span class="material-symbols-outlined">image</span>
-                        <span>Bilde</span>
-                    </button>
-
-                    <button id="toolbar-btn-share" class="sheet-action-btn" title="Del vers">
-                        <span class="material-symbols-outlined">share</span>
-                        <span>Del</span>
-                    </button>
-
-                    <button id="toolbar-btn-clear" class="sheet-action-btn" title="Lukk" style="min-width: 40px; height: 58px; background: transparent; border: none; color: #94a3b8; padding: 0;">
-                        <span class="material-symbols-outlined" style="font-size: 22px;">close</span>
-                    </button>
-                </div>
-            </div>
-
             <!-- Central Reading Area Bottom Floating Navigation -->
             <div class="floating-bible-nav" id="floating-bible-nav">
+                <!-- Verse Context Actions Toolbar (Centered Popover / Bottom Sheet) -->
+                <div id="verse-context-toolbar">
+                    <div class="sheet-handle-bar"></div>
+                    <div id="sheet-verse-reference" class="sheet-verse-reference">Velg vers</div>
+
+                    <div class="sheet-scrollable-row">
+                        <!-- Color Pickers -->
+                        <button class="color-swatch-circle" data-color="none" style="background: var(--bg-card, #ffffff); border: 2px dashed #94a3b8; display: flex; align-items: center; justify-content: center;" title="Fjern farge">
+                            <span class="material-symbols-outlined" style="font-size: 15px; color: #94a3b8;">block</span>
+                        </button>
+                        <button class="color-swatch-circle" data-color="yellow" style="background: #facc15;" title="Gul"></button>
+                        <button class="color-swatch-circle" data-color="green" style="background: #4ade80;" title="Grønn"></button>
+                        <button class="color-swatch-circle" data-color="cyan" style="background: #38bdf8;" title="Blå"></button>
+                        <div class="color-swatch-wrapper" style="position: relative; display: inline-flex; flex-shrink: 0;">
+                            <button class="color-swatch-circle" id="custom-color-swatch-btn" data-color="custom" style="background: linear-gradient(135deg, #facc15, #4ade80, #38bdf8, #f472b6);" title="Velg egendefinert farge"></button>
+                        </div>
+
+                        <div class="sheet-divider-v"></div>
+
+                        <!-- Action Buttons -->
+                        <button id="toolbar-btn-bookmark" class="sheet-action-btn" title="Lagre vers">
+                            <span class="material-symbols-outlined">bookmark</span>
+                            <span id="toolbar-bookmark-text">Lagre</span>
+                        </button>
+
+                        <button id="toolbar-btn-save-user" class="sheet-action-btn" title="Skriv notat">
+                            <span class="material-symbols-outlined">edit_note</span>
+                            <span>Notat</span>
+                        </button>
+
+                        <button id="toolbar-btn-crossref" class="sheet-action-btn" title="Kryssreferanser">
+                            <span class="material-symbols-outlined">link</span>
+                            <span>Kryssref</span>
+                        </button>
+
+                        <button id="toolbar-btn-download" class="sheet-action-btn" title="Kopier vers">
+                            <span class="material-symbols-outlined">content_copy</span>
+                            <span>Kopier</span>
+                        </button>
+
+                        <button id="toolbar-btn-lookup" class="sheet-action-btn" title="Forklar i Bibeleksikon">
+                            <span class="material-symbols-outlined">menu_book</span>
+                            <span>Leksikon</span>
+                        </button>
+
+                        <button id="toolbar-btn-image" class="sheet-action-btn" title="Lag bilde av vers">
+                            <span class="material-symbols-outlined">image</span>
+                            <span>Bilde</span>
+                        </button>
+
+                        <button id="toolbar-btn-share" class="sheet-action-btn" title="Del vers">
+                            <span class="material-symbols-outlined">share</span>
+                            <span>Del</span>
+                        </button>
+
+                        <button id="toolbar-btn-clear" class="sheet-action-btn" title="Lukk" style="min-width: 40px; height: 58px; background: transparent; border: none; color: #94a3b8; padding: 0;">
+                            <span class="material-symbols-outlined" style="font-size: 22px;">close</span>
+                        </button>
+                    </div>
+                </div>
                 <button class="floating-nav-btn" id="floating-prev-btn" title="Forrige kapittel">
                     <span class="material-symbols-outlined">chevron_left</span>
                 </button>
