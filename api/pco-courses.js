@@ -25,18 +25,22 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === 'GET') {
-      // Fetch Groups / Courses from Planning Center Groups API
+      // 1. Fetch Groups from Planning Center Groups API
       const groupsRes = await fetchPCO('https://api.planningcenteronline.com/groups/v2/groups', {
         headers: { Authorization: authHeader }
       });
       const groupsData = await groupsRes.json();
-      if (!groupsRes.ok) {
-        return res.status(groupsRes.status).json({ error: groupsData.errors?.[0]?.detail || 'Planning Center Groups error', details: groupsData });
-      }
+
+      // 2. Fetch Signups from Planning Center Registrations (Signups) API
+      const signupsRes = await fetchPCO('https://api.planningcenteronline.com/registrations/v2/signups', {
+        headers: { Authorization: authHeader }
+      });
+      const signupsData = await signupsRes.json();
+
       return res.status(200).json({
         success: true,
-        count: groupsData.meta?.total_count || groupsData.data?.length || 0,
-        groups: groupsData.data || []
+        groups: groupsData.data || [],
+        pcoSignups: signupsData.data || []
       });
     }
 
@@ -55,16 +59,14 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Kunne ikke opprette/koble person i Planning Center.' });
       }
 
-      // 2. Ensure Course Group exists in Planning Center Groups
+      // 2. Check / Add to Planning Center Group
       const groupId = await ensureCourseGroup(authHeader, courseName);
-
-      // 3. Add person to Course Group if group exists
       let membershipData = null;
       if (groupId) {
         membershipData = await addPersonToGroup(authHeader, groupId, personId);
       }
 
-      // 4. Create Followup Workflow Task in Planning Center People
+      // 3. Create Followup Workflow Task in Planning Center People
       const workflowId = await ensureWorkflow(authHeader);
       let taskData = null;
       if (workflowId) {
