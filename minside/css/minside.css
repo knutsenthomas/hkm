@@ -3020,6 +3020,48 @@ body.sidebar-collapsed .nav-link .material-symbols-outlined {
     font-weight: 800;
 }
 
+.ms-banner-quick-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    padding: 6px 14px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    border-radius: 99px !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    color: #ffffff !important;
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    transition: all 0.2s ease !important;
+    text-decoration: none !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}
+
+.ms-banner-quick-btn:hover {
+    background: #ffffff !important;
+    color: var(--accent-color, #d17d39) !important;
+    border-color: #ffffff !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.ms-banner-quick-btn:active {
+    transform: translateY(0) scale(0.96) !important;
+}
+
+.ms-banner-quick-btn .material-symbols-outlined {
+    font-size: 17px !important;
+    color: inherit !important;
+    display: inline-block !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+}
+
 .ms-overview-stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));

@@ -2109,13 +2109,13 @@ class MinSideManager {
                         <div class="ms-overview-banner-chip-label">${t('overview.memberSince')}</div>
                         <div class="ms-overview-banner-chip-value" id="ov-member-since">—</div>
                     </div>
-                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                        <button type="button" class="btn btn-ghost btn-sm ov-action-btn" data-view="reading-plans" style="font-size: 0.78rem; border-radius: 99px; background: rgba(255,255,255,0.7); backdrop-filter: blur(4px); padding: 5px 12px; height: 30px;">
-                            <span class="material-symbols-outlined" style="font-size: 15px;">auto_stories</span>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button type="button" class="ms-banner-quick-btn" onclick="window.minSideManager.loadView('reading-plans')">
+                            <span class="material-symbols-outlined">auto_stories</span>
                             <span>Leseplaner</span>
                         </button>
-                        <button type="button" class="btn btn-ghost btn-sm ov-action-btn" data-view="notes" style="font-size: 0.78rem; border-radius: 99px; background: rgba(255,255,255,0.7); backdrop-filter: blur(4px); padding: 5px 12px; height: 30px;">
-                            <span class="material-symbols-outlined" style="font-size: 15px;">edit_note</span>
+                        <button type="button" class="ms-banner-quick-btn" onclick="window.minSideManager.loadView('notes')">
+                            <span class="material-symbols-outlined">edit_note</span>
                             <span>Notater</span>
                         </button>
                     </div>
