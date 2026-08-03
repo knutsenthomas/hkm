@@ -105,33 +105,67 @@ async function fetchPCO(url, options, retries = 4) {
   return await fetch(url, options);
 }
 
-async function createOrSyncPerson(authHeader, { firstName, lastName, email, phone, note, createFollowupTask }) {
-  const pcoRes = await fetchPCO('https://api.planningcenteronline.com/people/v2/people', {
-    method: 'POST',
-    headers: {
-      Authorization: authHeader,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      data: {
-        type: 'Person',
-        attributes: {
-          first_name: firstName || 'Medlem',
-          last_name: lastName || ''
-        }
+async function findExistingPerson(authHeader, firstName, lastName, email) {
+  try {
+    if (email) {
+      const emailRes = await fetchPCO(`https://api.planningcenteronline.com/people/v2/people?where[search_name_or_email]=${encodeURIComponent(email)}`, {
+        headers: { Authorization: authHeader }
+      });
+      const emailData = await emailRes.json();
+      if (emailData.data && emailData.data.length > 0) {
+        return emailData.data[0];
       }
-    })
-  });
+    }
+    if (firstName && lastName) {
+      const nameRes = await fetchPCO(`https://api.planningcenteronline.com/people/v2/people?where[first_name]=${encodeURIComponent(firstName)}&where[last_name]=${encodeURIComponent(lastName)}`, {
+        headers: { Authorization: authHeader }
+      });
+      const nameData = await nameRes.json();
+      if (nameData.data && nameData.data.length > 0) {
+        return nameData.data[0];
+      }
+    }
+  } catch (err) {
+    console.warn('Find existing person error:', err);
+  }
+  return null;
+}
 
-  const data = await pcoRes.json();
-  if (!pcoRes.ok) {
-    return { success: false, error: data.errors?.[0]?.detail || 'Kunne ikke opprette person i Planning Center', details: data };
+async function createOrSyncPerson(authHeader, { firstName, lastName, email, phone, note, createFollowupTask }) {
+  // Search for existing person first to avoid creating duplicates in Planning Center
+  const existingPerson = await findExistingPerson(authHeader, firstName, lastName, email);
+  let personId = existingPerson?.id;
+  let personData = existingPerson;
+
+  if (!personId) {
+    const pcoRes = await fetchPCO('https://api.planningcenteronline.com/people/v2/people', {
+      method: 'POST',
+      headers: {
+        Authorization: authHeader,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        data: {
+          type: 'Person',
+          attributes: {
+            first_name: firstName || 'Medlem',
+            last_name: lastName || ''
+          }
+        }
+      })
+    });
+
+    const data = await pcoRes.json();
+    if (!pcoRes.ok) {
+      return { success: false, error: data.errors?.[0]?.detail || 'Kunne ikke opprette person i Planning Center', details: data };
+    }
+
+    personId = data.data?.id;
+    personData = data.data;
   }
 
-  const personId = data.data?.id;
-
-  // Add email if provided
-  if (email && personId) {
+  // Add email if provided and not already associated
+  if (email && personId && !existingPerson) {
     await fetchPCO(`https://api.planningcenteronline.com/people/v2/people/${personId}/emails`, {
       method: 'POST',
       headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
@@ -144,8 +178,8 @@ async function createOrSyncPerson(authHeader, { firstName, lastName, email, phon
     }).catch(() => {});
   }
 
-  // Add phone if provided
-  if (phone && personId) {
+  // Add phone if provided and not already associated
+  if (phone && personId && !existingPerson) {
     let cleanPhone = String(phone).trim().replace(/[^0-9+]/g, '');
     if (!cleanPhone.startsWith('+') && cleanPhone.length === 8) {
       cleanPhone = '+47' + cleanPhone;
@@ -164,7 +198,7 @@ async function createOrSyncPerson(authHeader, { firstName, lastName, email, phon
 
   // Automatically create a Follow-up Workflow Task in Planning Center if requested
   let taskData = null;
-  if (createFollowupTask !== false && personId) {
+  if (createFollowupTask !== false && personId && !existingPerson) {
     const workflowId = await ensureWorkflow(authHeader);
     if (workflowId) {
       taskData = await createWorkflowCard(authHeader, workflowId, personId, note || `Ny oppfølgingsoppgave for ${firstName} ${lastName}`.trim());
@@ -173,7 +207,8 @@ async function createOrSyncPerson(authHeader, { firstName, lastName, email, phon
 
   return {
     success: true,
-    person: data.data,
+    person: personData,
+    isExisting: !!existingPerson,
     taskCreated: !!taskData
   };
 }
