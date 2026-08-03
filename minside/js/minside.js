@@ -5658,15 +5658,15 @@ class MinSideManager {
         const inProgress = activeCourseInfo.find(ci => ci.total > 0 && ci.done > 0 && ci.pct < 100) || activeCourseInfo.find(ci => ci.total > 0 && ci.pct < 100);
 
         const continueHeroHtml = inProgress ? `
-            <div class="continue-course-hero" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 20px; padding: 24px; color: #fff; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);">
+            <div class="continue-course-hero">
                 <div style="display: flex; align-items: center; gap: 16px;">
-                    <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(209, 125, 57, 0.2); color: #d17d39; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <div class="hero-icon-box" style="width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                         <span class="material-symbols-outlined" style="font-size: 26px;">play_circle</span>
                     </div>
                     <div>
-                        <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #d17d39;">Fortsett der du slapp</div>
-                        <h3 style="font-size: 1.1rem; font-weight: 800; color: #fff; margin: 2px 0;">${this._escapeHtml(inProgress.course.title || '')}</h3>
-                        <p style="font-size: 0.8rem; color: #94a3b8; margin: 0;">${inProgress.done} av ${inProgress.total} leksjoner fullført (${inProgress.pct}%)</p>
+                        <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent-color, #d17d39);">Fortsett der du slapp</div>
+                        <h3 class="hero-title" style="font-size: 1.1rem; font-weight: 800; margin: 2px 0;">${this._escapeHtml(inProgress.course.title || '')}</h3>
+                        <p class="hero-subtitle" style="font-size: 0.8rem; margin: 0;">${inProgress.done} av ${inProgress.total} leksjoner fullført (${inProgress.pct}%)</p>
                     </div>
                 </div>
                 <a href="/kurs-detaljer.html?id=${encodeURIComponent(inProgress.course.id)}" class="btn btn-primary btn-sm" style="border-radius: 10px; font-weight: 700; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border: none; padding: 8px 18px; text-decoration: none; color: #fff; display: inline-flex; align-items: center; gap: 6px;">
