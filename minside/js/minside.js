@@ -5374,6 +5374,7 @@ class MinSideManager {
         const typeText = selectedType === 'all' ? (isNo ? 'Alle transaksjoner' : (isEs ? 'Todas las transacciones' : 'All transactions')) : (selectedType === 'gave' ? (isNo ? 'Kun gaver' : (isEs ? 'Solo ofrendas' : 'Donations only')) : (isNo ? 'Kun butikkjøp' : (isEs ? 'Solo tienda' : 'Shop purchases only')));
 
         const userName = this.profileData?.fullName || this.currentUser?.displayName || (isNo ? 'Medlem' : (isEs ? 'Miembro' : 'Member'));
+        const userSsn = this.profileData?.ssn || this.profileData?.nationalIdNumber || '';
         const userEmail = this.currentUser?.email || '';
         const userAddress = [
             this.profileData?.adresse,
@@ -5454,6 +5455,7 @@ class MinSideManager {
                         <div style="flex:1; background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:8px;">
                             <h3 style="margin:0 0 8px 0; font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Giver</h3>
                             <p style="margin:0; font-size:14px; font-weight:700; color:#0f172a;">${this._escapeHtml(userName)}</p>
+                            ${userSsn ? `<p style="margin:4px 0 0; font-size:12px; color:#475569;"><strong>F.nr:</strong> ${this._escapeHtml(userSsn)}</p>` : ''}
                             ${userEmail ? `<p style="margin:4px 0 0; font-size:12px; color:#475569;">${this._escapeHtml(userEmail)}</p>` : ''}
                             ${userAddress && userAddress !== 'Ingen registrert adresse' && userAddress !== 'Sin dirección registrada' && userAddress !== 'No registered address' ? `<p style="margin:4px 0 0; font-size:12px; color:#475569;">${this._escapeHtml(userAddress)}</p>` : ''}
                         </div>
