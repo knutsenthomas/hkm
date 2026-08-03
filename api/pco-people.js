@@ -34,7 +34,7 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
-      const { firstName, lastName, email, phone } = req.body || {};
+      const { firstName, lastName, email, phone, note, createFollowupTask } = req.body || {};
       if (!firstName && !lastName) {
         return res.status(400).json({ error: 'firstName eller lastName er påkrevd.' });
       }
@@ -95,12 +95,85 @@ export default async function handler(req, res) {
         }).catch(() => {});
       }
 
-      return res.status(200).json({ success: true, person: data.data });
+      // Automatically create a Follow-up Workflow Task in Planning Center if requested or by default for new members
+      let taskData = null;
+      if (createFollowupTask !== false && personId) {
+        const workflowId = await ensureWorkflow(authHeader);
+        if (workflowId) {
+          taskData = await createWorkflowCard(authHeader, workflowId, personId, note || `Ny oppfølgingsoppgave for ${firstName} ${lastName}`.trim());
+        }
+      }
+
+      return res.status(200).json({
+        success: true,
+        person: data.data,
+        taskCreated: !!taskData
+      });
     }
 
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (err) {
     console.error('Planning Center People API Error:', err);
     return res.status(500).json({ error: err.message || 'Serverfeil ved koble mot Planning Center' });
+  }
+}
+
+async function ensureWorkflow(authHeader) {
+  try {
+    const listRes = await fetch('https://api.planningcenteronline.com/people/v2/workflows', {
+      headers: { Authorization: authHeader }
+    });
+    const listData = await listRes.json();
+    let wf = (listData.data || []).find(w => w.attributes?.name === 'Oppfølging fra HKM Nettside');
+    
+    if (wf) return wf.id;
+
+    const createRes = await fetch('https://api.planningcenteronline.com/people/v2/workflows', {
+      method: 'POST',
+      headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        data: {
+          type: 'Workflow',
+          attributes: {
+            name: 'Oppfølging fra HKM Nettside'
+          }
+        }
+      })
+    });
+    const createData = await createRes.json();
+    return createData.data?.id;
+  } catch (err) {
+    console.warn('Workflow creation warning:', err);
+    return null;
+  }
+}
+
+async function createWorkflowCard(authHeader, workflowId, personId, note = '') {
+  if (!workflowId || !personId) return null;
+  try {
+    const cardRes = await fetch(`https://api.planningcenteronline.com/people/v2/workflows/${workflowId}/cards`, {
+      method: 'POST',
+      headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        data: {
+          type: 'WorkflowCard',
+          attributes: {
+            note: note || 'Ny registrering/henvendelse fra HKM Nettside'
+          },
+          relationships: {
+            person: {
+              data: {
+                type: 'Person',
+                id: personId
+              }
+            }
+          }
+        }
+      })
+    });
+    return await cardRes.json();
+  } catch (err) {
+    console.warn('Workflow card creation warning:', err);
+    return null;
   }
 }
