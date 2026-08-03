@@ -16,25 +16,26 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { phone, text, phones } = req.body || {};
-
-  // Support single phone string or array of phones
-  let targetPhones = [];
-  if (Array.isArray(phones) && phones.length > 0) {
-    targetPhones = phones;
-  } else if (phone) {
-    targetPhones = [phone];
-  }
-
-  if (targetPhones.length === 0 || !text) {
-    return res.status(400).json({ error: 'Mangler mottakertelefon (phone/phones) eller meldingstekst (text).' });
-  }
-
   const username = process.env.TEXTMAGIC_USERNAME || 'HKMmelding';
   const apiKey = process.env.TEXTMAGIC_API_KEY || 'qyaL8YBWbcb3PC9rP4xerf5GmBIHpa';
 
   if (!username || !apiKey) {
     return res.status(500).json({ error: 'TextMagic API-nøkler er ikke konfigurert.' });
+  }
+
+  // Support single phone string or array of phones, fallback to account owner phone
+  let targetPhones = [];
+  if (Array.isArray(phones) && phones.length > 0) {
+    targetPhones = phones;
+  } else if (phone) {
+    targetPhones = [phone];
+  } else {
+    // Default to HKM Account Owner phone number (4793094615)
+    targetPhones = [process.env.ADMIN_NOTIFY_PHONE || '4793094615'];
+  }
+
+  if (!text) {
+    return res.status(400).json({ error: 'Mangler meldingstekst (text).' });
   }
 
   // Format phone numbers to E.164 (ensure +47 prefix for Norwegian numbers if missing)
