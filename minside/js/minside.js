@@ -2683,6 +2683,9 @@ class MinSideManager {
         const uid = this.currentUser?.uid;
         if (!uid) return;
 
+        const isNo = document.documentElement.lang === 'no' || !document.documentElement.lang;
+        const isEs = document.documentElement.lang === 'es';
+
         // Fresh fetch
         let data = {};
         try {
