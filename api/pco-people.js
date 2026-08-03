@@ -1,3 +1,5 @@
+export const maxDuration = 60; // Set Vercel serverless timeout to 60s
+
 export default async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -30,7 +32,12 @@ export default async function handler(req, res) {
       if (!pcoRes.ok) {
         return res.status(pcoRes.status).json({ error: data.errors?.[0]?.detail || 'Planning Center API error', details: data });
       }
-      return res.status(200).json({ success: true, count: data.meta?.total_count || 0, data: data.data || [], included: data.included || [] });
+      return res.status(200).json({
+        success: true,
+        count: data.meta?.total_count || data.data?.length || 0,
+        data: data.data || [],
+        included: data.included || []
+      });
     }
 
     if (req.method === 'POST') {
@@ -40,23 +47,35 @@ export default async function handler(req, res) {
       if (Array.isArray(body.contacts)) {
         let syncedCount = 0;
         const results = [];
-        for (const c of body.contacts) {
-          const fn = c.firstName || (c.name ? c.name.split(' ')[0] : 'Medlem');
-          const ln = c.lastName || (c.name ? c.name.split(' ').slice(1).join(' ') : '');
-          try {
-            const syncRes = await createOrSyncPerson(authHeader, {
-              firstName: fn,
-              lastName: ln,
-              email: c.email,
-              phone: c.phone,
-              createFollowupTask: false
-            });
-            if (syncRes.success) syncedCount++;
-            results.push(syncRes);
-          } catch (e) {
-            console.warn('Bulk sync error for item:', c, e);
-          }
+
+        // Process batch with concurreny limit of 4 to stay well within PCO rate limits and Vercel execution window
+        const batchSize = 4;
+        for (let i = 0; i < body.contacts.length; i += batchSize) {
+          const chunk = body.contacts.slice(i, i + batchSize);
+          const chunkPromises = chunk.map(async (c) => {
+            const fn = c.firstName || (c.name ? c.name.split(' ')[0] : 'Medlem');
+            const ln = c.lastName || (c.name ? c.name.split(' ').slice(1).join(' ') : '');
+            try {
+              return await createOrSyncPerson(authHeader, {
+                firstName: fn,
+                lastName: ln,
+                email: c.email,
+                phone: c.phone,
+                createFollowupTask: false
+              });
+            } catch (e) {
+              console.warn('Bulk sync item error:', c, e);
+              return { success: false, error: e.message };
+            }
+          });
+
+          const chunkResults = await Promise.all(chunkPromises);
+          chunkResults.forEach((resItem) => {
+            if (resItem && resItem.success) syncedCount++;
+            results.push(resItem);
+          });
         }
+
         return res.status(200).json({ success: true, syncedCount, total: body.contacts.length, results });
       }
 
@@ -101,19 +120,22 @@ async function createOrSyncPerson(authHeader, { firstName, lastName, email, phon
   }
 
   const personId = data.data?.id;
+  const childRequests = [];
 
   // Add email if provided
   if (email && personId) {
-    await fetch(`https://api.planningcenteronline.com/people/v2/people/${personId}/emails`, {
-      method: 'POST',
-      headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        data: {
-          type: 'Email',
-          attributes: { address: email, location: 'Home' }
-        }
-      })
-    }).catch(() => {});
+    childRequests.push(
+      fetch(`https://api.planningcenteronline.com/people/v2/people/${personId}/emails`, {
+        method: 'POST',
+        headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data: {
+            type: 'Email',
+            attributes: { address: email, location: 'Home' }
+          }
+        })
+      }).catch(() => {})
+    );
   }
 
   // Add phone if provided
@@ -122,16 +144,22 @@ async function createOrSyncPerson(authHeader, { firstName, lastName, email, phon
     if (!cleanPhone.startsWith('+') && cleanPhone.length === 8) {
       cleanPhone = '+47' + cleanPhone;
     }
-    await fetch(`https://api.planningcenteronline.com/people/v2/people/${personId}/phone_numbers`, {
-      method: 'POST',
-      headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        data: {
-          type: 'PhoneNumber',
-          attributes: { number: cleanPhone, location: 'Mobile' }
-        }
-      })
-    }).catch(() => {});
+    childRequests.push(
+      fetch(`https://api.planningcenteronline.com/people/v2/people/${personId}/phone_numbers`, {
+        method: 'POST',
+        headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data: {
+            type: 'PhoneNumber',
+            attributes: { number: cleanPhone, location: 'Mobile' }
+          }
+        })
+      }).catch(() => {})
+    );
+  }
+
+  if (childRequests.length > 0) {
+    await Promise.all(childRequests);
   }
 
   // Automatically create a Follow-up Workflow Task in Planning Center if requested

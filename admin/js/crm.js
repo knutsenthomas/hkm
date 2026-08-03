@@ -3290,23 +3290,33 @@ class CRMManager {
                 return;
             }
 
-            const syncRes = await fetch('/api/pco-people', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contacts: contactsToSync })
-            });
+            let totalSynced = 0;
+            const batchSize = 15;
 
-            const syncData = await syncRes.json();
-            if (!syncRes.ok || !syncData.success) {
-                throw new Error(syncData.error || 'Kunne ikke overføre kontakter til Planning Center');
+            for (let i = 0; i < contactsToSync.length; i += batchSize) {
+                const batch = contactsToSync.slice(i, i + batchSize);
+                if (btn) {
+                    btn.innerHTML = `<span class="material-symbols-outlined spin" style="font-size: 18px;">sync</span> Synk (${Math.min(i + batchSize, contactsToSync.length)}/${contactsToSync.length})...`;
+                }
+
+                const syncRes = await fetch('/api/pco-people', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contacts: batch })
+                });
+
+                const syncData = await syncRes.json();
+                if (syncRes.ok && syncData.success) {
+                    totalSynced += (syncData.syncedCount || 0);
+                }
             }
 
-            // 2. Fetch people from Planning Center People to check for any new contacts in PCO
+            // 2. Fetch total count of people in Planning Center People
             const getRes = await fetch('/api/pco-people', { method: 'GET' });
             const getData = await getRes.json();
-            const pcoPeopleCount = getData.count || 0;
+            const pcoPeopleCount = getData.count || (getData.data ? getData.data.length : 0);
 
-            alert(`✅ Synkronisering fullført!\n- ${syncData.syncedCount} av ${contactsToSync.length} HKM-kontakter ble overført/oppdatert i Planning Center People.\n- Det finnes totalt ${pcoPeopleCount} registreringer i din Planning Center-konto.`);
+            alert(`✅ Synkronisering fullført!\n- ${totalSynced} av ${contactsToSync.length} HKM-kontakter ble overført/oppdatert i Planning Center People.\n- Det finnes totalt ${pcoPeopleCount} personer i din Planning Center-konto.`);
 
         } catch (err) {
             console.error('Planning Center sync error:', err);
