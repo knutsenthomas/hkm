@@ -3417,6 +3417,22 @@
                     }
                 });
 
+                function syncEnrollmentToPCO(courseTitle, name, email, phone) {
+                    if (!courseTitle || (!name && !email)) return;
+                    const parts = (name || '').trim().split(' ');
+                    const firstName = parts[0] || 'Kursdeltaker';
+                    const lastName = parts.slice(1).join(' ') || '';
+                    fetch('/api/pco-courses', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ courseName: courseTitle, firstName, lastName, email, phone })
+                    }).then(r => r.json()).then(data => {
+                        console.log('[HKM] Course registration synced to Planning Center:', data);
+                    }).catch(err => {
+                        console.warn('[HKM] Course PCO sync background error:', err);
+                    });
+                }
+
                 document.getElementById('enroll-form').addEventListener('submit', async e => {
                     e.preventDefault();
                     const name = document.getElementById('enroll-name').value.trim();
@@ -3434,15 +3450,20 @@
                             check();
                         });
                         const phone = document.getElementById('enroll-phone').value.trim();
+                        const courseTitle = currentCourse?.title || 'HKM Kurs';
+
                         await firebase.firestore().collection('courseEnrollments').add({
                             name, email, phone, message,
                             courseId: currentCourse?.id || '',
-                            courseTitle: currentCourse?.title || '',
+                            courseTitle: courseTitle,
                             amount: currentPrice,
                             paidLessons: selectedLessons,
                             enrolledAt: firebase.firestore.FieldValue.serverTimestamp(),
                             status: 'pending'
                         });
+
+                        // Trigger automatic sync to Planning Center
+                        syncEnrollmentToPCO(courseTitle, name, email, phone);
 
                         status.style.color = '#d17d39';
                         status.textContent = t('thankYouContact');
@@ -3478,10 +3499,11 @@
                         vBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + t('pleaseWait');
                         
                         try {
+                            const courseTitle = currentCourse?.title || 'HKM Kurs';
                             const customerDetails = {
                                 name, email, phone,
                                 courseId: currentCourse?.id || '',
-                                courseTitle: currentCourse?.title || '',
+                                courseTitle: courseTitle,
                                 type: 'Course'
                             };
                             
@@ -3493,6 +3515,9 @@
                                 status: 'pending_vipps',
                                 paymentMethod: 'Vipps'
                             });
+
+                            // Trigger automatic sync to Planning Center
+                            syncEnrollmentToPCO(courseTitle, name, email, phone);
                             
                             if (typeof window.startVippsPayment === 'function') {
                                 await window.startVippsPayment(currentPrice, { ...customerDetails, amount: currentPrice, paidLessons: selectedLessons });
@@ -3528,6 +3553,7 @@
                         sBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + t('pleaseWait');
                         
                         try {
+                            const courseTitle = currentCourse?.title || 'HKM Kurs';
                             const response = await fetch("https://createpaymentintent-42bhgdjkcq-uc.a.run.app", {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
@@ -3537,7 +3563,7 @@
                                     customerDetails: {
                                         name, email, phone,
                                         courseId: currentCourse.id,
-                                        courseTitle: currentCourse.title,
+                                        courseTitle: courseTitle,
                                         paidLessons: selectedLessons,
                                         type: 'Course'
                                     }
@@ -3579,13 +3605,16 @@
                                 await firebase.firestore().collection('courseEnrollments').add({
                                     name, email, phone,
                                     courseId: currentCourse.id,
-                                    courseTitle: currentCourse.title,
+                                    courseTitle: courseTitle,
                                     amount: currentPrice,
                                     paidLessons: selectedLessons,
                                     enrolledAt: firebase.firestore.FieldValue.serverTimestamp(),
                                     status: 'pending_stripe',
                                     paymentMethod: 'Card'
                                 });
+
+                                // Trigger automatic sync to Planning Center
+                                syncEnrollmentToPCO(courseTitle, name, email, phone);
                                 
                                 const { error } = await stripe.confirmPayment({
                                     elements,
