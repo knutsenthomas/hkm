@@ -1963,12 +1963,43 @@ export class HkmGroupsManager {
         `;
     }
 
-    renderHubMembers(tabContainer) {
+    async renderHubMembers(tabContainer) {
         const group = this.activeGroup;
         const uid = firebase.auth().currentUser?.uid;
         const isLeader = this.checkIsLeader(group);
         const canManage = isLeader || this.isAdmin;
         const totalCount = ((group.memberNames || []).length + (group.leaderNames || []).length) || (group.memberUids || []).length;
+
+        // Render loading state first
+        tabContainer.innerHTML = `
+            <div style="background: var(--card-bg, #fff); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 200px;">
+                <style>
+                    @keyframes hkm-spin {
+                        from { transform: rotate(0deg); }
+                        to { transform: rotate(360deg); }
+                    }
+                </style>
+                <span class="material-symbols-outlined" style="font-size: 32px; animation: hkm-spin 1.5s linear infinite; color: var(--admin-orange, #d17d39); margin-bottom: 12px; display: block;">sync</span>
+                <div style="font-size: 14px; opacity: 0.8; font-weight: 500;">Henter medlemsdetaljer...</div>
+            </div>
+        `;
+
+        let membersDetailMap = {};
+        try {
+            const db = firebase.firestore();
+            const snap = await db.collection('groupMembers').where('groupId', '==', group.id).get();
+            snap.forEach(doc => {
+                const data = doc.data();
+                if (data.name) {
+                    membersDetailMap[data.name.trim().toLowerCase()] = {
+                        email: data.email || '',
+                        phone: data.phone || ''
+                    };
+                }
+            });
+        } catch (e) {
+            console.error("Error loading group member details:", e);
+        }
 
         tabContainer.innerHTML = `
             <div style="background: var(--card-bg, #fff); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0); display: flex; flex-direction: column;">
@@ -2001,53 +2032,95 @@ export class HkmGroupsManager {
                 ` : ''}
 
                 <div class="compact-members-list" style="display: flex; flex-direction: column; gap: 4px;">
-                    ${(group.leaderNames || []).map(leader => `
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; border-radius: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='var(--bg-muted, #f8fafc)'" onmouseout="this.style.background='transparent'">
-                            <div style="display: flex; align-items: center; gap: 12px;">
+                    ${(group.leaderNames || []).filter(Boolean).map(leader => {
+                        const detail = membersDetailMap[leader.trim().toLowerCase()];
+                        return `
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; border-radius: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='var(--bg-muted, #f8fafc)'" onmouseout="this.style.background='transparent'">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    ${canManage ? `
+                                        <input type="checkbox" class="remove-member-checkbox" data-name="${this.escapeHtml(leader)}" data-role="leader" style="width: 16px; height: 16px; cursor: pointer; accent-color: #ef4444;">
+                                    ` : ''}
+                                    <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--admin-orange, #d17d39); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0;">
+                                        ${leader.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div style="display: flex; flex-direction: column;">
+                                        <div style="font-weight: 600; font-size: 14px; color: var(--text-color, #0f172a);">${this.escapeHtml(leader)}</div>
+                                        ${detail && (detail.email || detail.phone) ? `
+                                            <div style="font-size: 12px; color: var(--text-muted, #64748b); margin-top: 2px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                                                ${detail.email ? `
+                                                    <span style="display: inline-flex; align-items: center; gap: 4px;">
+                                                        <span class="material-symbols-outlined" style="font-size: 14px; opacity: 0.7; display: block;">mail</span>
+                                                        <a href="mailto:${this.escapeHtml(detail.email)}" style="color: inherit; text-decoration: none;">${this.escapeHtml(detail.email)}</a>
+                                                    </span>
+                                                ` : ''}
+                                                ${detail.phone ? `
+                                                    <span style="display: inline-flex; align-items: center; gap: 4px;">
+                                                        <span class="material-symbols-outlined" style="font-size: 14px; opacity: 0.7; display: block;">call</span>
+                                                        <a href="tel:${this.escapeHtml(detail.phone)}" style="color: inherit; text-decoration: none;">${this.escapeHtml(detail.phone)}</a>
+                                                    </span>
+                                                ` : ''}
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
                                 ${canManage ? `
-                                    <input type="checkbox" class="remove-member-checkbox" data-name="${this.escapeHtml(leader)}" data-role="leader" style="width: 16px; height: 16px; cursor: pointer; accent-color: #ef4444;">
-                                ` : ''}
-                                <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--admin-orange, #d17d39); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;">
-                                    ${leader.charAt(0).toUpperCase()}
-                                </div>
-                                <div style="font-weight: 600; font-size: 14px; color: var(--text-color, #0f172a);">${this.escapeHtml(leader)}</div>
+                                    <select class="member-role-select" data-name="${this.escapeHtml(leader)}" data-current-role="leader" style="font-size: 12px; font-weight: 700; border: 1px solid #fde68a; border-radius: 12px; padding: 4px 12px; background: #fef3c7; color: var(--admin-orange, #d17d39); cursor: pointer; outline: none; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+                                        <option value="leader" selected>★ ${this.t('groups.groupLeder')}</option>
+                                        <option value="member">${this.t('groups.groupMedlem')}</option>
+                                    </select>
+                                ` : `
+                                    <div style="font-size: 11px; color: var(--admin-orange, #d17d39); font-weight: 600; background: #fffbeb; border: 1px solid #fef3c7; padding: 2px 8px; border-radius: 12px; display: inline-flex; align-items: center; gap: 3px;">
+                                        <span class="material-symbols-outlined" style="font-size: 12px; color: var(--admin-orange, #d17d39); font-variation-settings: 'FILL' 1;">star</span>
+                                        <span>${this.t('groups.groupLeder')}</span>
+                                    </div>
+                                `}
                             </div>
-                            ${canManage ? `
-                                <select class="member-role-select" data-name="${this.escapeHtml(leader)}" data-current-role="leader" style="font-size: 12px; font-weight: 700; border: 1px solid #fde68a; border-radius: 12px; padding: 4px 12px; background: #fef3c7; color: var(--admin-orange, #d17d39); cursor: pointer; outline: none; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
-                                    <option value="leader" selected>★ ${this.t('groups.groupLeder')}</option>
-                                    <option value="member">${this.t('groups.groupMedlem')}</option>
-                                </select>
-                            ` : `
-                                <div style="font-size: 11px; color: var(--admin-orange, #d17d39); font-weight: 600; background: #fffbeb; border: 1px solid #fef3c7; padding: 2px 8px; border-radius: 12px; display: inline-flex; align-items: center; gap: 3px;">
-                                    <span class="material-symbols-outlined" style="font-size: 12px; color: var(--admin-orange, #d17d39); font-variation-settings: 'FILL' 1;">star</span>
-                                    <span>${this.t('groups.groupLeder')}</span>
+                        `;
+                    }).join('')}
+                    ${(group.memberNames || []).filter(Boolean).filter(m => !(group.leaderNames || []).includes(m)).map(member => {
+                        const detail = membersDetailMap[member.trim().toLowerCase()];
+                        return `
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; border-radius: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='var(--bg-muted, #f8fafc)'" onmouseout="this.style.background='transparent'">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    ${canManage ? `
+                                        <input type="checkbox" class="remove-member-checkbox" data-name="${this.escapeHtml(member)}" data-role="member" style="width: 16px; height: 16px; cursor: pointer; accent-color: #ef4444;">
+                                    ` : ''}
+                                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #0f172a; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0;">
+                                        ${member.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div style="display: flex; flex-direction: column;">
+                                        <div style="font-weight: 600; font-size: 14px; color: var(--text-color, #0f172a);">${this.escapeHtml(member)}</div>
+                                        ${detail && (detail.email || detail.phone) ? `
+                                            <div style="font-size: 12px; color: var(--text-muted, #64748b); margin-top: 2px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                                                ${detail.email ? `
+                                                    <span style="display: inline-flex; align-items: center; gap: 4px;">
+                                                        <span class="material-symbols-outlined" style="font-size: 14px; opacity: 0.7; display: block;">mail</span>
+                                                        <a href="mailto:${this.escapeHtml(detail.email)}" style="color: inherit; text-decoration: none;">${this.escapeHtml(detail.email)}</a>
+                                                    </span>
+                                                ` : ''}
+                                                ${detail.phone ? `
+                                                    <span style="display: inline-flex; align-items: center; gap: 4px;">
+                                                        <span class="material-symbols-outlined" style="font-size: 14px; opacity: 0.7; display: block;">call</span>
+                                                        <a href="tel:${this.escapeHtml(detail.phone)}" style="color: inherit; text-decoration: none;">${this.escapeHtml(detail.phone)}</a>
+                                                    </span>
+                                                ` : ''}
+                                            </div>
+                                        ` : ''}
+                                    </div>
                                 </div>
-                            `}
-                        </div>
-                    `).join('')}
-                    ${(group.memberNames || []).filter(m => !(group.leaderNames || []).includes(m)).map(member => `
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; border-radius: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='var(--bg-muted, #f8fafc)'" onmouseout="this.style.background='transparent'">
-                            <div style="display: flex; align-items: center; gap: 12px;">
                                 ${canManage ? `
-                                    <input type="checkbox" class="remove-member-checkbox" data-name="${this.escapeHtml(member)}" data-role="member" style="width: 16px; height: 16px; cursor: pointer; accent-color: #ef4444;">
-                                ` : ''}
-                                <div style="width: 32px; height: 32px; border-radius: 50%; background: #0f172a; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;">
-                                    ${member.charAt(0).toUpperCase()}
-                                </div>
-                                <div style="font-weight: 600; font-size: 14px; color: var(--text-color, #0f172a);">${this.escapeHtml(member)}</div>
+                                    <select class="member-role-select" data-name="${this.escapeHtml(member)}" data-current-role="member" style="font-size: 12px; font-weight: 600; border: 1px solid var(--border-color, #cbd5e1); border-radius: 12px; padding: 4px 12px; background: var(--bg-muted, #f8fafc); color: var(--text-muted, #64748b); cursor: pointer; outline: none; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+                                        <option value="leader">★ ${this.t('groups.groupLeder')}</option>
+                                        <option value="member" selected>${this.t('groups.groupMedlem')}</option>
+                                    </select>
+                                ` : `
+                                    <div style="font-size: 11px; color: var(--text-muted, #64748b); font-weight: 600; background: var(--bg-muted, #f1f5f9); padding: 2px 8px; border-radius: 12px;">
+                                        ${this.t('groups.groupMedlem')}
+                                    </div>
+                                `}
                             </div>
-                            ${canManage ? `
-                                <select class="member-role-select" data-name="${this.escapeHtml(member)}" data-current-role="member" style="font-size: 12px; font-weight: 600; border: 1px solid var(--border-color, #cbd5e1); border-radius: 12px; padding: 4px 12px; background: var(--bg-muted, #f8fafc); color: var(--text-muted, #64748b); cursor: pointer; outline: none; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
-                                    <option value="leader">★ ${this.t('groups.groupLeder')}</option>
-                                    <option value="member" selected>${this.t('groups.groupMedlem')}</option>
-                                </select>
-                            ` : `
-                                <div style="font-size: 11px; color: var(--text-muted, #64748b); font-weight: 600; background: var(--bg-muted, #f1f5f9); padding: 2px 8px; border-radius: 12px;">
-                                    ${this.t('groups.groupMedlem')}
-                                </div>
-                            `}
-                        </div>
-                    `).join('')}
+                        `;
+                    }).join('')}
                 </div>
             </div>
         `;
