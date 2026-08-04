@@ -727,7 +727,24 @@ export class HkmGroupsManager {
                         </div>
                         <div>
                             <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Beskrivelse</label>
-                            <textarea id="group-description-input" rows="4" placeholder="Fortell om hva gruppen gjør... Du kan bruke rik formatering (f.eks. **fet skrift**, - punkter, og [lenke](url))." style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a); font-family: inherit; font-size: 13px; line-height: 1.5;"></textarea>
+                            <!-- Rich Formatting Toolbar -->
+                            <div class="textarea-toolbar" style="display: flex; gap: 8px; margin-bottom: 0; background: var(--bg-muted, #f8fafc); padding: 8px 12px; border-radius: 10px 10px 0 0; border: 1px solid var(--border-color, #cbd5e1); border-bottom: none; align-items: center;">
+                                <button type="button" class="toolbar-btn" data-format="bold" title="Fet skrift" style="background: transparent; border: none; padding: 4px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; outline: none;" onmouseover="this.style.background='rgba(15,23,42,0.06)'" onmouseout="this.style.background='transparent'">
+                                    <span class="material-symbols-outlined" style="font-size: 20px; font-weight: bold; color: var(--text-color, #475569);">format_bold</span>
+                                </button>
+                                <button type="button" class="toolbar-btn" data-format="italic" title="Kursiv skrift" style="background: transparent; border: none; padding: 4px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; outline: none;" onmouseover="this.style.background='rgba(15,23,42,0.06)'" onmouseout="this.style.background='transparent'">
+                                    <span class="material-symbols-outlined" style="font-size: 20px; color: var(--text-color, #475569);">format_italic</span>
+                                </button>
+                                <button type="button" class="toolbar-btn" data-format="list" title="Punktliste" style="background: transparent; border: none; padding: 4px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; outline: none;" onmouseover="this.style.background='rgba(15,23,42,0.06)'" onmouseout="this.style.background='transparent'">
+                                    <span class="material-symbols-outlined" style="font-size: 20px; color: var(--text-color, #475569);">format_list_bulleted</span>
+                                </button>
+                                <button type="button" class="toolbar-btn" data-format="link" title="Sett inn lenke" style="background: transparent; border: none; padding: 4px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; outline: none;" onmouseover="this.style.background='rgba(15,23,42,0.06)'" onmouseout="this.style.background='transparent'">
+                                    <span class="material-symbols-outlined" style="font-size: 20px; color: var(--text-color, #475569);">link</span>
+                                </button>
+                                <div style="height: 16px; width: 1px; background: var(--border-color, #cbd5e1); margin: 0 4px;"></div>
+                                <span style="font-size: 11px; color: var(--text-muted, #64748b); font-weight: 500;">Markdown-verktøy</span>
+                            </div>
+                            <textarea id="group-description-input" rows="4" placeholder="Fortell om hva gruppen gjør... Du kan bruke rik formatering (f.eks. **fet skrift**, - punkter, og [lenke](url))." style="width: 100%; padding: 10px 14px; border-radius: 0 0 10px 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a); font-family: inherit; font-size: 13px; line-height: 1.5; outline: none;"></textarea>
                         </div>
                         <div>
                             <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">WhatsApp Gruppelenke (valgfri)</label>
@@ -3388,6 +3405,34 @@ export class HkmGroupsManager {
             form.querySelector('#group-image-input').value = '';
             if (previewEl) previewEl.src = defaultImg;
         }
+        // Bind rich formatting toolbar buttons
+        const toolbarButtons = modal.querySelectorAll('.toolbar-btn');
+        const textarea = form.querySelector('#group-description-input');
+        toolbarButtons.forEach(btn => {
+            btn.onclick = (e) => {
+                e.preventDefault();
+                const format = btn.dataset.format;
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const text = textarea.value;
+                const selected = text.substring(start, end);
+                
+                let replacement = '';
+                if (format === 'bold') {
+                    replacement = `**${selected || 'fet tekst'}**`;
+                } else if (format === 'italic') {
+                    replacement = `*${selected || 'kursiv tekst'}*`;
+                } else if (format === 'list') {
+                    replacement = `\n- ${selected || 'punkt'}`;
+                } else if (format === 'link') {
+                    replacement = `[${selected || 'lenketekst'}](https://)`;
+                }
+                
+                textarea.value = text.substring(0, start) + replacement + text.substring(end);
+                textarea.focus();
+                textarea.setSelectionRange(start + replacement.length, start + replacement.length);
+            };
+        });
 
         modal.style.display = 'flex';
     }
