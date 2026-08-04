@@ -180,54 +180,67 @@
 
     <!-- Header -->
     <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
-        <div class="header-content" id="header-container">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
+            id="header-container">
+            <!-- Logo -->
             <a href="/en/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
-                <div class="w-[45px] h-[45px] flex items-center justify-center rounded-lg overflow-hidden shrink-0 logo-icon">
+                <div
+                    class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
                     <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
                 </div>
                 <span class="text-xl">His Kingdom Ministry</span>
             </a>
 
+            <!-- Right Actions: Donate + Language + Hamburger -->
             <div class="header-actions">
+                <!-- Utilities Dock (Search, Bible, Reading Plans, Language Selector) -->
                 <div class="header-actions-dock">
-                    <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Search website">
+                    <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Search the site">
                         <span class="material-symbols-outlined text-xl" style="position: relative; top: 0px; left: 9px;">search</span>
                     </button>
                     
                     <div class="header-actions-expandable">
-                        <a href="/en/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Read Bible" title="Read Bible">
+                        <a href="/en/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-bible-btn" aria-label="Read the Bible" title="Read the Bible">
                             <span class="material-symbols-outlined text-xl">menu_book</span>
                         </a>
-                        <a href="/en/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Reading Plans" title="Reading Plans">
+                        <a href="/en/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-reading-plans-btn" aria-label="Reading Plans" title="Reading Plans">
                             <span class="material-symbols-outlined text-xl">calendar_today</span>
                         </a>
                         
-                        <div class="hidden md:block w-px h-5 bg-white/20 mx-1"></div>
+                        <div class="hidden md:block w-px h-5 bg-white/20 mx-1 dock-divider"></div>
 
+                        <!-- Language Switcher in same styling -->
                         <div class="lang-switcher relative group">
-                            <button class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full text-white hover:bg-white/15 transition-all lang-btn" aria-label="Select language">
+                            <button class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full text-white hover:bg-white/15 transition-all lang-btn" aria-label="Velg språk">
                                 <span class="material-symbols-outlined text-lg">language</span>
                                 <span>EN</span>
                             </button>
                             <div class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden border border-gray-100">
-                                <a href="/ressurser/bibeloppbygning" class="block px-4 py-2 text-gray-800 hover:bg-gray-50">🇳🇴 Norsk</a>
-                                <a href="/en/ressurser/bibeloppbygning" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 font-bold">🇺🇸 English</a>
-                                <a href="/es/ressurser/bibeloppbygning" class="block px-4 py-2 text-gray-800 hover:bg-gray-50">🇪🇸 Español</a>
+                                <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
+                                <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="en">🇺🇸 English</a>
+                                <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="es">🇪🇸 Español</a>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <a href="/minside/index.html" class="w-11 h-11 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all relative overflow-hidden hidden" aria-label="My Page" title="My Page">
+                <!-- Profile Button -->
+                <a href="/minside/index.html" id="header-profile-link" class="w-11 h-11 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all relative overflow-hidden hidden" aria-label="My Page" title="My Page">
                     <span class="material-symbols-outlined text-xl">account_circle</span>
+                    <img id="header-profile-img" src="" alt="Profile Picture" class="absolute inset-0 w-full h-full object-cover hidden rounded-full">
                 </a>
 
-                <a href="/donasjoner" class="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-[1.03] active:scale-[0.98] transition-all shadow-md shadow-orange-500/10 header-donate-btn">
+                <!-- Primary CTA: Donate (Pill Style, gradient) -->
+                <a href="/en/donations"
+                    class="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-[1.03] active:scale-[0.98] transition-all shadow-md shadow-orange-500/10 header-donate-btn">
                     <span>Donate</span>
                     <span class="material-symbols-outlined text-lg">favorite</span>
                 </a>
 
-                <button class="menu-toggle w-11 h-11 rounded-full flex items-center justify-center text-white bg-white/15 border border-white/10 hover:bg-white/25 active:scale-95 transition-all relative focus:outline-none focus:ring-0" id="menu-toggle" aria-label="Toggle menu">
+                <!-- Unified Toggle Button (Neutral circular button matching utilities) -->
+                <button
+                    class="menu-toggle w-11 h-11 rounded-full flex items-center justify-center text-white bg-white/15 border border-white/10 hover:bg-white/25 active:scale-95 transition-all relative focus:outline-none focus:ring-0"
+                    id="menu-toggle" aria-label="Toggle menu">
                     <span class="material-symbols-outlined text-2xl open-icon">menu</span>
                     <span class="material-symbols-outlined text-2xl close-icon hidden">close</span>
                 </button>
@@ -666,9 +679,112 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer" id="kontakt">
-        <div class="container mx-auto px-4 text-center text-xs text-gray-500">
-            <p>&copy; 2026 His Kingdom Ministry. All rights reserved.</p>
+    <footer class="footer" id="contact">
+        <div class="container">
+            <div class="footer-layout-v2">
+                <!-- Left Section: Brand + Links -->
+                <div class="footer-left">
+                    <div class="footer-brand">
+                        <a href="/en/" class="logo">
+                            <div class="logo-icon">
+                                <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" loading="lazy">
+                            </div>
+                            <span class="logo-text">His Kingdom Ministry</span>
+                        </a>
+                        <p class="brand-description">His Kingdom Ministry is a non-profit organization dedicated to
+                            spiritual growth through teaching, podcast, and missionary travel.</p>
+                    </div>
+
+                    <div class="footer-nav-grid">
+                        <div class="nav-col">
+                            <h4>About us</h4>
+                            <ul>
+                                <li><a href="/en">Home</a></li>
+                                <li><a href="/en/about">Who are we?</a></li>
+                                <li><a href="/en/about">Our vision</a></li>
+                                <li><a href="/en/contact">Contact us</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Resources</h4>
+                            <ul>
+                                <li><a href="/bibel">Bible</a></li>
+                                <li><a href="/en/media">Teaching</a></li>
+
+                                <li><a href="/en/courses">E-courses</a></li>
+                                <li><a href="/en/blog">Books & Blog</a></li>
+                                <li><a href="/en/../minside/index">My Page</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Media</h4>
+                            <ul>
+                                <li><a href="/en/media">Podcast</a></li>
+                                <li><a href="/en/media">Videos</a></li>
+                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Involvement</h4>
+                            <ul>
+                                <li><a href="/en/events">Calendar</a></li>
+                                <li><a href="/en/donations">Give a gift</a></li>
+                                <li><a href="/en/privacy">Privacy Policy</a></li>
+                                <li><a href="/en/accessibility">Accessibility</a></li>
+                                <li><a href="javascript:void(0)" onclick="if(window.showCookieBanner){window.showCookieBanner();}else{localStorage.removeItem('hkm_cookie_consent');location.reload();}return false;">Cookies</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Section: Cards -->
+                <div class="footer-right">
+                    <div class="footer-card">
+                        <h3>Follow Us</h3>
+                        <div class="footer-social-icons">
+                            <a href="https://www.facebook.com/hiskingdomministry777" target="_blank" aria-label="Facebook"><i
+                                    class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank" aria-label="Instagram"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank" aria-label="YouTube"><i
+                                    class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="footer-card contact-card">
+                        <h3>Contact Us</h3>
+                        <a href="/en/contact" class="btn btn-primary btn-block btn-sm">Contact Form</a>
+
+                        <div class="contact-details">
+                            <div class="detail-item">
+                                <strong>Email:</strong>
+                                <p>post@hiskingdomministry.no</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Phone:</strong>
+                                <p>+47 930 94 615</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Vipps:</strong>
+                                <p>938361</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Account nr.:</strong>
+                                <p>3000.66.08759</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 His Kingdom Ministry. All rights reserved.</p>
+                <a href="/en/../admin/login" class="admin-link">Admin</a>
+            </div>
         </div>
     </footer>
 
