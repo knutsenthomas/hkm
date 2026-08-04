@@ -49,6 +49,19 @@ export class HkmGroupsManager {
                 @keyframes spin {
                     to { transform: rotate(360deg); }
                 }
+                
+                /* Custom styles for select dropdowns to prevent squeezed arrow */
+                .groups-module-wrapper select,
+                .modal-overlay select {
+                    appearance: none !important;
+                    -webkit-appearance: none !important;
+                    -moz-appearance: none !important;
+                    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+                    background-repeat: no-repeat !important;
+                    background-position: right 14px center !important;
+                    background-size: 16px !important;
+                    padding-right: 40px !important;
+                }
             </style>
             <div class="groups-module-wrapper">
                 <!-- Top Module Navigation & Actions -->
