@@ -95,6 +95,19 @@
   },
   "headers": [
     {
+      "source": "/__/auth/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "ALLOWALL"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'; frame-ancestors *;"
+        }
+      ]
+    },
+    {
       "source": "/(.*)",
       "headers": [
         {
