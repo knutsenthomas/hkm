@@ -1085,8 +1085,9 @@ export class HkmGroupsManager {
                     </span>
                     <div style="position: absolute; top: 12px; right: 12px; display: flex; align-items: center; gap: 8px; z-index: 2;">
                         ${isLeader ? `
-                            <span style="background: var(--admin-orange, #d17d39); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; white-space: nowrap;">
-                                ⭐ ${this.t('groups.groupLeder')}
+                            <span style="background: var(--admin-orange, #d17d39); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;">
+                                <span class="material-symbols-outlined" style="font-size: 14px; color: #fff; font-variation-settings: 'FILL' 1;">star</span>
+                                <span>${this.t('groups.groupLeder')}</span>
                             </span>
                         ` : ''}
                         ${(isLeader || this.isAdmin) ? `
@@ -1758,7 +1759,10 @@ export class HkmGroupsManager {
                                 </div>
                                 <div>
                                     <div style="font-weight: 600; font-size: 14px;">${this.escapeHtml(leader)}</div>
-                                    <div style="font-size: 12px; color: var(--admin-orange, #d17d39); font-weight: 600;">⭐ ${this.t('groups.groupLeder')}</div>
+                                    <div style="font-size: 12px; color: var(--admin-orange, #d17d39); font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                                        <span class="material-symbols-outlined" style="font-size: 14px; color: var(--admin-orange, #d17d39); font-variation-settings: 'FILL' 1;">star</span>
+                                        <span>${this.t('groups.groupLeder')}</span>
+                                    </div>
                                 </div>
                             </div>
                         `).join('')}
