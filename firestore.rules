@@ -491,6 +491,36 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
+    // HKM Grupper (Planning Center Groups inspired)
+    match /groups/{groupId} {
+      allow read: if true;
+      allow create, update, delete: if signedIn();
+
+      match /{allSubcollections=**} {
+        allow read, write: if signedIn();
+      }
+    }
+
+    match /groupMembers/{memberId} {
+      allow read: if true;
+      allow create, update, delete: if signedIn();
+    }
+
+    match /groupEvents/{eventId} {
+      allow read: if true;
+      allow create, update, delete: if signedIn();
+    }
+
+    match /groupAttendance/{attendanceId} {
+      allow read: if signedIn();
+      allow create, update, delete: if signedIn();
+    }
+
+    match /groupMessages/{messageId} {
+      allow read: if signedIn();
+      allow create, update, delete: if signedIn();
+    }
+
     // Default deny
     match /{document=**} {
       allow read, write: if false;

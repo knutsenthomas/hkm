@@ -14,6 +14,16 @@ export class HkmGroupsManager {
         this.messagesListener = null;
         this.filterCategory = 'ALL';
         this.searchQuery = '';
+        this.allContactsList = [];
+        this.selectedContactIds = new Set();
+        this.activeGroupForContacts = null;
+    }
+
+    get isAdmin() {
+        const currentUser = firebase.auth() ? firebase.auth().currentUser : null;
+        const email = currentUser ? (currentUser.email || '').toLowerCase() : '';
+        const role = (this.app && this.app.currentUser && this.app.currentUser.role) || '';
+        return role === 'admin' || role === 'superadmin' || email === 'thomas@hiskingdomministry.no' || email === 'knutsenthomas@gmail.com';
     }
 
     async render(container, queryParams = {}) {
@@ -130,6 +140,39 @@ export class HkmGroupsManager {
                     </form>
                 </div>
             </div>
+
+            <!-- Import Contacts Modal (Admin only) -->
+            <div id="group-contacts-modal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 16px;">
+                <div class="modal-card" style="background: var(--card-bg, #ffffff); border-radius: 20px; width: 100%; max-width: 640px; padding: 28px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); max-height: 85vh; display: flex; flex-direction: column;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 20px; font-weight: 700;">Hent personer fra Kontakter</h3>
+                            <p style="margin: 4px 0 0 0; font-size: 13px; opacity: 0.7;">Søk i CRM-kontakter og velg hvem som skal legges til i gruppen.</p>
+                        </div>
+                        <button type="button" id="close-contacts-modal" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: var(--text-color, #64748b);">&times;</button>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+                        <input type="text" id="contacts-search-input" placeholder="Søk på navn, e-post eller telefon..." style="flex: 1; min-width: 220px; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a); font-size: 14px;">
+                        <select id="contacts-role-picker" style="padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a); font-size: 13px; font-weight: 600;">
+                            <option value="member">Legg til som Medlem</option>
+                            <option value="leader">Legg til som Gruppeleder</option>
+                        </select>
+                    </div>
+
+                    <div id="contacts-list-container" style="flex: 1; overflow-y: auto; border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px; max-height: 380px; min-height: 200px;">
+                        <div style="text-align: center; padding: 24px; color: var(--text-muted, #64748b);">Laster inn kontakter...</div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 18px; pt: 12px; border-top: 1px solid var(--border-color, #e2e8f0);">
+                        <button type="button" id="select-all-contacts-btn" style="background: transparent; border: none; color: var(--admin-orange, #d17d39); font-weight: 600; font-size: 13px; cursor: pointer;">Velg alle</button>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="button" id="cancel-contacts-modal" style="padding: 10px 16px; border-radius: 10px; border: 1px solid #cbd5e1; background: transparent; cursor: pointer; font-size: 13px;">Avbryt</button>
+                            <button type="button" id="submit-import-contacts-btn" style="padding: 10px 20px; border-radius: 10px; background: var(--admin-orange, #d17d39); color: white; border: none; font-weight: 600; cursor: pointer; font-size: 13px;">Legg til valgte kontakter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         `;
 
         this.bindEvents();
@@ -174,6 +217,27 @@ export class HkmGroupsManager {
         this.container.querySelector('#duplicate-form')?.addEventListener('submit', (e) => {
             e.preventDefault();
             this.handleDuplicateGroup();
+        });
+
+        // Contacts import modal (Admin only)
+        const contactsModal = this.container.querySelector('#group-contacts-modal');
+        this.container.querySelector('#close-contacts-modal')?.addEventListener('click', () => {
+            if (contactsModal) contactsModal.style.display = 'none';
+        });
+        this.container.querySelector('#cancel-contacts-modal')?.addEventListener('click', () => {
+            if (contactsModal) contactsModal.style.display = 'none';
+        });
+        this.container.querySelector('#contacts-search-input')?.addEventListener('input', () => {
+            this.renderContactsList();
+        });
+        this.container.querySelector('#select-all-contacts-btn')?.addEventListener('click', () => {
+            if (this.allContactsList) {
+                this.allContactsList.forEach(c => this.selectedContactIds.add(c.id));
+                this.renderContactsList();
+            }
+        });
+        this.container.querySelector('#submit-import-contacts-btn')?.addEventListener('click', () => {
+            this.submitImportContacts();
         });
     }
 
@@ -635,12 +699,21 @@ export class HkmGroupsManager {
                 </div>
 
                 <div style="background: var(--card-bg, #fff); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0);">
-                    <h3 style="margin-top: 0; font-size: 18px; font-weight: 700; margin-bottom: 16px;">Medlemmer (${(group.memberUids || []).length})</h3>
-                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 700;">Medlemmer & Ledere (${((group.memberNames || []).length + (group.leaderNames || []).length) || (group.memberUids || []).length})</h3>
+                        ${this.isAdmin ? `
+                            <button type="button" id="btn-open-contacts-modal" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; padding: 8px 16px; border-radius: 10px; background: linear-gradient(135deg, #d17d39 0%, #b86524 100%); color: white; border: none; font-weight: 600; cursor: pointer; transition: transform 0.15s ease;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">contacts</span>
+                                <span>Hent fra kontakter (Admin)</span>
+                            </button>
+                        ` : ''}
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
                         ${(group.leaderNames || []).map(leader => `
-                            <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; background: var(--bg-muted, #f8fafc); border: 1px solid var(--border-color, #e2e8f0);">
                                 <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--admin-orange, #d17d39); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700;">
-                                    ${leader.charAt(0)}
+                                    ${leader.charAt(0).toUpperCase()}
                                 </div>
                                 <div>
                                     <div style="font-weight: 600; font-size: 14px;">${this.escapeHtml(leader)}</div>
@@ -648,10 +721,25 @@ export class HkmGroupsManager {
                                 </div>
                             </div>
                         `).join('')}
+                        ${(group.memberNames || []).filter(m => !(group.leaderNames || []).includes(m)).map(member => `
+                            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; background: var(--bg-muted, #f8fafc); border: 1px solid var(--border-color, #e2e8f0);">
+                                <div style="width: 36px; height: 36px; border-radius: 50%; background: #0f172a; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                                    ${member.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; font-size: 14px;">${this.escapeHtml(member)}</div>
+                                    <div style="font-size: 12px; color: var(--text-muted, #64748b); font-weight: 600;">Medlem</div>
+                                </div>
+                            </div>
+                        `).join('')}
                     </div>
                 </div>
             </div>
         `;
+
+        tabContainer.querySelector('#btn-open-contacts-modal')?.addEventListener('click', () => {
+            this.openContactsModal(group);
+        });
     }
 
     renderHubChat(tabContainer) {
@@ -920,6 +1008,165 @@ export class HkmGroupsManager {
         } catch (err) {
             console.error("Error duplicating group:", err);
             alert("Kunne ikke duplisere gruppe: " + err.message);
+        }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       CONTACTS IMPORT (ADMIN ONLY)
+       ═══════════════════════════════════════════════════════════════════════════ */
+    async openContactsModal(targetGroup = null) {
+        if (!this.isAdmin) {
+            alert("Kun administratorer kan hente personer fra kontakter.");
+            return;
+        }
+
+        this.activeGroupForContacts = targetGroup || this.groups.find(g => g.id === this.selectedGroupId) || this.activeGroup;
+        if (!this.activeGroupForContacts) {
+            alert("Vennligst velg en gruppe først.");
+            return;
+        }
+
+        const modal = this.container.querySelector('#group-contacts-modal');
+        const container = this.container.querySelector('#contacts-list-container');
+        if (!modal || !container) return;
+
+        modal.style.display = 'flex';
+        container.innerHTML = '<div style="text-align: center; padding: 24px; color: var(--text-muted, #64748b);">Laster inn kontakter fra CRM...</div>';
+
+        try {
+            const db = firebase.firestore();
+            const snapshot = await db.collection('contacts').get();
+            this.allContactsList = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const name = data.displayName || data.name || `${data.firstName || ''} ${data.lastName || ''}`.trim() || data.email || 'Uten navn';
+                this.allContactsList.push({
+                    id: doc.id,
+                    name,
+                    email: data.email || '',
+                    phone: data.phone || '',
+                    ...data
+                });
+            });
+
+            this.selectedContactIds.clear();
+            this.renderContactsList();
+        } catch (err) {
+            console.error("Feil ved henting av kontakter:", err);
+            container.innerHTML = `<div style="text-align: center; padding: 24px; color: #ef4444;">Kunne ikke laste kontakter: ${this.escapeHtml(err.message)}</div>`;
+        }
+    }
+
+    renderContactsList() {
+        const container = this.container.querySelector('#contacts-list-container');
+        const queryInput = this.container.querySelector('#contacts-search-input');
+        if (!container) return;
+
+        const query = (queryInput ? queryInput.value : '').toLowerCase().trim();
+        const filtered = this.allContactsList.filter(c => 
+            c.name.toLowerCase().includes(query) ||
+            c.email.toLowerCase().includes(query) ||
+            c.phone.toLowerCase().includes(query)
+        );
+
+        if (filtered.length === 0) {
+            container.innerHTML = '<div style="text-align: center; padding: 24px; color: var(--text-muted, #64748b);">Ingen kontakter funnet.</div>';
+            return;
+        }
+
+        container.innerHTML = filtered.map(contact => {
+            const isChecked = this.selectedContactIds.has(contact.id);
+            return `
+                <label style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-radius: 10px; background: var(--bg-muted, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); cursor: pointer; transition: background 0.15s ease;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <input type="checkbox" class="contact-checkbox" data-cid="${contact.id}" ${isChecked ? 'checked' : ''} style="width: 18px; height: 18px; accent-color: var(--admin-orange, #d17d39); cursor: pointer;">
+                        <div style="width: 34px; height: 34px; border-radius: 50%; background: var(--admin-orange, #d17d39); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;">
+                            ${(contact.name.charAt(0) || 'K').toUpperCase()}
+                        </div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 14px; color: var(--text-color, #0f172a);">${this.escapeHtml(contact.name)}</div>
+                            <div style="font-size: 12px; opacity: 0.7; color: var(--text-muted, #64748b);">${this.escapeHtml(contact.email)}${contact.phone ? ` • ${this.escapeHtml(contact.phone)}` : ''}</div>
+                        </div>
+                    </div>
+                </label>
+            `;
+        }).join('');
+
+        container.querySelectorAll('.contact-checkbox').forEach(box => {
+            box.addEventListener('change', () => {
+                const cid = box.dataset.cid;
+                if (box.checked) {
+                    this.selectedContactIds.add(cid);
+                } else {
+                    this.selectedContactIds.delete(cid);
+                }
+            });
+        });
+    }
+
+    async submitImportContacts() {
+        if (!this.activeGroupForContacts) return;
+        if (this.selectedContactIds.size === 0) {
+            alert("Vennligst velg minst én kontakt.");
+            return;
+        }
+
+        const rolePicker = this.container.querySelector('#contacts-role-picker');
+        const roleType = rolePicker ? rolePicker.value : 'member';
+        const group = this.activeGroupForContacts;
+
+        const selectedContacts = this.allContactsList.filter(c => this.selectedContactIds.has(c.id));
+        const selectedNames = selectedContacts.map(c => c.name);
+
+        try {
+            const db = firebase.firestore();
+            const groupRef = db.collection('groups').doc(group.id);
+
+            if (roleType === 'leader') {
+                const updatedLeaders = Array.from(new Set([...(group.leaderNames || []), ...selectedNames]));
+                await groupRef.update({
+                    leaderNames: updatedLeaders,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                group.leaderNames = updatedLeaders;
+            } else {
+                const updatedMembers = Array.from(new Set([...(group.memberNames || []), ...selectedNames]));
+                const updatedCount = updatedMembers.length;
+                await groupRef.update({
+                    memberNames: updatedMembers,
+                    memberCount: updatedCount,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                group.memberNames = updatedMembers;
+                group.memberCount = updatedCount;
+            }
+
+            // Create individual groupMembers docs
+            const batch = db.batch();
+            selectedContacts.forEach(contact => {
+                const memRef = db.collection('groupMembers').doc(`${group.id}_${contact.id}`);
+                batch.set(memRef, {
+                    groupId: group.id,
+                    contactId: contact.id,
+                    name: contact.name,
+                    email: contact.email || '',
+                    phone: contact.phone || '',
+                    role: roleType,
+                    addedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+            });
+            await batch.commit();
+
+            this.container.querySelector('#group-contacts-modal').style.display = 'none';
+            alert(`Suksess! ${selectedContacts.length} kontakter ble lagt til i "${group.name}".`);
+
+            await this.loadGroupsData();
+            if (this.currentView === 'hub') {
+                this.renderCurrentView();
+            }
+        } catch (err) {
+            console.error("Feil ved import av kontakter til gruppe:", err);
+            alert("Kunne ikke legge til kontakter: " + err.message);
         }
     }
 
