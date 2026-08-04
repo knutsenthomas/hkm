@@ -78,31 +78,96 @@ export class HkmGroupsManager {
         return this.escapeHtml(trimmed);
     }
 
-    formatNorwegianDate(dateStr) {
-        if (!dateStr) return '';
-        try {
-            const parts = dateStr.split('-');
-            if (parts.length !== 3) return dateStr;
-            const year = parseInt(parts[0], 10);
-            const month = parseInt(parts[1], 10);
-            const day = parseInt(parts[2], 10);
-            const dateObj = new Date(year, month - 1, day);
-            
-            const months = [
-                'januar', 'februar', 'mars', 'april', 'mai', 'juni',
-                'juli', 'august', 'september', 'oktober', 'november', 'desember'
-            ];
-            const days = [
-                'Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'
-            ];
-            
-            const dayName = days[dateObj.getDay()];
-            const monthName = months[month - 1];
-            return `${dayName} ${day}. ${monthName}`;
-        } catch (e) {
-            return dateStr;
+    parseDateString(str) {
+        if (!str) return null;
+        const trimmed = str.trim();
+        
+        // 1. Check YYYY-MM-DD
+        const ymdMatch = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(trimmed);
+        if (ymdMatch) {
+            return new Date(parseInt(ymdMatch[1], 10), parseInt(ymdMatch[2], 10) - 1, parseInt(ymdMatch[3], 10));
         }
+        
+        // 2. Check DD.MM.YYYY
+        const dmyMatch = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.exec(trimmed);
+        if (dmyMatch) {
+            return new Date(parseInt(dmyMatch[3], 10), parseInt(dmyMatch[2], 10) - 1, parseInt(dmyMatch[1], 10));
+        }
+
+        // 3. Match English/Norwegian month name and date number
+        const monthsEng = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+        const monthsNor = ['januar', 'februar', 'mars', 'april', 'mai', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'desember'];
+        
+        let monthIndex = -1;
+        const lowerStr = trimmed.toLowerCase();
+        
+        for (let i = 0; i < 12; i++) {
+            if (lowerStr.includes(monthsEng[i]) || lowerStr.includes(monthsNor[i])) {
+                monthIndex = i;
+                break;
+            }
+        }
+        
+        // Match day number
+        const dayMatch = /(\d+)(?:st|nd|rd|th)?/.exec(trimmed);
+        let day = 1;
+        if (dayMatch) {
+            day = parseInt(dayMatch[1], 10);
+        }
+        
+        // Match year (optional)
+        let year = new Date().getFullYear();
+        const yearMatch = /\b(20\d{2})\b/.exec(trimmed);
+        if (yearMatch) {
+            year = parseInt(yearMatch[1], 10);
+        }
+        
+        if (monthIndex !== -1) {
+            return new Date(year, monthIndex, day);
+        }
+        
+        // 4. Try native Date parse as fallback
+        const timestamp = Date.parse(trimmed);
+        if (!isNaN(timestamp)) {
+            return new Date(timestamp);
+        }
+        
+        return null;
     }
+
+    formatNorwegianDate(dateInput) {
+        if (!dateInput) return '';
+        let dateObj = null;
+        if (dateInput instanceof Date) {
+            dateObj = dateInput;
+        } else {
+            dateObj = this.parseDateString(dateInput);
+        }
+        
+        if (!dateObj || isNaN(dateObj.getTime())) {
+            return dateInput;
+        }
+        
+        const months = [
+            'januar', 'februar', 'mars', 'april', 'mai', 'juni',
+            'juli', 'august', 'september', 'oktober', 'november', 'desember'
+        ];
+        const days = [
+            'Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'
+        ];
+        
+        const dayName = days[dateObj.getDay()];
+        const dayNum = dateObj.getDate();
+        const monthName = months[dateObj.getMonth()];
+        const year = dateObj.getFullYear();
+        
+        const currentYear = new Date().getFullYear();
+        if (year === currentYear) {
+            return `${dayName} ${dayNum}. ${monthName}`;
+        }
+        return `${dayName} ${dayNum}. ${monthName} ${year}`;
+    }
+
 
 
     t(key) {
@@ -1981,16 +2046,10 @@ export class HkmGroupsManager {
                         
                         <div style="display: flex; flex-direction: column; gap: 20px;">
                             <!-- Next Event Container -->
-                            <div id="overview-next-event-container" style="display: flex; align-items: flex-start; gap: 14px; background: linear-gradient(135deg, rgba(209,125,57,0.08) 0%, rgba(209,125,57,0.02) 100%); border: 1px solid rgba(209,125,57,0.15); padding: 16px; border-radius: 14px; margin-bottom: 4px;">
-                                <span class="material-symbols-outlined" style="font-size: 24px; color: var(--admin-orange, #d17d39); margin-top: 2px;">event</span>
-                                <div style="flex: 1;">
-                                    <span style="font-size: 11px; font-weight: 700; opacity: 0.6; text-transform: uppercase; color: var(--admin-orange, #d17d39); letter-spacing: 0.5px;">Neste Samling</span>
-                                    <div id="overview-next-event-content" style="margin-top: 6px; font-weight: 600; font-size: 13.5px; color: var(--text-muted, #64748b);">
-                                        <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
-                                            <span class="material-symbols-outlined" style="font-size: 16px; animation: hkm-spin 1.5s linear infinite; color: var(--admin-orange, #d17d39);">sync</span>
-                                            <span>Søker...</span>
-                                        </div>
-                                    </div>
+                            <div id="overview-next-event-container" style="display: flex; align-items: center; gap: 16px; background: linear-gradient(135deg, rgba(209,125,57,0.06) 0%, rgba(209,125,57,0.02) 100%); border: 1px solid rgba(209,125,57,0.15); padding: 16px; border-radius: 14px; margin-bottom: 4px; min-height: 92px;">
+                                <div style="display: flex; align-items: center; gap: 8px; color: var(--text-muted, #64748b); font-size: 13.5px; font-weight: 600; width: 100%; justify-content: center;">
+                                    <span class="material-symbols-outlined" style="font-size: 20px; animation: hkm-spin 1.5s linear infinite; color: var(--admin-orange, #d17d39);">sync</span>
+                                    <span>Henter neste samling...</span>
                                 </div>
                             </div>
 
@@ -2079,43 +2138,120 @@ export class HkmGroupsManager {
                     }
                 });
 
-                const upcoming = events.filter(e => e.date >= todayStr);
-                const contentEl = tabContainer.querySelector('#overview-next-event-content');
-                if (!contentEl) return;
+                const upcoming = events.filter(e => {
+                    // Try parsing date string
+                    const dObj = this.parseDateString(e.date);
+                    if (!dObj || isNaN(dObj.getTime())) {
+                        // If it can't be parsed, fallback to comparing string
+                        return e.date >= todayStr;
+                    }
+                    const compToday = new Date();
+                    compToday.setHours(0,0,0,0);
+                    dObj.setHours(0,0,0,0);
+                    return dObj >= compToday;
+                });
+
+                const containerEl = tabContainer.querySelector('#overview-next-event-container');
+                if (!containerEl) return;
 
                 if (upcoming.length === 0) {
-                    contentEl.innerHTML = `<span style="font-size: 13px; opacity: 0.8;">Ingen planlagte samlinger</span>`;
+                    containerEl.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
+                            <div style="width: 54px; height: 60px; background: var(--bg-muted, #f1f5f9); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <span class="material-symbols-outlined" style="font-size: 28px; color: var(--text-muted, #64748b);">calendar_today</span>
+                            </div>
+                            <div>
+                                <span style="font-size: 10px; font-weight: 700; opacity: 0.65; text-transform: uppercase; color: var(--text-muted, #64748b); letter-spacing: 0.7px;">Neste Samling</span>
+                                <div style="font-size: 13.5px; color: var(--text-muted, #64748b); font-weight: 600; margin-top: 2px;">Ingen planlagte samlinger</div>
+                            </div>
+                        </div>
+                    `;
                     return;
                 }
 
                 // Sort by date and time
                 upcoming.sort((a, b) => {
-                    const compareDate = a.date.localeCompare(b.date);
-                    if (compareDate !== 0) return compareDate;
-                    return (a.time || '').localeCompare(b.time || '');
+                    const dateA = this.parseDateString(a.date);
+                    const dateB = this.parseDateString(b.date);
+                    if (dateA && dateB) {
+                        return dateA.getTime() - dateB.getTime();
+                    }
+                    return a.date.localeCompare(b.date);
                 });
 
                 const nextEvt = upcoming[0];
-                const formattedDate = this.formatNorwegianDate(nextEvt.date);
-                contentEl.innerHTML = `
-                    <div style="font-weight: 700; font-size: 14px; color: var(--text-color, #0f172a); margin-bottom: 2px;">
-                        ${this.escapeHtml(nextEvt.title)}
-                    </div>
-                    <div style="font-size: 13px; color: var(--admin-orange, #d17d39); font-weight: 700;">
-                        ${this.escapeHtml(formattedDate)}${nextEvt.time ? ` kl. ${this.escapeHtml(nextEvt.time)}` : ''}
-                    </div>
-                    ${nextEvt.location ? `
-                        <div style="font-size: 12px; color: var(--text-muted, #64748b); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
-                            <span class="material-symbols-outlined" style="font-size: 15px; opacity: 0.7;">location_on</span>
-                            <span style="display: inline-block;">${this.formatLocation(nextEvt.location)}</span>
+                const dateObj = this.parseDateString(nextEvt.date);
+                const formattedDate = this.formatNorwegianDate(dateObj || nextEvt.date);
+                
+                let badgeHtml = '';
+                if (dateObj && !isNaN(dateObj.getTime())) {
+                    const monthsNorShort = ['JAN', 'FEB', 'MAR', 'APR', 'MAI', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DES'];
+                    const daysNorShort = ['søn', 'man', 'tir', 'ons', 'tor', 'fre', 'lør'];
+                    const mStr = monthsNorShort[dateObj.getMonth()];
+                    const dStr = dateObj.getDate();
+                    const dName = daysNorShort[dateObj.getDay()];
+                    
+                    badgeHtml = `
+                        <div style="width: 54px; height: 60px; background: var(--card-bg, #fff); border: 1px solid var(--border-color, #cbd5e1); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.03); flex-shrink: 0; text-align: center;">
+                            <div style="background: linear-gradient(135deg, #d17d39 0%, #b86524 100%); color: white; font-size: 9.5px; font-weight: 800; padding: 4px 0; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.2;">
+                                ${mStr}
+                            </div>
+                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2px 0;">
+                                <span style="font-size: 18px; font-weight: 800; color: var(--text-color, #0f172a); line-height: 1.1;">${dStr}</span>
+                                <span style="font-size: 9px; font-weight: 700; color: var(--text-muted, #64748b); text-transform: uppercase; margin-top: 1px; line-height: 1;">${dName}</span>
+                            </div>
                         </div>
-                    ` : ''}
+                    `;
+                } else {
+                    badgeHtml = `
+                        <div style="width: 54px; height: 60px; background: linear-gradient(135deg, rgba(209,125,57,0.1) 0%, rgba(209,125,57,0.05) 100%); border: 1px solid rgba(209,125,57,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <span class="material-symbols-outlined" style="font-size: 28px; color: var(--admin-orange, #d17d39);">calendar_month</span>
+                        </div>
+                    `;
+                }
+
+                containerEl.innerHTML = `
+                    <style>
+                        .next-event-location-wrapper a {
+                            color: var(--admin-orange, #d17d39) !important;
+                            text-decoration: none !important;
+                            background: rgba(209,125,57,0.06);
+                            padding: 5px 12px;
+                            border-radius: 8px;
+                            border: 1px solid rgba(209,125,57,0.15);
+                            transition: all 0.15s ease;
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 4px;
+                            font-weight: 700;
+                        }
+                        .next-event-location-wrapper a:hover {
+                            background: rgba(209,125,57,0.12) !important;
+                            color: #b86524 !important;
+                            transform: translateY(-1px);
+                        }
+                    </style>
+                    ${badgeHtml}
+                    <div style="flex: 1; min-width: 0;">
+                        <span style="font-size: 10px; font-weight: 700; opacity: 0.65; text-transform: uppercase; color: var(--admin-orange, #d17d39); letter-spacing: 0.7px;">Neste Samling</span>
+                        <h4 style="margin: 4px 0 2px 0; font-size: 15.5px; font-weight: 800; color: var(--text-color, #0f172a); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            ${this.escapeHtml(nextEvt.title)}
+                        </h4>
+                        <div style="font-size: 13.5px; color: var(--text-color, #334155); font-weight: 600;">
+                            ${this.escapeHtml(formattedDate)}${nextEvt.time ? ` kl. ${this.escapeHtml(nextEvt.time)}` : ''}
+                        </div>
+                        ${nextEvt.location ? `
+                            <div class="next-event-location-wrapper" style="margin-top: 8px;">
+                                ${this.formatLocation(nextEvt.location)}
+                            </div>
+                        ` : ''}
+                    </div>
                 `;
             } catch (err) {
                 console.error("Error loading next event:", err);
-                const contentEl = tabContainer.querySelector('#overview-next-event-content');
-                if (contentEl) {
-                    contentEl.innerHTML = `<span style="font-size: 13px; color: #ef4444;">Kunne ikke hente samling</span>`;
+                const containerEl = tabContainer.querySelector('#overview-next-event-container');
+                if (containerEl) {
+                    containerEl.innerHTML = `<span style="font-size: 13px; color: #ef4444;">Kunne ikke hente samling</span>`;
                 }
             }
         })();
