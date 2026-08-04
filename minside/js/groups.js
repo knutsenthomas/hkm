@@ -62,6 +62,33 @@ export class HkmGroupsManager {
                     background-size: 16px !important;
                     padding-right: 40px !important;
                 }
+
+                /* Sub-navigation active tabs and group action buttons styling */
+                .hub-tab-btn {
+                    color: var(--text-color, #1e293b) !important;
+                    transition: all 0.2s ease !important;
+                }
+                .hub-tab-btn.active {
+                    background: var(--admin-orange, #d17d39) !important;
+                    color: #ffffff !important;
+                }
+                .hub-tab-btn:not(.active):hover {
+                    background: rgba(15, 23, 42, 0.06) !important;
+                }
+                .groups-banner-btn {
+                    transition: all 0.2s ease !important;
+                }
+                .groups-banner-btn:hover {
+                    background: rgba(255, 255, 255, 0.3) !important;
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                }
+                .groups-banner-btn:active {
+                    transform: translateY(0);
+                }
+                #btn-open-group-email-modal:hover {
+                    background: #b86524 !important;
+                }
             </style>
             <div class="groups-module-wrapper">
                 <!-- Top Module Navigation & Actions -->
@@ -1315,18 +1342,40 @@ export class HkmGroupsManager {
 
             <!-- Group Banner & Header Card -->
             <div style="background: var(--card-bg, #ffffff); border-radius: 20px; border: 1px solid var(--border-color, #e2e8f0); overflow: hidden; margin-bottom: 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.04);">
-                <div style="position: relative; height: 180px; background: url('${img}') center/cover no-repeat;">
+                <div style="position: relative; min-height: 200px; background: url('${img}') center/cover no-repeat; display: flex; align-items: flex-end; padding: 24px;">
                     <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(15,23,42,0.85), transparent);"></div>
-                    <div style="position: absolute; bottom: 20px; left: 24px; right: 24px; color: white;">
-                        <span style="background: var(--admin-orange, #d17d39); font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.5px;">
-                            ${this.escapeHtml(group.category)}
-                        </span>
-                        <h2 style="margin: 8px 0 4px 0; font-size: 28px; font-weight: 800;">${this.escapeHtml(group.name)}</h2>
-                        <p style="margin: 0; opacity: 0.9; font-size: 14px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-                            <span>📍 ${this.escapeHtml(group.location || 'Sted ikke oppgitt')}</span>
-                            <span>🕒 ${this.escapeHtml(group.meetingSchedule || '')}</span>
-                            <span>👥 ${(group.memberUids || []).length} medlemmer</span>
-                        </p>
+                    <div style="position: relative; color: white; display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; width: 100%; z-index: 2;">
+                        <div>
+                            <span style="background: var(--admin-orange, #d17d39); font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.5px;">
+                                ${this.escapeHtml(group.category)}
+                            </span>
+                            <h2 style="margin: 8px 0 4px 0; font-size: 28px; font-weight: 800;">${this.escapeHtml(group.name)}</h2>
+                            <p style="margin: 0; opacity: 0.9; font-size: 14px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                                <span>📍 ${this.escapeHtml(group.location || 'Sted ikke oppgitt')}</span>
+                                <span>🕒 ${this.escapeHtml(group.meetingSchedule || '')}</span>
+                                <span>👥 ${(group.memberUids || []).length} medlemmer</span>
+                            </p>
+                        </div>
+                        
+                        <!-- Overlayed Action buttons inside banner -->
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 4px;">
+                            <button type="button" id="btn-open-group-email-modal" class="groups-banner-btn" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 10px; background: var(--admin-orange, #d17d39); color: white; border: none; cursor: pointer; font-size: 13px; font-weight: 600;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">mail</span>
+                                <span>Send e-post</span>
+                            </button>
+                            ${(isLeader || this.isAdmin) ? `
+                                <button type="button" id="btn-edit-group-details" class="groups-banner-btn" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 10px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(8px); cursor: pointer; font-size: 13px; font-weight: 600;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+                                    <span>Rediger gruppe</span>
+                                </button>
+                            ` : ''}
+                            ${isLeader ? `
+                                <button type="button" id="btn-duplicate-group-modal" class="groups-banner-btn" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 10px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(8px); cursor: pointer; font-size: 13px; font-weight: 600;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">content_copy</span>
+                                    <span>Dupliser</span>
+                                </button>
+                            ` : ''}
+                        </div>
                     </div>
                 </div>
 
@@ -1344,24 +1393,6 @@ export class HkmGroupsManager {
                     <button type="button" class="hub-tab-btn ${this.selectedGroupTab === 'resources' ? 'active' : ''}" data-htab="resources" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border: none; background: transparent; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer;">
                         <span class="material-symbols-outlined" style="font-size: 18px;">folder</span> Ressurser
                     </button>
-
-                    <div style="margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap;">
-                        <button type="button" id="btn-open-group-email-modal" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 8px; background: linear-gradient(135deg, #d17d39 0%, #b86524 100%); color: white; border: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: transform 0.15s ease;">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">mail</span>
-                            <span>Send e-post til gruppen</span>
-                        </button>
-                        ${(isLeader || this.isAdmin) ? `
-                            <button type="button" id="btn-edit-group-details" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 8px; background: #475569; color: white; border: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: transform 0.15s ease;">
-                                <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
-                                <span>Rediger gruppe</span>
-                            </button>
-                        ` : ''}
-                        ${isLeader ? `
-                            <button type="button" id="btn-duplicate-group-modal" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border-color, #cbd5e1); background: transparent; cursor: pointer; font-size: 13px; font-weight: 600;">
-                                <span class="material-symbols-outlined" style="font-size: 18px;">content_copy</span> Dupliser gruppe
-                            </button>
-                        ` : ''}
-                    </div>
                 </div>
             </div>
 
