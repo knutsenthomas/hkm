@@ -1830,6 +1830,9 @@ export class HkmGroupsManager {
                     <button type="button" class="hub-tab-btn ${this.selectedGroupTab === 'overview' ? 'active' : ''}" data-htab="overview" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border: none; background: transparent; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer;">
                         <span class="material-symbols-outlined" style="font-size: 18px;">info</span> ${this.t('groups.hubOverview')}
                     </button>
+                    <button type="button" class="hub-tab-btn ${this.selectedGroupTab === 'members' ? 'active' : ''}" data-htab="members" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border: none; background: transparent; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">group</span> ${this.t('groups.hubMembersTitle')}
+                    </button>
                     <button type="button" class="hub-tab-btn ${this.selectedGroupTab === 'chat' ? 'active' : ''}" data-htab="chat" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border: none; background: transparent; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer;">
                         <span class="material-symbols-outlined" style="font-size: 18px;">chat</span> ${this.t('groups.hubChat')}
                     </button>
@@ -1880,177 +1883,155 @@ export class HkmGroupsManager {
         this.renderHubTabBody(container.querySelector('#hub-tab-body'));
     }
 
-    renderHubTabBody(tabContainer) {
-        if (!tabContainer || !this.activeGroup) return;
+    renderHubOverview(tabContainer) {
+        const group = this.activeGroup;
+        tabContainer.innerHTML = `
+            <div style="background: var(--card-bg, #fff); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0);">
+                <h3 style="margin-top: 0; font-size: 18px; font-weight: 700; margin-bottom: 12px;">${this.t('groups.hubOverviewTitle')}</h3>
+                <p style="line-height: 1.6; opacity: 0.9; font-size: 15px; margin-bottom: 24px; white-space: pre-line;">
+                    ${this.escapeHtml(group.description || this.t('groups.noDesc'))}
+                </p>
 
-        if (this.selectedGroupTab === 'overview') {
-            this.renderHubOverview(tabContainer);
-        } else if (this.selectedGroupTab === 'chat') {
-            this.renderHubChat(tabContainer);
-        } else if (this.selectedGroupTab === 'events') {
-            this.renderHubEvents(tabContainer);
-        } else if (this.selectedGroupTab === 'resources') {
-            this.renderHubResources(tabContainer);
-        }
+                ${group.whatsappUrl ? `
+                    <div style="background: #e8f5e9; border: 1px solid #c8e6c9; border-radius: 16px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; gap: 16px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 14px; min-width: 250px;">
+                            <div style="background: #25d366; color: white; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 10px rgba(37,211,102,0.3);">
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.725-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.863-9.748.002-2.607-1.012-5.059-2.859-6.91-1.847-1.851-4.3-2.87-6.906-2.87-5.438 0-9.863 4.37-9.866 9.749-.001 1.813.493 3.59 1.426 5.148l-1.002 3.661 3.768-.973zm13.102-7.391c-.269-.134-1.593-.787-1.839-.877-.247-.09-.427-.134-.607.134-.18.269-.696.877-.853 1.055-.157.18-.314.202-.583.067-.27-.134-1.14-.422-2.172-1.341-.803-.715-1.346-1.597-1.503-1.866-.157-.269-.017-.415.118-.549.121-.122.269-.314.404-.471.134-.157.18-.27.27-.449.09-.18.045-.337-.022-.471-.067-.134-.607-1.46-.831-2.001-.219-.527-.46-.454-.63-.463-.162-.008-.347-.01-.533-.01-.186 0-.489.07-.746.353-.258.28-.985.963-.985 2.348 0 1.385 1.01 2.721 1.15 2.901.14.18 1.988 3.037 4.814 4.253.673.29 1.2.463 1.61.592.677.215 1.294.185 1.782.112.543-.081 1.593-.651 1.817-1.28.225-.63.225-1.17.157-1.28-.068-.113-.247-.202-.516-.337z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 style="margin: 0; font-size: 15px; font-weight: 700; color: #1b5e20;">WhatsApp-gruppe</h4>
+                                <p style="margin: 2px 0 0 0; font-size: 13px; color: #2e7d32; opacity: 0.95;">Bli med i gruppens interne chat på WhatsApp.</p>
+                            </div>
+                        </div>
+                        <a href="${group.whatsappUrl}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; justify-content: center; padding: 10px 20px; border-radius: 12px; background: #25d366; color: white; border: none; font-weight: 700; font-size: 13.5px; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(37,211,102,0.2);" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 16px rgba(37,211,102,0.3)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(37,211,102,0.2)';">
+                            <span>Åpne chat</span>
+                            <span class="material-symbols-outlined" style="font-size: 16px; display: block;">open_in_new</span>
+                        </a>
+                    </div>
+                ` : ''}
+
+                <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">${this.t('groups.hubInfo')}</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: var(--bg-muted, #f8fafc); padding: 16px; border-radius: 12px;">
+                    <div>
+                        <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">${this.t('groups.hubSchedule')}</span>
+                        <p style="margin: 4px 0 0 0; font-weight: 600;">${this.escapeHtml(group.meetingSchedule)}</p>
+                    </div>
+                    <div>
+                        <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">${this.t('groups.hubLocation')}</span>
+                        <p style="margin: 4px 0 0 0; font-weight: 600;">${this.formatLocation(group.location)}</p>
+                    </div>
+                    ${group.zoomMeetingId ? `
+                        <div>
+                            <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">Zoom Meeting ID</span>
+                            <p style="margin: 4px 0 0 0; font-weight: 600;">${this.escapeHtml(group.zoomMeetingId)}</p>
+                        </div>
+                    ` : ''}
+                    ${group.zoomPasscode ? `
+                        <div>
+                            <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">Zoom Passcode</span>
+                            <p style="margin: 4px 0 0 0; font-weight: 600;">${this.escapeHtml(group.zoomPasscode)}</p>
+                        </div>
+                    ` : ''}
+                    <div>
+                        <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">${this.t('groups.hubJoinPolicy')}</span>
+                        <p style="margin: 4px 0 0 0; font-weight: 600;">${group.joinPolicy === 'approval' ? this.t('groups.joinPolicyApproval') : this.t('groups.joinPolicyOpen')}</p>
+                    </div>
+                    <div>
+                        <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">${this.t('groups.hubLeaders')}</span>
+                        <p style="margin: 4px 0 0 0; font-weight: 600;">${this.escapeHtml((group.leaderNames || []).join(', '))}</p>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
-    renderHubOverview(tabContainer) {
+    renderHubMembers(tabContainer) {
         const group = this.activeGroup;
         const uid = firebase.auth().currentUser?.uid;
         const isLeader = this.checkIsLeader(group);
         const canManage = isLeader || this.isAdmin;
+        const totalCount = ((group.memberNames || []).length + (group.leaderNames || []).length) || (group.memberUids || []).length;
 
         tabContainer.innerHTML = `
-            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
-                <div style="background: var(--card-bg, #fff); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0);">
-                    <h3 style="margin-top: 0; font-size: 18px; font-weight: 700; margin-bottom: 12px;">${this.t('groups.hubOverviewTitle')}</h3>
-                    <p style="line-height: 1.6; opacity: 0.9; font-size: 15px; margin-bottom: 24px;">
-                        ${this.escapeHtml(group.description || this.t('groups.noDesc'))}
-                    </p>
-
-                    ${group.whatsappUrl ? `
-                        <div style="background: #e8f5e9; border: 1px solid #c8e6c9; border-radius: 16px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; gap: 16px; flex-wrap: wrap;">
-                            <div style="display: flex; align-items: center; gap: 14px; min-width: 250px;">
-                                <div style="background: #25d366; color: white; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 10px rgba(37,211,102,0.3);">
-                                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.725-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.863-9.748.002-2.607-1.012-5.059-2.859-6.91-1.847-1.851-4.3-2.87-6.906-2.87-5.438 0-9.863 4.37-9.866 9.749-.001 1.813.493 3.59 1.426 5.148l-1.002 3.661 3.768-.973zm13.102-7.391c-.269-.134-1.593-.787-1.839-.877-.247-.09-.427-.134-.607.134-.18.269-.696.877-.853 1.055-.157.18-.314.202-.583.067-.27-.134-1.14-.422-2.172-1.341-.803-.715-1.346-1.597-1.503-1.866-.157-.269-.017-.415.118-.549.121-.122.269-.314.404-.471.134-.157.18-.27.27-.449.09-.18.045-.337-.022-.471-.067-.134-.607-1.46-.831-2.001-.219-.527-.46-.454-.63-.463-.162-.008-.347-.01-.533-.01-.186 0-.489.07-.746.353-.258.28-.985.963-.985 2.348 0 1.385 1.01 2.721 1.15 2.901.14.18 1.988 3.037 4.814 4.253.673.29 1.2.463 1.61.592.677.215 1.294.185 1.782.112.543-.081 1.593-.651 1.817-1.28.225-.63.225-1.17.157-1.28-.068-.113-.247-.202-.516-.337z"/>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <h4 style="margin: 0; font-size: 15px; font-weight: 700; color: #1b5e20;">WhatsApp-gruppe</h4>
-                                    <p style="margin: 2px 0 0 0; font-size: 13px; color: #2e7d32; opacity: 0.95;">Bli med i gruppens interne chat på WhatsApp.</p>
-                                </div>
-                            </div>
-                            <a href="${group.whatsappUrl}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; justify-content: center; padding: 10px 20px; border-radius: 12px; background: #25d366; color: white; border: none; font-weight: 700; font-size: 13.5px; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(37,211,102,0.2);" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 16px rgba(37,211,102,0.3)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(37,211,102,0.2)';">
-                                <span>Åpne chat</span>
-                                <span class="material-symbols-outlined" style="font-size: 16px; display: block;">open_in_new</span>
-                            </a>
-                        </div>
-                    ` : ''}
-
-                    <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">${this.t('groups.hubInfo')}</h4>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: var(--bg-muted, #f8fafc); padding: 16px; border-radius: 12px;">
-                        <div>
-                            <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">${this.t('groups.hubSchedule')}</span>
-                            <p style="margin: 4px 0 0 0; font-weight: 600;">${this.escapeHtml(group.meetingSchedule)}</p>
-                        </div>
-                        <div>
-                            <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">${this.t('groups.hubLocation')}</span>
-                            <p style="margin: 4px 0 0 0; font-weight: 600;">${this.formatLocation(group.location)}</p>
-                        </div>
-                        ${group.zoomMeetingId ? `
-                            <div>
-                                <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">Zoom Meeting ID</span>
-                                <p style="margin: 4px 0 0 0; font-weight: 600;">${this.escapeHtml(group.zoomMeetingId)}</p>
-                            </div>
+            <div style="background: var(--card-bg, #fff); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0); display: flex; flex-direction: column;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--border-color, #f1f5f9); padding-bottom: 16px;">
+                    <div>
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 700;">${this.t('groups.hubMembersTitle')}</h3>
+                        <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--text-muted, #64748b);">Totalt ${totalCount} ${totalCount === 1 ? 'person' : 'personer'} i smågruppen</p>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                        ${this.isAdmin ? `
+                            <button type="button" id="btn-open-contacts-modal" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; padding: 8px 16px; border-radius: 10px; background: linear-gradient(135deg, #d17d39 0%, #b86524 100%); color: white; border: none; font-weight: 600; cursor: pointer; transition: transform 0.15s ease;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">contacts</span>
+                                <span>${this.t('groups.hubGetFromContacts')}</span>
+                            </button>
                         ` : ''}
-                        ${group.zoomPasscode ? `
-                            <div>
-                                <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">Zoom Passcode</span>
-                                <p style="margin: 4px 0 0 0; font-weight: 600;">${this.escapeHtml(group.zoomPasscode)}</p>
-                            </div>
+                        ${canManage ? `
+                            <button type="button" id="btn-remove-selected-members" style="display: none; align-items: center; gap: 6px; font-size: 13px; padding: 8px 16px; border-radius: 10px; background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; font-weight: 600; cursor: pointer; transition: all 0.15s ease;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">person_remove</span>
+                                <span>Fjern markerte</span>
+                            </button>
                         ` : ''}
-                        <div>
-                            <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">${this.t('groups.hubJoinPolicy')}</span>
-                            <p style="margin: 4px 0 0 0; font-weight: 600;">${group.joinPolicy === 'approval' ? this.t('groups.joinPolicyApproval') : this.t('groups.joinPolicyOpen')}</p>
-                        </div>
-                        <div>
-                            <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">${this.t('groups.hubLeaders')}</span>
-                            <p style="margin: 4px 0 0 0; font-weight: 600;">${this.escapeHtml((group.leaderNames || []).join(', '))}</p>
-                        </div>
                     </div>
                 </div>
 
-                <div style="background: var(--card-bg, #fff); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0); display: flex; flex-direction: column;">
-                    <style>
-                        .compact-members-list::-webkit-scrollbar {
-                            width: 6px;
-                        }
-                        .compact-members-list::-webkit-scrollbar-track {
-                            background: transparent;
-                        }
-                        .compact-members-list::-webkit-scrollbar-thumb {
-                            background: var(--border-color, #e2e8f0);
-                            border-radius: 10px;
-                        }
-                        .compact-members-list::-webkit-scrollbar-thumb:hover {
-                            background: #cbd5e1;
-                        }
-                    </style>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
-                        <h3 style="margin: 0; font-size: 18px; font-weight: 700;">${this.t('groups.hubMembersTitle')} (${((group.memberNames || []).length + (group.leaderNames || []).length) || (group.memberUids || []).length})</h3>
-                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                            ${this.isAdmin ? `
-                                <button type="button" id="btn-open-contacts-modal" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; padding: 8px 16px; border-radius: 10px; background: linear-gradient(135deg, #d17d39 0%, #b86524 100%); color: white; border: none; font-weight: 600; cursor: pointer; transition: transform 0.15s ease;">
-                                    <span class="material-symbols-outlined" style="font-size: 18px;">contacts</span>
-                                    <span>${this.t('groups.hubGetFromContacts')}</span>
-                                </button>
-                            ` : ''}
+                ${canManage ? `
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border-color, #e2e8f0); padding-bottom: 12px;">
+                        <input type="checkbox" id="checkbox-select-all-members" style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--admin-orange, #d17d39);">
+                        <label for="checkbox-select-all-members" style="font-size: 13px; font-weight: 600; cursor: pointer; opacity: 0.8; user-select: none;">Marker alle</label>
+                    </div>
+                ` : ''}
+
+                <div class="compact-members-list" style="display: flex; flex-direction: column; gap: 4px;">
+                    ${(group.leaderNames || []).map(leader => `
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; border-radius: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='var(--bg-muted, #f8fafc)'" onmouseout="this.style.background='transparent'">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                ${canManage ? `
+                                    <input type="checkbox" class="remove-member-checkbox" data-name="${this.escapeHtml(leader)}" data-role="leader" style="width: 16px; height: 16px; cursor: pointer; accent-color: #ef4444;">
+                                ` : ''}
+                                <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--admin-orange, #d17d39); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;">
+                                    ${leader.charAt(0).toUpperCase()}
+                                </div>
+                                <div style="font-weight: 600; font-size: 14px; color: var(--text-color, #0f172a);">${this.escapeHtml(leader)}</div>
+                            </div>
                             ${canManage ? `
-                                <button type="button" id="btn-remove-selected-members" style="display: none; align-items: center; gap: 6px; font-size: 13px; padding: 8px 16px; border-radius: 10px; background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; font-weight: 600; cursor: pointer; transition: all 0.15s ease;">
-                                    <span class="material-symbols-outlined" style="font-size: 18px;">person_remove</span>
-                                    <span>Fjern markerte</span>
-                                </button>
-                            ` : ''}
-                        </div>
-                    </div>
-
-                    ${canManage ? `
-                        <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; margin-bottom: 8px; border-bottom: 1px solid var(--border-color, #e2e8f0); padding-bottom: 12px;">
-                            <input type="checkbox" id="checkbox-select-all-members" style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--admin-orange, #d17d39);">
-                            <label for="checkbox-select-all-members" style="font-size: 13px; font-weight: 600; cursor: pointer; opacity: 0.8; user-select: none;">Marker alle</label>
-                        </div>
-                    ` : ''}
-
-                    <div class="compact-members-list" style="display: flex; flex-direction: column; gap: 4px; max-height: 400px; overflow-y: auto; padding-right: 4px;">
-                        ${(group.leaderNames || []).map(leader => `
-                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; border-radius: 8px; transition: background 0.15s ease;" onmouseover="this.style.background='var(--bg-muted, #f8fafc)'" onmouseout="this.style.background='transparent'">
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    ${canManage ? `
-                                        <input type="checkbox" class="remove-member-checkbox" data-name="${this.escapeHtml(leader)}" data-role="leader" style="width: 16px; height: 16px; cursor: pointer; accent-color: #ef4444;">
-                                    ` : ''}
-                                    <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--admin-orange, #d17d39); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px;">
-                                        ${leader.charAt(0).toUpperCase()}
-                                    </div>
-                                    <div style="font-weight: 600; font-size: 13px; color: var(--text-color, #0f172a);">${this.escapeHtml(leader)}</div>
+                                <select class="member-role-select" data-name="${this.escapeHtml(leader)}" data-current-role="leader" style="font-size: 12px; font-weight: 700; border: 1px solid #fde68a; border-radius: 12px; padding: 4px 12px; background: #fef3c7; color: var(--admin-orange, #d17d39); cursor: pointer; outline: none; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+                                    <option value="leader" selected>★ ${this.t('groups.groupLeder')}</option>
+                                    <option value="member">${this.t('groups.groupMedlem')}</option>
+                                </select>
+                            ` : `
+                                <div style="font-size: 11px; color: var(--admin-orange, #d17d39); font-weight: 600; background: #fffbeb; border: 1px solid #fef3c7; padding: 2px 8px; border-radius: 12px; display: inline-flex; align-items: center; gap: 3px;">
+                                    <span class="material-symbols-outlined" style="font-size: 12px; color: var(--admin-orange, #d17d39); font-variation-settings: 'FILL' 1;">star</span>
+                                    <span>${this.t('groups.groupLeder')}</span>
                                 </div>
+                            `}
+                        </div>
+                    `).join('')}
+                    ${(group.memberNames || []).filter(m => !(group.leaderNames || []).includes(m)).map(member => `
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; border-radius: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='var(--bg-muted, #f8fafc)'" onmouseout="this.style.background='transparent'">
+                            <div style="display: flex; align-items: center; gap: 12px;">
                                 ${canManage ? `
-                                    <select class="member-role-select" data-name="${this.escapeHtml(leader)}" data-current-role="leader" style="font-size: 11.5px; font-weight: 700; border: 1px solid #fde68a; border-radius: 12px; padding: 3px 10px; background: #fef3c7; color: var(--admin-orange, #d17d39); cursor: pointer; outline: none; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
-                                        <option value="leader" selected>★ ${this.t('groups.groupLeder')}</option>
-                                        <option value="member">${this.t('groups.groupMedlem')}</option>
-                                    </select>
-                                ` : `
-                                    <div style="font-size: 11px; color: var(--admin-orange, #d17d39); font-weight: 600; background: #fffbeb; border: 1px solid #fef3c7; padding: 2px 8px; border-radius: 12px; display: inline-flex; align-items: center; gap: 3px;">
-                                        <span class="material-symbols-outlined" style="font-size: 12px; color: var(--admin-orange, #d17d39); font-variation-settings: 'FILL' 1;">star</span>
-                                        <span>${this.t('groups.groupLeder')}</span>
-                                    </div>
-                                `}
-                            </div>
-                        `).join('')}
-                        ${(group.memberNames || []).filter(m => !(group.leaderNames || []).includes(m)).map(member => `
-                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; border-radius: 8px; transition: background 0.15s ease;" onmouseover="this.style.background='var(--bg-muted, #f8fafc)'" onmouseout="this.style.background='transparent'">
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    ${canManage ? `
-                                        <input type="checkbox" class="remove-member-checkbox" data-name="${this.escapeHtml(member)}" data-role="member" style="width: 16px; height: 16px; cursor: pointer; accent-color: #ef4444;">
-                                    ` : ''}
-                                    <div style="width: 28px; height: 28px; border-radius: 50%; background: #0f172a; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px;">
-                                        ${member.charAt(0).toUpperCase()}
-                                    </div>
-                                    <div style="font-weight: 600; font-size: 13px; color: var(--text-color, #0f172a);">${this.escapeHtml(member)}</div>
+                                    <input type="checkbox" class="remove-member-checkbox" data-name="${this.escapeHtml(member)}" data-role="member" style="width: 16px; height: 16px; cursor: pointer; accent-color: #ef4444;">
+                                ` : ''}
+                                <div style="width: 32px; height: 32px; border-radius: 50%; background: #0f172a; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;">
+                                    ${member.charAt(0).toUpperCase()}
                                 </div>
-                                ${canManage ? `
-                                    <select class="member-role-select" data-name="${this.escapeHtml(member)}" data-current-role="member" style="font-size: 11.5px; font-weight: 600; border: 1px solid var(--border-color, #cbd5e1); border-radius: 12px; padding: 3px 10px; background: var(--bg-muted, #f8fafc); color: var(--text-muted, #64748b); cursor: pointer; outline: none; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
-                                        <option value="leader">★ ${this.t('groups.groupLeder')}</option>
-                                        <option value="member" selected>${this.t('groups.groupMedlem')}</option>
-                                    </select>
-                                ` : `
-                                    <div style="font-size: 11px; color: var(--text-muted, #64748b); font-weight: 600; background: var(--bg-muted, #f1f5f9); padding: 2px 8px; border-radius: 12px;">
-                                        ${this.t('groups.groupMedlem')}
-                                    </div>
-                                `}
+                                <div style="font-weight: 600; font-size: 14px; color: var(--text-color, #0f172a);">${this.escapeHtml(member)}</div>
                             </div>
-                        `).join('')}
-                    </div>
+                            ${canManage ? `
+                                <select class="member-role-select" data-name="${this.escapeHtml(member)}" data-current-role="member" style="font-size: 12px; font-weight: 600; border: 1px solid var(--border-color, #cbd5e1); border-radius: 12px; padding: 4px 12px; background: var(--bg-muted, #f8fafc); color: var(--text-muted, #64748b); cursor: pointer; outline: none; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+                                    <option value="leader">★ ${this.t('groups.groupLeder')}</option>
+                                    <option value="member" selected>${this.t('groups.groupMedlem')}</option>
+                                </select>
+                            ` : `
+                                <div style="font-size: 11px; color: var(--text-muted, #64748b); font-weight: 600; background: var(--bg-muted, #f1f5f9); padding: 2px 8px; border-radius: 12px;">
+                                    ${this.t('groups.groupMedlem')}
+                                </div>
+                            `}
+                        </div>
+                    `).join('')}
                 </div>
             </div>
         `;
@@ -2154,8 +2135,8 @@ export class HkmGroupsManager {
 
                     alert(selected.length === 1 ? "Personen ble fjernet." : "De valgte personene ble fjernet.");
                     
-                    // Re-render overview to update list
-                    this.renderHubOverview(tabContainer);
+                    // Re-render members list
+                    this.renderHubMembers(tabContainer);
                 } catch (err) {
                     console.error("Error removing members:", err);
                     alert("Feil ved fjerning av personer: " + err.message);
@@ -2262,7 +2243,7 @@ export class HkmGroupsManager {
             group.memberCount = newCount;
 
             alert("Rollen ble endret.");
-            this.renderHubOverview(tabContainer);
+            this.renderHubMembers(tabContainer);
 
         } catch (err) {
             console.error("Error updating member role:", err);
