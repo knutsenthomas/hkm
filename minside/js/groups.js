@@ -325,6 +325,75 @@ export class HkmGroupsManager {
                     </div>
                 </div>
             </div>
+
+            <!-- Create / Edit Event Modal -->
+            <div id="group-event-modal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 16px;">
+                <div class="modal-card" style="background: var(--card-bg, #ffffff); border-radius: 20px; width: 100%; max-width: 480px; padding: 28px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 id="group-event-modal-title" style="margin: 0; font-size: 20px; font-weight: 700;">Opprett ny samling</h3>
+                        <button type="button" id="close-event-modal" style="background: none; border: none; cursor: pointer; color: var(--text-muted, #64748b);"><span class="material-symbols-outlined">close</span></button>
+                    </div>
+                    <form id="group-event-form" style="display: flex; flex-direction: column; gap: 16px;">
+                        <input type="hidden" id="group-event-form-id" value="">
+                        <div>
+                            <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Tittel / Tema *</label>
+                            <input type="text" id="group-event-title-input" required placeholder="f.eks. Ukentlig samling & Lovsang" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a);">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div>
+                                <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Dato *</label>
+                                <input type="text" id="group-event-date-input" required placeholder="f.eks. Tirsdag 12. August" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a);">
+                            </div>
+                            <div>
+                                <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Klokkeslett *</label>
+                                <input type="text" id="group-event-time-input" required placeholder="f.eks. 19:00" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a);">
+                            </div>
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Sted / Lokasjon</label>
+                            <input type="text" id="group-event-location-input" placeholder="Bruker gruppens sted hvis tom" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a);">
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px;">
+                            <button type="button" id="cancel-event-form" style="padding: 10px 18px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: transparent; cursor: pointer;">Avbryt</button>
+                            <button type="submit" style="padding: 10px 22px; border-radius: 10px; background: var(--admin-orange, #d17d39); color: white; border: none; font-weight: 600; cursor: pointer;">Lagre samling</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Create / Edit Resource Modal -->
+            <div id="group-resource-modal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 16px;">
+                <div class="modal-card" style="background: var(--card-bg, #ffffff); border-radius: 20px; width: 100%; max-width: 480px; padding: 28px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 id="group-resource-modal-title" style="margin: 0; font-size: 20px; font-weight: 700;">Legg til resurs</h3>
+                        <button type="button" id="close-resource-modal" style="background: none; border: none; cursor: pointer; color: var(--text-muted, #64748b);"><span class="material-symbols-outlined">close</span></button>
+                    </div>
+                    <form id="group-resource-form" style="display: flex; flex-direction: column; gap: 16px;">
+                        <input type="hidden" id="group-resource-form-id" value="">
+                        <div>
+                            <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Tittel *</label>
+                            <input type="text" id="group-resource-title-input" required placeholder="f.eks. Studiehefte PDF" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a);">
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Lenke (URL) *</label>
+                            <input type="url" id="group-resource-url-input" required placeholder="f.eks. https://example.com/file.pdf" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a);">
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Type resurs</label>
+                            <select id="group-resource-type-input" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a);">
+                                <option value="PDF">PDF-hefte</option>
+                                <option value="Dokument">Dokument / Ark</option>
+                                <option value="Lenke">Nettside-lenke</option>
+                                <option value="Video">Video-lenke</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px;">
+                            <button type="button" id="cancel-resource-form" style="padding: 10px 18px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: transparent; cursor: pointer;">Avbryt</button>
+                            <button type="submit" style="padding: 10px 22px; border-radius: 10px; background: var(--admin-orange, #d17d39); color: white; border: none; font-weight: 600; cursor: pointer;">Lagre resurs</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         `;
 
         this.bindEvents();
@@ -341,6 +410,32 @@ export class HkmGroupsManager {
                 btn.classList.add('active');
                 this.renderCurrentView();
             });
+        });
+
+        // Event form events
+        const eventModal = this.container.querySelector('#group-event-modal');
+        this.container.querySelector('#close-event-modal')?.addEventListener('click', () => {
+            if (eventModal) eventModal.style.display = 'none';
+        });
+        this.container.querySelector('#cancel-event-form')?.addEventListener('click', () => {
+            if (eventModal) eventModal.style.display = 'none';
+        });
+        this.container.querySelector('#group-event-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleSaveEvent();
+        });
+
+        // Resource form events
+        const resModal = this.container.querySelector('#group-resource-modal');
+        this.container.querySelector('#close-resource-modal')?.addEventListener('click', () => {
+            if (resModal) resModal.style.display = 'none';
+        });
+        this.container.querySelector('#cancel-resource-form')?.addEventListener('click', () => {
+            if (resModal) resModal.style.display = 'none';
+        });
+        this.container.querySelector('#group-resource-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleSaveResource();
         });
 
         // Create modal toggle
@@ -954,7 +1049,7 @@ export class HkmGroupsManager {
         await db.collection('groups').doc(groupId).delete();
         
         // Clean up related sub-collections / documents
-        const collections = ['groupMembers', 'groupEvents', 'groupAttendance', 'groupMessages'];
+        const collections = ['groupMembers', 'groupEvents', 'groupAttendance', 'groupMessages', 'groupResources'];
         for (const col of collections) {
             try {
                 const snap = await db.collection(col).where('groupId', '==', groupId).get();
@@ -1255,6 +1350,12 @@ export class HkmGroupsManager {
                             <span class="material-symbols-outlined" style="font-size: 18px;">mail</span>
                             <span>Send e-post til gruppen</span>
                         </button>
+                        ${(isLeader || this.isAdmin) ? `
+                            <button type="button" id="btn-edit-group-details" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 8px; background: #475569; color: white; border: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: transform 0.15s ease;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+                                <span>Rediger gruppe</span>
+                            </button>
+                        ` : ''}
                         ${isLeader ? `
                             <button type="button" id="btn-duplicate-group-modal" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border-color, #cbd5e1); background: transparent; cursor: pointer; font-size: 13px; font-weight: 600;">
                                 <span class="material-symbols-outlined" style="font-size: 18px;">content_copy</span> Dupliser gruppe
@@ -1292,6 +1393,11 @@ export class HkmGroupsManager {
         // Duplicate button
         container.querySelector('#btn-duplicate-group-modal')?.addEventListener('click', () => {
             this.openDuplicateModal(group);
+        });
+
+        // Edit button
+        container.querySelector('#btn-edit-group-details')?.addEventListener('click', () => {
+            this.openCreateModal(group);
         });
 
         this.renderHubTabBody(container.querySelector('#hub-tab-body'));
@@ -1477,77 +1583,404 @@ export class HkmGroupsManager {
         }
     }
 
-    renderHubEvents(tabContainer) {
-        const events = [
-            { id: 'e1', title: 'Ukentlig samling & Matfellesskap', date: 'Tirsdag 12. August', time: '19:00', location: this.activeGroup.location },
-            { id: 'e2', title: 'Bønnenatt & Lovsang', date: 'Tirsdag 26. August', time: '19:00', location: this.activeGroup.location }
-        ];
-
+    async renderHubEvents(tabContainer) {
         const uid = firebase.auth().currentUser?.uid;
         const isLeader = this.activeGroup.leaderUids && this.activeGroup.leaderUids.includes(uid);
+        const isAdmin = this.isAdmin;
 
         tabContainer.innerHTML = `
             <div style="display: flex; flex-direction: column; gap: 16px;">
-                ${events.map(evt => `
+                ${(isLeader || isAdmin) ? `
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
+                        <button type="button" id="btn-create-event" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 14px; background: var(--admin-orange, #d17d39); color: white; border: none; cursor: pointer; transition: transform 0.2s ease;">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">add</span>
+                            <span>Opprett ny samling</span>
+                        </button>
+                    </div>
+                ` : ''}
+                <div id="hub-events-list" style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="text-align: center; padding: 30px; color: var(--text-muted, #64748b);">Laster samlinger...</div>
+                </div>
+            </div>
+        `;
+
+        // Bind create button
+        tabContainer.querySelector('#btn-create-event')?.addEventListener('click', () => {
+            this.openEventModal();
+        });
+
+        // Load events from Firestore
+        try {
+            const db = firebase.firestore();
+            const snap = await db.collection('groupEvents')
+                .where('groupId', '==', this.selectedGroupId)
+                .get();
+
+            let fetchedEvents = [];
+            snap.forEach(doc => {
+                fetchedEvents.push({ id: doc.id, ...doc.data() });
+            });
+
+            fetchedEvents.sort((a, b) => {
+                const dateA = a.createdAt ? a.createdAt.toMillis() : 0;
+                const dateB = b.createdAt ? b.createdAt.toMillis() : 0;
+                return dateA - dateB;
+            });
+
+            const listEl = tabContainer.querySelector('#hub-events-list');
+            if (!listEl) return;
+
+            if (fetchedEvents.length === 0) {
+                listEl.innerHTML = `
+                    <div style="text-align: center; padding: 40px; background: var(--card-bg, #fff); border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0); color: var(--text-muted, #64748b);">
+                        <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.5; margin-bottom: 8px; display: block;">calendar_today</span>
+                        Ingen planlagte samlinger opprettet ennå.
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = fetchedEvents.map(evt => {
+                const canEdit = isLeader || isAdmin;
+                return `
                     <div style="background: var(--card-bg, #fff); padding: 20px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;">
                         <div>
-                            <span style="font-size: 12px; font-weight: 700; color: var(--admin-orange, #d17d39); text-transform: uppercase;">${evt.date} kl. ${evt.time}</span>
-                            <h4 style="margin: 4px 0; font-size: 16px; font-weight: 700;">${evt.title}</h4>
-                            <p style="margin: 0; font-size: 13px; opacity: 0.8;">📍 ${evt.location}</p>
+                            <span style="font-size: 12px; font-weight: 700; color: var(--admin-orange, #d17d39); text-transform: uppercase;">${this.escapeHtml(evt.date)} kl. ${this.escapeHtml(evt.time)}</span>
+                            <h4 style="margin: 4px 0; font-size: 16px; font-weight: 700;">${this.escapeHtml(evt.title)}</h4>
+                            <p style="margin: 0; font-size: 13px; opacity: 0.8;">📍 ${this.escapeHtml(evt.location || this.activeGroup.location || 'Sted ikke oppgitt')}</p>
                         </div>
-                        <div style="display: flex; items-center; gap: 10px;">
-                            <button type="button" class="btn-rsvp" data-status="yes" style="padding: 8px 16px; border-radius: 10px; background: #ecfdf5; color: #166534; border: 1px solid #bbf7d0; font-weight: 600; font-size: 13px; cursor: pointer;">
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <button type="button" class="btn-rsvp" data-evt-id="${evt.id}" data-status="yes" style="padding: 8px 14px; border-radius: 10px; background: #ecfdf5; color: #166534; border: 1px solid #bbf7d0; font-weight: 600; font-size: 13px; cursor: pointer;">
                                 ✓ Jeg kommer
                             </button>
-                            <button type="button" class="btn-rsvp" data-status="no" style="padding: 8px 16px; border-radius: 10px; background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; font-weight: 600; font-size: 13px; cursor: pointer;">
+                            <button type="button" class="btn-rsvp" data-evt-id="${evt.id}" data-status="no" style="padding: 8px 14px; border-radius: 10px; background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; font-weight: 600; font-size: 13px; cursor: pointer;">
                                 ✕ Kan ikke
                             </button>
 
-                            ${isLeader ? `
-                                <button type="button" class="btn-attendance" style="padding: 8px 14px; border-radius: 10px; background: var(--admin-orange, #d17d39); color: white; border: none; font-weight: 600; font-size: 13px; cursor: pointer;">
-                                    📝 Oppmøte
+                            ${canEdit ? `
+                                <button type="button" class="btn-edit-event" data-evt-id="${evt.id}" style="padding: 8px 14px; border-radius: 10px; background: #f1f5f9; color: var(--text-color, #1e293b); border: 1px solid var(--border-color, #cbd5e1); font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                                    <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
+                                    <span>Endre</span>
+                                </button>
+                                <button type="button" class="btn-delete-event" data-evt-id="${evt.id}" style="padding: 8px 14px; border-radius: 10px; background: rgba(239,68,68,0.1); color: #ef4444; border: none; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                                    <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
+                                    <span>Slett</span>
                                 </button>
                             ` : ''}
                         </div>
                     </div>
-                `).join('')}
-            </div>
-        `;
+                `;
+            }).join('');
 
-        tabContainer.querySelectorAll('.btn-attendance').forEach(btn => {
-            btn.addEventListener('click', () => {
-                alert("Oppmøterapport: Alle 8 medlemmer ble registrert til stede ✓");
+            // Bind RSVP buttons
+            listEl.querySelectorAll('.btn-rsvp').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const status = btn.dataset.status;
+                    alert(status === 'yes' ? "Du har meldt deg på denne samlingen ✓" : "Du har meldt fra at du ikke kan komme.");
+                });
             });
-        });
+
+            // Bind Edit & Delete buttons
+            listEl.querySelectorAll('.btn-edit-event').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const evtId = btn.dataset.evtId;
+                    const evt = fetchedEvents.find(e => e.id === evtId);
+                    if (evt) this.openEventModal(evt);
+                });
+            });
+
+            listEl.querySelectorAll('.btn-delete-event').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const evtId = btn.dataset.evtId;
+                    const evt = fetchedEvents.find(e => e.id === evtId);
+                    if (evt) this.handleDeleteEvent(evt.id, evt.title);
+                });
+            });
+
+        } catch (err) {
+            console.error("Error loading events:", err);
+            const listEl = tabContainer.querySelector('#hub-events-list');
+            if (listEl) listEl.innerHTML = '<div style="text-align: center; color: #ef4444; padding: 20px;">Kunne ikke laste samlinger.</div>';
+        }
     }
 
-    renderHubResources(tabContainer) {
-        const resources = [
-            { title: 'Studiehefte: Å leve i Guds rike (PDF)', type: 'PDF', icon: 'picture_as_pdf', url: '#' },
-            { title: 'Bønneguide & Ukens vers', type: 'Dokument', icon: 'description', url: '#' }
-        ];
+    async renderHubResources(tabContainer) {
+        const uid = firebase.auth().currentUser?.uid;
+        const isLeader = this.activeGroup.leaderUids && this.activeGroup.leaderUids.includes(uid);
+        const isAdmin = this.isAdmin;
 
         tabContainer.innerHTML = `
             <div style="background: var(--card-bg, #fff); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0);">
-                <h3 style="margin-top: 0; font-size: 18px; font-weight: 700; margin-bottom: 16px;">Delte ressurser & pensum</h3>
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                    ${resources.map(res => `
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-radius: 12px; background: var(--bg-muted, #f8fafc); border: 1px solid var(--border-color, #e2e8f0);">
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <span class="material-symbols-outlined" style="color: var(--admin-orange, #d17d39); font-size: 24px;">${res.icon}</span>
-                                <div>
-                                    <div style="font-weight: 600; font-size: 14px;">${res.title}</div>
-                                    <span style="font-size: 11px; opacity: 0.6; font-weight: 600;">${res.type}</span>
-                                </div>
-                            </div>
-                            <a href="${res.url}" style="padding: 6px 14px; border-radius: 8px; background: var(--admin-orange, #d17d39); color: white; text-decoration: none; font-size: 13px; font-weight: 600;">
-                                Last ned
-                            </a>
-                        </div>
-                    `).join('')}
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h3 style="margin: 0; font-size: 18px; font-weight: 700;">Delte ressurser & pensum</h3>
+                    ${(isLeader || isAdmin) ? `
+                        <button type="button" id="btn-create-resource" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 10px; font-weight: 600; font-size: 13px; background: var(--admin-orange, #d17d39); color: white; border: none; cursor: pointer;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+                            <span>Legg til resurs</span>
+                        </button>
+                    ` : ''}
+                </div>
+                <div id="hub-resources-list" style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="text-align: center; padding: 20px; color: var(--text-muted, #64748b);">Laster ressurser...</div>
                 </div>
             </div>
         `;
+
+        // Bind create button
+        tabContainer.querySelector('#btn-create-resource')?.addEventListener('click', () => {
+            this.openResourceModal();
+        });
+
+        // Load resources from Firestore
+        try {
+            const db = firebase.firestore();
+            const snap = await db.collection('groupResources')
+                .where('groupId', '==', this.selectedGroupId)
+                .get();
+
+            let fetchedRes = [];
+            snap.forEach(doc => {
+                fetchedRes.push({ id: doc.id, ...doc.data() });
+            });
+
+            fetchedRes.sort((a, b) => {
+                const dateA = a.createdAt ? a.createdAt.toMillis() : 0;
+                const dateB = b.createdAt ? b.createdAt.toMillis() : 0;
+                return dateA - dateB;
+            });
+
+            const listEl = tabContainer.querySelector('#hub-resources-list');
+            if (!listEl) return;
+
+            if (fetchedRes.length === 0) {
+                listEl.innerHTML = `
+                    <div style="text-align: center; padding: 30px; color: var(--text-muted, #64748b);">
+                        Ingen delte ressurser i denne gruppen ennå.
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = fetchedRes.map(res => {
+                const canEdit = isLeader || isAdmin;
+                let icon = 'description';
+                if (res.type === 'PDF') icon = 'picture_as_pdf';
+                else if (res.type === 'Lenke') icon = 'link';
+                else if (res.type === 'Video') icon = 'video_library';
+
+                return `
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-radius: 12px; background: var(--bg-muted, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); gap: 16px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 200px;">
+                            <span class="material-symbols-outlined" style="color: var(--admin-orange, #d17d39); font-size: 24px;">${icon}</span>
+                            <div>
+                                <div style="font-weight: 600; font-size: 14px;">${this.escapeHtml(res.title)}</div>
+                                <span style="font-size: 11px; opacity: 0.6; font-weight: 600;">${this.escapeHtml(res.type)}</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <a href="${this.escapeHtml(res.url)}" target="_blank" style="padding: 6px 14px; border-radius: 8px; background: var(--admin-orange, #d17d39); color: white; text-decoration: none; font-size: 13px; font-weight: 600;">
+                                Åpne lenke
+                            </a>
+                            ${canEdit ? `
+                                <button type="button" class="btn-edit-resource" data-res-id="${res.id}" style="padding: 6px 12px; border-radius: 8px; background: #f1f5f9; color: var(--text-color, #1e293b); border: 1px solid var(--border-color, #cbd5e1); font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center;">
+                                    <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
+                                </button>
+                                <button type="button" class="btn-delete-resource" data-res-id="${res.id}" style="padding: 6px 12px; border-radius: 8px; background: rgba(239,68,68,0.1); color: #ef4444; border: none; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center;">
+                                    <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Bind Edit & Delete buttons
+            listEl.querySelectorAll('.btn-edit-resource').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const resId = btn.dataset.resId;
+                    const res = fetchedRes.find(r => r.id === resId);
+                    if (res) this.openResourceModal(res);
+                });
+            });
+
+            listEl.querySelectorAll('.btn-delete-resource').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const resId = btn.dataset.resId;
+                    const res = fetchedRes.find(r => r.id === resId);
+                    if (res) this.handleDeleteResource(res.id, res.title);
+                });
+            });
+
+        } catch (err) {
+            console.error("Error loading resources:", err);
+            const listEl = tabContainer.querySelector('#hub-resources-list');
+            if (listEl) listEl.innerHTML = '<div style="text-align: center; color: #ef4444; padding: 20px;">Kunne ikke laste ressurser.</div>';
+        }
+    }
+
+    openEventModal(eventToEdit = null) {
+        const modal = this.container.querySelector('#group-event-modal');
+        const form = this.container.querySelector('#group-event-form');
+        const titleEl = this.container.querySelector('#group-event-modal-title');
+        if (!modal || !form) return;
+
+        form.reset();
+        if (eventToEdit) {
+            titleEl.textContent = 'Rediger samling';
+            form.querySelector('#group-event-form-id').value = eventToEdit.id;
+            form.querySelector('#group-event-title-input').value = eventToEdit.title || '';
+            form.querySelector('#group-event-date-input').value = eventToEdit.date || '';
+            form.querySelector('#group-event-time-input').value = eventToEdit.time || '';
+            form.querySelector('#group-event-location-input').value = eventToEdit.location || '';
+        } else {
+            titleEl.textContent = 'Opprett ny samling';
+            form.querySelector('#group-event-form-id').value = '';
+            form.querySelector('#group-event-location-input').value = this.activeGroup.location || '';
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    async handleSaveEvent() {
+        const form = this.container.querySelector('#group-event-form');
+        const id = form.querySelector('#group-event-form-id').value;
+        
+        const payload = {
+            groupId: this.selectedGroupId,
+            title: form.querySelector('#group-event-title-input').value.trim(),
+            date: form.querySelector('#group-event-date-input').value.trim(),
+            time: form.querySelector('#group-event-time-input').value.trim(),
+            location: form.querySelector('#group-event-location-input').value.trim(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        try {
+            const db = firebase.firestore();
+            if (id) {
+                await db.collection('groupEvents').doc(id).update(payload);
+            } else {
+                payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                await db.collection('groupEvents').add(payload);
+            }
+
+            this.container.querySelector('#group-event-modal').style.display = 'none';
+            // Reload the events tab
+            this.renderHubEvents(this.container.querySelector('#hub-tab-body'));
+        } catch (err) {
+            console.error("Error saving event:", err);
+            alert("Kunne ikke lagre samling: " + err.message);
+        }
+    }
+
+    async handleDeleteEvent(eventId, eventTitle) {
+        if (this.app && typeof this.app.showCustomConfirm === 'function') {
+            this.app.showCustomConfirm({
+                title: 'Slett samling',
+                message: `Er du sikker på at du vil slette samlingen "${eventTitle}"?`,
+                confirmText: 'Slett',
+                cancelText: 'Avbryt',
+                isDanger: true,
+                onConfirm: async () => {
+                    await this.performDeleteEvent(eventId);
+                }
+            });
+        } else {
+            if (confirm(`Er du sikker på at du vil slette samlingen "${eventTitle}"?`)) {
+                await this.performDeleteEvent(eventId);
+            }
+        }
+    }
+
+    async performDeleteEvent(eventId) {
+        try {
+            const db = firebase.firestore();
+            await db.collection('groupEvents').doc(eventId).delete();
+            this.renderHubEvents(this.container.querySelector('#hub-tab-body'));
+        } catch (err) {
+            console.error("Error deleting event:", err);
+            alert("Kunne ikke slette samling: " + err.message);
+        }
+    }
+
+    openResourceModal(resToEdit = null) {
+        const modal = this.container.querySelector('#group-resource-modal');
+        const form = this.container.querySelector('#group-resource-form');
+        const titleEl = this.container.querySelector('#group-resource-modal-title');
+        if (!modal || !form) return;
+
+        form.reset();
+        if (resToEdit) {
+            titleEl.textContent = 'Rediger resurs';
+            form.querySelector('#group-resource-form-id').value = resToEdit.id;
+            form.querySelector('#group-resource-title-input').value = resToEdit.title || '';
+            form.querySelector('#group-resource-url-input').value = resToEdit.url || '';
+            form.querySelector('#group-resource-type-input').value = resToEdit.type || 'PDF';
+        } else {
+            titleEl.textContent = 'Legg til resurs';
+            form.querySelector('#group-resource-form-id').value = '';
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    async handleSaveResource() {
+        const form = this.container.querySelector('#group-resource-form');
+        const id = form.querySelector('#group-resource-form-id').value;
+
+        const payload = {
+            groupId: this.selectedGroupId,
+            title: form.querySelector('#group-resource-title-input').value.trim(),
+            url: form.querySelector('#group-resource-url-input').value.trim(),
+            type: form.querySelector('#group-resource-type-input').value,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        try {
+            const db = firebase.firestore();
+            if (id) {
+                await db.collection('groupResources').doc(id).update(payload);
+            } else {
+                payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                await db.collection('groupResources').add(payload);
+            }
+
+            this.container.querySelector('#group-resource-modal').style.display = 'none';
+            // Reload resources tab
+            this.renderHubResources(this.container.querySelector('#hub-tab-body'));
+        } catch (err) {
+            console.error("Error saving resource:", err);
+            alert("Kunne ikke lagre resurs: " + err.message);
+        }
+    }
+
+    async handleDeleteResource(resId, resTitle) {
+        if (this.app && typeof this.app.showCustomConfirm === 'function') {
+            this.app.showCustomConfirm({
+                title: 'Slett resurs',
+                message: `Er du sikker på at du vil slette resursen "${resTitle}"?`,
+                confirmText: 'Slett',
+                cancelText: 'Avbryt',
+                isDanger: true,
+                onConfirm: async () => {
+                    await this.performDeleteResource(resId);
+                }
+            });
+        } else {
+            if (confirm(`Er du sikker på at du vil slette resursen "${resTitle}"?`)) {
+                await this.performDeleteResource(resId);
+            }
+        }
+    }
+
+    async performDeleteResource(resId) {
+        try {
+            const db = firebase.firestore();
+            await db.collection('groupResources').doc(resId).delete();
+            this.renderHubResources(this.container.querySelector('#hub-tab-body'));
+        } catch (err) {
+            console.error("Error deleting resource:", err);
+            alert("Kunne ikke slette resurs: " + err.message);
+        }
     }
 
     /* ═══════════════════════════════════════════════════════════════════════════
