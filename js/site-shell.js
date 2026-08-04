@@ -435,6 +435,35 @@ function menuColumnMarkup(section, sectionKey, routes) {
         </div>`;
 }
 
+function getTranslatedPath(targetLang) {
+    if (typeof window === 'undefined') return targetLang === 'no' ? '/' : `/${targetLang}/`;
+    const path = window.location.pathname.replace(/\/$/, '').toLowerCase();
+    if (path.includes('/register') || path.includes('/registro') || path.includes('/registrer')) {
+        if (targetLang === 'no') return '/registrer';
+        if (targetLang === 'en') return '/en/register';
+        if (targetLang === 'es') return '/es/registro';
+    }
+    if (path.includes('/contact') || path.includes('/contacto') || path.includes('/kontakt')) {
+        if (targetLang === 'no') return '/kontakt';
+        if (targetLang === 'en') return '/en/contact';
+        if (targetLang === 'es') return '/es/contacto';
+    }
+    if (path.includes('/about') || path.includes('/sobre-nosotros') || path.includes('/om-oss')) {
+        if (targetLang === 'no') return '/om-oss';
+        if (targetLang === 'en') return '/en/about';
+        if (targetLang === 'es') return '/es/sobre-nosotros';
+    }
+    if (path.includes('/donations') || path.includes('/donaciones') || path.includes('/donasjoner')) {
+        if (targetLang === 'no') return '/donasjoner';
+        if (targetLang === 'en') return '/en/donations';
+        if (targetLang === 'es') return '/es/donaciones';
+    }
+    if (targetLang === 'no') return '/';
+    if (targetLang === 'en') return '/en/';
+    if (targetLang === 'es') return '/es/';
+    return '/';
+}
+
 export function renderSiteHeader(language = getLanguage()) {
     const copy = COPY[language];
     const routes = ROUTES[language];
@@ -471,35 +500,6 @@ export function renderSiteHeader(language = getLanguage()) {
                             </a>
 
                             <div class="hidden md:block w-px h-5 bg-white/20 mx-1 dock-divider"></div>
-
-function getTranslatedPath(targetLang) {
-    if (typeof window === 'undefined') return targetLang === 'no' ? '/' : `/${targetLang}/`;
-    const path = window.location.pathname.replace(/\/$/, '').toLowerCase();
-    if (path.includes('/register') || path.includes('/registro') || path.includes('/registrer')) {
-        if (targetLang === 'no') return '/registrer';
-        if (targetLang === 'en') return '/en/register';
-        if (targetLang === 'es') return '/es/registro';
-    }
-    if (path.includes('/contact') || path.includes('/contacto') || path.includes('/kontakt')) {
-        if (targetLang === 'no') return '/kontakt';
-        if (targetLang === 'en') return '/en/contact';
-        if (targetLang === 'es') return '/es/contacto';
-    }
-    if (path.includes('/about') || path.includes('/sobre-nosotros') || path.includes('/om-oss')) {
-        if (targetLang === 'no') return '/om-oss';
-        if (targetLang === 'en') return '/en/about';
-        if (targetLang === 'es') return '/es/sobre-nosotros';
-    }
-    if (path.includes('/donations') || path.includes('/donaciones') || path.includes('/donasjoner')) {
-        if (targetLang === 'no') return '/donasjoner';
-        if (targetLang === 'en') return '/en/donations';
-        if (targetLang === 'es') return '/es/donaciones';
-    }
-    if (targetLang === 'no') return '/';
-    if (targetLang === 'en') return '/en/';
-    if (targetLang === 'es') return '/es/';
-    return '/';
-}
 
                             <div class="lang-switcher relative group">
                                 <button class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full text-white hover:bg-white/15 transition-all lang-btn"
