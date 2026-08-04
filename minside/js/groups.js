@@ -1767,7 +1767,22 @@ export class HkmGroupsManager {
                     </div>
                 </div>
 
-                <div style="background: var(--card-bg, #fff); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0);">
+                <div style="background: var(--card-bg, #fff); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0); display: flex; flex-direction: column;">
+                    <style>
+                        .compact-members-list::-webkit-scrollbar {
+                            width: 6px;
+                        }
+                        .compact-members-list::-webkit-scrollbar-track {
+                            background: transparent;
+                        }
+                        .compact-members-list::-webkit-scrollbar-thumb {
+                            background: var(--border-color, #e2e8f0);
+                            border-radius: 10px;
+                        }
+                        .compact-members-list::-webkit-scrollbar-thumb:hover {
+                            background: #cbd5e1;
+                        }
+                    </style>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
                         <h3 style="margin: 0; font-size: 18px; font-weight: 700;">${this.t('groups.hubMembersTitle')} (${((group.memberNames || []).length + (group.leaderNames || []).length) || (group.memberUids || []).length})</h3>
                         <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
@@ -1786,41 +1801,44 @@ export class HkmGroupsManager {
                         </div>
                     </div>
 
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                        ${canManage ? `
-                            <div style="display: flex; align-items: center; gap: 8px; padding: 4px 14px; margin-bottom: 4px;">
-                                <input type="checkbox" id="checkbox-select-all-members" style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--admin-orange, #d17d39);">
-                                <label for="checkbox-select-all-members" style="font-size: 13px; font-weight: 600; cursor: pointer; opacity: 0.8; user-select: none;">Marker alle</label>
-                            </div>
-                        ` : ''}
+                    ${canManage ? `
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; margin-bottom: 8px; border-bottom: 1px solid var(--border-color, #e2e8f0); padding-bottom: 12px;">
+                            <input type="checkbox" id="checkbox-select-all-members" style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--admin-orange, #d17d39);">
+                            <label for="checkbox-select-all-members" style="font-size: 13px; font-weight: 600; cursor: pointer; opacity: 0.8; user-select: none;">Marker alle</label>
+                        </div>
+                    ` : ''}
+
+                    <div class="compact-members-list" style="display: flex; flex-direction: column; gap: 4px; max-height: 400px; overflow-y: auto; padding-right: 4px;">
                         ${(group.leaderNames || []).map(leader => `
-                            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; background: var(--bg-muted, #f8fafc); border: 1px solid var(--border-color, #e2e8f0);">
-                                ${canManage ? `
-                                    <input type="checkbox" class="remove-member-checkbox" data-name="${this.escapeHtml(leader)}" data-role="leader" style="width: 16px; height: 16px; cursor: pointer; accent-color: #ef4444; margin-right: 4px;">
-                                ` : ''}
-                                <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--admin-orange, #d17d39); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700;">
-                                    ${leader.charAt(0).toUpperCase()}
-                                </div>
-                                <div>
-                                    <div style="font-weight: 600; font-size: 14px;">${this.escapeHtml(leader)}</div>
-                                    <div style="font-size: 12px; color: var(--admin-orange, #d17d39); font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
-                                        <span class="material-symbols-outlined" style="font-size: 14px; color: var(--admin-orange, #d17d39); font-variation-settings: 'FILL' 1;">star</span>
-                                        <span>${this.t('groups.groupLeder')}</span>
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; border-radius: 8px; transition: background 0.15s ease;" onmouseover="this.style.background='var(--bg-muted, #f8fafc)'" onmouseout="this.style.background='transparent'">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    ${canManage ? `
+                                        <input type="checkbox" class="remove-member-checkbox" data-name="${this.escapeHtml(leader)}" data-role="leader" style="width: 16px; height: 16px; cursor: pointer; accent-color: #ef4444;">
+                                    ` : ''}
+                                    <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--admin-orange, #d17d39); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px;">
+                                        ${leader.charAt(0).toUpperCase()}
                                     </div>
+                                    <div style="font-weight: 600; font-size: 13px; color: var(--text-color, #0f172a);">${this.escapeHtml(leader)}</div>
+                                </div>
+                                <div style="font-size: 11px; color: var(--admin-orange, #d17d39); font-weight: 600; background: #fffbeb; border: 1px solid #fef3c7; padding: 2px 8px; border-radius: 12px; display: inline-flex; align-items: center; gap: 3px;">
+                                    <span class="material-symbols-outlined" style="font-size: 12px; color: var(--admin-orange, #d17d39); font-variation-settings: 'FILL' 1;">star</span>
+                                    <span>${this.t('groups.groupLeder')}</span>
                                 </div>
                             </div>
                         `).join('')}
                         ${(group.memberNames || []).filter(m => !(group.leaderNames || []).includes(m)).map(member => `
-                            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; background: var(--bg-muted, #f8fafc); border: 1px solid var(--border-color, #e2e8f0);">
-                                ${canManage ? `
-                                    <input type="checkbox" class="remove-member-checkbox" data-name="${this.escapeHtml(member)}" data-role="member" style="width: 16px; height: 16px; cursor: pointer; accent-color: #ef4444; margin-right: 4px;">
-                                ` : ''}
-                                <div style="width: 36px; height: 36px; border-radius: 50%; background: #0f172a; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700;">
-                                    ${member.charAt(0).toUpperCase()}
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; border-radius: 8px; transition: background 0.15s ease;" onmouseover="this.style.background='var(--bg-muted, #f8fafc)'" onmouseout="this.style.background='transparent'">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    ${canManage ? `
+                                        <input type="checkbox" class="remove-member-checkbox" data-name="${this.escapeHtml(member)}" data-role="member" style="width: 16px; height: 16px; cursor: pointer; accent-color: #ef4444;">
+                                    ` : ''}
+                                    <div style="width: 28px; height: 28px; border-radius: 50%; background: #0f172a; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px;">
+                                        ${member.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div style="font-weight: 600; font-size: 13px; color: var(--text-color, #0f172a);">${this.escapeHtml(member)}</div>
                                 </div>
-                                <div>
-                                    <div style="font-weight: 600; font-size: 14px;">${this.escapeHtml(member)}</div>
-                                    <div style="font-size: 12px; color: var(--text-muted, #64748b); font-weight: 600;">${this.t('groups.groupMedlem')}</div>
+                                <div style="font-size: 11px; color: var(--text-muted, #64748b); font-weight: 600; background: var(--bg-muted, #f1f5f9); padding: 2px 8px; border-radius: 12px;">
+                                    ${this.t('groups.groupMedlem')}
                                 </div>
                             </div>
                         `).join('')}
