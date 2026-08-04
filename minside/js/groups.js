@@ -148,13 +148,22 @@ export class HkmGroupsManager {
             return dateInput;
         }
         
-        const months = [
-            'januar', 'februar', 'mars', 'april', 'mai', 'juni',
-            'juli', 'august', 'september', 'oktober', 'november', 'desember'
-        ];
-        const days = [
-            'Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'
-        ];
+        const lang = document.documentElement.lang || 'no';
+        
+        const monthsDict = {
+            no: ['januar', 'februar', 'mars', 'april', 'mai', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'desember'],
+            en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+            es: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
+        };
+        
+        const daysDict = {
+            no: ['Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'],
+            en: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+            es: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+        };
+        
+        const months = monthsDict[lang] || monthsDict['no'];
+        const days = daysDict[lang] || daysDict['no'];
         
         const dayName = days[dateObj.getDay()];
         const dayNum = dateObj.getDate();
@@ -162,10 +171,17 @@ export class HkmGroupsManager {
         const year = dateObj.getFullYear();
         
         const currentYear = new Date().getFullYear();
-        if (year === currentYear) {
-            return `${dayName} ${dayNum}. ${monthName}`;
+        const showYear = year !== currentYear;
+        
+        if (lang === 'en') {
+            const suffix = ['th', 'st', 'nd', 'rd'][(dayNum % 10 > 3 || Math.floor(dayNum % 100 / 10) === 1) ? 0 : dayNum % 10];
+            return `${dayName}, ${monthName} ${dayNum}${suffix}${showYear ? ` ${year}` : ''}`;
+        } else if (lang === 'es') {
+            return `${dayName}, ${dayNum} de ${monthName}${showYear ? ` de ${year}` : ''}`;
+        } else {
+            // Default Norwegian
+            return `${dayName} ${dayNum}. ${monthName}${showYear ? ` ${year}` : ''}`;
         }
-        return `${dayName} ${dayNum}. ${monthName} ${year}`;
     }
 
     renderMarkdown(text) {
@@ -236,9 +252,6 @@ export class HkmGroupsManager {
         clean = clean.replace(/^[\s]*[-*][\s]+/gm, '');
         return clean;
     }
-
-
-
 
     t(key) {
         const lang = document.documentElement.lang || 'no';
@@ -324,7 +337,24 @@ export class HkmGroupsManager {
                 'groups.category.Bibelstudie': 'Bibelstudie',
                 'groups.category.Ung-voksen': 'Ung-voksen',
                 'groups.category.Lovsang & Musikk': 'Lovsang & Musikk',
-                'groups.category.Lederteam': 'Lederteam'
+                'groups.category.Lederteam': 'Lederteam',
+
+                // Custom keys for layout and widgets
+                'groups.memberCountText': 'person',
+                'groups.membersCountText': 'personer',
+                'groups.totalInGroup': 'Totalt {count} {unit} i smågruppen',
+                'groups.removeSelected': 'Fjern markerte',
+                'groups.selectAll': 'Marker alle',
+                'groups.loadingDetails': 'Henter medlemsdetaljer...',
+                'groups.whatsappGroup': 'WhatsApp-gruppe',
+                'groups.whatsappDesc': 'Bli med i gruppens interne chat på WhatsApp.',
+                'groups.whatsappOpen': 'Åpne chat',
+                'groups.nextEvent': 'Neste Samling',
+                'groups.loadingNextEvent': 'Henter neste samling...',
+                'groups.noUpcomingEvents': 'Ingen planlagte samlinger',
+                'groups.errorNextEvent': 'Kunne ikke hente samling',
+                'groups.zoomMeetingId': 'Zoom Meeting ID',
+                'groups.zoomPasscode': 'Zoom Passcode'
             },
             en: {
                 'groups.title': 'Small Groups',
@@ -407,7 +437,24 @@ export class HkmGroupsManager {
                 'groups.category.Bibelstudie': 'Bible Study',
                 'groups.category.Ung-voksen': 'Young Adults',
                 'groups.category.Lovsang & Musikk': 'Worship & Music',
-                'groups.category.Lederteam': 'Leadership Team'
+                'groups.category.Lederteam': 'Leadership Team',
+
+                // Custom keys for layout and widgets
+                'groups.memberCountText': 'person',
+                'groups.membersCountText': 'people',
+                'groups.totalInGroup': 'Total {count} {unit} in the small group',
+                'groups.removeSelected': 'Remove selected',
+                'groups.selectAll': 'Select all',
+                'groups.loadingDetails': 'Loading member details...',
+                'groups.whatsappGroup': 'WhatsApp Group',
+                'groups.whatsappDesc': "Join the group's internal chat on WhatsApp.",
+                'groups.whatsappOpen': 'Open chat',
+                'groups.nextEvent': 'Next Gathering',
+                'groups.loadingNextEvent': 'Loading next gathering...',
+                'groups.noUpcomingEvents': 'No planned gatherings',
+                'groups.errorNextEvent': 'Could not load gathering',
+                'groups.zoomMeetingId': 'Zoom Meeting ID',
+                'groups.zoomPasscode': 'Zoom Passcode'
             },
             es: {
                 'groups.title': 'Grupos Pequeños',
@@ -482,7 +529,24 @@ export class HkmGroupsManager {
                 'groups.modalUrlPlaceholder': 'Pegar URL de la imagen aquí...',
                 'groups.modalLoading': 'Cargando...',
                 'groups.modalLoadingGroups': 'Cargando grupos...',
-                'groups.modalLeader': 'Líder: '
+                'groups.modalLeader': 'Líder: ',
+
+                // Custom keys for layout and widgets
+                'groups.memberCountText': 'persona',
+                'groups.membersCountText': 'personas',
+                'groups.totalInGroup': 'Total {count} {unit} en el grupo pequeño',
+                'groups.removeSelected': 'Eliminar seleccionados',
+                'groups.selectAll': 'Seleccionar todos',
+                'groups.loadingDetails': 'Cargando detalles de los miembros...',
+                'groups.whatsappGroup': 'Grupo de WhatsApp',
+                'groups.whatsappDesc': 'Únete al chat interno del grupo en WhatsApp.',
+                'groups.whatsappOpen': 'Abrir chat',
+                'groups.nextEvent': 'Próxima Reunión',
+                'groups.loadingNextEvent': 'Cargando próxima reunión...',
+                'groups.noUpcomingEvents': 'No hay reuniones planificadas',
+                'groups.errorNextEvent': 'No se pudo obtener la reunión',
+                'groups.zoomMeetingId': 'ID de reunión de Zoom',
+                'groups.zoomPasscode': 'Código de acceso de Zoom'
             }
         };
 
@@ -2095,12 +2159,12 @@ export class HkmGroupsManager {
                                         </svg>
                                     </div>
                                     <div>
-                                        <h4 style="margin: 0; font-size: 15.5px; font-weight: 700; color: #1b5e20;">WhatsApp-gruppe</h4>
-                                        <p style="margin: 2px 0 0 0; font-size: 13.5px; color: #2e7d32; opacity: 0.9;">Bli med i gruppens interne chat på WhatsApp.</p>
+                                        <h4 style="margin: 0; font-size: 15.5px; font-weight: 700; color: #1b5e20;">${this.t('groups.whatsappGroup')}</h4>
+                                        <p style="margin: 2px 0 0 0; font-size: 13.5px; color: #2e7d32; opacity: 0.9;">${this.t('groups.whatsappDesc')}</p>
                                     </div>
                                 </div>
                                 <a href="${group.whatsappUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 8px; justify-content: center; padding: 10px 20px; border-radius: 12px; background: #25d366; color: white; border: none; font-weight: 700; font-size: 13.5px; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(37,211,102,0.2);" onmouseover="this.style.transform='scale(1.03)';" onmouseout="this.style.transform='none';">
-                                    <span>Åpne chat</span>
+                                    <span>${this.t('groups.whatsappOpen')}</span>
                                     <span class="material-symbols-outlined" style="font-size: 16px; display: block;">open_in_new</span>
                                 </a>
                             </div>
@@ -2119,7 +2183,7 @@ export class HkmGroupsManager {
                             <div id="overview-next-event-container" style="display: flex; align-items: center; gap: 16px; background: linear-gradient(135deg, rgba(209,125,57,0.06) 0%, rgba(209,125,57,0.02) 100%); border: 1px solid rgba(209,125,57,0.15); padding: 16px; border-radius: 14px; margin-bottom: 4px; min-height: 92px;">
                                 <div style="display: flex; align-items: center; gap: 8px; color: var(--text-muted, #64748b); font-size: 13.5px; font-weight: 600; width: 100%; justify-content: center;">
                                     <span class="material-symbols-outlined" style="font-size: 20px; animation: hkm-spin 1.5s linear infinite; color: var(--admin-orange, #d17d39);">sync</span>
-                                    <span>Henter neste samling...</span>
+                                    <span>${this.t('groups.loadingNextEvent')}</span>
                                 </div>
                             </div>
 
@@ -2153,7 +2217,7 @@ export class HkmGroupsManager {
                                 <div style="display: flex; align-items: flex-start; gap: 14px;">
                                     <span class="material-symbols-outlined" style="font-size: 22px; color: var(--text-muted, #64748b); margin-top: 2px;">key</span>
                                     <div>
-                                        <span style="font-size: 11px; font-weight: 700; opacity: 0.6; text-transform: uppercase; color: var(--text-muted, #64748b); letter-spacing: 0.5px;">Zoom Meeting ID</span>
+                                        <span style="font-size: 11px; font-weight: 700; opacity: 0.6; text-transform: uppercase; color: var(--text-muted, #64748b); letter-spacing: 0.5px;">${this.t('groups.zoomMeetingId')}</span>
                                         <p style="margin: 2px 0 0 0; font-weight: 700; font-size: 14.5px; color: var(--text-color, #0f172a); letter-spacing: 0.5px;">${this.escapeHtml(group.zoomMeetingId)}</p>
                                     </div>
                                 </div>
@@ -2163,7 +2227,7 @@ export class HkmGroupsManager {
                                 <div style="display: flex; align-items: flex-start; gap: 14px;">
                                     <span class="material-symbols-outlined" style="font-size: 22px; color: var(--text-muted, #64748b); margin-top: 2px;">lock</span>
                                     <div>
-                                        <span style="font-size: 11px; font-weight: 700; opacity: 0.6; text-transform: uppercase; color: var(--text-muted, #64748b); letter-spacing: 0.5px;">Zoom Passcode</span>
+                                        <span style="font-size: 11px; font-weight: 700; opacity: 0.6; text-transform: uppercase; color: var(--text-muted, #64748b); letter-spacing: 0.5px;">${this.t('groups.zoomPasscode')}</span>
                                         <p style="margin: 2px 0 0 0; font-weight: 700; font-size: 14.5px; color: var(--text-color, #0f172a);">${this.escapeHtml(group.zoomPasscode)}</p>
                                     </div>
                                 </div>
@@ -2231,8 +2295,8 @@ export class HkmGroupsManager {
                                 <span class="material-symbols-outlined" style="font-size: 28px; color: var(--text-muted, #64748b);">calendar_today</span>
                             </div>
                             <div>
-                                <span style="font-size: 10px; font-weight: 700; opacity: 0.65; text-transform: uppercase; color: var(--text-muted, #64748b); letter-spacing: 0.7px;">Neste Samling</span>
-                                <div style="font-size: 13.5px; color: var(--text-muted, #64748b); font-weight: 600; margin-top: 2px;">Ingen planlagte samlinger</div>
+                                <span style="font-size: 10px; font-weight: 700; opacity: 0.65; text-transform: uppercase; color: var(--text-muted, #64748b); letter-spacing: 0.7px;">${this.t('groups.nextEvent')}</span>
+                                <div style="font-size: 13.5px; color: var(--text-muted, #64748b); font-weight: 600; margin-top: 2px;">${this.t('groups.noUpcomingEvents')}</div>
                             </div>
                         </div>
                     `;
@@ -2255,11 +2319,20 @@ export class HkmGroupsManager {
                 
                 let badgeHtml = '';
                 if (dateObj && !isNaN(dateObj.getTime())) {
-                    const monthsNorShort = ['JAN', 'FEB', 'MAR', 'APR', 'MAI', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DES'];
-                    const daysNorShort = ['søn', 'man', 'tir', 'ons', 'tor', 'fre', 'lør'];
-                    const mStr = monthsNorShort[dateObj.getMonth()];
+                    const monthsShortDict = {
+                        no: ['JAN', 'FEB', 'MAR', 'APR', 'MAI', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DES'],
+                        en: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
+                        es: ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC']
+                    };
+                    const daysShortDict = {
+                        no: ['søn', 'man', 'tir', 'ons', 'tor', 'fre', 'lør'],
+                        en: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
+                        es: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb']
+                    };
+                    const lang = document.documentElement.lang || 'no';
+                    const mStr = (monthsShortDict[lang] || monthsShortDict['no'])[dateObj.getMonth()];
                     const dStr = dateObj.getDate();
-                    const dName = daysNorShort[dateObj.getDay()];
+                    const dName = (daysShortDict[lang] || daysShortDict['no'])[dateObj.getDay()];
                     
                     badgeHtml = `
                         <div style="width: 54px; height: 60px; background: var(--card-bg, #fff); border: 1px solid var(--border-color, #cbd5e1); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.03); flex-shrink: 0; text-align: center;">
@@ -2279,6 +2352,14 @@ export class HkmGroupsManager {
                         </div>
                     `;
                 }
+
+                const lang = document.documentElement.lang || 'no';
+                const timePrefixDict = {
+                    no: ' kl. ',
+                    en: ' at ',
+                    es: ' a las '
+                };
+                const timePrefix = timePrefixDict[lang] || timePrefixDict['no'];
 
                 containerEl.innerHTML = `
                     <style>
@@ -2303,12 +2384,12 @@ export class HkmGroupsManager {
                     </style>
                     ${badgeHtml}
                     <div style="flex: 1; min-width: 0;">
-                        <span style="font-size: 10px; font-weight: 700; opacity: 0.65; text-transform: uppercase; color: var(--admin-orange, #d17d39); letter-spacing: 0.7px;">Neste Samling</span>
+                        <span style="font-size: 10px; font-weight: 700; opacity: 0.65; text-transform: uppercase; color: var(--admin-orange, #d17d39); letter-spacing: 0.7px;">${this.t('groups.nextEvent')}</span>
                         <h4 style="margin: 4px 0 2px 0; font-size: 15.5px; font-weight: 800; color: var(--text-color, #0f172a); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                             ${this.escapeHtml(nextEvt.title)}
                         </h4>
                         <div style="font-size: 13.5px; color: var(--text-color, #334155); font-weight: 600;">
-                            ${this.escapeHtml(formattedDate)}${nextEvt.time ? ` kl. ${this.escapeHtml(nextEvt.time)}` : ''}
+                            ${this.escapeHtml(formattedDate)}${nextEvt.time ? `${timePrefix}${this.escapeHtml(nextEvt.time)}` : ''}
                         </div>
                         ${nextEvt.location ? `
                             <div class="next-event-location-wrapper" style="margin-top: 8px;">
@@ -2321,7 +2402,7 @@ export class HkmGroupsManager {
                 console.error("Error loading next event:", err);
                 const containerEl = tabContainer.querySelector('#overview-next-event-container');
                 if (containerEl) {
-                    containerEl.innerHTML = `<span style="font-size: 13px; color: #ef4444;">Kunne ikke hente samling</span>`;
+                    containerEl.innerHTML = `<span style="font-size: 13px; color: #ef4444;">${this.t('groups.errorNextEvent')}</span>`;
                 }
             }
         })();
@@ -2344,7 +2425,7 @@ export class HkmGroupsManager {
                     }
                 </style>
                 <span class="material-symbols-outlined" style="font-size: 32px; animation: hkm-spin 1.5s linear infinite; color: var(--admin-orange, #d17d39); margin-bottom: 12px; display: block;">sync</span>
-                <div style="font-size: 14px; opacity: 0.8; font-weight: 500;">Henter medlemsdetaljer...</div>
+                <div style="font-size: 14px; opacity: 0.8; font-weight: 500;">${this.t('groups.loadingDetails')}</div>
             </div>
         `;
 
@@ -2371,7 +2452,7 @@ export class HkmGroupsManager {
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--border-color, #f1f5f9); padding-bottom: 16px;">
                     <div>
                         <h3 style="margin: 0; font-size: 18px; font-weight: 700;">${this.t('groups.hubMembersTitle')}</h3>
-                        <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--text-muted, #64748b);">Totalt ${totalCount} ${totalCount === 1 ? 'person' : 'personer'} i smågruppen</p>
+                        <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--text-muted, #64748b);">${this.t('groups.totalInGroup').replace('{count}', totalCount).replace('{unit}', totalCount === 1 ? this.t('groups.memberCountText') : this.t('groups.membersCountText'))}</p>
                     </div>
                     <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                         ${this.isAdmin ? `
@@ -2383,7 +2464,7 @@ export class HkmGroupsManager {
                         ${canManage ? `
                             <button type="button" id="btn-remove-selected-members" style="display: none; align-items: center; gap: 6px; font-size: 13px; padding: 8px 16px; border-radius: 10px; background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; font-weight: 600; cursor: pointer; transition: all 0.15s ease;">
                                 <span class="material-symbols-outlined" style="font-size: 18px;">person_remove</span>
-                                <span>Fjern markerte</span>
+                                <span>${this.t('groups.removeSelected')}</span>
                             </button>
                         ` : ''}
                     </div>
@@ -2392,7 +2473,7 @@ export class HkmGroupsManager {
                 ${canManage ? `
                     <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border-color, #e2e8f0); padding-bottom: 12px;">
                         <input type="checkbox" id="checkbox-select-all-members" style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--admin-orange, #d17d39);">
-                        <label for="checkbox-select-all-members" style="font-size: 13px; font-weight: 600; cursor: pointer; opacity: 0.8; user-select: none;">Marker alle</label>
+                        <label for="checkbox-select-all-members" style="font-size: 13px; font-weight: 600; cursor: pointer; opacity: 0.8; user-select: none;">${this.t('groups.selectAll')}</label>
                     </div>
                 ` : ''}
 
