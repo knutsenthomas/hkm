@@ -1153,6 +1153,7 @@ export class HkmGroupsManager {
         const isLeader = group.leaderUids && group.leaderUids.includes(uid);
 
         const img = group.imageUrl || 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80';
+        const totalCount = ((group.memberNames || []).length + (group.leaderNames || []).length) || (group.memberUids || []).length;
 
         return `
             <div class="group-card" style="background: var(--card-bg, #ffffff); border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0); overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
@@ -1200,7 +1201,7 @@ export class HkmGroupsManager {
                     <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid var(--border-color, #f1f5f9);">
                         <span style="font-size: 12px; font-weight: 600; opacity: 0.7; display: inline-flex; align-items: center; gap: 4px;">
                             <span class="material-symbols-outlined" style="font-size: 18px; color: var(--text-color, #64748b);">group</span>
-                            <span>${(group.memberUids || []).length} ${(group.memberUids || []).length === 1 ? this.t('groups.memberCount') : this.t('groups.membersCount')}</span>
+                            <span>${totalCount} ${totalCount === 1 ? this.t('groups.memberCount') : this.t('groups.membersCount')}</span>
                         </span>
                         
                         ${isMember ? `
@@ -1662,6 +1663,7 @@ export class HkmGroupsManager {
         const uid = firebase.auth().currentUser?.uid;
         const isLeader = group.leaderUids && group.leaderUids.includes(uid);
         const img = group.imageUrl || 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80';
+        const totalCount = ((group.memberNames || []).length + (group.leaderNames || []).length) || (group.memberUids || []).length;
 
         container.innerHTML = `
             <!-- Back to groups button -->
@@ -1691,7 +1693,7 @@ export class HkmGroupsManager {
                                 </span>
                                 <span style="display: inline-flex; align-items: center; gap: 4px;">
                                     <span class="material-symbols-outlined" style="font-size: 18px; color: inherit;">group</span>
-                                    <span>${(group.memberUids || []).length} ${(group.memberUids || []).length === 1 ? this.t('groups.memberCount') : this.t('groups.membersCount')}</span>
+                                    <span>${totalCount} ${totalCount === 1 ? this.t('groups.memberCount') : this.t('groups.membersCount')}</span>
                                 </span>
                             </p>
                         </div>
