@@ -6313,3 +6313,52 @@ html[data-theme="dark"] .ms-help-hero p {
     color: #94a3b8 !important;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   HKM GRUPPER (Planning Center Groups Inspired)
+   ═══════════════════════════════════════════════════════════════ */
+
+.hkm-groups-container {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.hkm-group-card {
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.hkm-group-card:hover {
+    transform: translateY(-3px) scale(1.01);
+}
+
+.hkm-tab-btn {
+    transition: all 0.2s ease;
+    border-bottom: 2px solid transparent;
+}
+
+.hkm-tab-btn.active {
+    border-bottom-color: #d17d39 !important;
+}
+
+.hkm-modal-overlay {
+    animation: fadeIn 0.2s ease-out;
+}
+
+.hkm-modal-content {
+    animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+    .hkm-groups-container {
+        padding: 12px !important;
+    }
+    .hkm-modal-content {
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+}
+
+

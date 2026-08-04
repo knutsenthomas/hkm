@@ -1,4 +1,5 @@
 import { biblicalCharacters } from '../../js/bibelske-personer-data.js';
+import { HkmGroupsManager } from './groups.js';
 
 // Safely wrap any promise in a timeout to prevent hanging on Safari/iOS browsers
 function withTimeout(promise, ms = 3000) {
@@ -38,6 +39,7 @@ const minsideTranslations = {
         'sidebar.kurs': 'Kurs',
         'sidebar.readingPlans': 'Leseplaner',
         'sidebar.gaver': 'Gaver',
+        'sidebar.grupper': 'Grupper',
         'sidebar.aktivitet': 'AKTIVITET',
         'sidebar.historikk': 'Aktivitet',
         'sidebar.varslinger': 'Varslinger',
@@ -82,6 +84,7 @@ const minsideTranslations = {
         'overview.btnReadingPlansLabel': 'Leseplaner',
         'view.notes': 'Notater',
         'view.prayerWall': 'Bønnevegg',
+        'view.groups': 'Grupper',
 
         // Overview
         'overview.goodMorning': 'God morgen',
@@ -1042,6 +1045,7 @@ class MinSideManager {
             'reading-plans': this.renderReadingPlans,
             'prayer-wall': this.renderPrayerWall,
             'course-player': this.renderCoursePlayer,
+            groups: this.renderGroups,
             help: this.renderHelp,
         };
 
@@ -1328,6 +1332,7 @@ class MinSideManager {
             'reading-plans': { title: t('view.readingPlans'), icon: 'auto_stories' },
             'prayer-wall': { title: t('view.prayerWall'), icon: 'favorite' },
             'course-player': { title: 'Kurs-spiller', icon: 'school' },
+            groups: { title: t('sidebar.grupper') || 'Grupper', icon: 'groups' },
             help: { title: t('sidebar.hjelp') || 'Hjelp & Support', icon: 'help' }
         };
 
@@ -11183,6 +11188,13 @@ class MinSideManager {
                 btn.innerHTML = `<span class="material-symbols-outlined">send</span> <span>${isNo ? 'Send melding' : 'Send message'}</span>`;
             }
         });
+    }
+
+    async renderGroups(container, queryParams) {
+        if (!this.groupsManager) {
+            this.groupsManager = new HkmGroupsManager(this);
+        }
+        await this.groupsManager.render(container, queryParams);
     }
 }
 
