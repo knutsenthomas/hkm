@@ -27,6 +27,248 @@ export class HkmGroupsManager {
         return role === 'admin' || role === 'superadmin' || email === 'thomas@hiskingdomministry.no' || email === 'knutsenthomas@gmail.com';
     }
 
+    t(key) {
+        const lang = document.documentElement.lang || 'no';
+        const localDict = {
+            no: {
+                'groups.title': 'Smågrupper',
+                'groups.subtitle': 'Finn og bli med i et kristent fellesskap',
+                'groups.searchPlaceholder': 'Søk på navn, sted eller kategori...',
+                'groups.adminCategories': 'Administrer kategorier',
+                'groups.createNew': 'Opprett ny gruppe',
+                'groups.categoryAll': 'Alle kategorier',
+                'groups.myGroups': 'Mine grupper',
+                'groups.exploreGroups': 'Utforsk grupper',
+                'groups.backToGroups': 'Tilbake til grupper',
+                'groups.groupLeder': 'Gruppeleder',
+                'groups.groupMedlem': 'Medlem',
+                'groups.membersCount': 'medlemmer',
+                'groups.memberCount': 'medlem',
+                'groups.joinPolicyOpen': 'Åpen for alle (Direkte påmelding)',
+                'groups.joinPolicyApproval': 'Godkjenning (Søknad til leder)',
+                'groups.joinOpen': 'Bli med i gruppen',
+                'groups.joinApply': 'Søk om plass',
+                'groups.openGroup': 'Åpne gruppe',
+                'groups.noGroups': 'Ingen grupper funnet.',
+                'groups.noMyGroups': 'Du er ikke medlem av noen grupper ennå.',
+                
+                // Group Hub
+                'groups.hubOverview': 'Oversikt',
+                'groups.hubChat': 'Meldinger & Chat',
+                'groups.hubEvents': 'Samlinger & Oppmøte',
+                'groups.hubResources': 'Ressurser',
+                'groups.hubSendEmail': 'Send e-post',
+                'groups.hubEdit': 'Rediger gruppe',
+                'groups.hubDuplicate': 'Dupliser',
+                'groups.hubOverviewTitle': 'Om gruppen',
+                'groups.hubInfo': 'Praktisk informasjon',
+                'groups.hubSchedule': 'Møtetid',
+                'groups.hubLocation': 'Sted',
+                'groups.hubJoinPolicy': 'Påmeldingstype',
+                'groups.hubLeaders': 'Gruppeledere',
+                'groups.hubMembersTitle': 'Medlemmer & Ledere',
+                'groups.hubGetFromContacts': 'Hent fra kontakter (Admin)',
+                'groups.noDesc': 'Ingen beskrivelse skrevet ennå.',
+                'groups.chatLoading': 'Laster gruppechat...',
+                
+                // Events
+                'groups.eventsCreate': 'Opprett ny samling',
+                'groups.eventsNoEvents': 'Ingen planlagte samlinger opprettet ennå.',
+                'groups.eventsRsvpYes': '✓ Jeg kommer',
+                'groups.eventsRsvpNo': '✕ Kan ikke',
+                'groups.eventsEdit': 'Endre',
+                'groups.eventsDelete': 'Slett',
+                
+                // Resources
+                'groups.resourcesTitle': 'Delte ressurser & pensum',
+                'groups.resourcesCreate': 'Legg til resurs',
+                'groups.resourcesNoRes': 'Ingen delte ressurser i denne gruppen ennå.',
+                'groups.resourcesOpen': 'Åpne lenke',
+                
+                // Modals
+                'groups.modalEditTitle': 'Rediger gruppe',
+                'groups.modalCreateTitle': 'Opprett ny gruppe',
+                'groups.modalSave': 'Lagre gruppe',
+                'groups.modalCancel': 'Avbryt',
+                'groups.modalName': 'Gruppenavn *',
+                'groups.modalCategory': 'Kategori *',
+                'groups.modalSchedule': 'Møtetidspunkt *',
+                'groups.modalLocation': 'Sted / Lokasjon *',
+                'groups.modalDesc': 'Beskrivelse',
+                'groups.modalPolicy': 'Påmeldingstype',
+                'groups.modalImage': 'Gruppebilde',
+                'groups.modalUpload': 'Last opp',
+                'groups.modalUnsplash': 'Unsplash',
+                'groups.modalRemove': 'Fjern',
+                'groups.modalUrlPlaceholder': 'Lim inn bilde-URL her...',
+                'groups.modalLoading': 'Laster...',
+                'groups.modalLoadingGroups': 'Laster grupper...',
+                'groups.modalLeader': 'Leder: '
+            },
+            en: {
+                'groups.title': 'Small Groups',
+                'groups.subtitle': 'Find and join a Christian community',
+                'groups.searchPlaceholder': 'Search by name, location or category...',
+                'groups.adminCategories': 'Manage categories',
+                'groups.createNew': 'Create new group',
+                'groups.categoryAll': 'All categories',
+                'groups.myGroups': 'My groups',
+                'groups.exploreGroups': 'Explore groups',
+                'groups.backToGroups': 'Back to groups',
+                'groups.groupLeder': 'Leader',
+                'groups.groupMedlem': 'Member',
+                'groups.membersCount': 'members',
+                'groups.memberCount': 'member',
+                'groups.joinPolicyOpen': 'Open for everyone (Direct join)',
+                'groups.joinPolicyApproval': 'Approval (Apply to leader)',
+                'groups.joinOpen': 'Join group',
+                'groups.joinApply': 'Apply for spot',
+                'groups.openGroup': 'Open group',
+                'groups.noGroups': 'No groups found.',
+                'groups.noMyGroups': 'You are not a member of any groups yet.',
+                
+                // Group Hub
+                'groups.hubOverview': 'Overview',
+                'groups.hubChat': 'Messages & Chat',
+                'groups.hubEvents': 'Gatherings & Attendance',
+                'groups.hubResources': 'Resources',
+                'groups.hubSendEmail': 'Send email',
+                'groups.hubEdit': 'Edit group',
+                'groups.hubDuplicate': 'Duplicate',
+                'groups.hubOverviewTitle': 'About the Group',
+                'groups.hubInfo': 'Practical Information',
+                'groups.hubSchedule': 'Meeting Time',
+                'groups.hubLocation': 'Location',
+                'groups.hubJoinPolicy': 'Join Policy',
+                'groups.hubLeaders': 'Leaders',
+                'groups.hubMembersTitle': 'Members & Leaders',
+                'groups.hubGetFromContacts': 'Get from Contacts (Admin)',
+                'groups.noDesc': 'No description written yet.',
+                'groups.chatLoading': 'Loading group chat...',
+                
+                // Events
+                'groups.eventsCreate': 'Create gathering',
+                'groups.eventsNoEvents': 'No planned gatherings created yet.',
+                'groups.eventsRsvpYes': '✓ Attending',
+                'groups.eventsRsvpNo': '✕ Cannot attend',
+                'groups.eventsEdit': 'Edit',
+                'groups.eventsDelete': 'Delete',
+                
+                // Resources
+                'groups.resourcesTitle': 'Shared resources & curriculum',
+                'groups.resourcesCreate': 'Add resource',
+                'groups.resourcesNoRes': 'No shared resources in this group yet.',
+                'groups.resourcesOpen': 'Open link',
+                
+                // Modals
+                'groups.modalEditTitle': 'Edit group',
+                'groups.modalCreateTitle': 'Create new group',
+                'groups.modalSave': 'Save group',
+                'groups.modalCancel': 'Cancel',
+                'groups.modalName': 'Group name *',
+                'groups.modalCategory': 'Category *',
+                'groups.modalSchedule': 'Meeting time *',
+                'groups.modalLocation': 'Location *',
+                'groups.modalDesc': 'Description',
+                'groups.modalPolicy': 'Join policy',
+                'groups.modalImage': 'Group image',
+                'groups.modalUpload': 'Upload',
+                'groups.modalUnsplash': 'Unsplash',
+                'groups.modalRemove': 'Remove',
+                'groups.modalUrlPlaceholder': 'Paste image URL here...',
+                'groups.modalLoading': 'Loading...',
+                'groups.modalLoadingGroups': 'Loading groups...',
+                'groups.modalLeader': 'Leader: '
+            },
+            es: {
+                'groups.title': 'Grupos Pequeños',
+                'groups.subtitle': 'Encuentra y únete a una comunidad cristiana',
+                'groups.searchPlaceholder': 'Buscar por nombre, ubicación o categoría...',
+                'groups.adminCategories': 'Administrar categorías',
+                'groups.createNew': 'Crear nuevo grupo',
+                'groups.categoryAll': 'Todas las categorías',
+                'groups.myGroups': 'Mis grupos',
+                'groups.exploreGroups': 'Explorar grupos',
+                'groups.backToGroups': 'Volver a grupos',
+                'groups.groupLeder': 'Líder',
+                'groups.groupMedlem': 'Miembro',
+                'groups.membersCount': 'miembros',
+                'groups.memberCount': 'miembro',
+                'groups.joinPolicyOpen': 'Abierto para todos (Inscripción directa)',
+                'groups.joinPolicyApproval': 'Aprobación (Solicitud al líder)',
+                'groups.joinOpen': 'Unirse al grupo',
+                'groups.joinApply': 'Solicitar plaza',
+                'groups.openGroup': 'Abrir grupo',
+                'groups.noGroups': 'No se encontraron grupos.',
+                'groups.noMyGroups': 'Aún no eres miembro de ningún grupo.',
+                
+                // Group Hub
+                'groups.hubOverview': 'Resumen',
+                'groups.hubChat': 'Mensajes y chat',
+                'groups.hubEvents': 'Reuniones y asistencia',
+                'groups.hubResources': 'Recursos',
+                'groups.hubSendEmail': 'Enviar correo',
+                'groups.hubEdit': 'Editar grupo',
+                'groups.hubDuplicate': 'Duplicar',
+                'groups.hubOverviewTitle': 'Sobre el grupo',
+                'groups.hubInfo': 'Información práctica',
+                'groups.hubSchedule': 'Horario de reunión',
+                'groups.hubLocation': 'Ubicación',
+                'groups.hubJoinPolicy': 'Tipo de registro',
+                'groups.hubLeaders': 'Líderes',
+                'groups.hubMembersTitle': 'Miembros y líderes',
+                'groups.hubGetFromContacts': 'Obtener de contactos (Admin)',
+                'groups.noDesc': 'Aún no se ha escrito ninguna descripción.',
+                'groups.chatLoading': 'Cargando chat grupal...',
+                
+                // Events
+                'groups.eventsCreate': 'Crear reunión',
+                'groups.eventsNoEvents': 'Aún no se han creado reuniones planificadas.',
+                'groups.eventsRsvpYes': '✓ Asistiré',
+                'groups.eventsRsvpNo': '✕ No asistiré',
+                'groups.eventsEdit': 'Editar',
+                'groups.eventsDelete': 'Eliminar',
+                
+                // Resources
+                'groups.resourcesTitle': 'Recursos compartidos y plan de estudios',
+                'groups.resourcesCreate': 'Añadir recurso',
+                'groups.resourcesNoRes': 'Aún no hay recursos compartidos en este grupo.',
+                'groups.resourcesOpen': 'Abrir enlace',
+                
+                // Modals
+                'groups.modalEditTitle': 'Editar grupo',
+                'groups.modalCreateTitle': 'Crear nuevo grupo',
+                'groups.modalSave': 'Guardar grupo',
+                'groups.modalCancel': 'Cancelar',
+                'groups.modalName': 'Nombre del grupo *',
+                'groups.modalCategory': 'Categoría *',
+                'groups.modalSchedule': 'Horario de reunión *',
+                'groups.modalLocation': 'Ubicación *',
+                'groups.modalDesc': 'Descripción',
+                'groups.modalPolicy': 'Tipo de registro',
+                'groups.modalImage': 'Imagen del grupo',
+                'groups.modalUpload': 'Subir',
+                'groups.modalUnsplash': 'Unsplash',
+                'groups.modalRemove': 'Quitar',
+                'groups.modalUrlPlaceholder': 'Pegar URL de la imagen aquí...',
+                'groups.modalLoading': 'Cargando...',
+                'groups.modalLoadingGroups': 'Cargando grupos...',
+                'groups.modalLeader': 'Líder: '
+            }
+        };
+
+        try {
+            if (typeof window.t === 'function') {
+                const globalVal = window.t(key);
+                if (globalVal && globalVal !== key) {
+                    return globalVal;
+                }
+            }
+        } catch (e) {}
+
+        return localDict[lang]?.[key] || localDict['no']?.[key] || key;
+    }
+
     async render(container, queryParams = {}) {
         this.container = container;
         if (queryParams && queryParams.id) {
@@ -96,11 +338,11 @@ export class HkmGroupsManager {
                     <div class="groups-nav-tabs" style="display: flex; gap: 8px; background: rgba(15, 23, 42, 0.04); padding: 4px; border-radius: 12px;">
                         <button type="button" class="groups-tab-btn ${this.currentView === 'directory' ? 'active' : ''}" data-gview="directory" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; border: none; background: transparent; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
                             <span class="material-symbols-outlined" style="font-size: 18px;">explore</span>
-                            <span>Utforsk grupper</span>
+                            <span>${this.t('groups.exploreGroups')}</span>
                         </button>
                         <button type="button" class="groups-tab-btn ${this.currentView === 'my-groups' ? 'active' : ''}" data-gview="my-groups" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; border: none; background: transparent; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
                             <span class="material-symbols-outlined" style="font-size: 18px;">group_work</span>
-                            <span>Mine grupper</span>
+                            <span>${this.t('groups.myGroups')}</span>
                         </button>
                     </div>
 
@@ -108,12 +350,12 @@ export class HkmGroupsManager {
                         ${this.isAdmin ? `
                             <button type="button" class="btn btn-secondary" id="groups-manage-categories-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 14px; background: #475569; color: white; border: none; cursor: pointer; transition: transform 0.2s ease, background-color 0.2s ease;">
                                 <span class="material-symbols-outlined" style="font-size: 20px;">category</span>
-                                <span>Administrer kategorier</span>
+                                <span>${this.t('groups.adminCategories')}</span>
                             </button>
                         ` : ''}
                         <button type="button" class="btn btn-primary" id="groups-create-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 14px; background: var(--admin-orange, #d17d39); color: white; border: none; cursor: pointer; transition: transform 0.2s ease, background-color 0.2s ease;">
                             <span class="material-symbols-outlined" style="font-size: 20px;">add</span>
-                            <span>Opprett ny gruppe</span>
+                            <span>${this.t('groups.createNew')}</span>
                         </button>
                     </div>
                 </div>
@@ -122,7 +364,7 @@ export class HkmGroupsManager {
                 <div id="groups-content-body">
                     <div class="loading-state" style="padding: 40px; text-align: center;">
                         <div class="spinner"></div>
-                        <p style="margin-top: 12px; opacity: 0.7;">Laster grupper...</p>
+                        <p style="margin-top: 12px; opacity: 0.7;">${this.t('groups.modalLoadingGroups')}</p>
                     </div>
                 </div>
             </div>
@@ -784,14 +1026,14 @@ export class HkmGroupsManager {
                 <!-- Search Input -->
                 <div style="position: relative; flex: 1; min-width: 240px;">
                     <span class="material-symbols-outlined" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 20px;">search</span>
-                    <input type="text" id="group-search-input" value="${this.escapeHtml(this.searchQuery)}" placeholder="Søk etter gruppe, sted eller tema..." style="width: 100%; padding: 10px 14px 10px 40px !important; padding-left: 40px !important; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); font-size: 14px;">
+                    <input type="text" id="group-search-input" value="${this.escapeHtml(this.searchQuery)}" placeholder="${this.t('groups.searchPlaceholder')}" style="width: 100%; padding: 10px 14px 10px 40px !important; padding-left: 40px !important; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); font-size: 14px;">
                 </div>
 
                 <!-- Category Filter Pills -->
                 <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
                     ${categories.map(cat => `
                         <button type="button" class="cat-pill-btn ${this.filterCategory === cat ? 'active' : ''}" data-cat="${cat}" style="padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; border: 1px solid ${this.filterCategory === cat ? 'var(--admin-orange, #d17d39)' : 'var(--border-color, #e2e8f0)'}; background: ${this.filterCategory === cat ? 'var(--admin-orange, #d17d39)' : 'transparent'}; color: ${this.filterCategory === cat ? '#fff' : 'inherit'}; cursor: pointer; transition: all 0.2s ease;">
-                            ${cat === 'ALL' ? 'Alle kategorier' : cat}
+                            ${cat === 'ALL' ? this.t('groups.categoryAll') : cat}
                         </button>
                     `).join('')}
                 </div>
@@ -801,8 +1043,7 @@ export class HkmGroupsManager {
             ${filtered.length === 0 ? `
                 <div style="padding: 60px 20px; text-align: center; background: var(--card-bg, #fff); border-radius: 16px; border: 1px dashed #cbd5e1;">
                     <span class="material-symbols-outlined" style="font-size: 48px; color: #94a3b8;">groups</span>
-                    <h3 style="margin-top: 12px; font-size: 18px; font-weight: 600;">Ingen grupper funnet</h3>
-                    <p style="opacity: 0.7; max-width: 400px; margin: 8px auto 0;">Prøv et annet søkeord eller endre kategorifilteret ovenfor.</p>
+                    <h3 style="margin-top: 12px; font-size: 18px; font-weight: 600;">${this.t('groups.noGroups')}</h3>
                 </div>
             ` : `
                 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;">
@@ -844,7 +1085,7 @@ export class HkmGroupsManager {
                     </span>
                     ${isLeader ? `
                         <span style="position: absolute; top: 12px; right: 12px; background: var(--admin-orange, #d17d39); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;">
-                            ⭐ Leder
+                            ⭐ ${this.t('groups.groupLeder')}
                         </span>
                     ` : ''}
                     ${(isLeader || this.isAdmin) ? `
@@ -863,30 +1104,30 @@ export class HkmGroupsManager {
                     <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px; opacity: 0.9; margin-bottom: 20px;">
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <span class="material-symbols-outlined" style="font-size: 18px; color: var(--admin-orange, #d17d39);">schedule</span>
-                            <span>${this.escapeHtml(group.meetingSchedule || 'Planlagte møter')}</span>
+                            <span>${this.escapeHtml(group.meetingSchedule || '')}</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <span class="material-symbols-outlined" style="font-size: 18px; color: var(--admin-orange, #d17d39);">location_on</span>
-                            <span>${this.escapeHtml(group.location || 'Sted ikke oppgitt')}</span>
+                            <span>${this.escapeHtml(group.location || '')}</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <span class="material-symbols-outlined" style="font-size: 18px; color: var(--admin-orange, #d17d39);">person</span>
-                            <span>Leder: ${this.escapeHtml((group.leaderNames && group.leaderNames[0]) || 'Leder')}</span>
+                            <span>${this.t('groups.modalLeader')}${this.escapeHtml((group.leaderNames && group.leaderNames[0]) || '')}</span>
                         </div>
                     </div>
 
                     <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid var(--border-color, #f1f5f9);">
                         <span style="font-size: 12px; font-weight: 600; opacity: 0.7;">
-                            👥 ${(group.memberUids || []).length} ${(group.memberUids || []).length === 1 ? 'medlem' : 'medlemmer'}
+                            👥 ${(group.memberUids || []).length} ${(group.memberUids || []).length === 1 ? this.t('groups.memberCount') : this.t('groups.membersCount')}
                         </span>
                         
                         ${isMember ? `
                             <button type="button" class="btn-open-group" data-id="${group.id}" style="padding: 8px 16px; border-radius: 10px; background: var(--admin-orange, #d17d39); color: white; border: none; font-weight: 600; font-size: 13px; cursor: pointer; transition: background 0.2s ease;">
-                                Åpne gruppe
+                                ${this.t('groups.openGroup')}
                             </button>
                         ` : `
                             <button type="button" class="btn-join-group" data-id="${group.id}" data-policy="${group.joinPolicy || 'open'}" style="padding: 8px 16px; border-radius: 10px; background: transparent; border: 1px solid var(--admin-orange, #d17d39); color: var(--admin-orange, #d17d39); font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s ease;">
-                                ${group.joinPolicy === 'approval' ? 'Søk om plass' : 'Bli med i gruppen'}
+                                ${group.joinPolicy === 'approval' ? this.t('groups.joinApply') : this.t('groups.joinOpen')}
                             </button>
                         `}
                     </div>
@@ -900,11 +1141,12 @@ export class HkmGroupsManager {
             container.innerHTML = `
                 <div style="padding: 60px 20px; text-align: center; background: var(--card-bg, #fff); border-radius: 16px; border: 1px dashed #cbd5e1;">
                     <span class="material-symbols-outlined" style="font-size: 48px; color: #94a3b8;">group_work</span>
-                    <h3 style="margin-top: 12px; font-size: 18px; font-weight: 600;">Du har ikke blitt med i noen grupper ennå</h3>
-                    <p style="opacity: 0.7; max-width: 440px; margin: 8px auto 20px;">Utforsk gruppelisten for å finne husfellesskap, bønnegrupper eller bibelstudier som passer for deg!</p>
-                    <button type="button" id="btn-explore-groups-now" style="padding: 10px 20px; border-radius: 10px; background: var(--admin-orange, #d17d39); color: white; border: none; font-weight: 600; cursor: pointer;">
-                        Utforsk grupper nå
-                    </button>
+                    <h3 style="margin-top: 12px; font-size: 18px; font-weight: 600;">${this.t('groups.noMyGroups')}</h3>
+                    <div style="margin-top: 20px;">
+                        <button type="button" id="btn-explore-groups-now" style="padding: 10px 20px; border-radius: 10px; background: var(--admin-orange, #d17d39); color: white; border: none; font-weight: 600; cursor: pointer;">
+                            ${this.t('groups.exploreGroups')}
+                        </button>
+                    </div>
                 </div>
             `;
 
@@ -1343,7 +1585,7 @@ export class HkmGroupsManager {
             <!-- Back to groups button -->
             <button type="button" id="btn-back-to-directory" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color, #cbd5e1); background: transparent; cursor: pointer; font-size: 13px; font-weight: 600; margin-bottom: 16px;">
                 <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
-                <span>Tilbake til grupper</span>
+                <span>${this.t('groups.backToGroups')}</span>
             </button>
 
             <!-- Group Banner & Header Card -->
@@ -1357,9 +1599,9 @@ export class HkmGroupsManager {
                             </span>
                             <h2 style="margin: 8px 0 4px 0; font-size: 28px; font-weight: 800;">${this.escapeHtml(group.name)}</h2>
                             <p style="margin: 0; opacity: 0.9; font-size: 14px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-                                <span>📍 ${this.escapeHtml(group.location || 'Sted ikke oppgitt')}</span>
+                                <span>📍 ${this.escapeHtml(group.location || '')}</span>
                                 <span>🕒 ${this.escapeHtml(group.meetingSchedule || '')}</span>
-                                <span>👥 ${(group.memberUids || []).length} ${(group.memberUids || []).length === 1 ? 'medlem' : 'medlemmer'}</span>
+                                <span>👥 ${(group.memberUids || []).length} ${(group.memberUids || []).length === 1 ? this.t('groups.memberCount') : this.t('groups.membersCount')}</span>
                             </p>
                         </div>
                         
@@ -1367,18 +1609,18 @@ export class HkmGroupsManager {
                         <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 4px;">
                             <button type="button" id="btn-open-group-email-modal" class="groups-banner-btn" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 10px; background: var(--admin-orange, #d17d39); color: white; border: none; cursor: pointer; font-size: 13px; font-weight: 600;">
                                 <span class="material-symbols-outlined" style="font-size: 18px;">mail</span>
-                                <span>Send e-post</span>
+                                <span>${this.t('groups.hubSendEmail')}</span>
                             </button>
                             ${(isLeader || this.isAdmin) ? `
                                 <button type="button" id="btn-edit-group-details" class="groups-banner-btn" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 10px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(8px); cursor: pointer; font-size: 13px; font-weight: 600;">
                                     <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
-                                    <span>Rediger gruppe</span>
+                                    <span>${this.t('groups.hubEdit')}</span>
                                 </button>
                             ` : ''}
                             ${isLeader ? `
                                 <button type="button" id="btn-duplicate-group-modal" class="groups-banner-btn" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 10px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(8px); cursor: pointer; font-size: 13px; font-weight: 600;">
                                     <span class="material-symbols-outlined" style="font-size: 18px;">content_copy</span>
-                                    <span>Dupliser</span>
+                                    <span>${this.t('groups.hubDuplicate')}</span>
                                 </button>
                             ` : ''}
                         </div>
@@ -1388,16 +1630,16 @@ export class HkmGroupsManager {
                 <!-- Hub Sub-navigation Tabs -->
                 <div style="display: flex; gap: 4px; padding: 12px 24px; background: var(--card-bg, #fff); border-top: 1px solid var(--border-color, #f1f5f9); overflow-x: auto;">
                     <button type="button" class="hub-tab-btn ${this.selectedGroupTab === 'overview' ? 'active' : ''}" data-htab="overview" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border: none; background: transparent; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer;">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">info</span> Oversikt
+                        <span class="material-symbols-outlined" style="font-size: 18px;">info</span> ${this.t('groups.hubOverview')}
                     </button>
                     <button type="button" class="hub-tab-btn ${this.selectedGroupTab === 'chat' ? 'active' : ''}" data-htab="chat" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border: none; background: transparent; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer;">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">chat</span> Meldinger & Chat
+                        <span class="material-symbols-outlined" style="font-size: 18px;">chat</span> ${this.t('groups.hubChat')}
                     </button>
                     <button type="button" class="hub-tab-btn ${this.selectedGroupTab === 'events' ? 'active' : ''}" data-htab="events" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border: none; background: transparent; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer;">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">calendar_month</span> Samlinger & Oppmøte
+                        <span class="material-symbols-outlined" style="font-size: 18px;">calendar_month</span> ${this.t('groups.hubEvents')}
                     </button>
                     <button type="button" class="hub-tab-btn ${this.selectedGroupTab === 'resources' ? 'active' : ''}" data-htab="resources" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border: none; background: transparent; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer;">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">folder</span> Ressurser
+                        <span class="material-symbols-outlined" style="font-size: 18px;">folder</span> ${this.t('groups.hubResources')}
                     </button>
                 </div>
             </div>
@@ -1459,27 +1701,27 @@ export class HkmGroupsManager {
         tabContainer.innerHTML = `
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
                 <div style="background: var(--card-bg, #fff); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0);">
-                    <h3 style="margin-top: 0; font-size: 18px; font-weight: 700; margin-bottom: 12px;">Om gruppen</h3>
+                    <h3 style="margin-top: 0; font-size: 18px; font-weight: 700; margin-bottom: 12px;">${this.t('groups.hubOverviewTitle')}</h3>
                     <p style="line-height: 1.6; opacity: 0.9; font-size: 15px; margin-bottom: 24px;">
-                        ${this.escapeHtml(group.description || 'Ingen beskrivelse skrevet ennå.')}
+                        ${this.escapeHtml(group.description || this.t('groups.noDesc'))}
                     </p>
 
-                    <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">Praktisk informasjon</h4>
+                    <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">${this.t('groups.hubInfo')}</h4>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: var(--bg-muted, #f8fafc); padding: 16px; border-radius: 12px;">
                         <div>
-                            <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">Møtetid</span>
+                            <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">${this.t('groups.hubSchedule')}</span>
                             <p style="margin: 4px 0 0 0; font-weight: 600;">${this.escapeHtml(group.meetingSchedule)}</p>
                         </div>
                         <div>
-                            <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">Sted</span>
+                            <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">${this.t('groups.hubLocation')}</span>
                             <p style="margin: 4px 0 0 0; font-weight: 600;">${this.escapeHtml(group.location)}</p>
                         </div>
                         <div>
-                            <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">Påmeldingstype</span>
-                            <p style="margin: 4px 0 0 0; font-weight: 600;">${group.joinPolicy === 'approval' ? 'Søknad / Godkjenning' : 'Åpen for alle'}</p>
+                            <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">${this.t('groups.hubJoinPolicy')}</span>
+                            <p style="margin: 4px 0 0 0; font-weight: 600;">${group.joinPolicy === 'approval' ? this.t('groups.joinPolicyApproval') : this.t('groups.joinPolicyOpen')}</p>
                         </div>
                         <div>
-                            <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">Gruppeledere</span>
+                            <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">${this.t('groups.hubLeaders')}</span>
                             <p style="margin: 4px 0 0 0; font-weight: 600;">${this.escapeHtml((group.leaderNames || []).join(', '))}</p>
                         </div>
                     </div>
@@ -1487,11 +1729,11 @@ export class HkmGroupsManager {
 
                 <div style="background: var(--card-bg, #fff); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
-                        <h3 style="margin: 0; font-size: 18px; font-weight: 700;">Medlemmer & Ledere (${((group.memberNames || []).length + (group.leaderNames || []).length) || (group.memberUids || []).length})</h3>
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 700;">${this.t('groups.hubMembersTitle')} (${((group.memberNames || []).length + (group.leaderNames || []).length) || (group.memberUids || []).length})</h3>
                         ${this.isAdmin ? `
                             <button type="button" id="btn-open-contacts-modal" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; padding: 8px 16px; border-radius: 10px; background: linear-gradient(135deg, #d17d39 0%, #b86524 100%); color: white; border: none; font-weight: 600; cursor: pointer; transition: transform 0.15s ease;">
                                 <span class="material-symbols-outlined" style="font-size: 18px;">contacts</span>
-                                <span>Hent fra kontakter (Admin)</span>
+                                <span>${this.t('groups.hubGetFromContacts')}</span>
                             </button>
                         ` : ''}
                     </div>
@@ -1504,7 +1746,7 @@ export class HkmGroupsManager {
                                 </div>
                                 <div>
                                     <div style="font-weight: 600; font-size: 14px;">${this.escapeHtml(leader)}</div>
-                                    <div style="font-size: 12px; color: var(--admin-orange, #d17d39); font-weight: 600;">⭐ Gruppeleder</div>
+                                    <div style="font-size: 12px; color: var(--admin-orange, #d17d39); font-weight: 600;">⭐ ${this.t('groups.groupLeder')}</div>
                                 </div>
                             </div>
                         `).join('')}
@@ -1515,7 +1757,7 @@ export class HkmGroupsManager {
                                 </div>
                                 <div>
                                     <div style="font-weight: 600; font-size: 14px;">${this.escapeHtml(member)}</div>
-                                    <div style="font-size: 12px; color: var(--text-muted, #64748b); font-weight: 600;">Medlem</div>
+                                    <div style="font-size: 12px; color: var(--text-muted, #64748b); font-weight: 600;">${this.t('groups.groupMedlem')}</div>
                                 </div>
                             </div>
                         `).join('')}
@@ -1534,7 +1776,7 @@ export class HkmGroupsManager {
             <div style="background: var(--card-bg, #fff); border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0); height: 500px; display: flex; flex-direction: column; overflow: hidden;">
                 <!-- Chat Feed -->
                 <div id="group-chat-feed" style="flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px;">
-                    <div style="text-align: center; color: #94a3b8; font-size: 13px; margin: auto;">Laster gruppechat...</div>
+                    <div style="text-align: center; color: #94a3b8; font-size: 13px; margin: auto;">${this.t('groups.chatLoading')}</div>
                 </div>
 
                 <!-- Chat Input Form -->
@@ -1631,12 +1873,12 @@ export class HkmGroupsManager {
                     <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
                         <button type="button" id="btn-create-event" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 14px; background: var(--admin-orange, #d17d39); color: white; border: none; cursor: pointer; transition: transform 0.2s ease;">
                             <span class="material-symbols-outlined" style="font-size: 20px;">add</span>
-                            <span>Opprett ny samling</span>
+                            <span>${this.t('groups.eventsCreate')}</span>
                         </button>
                     </div>
                 ` : ''}
                 <div id="hub-events-list" style="display: flex; flex-direction: column; gap: 12px;">
-                    <div style="text-align: center; padding: 30px; color: var(--text-muted, #64748b);">Laster samlinger...</div>
+                    <div style="text-align: center; padding: 30px; color: var(--text-muted, #64748b);">${this.t('groups.modalLoading')}</div>
                 </div>
             </div>
         `;
@@ -1671,7 +1913,7 @@ export class HkmGroupsManager {
                 listEl.innerHTML = `
                     <div style="text-align: center; padding: 40px; background: var(--card-bg, #fff); border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0); color: var(--text-muted, #64748b);">
                         <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.5; margin-bottom: 8px; display: block;">calendar_today</span>
-                        Ingen planlagte samlinger opprettet ennå.
+                        ${this.t('groups.eventsNoEvents')}
                     </div>
                 `;
                 return;
@@ -1684,24 +1926,24 @@ export class HkmGroupsManager {
                         <div>
                             <span style="font-size: 12px; font-weight: 700; color: var(--admin-orange, #d17d39); text-transform: uppercase;">${this.escapeHtml(evt.date)} kl. ${this.escapeHtml(evt.time)}</span>
                             <h4 style="margin: 4px 0; font-size: 16px; font-weight: 700;">${this.escapeHtml(evt.title)}</h4>
-                            <p style="margin: 0; font-size: 13px; opacity: 0.8;">📍 ${this.escapeHtml(evt.location || this.activeGroup.location || 'Sted ikke oppgitt')}</p>
+                            <p style="margin: 0; font-size: 13px; opacity: 0.8;">📍 ${this.escapeHtml(evt.location || this.activeGroup.location || '')}</p>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                             <button type="button" class="btn-rsvp" data-evt-id="${evt.id}" data-status="yes" style="padding: 8px 14px; border-radius: 10px; background: #ecfdf5; color: #166534; border: 1px solid #bbf7d0; font-weight: 600; font-size: 13px; cursor: pointer;">
-                                ✓ Jeg kommer
+                                ${this.t('groups.eventsRsvpYes')}
                             </button>
                             <button type="button" class="btn-rsvp" data-evt-id="${evt.id}" data-status="no" style="padding: 8px 14px; border-radius: 10px; background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; font-weight: 600; font-size: 13px; cursor: pointer;">
-                                ✕ Kan ikke
+                                ${this.t('groups.eventsRsvpNo')}
                             </button>
 
                             ${canEdit ? `
                                 <button type="button" class="btn-edit-event" data-evt-id="${evt.id}" style="padding: 8px 14px; border-radius: 10px; background: #f1f5f9; color: var(--text-color, #1e293b); border: 1px solid var(--border-color, #cbd5e1); font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
                                     <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
-                                    <span>Endre</span>
+                                    <span>${this.t('groups.eventsEdit')}</span>
                                 </button>
                                 <button type="button" class="btn-delete-event" data-evt-id="${evt.id}" style="padding: 8px 14px; border-radius: 10px; background: rgba(239,68,68,0.1); color: #ef4444; border: none; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
                                     <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
-                                    <span>Slett</span>
+                                    <span>${this.t('groups.eventsDelete')}</span>
                                 </button>
                             ` : ''}
                         </div>
@@ -1749,16 +1991,16 @@ export class HkmGroupsManager {
         tabContainer.innerHTML = `
             <div style="background: var(--card-bg, #fff); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                    <h3 style="margin: 0; font-size: 18px; font-weight: 700;">Delte ressurser & pensum</h3>
+                    <h3 style="margin: 0; font-size: 18px; font-weight: 700;">${this.t('groups.resourcesTitle')}</h3>
                     ${(isLeader || isAdmin) ? `
                         <button type="button" id="btn-create-resource" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 10px; font-weight: 600; font-size: 13px; background: var(--admin-orange, #d17d39); color: white; border: none; cursor: pointer;">
                             <span class="material-symbols-outlined" style="font-size: 18px;">add</span>
-                            <span>Legg til resurs</span>
+                            <span>${this.t('groups.resourcesCreate')}</span>
                         </button>
                     ` : ''}
                 </div>
                 <div id="hub-resources-list" style="display: flex; flex-direction: column; gap: 12px;">
-                    <div style="text-align: center; padding: 20px; color: var(--text-muted, #64748b);">Laster ressurser...</div>
+                    <div style="text-align: center; padding: 20px; color: var(--text-muted, #64748b);">${this.t('groups.modalLoading')}</div>
                 </div>
             </div>
         `;
@@ -1792,7 +2034,7 @@ export class HkmGroupsManager {
             if (fetchedRes.length === 0) {
                 listEl.innerHTML = `
                     <div style="text-align: center; padding: 30px; color: var(--text-muted, #64748b);">
-                        Ingen delte ressurser i denne gruppen ennå.
+                        ${this.t('groups.resourcesNoRes')}
                     </div>
                 `;
                 return;
@@ -1816,7 +2058,7 @@ export class HkmGroupsManager {
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <a href="${this.escapeHtml(res.url)}" target="_blank" style="padding: 6px 14px; border-radius: 8px; background: var(--admin-orange, #d17d39); color: white; text-decoration: none; font-size: 13px; font-weight: 600;">
-                                Åpne lenke
+                                ${this.t('groups.resourcesOpen')}
                             </a>
                             ${canEdit ? `
                                 <button type="button" class="btn-edit-resource" data-res-id="${res.id}" style="padding: 6px 12px; border-radius: 8px; background: #f1f5f9; color: var(--text-color, #1e293b); border: 1px solid var(--border-color, #cbd5e1); font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center;">
