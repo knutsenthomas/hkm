@@ -10,6 +10,7 @@ export class HkmGroupsManager {
         this.selectedGroupTab = 'overview'; // 'overview' | 'chat' | 'events' | 'resources'
         this.groups = [];
         this.myGroups = [];
+        this.categories = [];
         this.activeGroup = null;
         this.messagesListener = null;
         this.filterCategory = 'ALL';
@@ -48,7 +49,13 @@ export class HkmGroupsManager {
                         </button>
                     </div>
 
-                    <div class="groups-header-actions" style="display: flex; gap: 10px;">
+                    <div class="groups-header-actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        ${this.isAdmin ? `
+                            <button type="button" class="btn btn-secondary" id="groups-manage-categories-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 14px; background: #475569; color: white; border: none; cursor: pointer; transition: transform 0.2s ease, background-color 0.2s ease;">
+                                <span class="material-symbols-outlined" style="font-size: 20px;">category</span>
+                                <span>Administrer kategorier</span>
+                            </button>
+                        ` : ''}
                         <button type="button" class="btn btn-primary" id="groups-create-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 14px; background: var(--admin-orange, #d17d39); color: white; border: none; cursor: pointer; transition: transform 0.2s ease, background-color 0.2s ease;">
                             <span class="material-symbols-outlined" style="font-size: 20px;">add</span>
                             <span>Opprett ny gruppe</span>
@@ -212,6 +219,31 @@ export class HkmGroupsManager {
                     </form>
                 </div>
             </div>
+
+            <!-- Categories Management Modal (Admin only) -->
+            <div id="group-categories-modal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 16px;">
+                <div class="modal-card" style="background: var(--card-bg, #ffffff); border-radius: 20px; width: 100%; max-width: 480px; padding: 28px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); max-height: 85vh; display: flex; flex-direction: column;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 20px; font-weight: 700;">Administrer kategorier</h3>
+                            <p style="margin: 4px 0 0 0; font-size: 13px; opacity: 0.7;">Opprett eller slett kategorier for smågrupper.</p>
+                        </div>
+                        <button type="button" id="close-categories-modal" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: var(--text-color, #64748b);">&times;</button>
+                    </div>
+
+                    <div id="categories-list-container" style="flex: 1; overflow-y: auto; border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px; max-height: 300px; min-height: 150px; margin-bottom: 16px;">
+                        <!-- Will be populated dynamically -->
+                    </div>
+
+                    <form id="add-category-form" style="display: flex; gap: 10px; align-items: center; border-top: 1px solid var(--border-color, #e2e8f0); padding-top: 16px;">
+                        <input type="text" id="new-category-input" required placeholder="Nytt kategorinavn..." style="flex: 1; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a); font-size: 14px;">
+                        <button type="submit" style="padding: 10px 18px; border-radius: 10px; background: var(--admin-orange, #d17d39); color: white; border: none; font-weight: 600; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+                            <span>Legg til</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
         `;
 
         this.bindEvents();
@@ -234,6 +266,19 @@ export class HkmGroupsManager {
         const modal = this.container.querySelector('#group-form-modal');
         this.container.querySelector('#groups-create-btn')?.addEventListener('click', () => {
             this.openCreateModal();
+        });
+
+        // Categories management modal (Admin only)
+        const categoriesModal = this.container.querySelector('#group-categories-modal');
+        this.container.querySelector('#groups-manage-categories-btn')?.addEventListener('click', () => {
+            this.openCategoriesModal();
+        });
+        this.container.querySelector('#close-categories-modal')?.addEventListener('click', () => {
+            if (categoriesModal) categoriesModal.style.display = 'none';
+        });
+        this.container.querySelector('#add-category-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleAddCategory();
         });
 
 
@@ -298,8 +343,31 @@ export class HkmGroupsManager {
     async loadGroupsData() {
         try {
             const db = firebase.firestore();
-            const snap = await db.collection('groups').get();
 
+            // Load categories
+            const catsSnap = await db.collection('groupCategories').orderBy('name').get();
+            let fetchedCats = [];
+            catsSnap.forEach(doc => {
+                fetchedCats.push(doc.data().name);
+            });
+
+            // If empty, seed categories and reload
+            if (fetchedCats.length === 0) {
+                const defaultCats = ['Husfellesskap', 'Bønnegruppe', 'Bibelstudie', 'Ung-voksen', 'Lovsang & Musikk', 'Lederteam'];
+                const batch = db.batch();
+                defaultCats.forEach(cat => {
+                    const docRef = db.collection('groupCategories').doc();
+                    batch.set(docRef, { name: cat, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+                });
+                await batch.commit();
+                
+                // reload
+                return this.loadGroupsData();
+            }
+
+            this.categories = fetchedCats;
+
+            const snap = await db.collection('groups').get();
             let fetchedGroups = [];
             snap.forEach(doc => {
                 fetchedGroups.push({ id: doc.id, ...doc.data() });
@@ -408,7 +476,7 @@ export class HkmGroupsManager {
     }
 
     renderDirectoryView(container) {
-        const categories = ['ALL', 'Husfellesskap', 'Bønnegruppe', 'Bibelstudie', 'Ung-voksen', 'Lovsang & Musikk', 'Lederteam'];
+        const categories = ['ALL', ...this.categories];
 
         let filtered = this.groups;
         if (this.filterCategory !== 'ALL') {
@@ -709,6 +777,93 @@ export class HkmGroupsManager {
             } catch (e) {
                 console.warn(`Could not clean up collection ${col} for group ${groupId}:`, e);
             }
+        }
+    }
+
+    openCategoriesModal() {
+        if (!this.isAdmin) {
+            alert("Kun administratorer kan administrere kategorier.");
+            return;
+        }
+
+        const modal = this.container.querySelector('#group-categories-modal');
+        if (!modal) return;
+
+        modal.style.display = 'flex';
+        this.renderCategoriesList();
+    }
+
+    renderCategoriesList() {
+        const container = this.container.querySelector('#categories-list-container');
+        if (!container) return;
+
+        if (this.categories.length === 0) {
+            container.innerHTML = '<div style="text-align: center; padding: 16px; color: var(--text-muted, #64748b);">Ingen kategorier funnet.</div>';
+            return;
+        }
+
+        container.innerHTML = this.categories.map(cat => `
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-radius: 12px; background: var(--bg-muted, #f8fafc); border: 1px solid var(--border-color, #e2e8f0);">
+                <span style="font-weight: 600; font-size: 14px; color: var(--text-color, #0f172a);">${this.escapeHtml(cat)}</span>
+                <button type="button" class="btn-delete-category" data-cat="${this.escapeHtml(cat)}" title="Slett kategori" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.15s ease;">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
+                </button>
+            </div>
+        `).join('');
+
+        container.querySelectorAll('.btn-delete-category').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const catName = btn.dataset.cat;
+                this.handleDeleteCategory(catName);
+            });
+        });
+    }
+
+    async handleAddCategory() {
+        const input = this.container.querySelector('#new-category-input');
+        const catName = input ? input.value.trim() : '';
+        if (!catName) return;
+
+        if (this.categories.includes(catName)) {
+            alert("Kategorien eksisterer allerede.");
+            return;
+        }
+
+        try {
+            const db = firebase.firestore();
+            await db.collection('groupCategories').add({
+                name: catName,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            if (input) input.value = '';
+            
+            await this.loadGroupsData();
+            this.renderCategoriesList();
+        } catch (err) {
+            console.error("Error adding category:", err);
+            alert("Kunne ikke legge til kategori: " + err.message);
+        }
+    }
+
+    async handleDeleteCategory(catName) {
+        if (!confirm(`Er du sikker på at du vil slette kategorien "${catName}"?`)) {
+            return;
+        }
+
+        try {
+            const db = firebase.firestore();
+            const snap = await db.collection('groupCategories').where('name', '==', catName).get();
+            
+            const batch = db.batch();
+            snap.forEach(doc => batch.delete(doc.ref));
+            await batch.commit();
+
+            await this.loadGroupsData();
+            this.renderCategoriesList();
+        } catch (err) {
+            console.error("Error deleting category:", err);
+            alert("Kunne ikke slette kategori: " + err.message);
         }
     }
 
@@ -1076,12 +1231,20 @@ export class HkmGroupsManager {
 
         if (!modal || !form) return;
 
+        // Populate categories dynamically
+        const categorySelect = form.querySelector('#group-category-input');
+        if (categorySelect) {
+            categorySelect.innerHTML = this.categories.map(cat => `
+                <option value="${this.escapeHtml(cat)}">${this.escapeHtml(cat)}</option>
+            `).join('');
+        }
+
         form.reset();
         if (groupToEdit) {
             titleEl.textContent = 'Rediger gruppe';
             form.querySelector('#group-form-id').value = groupToEdit.id;
             form.querySelector('#group-name-input').value = groupToEdit.name || '';
-            form.querySelector('#group-category-input').value = groupToEdit.category || 'Husfellesskap';
+            form.querySelector('#group-category-input').value = groupToEdit.category || (this.categories[0] || 'Husfellesskap');
             form.querySelector('#group-schedule-input').value = groupToEdit.meetingSchedule || '';
             form.querySelector('#group-location-input').value = groupToEdit.location || '';
             form.querySelector('#group-description-input').value = groupToEdit.description || '';

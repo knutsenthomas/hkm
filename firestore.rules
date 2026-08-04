@@ -506,6 +506,11 @@ service cloud.firestore {
       allow create, update, delete: if signedIn();
     }
 
+    match /groupCategories/{categoryId} {
+      allow read: if true;
+      allow create, update, delete: if signedIn();
+    }
+
     match /groupEvents/{eventId} {
       allow read: if true;
       allow create, update, delete: if signedIn();
