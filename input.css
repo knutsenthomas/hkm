@@ -298,15 +298,18 @@ th {
     background: transparent;
 }
 
-.lang-switcher.active .lang-dropdown {
+.lang-switcher.active .lang-dropdown,
+.lang-switcher:hover .lang-dropdown {
     display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
     animation: fadeInDown 0.3s ease forwards;
 }
 
 .lang-dropdown a {
     display: block;
     padding: 10px 20px;
-    color: var(--text-dark);
+    color: #1e293b !important;
     text-decoration: none;
     font-size: 14px;
     font-weight: 500;
@@ -314,8 +317,8 @@ th {
 }
 
 .lang-dropdown a:hover {
-    background: #f8f9fa;
-    color: var(--accent-orange);
+    background: #f1f5f9 !important;
+    color: #d17d39 !important;
 }
 
 @keyframes fadeInDown {

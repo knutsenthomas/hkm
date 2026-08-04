@@ -800,7 +800,65 @@ function initCookieSettingsLink() {
     });
 }
 
+function bindLanguageSwitcher(header) {
+    if (!header || header.dataset.hkmLangBound === 'true') return;
+    header.dataset.hkmLangBound = 'true';
+
+    document.addEventListener('click', (event) => {
+        const langBtn = event.target.closest('.lang-btn');
+        if (langBtn) {
+            event.preventDefault();
+            event.stopPropagation();
+            const langSwitcher = langBtn.closest('.lang-switcher');
+            const dock = langBtn.closest('.header-actions-dock');
+            if (langSwitcher) {
+                const dropdown = langSwitcher.querySelector('.lang-dropdown');
+                const wasActive = langSwitcher.classList.contains('active');
+                if (wasActive) {
+                    langSwitcher.classList.remove('active');
+                    if (dropdown) {
+                        dropdown.classList.add('hidden');
+                        dropdown.style.display = 'none';
+                    }
+                } else {
+                    langSwitcher.classList.add('active');
+                    if (dropdown) {
+                        dropdown.classList.remove('hidden');
+                        dropdown.style.display = 'block';
+                        dropdown.style.opacity = '1';
+                        dropdown.style.visibility = 'visible';
+                    }
+                }
+            }
+            if (dock) dock.classList.add('expanded');
+            return;
+        }
+
+        const langSwitchLink = event.target.closest('.lang-switch-btn');
+        if (langSwitchLink) {
+            const lang = langSwitchLink.getAttribute('data-lang');
+            if (lang) {
+                localStorage.setItem('hkm_lang', lang);
+                document.cookie = `hkm_lang=${lang};path=/;max-age=31536000`;
+            }
+            return;
+        }
+
+        document.querySelectorAll('.lang-switcher').forEach((switcher) => {
+            if (!switcher.contains(event.target)) {
+                switcher.classList.remove('active');
+                const dropdown = switcher.querySelector('.lang-dropdown');
+                if (dropdown) {
+                    dropdown.classList.add('hidden');
+                    dropdown.style.display = 'none';
+                }
+            }
+        });
+    });
+}
+
 function bindSiteShellMenu(header, megaMenu) {
+    bindLanguageSwitcher(header);
     const menuToggle = header.querySelector('#menu-toggle');
     if (!menuToggle || !megaMenu || menuToggle.dataset.hkmMenuBound === 'true') return;
 
