@@ -5182,78 +5182,81 @@ class AdminManager {
                         font-size: 28px !important;
                     }
                     .hero-actions-container {
-                        flex-direction: column !important;
-                        width: 100% !important;
+                        flex-direction: row !important;
+                        flex-wrap: wrap !important;
+                        justify-content: flex-start !important;
+                        gap: 10px !important;
                     }
                     .overview-hero-action, .overview-hero-action-secondary {
-                        width: 100% !important;
+                        width: 44px !important;
+                        height: 44px !important;
+                        min-width: 44px !important;
                         justify-content: center !important;
                     }
                 }
                 
-                /* Override dashboard.css SaaS styles with premium buttons */
+                /* Override dashboard.css SaaS styles with premium icon buttons */
                 .overview-hero-action {
-                    height: 42px !important;
+                    width: 44px !important;
+                    height: 44px !important;
+                    min-width: 44px !important;
                     background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
                     color: white !important;
-                    border-radius: 8px !important;
-                    padding: 0 12px !important;
+                    border-radius: 10px !important;
+                    padding: 0 !important;
                     font-weight: 600 !important;
                     border: none !important;
                     box-shadow: 0 4px 12px rgba(209, 125, 57, 0.25) !important;
                     cursor: pointer !important;
-                    display: flex !important;
+                    display: inline-flex !important;
                     align-items: center !important;
                     justify-content: center !important;
-                    gap: 6px !important;
                     font-family: 'Inter', sans-serif !important;
-                    transition: all 0.2s ease !important;
-                    font-size: 13px !important;
-                    white-space: nowrap !important;
+                    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
                     margin: 0 !important;
                 }
                 .overview-hero-action:hover {
-                    transform: translateY(-2px) !important;
+                    transform: translateY(-2px) scale(1.05) !important;
                     box-shadow: 0 6px 16px rgba(209, 125, 57, 0.35) !important;
                     filter: brightness(1.05) !important;
                 }
                 .overview-hero-action-secondary {
-                    height: 42px !important;
+                    width: 44px !important;
+                    height: 44px !important;
+                    min-width: 44px !important;
                     background: var(--admin-surface-muted, #ffffff) !important;
                     color: var(--admin-text-muted, #475569) !important;
-                    border-radius: 8px !important;
-                    padding: 0 12px !important;
+                    border-radius: 10px !important;
+                    padding: 0 !important;
                     font-weight: 600 !important;
                     border: 1px solid var(--admin-border, #cbd5e1) !important;
                     box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
                     cursor: pointer !important;
-                    display: flex !important;
+                    display: inline-flex !important;
                     align-items: center !important;
                     justify-content: center !important;
-                    gap: 6px !important;
                     font-family: 'Inter', sans-serif !important;
-                    transition: all 0.2s ease !important;
-                    font-size: 13px !important;
-                    white-space: nowrap !important;
+                    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
                     margin: 0 !important;
                 }
                 .overview-hero-action-secondary:hover {
                     background: var(--admin-surface, #f8fafc) !important;
                     color: var(--admin-text, #0f172a) !important;
                     border-color: var(--admin-border, #94a3b8) !important;
-                    transform: translateY(-1px) !important;
+                    transform: translateY(-2px) scale(1.05) !important;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
                 }
                 .overview-hero-action .material-symbols-outlined,
                 .overview-hero-action-secondary .material-symbols-outlined {
-                    font-size: 18px !important;
+                    font-size: 20px !important;
                     color: inherit !important;
                     display: inline-flex !important;
                     align-items: center !important;
                     justify-content: center !important;
                     vertical-align: middle !important;
                     line-height: 1 !important;
-                    width: 18px !important;
-                    height: 18px !important;
+                    width: 20px !important;
+                    height: 20px !important;
                 }
                 
                 /* Dark Mode overrides for local page layout */
@@ -5287,22 +5290,21 @@ class AdminManager {
                     <p class="overview-hero-text" style="font-size: 16px; opacity: 0.9; max-width: 600px; line-height: 1.6;">
                         Her har du en fullstendig oversikt over HKM Studio. Se sanntidsdata, administrer innhold og svar på meldinger fra én sentral flate.
                     </p>
-                    <div class="hero-actions-container" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 32px; align-items: center !important; justify-content: flex-start !important;">
-                        <button type="button" class="overview-hero-action" onclick="window.location.href='/admin/admin-meldinger.html'">
+                    <div class="hero-actions-container" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; align-items: center !important; justify-content: flex-start !important;">
+                        <button type="button" class="overview-hero-action" title="Send e-post" aria-label="Send e-post" onclick="if(window.crm && window.crm.openSendEmailModal){window.crm.openSendEmailModal()}else if(window.openSendEmailModal){window.openSendEmailModal()}else{window.location.href='/admin/admin-meldinger.html#compose'}">
+                            <span class="material-symbols-outlined">send</span>
+                        </button>
+                        <button type="button" class="overview-hero-action-secondary" title="Gå til meldinger" aria-label="Gå til meldinger" onclick="window.location.href='/admin/admin-meldinger.html'">
                             <span class="material-symbols-outlined">mail</span>
-                            Gå til meldinger
                         </button>
-                        <button type="button" class="overview-hero-action-secondary" onclick="window.location.href='/admin/index.html#content'">
+                        <button type="button" class="overview-hero-action-secondary" title="Se sideinnhold" aria-label="Se sideinnhold" onclick="window.location.href='/admin/index.html#content'">
                             <span class="material-symbols-outlined">dashboard_customize</span>
-                            Se sideinnhold
                         </button>
-                        <button type="button" class="overview-hero-action-secondary" onclick="if(window.handleSectionSwitch){window.handleSectionSwitch('causes')}else{window.location.hash='causes'}">
+                        <button type="button" class="overview-hero-action-secondary" title="Se gaver" aria-label="Se gaver" onclick="if(window.handleSectionSwitch){window.handleSectionSwitch('causes')}else{window.location.hash='causes'}">
                             <span class="material-symbols-outlined">volunteer_activism</span>
-                            Se gaver
                         </button>
-                        <button type="button" class="overview-hero-action-secondary" onclick="if(window.handleSectionSwitch){window.handleSectionSwitch('shop')}else{window.location.hash='shop'}">
+                        <button type="button" class="overview-hero-action-secondary" title="Se butikk" aria-label="Se butikk" onclick="if(window.handleSectionSwitch){window.handleSectionSwitch('shop')}else{window.location.hash='shop'}">
                             <span class="material-symbols-outlined">shopping_cart</span>
-                            Se butikk
                         </button>
                     </div>
                 </div>

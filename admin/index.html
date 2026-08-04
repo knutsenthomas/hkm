@@ -828,22 +828,21 @@
                             Her har du rask oversikt over innhold, meldinger og aktivitet. Bruk menyen til venstre for
                             å redigere nettsiden og følge opp kommunikasjonen.
                         </p>
-                        <div class="hero-actions-container" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 32px; align-items: center; justify-content: flex-start;">
-                            <button type="button" class="overview-hero-action" onclick="window.location.href='/admin/admin-meldinger.html'">
+                        <div class="hero-actions-container" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; align-items: center; justify-content: flex-start;">
+                            <button type="button" class="overview-hero-action" title="Send e-post" aria-label="Send e-post" onclick="if(window.crm && window.crm.openSendEmailModal){window.crm.openSendEmailModal()}else if(window.openSendEmailModal){window.openSendEmailModal()}else{window.location.href='/admin/admin-meldinger.html#compose'}">
+                                <span class="material-symbols-outlined">send</span>
+                            </button>
+                            <button type="button" class="overview-hero-action-secondary" title="Gå til meldinger" aria-label="Gå til meldinger" onclick="window.location.href='/admin/admin-meldinger.html'">
                                 <span class="material-symbols-outlined">mail</span>
-                                Gå til meldinger
                             </button>
-                            <button type="button" class="overview-hero-action-secondary" onclick="window.location.href='/admin/index.html#content'">
+                            <button type="button" class="overview-hero-action-secondary" title="Se sideinnhold" aria-label="Se sideinnhold" onclick="window.location.href='/admin/index.html#content'">
                                 <span class="material-symbols-outlined">dashboard_customize</span>
-                                Se sideinnhold
                             </button>
-                            <button type="button" class="overview-hero-action-secondary" onclick="if(window.handleSectionSwitch){window.handleSectionSwitch('causes')}else{window.location.hash='causes'}">
+                            <button type="button" class="overview-hero-action-secondary" title="Se gaver" aria-label="Se gaver" onclick="if(window.handleSectionSwitch){window.handleSectionSwitch('causes')}else{window.location.hash='causes'}">
                                 <span class="material-symbols-outlined">volunteer_activism</span>
-                                Se gaver
                             </button>
-                            <button type="button" class="overview-hero-action-secondary" onclick="if(window.handleSectionSwitch){window.handleSectionSwitch('shop')}else{window.location.hash='shop'}">
+                            <button type="button" class="overview-hero-action-secondary" title="Se butikk" aria-label="Se butikk" onclick="if(window.handleSectionSwitch){window.handleSectionSwitch('shop')}else{window.location.hash='shop'}">
                                 <span class="material-symbols-outlined">shopping_cart</span>
-                                Se butikk
                             </button>
                         </div>
                     </div>
