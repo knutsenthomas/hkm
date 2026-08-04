@@ -4622,6 +4622,9 @@ function wrapInHkmMasterEmailTemplate(contentHtml, options = {}) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Caveat:wght@600&display=block');
+  </style>
 </head>
 <body style="margin: 0; padding: 24px 12px; background-color: #f8fafc; font-family: 'Inter', -apple-system, BlinkMacSystemFont, Arial, sans-serif; color: #1e293b;">
   <div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, Arial, sans-serif; max-width: 580px; margin: 0 auto; background-color: #ffffff; border-radius: 20px; overflow: hidden; border: 1px solid #eae4dc; box-shadow: 0 10px 30px rgba(0,0,0,0.04);">
@@ -4641,16 +4644,19 @@ function wrapInHkmMasterEmailTemplate(contentHtml, options = {}) {
       ${rawContent}
     </div>
 
-    <!-- Official HKM Signature Block -->
+    <!-- Official HKM Signature Block with Handwritten Cursive Name -->
     <div style="padding: 24px 32px; background-color: #fcf9f5; border-top: 1px solid #eae4dc;">
       <table cellpadding="0" cellspacing="0" border="0" style="font-family: Arial, sans-serif; font-size: 13px; color: #475569; width: 100%;">
         <tr>
           <td style="border-left: 3px solid #d17d39; padding-left: 16px; vertical-align: top;">
-            <div style="font-size: 15px; font-weight: 700; color: #102542; margin-bottom: 2px;">
+            <div style="font-family: 'Dancing Script', 'Caveat', 'Brush Script MT', 'Segoe Script', cursive, Georgia, serif; font-size: 26px; font-weight: 600; color: #d17d39; font-style: italic; line-height: 1.1; margin-bottom: 4px;">
               ${escapeHtml(nameToUse)}
             </div>
+            <div style="font-size: 13px; font-weight: 800; color: #102542; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 2px;">
+              His Kingdom Ministry
+            </div>
             <div style="font-size: 11px; color: #d17d39; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">
-              His Kingdom Ministry &bull; Spre evangeliet og Guds rike
+              Spre evangeliet og Guds rike
             </div>
             <div style="font-size: 13px; color: #64748b; line-height: 1.5;">
               E-post: <a href="mailto:post@hiskingdomministry.no" style="color: #d17d39; text-decoration: none; font-weight: 600;">post@hiskingdomministry.no</a><br>
