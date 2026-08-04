@@ -4605,6 +4605,72 @@ async function getEmailTemplate(templateId, fallback) {
 }
 
 /**
+ * Pakker inn e-postinnhold i en offisiell, responsiv HKM-merkevaremal med logo i toppen og signatur i bunnen.
+ */
+function wrapInHkmMasterEmailTemplate(contentHtml, options = {}) {
+  const rawContent = contentHtml || (options.text ? escapeHtml(options.text).replace(/\n/g, '<br>') : '');
+  
+  // Hvis e-posten allerede er et fullstendig HTML-dokument eller inneholder HKM-logo, bevarer vi den som den er
+  if (rawContent && (rawContent.includes('<!DOCTYPE') || rawContent.includes('logo-hkm.png') || rawContent.includes('hkm-logo.png'))) {
+    return rawContent;
+  }
+
+  const nameToUse = options.fromName || "His Kingdom Ministry";
+
+  return `<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 24px 12px; background-color: #f8fafc; font-family: 'Inter', -apple-system, BlinkMacSystemFont, Arial, sans-serif; color: #1e293b;">
+  <div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, Arial, sans-serif; max-width: 580px; margin: 0 auto; background-color: #ffffff; border-radius: 20px; overflow: hidden; border: 1px solid #eae4dc; box-shadow: 0 10px 30px rgba(0,0,0,0.04);">
+    
+    <!-- Top Gradient Accent Bar -->
+    <div style="height: 6px; background: linear-gradient(90deg, #102542 0%, #d17d39 100%);"></div>
+    
+    <!-- Top Header with Logo -->
+    <div style="padding: 28px 32px 20px 32px; border-bottom: 1px solid #f1f5f9; background-color: #ffffff; text-align: left;">
+      <a href="https://www.hiskingdomministry.no" target="_blank" style="text-decoration: none; display: inline-block;">
+        <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" alt="His Kingdom Ministry" width="56" style="display: block; width: 56px; height: auto;" />
+      </a>
+    </div>
+
+    <!-- Main Body Content -->
+    <div style="padding: 32px; font-size: 15px; line-height: 1.7; color: #334155;">
+      ${rawContent}
+    </div>
+
+    <!-- Official HKM Signature Block -->
+    <div style="padding: 24px 32px; background-color: #fcf9f5; border-top: 1px solid #eae4dc;">
+      <table cellpadding="0" cellspacing="0" border="0" style="font-family: Arial, sans-serif; font-size: 13px; color: #475569; width: 100%;">
+        <tr>
+          <td style="border-left: 3px solid #d17d39; padding-left: 16px; vertical-align: top;">
+            <div style="font-size: 15px; font-weight: 700; color: #102542; margin-bottom: 2px;">
+              ${escapeHtml(nameToUse)}
+            </div>
+            <div style="font-size: 11px; color: #d17d39; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">
+              His Kingdom Ministry &bull; Spre evangeliet og Guds rike
+            </div>
+            <div style="font-size: 13px; color: #64748b; line-height: 1.5;">
+              E-post: <a href="mailto:post@hiskingdomministry.no" style="color: #d17d39; text-decoration: none; font-weight: 600;">post@hiskingdomministry.no</a><br>
+              Nettsted: <a href="https://www.hiskingdomministry.no" target="_blank" style="color: #102542; text-decoration: underline; font-weight: 600;">www.hiskingdomministry.no</a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Footer Copyright -->
+    <div style="padding: 16px 32px; text-align: center; background: #faf6f0; font-size: 11px; color: #8c7b75; text-transform: uppercase; letter-spacing: 0.1em;">
+      &copy; 2026 His Kingdom Ministry &bull; <a href="https://www.hiskingdomministry.no" style="color: #d17d39; text-decoration: none;">www.hiskingdomministry.no</a>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+/**
  * Helper-funksjon for å sende e-post.
  */
 async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Ministry", type = "automated", cc = "", bcc = "", replyTo = "post@hiskingdomministry.no", attachments = [], headers = {} }) {
@@ -4631,6 +4697,8 @@ async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Mini
     auth: { user, pass },
   });
 
+  const finalHtml = wrapInHkmMasterEmailTemplate(html, { fromName, subject, text });
+
   try {
     // Legg til standard bulk/unsubscribe-headere for nyhetsbrev for å unngå søppelpost
     let finalHeaders = { ...headers };
@@ -4647,7 +4715,7 @@ async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Mini
       replyTo: replyTo || senderEmail,
       subject,
       text,
-      html,
+      html: finalHtml,
       attachments: Array.isArray(attachments) && attachments.length ? attachments : undefined,
       headers: finalHeaders,
     });
