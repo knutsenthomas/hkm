@@ -113,6 +113,18 @@ service firebase.storage {
       allow create, update, delete: if isPrivilegedUser();
     }
 
+    match /groups/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if isSignedIn() && request.resource.size < 50 * 1024 * 1024;
+      allow delete: if isPrivilegedUser();
+    }
+
+    match /group_resources/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if isSignedIn() && request.resource.size < 50 * 1024 * 1024;
+      allow delete: if isPrivilegedUser();
+    }
+
     match /{allPaths=**} {
       allow read, write: if false;
     }
