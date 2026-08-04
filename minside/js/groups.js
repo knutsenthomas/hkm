@@ -103,7 +103,15 @@ export class HkmGroupsManager {
                 'groups.modalUrlPlaceholder': 'Lim inn bilde-URL her...',
                 'groups.modalLoading': 'Laster...',
                 'groups.modalLoadingGroups': 'Laster grupper...',
-                'groups.modalLeader': 'Leder: '
+                'groups.modalLeader': 'Leder: ',
+
+                // Categories
+                'groups.category.Husfellesskap': 'Husfellesskap',
+                'groups.category.Bønnegruppe': 'Bønnegruppe',
+                'groups.category.Bibelstudie': 'Bibelstudie',
+                'groups.category.Ung-voksen': 'Ung-voksen',
+                'groups.category.Lovsang & Musikk': 'Lovsang & Musikk',
+                'groups.category.Lederteam': 'Lederteam'
             },
             en: {
                 'groups.title': 'Small Groups',
@@ -178,7 +186,15 @@ export class HkmGroupsManager {
                 'groups.modalUrlPlaceholder': 'Paste image URL here...',
                 'groups.modalLoading': 'Loading...',
                 'groups.modalLoadingGroups': 'Loading groups...',
-                'groups.modalLeader': 'Leader: '
+                'groups.modalLeader': 'Leader: ',
+
+                // Categories
+                'groups.category.Husfellesskap': 'House Fellowship',
+                'groups.category.Bønnegruppe': 'Prayer Group',
+                'groups.category.Bibelstudie': 'Bible Study',
+                'groups.category.Ung-voksen': 'Young Adults',
+                'groups.category.Lovsang & Musikk': 'Worship & Music',
+                'groups.category.Lederteam': 'Leadership Team'
             },
             es: {
                 'groups.title': 'Grupos Pequeños',
@@ -267,6 +283,13 @@ export class HkmGroupsManager {
         } catch (e) {}
 
         return localDict[lang]?.[key] || localDict['no']?.[key] || key;
+    }
+
+    translateCategory(categoryName) {
+        if (!categoryName) return '';
+        const key = `groups.category.${categoryName}`;
+        const translated = this.t(key);
+        return translated === key ? categoryName : translated;
     }
 
     async render(container, queryParams = {}) {
@@ -1033,7 +1056,7 @@ export class HkmGroupsManager {
                 <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
                     ${categories.map(cat => `
                         <button type="button" class="cat-pill-btn ${this.filterCategory === cat ? 'active' : ''}" data-cat="${cat}" style="padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; border: 1px solid ${this.filterCategory === cat ? 'var(--admin-orange, #d17d39)' : 'var(--border-color, #e2e8f0)'}; background: ${this.filterCategory === cat ? 'var(--admin-orange, #d17d39)' : 'transparent'}; color: ${this.filterCategory === cat ? '#fff' : 'inherit'}; cursor: pointer; transition: all 0.2s ease;">
-                            ${cat === 'ALL' ? this.t('groups.categoryAll') : cat}
+                            ${cat === 'ALL' ? this.t('groups.categoryAll') : this.translateCategory(cat)}
                         </button>
                     `).join('')}
                 </div>
@@ -1081,7 +1104,7 @@ export class HkmGroupsManager {
                 <div class="group-card-banner" style="position: relative; height: 140px; background: url('${img}') center/cover no-repeat;">
                     <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(15,23,42,0.8), transparent);"></div>
                     <span style="position: absolute; top: 12px; left: 12px; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); color: #fff; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 10px; border-radius: 20px;">
-                        ${this.escapeHtml(group.category || 'Grupper')}
+                        ${this.escapeHtml(this.translateCategory(group.category || 'Grupper'))}
                     </span>
                     <div style="position: absolute; top: 12px; right: 12px; display: flex; align-items: center; gap: 8px; z-index: 2;">
                         ${isLeader ? `
@@ -1599,7 +1622,7 @@ export class HkmGroupsManager {
                     <div style="position: relative; color: white; display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; width: 100%; z-index: 2;">
                         <div>
                             <span style="background: var(--admin-orange, #d17d39); font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.5px;">
-                                ${this.escapeHtml(group.category)}
+                                ${this.escapeHtml(this.translateCategory(group.category))}
                             </span>
                             <h2 style="margin: 8px 0 4px 0; font-size: 28px; font-weight: 800;">${this.escapeHtml(group.name)}</h2>
                             <p style="margin: 0; opacity: 0.9; font-size: 14px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
@@ -2420,7 +2443,7 @@ export class HkmGroupsManager {
         const categorySelect = form.querySelector('#group-category-input');
         if (categorySelect) {
             categorySelect.innerHTML = this.categories.map(cat => `
-                <option value="${this.escapeHtml(cat)}">${this.escapeHtml(cat)}</option>
+                <option value="${this.escapeHtml(cat)}">${this.escapeHtml(this.translateCategory(cat))}</option>
             `).join('');
         }
 
