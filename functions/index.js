@@ -4615,11 +4615,10 @@ function wrapInHkmMasterEmailTemplate(contentHtml, options = {}) {
     return rawContent;
   }
 
-  const rawFromName = options.fromName || "";
-  // Sikre at signaturen alltid viser et personnavn i fin håndskrift, og fallback til "Thomas Knutsen" dersom avsender kun er firmanavn
-  let personName = rawFromName;
-  if (!personName || personName.toLowerCase().trim() === 'his kingdom ministry' || personName.toLowerCase().trim() === 'hkm team' || personName.toLowerCase().trim() === 'hkm registrering') {
-    personName = "Thomas Knutsen";
+  const rawFromName = (options.fromName || "").trim();
+  let displayName = rawFromName;
+  if (!displayName || displayName.toLowerCase() === 'his kingdom ministry' || displayName.toLowerCase() === 'hkm team' || displayName.toLowerCase() === 'hkm registrering') {
+    displayName = "His Kingdom Ministry Team";
   }
 
   return `<!DOCTYPE html>
@@ -4627,9 +4626,6 @@ function wrapInHkmMasterEmailTemplate(contentHtml, options = {}) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Alex+Brush&family=Great+Vibes&family=Marck+Script&display=block');
-  </style>
 </head>
 <body style="margin: 0; padding: 24px 12px; background-color: #f8fafc; font-family: 'Inter', -apple-system, BlinkMacSystemFont, Arial, sans-serif; color: #1e293b;">
   <div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, Arial, sans-serif; max-width: 580px; margin: 0 auto; background-color: #ffffff; border-radius: 20px; overflow: hidden; border: 1px solid #eae4dc; box-shadow: 0 10px 30px rgba(0,0,0,0.04);">
@@ -4649,23 +4645,29 @@ function wrapInHkmMasterEmailTemplate(contentHtml, options = {}) {
       ${rawContent}
     </div>
 
-    <!-- Official HKM Signature Block with Elegant Thin Handwritten Name -->
+    <!-- Official Executive HKM Signature Block -->
     <div style="padding: 24px 32px; background-color: #fcf9f5; border-top: 1px solid #eae4dc;">
-      <table cellpadding="0" cellspacing="0" border="0" style="font-family: Arial, sans-serif; font-size: 13px; color: #475569; width: 100%;">
+      <table cellpadding="0" cellspacing="0" border="0" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, Arial, sans-serif; font-size: 13px; color: #475569; width: 100%;">
         <tr>
+          <!-- Small Brand Logo Badge -->
+          <td style="vertical-align: top; width: 48px; padding-right: 16px;">
+            <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" alt="HKM Logo" width="48" height="48" style="display: block; width: 48px; height: 48px; border-radius: 12px; object-fit: cover;" />
+          </td>
+
+          <!-- Vertical Line & Person Details -->
           <td style="border-left: 3px solid #d17d39; padding-left: 16px; vertical-align: top;">
-            <div style="font-family: 'Alex Brush', 'Great Vibes', 'Marck Script', 'Dancing Script', cursive, Georgia, serif; font-size: 32px; font-weight: 400; color: #d17d39; line-height: 1.1; margin-bottom: 2px;">
-              ${escapeHtml(personName)}
+            <div style="font-size: 16px; font-weight: 800; color: #102542; margin-bottom: 2px; letter-spacing: -0.01em;">
+              ${escapeHtml(displayName)}
             </div>
-            <div style="font-size: 12px; font-weight: 800; color: #102542; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 2px;">
+            <div style="font-size: 11px; font-weight: 700; color: #d17d39; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 6px;">
               His Kingdom Ministry
             </div>
-            <div style="font-size: 11px; color: #d17d39; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">
+            <div style="font-size: 12px; color: #64748b; font-style: italic; margin-bottom: 8px;">
               Spre evangeliet og Guds rike
             </div>
-            <div style="font-size: 13px; color: #64748b; line-height: 1.5;">
-              E-post: <a href="mailto:post@hiskingdomministry.no" style="color: #d17d39; text-decoration: none; font-weight: 600;">post@hiskingdomministry.no</a><br>
-              Nettsted: <a href="https://www.hiskingdomministry.no" target="_blank" style="color: #102542; text-decoration: underline; font-weight: 600;">www.hiskingdomministry.no</a>
+            <div style="font-size: 12px; color: #475569; line-height: 1.6;">
+              <strong style="color: #102542;">E-post:</strong> <a href="mailto:post@hiskingdomministry.no" style="color: #d17d39; text-decoration: none; font-weight: 600;">post@hiskingdomministry.no</a><br>
+              <strong style="color: #102542;">Nettsted:</strong> <a href="https://www.hiskingdomministry.no" target="_blank" style="color: #102542; text-decoration: underline; font-weight: 600;">www.hiskingdomministry.no</a>
             </div>
           </td>
         </tr>
