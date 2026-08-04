@@ -4632,13 +4632,6 @@ function wrapInHkmMasterEmailTemplate(contentHtml, options = {}) {
     
     <!-- Top Gradient Accent Bar -->
     <div style="height: 6px; background: linear-gradient(90deg, #102542 0%, #d17d39 100%);"></div>
-    
-    <!-- Top Header with Logo -->
-    <div style="padding: 28px 32px 20px 32px; border-bottom: 1px solid #f1f5f9; background-color: #ffffff; text-align: left;">
-      <a href="https://www.hiskingdomministry.no" target="_blank" style="text-decoration: none; display: inline-block;">
-        <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" alt="His Kingdom Ministry" width="56" style="display: block; width: 56px; height: auto;" />
-      </a>
-    </div>
 
     <!-- Main Body Content -->
     <div style="padding: 32px; font-size: 15px; line-height: 1.7; color: #334155;">
