@@ -477,6 +477,16 @@ export class HkmGroupsManager {
                             <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Sted / Adresse / Link</label>
                             <input type="text" id="group-location-input" placeholder="f.eks. Majorstuen, Oslo eller Zoom-lenke" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a);">
                         </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div>
+                                <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Zoom Meeting ID (valgfri)</label>
+                                <input type="text" id="group-zoom-id-input" placeholder="f.eks. 899 2581 2071" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a);">
+                            </div>
+                            <div>
+                                <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Zoom Passcode (valgfri)</label>
+                                <input type="text" id="group-zoom-passcode-input" placeholder="f.eks. 529270" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a);">
+                            </div>
+                        </div>
                         <div>
                             <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Beskrivelse</label>
                             <textarea id="group-description-input" rows="3" placeholder="Fortell om hva gruppen gjør..." style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a); font-family: inherit;"></textarea>
@@ -997,6 +1007,34 @@ export class HkmGroupsManager {
     async loadGroupsData() {
         try {
             const db = firebase.firestore();
+
+            // Temporary Zoom Details Seeder Hook for HKM prayer team
+            if (!this._hasSeededZoom) {
+                this._hasSeededZoom = true;
+                setTimeout(async () => {
+                    try {
+                        const q = await db.collection('groups').where('name', '==', 'HKM prayer team').get();
+                        if (!q.empty) {
+                            const docId = q.docs[0].id;
+                            const docData = q.docs[0].data();
+                            if (!docData.zoomMeetingId || !docData.zoomPasscode) {
+                                await db.collection('groups').doc(docId).update({
+                                    location: "https://us06web.zoom.us/j/89925812071?pwd=ZJUzTOWHwaQES4UQLAxA3WT4lnsx9.1",
+                                    zoomMeetingId: "899 2581 2071",
+                                    zoomPasscode: "529270"
+                                });
+                                console.log("Seeded HKM prayer team zoom details client-side!");
+                                await this.loadGroupsData();
+                                if (this.activeGroup && this.activeGroup.name === 'HKM prayer team') {
+                                    this.renderGroupHubView(this.container.querySelector('#groups-view-container'));
+                                }
+                            }
+                        }
+                    } catch (err) {
+                        console.warn("Client-side zoom seeder failed:", err);
+                    }
+                }, 1500);
+            }
 
             // Load categories
             const catsSnap = await db.collection('groupCategories').orderBy('name').get();
@@ -1742,6 +1780,18 @@ export class HkmGroupsManager {
                                     <span class="material-symbols-outlined" style="font-size: 18px; color: inherit;">location_on</span>
                                     <span>${this.formatLocation(group.location || '')}</span>
                                 </span>
+                                ${group.zoomMeetingId ? `
+                                    <span style="display: inline-flex; align-items: center; gap: 4px;">
+                                        <span class="material-symbols-outlined" style="font-size: 18px; color: inherit;">key</span>
+                                        <span>ID: ${this.escapeHtml(group.zoomMeetingId)}</span>
+                                    </span>
+                                ` : ''}
+                                ${group.zoomPasscode ? `
+                                    <span style="display: inline-flex; align-items: center; gap: 4px;">
+                                        <span class="material-symbols-outlined" style="font-size: 18px; color: inherit;">lock</span>
+                                        <span>Passord: ${this.escapeHtml(group.zoomPasscode)}</span>
+                                    </span>
+                                ` : ''}
                                 <span style="display: inline-flex; align-items: center; gap: 4px;">
                                     <span class="material-symbols-outlined" style="font-size: 18px; color: inherit;">schedule</span>
                                     <span>${this.escapeHtml(group.meetingSchedule || '')}</span>
@@ -1888,6 +1938,18 @@ export class HkmGroupsManager {
                             <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">${this.t('groups.hubLocation')}</span>
                             <p style="margin: 4px 0 0 0; font-weight: 600;">${this.formatLocation(group.location)}</p>
                         </div>
+                        ${group.zoomMeetingId ? `
+                            <div>
+                                <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">Zoom Meeting ID</span>
+                                <p style="margin: 4px 0 0 0; font-weight: 600;">${this.escapeHtml(group.zoomMeetingId)}</p>
+                            </div>
+                        ` : ''}
+                        ${group.zoomPasscode ? `
+                            <div>
+                                <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">Zoom Passcode</span>
+                                <p style="margin: 4px 0 0 0; font-weight: 600;">${this.escapeHtml(group.zoomPasscode)}</p>
+                            </div>
+                        ` : ''}
                         <div>
                             <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">${this.t('groups.hubJoinPolicy')}</span>
                             <p style="margin: 4px 0 0 0; font-weight: 600;">${group.joinPolicy === 'approval' ? this.t('groups.joinPolicyApproval') : this.t('groups.joinPolicyOpen')}</p>
@@ -2754,6 +2816,8 @@ export class HkmGroupsManager {
             form.querySelector('#group-category-input').value = groupToEdit.category || (this.categories[0] || 'Husfellesskap');
             form.querySelector('#group-schedule-input').value = groupToEdit.meetingSchedule || '';
             form.querySelector('#group-location-input').value = groupToEdit.location || '';
+            form.querySelector('#group-zoom-id-input').value = groupToEdit.zoomMeetingId || '';
+            form.querySelector('#group-zoom-passcode-input').value = groupToEdit.zoomPasscode || '';
             form.querySelector('#group-description-input').value = groupToEdit.description || '';
             form.querySelector('#group-whatsapp-input').value = groupToEdit.whatsappUrl || '';
             form.querySelector('#group-policy-input').value = groupToEdit.joinPolicy || 'open';
@@ -2762,6 +2826,8 @@ export class HkmGroupsManager {
         } else {
             titleEl.textContent = 'Opprett ny gruppe';
             form.querySelector('#group-form-id').value = '';
+            form.querySelector('#group-zoom-id-input').value = '';
+            form.querySelector('#group-zoom-passcode-input').value = '';
             form.querySelector('#group-whatsapp-input').value = '';
             form.querySelector('#group-image-input').value = '';
             if (previewEl) previewEl.src = defaultImg;
@@ -2791,6 +2857,8 @@ export class HkmGroupsManager {
             category: form.querySelector('#group-category-input').value,
             meetingSchedule: form.querySelector('#group-schedule-input').value.trim(),
             location: form.querySelector('#group-location-input').value.trim(),
+            zoomMeetingId: form.querySelector('#group-zoom-id-input').value.trim(),
+            zoomPasscode: form.querySelector('#group-zoom-passcode-input').value.trim(),
             description: form.querySelector('#group-description-input').value.trim(),
             whatsappUrl: form.querySelector('#group-whatsapp-input').value.trim(),
             joinPolicy: form.querySelector('#group-policy-input').value,
