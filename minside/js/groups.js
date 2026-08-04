@@ -78,6 +78,33 @@ export class HkmGroupsManager {
         return this.escapeHtml(trimmed);
     }
 
+    formatNorwegianDate(dateStr) {
+        if (!dateStr) return '';
+        try {
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            const year = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10);
+            const day = parseInt(parts[2], 10);
+            const dateObj = new Date(year, month - 1, day);
+            
+            const months = [
+                'januar', 'februar', 'mars', 'april', 'mai', 'juni',
+                'juli', 'august', 'september', 'oktober', 'november', 'desember'
+            ];
+            const days = [
+                'Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'
+            ];
+            
+            const dayName = days[dateObj.getDay()];
+            const monthName = months[month - 1];
+            return `${dayName} ${day}. ${monthName}`;
+        } catch (e) {
+            return dateStr;
+        }
+    }
+
+
     t(key) {
         const lang = document.documentElement.lang || 'no';
         const localDict = {
@@ -1953,6 +1980,20 @@ export class HkmGroupsManager {
                         </h3>
                         
                         <div style="display: flex; flex-direction: column; gap: 20px;">
+                            <!-- Next Event Container -->
+                            <div id="overview-next-event-container" style="display: flex; align-items: flex-start; gap: 14px; background: linear-gradient(135deg, rgba(209,125,57,0.08) 0%, rgba(209,125,57,0.02) 100%); border: 1px solid rgba(209,125,57,0.15); padding: 16px; border-radius: 14px; margin-bottom: 4px;">
+                                <span class="material-symbols-outlined" style="font-size: 24px; color: var(--admin-orange, #d17d39); margin-top: 2px;">event</span>
+                                <div style="flex: 1;">
+                                    <span style="font-size: 11px; font-weight: 700; opacity: 0.6; text-transform: uppercase; color: var(--admin-orange, #d17d39); letter-spacing: 0.5px;">Neste Samling</span>
+                                    <div id="overview-next-event-content" style="margin-top: 6px; font-weight: 600; font-size: 13.5px; color: var(--text-muted, #64748b);">
+                                        <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
+                                            <span class="material-symbols-outlined" style="font-size: 16px; animation: hkm-spin 1.5s linear infinite; color: var(--admin-orange, #d17d39);">sync</span>
+                                            <span>Søker...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div style="display: flex; align-items: flex-start; gap: 14px;">
                                 <span class="material-symbols-outlined" style="font-size: 22px; color: var(--text-muted, #64748b); margin-top: 2px;">calendar_month</span>
                                 <div>
@@ -2020,6 +2061,64 @@ export class HkmGroupsManager {
                 </div>
             </div>
         `;
+
+        // Fetch next event asynchronously
+        (async () => {
+            try {
+                const db = firebase.firestore();
+                const snap = await db.collection('groupEvents')
+                    .where('groupId', '==', this.selectedGroupId)
+                    .get();
+
+                const todayStr = new Date().toISOString().split('T')[0];
+                const events = [];
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    if (data.date) {
+                        events.push(data);
+                    }
+                });
+
+                const upcoming = events.filter(e => e.date >= todayStr);
+                const contentEl = tabContainer.querySelector('#overview-next-event-content');
+                if (!contentEl) return;
+
+                if (upcoming.length === 0) {
+                    contentEl.innerHTML = `<span style="font-size: 13px; opacity: 0.8;">Ingen planlagte samlinger</span>`;
+                    return;
+                }
+
+                // Sort by date and time
+                upcoming.sort((a, b) => {
+                    const compareDate = a.date.localeCompare(b.date);
+                    if (compareDate !== 0) return compareDate;
+                    return (a.time || '').localeCompare(b.time || '');
+                });
+
+                const nextEvt = upcoming[0];
+                const formattedDate = this.formatNorwegianDate(nextEvt.date);
+                contentEl.innerHTML = `
+                    <div style="font-weight: 700; font-size: 14px; color: var(--text-color, #0f172a); margin-bottom: 2px;">
+                        ${this.escapeHtml(nextEvt.title)}
+                    </div>
+                    <div style="font-size: 13px; color: var(--admin-orange, #d17d39); font-weight: 700;">
+                        ${this.escapeHtml(formattedDate)}${nextEvt.time ? ` kl. ${this.escapeHtml(nextEvt.time)}` : ''}
+                    </div>
+                    ${nextEvt.location ? `
+                        <div style="font-size: 12px; color: var(--text-muted, #64748b); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
+                            <span class="material-symbols-outlined" style="font-size: 15px; opacity: 0.7;">location_on</span>
+                            <span style="display: inline-block;">${this.formatLocation(nextEvt.location)}</span>
+                        </div>
+                    ` : ''}
+                `;
+            } catch (err) {
+                console.error("Error loading next event:", err);
+                const contentEl = tabContainer.querySelector('#overview-next-event-content');
+                if (contentEl) {
+                    contentEl.innerHTML = `<span style="font-size: 13px; color: #ef4444;">Kunne ikke hente samling</span>`;
+                }
+            }
+        })();
     }
 
     async renderHubMembers(tabContainer) {
