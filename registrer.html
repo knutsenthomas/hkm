@@ -159,8 +159,8 @@
         }
 
         .success-box.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
+            display: block !important;
+            animation: fadeIn 0.4s ease forwards;
         }
 
         .share-link-box {
@@ -343,62 +343,77 @@
                         submitBtn.innerHTML = '<span>Registrerer...</span>';
                     }
 
-                    const contactData = {
+                    const payload = {
                         name: name,
                         email: email,
                         phone: phone || '',
-                        role: role || 'HKM Team',
+                        role: role || 'HKM prayer team',
                         notes: notes || '',
-                        source: 'registrer.html',
-                        status: 'Aktiv',
-                        subscribed: true,
-                        createdAt: firebase.firestore.FieldValue ? firebase.firestore.FieldValue.serverTimestamp() : new Date().toISOString(),
-                        updatedAt: new Date().toISOString()
+                        source: 'registrer.html'
                     };
 
+                    let apiSuccess = false;
+
+                    // 1. Send via Cloud Function HTTP endpoint for instant email send
                     try {
-                        if (db) {
-                            await db.collection('contacts').add(contactData);
-                            await db.collection('contactMessages').add({
-                                name: name,
-                                email: email,
-                                phone: phone || '',
-                                subject: `Ny registrering: ${role} (${name})`,
-                                message: `Ny registrering for ${role}.\nNavn: ${name}\nE-post: ${email}\nTelefon: ${phone || 'Ikke oppgitt'}\nFormål/Rolle: ${role}\nNotat: ${notes || 'Ingen melding'}`,
-                                source: 'registrer.html',
-                                pagePath: window.location.pathname,
-                                createdAt: firebase.firestore.FieldValue ? firebase.firestore.FieldValue.serverTimestamp() : new Date().toISOString()
-                            });
+                        const response = await fetch('https://us-central1-hiskingdomministry.cloudfunctions.net/submitRegistrationForm', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        if (response.ok) {
+                            apiSuccess = true;
                         }
+                    } catch (e) {
+                        console.warn('API submission fallback to direct Firestore:', e);
+                    }
+
+                    // 2. Fallback to direct Firestore write if API didn't respond
+                    if (!apiSuccess) {
                         try {
-                            const saved = JSON.parse(localStorage.getItem('hkm_system_contacts') || '[]');
-                            saved.push(contactData);
-                            localStorage.setItem('hkm_system_contacts', JSON.stringify(saved));
-                        } catch (e) {}
-
-                        if (successBox) {
-                            successBox.classList.add('active');
+                            if (db) {
+                                await db.collection('contacts').add({
+                                    ...payload,
+                                    status: 'Aktiv',
+                                    subscribed: true,
+                                    createdAt: firebase.firestore.FieldValue ? firebase.firestore.FieldValue.serverTimestamp() : new Date().toISOString()
+                                });
+                                await db.collection('contactMessages').add({
+                                    name: name,
+                                    email: email,
+                                    phone: phone || '',
+                                    subject: `Ny registrering: ${role} (${name})`,
+                                    message: `Ny registrering for ${role}.\nNavn: ${name}\nE-post: ${email}\nTelefon: ${phone || 'Ikke oppgitt'}\nFormål/Rolle: ${role}\nNotat: ${notes || 'Ingen melding'}`,
+                                    source: 'registrer.html',
+                                    pagePath: window.location.pathname,
+                                    createdAt: firebase.firestore.FieldValue ? firebase.firestore.FieldValue.serverTimestamp() : new Date().toISOString()
+                                });
+                            }
+                        } catch (err) {
+                            console.error('Firestore write error:', err);
                         }
-                        form.reset();
-                        window.scrollTo({ top: 200, behavior: 'smooth' });
+                    }
 
-                    } catch (err) {
-                        console.error('Kunne ikke lagre kontakten i Firestore:', err);
-                        try {
-                            const saved = JSON.parse(localStorage.getItem('hkm_system_contacts') || '[]');
-                            saved.push(contactData);
-                            localStorage.setItem('hkm_system_contacts', JSON.stringify(saved));
-                        } catch (e) {}
+                    // 3. Save local copy backup
+                    try {
+                        const saved = JSON.parse(localStorage.getItem('hkm_system_contacts') || '[]');
+                        saved.push({ ...payload, createdAt: new Date().toISOString() });
+                        localStorage.setItem('hkm_system_contacts', JSON.stringify(saved));
+                    } catch (e) {}
 
-                        if (successBox) {
-                            successBox.classList.add('active');
-                        }
-                        form.reset();
-                    } finally {
-                        if (submitBtn) {
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = '<span>Fullfør registrering</span><span class="material-symbols-outlined">arrow_forward</span>';
-                        }
+                    // 4. Show success box and scroll smoothly
+                    if (successBox) {
+                        successBox.style.display = 'block';
+                        successBox.classList.add('active');
+                        setTimeout(() => {
+                            successBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 100);
+                    }
+                    form.reset();
+
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<span>Fullfør registrering</span><span class="material-symbols-outlined">arrow_forward</span>';
                     }
                 });
             }

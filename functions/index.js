@@ -5960,6 +5960,172 @@ exports.logSystemError = onRequest({ cors: true, invoker: "public", secrets: [em
 });
 
 /**
+ * Public HTTP endpoint for innsending av registrering og umiddelbar e-postutsendelse.
+ */
+exports.submitRegistrationForm = onRequest({ cors: true, invoker: "public", secrets: [emailUserParam, emailPassParam] }, async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    res.status(204).send('');
+    return;
+  }
+
+  try {
+    const { name, email, phone, role, notes, source } = req.body || {};
+    const normalizedEmail = (email || '').trim().toLowerCase();
+    const normalizedName = (name || '').trim() || 'Uten navn';
+    const cleanPhone = (phone || '').trim();
+    const cleanRole = (role || 'HKM prayer team').trim();
+    const cleanNotes = (notes || '').trim();
+    const pageSource = (source || 'registrer.html').trim();
+
+    if (!normalizedEmail) {
+      res.status(400).send({ error: 'Mangler e-postadresse' });
+      return;
+    }
+
+    // 1. Save contact in Firestore
+    const contactRef = await db.collection('contacts').add({
+      name: normalizedName,
+      email: normalizedEmail,
+      phone: cleanPhone,
+      role: cleanRole,
+      notes: cleanNotes,
+      source: pageSource,
+      status: 'Aktiv',
+      subscribed: true,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: new Date().toISOString()
+    });
+
+    // 2. Also log to contactMessages for admin message inbox
+    await db.collection('contactMessages').add({
+      name: normalizedName,
+      email: normalizedEmail,
+      phone: cleanPhone,
+      subject: `Ny registrering: ${cleanRole} (${normalizedName})`,
+      message: `Ny registrering for ${cleanRole}.\nNavn: ${normalizedName}\nE-post: ${normalizedEmail}\nTelefon: ${cleanPhone || 'Ikke oppgitt'}\nFormål/Rolle: ${cleanRole}\nNotat: ${cleanNotes || 'Ingen melding'}`,
+      source: pageSource,
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    // 3. Send HTML email to post@hiskingdomministry.no
+    const adminRecipients = ['post@hiskingdomministry.no', 'thomas@hiskingdomministry.no', 'knutsenthomas@gmail.com'];
+    const adminSubject = `Ny registrering: ${cleanRole} (${normalizedName})`;
+    const adminHtml = `
+      <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #fed7aa; border-radius: 16px; background-color: #ffffff;">
+        <div style="margin-bottom: 16px;">
+          <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #d17d39; background: #fff7ed; padding: 4px 12px; border-radius: 20px; display: inline-block;">
+            His Kingdom Ministry &bull; Systemvarsel
+          </span>
+        </div>
+        <h2 style="font-size: 22px; font-weight: 800; color: #102542; margin-top: 0; margin-bottom: 16px;">
+          Ny registrering mottatt!
+        </h2>
+        <p style="font-size: 14px; color: #334155; margin-bottom: 20px; line-height: 1.5;">
+          En ny registrering har kommet inn via nettsiden og er lagret i systemets kontakter.
+        </p>
+        
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 14px; color: #1e293b;">
+            <tr>
+              <td style="padding: 6px 0; font-weight: 700; width: 140px; color: #64748b;">Fullt navn:</td>
+              <td style="padding: 6px 0; font-weight: 600; color: #0f172a;">${normalizedName}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; font-weight: 700; color: #64748b;">E-postadresse:</td>
+              <td style="padding: 6px 0; font-weight: 600; color: #d17d39;"><a href="mailto:${normalizedEmail}" style="color: #d17d39; text-decoration: none;">${normalizedEmail}</a></td>
+            </tr>
+            ${cleanPhone ? `<tr><td style="padding: 6px 0; font-weight: 700; color: #64748b;">Telefon:</td><td style="padding: 6px 0; color: #0f172a;">${cleanPhone}</td></tr>` : ''}
+            <tr>
+              <td style="padding: 6px 0; font-weight: 700; color: #64748b;">Formål / Rolle:</td>
+              <td style="padding: 6px 0; font-weight: 600; color: #0f172a;">${cleanRole}</td>
+            </tr>
+            ${cleanNotes ? `<tr><td style="padding: 6px 0; font-weight: 700; color: #64748b; vertical-align: top;">Melding:</td><td style="padding: 6px 0; color: #0f172a; white-space: pre-wrap;">${cleanNotes}</td></tr>` : ''}
+            <tr>
+              <td style="padding: 6px 0; font-weight: 700; color: #64748b;">Kilde:</td>
+              <td style="padding: 6px 0; color: #64748b; font-family: monospace;">${pageSource}</td>
+            </tr>
+          </table>
+        </div>
+
+        <div style="text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #f1f5f9;">
+          <a href="https://www.hiskingdomministry.no/admin/admin-kommunikasjon.html" style="display: inline-block; padding: 12px 24px; background: #d17d39; color: #ffffff; text-decoration: none; font-weight: 700; border-radius: 10px; font-size: 14px;">
+            Åpne Kontakter i Admin
+          </a>
+        </div>
+      </div>
+    `;
+
+    try {
+      await sendEmail({
+        to: adminRecipients.join(', '),
+        subject: adminSubject,
+        html: adminHtml,
+        text: `Ny registrering: ${normalizedName} (${normalizedEmail}) - ${cleanRole}`,
+        fromName: 'HKM Registrering',
+        type: 'contact_alert'
+      });
+    } catch (e) {
+      console.warn('Feil ved sending av admin e-post:', e);
+    }
+
+    // 4. Send confirmation email to subscriber
+    const userSubject = `Takk for at du registrerte deg hos His Kingdom Ministry!`;
+    const userHtml = `
+      <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 28px; border: 1px solid #fed7aa; border-radius: 16px; background-color: #ffffff;">
+        <div style="margin-bottom: 20px; text-align: center;">
+          <h1 style="font-size: 24px; font-weight: 800; color: #102542; margin: 0 0 8px 0;">His Kingdom Ministry</h1>
+          <p style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #d17d39; margin: 0;">Bekreftelse på registrering</p>
+        </div>
+
+        <div style="background: #fffaf0; border: 1px solid #feebc8; border-radius: 12px; padding: 20px; margin-bottom: 24px; text-align: center;">
+          <h2 style="font-size: 20px; font-weight: 700; color: #7b341e; margin: 0 0 10px 0;">Velkommen, ${normalizedName}!</h2>
+          <p style="font-size: 15px; color: #4a5568; margin: 0; line-height: 1.6;">
+            Din registrering for <strong>${cleanRole}</strong> er mottatt. Opplysningene dine er trygt lagret i systemet vårt.
+          </p>
+        </div>
+
+        <p style="font-size: 14px; color: #4a5568; line-height: 1.6; margin-bottom: 20px;">
+          Du kan når som helst gå inn via <strong>Min side</strong> på <a href="https://www.hiskingdomministry.no/minside/" style="color: #d17d39; font-weight: 700;">hiskingdomministry.no</a> for å endre opplysningene dine eller administrere dine innstillinger.
+        </p>
+
+        <div style="background: #f7fafc; border: 1px solid #edf2f7; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+          <p style="font-size: 13px; font-weight: 700; color: #2d3748; margin: 0 0 6px 0;">Registrerte detaljer:</p>
+          <p style="font-size: 13px; color: #718096; margin: 0 0 4px 0;"><strong>Navn:</strong> ${normalizedName}</p>
+          <p style="font-size: 13px; color: #718096; margin: 0 0 4px 0;"><strong>E-post:</strong> ${normalizedEmail}</p>
+          ${cleanPhone ? `<p style="font-size: 13px; color: #718096; margin: 0;"><strong>Telefon:</strong> ${cleanPhone}</p>` : ''}
+        </div>
+
+        <div style="text-align: center; padding-top: 16px; border-top: 1px solid #edf2f7; font-size: 12px; color: #a0aec0;">
+          His Kingdom Ministry &bull; <a href="https://www.hiskingdomministry.no" style="color: #d17d39; text-decoration: none;">www.hiskingdomministry.no</a> &bull; post@hiskingdomministry.no
+        </div>
+      </div>
+    `;
+
+    try {
+      await sendEmail({
+        to: normalizedEmail,
+        subject: userSubject,
+        html: userHtml,
+        text: `Takk for at du registrerte deg for ${cleanRole}!`,
+        fromName: 'His Kingdom Ministry',
+        type: 'registration_confirmation'
+      });
+    } catch (e) {
+      console.warn('Feil ved sending av bruker e-post:', e);
+    }
+
+    res.status(200).send({ success: true, id: contactRef.id });
+  } catch (error) {
+    console.error('Feil ved submitRegistrationForm:', error);
+    res.status(500).send({ error: error.message || 'Kunne ikke fullføre registreringen' });
+  }
+});
+
+/**
  * Trigger som sender e-post til post@hiskingdomministry.no ved ny registrering i contacts.
  */
 exports.onContactCreated = onDocumentCreated({
