@@ -46,6 +46,9 @@ export class HkmGroupsManager {
                 .groups-tab-btn:not(.active):hover {
                     background: rgba(15, 23, 42, 0.06) !important;
                 }
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
             </style>
             <div class="groups-module-wrapper">
                 <!-- Top Module Navigation & Actions -->
@@ -122,7 +125,7 @@ export class HkmGroupsManager {
                             <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Beskrivelse</label>
                             <textarea id="group-description-input" rows="3" placeholder="Fortell om hva gruppen gjør..." style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a); font-family: inherit;"></textarea>
                         </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div style="display: grid; grid-template-columns: 1fr; gap: 16px;">
                             <div>
                                 <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Påmeldingstype</label>
                                 <select id="group-policy-input" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a);">
@@ -131,8 +134,30 @@ export class HkmGroupsManager {
                                 </select>
                             </div>
                             <div>
-                                <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Bilde (Valgfri URL)</label>
-                                <input type="url" id="group-image-input" placeholder="https://..." style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a);">
+                                <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Gruppebilde</label>
+                                <div style="display: flex; gap: 16px; align-items: center; background: var(--bg-muted, #f8fafc); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color, #cbd5e1);">
+                                    <div id="group-image-preview-container" style="width: 80px; height: 80px; border-radius: 12px; overflow: hidden; background: #e2e8f0; border: 1px solid var(--border-color, #cbd5e1); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <img id="group-image-preview" src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=150&q=80" style="width: 100%; height: 100%; object-fit: cover;">
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; gap: 8px; flex: 1;">
+                                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                            <button type="button" id="btn-upload-group-image" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 10px; background: #1e293b; color: white; border: none; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s ease;">
+                                                <span class="material-symbols-outlined" style="font-size: 16px;">upload</span>
+                                                <span>Last opp</span>
+                                            </button>
+                                            <button type="button" id="btn-unsplash-group-image" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 10px; background: var(--admin-orange, #d17d39); color: white; border: none; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s ease;">
+                                                <span class="material-symbols-outlined" style="font-size: 16px;">image_search</span>
+                                                <span>Unsplash</span>
+                                            </button>
+                                            <button type="button" id="btn-clear-group-image" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 10px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: none; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s ease;">
+                                                <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
+                                                <span>Fjern</span>
+                                            </button>
+                                        </div>
+                                        <input type="text" id="group-image-input" placeholder="Lim inn bilde-URL her..." style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a); font-size: 12px;">
+                                        <input type="file" id="group-image-file-input" accept="image/*" style="display: none;">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 12px;">
@@ -258,6 +283,35 @@ export class HkmGroupsManager {
                     </form>
                 </div>
             </div>
+
+            <!-- Unsplash Picker Modal -->
+            <div id="group-unsplash-modal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 16px;">
+                <div class="modal-card" style="background: var(--card-bg, #ffffff); border-radius: 20px; width: 100%; max-width: 720px; padding: 28px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); max-height: 85vh; display: flex; flex-direction: column;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 20px; font-weight: 700;">Hent bilde fra Unsplash</h3>
+                            <p style="margin: 4px 0 0 0; font-size: 13px; opacity: 0.7;">Søk etter bilder for å bruke som gruppebilde.</p>
+                        </div>
+                        <button type="button" id="close-unsplash-modal" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: var(--text-color, #64748b);">&times;</button>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 16px;">
+                        <input type="text" id="unsplash-search-input" placeholder="Søk etter bilder (f.eks. fellesskap, bibel, natur)..." style="flex: 1; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a); font-size: 14px;">
+                        <button type="button" id="btn-search-unsplash" style="padding: 10px 18px; border-radius: 10px; background: var(--admin-orange, #d17d39); color: white; border: none; font-weight: 600; cursor: pointer; font-size: 13px;">Søk</button>
+                    </div>
+
+                    <div id="unsplash-loader" style="display: none; text-align: center; padding: 30px 0; color: var(--text-muted, #64748b);">
+                        <div style="display: inline-block; width: 30px; height: 30px; border: 3px solid rgba(0,0,0,0.1); border-top-color: var(--admin-orange, #d17d39); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 8px;"></div>
+                        <div>Søker etter bilder...</div>
+                    </div>
+
+                    <div id="unsplash-results" style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; max-height: 380px; min-height: 200px; padding: 4px;">
+                        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted, #64748b);">
+                            Søk etter bilder over.
+                        </div>
+                    </div>
+                </div>
+            </div>
         `;
 
         this.bindEvents();
@@ -307,6 +361,76 @@ export class HkmGroupsManager {
         this.container.querySelector('#group-form')?.addEventListener('submit', (e) => {
             e.preventDefault();
             this.handleSaveGroup();
+        });
+
+        // Photo upload / selection events
+        const imageInput = this.container.querySelector('#group-image-input');
+        const fileInput = this.container.querySelector('#group-image-file-input');
+        const previewImg = this.container.querySelector('#group-image-preview');
+        const unsplashModal = this.container.querySelector('#group-unsplash-modal');
+
+        this.container.querySelector('#btn-upload-group-image')?.addEventListener('click', () => {
+            fileInput?.click();
+        });
+
+        fileInput?.addEventListener('change', async (e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+
+            // Show temporary loading state
+            if (previewImg) previewImg.style.opacity = '0.5';
+
+            try {
+                const uid = firebase.auth().currentUser?.uid || 'anonymous';
+                const tempId = firebase.firestore().collection('groups').doc().id;
+                const storageRef = firebase.storage().ref(`groups/temp-${uid}-${tempId}`);
+                await storageRef.put(file);
+                const downloadUrl = await storageRef.getDownloadURL();
+
+                if (imageInput) imageInput.value = downloadUrl;
+                if (previewImg) {
+                    previewImg.src = downloadUrl;
+                    previewImg.style.opacity = '1';
+                }
+            } catch (err) {
+                console.error("Failed to upload image:", err);
+                alert("Kunne ikke laste opp bilde: " + err.message);
+                if (previewImg) previewImg.style.opacity = '1';
+            }
+        });
+
+        this.container.querySelector('#btn-unsplash-group-image')?.addEventListener('click', () => {
+            if (unsplashModal) {
+                unsplashModal.style.display = 'flex';
+                this.container.querySelector('#unsplash-search-input')?.focus();
+            }
+        });
+
+        this.container.querySelector('#close-unsplash-modal')?.addEventListener('click', () => {
+            if (unsplashModal) unsplashModal.style.display = 'none';
+        });
+
+        this.container.querySelector('#btn-search-unsplash')?.addEventListener('click', () => {
+            this.handleUnsplashSearch();
+        });
+
+        this.container.querySelector('#unsplash-search-input')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.handleUnsplashSearch();
+            }
+        });
+
+        this.container.querySelector('#btn-clear-group-image')?.addEventListener('click', () => {
+            const defaultImg = 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=150&q=80';
+            if (imageInput) imageInput.value = '';
+            if (previewImg) previewImg.src = defaultImg;
+        });
+
+        imageInput?.addEventListener('input', () => {
+            if (previewImg) {
+                previewImg.src = imageInput.value.trim() || 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=150&q=80';
+            }
         });
 
         // Duplicate modal cancel
@@ -898,6 +1022,131 @@ export class HkmGroupsManager {
         }
     }
 
+    async handleUnsplashSearch() {
+        const queryInput = this.container.querySelector('#unsplash-search-input');
+        const resultsContainer = this.container.querySelector('#unsplash-results');
+        const loader = this.container.querySelector('#unsplash-loader');
+
+        const query = queryInput ? queryInput.value.trim() : '';
+        if (!query) return;
+
+        if (loader) loader.style.display = 'block';
+        if (resultsContainer) resultsContainer.style.display = 'none';
+
+        try {
+            // Translate search term to English using Google Translate API for better Unsplash results
+            let searchQuery = query;
+            try {
+                const translateUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=no&tl=en&dt=t&q=${encodeURIComponent(query)}`;
+                const translateRes = await fetch(translateUrl);
+                if (translateRes.ok) {
+                    const translateData = await translateRes.json();
+                    if (translateData && translateData[0]) {
+                        const translatedText = translateData[0].map(s => s[0]).filter(Boolean).join('');
+                        if (translatedText && translatedText.trim()) {
+                            searchQuery = translatedText.trim();
+                        }
+                    }
+                }
+            } catch (transErr) {
+                console.warn('[Unsplash] Translation error:', transErr);
+            }
+
+            const accessKey = 'W5CRu1Mp-4eJ7FV2PIdjVWPfHdkZV00F4I9fjIOEr60';
+            const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(searchQuery)}&per_page=20&client_id=${accessKey}`;
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error('Kunne ikke hente bilder fra Unsplash.');
+            }
+
+            const data = await response.json();
+            this.renderUnsplashResults(data.results);
+        } catch (err) {
+            console.error("Unsplash search error:", err);
+            if (resultsContainer) {
+                resultsContainer.innerHTML = `<div style="grid-column: 1/-1; color: #ef4444; text-align: center; padding: 20px;">Feil: ${err.message}</div>`;
+                resultsContainer.style.display = 'grid';
+            }
+        } finally {
+            if (loader) loader.style.display = 'none';
+        }
+    }
+
+    renderUnsplashResults(images) {
+        const resultsContainer = this.container.querySelector('#unsplash-results');
+        if (!resultsContainer) return;
+
+        resultsContainer.innerHTML = '';
+        resultsContainer.style.display = 'grid';
+
+        if (!images || images.length === 0) {
+            resultsContainer.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted, #64748b);">Ingen bilder funnet.</div>';
+            return;
+        }
+
+        images.forEach(img => {
+            const item = document.createElement('div');
+            item.style.cssText = `
+                position: relative;
+                aspect-ratio: 1.5;
+                border-radius: 12px;
+                overflow: hidden;
+                cursor: pointer;
+                background: #f1f5f9;
+                border: 1px solid var(--border-color, #e2e8f0);
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+            `;
+
+            item.innerHTML = `
+                <img src="${img.urls.small}" style="width: 100%; height: 100%; object-fit: cover;">
+                <div class="hover-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.4); opacity: 0; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; color: white;">
+                    <span class="material-symbols-outlined" style="font-size: 28px;">check_circle</span>
+                </div>
+                <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 4px 8px; background: rgba(0,0,0,0.6); color: white; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    av ${img.user.name}
+                </div>
+            `;
+
+            item.addEventListener('mouseenter', () => {
+                item.style.transform = 'scale(1.03)';
+                item.style.boxShadow = '0 6px 16px rgba(0,0,0,0.15)';
+                item.querySelector('.hover-overlay').style.opacity = '1';
+            });
+
+            item.addEventListener('mouseleave', () => {
+                item.style.transform = 'scale(1)';
+                item.style.boxShadow = 'none';
+                item.querySelector('.hover-overlay').style.opacity = '0';
+            });
+
+            item.addEventListener('click', () => {
+                this.selectUnsplashImage(img.urls.regular, img.links.download_location);
+            });
+
+            resultsContainer.appendChild(item);
+        });
+    }
+
+    async selectUnsplashImage(imageUrl, downloadLocation) {
+        const imageInput = this.container.querySelector('#group-image-input');
+        const previewImg = this.container.querySelector('#group-image-preview');
+        const unsplashModal = this.container.querySelector('#group-unsplash-modal');
+
+        if (imageInput) imageInput.value = imageUrl;
+        if (previewImg) previewImg.src = imageUrl;
+
+        if (unsplashModal) unsplashModal.style.display = 'none';
+
+        // Trigger download tracking as required by Unsplash API terms
+        try {
+            const accessKey = 'W5CRu1Mp-4eJ7FV2PIdjVWPfHdkZV00F4I9fjIOEr60';
+            await fetch(`${downloadLocation}?client_id=${accessKey}`);
+        } catch (e) {
+            console.warn('[Unsplash] Download tracking failed:', e);
+        }
+    }
+
     async handleDeleteCategory(catName) {
         if (this.app && typeof this.app.showCustomConfirm === 'function') {
             this.app.showCustomConfirm({
@@ -1307,6 +1556,8 @@ export class HkmGroupsManager {
         }
 
         form.reset();
+        const previewEl = form.querySelector('#group-image-preview');
+        const defaultImg = 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=150&q=80';
         if (groupToEdit) {
             titleEl.textContent = 'Rediger gruppe';
             form.querySelector('#group-form-id').value = groupToEdit.id;
@@ -1317,9 +1568,12 @@ export class HkmGroupsManager {
             form.querySelector('#group-description-input').value = groupToEdit.description || '';
             form.querySelector('#group-policy-input').value = groupToEdit.joinPolicy || 'open';
             form.querySelector('#group-image-input').value = groupToEdit.imageUrl || '';
+            if (previewEl) previewEl.src = groupToEdit.imageUrl || defaultImg;
         } else {
             titleEl.textContent = 'Opprett ny gruppe';
             form.querySelector('#group-form-id').value = '';
+            form.querySelector('#group-image-input').value = '';
+            if (previewEl) previewEl.src = defaultImg;
         }
 
         modal.style.display = 'flex';
