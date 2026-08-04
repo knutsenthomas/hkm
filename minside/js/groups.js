@@ -168,6 +168,76 @@ export class HkmGroupsManager {
         return `${dayName} ${dayNum}. ${monthName} ${year}`;
     }
 
+    renderMarkdown(text) {
+        if (!text) return '';
+        let html = this.escapeHtml(text);
+
+        // 1. Convert headers: ### Title, ## Title, # Title
+        html = html.replace(/^### (.*?)$/gm, '<h5 style="margin: 12px 0 6px 0; font-size: 14.5px; font-weight: 700; color: var(--text-color, #0f172a);">$1</h5>');
+        html = html.replace(/^## (.*?)$/gm, '<h4 style="margin: 16px 0 8px 0; font-size: 16px; font-weight: 700; color: var(--text-color, #0f172a); border-bottom: 1px solid var(--border-color, #f1f5f9); padding-bottom: 4px;">$1</h4>');
+        html = html.replace(/^# (.*?)$/gm, '<h3 style="margin: 20px 0 10px 0; font-size: 18px; font-weight: 800; color: var(--text-color, #0f172a);">$1</h3>');
+
+        // 2. Convert bold: **text**
+        html = html.replace(/\*\*(.*?)\*\*/g, '<strong style="font-weight: 700; color: var(--text-color, #0f172a);">$1</strong>');
+        // Convert italic: *text*
+        html = html.replace(/\*(.*?)\*/g, '<em style="font-style: italic;">$1</em>');
+
+        // 3. Convert links: [label](url)
+        html = html.replace(/\[(.*?)\]\((.*?)\)/g, (match, label, url) => {
+            const cleanUrl = url.replace(/&amp;/g, '&');
+            return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" style="color: var(--admin-orange, #d17d39); text-decoration: underline; font-weight: 600;">${label}</a>`;
+        });
+
+        // 4. Convert lists (unordered)
+        let inList = false;
+        const lines = html.split('\n');
+        const processedLines = lines.map(line => {
+            const listMatch = /^[\s]*[-*][\s]+(.*)$/.exec(line);
+            if (listMatch) {
+                let prefix = '';
+                if (!inList) {
+                    inList = true;
+                    prefix = '<ul style="margin: 8px 0; padding-left: 20px; list-style-type: disc; display: flex; flex-direction: column; gap: 4px;">';
+                }
+                return prefix + `<li style="line-height: 1.6; font-size: 15px; color: var(--text-color, #334155);">${listMatch[1]}</li>`;
+            } else {
+                let suffix = '';
+                if (inList) {
+                    inList = false;
+                    suffix = '</ul>';
+                }
+                return suffix + line;
+            }
+        });
+        if (inList) {
+            processedLines[processedLines.length - 1] += '</ul>';
+        }
+        html = processedLines.join('\n');
+
+        // 5. Convert double newlines to paragraphs and single newlines to br
+        html = html.replace(/\n/g, '<br>');
+        
+        // Remove duplicate <br> after block tags
+        html = html.replace(/<\/h[345]><br>/g, (m) => m.substring(0, m.length - 4));
+        html = html.replace(/<\/ul><br>/g, (m) => m.substring(0, m.length - 4));
+        html = html.replace(/<li(.*?)><br>/g, '<li$1>');
+        html = html.replace(/<\/li><br>/g, '</li>');
+
+        return html;
+    }
+
+    stripMarkdown(text) {
+        if (!text) return '';
+        let clean = text;
+        clean = clean.replace(/^#+\s+/gm, '');
+        clean = clean.replace(/\*\*([^*]+)\*\*/g, '$1');
+        clean = clean.replace(/\*([^*]+)\*/g, '$1');
+        clean = clean.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+        clean = clean.replace(/^[\s]*[-*][\s]+/gm, '');
+        return clean;
+    }
+
+
 
 
     t(key) {
@@ -581,7 +651,7 @@ export class HkmGroupsManager {
                         </div>
                         <div>
                             <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Beskrivelse</label>
-                            <textarea id="group-description-input" rows="3" placeholder="Fortell om hva gruppen gjør..." style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a); font-family: inherit;"></textarea>
+                            <textarea id="group-description-input" rows="4" placeholder="Fortell om hva gruppen gjør... Du kan bruke rik formatering (f.eks. **fet skrift**, - punkter, og [lenke](url))." style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a); font-family: inherit; font-size: 13px; line-height: 1.5;"></textarea>
                         </div>
                         <div>
                             <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">WhatsApp Gruppelenke (valgfri)</label>
@@ -1365,7 +1435,7 @@ export class HkmGroupsManager {
                 <div style="padding: 20px; flex: 1; display: flex; flex-direction: column;">
                     <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 700;">${this.escapeHtml(group.name)}</h3>
                     <p style="font-size: 13px; line-height: 1.5; opacity: 0.8; margin: 0 0 16px 0; flex: 1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                        ${this.escapeHtml(group.description || '')}
+                        ${this.escapeHtml(this.stripMarkdown(group.description || ''))}
                     </p>
 
                     <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px; opacity: 0.9; margin-bottom: 20px;">
@@ -2010,9 +2080,9 @@ export class HkmGroupsManager {
                                 <span class="material-symbols-outlined" style="color: var(--admin-orange, #d17d39); font-size: 22px;">description</span>
                                 <span>${this.t('groups.hubOverviewTitle')}</span>
                             </h3>
-                            <p style="line-height: 1.7; opacity: 0.95; font-size: 15.5px; margin: 0; white-space: pre-line; color: var(--text-color, #334155);">
-                                ${this.escapeHtml(group.description || this.t('groups.noDesc'))}
-                            </p>
+                            <div style="line-height: 1.7; opacity: 0.95; font-size: 15.5px; margin: 0; color: var(--text-color, #334155);">
+                                ${group.description ? this.renderMarkdown(group.description) : this.escapeHtml(this.t('groups.noDesc'))}
+                            </div>
                         </div>
 
                         <!-- WhatsApp Widget -->
