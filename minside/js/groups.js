@@ -57,6 +57,10 @@ export class HkmGroupsManager {
     formatLocation(location) {
         if (!location) return '';
         const trimmed = location.trim();
+        const lower = trimmed.toLowerCase();
+        if (lower === 'zoom lenke' || lower === 'zoom-lenke' || lower === 'zoom lenke.' || lower === 'zoom-lenke.') {
+            return '';
+        }
         if (/^https?:\/\//i.test(trimmed)) {
             let label = 'Nettlenke';
             if (trimmed.toLowerCase().includes('zoom.us')) {
@@ -2420,11 +2424,14 @@ export class HkmGroupsManager {
                         <div style="font-size: 13.5px; color: var(--text-color, #334155); font-weight: 600;">
                             ${this.escapeHtml(formattedDate)}${nextEvt.time ? `${timePrefix}${this.escapeHtml(nextEvt.time)}` : ''}
                         </div>
-                        ${nextEvt.location ? `
-                            <div class="next-event-location-wrapper" style="margin-top: 8px;">
-                                ${this.formatLocation(nextEvt.location)}
-                            </div>
-                        ` : ''}
+                        ${(() => {
+                            const loc = this.formatLocation(nextEvt.location || '');
+                            return loc ? `
+                                <div class="next-event-location-wrapper" style="margin-top: 8px;">
+                                    ${loc}
+                                </div>
+                            ` : '';
+                        })()}
                     </div>
                 `;
             } catch (err) {
@@ -3021,7 +3028,10 @@ export class HkmGroupsManager {
                         <div>
                             <span style="font-size: 12px; font-weight: 700; color: var(--admin-orange, #d17d39); text-transform: uppercase;">${this.escapeHtml(evt.date)} kl. ${this.escapeHtml(evt.time)}</span>
                             <h4 style="margin: 4px 0; font-size: 16px; font-weight: 700;">${this.escapeHtml(evt.title)}</h4>
-                            <p style="margin: 0; font-size: 13px; opacity: 0.8;">📍 ${this.formatLocation(evt.location || this.activeGroup.location || '')}</p>
+                            ${(() => {
+                                const loc = this.formatLocation(evt.location || this.activeGroup.location || '');
+                                return loc ? `<p style="margin: 0; font-size: 13px; opacity: 0.8;">📍 ${loc}</p>` : '';
+                            })()}
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                             <button type="button" class="btn-rsvp" data-evt-id="${evt.id}" data-status="yes" style="padding: 8px 14px; border-radius: 10px; background: #ecfdf5; color: #166534; border: 1px solid #bbf7d0; font-weight: 600; font-size: 13px; cursor: pointer;">
