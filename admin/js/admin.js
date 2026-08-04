@@ -5291,7 +5291,7 @@ class AdminManager {
                         Her har du en fullstendig oversikt over HKM Studio. Se sanntidsdata, administrer innhold og svar på meldinger fra én sentral flate.
                     </p>
                     <div class="hero-actions-container" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; align-items: center !important; justify-content: flex-start !important;">
-                        <button type="button" class="overview-hero-action" title="Send e-post" aria-label="Send e-post" onclick="if(window.crm && window.crm.openSendEmailModal){window.crm.openSendEmailModal()}else if(window.openSendEmailModal){window.openSendEmailModal()}else{window.location.href='/admin/admin-meldinger.html#compose'}">
+                        <button type="button" class="overview-hero-action" title="Gå til kontakter" aria-label="Gå til kontakter" onclick="window.location.href='/admin/admin-kommunikasjon.html'">
                             <span class="material-symbols-outlined">send</span>
                         </button>
                         <button type="button" class="overview-hero-action-secondary" title="Gå til meldinger" aria-label="Gå til meldinger" onclick="window.location.href='/admin/admin-meldinger.html'">
