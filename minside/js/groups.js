@@ -1883,6 +1883,22 @@ export class HkmGroupsManager {
         this.renderHubTabBody(container.querySelector('#hub-tab-body'));
     }
 
+    renderHubTabBody(tabContainer) {
+        if (!tabContainer || !this.activeGroup) return;
+
+        if (this.selectedGroupTab === 'overview') {
+            this.renderHubOverview(tabContainer);
+        } else if (this.selectedGroupTab === 'members') {
+            this.renderHubMembers(tabContainer);
+        } else if (this.selectedGroupTab === 'chat') {
+            this.renderHubChat(tabContainer);
+        } else if (this.selectedGroupTab === 'events') {
+            this.renderHubEvents(tabContainer);
+        } else if (this.selectedGroupTab === 'resources') {
+            this.renderHubResources(tabContainer);
+        }
+    }
+
     renderHubOverview(tabContainer) {
         const group = this.activeGroup;
         tabContainer.innerHTML = `
