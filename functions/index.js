@@ -6015,46 +6015,67 @@ exports.submitRegistrationForm = onRequest({ cors: true, invoker: "public", secr
     const adminRecipients = ['post@hiskingdomministry.no', 'thomas@hiskingdomministry.no', 'knutsenthomas@gmail.com'];
     const adminSubject = `Ny registrering: ${cleanRole} (${normalizedName})`;
     const adminHtml = `
-      <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #fed7aa; border-radius: 16px; background-color: #ffffff;">
-        <div style="margin-bottom: 16px;">
-          <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #d17d39; background: #fff7ed; padding: 4px 12px; border-radius: 20px; display: inline-block;">
-            His Kingdom Ministry &bull; Systemvarsel
-          </span>
-        </div>
-        <h2 style="font-size: 22px; font-weight: 800; color: #102542; margin-top: 0; margin-bottom: 16px;">
-          Ny registrering mottatt!
-        </h2>
-        <p style="font-size: 14px; color: #334155; margin-bottom: 20px; line-height: 1.5;">
-          En ny registrering har kommet inn via nettsiden og er lagret i systemets kontakter.
-        </p>
-        
-        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-          <table style="width: 100%; border-collapse: collapse; font-size: 14px; color: #1e293b;">
-            <tr>
-              <td style="padding: 6px 0; font-weight: 700; width: 140px; color: #64748b;">Fullt navn:</td>
-              <td style="padding: 6px 0; font-weight: 600; color: #0f172a;">${normalizedName}</td>
-            </tr>
-            <tr>
-              <td style="padding: 6px 0; font-weight: 700; color: #64748b;">E-postadresse:</td>
-              <td style="padding: 6px 0; font-weight: 600; color: #d17d39;"><a href="mailto:${normalizedEmail}" style="color: #d17d39; text-decoration: none;">${normalizedEmail}</a></td>
-            </tr>
-            ${cleanPhone ? `<tr><td style="padding: 6px 0; font-weight: 700; color: #64748b;">Telefon:</td><td style="padding: 6px 0; color: #0f172a;">${cleanPhone}</td></tr>` : ''}
-            <tr>
-              <td style="padding: 6px 0; font-weight: 700; color: #64748b;">Formål / Rolle:</td>
-              <td style="padding: 6px 0; font-weight: 600; color: #0f172a;">${cleanRole}</td>
-            </tr>
-            ${cleanNotes ? `<tr><td style="padding: 6px 0; font-weight: 700; color: #64748b; vertical-align: top;">Melding:</td><td style="padding: 6px 0; color: #0f172a; white-space: pre-wrap;">${cleanNotes}</td></tr>` : ''}
-            <tr>
-              <td style="padding: 6px 0; font-weight: 700; color: #64748b;">Kilde:</td>
-              <td style="padding: 6px 0; color: #64748b; font-family: monospace;">${pageSource}</td>
-            </tr>
-          </table>
+      <div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, Arial, sans-serif; max-width: 580px; margin: 0 auto; background-color: #fcf9f5; border-radius: 20px; overflow: hidden; border: 1px solid #eae4dc; box-shadow: 0 10px 30px rgba(0,0,0,0.04);">
+        <div style="height: 6px; background: linear-gradient(90deg, #102542 0%, #d17d39 100%);"></div>
+        <div style="padding: 32px 32px 24px 32px;">
+          <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" alt="His Kingdom Ministry" width="56" style="display: block; width: 56px; height: auto; margin-bottom: 20px;" />
+          
+          <div style="display: inline-block; padding: 4px 10px; background-color: rgba(209, 125, 57, 0.1); color: #d17d39; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; border-radius: 6px; margin-bottom: 12px;">
+            SYSTEMVARSEL &bull; NY REGISTRERING
+          </div>
+
+          <h2 style="font-family: Georgia, serif; font-size: 26px; line-height: 1.3; font-weight: 700; color: #102542; margin: 0 0 10px 0;">
+            Ny registrering mottatt
+          </h2>
+          <p style="font-size: 15px; line-height: 1.6; color: #526078; margin: 0 0 24px 0;">
+            En ny registrering har kommet inn via nettsiden og er lagret i systemets kontakter.
+          </p>
+
+          <div style="background: #ffffff; border: 1px solid #eae4dc; border-radius: 14px; padding: 22px 24px; margin-bottom: 24px;">
+            <div style="margin-bottom: 16px;">
+              <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: #8c7b75; margin-bottom: 4px;">Fullt navn</div>
+              <div style="font-size: 16px; font-weight: 700; color: #102542;">${normalizedName}</div>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+              <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: #8c7b75; margin-bottom: 4px;">E-postadresse</div>
+              <div style="font-size: 15px; font-weight: 600; color: #d17d39; word-break: break-all;">
+                <a href="mailto:${normalizedEmail}" style="color: #d17d39; text-decoration: none;">${normalizedEmail}</a>
+              </div>
+            </div>
+
+            ${cleanPhone ? `
+            <div style="margin-bottom: 16px;">
+              <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: #8c7b75; margin-bottom: 4px;">Telefonnummer</div>
+              <div style="font-size: 15px; font-weight: 600; color: #102542;">${cleanPhone}</div>
+            </div>` : ''}
+
+            <div style="margin-bottom: 16px;">
+              <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: #8c7b75; margin-bottom: 4px;">Formål / Rolle</div>
+              <div style="font-size: 15px; font-weight: 700; color: #102542;">${cleanRole}</div>
+            </div>
+
+            ${cleanNotes ? `
+            <div style="margin-bottom: 16px;">
+              <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: #8c7b75; margin-bottom: 4px;">Melding / Kommentar</div>
+              <div style="font-size: 14px; line-height: 1.6; color: #334155; white-space: pre-wrap;">${cleanNotes}</div>
+            </div>` : ''}
+
+            <div>
+              <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: #8c7b75; margin-bottom: 4px;">Registrert via</div>
+              <div style="font-size: 13px; color: #64748b; font-family: monospace;">${pageSource}</div>
+            </div>
+          </div>
+
+          <div style="text-align: center; margin-bottom: 12px;">
+            <a href="https://www.hiskingdomministry.no/admin/admin-kommunikasjon.html" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 14px 32px; border-radius: 12px; font-size: 13px; font-weight: 700; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.15em; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.25);">
+              Åpne Kontakter i Admin
+            </a>
+          </div>
         </div>
 
-        <div style="text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #f1f5f9;">
-          <a href="https://www.hiskingdomministry.no/admin/admin-kommunikasjon.html" style="display: inline-block; padding: 12px 24px; background: #d17d39; color: #ffffff; text-decoration: none; font-weight: 700; border-radius: 10px; font-size: 14px;">
-            Åpne Kontakter i Admin
-          </a>
+        <div style="padding: 20px 32px; text-align: center; border-top: 1px solid #eae4dc; background: #faf6f0; font-size: 11px; color: #8c7b75; text-transform: uppercase; letter-spacing: 0.1em;">
+          &copy; 2026 His Kingdom Ministry &bull; <a href="https://www.hiskingdomministry.no" style="color: #d17d39; text-decoration: none;">www.hiskingdomministry.no</a>
         </div>
       </div>
     `;
@@ -6075,31 +6096,55 @@ exports.submitRegistrationForm = onRequest({ cors: true, invoker: "public", secr
     // 4. Send confirmation email to subscriber
     const userSubject = `Takk for at du registrerte deg hos His Kingdom Ministry!`;
     const userHtml = `
-      <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 28px; border: 1px solid #fed7aa; border-radius: 16px; background-color: #ffffff;">
-        <div style="margin-bottom: 20px; text-align: center;">
-          <h1 style="font-size: 24px; font-weight: 800; color: #102542; margin: 0 0 8px 0;">His Kingdom Ministry</h1>
-          <p style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #d17d39; margin: 0;">Bekreftelse på registrering</p>
-        </div>
+      <div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, Arial, sans-serif; max-width: 580px; margin: 0 auto; background-color: #fcf9f5; border-radius: 20px; overflow: hidden; border: 1px solid #eae4dc; box-shadow: 0 10px 30px rgba(0,0,0,0.04);">
+        <div style="height: 6px; background: linear-gradient(90deg, #102542 0%, #d17d39 100%);"></div>
+        <div style="padding: 36px 34px 28px 34px;">
+          <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" alt="His Kingdom Ministry" width="56" style="display: block; width: 56px; height: auto; margin-bottom: 24px;" />
+          
+          <div style="display: inline-block; padding: 4px 10px; background-color: rgba(209, 125, 57, 0.1); color: #d17d39; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; border-radius: 6px; margin-bottom: 14px;">
+            BEKREFTELSE PÅ REGISTRERING
+          </div>
 
-        <div style="background: #fffaf0; border: 1px solid #feebc8; border-radius: 12px; padding: 20px; margin-bottom: 24px; text-align: center;">
-          <h2 style="font-size: 20px; font-weight: 700; color: #7b341e; margin: 0 0 10px 0;">Velkommen, ${normalizedName}!</h2>
-          <p style="font-size: 15px; color: #4a5568; margin: 0; line-height: 1.6;">
-            Din registrering for <strong>${cleanRole}</strong> er mottatt. Opplysningene dine er trygt lagret i systemet vårt.
+          <h1 style="font-family: Georgia, serif; font-size: 28px; line-height: 1.25; font-weight: 700; color: #102542; margin: 0 0 14px 0;">
+            Velkommen, ${normalizedName}!
+          </h1>
+          
+          <p style="font-size: 16px; line-height: 1.7; color: #526078; margin: 0 0 24px 0;">
+            Takk for din registrering for <strong>${cleanRole}</strong>. Opplysningene dine er trygt lagret i systemet vårt.
           </p>
+
+          <div style="background: #ffffff; border: 1px solid #eae4dc; border-radius: 14px; padding: 22px 24px; margin-bottom: 24px;">
+            <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: #8c7b75; margin-bottom: 12px; border-bottom: 1px solid #f3ece4; padding-bottom: 8px;">
+              Registrerte detaljer
+            </div>
+            
+            <div style="margin-bottom: 10px;">
+              <span style="font-size: 13px; color: #8c7b75;">Navn:</span>
+              <strong style="font-size: 14px; color: #102542; margin-left: 6px;">${normalizedName}</strong>
+            </div>
+            <div style="margin-bottom: 10px;">
+              <span style="font-size: 13px; color: #8c7b75;">E-post:</span>
+              <strong style="font-size: 14px; color: #d17d39; margin-left: 6px;">${normalizedEmail}</strong>
+            </div>
+            ${cleanPhone ? `
+            <div>
+              <span style="font-size: 13px; color: #8c7b75;">Telefon:</span>
+              <strong style="font-size: 14px; color: #102542; margin-left: 6px;">${cleanPhone}</strong>
+            </div>` : ''}
+          </div>
+
+          <p style="font-size: 14px; line-height: 1.6; color: #526078; margin-bottom: 24px;">
+            Du kan når som helst gå inn på <strong>Min side</strong> på <a href="https://www.hiskingdomministry.no/minside/" style="color: #d17d39; font-weight: 700; text-decoration: underline;">hiskingdomministry.no</a> for å administrere innstillingene dine.
+          </p>
+
+          <div style="text-align: center; margin-bottom: 12px;">
+            <a href="https://www.hiskingdomministry.no/minside/" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 14px 36px; border-radius: 12px; font-size: 12px; font-weight: 700; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.18em; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.25);">
+              Gå til Min side
+            </a>
+          </div>
         </div>
 
-        <p style="font-size: 14px; color: #4a5568; line-height: 1.6; margin-bottom: 20px;">
-          Du kan når som helst gå inn via <strong>Min side</strong> på <a href="https://www.hiskingdomministry.no/minside/" style="color: #d17d39; font-weight: 700;">hiskingdomministry.no</a> for å endre opplysningene dine eller administrere dine innstillinger.
-        </p>
-
-        <div style="background: #f7fafc; border: 1px solid #edf2f7; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
-          <p style="font-size: 13px; font-weight: 700; color: #2d3748; margin: 0 0 6px 0;">Registrerte detaljer:</p>
-          <p style="font-size: 13px; color: #718096; margin: 0 0 4px 0;"><strong>Navn:</strong> ${normalizedName}</p>
-          <p style="font-size: 13px; color: #718096; margin: 0 0 4px 0;"><strong>E-post:</strong> ${normalizedEmail}</p>
-          ${cleanPhone ? `<p style="font-size: 13px; color: #718096; margin: 0;"><strong>Telefon:</strong> ${cleanPhone}</p>` : ''}
-        </div>
-
-        <div style="text-align: center; padding-top: 16px; border-top: 1px solid #edf2f7; font-size: 12px; color: #a0aec0;">
+        <div style="padding: 20px 34px; text-align: center; border-top: 1px solid #eae4dc; background: #faf6f0; font-size: 11px; color: #8c7b75; text-transform: uppercase; letter-spacing: 0.1em;">
           His Kingdom Ministry &bull; <a href="https://www.hiskingdomministry.no" style="color: #d17d39; text-decoration: none;">www.hiskingdomministry.no</a> &bull; post@hiskingdomministry.no
         </div>
       </div>
@@ -6147,46 +6192,67 @@ exports.onContactCreated = onDocumentCreated({
   const recipients = ["post@hiskingdomministry.no", "thomas@hiskingdomministry.no", "knutsenthomas@gmail.com"];
   const adminSubject = `Ny registrering: ${role} (${name})`;
   const adminHtml = `
-    <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #fed7aa; border-radius: 16px; background-color: #ffffff;">
-      <div style="margin-bottom: 16px;">
-        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #d17d39; background: #fff7ed; padding: 4px 12px; border-radius: 20px; display: inline-block;">
-          His Kingdom Ministry &bull; Systemvarsel
-        </span>
-      </div>
-      <h2 style="font-size: 22px; font-weight: 800; color: #102542; margin-top: 0; margin-bottom: 16px;">
-        Ny registrering mottatt!
-      </h2>
-      <p style="font-size: 14px; color: #334155; margin-bottom: 20px; line-height: 1.5;">
-        En ny registrering har kommet inn via nettsiden og er lagret i systemets kontakter.
-      </p>
-      
-      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-        <table style="width: 100%; border-collapse: collapse; font-size: 14px; color: #1e293b;">
-          <tr>
-            <td style="padding: 6px 0; font-weight: 700; width: 140px; color: #64748b;">Fullt navn:</td>
-            <td style="padding: 6px 0; font-weight: 600; color: #0f172a;">${name}</td>
-          </tr>
-          <tr>
-            <td style="padding: 6px 0; font-weight: 700; color: #64748b;">E-postadresse:</td>
-            <td style="padding: 6px 0; font-weight: 600; color: #d17d39;"><a href="mailto:${email}" style="color: #d17d39; text-decoration: none;">${email}</a></td>
-          </tr>
-          ${phone ? `<tr><td style="padding: 6px 0; font-weight: 700; color: #64748b;">Telefon:</td><td style="padding: 6px 0; color: #0f172a;">${phone}</td></tr>` : ''}
-          <tr>
-            <td style="padding: 6px 0; font-weight: 700; color: #64748b;">Formål / Rolle:</td>
-            <td style="padding: 6px 0; font-weight: 600; color: #0f172a;">${role}</td>
-          </tr>
-          ${notes ? `<tr><td style="padding: 6px 0; font-weight: 700; color: #64748b; vertical-align: top;">Melding:</td><td style="padding: 6px 0; color: #0f172a; white-space: pre-wrap;">${notes}</td></tr>` : ''}
-          <tr>
-            <td style="padding: 6px 0; font-weight: 700; color: #64748b;">Kilde / Registrert via:</td>
-            <td style="padding: 6px 0; color: #64748b; font-family: monospace;">${source}</td>
-          </tr>
-        </table>
+    <div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, Arial, sans-serif; max-width: 580px; margin: 0 auto; background-color: #fcf9f5; border-radius: 20px; overflow: hidden; border: 1px solid #eae4dc; box-shadow: 0 10px 30px rgba(0,0,0,0.04);">
+      <div style="height: 6px; background: linear-gradient(90deg, #102542 0%, #d17d39 100%);"></div>
+      <div style="padding: 32px 32px 24px 32px;">
+        <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" alt="His Kingdom Ministry" width="56" style="display: block; width: 56px; height: auto; margin-bottom: 20px;" />
+        
+        <div style="display: inline-block; padding: 4px 10px; background-color: rgba(209, 125, 57, 0.1); color: #d17d39; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; border-radius: 6px; margin-bottom: 12px;">
+          SYSTEMVARSEL &bull; NY REGISTRERING
+        </div>
+
+        <h2 style="font-family: Georgia, serif; font-size: 26px; line-height: 1.3; font-weight: 700; color: #102542; margin: 0 0 10px 0;">
+          Ny registrering mottatt
+        </h2>
+        <p style="font-size: 15px; line-height: 1.6; color: #526078; margin: 0 0 24px 0;">
+          En ny registrering har kommet inn via nettsiden og er lagret i systemets kontakter.
+        </p>
+
+        <div style="background: #ffffff; border: 1px solid #eae4dc; border-radius: 14px; padding: 22px 24px; margin-bottom: 24px;">
+          <div style="margin-bottom: 16px;">
+            <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: #8c7b75; margin-bottom: 4px;">Fullt navn</div>
+            <div style="font-size: 16px; font-weight: 700; color: #102542;">${name}</div>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: #8c7b75; margin-bottom: 4px;">E-postadresse</div>
+            <div style="font-size: 15px; font-weight: 600; color: #d17d39; word-break: break-all;">
+              <a href="mailto:${email}" style="color: #d17d39; text-decoration: none;">${email}</a>
+            </div>
+          </div>
+
+          ${phone ? `
+          <div style="margin-bottom: 16px;">
+            <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: #8c7b75; margin-bottom: 4px;">Telefonnummer</div>
+            <div style="font-size: 15px; font-weight: 600; color: #102542;">${phone}</div>
+          </div>` : ''}
+
+          <div style="margin-bottom: 16px;">
+            <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: #8c7b75; margin-bottom: 4px;">Formål / Rolle</div>
+            <div style="font-size: 15px; font-weight: 700; color: #102542;">${role}</div>
+          </div>
+
+          ${notes ? `
+          <div style="margin-bottom: 16px;">
+            <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: #8c7b75; margin-bottom: 4px;">Melding / Kommentar</div>
+            <div style="font-size: 14px; line-height: 1.6; color: #334155; white-space: pre-wrap;">${notes}</div>
+          </div>` : ''}
+
+          <div>
+            <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: #8c7b75; margin-bottom: 4px;">Registrert via</div>
+            <div style="font-size: 13px; color: #64748b; font-family: monospace;">${source}</div>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 12px;">
+          <a href="https://www.hiskingdomministry.no/admin/admin-kommunikasjon.html" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 14px 32px; border-radius: 12px; font-size: 13px; font-weight: 700; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.15em; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.25);">
+            Åpne Kontakter i Admin
+          </a>
+        </div>
       </div>
 
-      <div style="text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #f1f5f9;">
-        <a href="https://www.hiskingdomministry.no/admin/admin-kommunikasjon.html" style="display: inline-block; padding: 12px 24px; background: #d17d39; color: #ffffff; text-decoration: none; font-weight: 700; border-radius: 10px; font-size: 14px;">
-          Åpne Kontakter i Admin
-        </a>
+      <div style="padding: 20px 32px; text-align: center; border-top: 1px solid #eae4dc; background: #faf6f0; font-size: 11px; color: #8c7b75; text-transform: uppercase; letter-spacing: 0.1em;">
+        &copy; 2026 His Kingdom Ministry &bull; <a href="https://www.hiskingdomministry.no" style="color: #d17d39; text-decoration: none;">www.hiskingdomministry.no</a>
       </div>
     </div>
   `;
