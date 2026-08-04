@@ -1928,10 +1928,17 @@ export class HkmGroupsManager {
                                     </div>
                                     <div style="font-weight: 600; font-size: 13px; color: var(--text-color, #0f172a);">${this.escapeHtml(leader)}</div>
                                 </div>
-                                <div style="font-size: 11px; color: var(--admin-orange, #d17d39); font-weight: 600; background: #fffbeb; border: 1px solid #fef3c7; padding: 2px 8px; border-radius: 12px; display: inline-flex; align-items: center; gap: 3px;">
-                                    <span class="material-symbols-outlined" style="font-size: 12px; color: var(--admin-orange, #d17d39); font-variation-settings: 'FILL' 1;">star</span>
-                                    <span>${this.t('groups.groupLeder')}</span>
-                                </div>
+                                ${canManage ? `
+                                    <select class="member-role-select" data-name="${this.escapeHtml(leader)}" data-current-role="leader" style="font-size: 11.5px; font-weight: 700; border: 1px solid #fde68a; border-radius: 12px; padding: 3px 10px; background: #fef3c7; color: var(--admin-orange, #d17d39); cursor: pointer; outline: none; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+                                        <option value="leader" selected>★ ${this.t('groups.groupLeder')}</option>
+                                        <option value="member">${this.t('groups.groupMedlem')}</option>
+                                    </select>
+                                ` : `
+                                    <div style="font-size: 11px; color: var(--admin-orange, #d17d39); font-weight: 600; background: #fffbeb; border: 1px solid #fef3c7; padding: 2px 8px; border-radius: 12px; display: inline-flex; align-items: center; gap: 3px;">
+                                        <span class="material-symbols-outlined" style="font-size: 12px; color: var(--admin-orange, #d17d39); font-variation-settings: 'FILL' 1;">star</span>
+                                        <span>${this.t('groups.groupLeder')}</span>
+                                    </div>
+                                `}
                             </div>
                         `).join('')}
                         ${(group.memberNames || []).filter(m => !(group.leaderNames || []).includes(m)).map(member => `
@@ -1945,9 +1952,16 @@ export class HkmGroupsManager {
                                     </div>
                                     <div style="font-weight: 600; font-size: 13px; color: var(--text-color, #0f172a);">${this.escapeHtml(member)}</div>
                                 </div>
-                                <div style="font-size: 11px; color: var(--text-muted, #64748b); font-weight: 600; background: var(--bg-muted, #f1f5f9); padding: 2px 8px; border-radius: 12px;">
-                                    ${this.t('groups.groupMedlem')}
-                                </div>
+                                ${canManage ? `
+                                    <select class="member-role-select" data-name="${this.escapeHtml(member)}" data-current-role="member" style="font-size: 11.5px; font-weight: 600; border: 1px solid var(--border-color, #cbd5e1); border-radius: 12px; padding: 3px 10px; background: var(--bg-muted, #f8fafc); color: var(--text-muted, #64748b); cursor: pointer; outline: none; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+                                        <option value="leader">★ ${this.t('groups.groupLeder')}</option>
+                                        <option value="member" selected>${this.t('groups.groupMedlem')}</option>
+                                    </select>
+                                ` : `
+                                    <div style="font-size: 11px; color: var(--text-muted, #64748b); font-weight: 600; background: var(--bg-muted, #f1f5f9); padding: 2px 8px; border-radius: 12px;">
+                                        ${this.t('groups.groupMedlem')}
+                                    </div>
+                                `}
                             </div>
                         `).join('')}
                     </div>
@@ -2061,6 +2075,112 @@ export class HkmGroupsManager {
                     alert("Feil ved fjerning av personer: " + err.message);
                 }
             });
+
+            // Bind endre rolle event lyttere
+            tabContainer.querySelectorAll('.member-role-select').forEach(select => {
+                select.addEventListener('change', async (e) => {
+                    const name = e.target.dataset.name;
+                    const currentRole = e.target.dataset.currentRole;
+                    const newRole = e.target.value;
+                    
+                    const confirmMsg = `Er du sikker på at du vil endre rollen til ${name} fra ${currentRole === 'leader' ? 'Gruppeleder' : 'Medlem'} til ${newRole === 'leader' ? 'Gruppeleder' : 'Medlem'}?`;
+                    if (confirm(confirmMsg)) {
+                        await this.handleUpdateMemberRole(name, currentRole, newRole, tabContainer);
+                    } else {
+                        e.target.value = currentRole;
+                    }
+                });
+            });
+        }
+    }
+
+    async handleUpdateMemberRole(name, currentRole, newRole, tabContainer) {
+        if (currentRole === newRole) return;
+
+        const group = this.activeGroup;
+        if (!group) return;
+
+        try {
+            const db = firebase.firestore();
+            const groupRef = db.collection('groups').doc(group.id);
+
+            let updatedLeaders = [...(group.leaderNames || [])];
+            let updatedMembers = [...(group.memberNames || [])];
+
+            let leaderUids = [...(group.leaderUids || [])];
+            let memberUids = [...(group.memberUids || [])];
+
+            // 1. Oppdater navn-matriser
+            if (newRole === 'leader') {
+                updatedMembers = updatedMembers.filter(m => m !== name);
+                if (!updatedLeaders.includes(name)) {
+                    updatedLeaders.push(name);
+                }
+            } else {
+                updatedLeaders = updatedLeaders.filter(m => m !== name);
+                if (!updatedMembers.includes(name)) {
+                    updatedMembers.push(name);
+                }
+            }
+
+            // 2. Søk etter samsvarende UID i users-samlingen
+            let targetUid = null;
+            try {
+                const userQuery = await db.collection('users')
+                    .where('displayName', '==', name)
+                    .limit(1)
+                    .get();
+                if (!userQuery.empty) {
+                    targetUid = userQuery.docs[0].id;
+                }
+            } catch (err) {
+                console.warn("[Groups] Kunne ikke søke etter bruker-UID:", err);
+            }
+
+            // 3. Oppdater UID-matriser
+            if (targetUid) {
+                if (newRole === 'leader') {
+                    if (!leaderUids.includes(targetUid)) {
+                        leaderUids.push(targetUid);
+                    }
+                } else {
+                    leaderUids = leaderUids.filter(u => u !== targetUid);
+                }
+            }
+
+            // Beregn nytt antall medlemmer
+            const uniqueNames = Array.from(new Set([...updatedMembers, ...updatedLeaders]));
+            const newCount = uniqueNames.length || memberUids.length;
+
+            const payload = {
+                leaderNames: updatedLeaders,
+                memberNames: updatedMembers,
+                memberCount: newCount,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            if (group.leaderUids !== undefined || leaderUids.length > 0) {
+                payload.leaderUids = leaderUids;
+            }
+            if (group.memberUids !== undefined || memberUids.length > 0) {
+                payload.memberUids = memberUids;
+            }
+
+            await groupRef.update(payload);
+
+            // 4. Oppdater lokal minnetilstand
+            group.leaderNames = updatedLeaders;
+            group.memberNames = updatedMembers;
+            group.leaderUids = leaderUids;
+            group.memberUids = memberUids;
+            group.memberCount = newCount;
+
+            alert("Rollen ble endret.");
+            this.renderHubOverview(tabContainer);
+
+        } catch (err) {
+            console.error("Error updating member role:", err);
+            alert("Feil ved endring av rolle: " + err.message);
         }
     }
 
