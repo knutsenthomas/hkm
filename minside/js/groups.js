@@ -1117,8 +1117,9 @@ export class HkmGroupsManager {
                     </div>
 
                     <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid var(--border-color, #f1f5f9);">
-                        <span style="font-size: 12px; font-weight: 600; opacity: 0.7;">
-                            👥 ${(group.memberUids || []).length} ${(group.memberUids || []).length === 1 ? this.t('groups.memberCount') : this.t('groups.membersCount')}
+                        <span style="font-size: 12px; font-weight: 600; opacity: 0.7; display: inline-flex; align-items: center; gap: 4px;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; color: var(--text-color, #64748b);">group</span>
+                            <span>${(group.memberUids || []).length} ${(group.memberUids || []).length === 1 ? this.t('groups.memberCount') : this.t('groups.membersCount')}</span>
                         </span>
                         
                         ${isMember ? `
@@ -1599,9 +1600,18 @@ export class HkmGroupsManager {
                             </span>
                             <h2 style="margin: 8px 0 4px 0; font-size: 28px; font-weight: 800;">${this.escapeHtml(group.name)}</h2>
                             <p style="margin: 0; opacity: 0.9; font-size: 14px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-                                <span>📍 ${this.escapeHtml(group.location || '')}</span>
-                                <span>🕒 ${this.escapeHtml(group.meetingSchedule || '')}</span>
-                                <span>👥 ${(group.memberUids || []).length} ${(group.memberUids || []).length === 1 ? this.t('groups.memberCount') : this.t('groups.membersCount')}</span>
+                                <span style="display: inline-flex; align-items: center; gap: 4px;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; color: inherit;">location_on</span>
+                                    <span>${this.escapeHtml(group.location || '')}</span>
+                                </span>
+                                <span style="display: inline-flex; align-items: center; gap: 4px;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; color: inherit;">schedule</span>
+                                    <span>${this.escapeHtml(group.meetingSchedule || '')}</span>
+                                </span>
+                                <span style="display: inline-flex; align-items: center; gap: 4px;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; color: inherit;">group</span>
+                                    <span>${(group.memberUids || []).length} ${(group.memberUids || []).length === 1 ? this.t('groups.memberCount') : this.t('groups.membersCount')}</span>
+                                </span>
                             </p>
                         </div>
                         
