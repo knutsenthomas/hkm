@@ -719,10 +719,25 @@ export class HkmGroupsManager {
     }
 
     async handleDeleteGroup(groupId, groupName) {
-        if (!confirm(`Er du sikker på at du vil slette gruppen "${groupName}"? Dette vil slette gruppen permanent.`)) {
-            return;
+        if (this.app && typeof this.app.showCustomConfirm === 'function') {
+            this.app.showCustomConfirm({
+                title: 'Slett gruppe',
+                message: `Er du sikker på at du vil slette gruppen "${groupName}"? Dette vil slette gruppen permanent.`,
+                confirmText: 'Slett',
+                cancelText: 'Avbryt',
+                isDanger: true,
+                onConfirm: async () => {
+                    await this.performDeleteGroup(groupId, groupName);
+                }
+            });
+        } else {
+            if (confirm(`Er du sikker på at du vil slette gruppen "${groupName}"? Dette vil slette gruppen permanent.`)) {
+                await this.performDeleteGroup(groupId, groupName);
+            }
         }
+    }
 
+    async performDeleteGroup(groupId, groupName) {
         try {
             await this.deleteGroupQuietly(groupId);
             alert(`Suksess! Gruppen "${groupName}" ble slettet.`);
@@ -740,10 +755,25 @@ export class HkmGroupsManager {
     }
 
     async handleRemoveMockupGroups() {
-        if (!confirm('Er du sikker på at du vil fjerne alle mockup- og demogrupper? Dette vil slette dem permanent.')) {
-            return;
+        if (this.app && typeof this.app.showCustomConfirm === 'function') {
+            this.app.showCustomConfirm({
+                title: 'Fjern mockup-grupper',
+                message: 'Er du sikker på at du vil fjerne alle mockup- og demogrupper? Dette vil slette dem permanent.',
+                confirmText: 'Slett',
+                cancelText: 'Avbryt',
+                isDanger: true,
+                onConfirm: async () => {
+                    await this.performRemoveMockupGroups();
+                }
+            });
+        } else {
+            if (confirm('Er du sikker på at du vil fjerne alle mockup- og demogrupper? Dette vil slette dem permanent.')) {
+                await this.performRemoveMockupGroups();
+            }
         }
+    }
 
+    async performRemoveMockupGroups() {
         try {
             const db = firebase.firestore();
             const snap = await db.collection('groups').get();
@@ -869,10 +899,25 @@ export class HkmGroupsManager {
     }
 
     async handleDeleteCategory(catName) {
-        if (!confirm(`Er du sikker på at du vil slette kategorien "${catName}"?`)) {
-            return;
+        if (this.app && typeof this.app.showCustomConfirm === 'function') {
+            this.app.showCustomConfirm({
+                title: 'Slett kategori',
+                message: `Er du sikker på at du vil slette kategorien "${catName}"?`,
+                confirmText: 'Slett',
+                cancelText: 'Avbryt',
+                isDanger: true,
+                onConfirm: async () => {
+                    await this.performDeleteCategory(catName);
+                }
+            });
+        } else {
+            if (confirm(`Er du sikker på at du vil slette kategorien "${catName}"?`)) {
+                await this.performDeleteCategory(catName);
+            }
         }
+    }
 
+    async performDeleteCategory(catName) {
         try {
             const db = firebase.firestore();
             const snap = await db.collection('groupCategories').where('name', '==', catName).get();
