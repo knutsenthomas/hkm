@@ -171,6 +171,45 @@ export class HkmGroupsManager {
                             <button type="button" id="submit-import-contacts-btn" style="padding: 10px 20px; border-radius: 10px; background: var(--admin-orange, #d17d39); color: white; border: none; font-weight: 600; cursor: pointer; font-size: 13px;">Legg til valgte kontakter</button>
                         </div>
                     </div>
+            <!-- Send Group Email Modal -->
+            <div id="group-email-modal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 16px;">
+                <div class="modal-card" style="background: var(--card-bg, #ffffff); border-radius: 20px; width: 100%; max-width: 580px; padding: 28px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(209, 125, 57, 0.12); color: var(--admin-orange, #d17d39); display: flex; align-items: center; justify-content: center;">
+                                <span class="material-symbols-outlined" style="font-size: 22px;">mail</span>
+                            </div>
+                            <div>
+                                <h3 style="margin: 0; font-size: 20px; font-weight: 700;">Send e-post til gruppen</h3>
+                                <p id="group-email-subtitle" style="margin: 2px 0 0 0; font-size: 13px; opacity: 0.7;">Send melding til alle gruppemedlemmer</p>
+                            </div>
+                        </div>
+                        <button type="button" id="close-email-modal" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: var(--text-color, #64748b);">&times;</button>
+                    </div>
+
+                    <form id="group-send-email-form" style="display: flex; flex-direction: column; gap: 16px;">
+                        <div>
+                            <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Emne *</label>
+                            <input type="text" id="group-email-subject" required placeholder="f.eks. Viktig beskjed angående neste samling" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a); font-size: 14px;">
+                        </div>
+
+                        <div>
+                            <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Melding *</label>
+                            <textarea id="group-email-message" rows="6" required placeholder="Skriv din e-postmelding til gruppen her..." style="width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a); font-family: inherit; font-size: 14px; line-height: 1.5;"></textarea>
+                        </div>
+
+                        <div style="background: var(--bg-muted, #f8fafc); padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border-color, #e2e8f0); font-size: 12px; color: var(--text-muted, #64748b);">
+                            💡 E-posten sendes fra His Kingdom Ministry sin e-posttjeneste og utformes med offisiell mal og underskrift.
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px;">
+                            <button type="button" id="cancel-group-email-btn" style="padding: 10px 16px; border-radius: 10px; border: 1px solid #cbd5e1; background: transparent; cursor: pointer; font-size: 13px;">Avbryt</button>
+                            <button type="submit" id="submit-group-email-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; border-radius: 10px; background: linear-gradient(135deg, #d17d39 0%, #b86524 100%); color: white; border: none; font-weight: 600; cursor: pointer; font-size: 13px;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">send</span>
+                                <span>Send e-post til gruppen</span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         `;
@@ -238,6 +277,19 @@ export class HkmGroupsManager {
         });
         this.container.querySelector('#submit-import-contacts-btn')?.addEventListener('click', () => {
             this.submitImportContacts();
+        });
+
+        // Group Email modal
+        const emailModal = this.container.querySelector('#group-email-modal');
+        this.container.querySelector('#close-email-modal')?.addEventListener('click', () => {
+            if (emailModal) emailModal.style.display = 'none';
+        });
+        this.container.querySelector('#cancel-group-email-btn')?.addEventListener('click', () => {
+            if (emailModal) emailModal.style.display = 'none';
+        });
+        this.container.querySelector('#group-send-email-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleSendGroupEmail();
         });
     }
 
@@ -615,13 +667,17 @@ export class HkmGroupsManager {
                         <span class="material-symbols-outlined" style="font-size: 18px;">folder</span> Ressurser
                     </button>
 
-                    ${isLeader ? `
-                        <div style="margin-left: auto; display: flex; gap: 8px;">
+                    <div style="margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button type="button" id="btn-open-group-email-modal" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 8px; background: linear-gradient(135deg, #d17d39 0%, #b86524 100%); color: white; border: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: transform 0.15s ease;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">mail</span>
+                            <span>Send e-post til gruppen</span>
+                        </button>
+                        ${isLeader ? `
                             <button type="button" id="btn-duplicate-group-modal" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border-color, #cbd5e1); background: transparent; cursor: pointer; font-size: 13px; font-weight: 600;">
                                 <span class="material-symbols-outlined" style="font-size: 18px;">content_copy</span> Dupliser gruppe
                             </button>
-                        </div>
-                    ` : ''}
+                        ` : ''}
+                    </div>
                 </div>
             </div>
 
@@ -633,6 +689,11 @@ export class HkmGroupsManager {
         container.querySelector('#btn-back-to-directory')?.addEventListener('click', () => {
             this.currentView = 'directory';
             this.renderCurrentView();
+        });
+
+        // Open Group Email modal
+        container.querySelector('#btn-open-group-email-modal')?.addEventListener('click', () => {
+            this.openGroupEmailModal();
         });
 
         // Tab click
@@ -1167,6 +1228,113 @@ export class HkmGroupsManager {
         } catch (err) {
             console.error("Feil ved import av kontakter til gruppe:", err);
             alert("Kunne ikke legge til kontakter: " + err.message);
+        }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       SEND EMAIL TO GROUP
+       ═══════════════════════════════════════════════════════════════════════════ */
+    openGroupEmailModal(targetGroup = null) {
+        const group = targetGroup || this.activeGroup || this.groups.find(g => g.id === this.selectedGroupId);
+        if (!group) {
+            alert("Velg en gruppe først.");
+            return;
+        }
+
+        const modal = this.container.querySelector('#group-email-modal');
+        const subtitle = this.container.querySelector('#group-email-subtitle');
+        if (!modal) return;
+
+        if (subtitle) {
+            subtitle.textContent = `Send e-postmelding til alle medlemmer i "${group.name}"`;
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    async handleSendGroupEmail() {
+        const group = this.activeGroup || this.groups.find(g => g.id === this.selectedGroupId);
+        if (!group) return;
+
+        const subjectInput = this.container.querySelector('#group-email-subject');
+        const messageInput = this.container.querySelector('#group-email-message');
+        const submitBtn = this.container.querySelector('#submit-group-email-btn');
+
+        const subject = subjectInput ? subjectInput.value.trim() : '';
+        const message = messageInput ? messageInput.value.trim() : '';
+
+        if (!subject || !message) {
+            alert("Vennligst fyll ut både emne og melding.");
+            return;
+        }
+
+        let recipients = [];
+        try {
+            const db = firebase.firestore();
+            const memDocs = await db.collection('groupMembers').where('groupId', '==', group.id).get();
+            memDocs.forEach(d => {
+                const data = d.data();
+                if (data.email) recipients.push({ name: data.name || '', email: data.email });
+            });
+        } catch (e) {
+            console.warn("Mangler direkte groupMembers:", e);
+        }
+
+        if (recipients.length === 0) {
+            (this.allContactsList || []).forEach(c => {
+                if (c.email && (group.memberNames || []).some(m => m.toLowerCase().includes((c.name || '').toLowerCase()))) {
+                    recipients.push({ name: c.name, email: c.email });
+                }
+            });
+        }
+
+        if (recipients.length === 0 && firebase.auth().currentUser?.email) {
+            recipients.push({
+                name: firebase.auth().currentUser.displayName || 'Gruppeleder',
+                email: firebase.auth().currentUser.email
+            });
+        }
+
+        if (recipients.length === 0) {
+            alert("Fant ingen e-postadresser registrert for gruppens medlemmer. Legg til kontakter eller medlemmer med e-post først.");
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner" style="width: 16px; height: 16px;"></span> <span>Sender e-post...</span>';
+
+        try {
+            const token = await firebase.auth().currentUser.getIdToken();
+            const response = await fetch('/sendGroupEmail', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    groupId: group.id,
+                    groupName: group.name,
+                    recipients,
+                    subject,
+                    message
+                })
+            });
+
+            const data = await response.json();
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || data.message || "Kunne ikke sende e-post");
+            }
+
+            alert(`Suksess! E-post ble sendt til ${data.successCount || recipients.length} medlemmer i gruppen "${group.name}".`);
+            this.container.querySelector('#group-email-modal').style.display = 'none';
+            if (subjectInput) subjectInput.value = '';
+            if (messageInput) messageInput.value = '';
+        } catch (err) {
+            console.error("Feil ved utsending av e-post til gruppen:", err);
+            alert("Kunne ikke sende e-post: " + err.message);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px;">send</span> <span>Send e-post til gruppen</span>';
         }
     }
 

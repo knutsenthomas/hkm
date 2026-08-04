@@ -5824,6 +5824,95 @@ exports.sendBulkEmail = onRequest({ cors: true, secrets: [emailUserParam, emailP
 });
 
 /**
+ * Utsendelse av e-post til alles medlemmer i en gruppe.
+ */
+exports.sendGroupEmail = onRequest({ cors: true, secrets: [emailUserParam, emailPassParam] }, async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') {
+    res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.status(204).send('');
+    return;
+  }
+
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      res.status(401).send({ error: 'Uautorisert request: Mangler token' });
+      return;
+    }
+    const token = authHeader.split('Bearer ')[1];
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    const senderUid = decodedToken.uid;
+    const senderEmail = decodedToken.email;
+
+    const { groupId, groupName, recipients, subject, message } = req.body;
+    if (!recipients || !Array.isArray(recipients) || recipients.length === 0 || !subject || !message) {
+      res.status(400).send({ error: 'Mangler mottakere, emne eller melding.' });
+      return;
+    }
+
+    let senderName = decodedToken.name || senderEmail;
+    try {
+      const userDoc = await db.collection('users').doc(senderUid).get();
+      if (userDoc.exists) {
+        const uData = userDoc.data();
+        senderName = uData.displayName || `${uData.firstName || ''} ${uData.lastName || ''}`.trim() || uData.name || senderName;
+      }
+    } catch (e) {
+      console.warn("Kunne ikke hente sender profil:", e);
+    }
+
+    console.log(`[sendGroupEmail] Sender e-post til ${recipients.length} mottakere i gruppe "${groupName || groupId}" fra ${senderName}`);
+
+    const formattedBody = `
+      <div style="margin-bottom: 20px; font-size: 15px; line-height: 1.6; color: #1e293b;">
+        <div style="display: inline-block; padding: 4px 12px; background: rgba(209, 125, 57, 0.1); color: #d17d39; border-radius: 6px; font-size: 12px; font-weight: 600; margin-bottom: 14px;">
+          👥 E-post til ${groupName ? groupName : 'gruppen'}
+        </div>
+        <div>
+          ${message.replace(/\n/g, '<br>')}
+        </div>
+      </div>
+    `;
+
+    let successCount = 0;
+    let failCount = 0;
+
+    const promises = recipients.map(async (item) => {
+      const email = typeof item === 'string' ? item : item.email;
+      if (!email || !email.includes('@')) return;
+
+      try {
+        await sendEmail({
+          to: email,
+          subject: `[${groupName || 'Gruppe'}] ${subject}`,
+          html: formattedBody,
+          text: message,
+          fromName: senderName
+        });
+        successCount++;
+      } catch (err) {
+        console.error(`[sendGroupEmail] Feil ved sending til ${email}:`, err);
+        failCount++;
+      }
+    });
+
+    await Promise.all(promises);
+
+    res.status(200).send({
+      success: true,
+      message: `Sendt e-post til ${successCount} medlemmer (${failCount} feilet).`,
+      successCount,
+      failCount
+    });
+  } catch (err) {
+    console.error('[sendGroupEmail] Error:', err);
+    res.status(500).send({ error: err.message });
+  }
+});
+
+/**
  * Utsendelse av push-varslinger til en gruppe brukere.
  * Krever admin-autentisering.
  */
