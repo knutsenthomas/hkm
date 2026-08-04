@@ -4669,7 +4669,7 @@ function wrapInHkmMasterEmailTemplate(contentHtml, options = {}) {
 
     <!-- Footer Copyright -->
     <div style="padding: 16px 32px; text-align: center; background: #faf6f0; font-size: 11px; color: #8c7b75; text-transform: uppercase; letter-spacing: 0.1em;">
-      &copy; 2026 His Kingdom Ministry &bull; <a href="https://www.hiskingdomministry.no" style="color: #d17d39; text-decoration: none;">www.hiskingdomministry.no</a>
+      &copy; 2026 His Kingdom Ministry &bull; Alle rettigheter reservert
     </div>
   </div>
 </body>
