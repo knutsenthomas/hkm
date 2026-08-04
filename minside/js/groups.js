@@ -54,6 +54,30 @@ export class HkmGroupsManager {
         return false;
     }
 
+    formatLocation(location) {
+        if (!location) return '';
+        const trimmed = location.trim();
+        if (/^https?:\/\//i.test(trimmed)) {
+            let label = 'Nettlenke';
+            if (trimmed.toLowerCase().includes('zoom.us')) {
+                label = 'Zoom-møte';
+            } else if (trimmed.toLowerCase().includes('teams.microsoft.com')) {
+                label = 'Teams-møte';
+            } else if (trimmed.toLowerCase().includes('meet.google.com')) {
+                label = 'Google Meet';
+            } else {
+                try {
+                    const url = new URL(trimmed);
+                    label = url.hostname.replace('www.', '');
+                } catch (e) {
+                    label = 'Lenke';
+                }
+            }
+            return `<a href="${this.escapeHtml(trimmed)}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; font-weight: 600;">${this.escapeHtml(label)}</a>`;
+        }
+        return this.escapeHtml(trimmed);
+    }
+
     t(key) {
         const lang = document.documentElement.lang || 'no';
         const localDict = {
@@ -1221,7 +1245,7 @@ export class HkmGroupsManager {
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <span class="material-symbols-outlined" style="font-size: 18px; color: var(--admin-orange, #d17d39);">location_on</span>
-                            <span>${this.escapeHtml(group.location || '')}</span>
+                            <span>${this.formatLocation(group.location || '')}</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <span class="material-symbols-outlined" style="font-size: 18px; color: var(--admin-orange, #d17d39);">person</span>
@@ -1716,7 +1740,7 @@ export class HkmGroupsManager {
                             <p style="margin: 0; opacity: 0.9; font-size: 14px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
                                 <span style="display: inline-flex; align-items: center; gap: 4px;">
                                     <span class="material-symbols-outlined" style="font-size: 18px; color: inherit;">location_on</span>
-                                    <span>${this.escapeHtml(group.location || '')}</span>
+                                    <span>${this.formatLocation(group.location || '')}</span>
                                 </span>
                                 <span style="display: inline-flex; align-items: center; gap: 4px;">
                                     <span class="material-symbols-outlined" style="font-size: 18px; color: inherit;">schedule</span>
@@ -1862,7 +1886,7 @@ export class HkmGroupsManager {
                         </div>
                         <div>
                             <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">${this.t('groups.hubLocation')}</span>
-                            <p style="margin: 4px 0 0 0; font-weight: 600;">${this.escapeHtml(group.location)}</p>
+                            <p style="margin: 4px 0 0 0; font-weight: 600;">${this.formatLocation(group.location)}</p>
                         </div>
                         <div>
                             <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">${this.t('groups.hubJoinPolicy')}</span>
@@ -2362,7 +2386,7 @@ export class HkmGroupsManager {
                         <div>
                             <span style="font-size: 12px; font-weight: 700; color: var(--admin-orange, #d17d39); text-transform: uppercase;">${this.escapeHtml(evt.date)} kl. ${this.escapeHtml(evt.time)}</span>
                             <h4 style="margin: 4px 0; font-size: 16px; font-weight: 700;">${this.escapeHtml(evt.title)}</h4>
-                            <p style="margin: 0; font-size: 13px; opacity: 0.8;">📍 ${this.escapeHtml(evt.location || this.activeGroup.location || '')}</p>
+                            <p style="margin: 0; font-size: 13px; opacity: 0.8;">📍 ${this.formatLocation(evt.location || this.activeGroup.location || '')}</p>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                             <button type="button" class="btn-rsvp" data-evt-id="${evt.id}" data-status="yes" style="padding: 8px 14px; border-radius: 10px; background: #ecfdf5; color: #166534; border: 1px solid #bbf7d0; font-weight: 600; font-size: 13px; cursor: pointer;">
