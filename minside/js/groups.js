@@ -48,8 +48,18 @@ export class HkmGroupsManager {
                         </button>
                     </div>
 
-                    <div class="groups-header-actions" style="display: flex; gap: 10px;">
-                        <button type="button" class="btn btn-primary" id="groups-create-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 14px; background: var(--admin-orange, #d17d39); color: white; border: none; cursor: pointer; transition: transform 0.2s ease;">
+                    <div class="groups-header-actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        ${this.isAdmin ? `
+                            <button type="button" class="btn btn-secondary" id="groups-seed-mock-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 14px; background: #475569; color: white; border: none; cursor: pointer; transition: transform 0.2s ease, background-color 0.2s ease;">
+                                <span class="material-symbols-outlined" style="font-size: 20px;">science</span>
+                                <span>Opprett mockup-grupper</span>
+                            </button>
+                            <button type="button" class="btn btn-danger" id="groups-clear-mock-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 14px; background: #dc2626; color: white; border: none; cursor: pointer; transition: transform 0.2s ease, background-color 0.2s ease;">
+                                <span class="material-symbols-outlined" style="font-size: 20px;">delete_sweep</span>
+                                <span>Fjern mockup-grupper</span>
+                            </button>
+                        ` : ''}
+                        <button type="button" class="btn btn-primary" id="groups-create-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 14px; background: var(--admin-orange, #d17d39); color: white; border: none; cursor: pointer; transition: transform 0.2s ease, background-color 0.2s ease;">
                             <span class="material-symbols-outlined" style="font-size: 20px;">add</span>
                             <span>Opprett ny gruppe</span>
                         </button>
@@ -235,6 +245,25 @@ export class HkmGroupsManager {
         this.container.querySelector('#groups-create-btn')?.addEventListener('click', () => {
             this.openCreateModal();
         });
+
+        if (this.isAdmin) {
+            this.container.querySelector('#groups-seed-mock-btn')?.addEventListener('click', async () => {
+                if (confirm('Vil du opprette standard mockup-grupper?')) {
+                    try {
+                        await this.seedDemoGroups();
+                        alert('Mockup-grupper opprettet!');
+                        await this.loadGroupsData();
+                    } catch (err) {
+                        console.error('Error seeding groups:', err);
+                        alert('Feil ved oppretting av mockup-grupper: ' + err.message);
+                    }
+                }
+            });
+
+            this.container.querySelector('#groups-clear-mock-btn')?.addEventListener('click', () => {
+                this.handleRemoveMockupGroups();
+            });
+        }
         this.container.querySelector('#close-group-modal')?.addEventListener('click', () => {
             modal.style.display = 'none';
         });
@@ -303,11 +332,6 @@ export class HkmGroupsManager {
                 fetchedGroups.push({ id: doc.id, ...doc.data() });
             });
 
-            // Seed demo groups if empty
-            if (fetchedGroups.length === 0) {
-                fetchedGroups = await this.seedDemoGroups();
-            }
-
             this.groups = fetchedGroups;
             const uid = firebase.auth().currentUser?.uid;
 
@@ -352,6 +376,7 @@ export class HkmGroupsManager {
                 memberUids: [uid],
                 memberCount: 8,
                 imageUrl: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80',
+                isMockup: true,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             },
             {
@@ -367,6 +392,7 @@ export class HkmGroupsManager {
                 memberUids: [uid],
                 memberCount: 14,
                 imageUrl: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80',
+                isMockup: true,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             },
             {
@@ -382,6 +408,7 @@ export class HkmGroupsManager {
                 memberUids: [uid],
                 memberCount: 6,
                 imageUrl: 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80',
+                isMockup: true,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             }
         ];
@@ -492,6 +519,11 @@ export class HkmGroupsManager {
                             ⭐ Leder
                         </span>
                     ` : ''}
+                    ${(isLeader || this.isAdmin) ? `
+                        <button type="button" class="btn-delete-card-group" data-id="${group.id}" data-name="${this.escapeHtml(group.name)}" title="Slett gruppe" style="position: absolute; top: 12px; right: ${isLeader ? '80px' : '12px'}; background: rgba(239, 68, 68, 0.9); backdrop-filter: blur(4px); color: white; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s ease, background-color 0.15s ease; z-index: 2;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
+                        </button>
+                    ` : ''}
                 </div>
 
                 <div style="padding: 20px; flex: 1; display: flex; flex-direction: column;">
@@ -547,6 +579,7 @@ export class HkmGroupsManager {
                     </button>
                 </div>
             `;
+
             container.querySelector('#btn-explore-groups-now')?.addEventListener('click', () => {
                 this.currentView = 'directory';
                 this.container.querySelectorAll('.groups-tab-btn').forEach(b => b.classList.remove('active'));
@@ -582,6 +615,15 @@ export class HkmGroupsManager {
                 await this.handleJoinGroup(groupId, policy);
             });
         });
+
+        container.querySelectorAll('.btn-delete-card-group').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const groupId = btn.dataset.id;
+                const groupName = btn.dataset.name;
+                this.handleDeleteGroup(groupId, groupName);
+            });
+        });
     }
 
     async handleJoinGroup(groupId, policy) {
@@ -610,6 +652,90 @@ export class HkmGroupsManager {
         } catch (err) {
             console.error("Error joining group:", err);
             alert("Feil ved påmelding: " + err.message);
+        }
+    }
+
+    async handleDeleteGroup(groupId, groupName) {
+        if (!confirm(`Er du sikker på at du vil slette gruppen "${groupName}"? Dette vil slette gruppen permanent.`)) {
+            return;
+        }
+
+        try {
+            await this.deleteGroupQuietly(groupId);
+            alert(`Suksess! Gruppen "${groupName}" ble slettet.`);
+            
+            if (this.selectedGroupId === groupId) {
+                this.selectedGroupId = null;
+                this.currentView = 'directory';
+            }
+            
+            await this.loadGroupsData();
+        } catch (err) {
+            console.error("Error deleting group:", err);
+            alert("Kunne ikke slette gruppen: " + err.message);
+        }
+    }
+
+    async handleRemoveMockupGroups() {
+        if (!confirm('Er du sikker på at du vil fjerne alle mockup- og demogrupper? Dette vil slette dem permanent.')) {
+            return;
+        }
+
+        try {
+            const db = firebase.firestore();
+            const snap = await db.collection('groups').get();
+            let count = 0;
+            
+            const promises = [];
+            snap.forEach(doc => {
+                const data = doc.data();
+                const name = data.name || '';
+                const isMock = data.isMockup === true || 
+                               name === 'Husfellesskap Majorstuen' || 
+                               name === 'Bønnegruppe for Ung-Voksne' || 
+                               name === 'Bibelstudie: Romerbrevet' || 
+                               name.toLowerCase().includes('demo') ||
+                               name.toLowerCase().includes('mockup');
+                
+                if (isMock) {
+                    count++;
+                    promises.push(this.deleteGroupQuietly(doc.id));
+                }
+            });
+
+            if (count === 0) {
+                alert("Fant ingen mockup- eller demogrupper å slette.");
+                return;
+            }
+
+            await Promise.all(promises);
+            alert(`Suksess! ${count} mockup/demogrupper ble fjernet.`);
+            this.selectedGroupId = null;
+            this.currentView = 'directory';
+            await this.loadGroupsData();
+        } catch (err) {
+            console.error("Error removing mockup groups:", err);
+            alert("Kunne ikke fjerne mockup-grupper: " + err.message);
+        }
+    }
+
+    async deleteGroupQuietly(groupId) {
+        const db = firebase.firestore();
+        await db.collection('groups').doc(groupId).delete();
+        
+        // Clean up related sub-collections / documents
+        const collections = ['groupMembers', 'groupEvents', 'groupAttendance', 'groupMessages'];
+        for (const col of collections) {
+            try {
+                const snap = await db.collection(col).where('groupId', '==', groupId).get();
+                if (!snap.empty) {
+                    const batch = db.batch();
+                    snap.forEach(doc => batch.delete(doc.ref));
+                    await batch.commit();
+                }
+            } catch (e) {
+                console.warn(`Could not clean up collection ${col} for group ${groupId}:`, e);
+            }
         }
     }
 

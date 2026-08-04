@@ -5826,7 +5826,7 @@ exports.sendBulkEmail = onRequest({ cors: true, secrets: [emailUserParam, emailP
 /**
  * Utsendelse av e-post til alles medlemmer i en gruppe.
  */
-exports.sendGroupEmail = onRequest({ cors: true, secrets: [emailUserParam, emailPassParam] }, async (req, res) => {
+exports.sendGroupEmail = onRequest({ cors: true, invoker: 'public', secrets: [emailUserParam, emailPassParam] }, async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
   res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') {
