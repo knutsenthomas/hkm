@@ -35,6 +35,18 @@ export class HkmGroupsManager {
         }
 
         container.innerHTML = `
+            <style>
+                .groups-tab-btn {
+                    color: var(--text-color, #1e293b) !important;
+                }
+                .groups-tab-btn.active {
+                    background: var(--admin-orange, #d17d39) !important;
+                    color: #ffffff !important;
+                }
+                .groups-tab-btn:not(.active):hover {
+                    background: rgba(15, 23, 42, 0.06) !important;
+                }
+            </style>
             <div class="groups-module-wrapper">
                 <!-- Top Module Navigation & Actions -->
                 <div class="groups-header-bar" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px;">
