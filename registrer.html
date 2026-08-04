@@ -347,6 +347,16 @@
                     try {
                         if (db) {
                             await db.collection('contacts').add(contactData);
+                            await db.collection('contactMessages').add({
+                                name: name,
+                                email: email,
+                                phone: phone || '',
+                                subject: `Ny registrering: ${role} (${name})`,
+                                message: `Ny registrering for ${role}.\nNavn: ${name}\nE-post: ${email}\nTelefon: ${phone || 'Ikke oppgitt'}\nFormål/Rolle: ${role}\nNotat: ${notes || 'Ingen melding'}`,
+                                source: 'registrer.html',
+                                pagePath: window.location.pathname,
+                                createdAt: firebase.firestore.FieldValue ? firebase.firestore.FieldValue.serverTimestamp() : new Date().toISOString()
+                            });
                         }
                         try {
                             const saved = JSON.parse(localStorage.getItem('hkm_system_contacts') || '[]');

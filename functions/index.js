@@ -5960,6 +5960,87 @@ exports.logSystemError = onRequest({ cors: true, invoker: "public", secrets: [em
 });
 
 /**
+ * Trigger som sender e-post til post@hiskingdomministry.no ved ny registrering i contacts.
+ */
+exports.onContactCreated = onDocumentCreated({
+  document: "contacts/{id}",
+  secrets: [emailUserParam, emailPassParam],
+}, async (event) => {
+  const snapshot = event.data;
+  if (!snapshot) return;
+  const data = snapshot.data() || {};
+  const email = (data.email || "").trim();
+  const name = data.name || "Uten navn";
+  const phone = data.phone || "";
+  const role = data.role || "HKM prayer team";
+  const notes = data.notes || "";
+  const source = data.source || "registrer.html";
+
+  if (!email) return;
+
+  const recipients = ["post@hiskingdomministry.no", "thomas@hiskingdomministry.no", "knutsenthomas@gmail.com"];
+  const adminSubject = `Ny registrering: ${role} (${name})`;
+  const adminHtml = `
+    <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #fed7aa; border-radius: 16px; background-color: #ffffff;">
+      <div style="margin-bottom: 16px;">
+        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #d17d39; background: #fff7ed; padding: 4px 12px; border-radius: 20px; display: inline-block;">
+          His Kingdom Ministry &bull; Systemvarsel
+        </span>
+      </div>
+      <h2 style="font-size: 22px; font-weight: 800; color: #102542; margin-top: 0; margin-bottom: 16px;">
+        Ny registrering mottatt!
+      </h2>
+      <p style="font-size: 14px; color: #334155; margin-bottom: 20px; line-height: 1.5;">
+        En ny registrering har kommet inn via nettsiden og er lagret i systemets kontakter.
+      </p>
+      
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px; color: #1e293b;">
+          <tr>
+            <td style="padding: 6px 0; font-weight: 700; width: 140px; color: #64748b;">Fullt navn:</td>
+            <td style="padding: 6px 0; font-weight: 600; color: #0f172a;">${name}</td>
+          </tr>
+          <tr>
+            <td style="padding: 6px 0; font-weight: 700; color: #64748b;">E-postadresse:</td>
+            <td style="padding: 6px 0; font-weight: 600; color: #d17d39;"><a href="mailto:${email}" style="color: #d17d39; text-decoration: none;">${email}</a></td>
+          </tr>
+          ${phone ? `<tr><td style="padding: 6px 0; font-weight: 700; color: #64748b;">Telefon:</td><td style="padding: 6px 0; color: #0f172a;">${phone}</td></tr>` : ''}
+          <tr>
+            <td style="padding: 6px 0; font-weight: 700; color: #64748b;">Formål / Rolle:</td>
+            <td style="padding: 6px 0; font-weight: 600; color: #0f172a;">${role}</td>
+          </tr>
+          ${notes ? `<tr><td style="padding: 6px 0; font-weight: 700; color: #64748b; vertical-align: top;">Melding:</td><td style="padding: 6px 0; color: #0f172a; white-space: pre-wrap;">${notes}</td></tr>` : ''}
+          <tr>
+            <td style="padding: 6px 0; font-weight: 700; color: #64748b;">Kilde / Registrert via:</td>
+            <td style="padding: 6px 0; color: #64748b; font-family: monospace;">${source}</td>
+          </tr>
+        </table>
+      </div>
+
+      <div style="text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #f1f5f9;">
+        <a href="https://www.hiskingdomministry.no/admin/admin-kommunikasjon.html" style="display: inline-block; padding: 12px 24px; background: #d17d39; color: #ffffff; text-decoration: none; font-weight: 700; border-radius: 10px; font-size: 14px;">
+          Åpne Kontakter i Admin
+        </a>
+      </div>
+    </div>
+  `;
+
+  try {
+    await sendEmail({
+      to: recipients.join(", "),
+      subject: adminSubject,
+      html: adminHtml,
+      text: `Ny registrering fra ${name} (${email}). Formål: ${role}.`,
+      fromName: "HKM Registrering",
+      type: "contact_created_alert"
+    });
+    console.log(`[ContactCreated] E-postvarsel sendt for ${email}`);
+  } catch (err) {
+    console.error("[ContactCreated] Kunne ikke sende e-postvarsel:", err);
+  }
+});
+
+/**
  * Trigger som sender bekreftelse ved innsending av kontaktskjema.
  */
 exports.onContactFormSubmit = onDocumentCreated({
