@@ -1764,6 +1764,12 @@ export class HkmGroupsManager {
                     </div>
 
                     <div style="display: flex; flex-direction: column; gap: 10px;">
+                        ${canManage ? `
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 4px 14px; margin-bottom: 4px;">
+                                <input type="checkbox" id="checkbox-select-all-members" style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--admin-orange, #d17d39);">
+                                <label for="checkbox-select-all-members" style="font-size: 13px; font-weight: 600; cursor: pointer; opacity: 0.8; user-select: none;">Marker alle</label>
+                            </div>
+                        ` : ''}
                         ${(group.leaderNames || []).map(leader => `
                             <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; background: var(--bg-muted, #f8fafc); border: 1px solid var(--border-color, #e2e8f0);">
                                 ${canManage ? `
@@ -1807,12 +1813,27 @@ export class HkmGroupsManager {
         if (canManage) {
             const checkboxes = tabContainer.querySelectorAll('.remove-member-checkbox');
             const removeBtn = tabContainer.querySelector('#btn-remove-selected-members');
+            const selectAllCb = tabContainer.querySelector('#checkbox-select-all-members');
+
+            selectAllCb?.addEventListener('change', (e) => {
+                const checked = e.target.checked;
+                checkboxes.forEach(cb => {
+                    cb.checked = checked;
+                });
+                if (removeBtn) {
+                    removeBtn.style.display = checked && checkboxes.length > 0 ? 'inline-flex' : 'none';
+                }
+            });
 
             checkboxes.forEach(cb => {
                 cb.addEventListener('change', () => {
                     const checkedCount = Array.from(checkboxes).filter(c => c.checked).length;
                     if (removeBtn) {
                         removeBtn.style.display = checkedCount > 0 ? 'inline-flex' : 'none';
+                    }
+                    if (selectAllCb) {
+                        selectAllCb.checked = checkedCount === checkboxes.length;
+                        selectAllCb.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
                     }
                 });
             });
