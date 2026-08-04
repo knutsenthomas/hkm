@@ -237,8 +237,11 @@ export class HkmGroupsManager {
                     </div>
 
                     <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
-                        <input type="text" id="contacts-search-input" placeholder="Søk på navn, e-post eller telefon..." style="flex: 1; min-width: 220px; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a); font-size: 14px;">
-                        <select id="contacts-role-picker" style="padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a); font-size: 13px; font-weight: 600;">
+                        <input type="text" id="contacts-search-input" placeholder="Søk på navn, e-post eller telefon..." style="flex: 2; min-width: 200px; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a); font-size: 14px;">
+                        <select id="contacts-tag-filter" style="flex: 1; min-width: 130px; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a); font-size: 13px; font-weight: 600;">
+                            <option value="ALL">Alle etiketter</option>
+                        </select>
+                        <select id="contacts-role-picker" style="flex: 1; min-width: 160px; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a); font-size: 13px; font-weight: 600;">
                             <option value="member">Legg til som Medlem</option>
                             <option value="leader">Legg til som Gruppeleder</option>
                         </select>
@@ -248,7 +251,7 @@ export class HkmGroupsManager {
                         <div style="text-align: center; padding: 24px; color: var(--text-muted, #64748b);">Laster inn kontakter...</div>
                     </div>
 
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 18px; pt: 12px; border-top: 1px solid var(--border-color, #e2e8f0);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border-color, #e2e8f0);">
                         <button type="button" id="select-all-contacts-btn" style="background: transparent; border: none; color: var(--admin-orange, #d17d39); font-weight: 600; font-size: 13px; cursor: pointer;">Velg alle</button>
                         <div style="display: flex; gap: 10px;">
                             <button type="button" id="cancel-contacts-modal" style="padding: 10px 16px; border-radius: 10px; border: 1px solid #cbd5e1; background: transparent; cursor: pointer; font-size: 13px;">Avbryt</button>
@@ -587,6 +590,9 @@ export class HkmGroupsManager {
             if (contactsModal) contactsModal.style.display = 'none';
         });
         this.container.querySelector('#contacts-search-input')?.addEventListener('input', () => {
+            this.renderContactsList();
+        });
+        this.container.querySelector('#contacts-tag-filter')?.addEventListener('change', () => {
             this.renderContactsList();
         });
         this.container.querySelector('#select-all-contacts-btn')?.addEventListener('click', () => {
@@ -2158,6 +2164,7 @@ export class HkmGroupsManager {
             const db = firebase.firestore();
             const snapshot = await db.collection('contacts').get();
             this.allContactsList = [];
+            const tagsSet = new Set();
             snapshot.forEach(doc => {
                 const data = doc.data();
                 const name = data.displayName || data.name || `${data.firstName || ''} ${data.lastName || ''}`.trim() || data.email || 'Uten navn';
@@ -2168,7 +2175,26 @@ export class HkmGroupsManager {
                     phone: data.phone || '',
                     ...data
                 });
+
+                // Extract unique tags/labels
+                if (Array.isArray(data.tags)) {
+                    data.tags.forEach(t => t && tagsSet.add(String(t).trim()));
+                } else if (data.tags) {
+                    tagsSet.add(String(data.tags).trim());
+                }
             });
+
+            // Populate the tag filter dropdown
+            const tagFilterSelect = this.container.querySelector('#contacts-tag-filter');
+            if (tagFilterSelect) {
+                tagFilterSelect.innerHTML = '<option value="ALL">Alle etiketter</option>';
+                Array.from(tagsSet).sort().forEach(tag => {
+                    const opt = document.createElement('option');
+                    opt.value = tag;
+                    opt.textContent = tag;
+                    tagFilterSelect.appendChild(opt);
+                });
+            }
 
             this.selectedContactIds.clear();
             this.renderContactsList();
@@ -2181,14 +2207,32 @@ export class HkmGroupsManager {
     renderContactsList() {
         const container = this.container.querySelector('#contacts-list-container');
         const queryInput = this.container.querySelector('#contacts-search-input');
+        const tagFilterSelect = this.container.querySelector('#contacts-tag-filter');
         if (!container) return;
 
         const query = (queryInput ? queryInput.value : '').toLowerCase().trim();
-        const filtered = this.allContactsList.filter(c => 
-            c.name.toLowerCase().includes(query) ||
-            c.email.toLowerCase().includes(query) ||
-            c.phone.toLowerCase().includes(query)
-        );
+        const selectedTag = tagFilterSelect ? tagFilterSelect.value : 'ALL';
+
+        const filtered = this.allContactsList.filter(c => {
+            // Text query filter
+            const matchesQuery = c.name.toLowerCase().includes(query) ||
+                c.email.toLowerCase().includes(query) ||
+                c.phone.toLowerCase().includes(query);
+
+            // Label/tag filter
+            let matchesTag = true;
+            if (selectedTag !== 'ALL') {
+                if (Array.isArray(c.tags)) {
+                    matchesTag = c.tags.map(t => String(t).trim()).includes(selectedTag);
+                } else if (c.tags) {
+                    matchesTag = String(c.tags).trim() === selectedTag;
+                } else {
+                    matchesTag = false;
+                }
+            }
+
+            return matchesQuery && matchesTag;
+        });
 
         if (filtered.length === 0) {
             container.innerHTML = '<div style="text-align: center; padding: 24px; color: var(--text-muted, #64748b);">Ingen kontakter funnet.</div>';
