@@ -80,7 +80,7 @@ export class HkmGroupsManager {
                 'groups.eventsDelete': 'Slett',
                 
                 // Resources
-                'groups.resourcesTitle': 'Delte ressurser & pensum',
+                'groups.resourcesTitle': 'Delte ressurser',
                 'groups.resourcesCreate': 'Legg til resurs',
                 'groups.resourcesNoRes': 'Ingen delte ressurser i denne gruppen ennå.',
                 'groups.resourcesOpen': 'Åpne lenke',
@@ -163,7 +163,7 @@ export class HkmGroupsManager {
                 'groups.eventsDelete': 'Delete',
                 
                 // Resources
-                'groups.resourcesTitle': 'Shared resources & curriculum',
+                'groups.resourcesTitle': 'Shared resources',
                 'groups.resourcesCreate': 'Add resource',
                 'groups.resourcesNoRes': 'No shared resources in this group yet.',
                 'groups.resourcesOpen': 'Open link',
@@ -246,7 +246,7 @@ export class HkmGroupsManager {
                 'groups.eventsDelete': 'Eliminar',
                 
                 // Resources
-                'groups.resourcesTitle': 'Recursos compartidos y plan de estudios',
+                'groups.resourcesTitle': 'Recursos compartidos',
                 'groups.resourcesCreate': 'Añadir recurso',
                 'groups.resourcesNoRes': 'Aún no hay recursos compartidos en este grupo.',
                 'groups.resourcesOpen': 'Abrir enlace',
