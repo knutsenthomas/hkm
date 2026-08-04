@@ -497,7 +497,7 @@ export class HkmGroupsManager {
                 <!-- Search Input -->
                 <div style="position: relative; flex: 1; min-width: 240px;">
                     <span class="material-symbols-outlined" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 20px;">search</span>
-                    <input type="text" id="group-search-input" value="${this.escapeHtml(this.searchQuery)}" placeholder="Søk etter gruppe, sted eller tema..." style="width: 100%; padding: 10px 14px 10px 40px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); font-size: 14px;">
+                    <input type="text" id="group-search-input" value="${this.escapeHtml(this.searchQuery)}" placeholder="Søk etter gruppe, sted eller tema..." style="width: 100%; padding: 10px 14px 10px 40px !important; padding-left: 40px !important; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); font-size: 14px;">
                 </div>
 
                 <!-- Category Filter Pills -->
