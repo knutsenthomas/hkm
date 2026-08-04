@@ -1767,37 +1767,32 @@ export class HkmGroupsManager {
 
             <!-- Group Banner & Header Card -->
             <div style="background: var(--card-bg, #ffffff); border-radius: 20px; border: 1px solid var(--border-color, #e2e8f0); overflow: hidden; margin-bottom: 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.04);">
-                <div style="position: relative; min-height: 200px; background: url('${img}') center/cover no-repeat; display: flex; align-items: flex-end; padding: 24px;">
-                    <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(15,23,42,0.85), transparent);"></div>
-                    <div style="position: relative; color: white; display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; width: 100%; z-index: 2;">
+                <div style="position: relative; min-height: 220px; background: url('${img}') center/cover no-repeat; display: flex; align-items: flex-end; padding: 32px 24px;">
+                    <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(15,23,42,0.9) 0%, rgba(15,23,42,0.4) 60%, rgba(15,23,42,0.1) 100%);"></div>
+                    <div style="position: relative; color: white; display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; width: 100%; z-index: 2;">
                         <div>
-                            <span style="background: var(--admin-orange, #d17d39); font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.5px;">
+                            <span style="background: var(--admin-orange, #d17d39); font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                 ${this.escapeHtml(this.translateCategory(group.category))}
                             </span>
-                            <h2 style="margin: 8px 0 4px 0; font-size: 28px; font-weight: 800;">${this.escapeHtml(group.name)}</h2>
-                            <p style="margin: 0; opacity: 0.9; font-size: 14px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-                                <span style="display: inline-flex; align-items: center; gap: 4px;">
-                                    <span class="material-symbols-outlined" style="font-size: 18px; color: inherit;">location_on</span>
-                                    <span>${this.formatLocation(group.location || '')}</span>
+                            <h2 style="margin: 12px 0 8px 0; font-size: 32px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">${this.escapeHtml(group.name)}</h2>
+                            <p style="margin: 0; opacity: 0.95; font-size: 14.5px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; font-weight: 500;">
+                                <style>
+                                    .banner-location-label a {
+                                        color: #fff !important;
+                                        text-decoration: underline !important;
+                                        font-weight: 600 !important;
+                                    }
+                                </style>
+                                <span style="display: inline-flex; align-items: center; gap: 6px;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; opacity: 0.85;">location_on</span>
+                                    <span class="banner-location-label">${this.formatLocation(group.location || '')}</span>
                                 </span>
-                                ${group.zoomMeetingId ? `
-                                    <span style="display: inline-flex; align-items: center; gap: 4px;">
-                                        <span class="material-symbols-outlined" style="font-size: 18px; color: inherit;">key</span>
-                                        <span>ID: ${this.escapeHtml(group.zoomMeetingId)}</span>
-                                    </span>
-                                ` : ''}
-                                ${group.zoomPasscode ? `
-                                    <span style="display: inline-flex; align-items: center; gap: 4px;">
-                                        <span class="material-symbols-outlined" style="font-size: 18px; color: inherit;">lock</span>
-                                        <span>Passord: ${this.escapeHtml(group.zoomPasscode)}</span>
-                                    </span>
-                                ` : ''}
-                                <span style="display: inline-flex; align-items: center; gap: 4px;">
-                                    <span class="material-symbols-outlined" style="font-size: 18px; color: inherit;">schedule</span>
+                                <span style="display: inline-flex; align-items: center; gap: 6px;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; opacity: 0.85;">schedule</span>
                                     <span>${this.escapeHtml(group.meetingSchedule || '')}</span>
                                 </span>
-                                <span style="display: inline-flex; align-items: center; gap: 4px;">
-                                    <span class="material-symbols-outlined" style="font-size: 18px; color: inherit;">group</span>
+                                <span style="display: inline-flex; align-items: center; gap: 6px;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; opacity: 0.85;">group</span>
                                     <span>${totalCount} ${totalCount === 1 ? this.t('groups.memberCount') : this.t('groups.membersCount')}</span>
                                 </span>
                             </p>
@@ -1805,18 +1800,18 @@ export class HkmGroupsManager {
                         
                         <!-- Overlayed Action buttons inside banner -->
                         <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 4px;">
-                            <button type="button" id="btn-open-group-email-modal" class="groups-banner-btn" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 10px; background: var(--admin-orange, #d17d39); color: white; border: none; cursor: pointer; font-size: 13px; font-weight: 600;">
+                            <button type="button" id="btn-open-group-email-modal" class="groups-banner-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; background: linear-gradient(135deg, #d17d39 0%, #b86524 100%); color: white; border: none; cursor: pointer; font-size: 13.5px; font-weight: 700; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(209,125,57,0.3);" onmouseover="this.style.transform='scale(1.03)';" onmouseout="this.style.transform='none';">
                                 <span class="material-symbols-outlined" style="font-size: 18px;">mail</span>
                                 <span>${this.t('groups.hubSendEmail')}</span>
                             </button>
                             ${(isLeader || this.isAdmin) ? `
-                                <button type="button" id="btn-edit-group-details" class="groups-banner-btn" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 10px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(8px); cursor: pointer; font-size: 13px; font-weight: 600;">
+                                <button type="button" id="btn-edit-group-details" class="groups-banner-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.25); backdrop-filter: blur(8px); cursor: pointer; font-size: 13.5px; font-weight: 700; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.25)'; this.style.transform='scale(1.03)';" onmouseout="this.style.background='rgba(255,255,255,0.15)'; this.style.transform='none';">
                                     <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
                                     <span>${this.t('groups.hubEdit')}</span>
                                 </button>
                             ` : ''}
                             ${isLeader ? `
-                                <button type="button" id="btn-duplicate-group-modal" class="groups-banner-btn" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 10px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(8px); cursor: pointer; font-size: 13px; font-weight: 600;">
+                                <button type="button" id="btn-duplicate-group-modal" class="groups-banner-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.25); backdrop-filter: blur(8px); cursor: pointer; font-size: 13.5px; font-weight: 700; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.25)'; this.style.transform='scale(1.03)';" onmouseout="this.style.background='rgba(255,255,255,0.15)'; this.style.transform='none';">
                                     <span class="material-symbols-outlined" style="font-size: 18px;">content_copy</span>
                                     <span>${this.t('groups.hubDuplicate')}</span>
                                 </button>
@@ -1902,62 +1897,126 @@ export class HkmGroupsManager {
     renderHubOverview(tabContainer) {
         const group = this.activeGroup;
         tabContainer.innerHTML = `
-            <div style="background: var(--card-bg, #fff); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0);">
-                <h3 style="margin-top: 0; font-size: 18px; font-weight: 700; margin-bottom: 12px;">${this.t('groups.hubOverviewTitle')}</h3>
-                <p style="line-height: 1.6; opacity: 0.9; font-size: 15px; margin-bottom: 24px; white-space: pre-line;">
-                    ${this.escapeHtml(group.description || this.t('groups.noDesc'))}
-                </p>
+            <div style="display: grid; grid-template-columns: 1fr; gap: 24px; align-items: start; width: 100%;">
+                <style>
+                    @media (min-width: 992px) {
+                        .hub-overview-grid {
+                            display: grid !important;
+                            grid-template-columns: 1.6fr 1fr !important;
+                            gap: 24px !important;
+                        }
+                    }
+                </style>
+                <div class="hub-overview-grid" style="display: flex; flex-direction: column; gap: 24px; width: 100%;">
+                    
+                    <!-- Left Column: Description & WhatsApp -->
+                    <div style="display: flex; flex-direction: column; gap: 24px;">
+                        
+                        <!-- Description Card -->
+                        <div style="background: var(--card-bg, #fff); padding: 28px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0); box-shadow: 0 4px 20px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 16px;">
+                            <h3 style="margin: 0; font-size: 18px; font-weight: 800; color: var(--text-color, #0f172a); display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border-color, #f1f5f9); padding-bottom: 12px;">
+                                <span class="material-symbols-outlined" style="color: var(--admin-orange, #d17d39); font-size: 22px;">description</span>
+                                <span>${this.t('groups.hubOverviewTitle')}</span>
+                            </h3>
+                            <p style="line-height: 1.7; opacity: 0.95; font-size: 15.5px; margin: 0; white-space: pre-line; color: var(--text-color, #334155);">
+                                ${this.escapeHtml(group.description || this.t('groups.noDesc'))}
+                            </p>
+                        </div>
 
-                ${group.whatsappUrl ? `
-                    <div style="background: #e8f5e9; border: 1px solid #c8e6c9; border-radius: 16px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; gap: 16px; flex-wrap: wrap;">
-                        <div style="display: flex; align-items: center; gap: 14px; min-width: 250px;">
-                            <div style="background: #25d366; color: white; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 10px rgba(37,211,102,0.3);">
-                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.725-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.863-9.748.002-2.607-1.012-5.059-2.859-6.91-1.847-1.851-4.3-2.87-6.906-2.87-5.438 0-9.863 4.37-9.866 9.749-.001 1.813.493 3.59 1.426 5.148l-1.002 3.661 3.768-.973zm13.102-7.391c-.269-.134-1.593-.787-1.839-.877-.247-.09-.427-.134-.607.134-.18.269-.696.877-.853 1.055-.157.18-.314.202-.583.067-.27-.134-1.14-.422-2.172-1.341-.803-.715-1.346-1.597-1.503-1.866-.157-.269-.017-.415.118-.549.121-.122.269-.314.404-.471.134-.157.18-.27.27-.449.09-.18.045-.337-.022-.471-.067-.134-.607-1.46-.831-2.001-.219-.527-.46-.454-.63-.463-.162-.008-.347-.01-.533-.01-.186 0-.489.07-.746.353-.258.28-.985.963-.985 2.348 0 1.385 1.01 2.721 1.15 2.901.14.18 1.988 3.037 4.814 4.253.673.29 1.2.463 1.61.592.677.215 1.294.185 1.782.112.543-.081 1.593-.651 1.817-1.28.225-.63.225-1.17.157-1.28-.068-.113-.247-.202-.516-.337z"/>
-                                </svg>
+                        <!-- WhatsApp Widget -->
+                        ${group.whatsappUrl ? `
+                            <div style="background: linear-gradient(135deg, rgba(37,211,102,0.08) 0%, rgba(37,211,102,0.02) 100%); border: 1px solid rgba(37,211,102,0.2); border-radius: 16px; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(37,211,102,0.05);" onmouseover="this.style.borderColor='rgba(37,211,102,0.4)';" onmouseout="this.style.borderColor='rgba(37,211,102,0.2)';">
+                                <div style="display: flex; align-items: center; gap: 16px; min-width: 250px;">
+                                    <div style="background: #25d366; color: white; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(37,211,102,0.3);">
+                                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.725-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.863-9.748.002-2.607-1.012-5.059-2.859-6.91-1.847-1.851-4.3-2.87-6.906-2.87-5.438 0-9.863 4.37-9.866 9.749-.001 1.813.493 3.59 1.426 5.148l-1.002 3.661 3.768-.973zm13.102-7.391c-.269-.134-1.593-.787-1.839-.877-.247-.09-.427-.134-.607.134-.18.269-.696.877-.853 1.055-.157.18-.314.202-.583.067-.27-.134-1.14-.422-2.172-1.341-.803-.715-1.346-1.597-1.503-1.866-.157-.269-.017-.415.118-.549.121-.122.269-.314.404-.471.134-.157.18-.27.27-.449.09-.18.045-.337-.022-.471-.067-.134-.607-1.46-.831-2.001-.219-.527-.46-.454-.63-.463-.162-.008-.347-.01-.533-.01-.186 0-.489.07-.746.353-.258.28-.985.963-.985 2.348 0 1.385 1.01 2.721 1.15 2.901.14.18 1.988 3.037 4.814 4.253.673.29 1.2.463 1.61.592.677.215 1.294.185 1.782.112.543-.081 1.593-.651 1.817-1.28.225-.63.225-1.17.157-1.28-.068-.113-.247-.202-.516-.337z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4 style="margin: 0; font-size: 15.5px; font-weight: 700; color: #1b5e20;">WhatsApp-gruppe</h4>
+                                        <p style="margin: 2px 0 0 0; font-size: 13.5px; color: #2e7d32; opacity: 0.9;">Bli med i gruppens interne chat på WhatsApp.</p>
+                                    </div>
+                                </div>
+                                <a href="${group.whatsappUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 8px; justify-content: center; padding: 10px 20px; border-radius: 12px; background: #25d366; color: white; border: none; font-weight: 700; font-size: 13.5px; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(37,211,102,0.2);" onmouseover="this.style.transform='scale(1.03)';" onmouseout="this.style.transform='none';">
+                                    <span>Åpne chat</span>
+                                    <span class="material-symbols-outlined" style="font-size: 16px; display: block;">open_in_new</span>
+                                </a>
                             </div>
-                            <div>
-                                <h4 style="margin: 0; font-size: 15px; font-weight: 700; color: #1b5e20;">WhatsApp-gruppe</h4>
-                                <p style="margin: 2px 0 0 0; font-size: 13px; color: #2e7d32; opacity: 0.95;">Bli med i gruppens interne chat på WhatsApp.</p>
-                            </div>
-                        </div>
-                        <a href="${group.whatsappUrl}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; justify-content: center; padding: 10px 20px; border-radius: 12px; background: #25d366; color: white; border: none; font-weight: 700; font-size: 13.5px; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(37,211,102,0.2);" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 16px rgba(37,211,102,0.3)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(37,211,102,0.2)';">
-                            <span>Åpne chat</span>
-                            <span class="material-symbols-outlined" style="font-size: 16px; display: block;">open_in_new</span>
-                        </a>
+                        ` : ''}
                     </div>
-                ` : ''}
 
-                <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">${this.t('groups.hubInfo')}</h4>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: var(--bg-muted, #f8fafc); padding: 16px; border-radius: 12px;">
-                    <div>
-                        <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">${this.t('groups.hubSchedule')}</span>
-                        <p style="margin: 4px 0 0 0; font-weight: 600;">${this.escapeHtml(group.meetingSchedule)}</p>
-                    </div>
-                    <div>
-                        <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">${this.t('groups.hubLocation')}</span>
-                        <p style="margin: 4px 0 0 0; font-weight: 600;">${this.formatLocation(group.location)}</p>
-                    </div>
-                    ${group.zoomMeetingId ? `
-                        <div>
-                            <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">Zoom Meeting ID</span>
-                            <p style="margin: 4px 0 0 0; font-weight: 600;">${this.escapeHtml(group.zoomMeetingId)}</p>
+                    <!-- Right Column: Practical Info Card -->
+                    <div style="background: var(--card-bg, #fff); padding: 28px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0); box-shadow: 0 4px 20px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 20px;">
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 800; color: var(--text-color, #0f172a); display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border-color, #f1f5f9); padding-bottom: 12px;">
+                            <span class="material-symbols-outlined" style="color: var(--admin-orange, #d17d39); font-size: 22px;">info</span>
+                            <span>${this.t('groups.hubInfo')}</span>
+                        </h3>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 20px;">
+                            <div style="display: flex; align-items: flex-start; gap: 14px;">
+                                <span class="material-symbols-outlined" style="font-size: 22px; color: var(--text-muted, #64748b); margin-top: 2px;">calendar_month</span>
+                                <div>
+                                    <span style="font-size: 11px; font-weight: 700; opacity: 0.6; text-transform: uppercase; color: var(--text-muted, #64748b); letter-spacing: 0.5px;">${this.t('groups.hubSchedule')}</span>
+                                    <p style="margin: 2px 0 0 0; font-weight: 700; font-size: 14.5px; color: var(--text-color, #0f172a);">${this.escapeHtml(group.meetingSchedule)}</p>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; align-items: flex-start; gap: 14px;">
+                                <span class="material-symbols-outlined" style="font-size: 22px; color: var(--text-muted, #64748b); margin-top: 2px;">location_on</span>
+                                <style>
+                                  .location-link-wrapper a {
+                                      color: var(--admin-orange, #d17d39) !important;
+                                      text-decoration: underline !important;
+                                      font-weight: 700 !important;
+                                  }
+                                  .location-link-wrapper a:hover {
+                                      color: #b86524 !important;
+                                  }
+                                </style>
+                                <div>
+                                    <span style="font-size: 11px; font-weight: 700; opacity: 0.6; text-transform: uppercase; color: var(--text-muted, #64748b); letter-spacing: 0.5px;">${this.t('groups.hubLocation')}</span>
+                                    <p class="location-link-wrapper" style="margin: 2px 0 0 0; font-weight: 700; font-size: 14.5px; color: var(--text-color, #0f172a);">${this.formatLocation(group.location)}</p>
+                                </div>
+                            </div>
+
+                            ${group.zoomMeetingId ? `
+                                <div style="display: flex; align-items: flex-start; gap: 14px;">
+                                    <span class="material-symbols-outlined" style="font-size: 22px; color: var(--text-muted, #64748b); margin-top: 2px;">key</span>
+                                    <div>
+                                        <span style="font-size: 11px; font-weight: 700; opacity: 0.6; text-transform: uppercase; color: var(--text-muted, #64748b); letter-spacing: 0.5px;">Zoom Meeting ID</span>
+                                        <p style="margin: 2px 0 0 0; font-weight: 700; font-size: 14.5px; color: var(--text-color, #0f172a); letter-spacing: 0.5px;">${this.escapeHtml(group.zoomMeetingId)}</p>
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            ${group.zoomPasscode ? `
+                                <div style="display: flex; align-items: flex-start; gap: 14px;">
+                                    <span class="material-symbols-outlined" style="font-size: 22px; color: var(--text-muted, #64748b); margin-top: 2px;">lock</span>
+                                    <div>
+                                        <span style="font-size: 11px; font-weight: 700; opacity: 0.6; text-transform: uppercase; color: var(--text-muted, #64748b); letter-spacing: 0.5px;">Zoom Passcode</span>
+                                        <p style="margin: 2px 0 0 0; font-weight: 700; font-size: 14.5px; color: var(--text-color, #0f172a);">${this.escapeHtml(group.zoomPasscode)}</p>
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            <div style="display: flex; align-items: flex-start; gap: 14px;">
+                                <span class="material-symbols-outlined" style="font-size: 22px; color: var(--text-muted, #64748b); margin-top: 2px;">lock_open</span>
+                                <div>
+                                    <span style="font-size: 11px; font-weight: 700; opacity: 0.6; text-transform: uppercase; color: var(--text-muted, #64748b); letter-spacing: 0.5px;">${this.t('groups.hubJoinPolicy')}</span>
+                                    <p style="margin: 2px 0 0 0; font-weight: 700; font-size: 14.5px; color: var(--text-color, #0f172a);">${group.joinPolicy === 'approval' ? this.t('groups.joinPolicyApproval') : this.t('groups.joinPolicyOpen')}</p>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; align-items: flex-start; gap: 14px;">
+                                <span class="material-symbols-outlined" style="font-size: 22px; color: var(--text-muted, #64748b); margin-top: 2px;">star</span>
+                                <div>
+                                    <span style="font-size: 11px; font-weight: 700; opacity: 0.6; text-transform: uppercase; color: var(--text-muted, #64748b); letter-spacing: 0.5px;">${this.t('groups.hubLeaders')}</span>
+                                    <p style="margin: 2px 0 0 0; font-weight: 700; font-size: 14.5px; color: var(--text-color, #0f172a);">${this.escapeHtml((group.leaderNames || []).join(', '))}</p>
+                                </div>
+                            </div>
                         </div>
-                    ` : ''}
-                    ${group.zoomPasscode ? `
-                        <div>
-                            <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">Zoom Passcode</span>
-                            <p style="margin: 4px 0 0 0; font-weight: 600;">${this.escapeHtml(group.zoomPasscode)}</p>
-                        </div>
-                    ` : ''}
-                    <div>
-                        <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">${this.t('groups.hubJoinPolicy')}</span>
-                        <p style="margin: 4px 0 0 0; font-weight: 600;">${group.joinPolicy === 'approval' ? this.t('groups.joinPolicyApproval') : this.t('groups.joinPolicyOpen')}</p>
                     </div>
-                    <div>
-                        <span style="font-size: 12px; font-weight: 600; opacity: 0.6; text-transform: uppercase;">${this.t('groups.hubLeaders')}</span>
-                        <p style="margin: 4px 0 0 0; font-weight: 600;">${this.escapeHtml((group.leaderNames || []).join(', '))}</p>
-                    </div>
+
                 </div>
             </div>
         `;
