@@ -671,7 +671,14 @@ export class HkmGroupsManager {
                         </div>
                         <div>
                             <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Lenke (URL) *</label>
-                            <input type="url" id="group-resource-url-input" required placeholder="f.eks. https://example.com/file.pdf" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a);">
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <input type="url" id="group-resource-url-input" required placeholder="f.eks. https://example.com/file.pdf" style="flex: 1; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a);">
+                                <input type="file" id="group-resource-file-input" style="display: none;">
+                                <button type="button" id="btn-upload-resource-file" style="display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--bg-muted, #f8fafc); cursor: pointer; color: var(--text-color, #0f172a);" title="Last opp fil fra enhet">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">upload_file</span>
+                                </button>
+                            </div>
+                            <span id="resource-upload-status" style="display: block; font-size: 11px; color: var(--text-muted, #64748b); margin-top: 4px;"></span>
                         </div>
                         <div>
                             <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Type resurs</label>
@@ -731,6 +738,54 @@ export class HkmGroupsManager {
         this.container.querySelector('#group-resource-form')?.addEventListener('submit', (e) => {
             e.preventDefault();
             this.handleSaveResource();
+        });
+
+        // Resource file upload events
+        const resForm = this.container.querySelector('#group-resource-form');
+        const resFileInput = resForm?.querySelector('#group-resource-file-input');
+        const resUploadBtn = resForm?.querySelector('#btn-upload-resource-file');
+        const resStatusEl = resForm?.querySelector('#resource-upload-status');
+
+        resUploadBtn?.addEventListener('click', () => {
+            resFileInput?.click();
+        });
+
+        resFileInput?.addEventListener('change', async (e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+
+            if (resStatusEl) resStatusEl.textContent = 'Laster opp fil...';
+
+            try {
+                const uid = firebase.auth().currentUser?.uid || 'anonymous';
+                const tempId = firebase.firestore().collection('groups').doc().id;
+                const storageRef = firebase.storage().ref(`group_resources/res-${uid}-${tempId}-${file.name}`);
+                await storageRef.put(file);
+                const downloadUrl = await storageRef.getDownloadURL();
+
+                const urlInput = resForm.querySelector('#group-resource-url-input');
+                if (urlInput) urlInput.value = downloadUrl;
+                if (resStatusEl) resStatusEl.textContent = `Vellykket opplastet: ${file.name}`;
+
+                // Auto-detect type
+                const ext = file.name.split('.').pop().toLowerCase();
+                const typeSelect = resForm.querySelector('#group-resource-type-input');
+                if (typeSelect) {
+                    if (ext === 'pdf') {
+                        typeSelect.value = 'PDF';
+                    } else if (['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(ext)) {
+                        typeSelect.value = 'Dokument';
+                    } else if (['mp4', 'mov', 'avi', 'mkv'].includes(ext)) {
+                        typeSelect.value = 'Video';
+                    } else {
+                        typeSelect.value = 'Dokument';
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to upload resource:", err);
+                if (resStatusEl) resStatusEl.textContent = 'Kunne ikke laste opp fil.';
+                alert("Feil ved opplasting av fil: " + err.message);
+            }
         });
 
         // Create modal toggle
@@ -2373,6 +2428,10 @@ export class HkmGroupsManager {
         if (!modal || !form) return;
 
         form.reset();
+        const statusEl = form.querySelector('#resource-upload-status');
+        if (statusEl) statusEl.textContent = '';
+        const fileInput = form.querySelector('#group-resource-file-input');
+        if (fileInput) fileInput.value = '';
         if (resToEdit) {
             titleEl.textContent = 'Rediger resurs';
             form.querySelector('#group-resource-form-id').value = resToEdit.id;
