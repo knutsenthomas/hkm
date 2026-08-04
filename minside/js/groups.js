@@ -2065,8 +2065,31 @@ export class HkmGroupsManager {
     }
 
     renderHubChat(tabContainer) {
+        const group = this.activeGroup;
+        const waBannerHtml = group.whatsappUrl ? `
+            <div style="background: linear-gradient(135deg, #128c7e 0%, #075e54 100%); color: white; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid rgba(0,0,0,0.1); flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 12px; min-width: 250px;">
+                    <div style="background: rgba(255,255,255,0.15); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="white">
+                            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.725-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.863-9.748.002-2.607-1.012-5.059-2.859-6.91-1.847-1.851-4.3-2.87-6.906-2.87-5.438 0-9.863 4.37-9.866 9.749-.001 1.813.493 3.59 1.426 5.148l-1.002 3.661 3.768-.973zm13.102-7.391c-.269-.134-1.593-.787-1.839-.877-.247-.09-.427-.134-.607.134-.18.269-.696.877-.853 1.055-.157.18-.314.202-.583.067-.27-.134-1.14-.422-2.172-1.341-.803-.715-1.346-1.597-1.503-1.866-.157-.269-.017-.415.118-.549.121-.122.269-.314.404-.471.134-.157.18-.27.27-.449.09-.18.045-.337-.022-.471-.067-.134-.607-1.46-.831-2.001-.219-.527-.46-.454-.63-.463-.162-.008-.347-.01-.533-.01-.186 0-.489.07-.746.353-.258.28-.985.963-.985 2.348 0 1.385 1.01 2.721 1.15 2.901.14.18 1.988 3.037 4.814 4.253.673.29 1.2.463 1.61.592.677.215 1.294.185 1.782.112.543-.081 1.593-.651 1.817-1.28.225-.63.225-1.17.157-1.28-.068-.113-.247-.202-.516-.337z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 style="margin: 0; font-size: 13.5px; font-weight: 700; color: white;">WhatsApp Gruppechat</h4>
+                        <p style="margin: 2px 0 0 0; font-size: 11.5px; color: rgba(255,255,255,0.9); line-height: 1.3;">Bli med i smågruppens chat på WhatsApp.</p>
+                    </div>
+                </div>
+                <a href="${group.whatsappUrl}" target="_blank" rel="noopener noreferrer" style="background: #25d366; color: white; text-decoration: none; padding: 7px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 3px 8px rgba(0,0,0,0.15); transition: background-color 0.15s ease, transform 0.15s ease;">
+                    <span class="material-symbols-outlined" style="font-size: 16px; display: block;">open_in_new</span>
+                    Åpne WhatsApp
+                </a>
+            </div>
+        ` : '';
+
         tabContainer.innerHTML = `
             <div style="background: var(--card-bg, #fff); border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0); height: 500px; display: flex; flex-direction: column; overflow: hidden;">
+                ${waBannerHtml}
+                
                 <!-- Chat Feed -->
                 <div id="group-chat-feed" style="flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px;">
                     <div style="text-align: center; color: #94a3b8; font-size: 13px; margin: auto;">${this.t('groups.chatLoading')}</div>
