@@ -356,7 +356,7 @@
 
                     // 1. Send via Cloud Function HTTP endpoint for instant email send
                     try {
-                        const response = await fetch('https://us-central1-hiskingdomministry.cloudfunctions.net/submitRegistrationForm', {
+                        const response = await fetch('https://us-central1-his-kingdom-ministry.cloudfunctions.net/submitRegistrationForm', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(payload)
