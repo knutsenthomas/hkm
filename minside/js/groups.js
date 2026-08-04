@@ -178,6 +178,8 @@ export class HkmGroupsManager {
                             <button type="button" id="submit-import-contacts-btn" style="padding: 10px 20px; border-radius: 10px; background: var(--admin-orange, #d17d39); color: white; border: none; font-weight: 600; cursor: pointer; font-size: 13px;">Legg til valgte kontakter</button>
                         </div>
                     </div>
+                </div>
+            </div>
             <!-- Send Group Email Modal -->
             <div id="group-email-modal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 16px;">
                 <div class="modal-card" style="background: var(--card-bg, #ffffff); border-radius: 20px; width: 100%; max-width: 580px; padding: 28px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto;">
