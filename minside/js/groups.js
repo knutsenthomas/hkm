@@ -354,7 +354,11 @@ export class HkmGroupsManager {
                 'groups.noUpcomingEvents': 'Ingen planlagte samlinger',
                 'groups.errorNextEvent': 'Kunne ikke hente samling',
                 'groups.zoomMeetingId': 'Zoom Meeting ID',
-                'groups.zoomPasscode': 'Zoom Passcode'
+                'groups.zoomPasscode': 'Zoom Passcode',
+                // Database content translations
+                'HKM prayer team': 'HKM bønneteam',
+                'Bønneteam for HKM profetiske skole -  His Kingdom Ministry har fokus på misjon, utrustning av de hellige, bibelundervisning, bønn, forbønn, helbredelse og utfrielse, samt å vokse i Åndens profetiske gaver. Alt vi gjør skal gjøres etter bibelske standarder og med Guds ledelse.': 'Bønneteam for HKM profetiske skole -  His Kingdom Ministry har fokus på misjon, utrustning av de hellige, bibelundervisning, bønn, forbønn, helbredelse og utfrielse, samt å vokse i Åndens profetiske gaver. Alt vi gjør skal gjøres etter bibelske standarder og med Guds ledelse.',
+                'Bønneteam for HKM profetiske skole - His Kingdom Ministry har fokus på misjon, utrustning av de hellige, bibelundervisning, bønn, forbønn, helbredelse og utfrielse, samt å vokse i Åndens profetiske gaver. Alt vi gjør skal gjøres etter bibelske standarder og med Guds ledelse.': 'Bønneteam for HKM profetiske skole - His Kingdom Ministry har fokus på misjon, utrustning av de hellige, bibelundervisning, bønn, forbønn, helbredelse og utfrielse, samt å vokse i Åndens profetiske gaver. Alt vi gjør skal gjøres etter bibelske standarder og med Guds ledelse.'
             },
             en: {
                 'groups.title': 'Small Groups',
@@ -454,7 +458,11 @@ export class HkmGroupsManager {
                 'groups.noUpcomingEvents': 'No planned gatherings',
                 'groups.errorNextEvent': 'Could not load gathering',
                 'groups.zoomMeetingId': 'Zoom Meeting ID',
-                'groups.zoomPasscode': 'Zoom Passcode'
+                'groups.zoomPasscode': 'Zoom Passcode',
+                // Database content translations
+                'HKM prayer team': 'HKM Prayer Team',
+                'Bønneteam for HKM profetiske skole -  His Kingdom Ministry har fokus på misjon, utrustning av de hellige, bibelundervisning, bønn, forbønn, helbredelse og utfrielse, samt å vokse i Åndens profetiske gaver. Alt vi gjør skal gjøres etter bibelske standarder og med Guds ledelse.': 'Prayer team for HKM prophetic school - His Kingdom Ministry focuses on mission, equipping of the saints, Bible teaching, prayer, intercession, healing and deliverance, as well as growing in the prophetic gifts of the Spirit. Everything we do shall be done according to biblical standards and with God\'s guidance.',
+                'Bønneteam for HKM profetiske skole - His Kingdom Ministry har fokus på misjon, utrustning av de hellige, bibelundervisning, bønn, forbønn, helbredelse og utfrielse, samt å vokse i Åndens profetiske gaver. Alt vi gjør skal gjøres etter bibelske standarder og med Guds ledelse.': 'Prayer team for HKM prophetic school - His Kingdom Ministry focuses on mission, equipping of the saints, Bible teaching, prayer, intercession, healing and deliverance, as well as growing in the prophetic gifts of the Spirit. Everything we do shall be done according to biblical standards and with God\'s guidance.'
             },
             es: {
                 'groups.title': 'Grupos Pequeños',
@@ -546,7 +554,11 @@ export class HkmGroupsManager {
                 'groups.noUpcomingEvents': 'No hay reuniones planificadas',
                 'groups.errorNextEvent': 'No se pudo obtener la reunión',
                 'groups.zoomMeetingId': 'ID de reunión de Zoom',
-                'groups.zoomPasscode': 'Código de acceso de Zoom'
+                'groups.zoomPasscode': 'Código de acceso de Zoom',
+                // Database content translations
+                'HKM prayer team': 'Equipo de oración de HKM',
+                'Bønneteam for HKM profetiske skole -  His Kingdom Ministry har fokus på misjon, utrustning av de hellige, bibelundervisning, bønn, forbønn, helbredelse og utfrielse, samt å vokse i Åndens profetiske gaver. Alt vi gjør skal gjøres etter bibelske standarder og med Guds ledelse.': 'Equipo de oración para la escuela profética de HKM - His Kingdom Ministry se enfoca en la misión, el equipamiento de los santos, la enseñanza bíblica, la oración, la intercesión, la sanidad y la liberación, así como en el crecimiento en los dones proféticos del Espíritu. Todo lo que hacemos se hará de acuerdo con los estándares bíblicos y bajo la guía de Dios.',
+                'Bønneteam for HKM profetiske skole - His Kingdom Ministry har fokus på misjon, utrustning av de hellige, bibelundervisning, bønn, forbønn, helbredelse og utfrielse, samt å vokse i Åndens profetiske gaver. Alt vi gjør skal gjøres etter bibelske standarder og med Guds ledelse.': 'Equipo de oración para la escuela profética de HKM - His Kingdom Ministry se enfoca en la misión, el equipamiento de los santos, la enseñanza bíblica, la oración, la intercesión, la sanidad y la liberación, así como en el crecimiento en los dones proféticos del Espíritu. Todo lo que hacemos se hará de acuerdo con los estándares bíblicos y bajo la guía de Dios.'
             }
         };
 
@@ -1497,9 +1509,9 @@ export class HkmGroupsManager {
                 </div>
 
                 <div style="padding: 20px; flex: 1; display: flex; flex-direction: column;">
-                    <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 700;">${this.escapeHtml(group.name)}</h3>
+                    <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 700;">${this.escapeHtml(this.t(group.name))}</h3>
                     <p style="font-size: 13px; line-height: 1.5; opacity: 0.8; margin: 0 0 16px 0; flex: 1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                        ${this.escapeHtml(this.stripMarkdown(group.description || ''))}
+                        ${this.escapeHtml(this.stripMarkdown(this.t(group.description || '')))}
                     </p>
 
                     <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px; opacity: 0.9; margin-bottom: 20px;">
@@ -2000,7 +2012,7 @@ export class HkmGroupsManager {
                             <span style="background: var(--admin-orange, #d17d39); font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                 ${this.escapeHtml(this.translateCategory(group.category))}
                             </span>
-                            <h2 style="margin: 12px 0 8px 0; font-size: 32px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">${this.escapeHtml(group.name)}</h2>
+                            <h2 style="margin: 12px 0 8px 0; font-size: 32px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">${this.escapeHtml(this.t(group.name))}</h2>
                             <p style="margin: 0; opacity: 0.95; font-size: 14.5px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; font-weight: 500;">
                                 <style>
                                     .banner-location-label a {
@@ -2145,7 +2157,7 @@ export class HkmGroupsManager {
                                 <span>${this.t('groups.hubOverviewTitle')}</span>
                             </h3>
                             <div style="line-height: 1.7; opacity: 0.95; font-size: 15.5px; margin: 0; color: var(--text-color, #334155);">
-                                ${group.description ? this.renderMarkdown(group.description) : this.escapeHtml(this.t('groups.noDesc'))}
+                                ${group.description ? this.renderMarkdown(this.t(group.description)) : this.escapeHtml(this.t('groups.noDesc'))}
                             </div>
                         </div>
 
