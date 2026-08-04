@@ -89,9 +89,10 @@
         .btn-register-submit {
             width: 100%;
             padding: 16px 24px;
-            background: var(--primary-orange, #d17d39);
-            color: #ffffff;
-            border: none;
+            background: #d17d39 !important;
+            background-color: #d17d39 !important;
+            color: #ffffff !important;
+            border: none !important;
             border-radius: 12px;
             font-size: 16px;
             font-weight: 700;
@@ -101,13 +102,32 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            box-shadow: 0 8px 20px rgba(209, 125, 57, 0.25);
+            box-shadow: 0 8px 20px rgba(209, 125, 57, 0.3);
+        }
+
+        .btn-register-submit span,
+        .btn-register-submit .material-symbols-outlined {
+            color: #ffffff !important;
         }
 
         .btn-register-submit:hover {
-            background: #b5601f;
+            background: #b5601f !important;
+            background-color: #b5601f !important;
+            color: #ffffff !important;
             transform: translateY(-2px);
-            box-shadow: 0 12px 24px rgba(209, 125, 57, 0.35);
+            box-shadow: 0 12px 24px rgba(209, 125, 57, 0.4);
+        }
+
+        .lang-btn {
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        }
+
+        .lang-switcher:hover .lang-dropdown,
+        .lang-switcher.active .lang-dropdown {
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
         }
 
         .btn-register-submit:active {

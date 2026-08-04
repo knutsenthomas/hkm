@@ -472,6 +472,35 @@ export function renderSiteHeader(language = getLanguage()) {
 
                             <div class="hidden md:block w-px h-5 bg-white/20 mx-1 dock-divider"></div>
 
+function getTranslatedPath(targetLang) {
+    if (typeof window === 'undefined') return targetLang === 'no' ? '/' : `/${targetLang}/`;
+    const path = window.location.pathname.replace(/\/$/, '').toLowerCase();
+    if (path.includes('/register') || path.includes('/registro') || path.includes('/registrer')) {
+        if (targetLang === 'no') return '/registrer';
+        if (targetLang === 'en') return '/en/register';
+        if (targetLang === 'es') return '/es/registro';
+    }
+    if (path.includes('/contact') || path.includes('/contacto') || path.includes('/kontakt')) {
+        if (targetLang === 'no') return '/kontakt';
+        if (targetLang === 'en') return '/en/contact';
+        if (targetLang === 'es') return '/es/contacto';
+    }
+    if (path.includes('/about') || path.includes('/sobre-nosotros') || path.includes('/om-oss')) {
+        if (targetLang === 'no') return '/om-oss';
+        if (targetLang === 'en') return '/en/about';
+        if (targetLang === 'es') return '/es/sobre-nosotros';
+    }
+    if (path.includes('/donations') || path.includes('/donaciones') || path.includes('/donasjoner')) {
+        if (targetLang === 'no') return '/donasjoner';
+        if (targetLang === 'en') return '/en/donations';
+        if (targetLang === 'es') return '/es/donaciones';
+    }
+    if (targetLang === 'no') return '/';
+    if (targetLang === 'en') return '/en/';
+    if (targetLang === 'es') return '/es/';
+    return '/';
+}
+
                             <div class="lang-switcher relative group">
                                 <button class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full text-white hover:bg-white/15 transition-all lang-btn"
                                     aria-label="${copy.languageLabel}">
@@ -479,9 +508,9 @@ export function renderSiteHeader(language = getLanguage()) {
                                     <span ${contentAttributes('header.currentLanguage')}>${copy.code}</span>
                                 </button>
                                 <div class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden border border-gray-100">
-                                    <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
-                                    <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="en">🇺🇸 English</a>
-                                    <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="es">🇪🇸 Español</a>
+                                    <a href="${getTranslatedPath('no')}" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
+                                    <a href="${getTranslatedPath('en')}" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="en">🇺🇸 English</a>
+                                    <a href="${getTranslatedPath('es')}" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="es">🇪🇸 Español</a>
                                 </div>
                             </div>
                         </div>
