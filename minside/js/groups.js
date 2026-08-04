@@ -48,17 +48,7 @@ export class HkmGroupsManager {
                         </button>
                     </div>
 
-                    <div class="groups-header-actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        ${this.isAdmin ? `
-                            <button type="button" class="btn btn-secondary" id="groups-seed-mock-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 14px; background: #475569; color: white; border: none; cursor: pointer; transition: transform 0.2s ease, background-color 0.2s ease;">
-                                <span class="material-symbols-outlined" style="font-size: 20px;">science</span>
-                                <span>Opprett mockup-grupper</span>
-                            </button>
-                            <button type="button" class="btn btn-danger" id="groups-clear-mock-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 14px; background: #dc2626; color: white; border: none; cursor: pointer; transition: transform 0.2s ease, background-color 0.2s ease;">
-                                <span class="material-symbols-outlined" style="font-size: 20px;">delete_sweep</span>
-                                <span>Fjern mockup-grupper</span>
-                            </button>
-                        ` : ''}
+                    <div class="groups-header-actions" style="display: flex; gap: 10px;">
                         <button type="button" class="btn btn-primary" id="groups-create-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 14px; background: var(--admin-orange, #d17d39); color: white; border: none; cursor: pointer; transition: transform 0.2s ease, background-color 0.2s ease;">
                             <span class="material-symbols-outlined" style="font-size: 20px;">add</span>
                             <span>Opprett ny gruppe</span>
@@ -246,24 +236,7 @@ export class HkmGroupsManager {
             this.openCreateModal();
         });
 
-        if (this.isAdmin) {
-            this.container.querySelector('#groups-seed-mock-btn')?.addEventListener('click', async () => {
-                if (confirm('Vil du opprette standard mockup-grupper?')) {
-                    try {
-                        await this.seedDemoGroups();
-                        alert('Mockup-grupper opprettet!');
-                        await this.loadGroupsData();
-                    } catch (err) {
-                        console.error('Error seeding groups:', err);
-                        alert('Feil ved oppretting av mockup-grupper: ' + err.message);
-                    }
-                }
-            });
 
-            this.container.querySelector('#groups-clear-mock-btn')?.addEventListener('click', () => {
-                this.handleRemoveMockupGroups();
-            });
-        }
         this.container.querySelector('#close-group-modal')?.addEventListener('click', () => {
             modal.style.display = 'none';
         });
