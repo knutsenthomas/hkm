@@ -1083,16 +1083,18 @@ export class HkmGroupsManager {
                     <span style="position: absolute; top: 12px; left: 12px; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); color: #fff; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 10px; border-radius: 20px;">
                         ${this.escapeHtml(group.category || 'Grupper')}
                     </span>
-                    ${isLeader ? `
-                        <span style="position: absolute; top: 12px; right: 12px; background: var(--admin-orange, #d17d39); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;">
-                            ⭐ ${this.t('groups.groupLeder')}
-                        </span>
-                    ` : ''}
-                    ${(isLeader || this.isAdmin) ? `
-                        <button type="button" class="btn-delete-card-group" data-id="${group.id}" data-name="${this.escapeHtml(group.name)}" title="Slett gruppe" style="position: absolute; top: 12px; right: ${isLeader ? '80px' : '12px'}; background: rgba(239, 68, 68, 0.9); backdrop-filter: blur(4px); color: white; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s ease, background-color 0.15s ease; z-index: 2;">
-                            <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
-                        </button>
-                    ` : ''}
+                    <div style="position: absolute; top: 12px; right: 12px; display: flex; align-items: center; gap: 8px; z-index: 2;">
+                        ${isLeader ? `
+                            <span style="background: var(--admin-orange, #d17d39); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; white-space: nowrap;">
+                                ⭐ ${this.t('groups.groupLeder')}
+                            </span>
+                        ` : ''}
+                        ${(isLeader || this.isAdmin) ? `
+                            <button type="button" class="btn-delete-card-group" data-id="${group.id}" data-name="${this.escapeHtml(group.name)}" title="Slett gruppe" style="background: rgba(239, 68, 68, 0.9); backdrop-filter: blur(4px); color: white; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s ease, background-color 0.15s ease;">
+                                <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
+                            </button>
+                        ` : ''}
+                    </div>
                 </div>
 
                 <div style="padding: 20px; flex: 1; display: flex; flex-direction: column;">
