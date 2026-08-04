@@ -5532,12 +5532,23 @@ exports.sendManualEmail = onRequest({ cors: true, secrets: [emailUserParam, emai
 
   await verifyAdmin(req, res, async () => {
     try {
-      const { to, subject, message, fromName, html: rawHtml } = req.body;
+      const { to, subject, message, html: rawHtml } = req.body;
 
       if (!to || !subject || (!message && !rawHtml)) {
         res.status(400).send({ error: "Mangler mottaker, emne eller melding." });
         return;
       }
+
+      // Hent navn på innlogget admin-bruker
+      let userDisplayName = req.body.fromName;
+      if (!userDisplayName && req.user) {
+        try {
+          const userDoc = req.user.uid ? await db.collection("users").doc(req.user.uid).get() : null;
+          const userData = userDoc && userDoc.exists ? userDoc.data() : {};
+          userDisplayName = userData.displayName || req.user.name || req.user.displayName || (req.user.email ? req.user.email.split('@')[0] : "");
+        } catch (e) {}
+      }
+      const fromName = userDisplayName || "His Kingdom Ministry";
 
       let html = "";
       let text = message || "";
@@ -5559,17 +5570,7 @@ exports.sendManualEmail = onRequest({ cors: true, secrets: [emailUserParam, emai
           console.warn("Unsubscribe link error ignored during manual email send:", unsubErr);
         }
       } else {
-        html = `
-          <div style="font-family: sans-serif; width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-            <div style="margin-bottom: 20px;">
-              ${message.replace(/\n/g, '<br>')}
-            </div>
-            <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
-              Vennlig hilsen,<br>
-              His Kingdom Ministry
-            </div>
-          </div>
-        `;
+        html = `<div>${(message || '').replace(/\n/g, '<br>')}</div>`;
       }
 
       const emailResult = await sendEmail({ to, subject, html, text, fromName });
@@ -5619,8 +5620,9 @@ exports.sendInboxEmail = onRequest({ cors: true, secrets: [emailUserParam, email
       const text = clampText(req.body.text || "", 12000);
       const htmlBody = sanitizeInboxEmailHtml(req.body.html || "");
       const fromMode = req.body.fromMode === "admin" ? "admin" : "post";
+      const userDisplayName = userData.displayName || (req.user && (req.user.name || req.user.displayName)) || (adminEmail ? adminEmail.split('@')[0] : "");
       const fromName = clampText(
-        req.body.fromName || (fromMode === "admin" ? (userData.displayName || adminEmail || "HKM Team") : "His Kingdom Ministry"),
+        req.body.fromName || (fromMode === "admin" ? (userDisplayName || "HKM Team") : (userDisplayName || "His Kingdom Ministry")),
         120
       );
       const replyTo = fromMode === "admin" && adminEmail ? adminEmail : "post@hiskingdomministry.no";
