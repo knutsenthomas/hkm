@@ -877,7 +877,7 @@ export class HkmGroupsManager {
 
                     <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid var(--border-color, #f1f5f9);">
                         <span style="font-size: 12px; font-weight: 600; opacity: 0.7;">
-                            👥 ${(group.memberUids || []).length} medlemmer
+                            👥 ${(group.memberUids || []).length} ${(group.memberUids || []).length === 1 ? 'medlem' : 'medlemmer'}
                         </span>
                         
                         ${isMember ? `
@@ -1359,7 +1359,7 @@ export class HkmGroupsManager {
                             <p style="margin: 0; opacity: 0.9; font-size: 14px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
                                 <span>📍 ${this.escapeHtml(group.location || 'Sted ikke oppgitt')}</span>
                                 <span>🕒 ${this.escapeHtml(group.meetingSchedule || '')}</span>
-                                <span>👥 ${(group.memberUids || []).length} medlemmer</span>
+                                <span>👥 ${(group.memberUids || []).length} ${(group.memberUids || []).length === 1 ? 'medlem' : 'medlemmer'}</span>
                             </p>
                         </div>
                         
