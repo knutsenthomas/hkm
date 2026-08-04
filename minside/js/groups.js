@@ -23,8 +23,35 @@ export class HkmGroupsManager {
     get isAdmin() {
         const currentUser = firebase.auth() ? firebase.auth().currentUser : null;
         const email = currentUser ? (currentUser.email || '').toLowerCase() : '';
-        const role = (this.app && this.app.currentUser && this.app.currentUser.role) || '';
+        const role = (this.app && this.app.profileData && this.app.profileData.role) || '';
         return role === 'admin' || role === 'superadmin' || email === 'thomas@hiskingdomministry.no' || email === 'knutsenthomas@gmail.com';
+    }
+
+    checkIsLeader(group) {
+        if (!group) return false;
+        const currentUser = firebase.auth() ? firebase.auth().currentUser : null;
+        if (!currentUser) return false;
+        const uid = currentUser.uid;
+
+        // 1. Sjekk om brukerens UID er registrert i leaderUids
+        if (group.leaderUids && group.leaderUids.includes(uid)) {
+            return true;
+        }
+
+        // 2. Sjekk om brukerens visningsnavn matcher et av navnene i leaderNames (case-insensitive)
+        const profileDisplayName = (this.app && this.app.profileData && this.app.profileData.displayName) || '';
+        const authDisplayName = currentUser.displayName || '';
+        
+        const leaderNamesLower = (group.leaderNames || []).map(n => n.trim().toLowerCase());
+        
+        if (profileDisplayName && leaderNamesLower.includes(profileDisplayName.trim().toLowerCase())) {
+            return true;
+        }
+        if (authDisplayName && leaderNamesLower.includes(authDisplayName.trim().toLowerCase())) {
+            return true;
+        }
+
+        return false;
     }
 
     t(key) {
@@ -429,6 +456,10 @@ export class HkmGroupsManager {
                         <div>
                             <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Beskrivelse</label>
                             <textarea id="group-description-input" rows="3" placeholder="Fortell om hva gruppen gjør..." style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a); font-family: inherit;"></textarea>
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">WhatsApp Gruppelenke (valgfri)</label>
+                            <input type="url" id="group-whatsapp-input" placeholder="f.eks. https://chat.whatsapp.com/..." style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a);">
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr; gap: 16px;">
                             <div>
@@ -1150,7 +1181,7 @@ export class HkmGroupsManager {
     renderGroupCard(group) {
         const uid = firebase.auth().currentUser?.uid;
         const isMember = group.memberUids && group.memberUids.includes(uid);
-        const isLeader = group.leaderUids && group.leaderUids.includes(uid);
+        const isLeader = this.checkIsLeader(group);
 
         const img = group.imageUrl || 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80';
         const totalCount = ((group.memberNames || []).length + (group.leaderNames || []).length) || (group.memberUids || []).length;
@@ -1661,7 +1692,7 @@ export class HkmGroupsManager {
 
         const group = this.activeGroup;
         const uid = firebase.auth().currentUser?.uid;
-        const isLeader = group.leaderUids && group.leaderUids.includes(uid);
+        const isLeader = this.checkIsLeader(group);
         const img = group.imageUrl || 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80';
         const totalCount = ((group.memberNames || []).length + (group.leaderNames || []).length) || (group.memberUids || []).length;
 
@@ -1792,7 +1823,7 @@ export class HkmGroupsManager {
     renderHubOverview(tabContainer) {
         const group = this.activeGroup;
         const uid = firebase.auth().currentUser?.uid;
-        const isLeader = group.leaderUids && group.leaderUids.includes(uid);
+        const isLeader = this.checkIsLeader(group);
         const canManage = isLeader || this.isAdmin;
 
         tabContainer.innerHTML = `
@@ -1802,6 +1833,26 @@ export class HkmGroupsManager {
                     <p style="line-height: 1.6; opacity: 0.9; font-size: 15px; margin-bottom: 24px;">
                         ${this.escapeHtml(group.description || this.t('groups.noDesc'))}
                     </p>
+
+                    ${group.whatsappUrl ? `
+                        <div style="background: #e8f5e9; border: 1px solid #c8e6c9; border-radius: 16px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; gap: 16px; flex-wrap: wrap;">
+                            <div style="display: flex; align-items: center; gap: 14px; min-width: 250px;">
+                                <div style="background: #25d366; color: white; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 10px rgba(37,211,102,0.3);">
+                                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.725-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.863-9.748.002-2.607-1.012-5.059-2.859-6.91-1.847-1.851-4.3-2.87-6.906-2.87-5.438 0-9.863 4.37-9.866 9.749-.001 1.813.493 3.59 1.426 5.148l-1.002 3.661 3.768-.973zm13.102-7.391c-.269-.134-1.593-.787-1.839-.877-.247-.09-.427-.134-.607.134-.18.269-.696.877-.853 1.055-.157.18-.314.202-.583.067-.27-.134-1.14-.422-2.172-1.341-.803-.715-1.346-1.597-1.503-1.866-.157-.269-.017-.415.118-.549.121-.122.269-.314.404-.471.134-.157.18-.27.27-.449.09-.18.045-.337-.022-.471-.067-.134-.607-1.46-.831-2.001-.219-.527-.46-.454-.63-.463-.162-.008-.347-.01-.533-.01-.186 0-.489.07-.746.353-.258.28-.985.963-.985 2.348 0 1.385 1.01 2.721 1.15 2.901.14.18 1.988 3.037 4.814 4.253.673.29 1.2.463 1.61.592.677.215 1.294.185 1.782.112.543-.081 1.593-.651 1.817-1.28.225-.63.225-1.17.157-1.28-.068-.113-.247-.202-.516-.337z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 style="margin: 0; font-size: 15px; font-weight: 700; color: #1b5e20;">WhatsApp-gruppe</h4>
+                                    <p style="margin: 2px 0 0 0; font-size: 13px; color: #2e7d32; opacity: 0.95;">Bli med i gruppens interne chat på WhatsApp.</p>
+                                </div>
+                            </div>
+                            <a href="${group.whatsappUrl}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; justify-content: center; padding: 10px 20px; border-radius: 12px; background: #25d366; color: white; border: none; font-weight: 700; font-size: 13.5px; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(37,211,102,0.2);" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 16px rgba(37,211,102,0.3)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(37,211,102,0.2)';">
+                                <span>Åpne chat</span>
+                                <span class="material-symbols-outlined" style="font-size: 16px; display: block;">open_in_new</span>
+                            </a>
+                        </div>
+                    ` : ''}
 
                     <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">${this.t('groups.hubInfo')}</h4>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: var(--bg-muted, #f8fafc); padding: 16px; border-radius: 12px;">
@@ -2106,7 +2157,7 @@ export class HkmGroupsManager {
 
     async renderHubEvents(tabContainer) {
         const uid = firebase.auth().currentUser?.uid;
-        const isLeader = this.activeGroup.leaderUids && this.activeGroup.leaderUids.includes(uid);
+        const isLeader = this.checkIsLeader(this.activeGroup);
         const isAdmin = this.isAdmin;
 
         tabContainer.innerHTML = `
@@ -2227,7 +2278,7 @@ export class HkmGroupsManager {
 
     async renderHubResources(tabContainer) {
         const uid = firebase.auth().currentUser?.uid;
-        const isLeader = this.activeGroup.leaderUids && this.activeGroup.leaderUids.includes(uid);
+        const isLeader = this.checkIsLeader(this.activeGroup);
         const isAdmin = this.isAdmin;
 
         tabContainer.innerHTML = `
@@ -2537,12 +2588,14 @@ export class HkmGroupsManager {
             form.querySelector('#group-schedule-input').value = groupToEdit.meetingSchedule || '';
             form.querySelector('#group-location-input').value = groupToEdit.location || '';
             form.querySelector('#group-description-input').value = groupToEdit.description || '';
+            form.querySelector('#group-whatsapp-input').value = groupToEdit.whatsappUrl || '';
             form.querySelector('#group-policy-input').value = groupToEdit.joinPolicy || 'open';
             form.querySelector('#group-image-input').value = groupToEdit.imageUrl || '';
             if (previewEl) previewEl.src = groupToEdit.imageUrl || defaultImg;
         } else {
             titleEl.textContent = 'Opprett ny gruppe';
             form.querySelector('#group-form-id').value = '';
+            form.querySelector('#group-whatsapp-input').value = '';
             form.querySelector('#group-image-input').value = '';
             if (previewEl) previewEl.src = defaultImg;
         }
@@ -2572,6 +2625,7 @@ export class HkmGroupsManager {
             meetingSchedule: form.querySelector('#group-schedule-input').value.trim(),
             location: form.querySelector('#group-location-input').value.trim(),
             description: form.querySelector('#group-description-input').value.trim(),
+            whatsappUrl: form.querySelector('#group-whatsapp-input').value.trim(),
             joinPolicy: form.querySelector('#group-policy-input').value,
             imageUrl: form.querySelector('#group-image-input').value.trim() || 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80',
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
