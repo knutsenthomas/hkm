@@ -354,18 +354,26 @@ export class HkmGroupsManager {
             // If empty, seed categories and reload
             if (fetchedCats.length === 0) {
                 const defaultCats = ['Husfellesskap', 'Bønnegruppe', 'Bibelstudie', 'Ung-voksen', 'Lovsang & Musikk', 'Lederteam'];
-                const batch = db.batch();
-                defaultCats.forEach(cat => {
-                    const docRef = db.collection('groupCategories').doc();
-                    batch.set(docRef, { name: cat, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-                });
-                await batch.commit();
-                
-                // reload
-                return this.loadGroupsData();
+                const uid = firebase.auth().currentUser?.uid;
+                if (uid) {
+                    try {
+                        const batch = db.batch();
+                        defaultCats.forEach(cat => {
+                            const docRef = db.collection('groupCategories').doc();
+                            batch.set(docRef, { name: cat, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+                        });
+                        await batch.commit();
+                        return this.loadGroupsData();
+                    } catch (e) {
+                        console.warn("Failed to seed groupCategories in Firestore, using fallback:", e);
+                        this.categories = defaultCats;
+                    }
+                } else {
+                    this.categories = defaultCats;
+                }
+            } else {
+                this.categories = fetchedCats;
             }
-
-            this.categories = fetchedCats;
 
             const snap = await db.collection('groups').get();
             let fetchedGroups = [];
