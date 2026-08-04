@@ -1711,6 +1711,10 @@ export class HkmGroupsManager {
 
     renderHubOverview(tabContainer) {
         const group = this.activeGroup;
+        const uid = firebase.auth().currentUser?.uid;
+        const isLeader = group.leaderUids && group.leaderUids.includes(uid);
+        const canManage = isLeader || this.isAdmin;
+
         tabContainer.innerHTML = `
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
                 <div style="background: var(--card-bg, #fff); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0);">
@@ -1743,17 +1747,28 @@ export class HkmGroupsManager {
                 <div style="background: var(--card-bg, #fff); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
                         <h3 style="margin: 0; font-size: 18px; font-weight: 700;">${this.t('groups.hubMembersTitle')} (${((group.memberNames || []).length + (group.leaderNames || []).length) || (group.memberUids || []).length})</h3>
-                        ${this.isAdmin ? `
-                            <button type="button" id="btn-open-contacts-modal" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; padding: 8px 16px; border-radius: 10px; background: linear-gradient(135deg, #d17d39 0%, #b86524 100%); color: white; border: none; font-weight: 600; cursor: pointer; transition: transform 0.15s ease;">
-                                <span class="material-symbols-outlined" style="font-size: 18px;">contacts</span>
-                                <span>${this.t('groups.hubGetFromContacts')}</span>
-                            </button>
-                        ` : ''}
+                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                            ${this.isAdmin ? `
+                                <button type="button" id="btn-open-contacts-modal" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; padding: 8px 16px; border-radius: 10px; background: linear-gradient(135deg, #d17d39 0%, #b86524 100%); color: white; border: none; font-weight: 600; cursor: pointer; transition: transform 0.15s ease;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">contacts</span>
+                                    <span>${this.t('groups.hubGetFromContacts')}</span>
+                                </button>
+                            ` : ''}
+                            ${canManage ? `
+                                <button type="button" id="btn-remove-selected-members" style="display: none; align-items: center; gap: 6px; font-size: 13px; padding: 8px 16px; border-radius: 10px; background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; font-weight: 600; cursor: pointer; transition: all 0.15s ease;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">person_remove</span>
+                                    <span>Fjern markerte</span>
+                                </button>
+                            ` : ''}
+                        </div>
                     </div>
 
                     <div style="display: flex; flex-direction: column; gap: 10px;">
                         ${(group.leaderNames || []).map(leader => `
                             <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; background: var(--bg-muted, #f8fafc); border: 1px solid var(--border-color, #e2e8f0);">
+                                ${canManage ? `
+                                    <input type="checkbox" class="remove-member-checkbox" data-name="${this.escapeHtml(leader)}" data-role="leader" style="width: 16px; height: 16px; cursor: pointer; accent-color: #ef4444; margin-right: 4px;">
+                                ` : ''}
                                 <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--admin-orange, #d17d39); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700;">
                                     ${leader.charAt(0).toUpperCase()}
                                 </div>
@@ -1768,6 +1783,9 @@ export class HkmGroupsManager {
                         `).join('')}
                         ${(group.memberNames || []).filter(m => !(group.leaderNames || []).includes(m)).map(member => `
                             <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; background: var(--bg-muted, #f8fafc); border: 1px solid var(--border-color, #e2e8f0);">
+                                ${canManage ? `
+                                    <input type="checkbox" class="remove-member-checkbox" data-name="${this.escapeHtml(member)}" data-role="member" style="width: 16px; height: 16px; cursor: pointer; accent-color: #ef4444; margin-right: 4px;">
+                                ` : ''}
                                 <div style="width: 36px; height: 36px; border-radius: 50%; background: #0f172a; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700;">
                                     ${member.charAt(0).toUpperCase()}
                                 </div>
@@ -1785,6 +1803,95 @@ export class HkmGroupsManager {
         tabContainer.querySelector('#btn-open-contacts-modal')?.addEventListener('click', () => {
             this.openContactsModal(group);
         });
+
+        if (canManage) {
+            const checkboxes = tabContainer.querySelectorAll('.remove-member-checkbox');
+            const removeBtn = tabContainer.querySelector('#btn-remove-selected-members');
+
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    const checkedCount = Array.from(checkboxes).filter(c => c.checked).length;
+                    if (removeBtn) {
+                        removeBtn.style.display = checkedCount > 0 ? 'inline-flex' : 'none';
+                    }
+                });
+            });
+
+            removeBtn?.addEventListener('click', async () => {
+                const selected = Array.from(checkboxes)
+                    .filter(c => c.checked)
+                    .map(c => ({
+                        name: c.dataset.name,
+                        role: c.dataset.role
+                    }));
+
+                if (selected.length === 0) return;
+
+                const confirmMsg = selected.length === 1 
+                    ? `Er du sikker på at du vil fjerne ${selected[0].name} fra gruppen?`
+                    : `Er du sikker på at du vil fjerne ${selected.length} valgte personer fra gruppen?`;
+
+                if (!confirm(confirmMsg)) return;
+
+                try {
+                    const db = firebase.firestore();
+                    const groupRef = db.collection('groups').doc(group.id);
+
+                    // Filter local arrays
+                    let updatedMembers = [...(group.memberNames || [])];
+                    let updatedLeaders = [...(group.leaderNames || [])];
+
+                    selected.forEach(p => {
+                        if (p.role === 'leader') {
+                            updatedLeaders = updatedLeaders.filter(n => n !== p.name);
+                        }
+                        updatedMembers = updatedMembers.filter(n => n !== p.name);
+                    });
+
+                    const updatedCount = updatedMembers.length;
+
+                    // Update Firestore group doc
+                    await groupRef.update({
+                        memberNames: updatedMembers,
+                        leaderNames: updatedLeaders,
+                        memberCount: updatedCount,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    // Update local memory object
+                    group.memberNames = updatedMembers;
+                    group.leaderNames = updatedLeaders;
+                    group.memberCount = updatedCount;
+
+                    // Clean up groupMembers collection
+                    const selectedNamesList = selected.map(p => p.name);
+                    const membersSnap = await db.collection('groupMembers')
+                        .where('groupId', '==', group.id)
+                        .get();
+
+                    const batch = db.batch();
+                    let hasDocsToDelete = false;
+                    membersSnap.forEach(doc => {
+                        if (selectedNamesList.includes(doc.data().name)) {
+                            batch.delete(doc.ref);
+                            hasDocsToDelete = true;
+                        }
+                    });
+
+                    if (hasDocsToDelete) {
+                        await batch.commit();
+                    }
+
+                    alert(selected.length === 1 ? "Personen ble fjernet." : "De valgte personene ble fjernet.");
+                    
+                    // Re-render overview to update list
+                    this.renderHubOverview(tabContainer);
+                } catch (err) {
+                    console.error("Error removing members:", err);
+                    alert("Feil ved fjerning av personer: " + err.message);
+                }
+            });
+        }
     }
 
     renderHubChat(tabContainer) {
