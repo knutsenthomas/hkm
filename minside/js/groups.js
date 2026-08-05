@@ -284,7 +284,7 @@ export class HkmGroupsManager {
                 
                 // Group Hub
                 'groups.hubOverview': 'Oversikt',
-                'groups.hubChat': 'Meldinger & Chat',
+                'groups.hubChat': 'Meldinger',
                 'groups.hubEvents': 'Samlinger',
                 'groups.hubResources': 'Ressurser',
                 'groups.hubSendEmail': 'Send e-post',
@@ -388,7 +388,7 @@ export class HkmGroupsManager {
                 
                 // Group Hub
                 'groups.hubOverview': 'Overview',
-                'groups.hubChat': 'Messages & Chat',
+                'groups.hubChat': 'Messages',
                 'groups.hubEvents': 'Gatherings',
                 'groups.hubResources': 'Resources',
                 'groups.hubSendEmail': 'Send email',
@@ -492,7 +492,7 @@ export class HkmGroupsManager {
                 
                 // Group Hub
                 'groups.hubOverview': 'Resumen',
-                'groups.hubChat': 'Mensajes y chat',
+                'groups.hubChat': 'Mensajes',
                 'groups.hubEvents': 'Reuniones',
                 'groups.hubResources': 'Recursos',
                 'groups.hubSendEmail': 'Enviar correo',
