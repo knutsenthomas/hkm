@@ -1649,7 +1649,7 @@ export class HkmGroupsManager {
             </div>
 
             <!-- Mobile PCO-style layout -->
-            <div class="groups-mobile-only pco-header-bar" style="align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--card-bg, #ffffff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); position: relative; z-index: 100; width: 100%;">
+            <div class="groups-mobile-only pco-header-bar" style="align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--card-bg, #ffffff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); position: relative; z-index: 100; width: 100%; margin-bottom: 24px;">
                 <!-- Left: Back Button -->
                 <button type="button" id="btn-groups-back" style="background: transparent; border: none; padding: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-color, #0f172a); transition: transform 0.2s ease, background-color 0.2s ease; border-radius: 50%;" onmouseover="this.style.background='rgba(15,23,42,0.05)';" onmouseout="this.style.background='transparent';">
                     <span class="material-symbols-outlined" style="font-size: 24px; font-weight: 600;">chevron_left</span>
