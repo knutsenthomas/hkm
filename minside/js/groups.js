@@ -1529,6 +1529,22 @@ export class HkmGroupsManager {
 
         headerContainer.innerHTML = `
             <style>
+                .groups-mobile-only {
+                    display: none;
+                }
+                .groups-desktop-only {
+                    display: none;
+                }
+                @media (max-width: 768px) {
+                    .groups-mobile-only {
+                        display: flex !important;
+                    }
+                }
+                @media (min-width: 769px) {
+                    .groups-desktop-only {
+                        display: flex !important;
+                    }
+                }
                 .pco-menu-item {
                     display: flex;
                     align-items: center;
@@ -1556,8 +1572,86 @@ export class HkmGroupsManager {
                 .pco-menu-item .material-symbols-outlined {
                     font-size: 18px;
                 }
+                .desktop-tab-btn {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 8px 16px;
+                    border: none;
+                    background: transparent;
+                    border-radius: 8px;
+                    font-weight: 700;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    font-size: 14px;
+                    color: var(--text-color, #475569);
+                }
+                .desktop-tab-btn:hover {
+                    background: rgba(15, 23, 42, 0.08);
+                }
+                .desktop-tab-btn.active {
+                    background: var(--admin-orange, #d17d39) !important;
+                    color: #ffffff !important;
+                }
             </style>
-            <div class="pco-header-bar" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--card-bg, #ffffff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); position: relative; z-index: 100; width: 100%;">
+
+            <!-- PC/Desktop layout: Tabs and Back button side-by-side -->
+            <div class="groups-desktop-only" style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; width: 100%;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    ${isHub ? `
+                        <button type="button" id="btn-desktop-back" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--card-bg, #ffffff); cursor: pointer; font-size: 14px; font-weight: 700; transition: all 0.2s ease; color: var(--text-color, #0f172a);" onmouseover="this.style.background='rgba(15,23,42,0.02)';" onmouseout="this.style.background='var(--card-bg, #ffffff)';">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
+                            <span>${this.t('groups.backToGroups')}</span>
+                        </button>
+                    ` : ''}
+                    
+                    <div class="groups-nav-tabs" style="display: flex; gap: 4px; background: rgba(15, 23, 42, 0.04); padding: 4px; border-radius: 12px;">
+                        <button type="button" class="desktop-tab-btn ${this.currentView === 'directory' ? 'active' : ''}" data-gview="directory">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">explore</span>
+                            <span>${this.t('groups.exploreGroups')}</span>
+                        </button>
+                        <button type="button" class="desktop-tab-btn ${this.currentView === 'my-groups' ? 'active' : ''}" data-gview="my-groups">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">group_work</span>
+                            <span>${this.t('groups.myGroups')}</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    ${isHub ? `
+                        <!-- Hub actions -->
+                        <button type="button" id="btn-desktop-email" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 700; font-size: 14px; background: var(--admin-orange, #d17d39); color: white; border: none; cursor: pointer; transition: transform 0.2s ease; box-shadow: 0 4px 12px rgba(209,125,57,0.2);" onmouseover="this.style.transform='scale(1.02)';" onmouseout="this.style.transform='none';">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">mail</span>
+                            <span>${this.t('groups.hubSendEmail')}</span>
+                        </button>
+                        ${(this.checkIsLeader(activeGroup) || isAdmin) ? `
+                            <button type="button" id="btn-desktop-edit" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 700; font-size: 14px; background: #475569; color: white; border: none; cursor: pointer; transition: transform 0.2s ease;" onmouseover="this.style.transform='scale(1.02)';" onmouseout="this.style.transform='none';">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+                                <span>Rediger</span>
+                            </button>
+                            <button type="button" id="btn-desktop-duplicate" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 700; font-size: 14px; background: #475569; color: white; border: none; cursor: pointer; transition: transform 0.2s ease;" onmouseover="this.style.transform='scale(1.02)';" onmouseout="this.style.transform='none';">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">content_copy</span>
+                                <span>Dupliser</span>
+                            </button>
+                        ` : ''}
+                    ` : `
+                        <!-- Directory actions -->
+                        ${isAdmin ? `
+                            <button type="button" id="btn-desktop-manage-categories" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 700; font-size: 14px; background: #475569; color: white; border: none; cursor: pointer; transition: transform 0.2s ease;" onmouseover="this.style.transform='scale(1.02)';" onmouseout="this.style.transform='none';">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">category</span>
+                                <span>${this.t('groups.adminCategories')}</span>
+                            </button>
+                        ` : ''}
+                        <button type="button" id="btn-desktop-create" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 700; font-size: 14px; background: var(--admin-orange, #d17d39); color: white; border: none; cursor: pointer; transition: transform 0.2s ease; box-shadow: 0 4px 12px rgba(209,125,57,0.2);" onmouseover="this.style.transform='scale(1.02)';" onmouseout="this.style.transform='none';">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+                            <span>${this.t('groups.createNew')}</span>
+                        </button>
+                    `}
+                </div>
+            </div>
+
+            <!-- Mobile PCO-style layout -->
+            <div class="groups-mobile-only pco-header-bar" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--card-bg, #ffffff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); position: relative; z-index: 100; width: 100%;">
                 <!-- Left: Back Button -->
                 <button type="button" id="btn-groups-back" style="background: transparent; border: none; padding: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-color, #0f172a); transition: transform 0.2s ease, background-color 0.2s ease; border-radius: 50%;" onmouseover="this.style.background='rgba(15,23,42,0.05)';" onmouseout="this.style.background='transparent';">
                     <span class="material-symbols-outlined" style="font-size: 24px; font-weight: 600;">chevron_left</span>
@@ -1725,6 +1819,43 @@ export class HkmGroupsManager {
             if (confirm(`Er du sikker på at du vil melde deg ut av "${activeGroup.name}"?`)) {
                 this.handleLeaveGroup(activeGroup.id);
             }
+        });
+
+        // Bind desktop tab buttons
+        headerContainer.querySelectorAll('.desktop-tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.currentView = btn.dataset.gview;
+                this.renderCurrentView();
+            });
+        });
+
+        // Bind desktop back button
+        headerContainer.querySelector('#btn-desktop-back')?.addEventListener('click', () => {
+            this.selectedGroupId = null;
+            this.activeGroup = null;
+            this.currentView = 'directory';
+            this.render(this.container);
+        });
+
+        // Bind desktop actions
+        headerContainer.querySelector('#btn-desktop-email')?.addEventListener('click', () => {
+            this.openGroupEmailModal();
+        });
+
+        headerContainer.querySelector('#btn-desktop-edit')?.addEventListener('click', () => {
+            this.openCreateModal(activeGroup);
+        });
+
+        headerContainer.querySelector('#btn-desktop-duplicate')?.addEventListener('click', () => {
+            this.openDuplicateModal(activeGroup);
+        });
+
+        headerContainer.querySelector('#btn-desktop-manage-categories')?.addEventListener('click', () => {
+            this.openCategoriesModal();
+        });
+
+        headerContainer.querySelector('#btn-desktop-create')?.addEventListener('click', () => {
+            this.openCreateModal();
         });
     }
 
