@@ -1627,23 +1627,7 @@ export class HkmGroupsManager {
                 </div>
 
                 <div style="display: flex; gap: 10px; align-items: center;">
-                    ${isHub ? `
-                        <!-- Hub actions -->
-                        <button type="button" id="btn-desktop-email" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 700; font-size: 14px; background: var(--admin-orange, #d17d39); color: white; border: none; cursor: pointer; transition: transform 0.2s ease; box-shadow: 0 4px 12px rgba(209,125,57,0.2);" onmouseover="this.style.transform='scale(1.02)';" onmouseout="this.style.transform='none';">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">mail</span>
-                            <span>${this.t('groups.hubSendEmail')}</span>
-                        </button>
-                        ${(this.checkIsLeader(activeGroup) || isAdmin) ? `
-                            <button type="button" id="btn-desktop-edit" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 700; font-size: 14px; background: #475569; color: white; border: none; cursor: pointer; transition: transform 0.2s ease;" onmouseover="this.style.transform='scale(1.02)';" onmouseout="this.style.transform='none';">
-                                <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
-                                <span>Rediger</span>
-                            </button>
-                            <button type="button" id="btn-desktop-duplicate" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 700; font-size: 14px; background: #475569; color: white; border: none; cursor: pointer; transition: transform 0.2s ease;" onmouseover="this.style.transform='scale(1.02)';" onmouseout="this.style.transform='none';">
-                                <span class="material-symbols-outlined" style="font-size: 18px;">content_copy</span>
-                                <span>Dupliser</span>
-                            </button>
-                        ` : ''}
-                    ` : `
+                    ${isHub ? '' : `
                         <!-- Directory actions -->
                         ${isAdmin ? `
                             <button type="button" id="btn-desktop-manage-categories" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 700; font-size: 14px; background: #475569; color: white; border: none; cursor: pointer; transition: transform 0.2s ease;" onmouseover="this.style.transform='scale(1.02)';" onmouseout="this.style.transform='none';">
@@ -2499,6 +2483,36 @@ export class HkmGroupsManager {
                                 </span>
                             </p>
                         </div>
+                        
+                        <!-- Hero action buttons (desktop only, hidden on mobile) -->
+                        <style>
+                            .hero-action-buttons-desktop {
+                                display: flex;
+                                gap: 10px;
+                                align-items: center;
+                            }
+                            @media (max-width: 768px) {
+                                .hero-action-buttons-desktop {
+                                    display: none !important;
+                                }
+                            }
+                        </style>
+                        <div class="hero-action-buttons-desktop">
+                            <button type="button" id="btn-hero-email" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 700; font-size: 14px; background: var(--admin-orange, #d17d39); color: white; border: none; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(209,125,57,0.25);" onmouseover="this.style.transform='scale(1.02)';" onmouseout="this.style.transform='none';">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">mail</span>
+                                <span>Send e-post</span>
+                            </button>
+                            ${(isLeader || this.isAdmin) ? `
+                                <button type="button" id="btn-hero-edit" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 700; font-size: 14px; background: #3d4b5c; color: white; border: none; cursor: pointer; transition: transform 0.2s ease;" onmouseover="this.style.transform='scale(1.02)';" onmouseout="this.style.transform='none';">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+                                    <span>Rediger</span>
+                                </button>
+                                <button type="button" id="btn-hero-duplicate" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 700; font-size: 14px; background: #3d4b5c; color: white; border: none; cursor: pointer; transition: transform 0.2s ease;" onmouseover="this.style.transform='scale(1.02)';" onmouseout="this.style.transform='none';">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">content_copy</span>
+                                    <span>Dupliser</span>
+                                </button>
+                            ` : ''}
+                        </div>
                     </div>
                 </div>
 
@@ -2534,6 +2548,17 @@ export class HkmGroupsManager {
             <!-- Hub Tab Body -->
             <div id="hub-tab-body"></div>
         `;
+
+        // Bind hero action buttons
+        container.querySelector('#btn-hero-email')?.addEventListener('click', () => {
+            this.openGroupEmailModal(group);
+        });
+        container.querySelector('#btn-hero-edit')?.addEventListener('click', () => {
+            this.openCreateModal(group);
+        });
+        container.querySelector('#btn-hero-duplicate')?.addEventListener('click', () => {
+            this.openDuplicateModal(group);
+        });
 
         // Tab click
         container.querySelectorAll('.hub-tab-btn').forEach(btn => {
