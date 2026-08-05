@@ -2545,7 +2545,13 @@ export class HkmGroupsManager {
 
         // Bind hero action buttons
         container.querySelector('#btn-hero-email')?.addEventListener('click', () => {
-            this.openGroupEmailModal(group);
+            const checkboxes = this.container.querySelectorAll('.remove-member-checkbox');
+            const selectedNames = Array.from(checkboxes).filter(c => c.checked).map(c => c.dataset.name);
+            if (selectedNames.length > 0) {
+                this.openGroupEmailModal(group, selectedNames);
+            } else {
+                this.openGroupEmailModal(group);
+            }
         });
         container.querySelector('#btn-hero-edit')?.addEventListener('click', () => {
             this.openCreateModal(group);
@@ -4343,19 +4349,25 @@ export class HkmGroupsManager {
     /* ═══════════════════════════════════════════════════════════════════════════
        SEND EMAIL TO GROUP
        ═══════════════════════════════════════════════════════════════════════════ */
-    openGroupEmailModal(targetGroup = null) {
+    openGroupEmailModal(targetGroup = null, targetMemberNames = null) {
         const group = targetGroup || this.activeGroup || this.groups.find(g => g.id === this.selectedGroupId);
         if (!group) {
             alert("Velg en gruppe først.");
             return;
         }
 
+        this.emailTargets = targetMemberNames;
+
         const modal = this.container.querySelector('#group-email-modal');
         const subtitle = this.container.querySelector('#group-email-subtitle');
         if (!modal) return;
 
         if (subtitle) {
-            subtitle.textContent = `Send e-postmelding til alle medlemmer i "${group.name}"`;
+            if (targetMemberNames && targetMemberNames.length > 0) {
+                subtitle.textContent = `Send e-postmelding til ${targetMemberNames.length} valgte medlemmer i "${group.name}"`;
+            } else {
+                subtitle.textContent = `Send e-postmelding til alle medlemmer i "${group.name}"`;
+            }
         }
 
         modal.style.display = 'flex';
@@ -4404,8 +4416,17 @@ export class HkmGroupsManager {
             });
         }
 
+        // Apply filter for selected/marked targets if active
+        if (this.emailTargets && this.emailTargets.length > 0) {
+            const targetsLower = this.emailTargets.map(name => name.trim().toLowerCase());
+            recipients = recipients.filter(r => {
+                const nameLower = (r.name || '').trim().toLowerCase();
+                return targetsLower.includes(nameLower) || targetsLower.some(t => nameLower.includes(t) || t.includes(nameLower));
+            });
+        }
+
         if (recipients.length === 0) {
-            alert("Fant ingen e-postadresser registrert for gruppens medlemmer. Legg til kontakter eller medlemmer med e-post først.");
+            alert("Fant ingen e-postadresser registrert for de valgte medlemmene. Legg til kontakter eller medlemmer med e-post først.");
             return;
         }
 
