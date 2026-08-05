@@ -11440,6 +11440,31 @@ html[data-theme="dark"] .status-pill.status-completed {
         color: var(--admin-accent-color, #e06c55) !important;
         background: rgba(224, 108, 85, 0.15) !important;
     }
+
+    /* Horizontal scroll for Min Side where there are many items */
+    body.minside-body .mobile-bottom-nav,
+    body.minside-body.admin-body .mobile-bottom-nav {
+        justify-content: flex-start !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+        gap: 8px !important;
+    }
+    
+    body.minside-body .mobile-bottom-nav::-webkit-scrollbar,
+    body.minside-body.admin-body .mobile-bottom-nav::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    body.minside-body .mobile-bottom-nav .mobile-nav-item,
+    body.minside-body.admin-body .mobile-bottom-nav .mobile-nav-item {
+        flex: 0 0 auto !important;
+        min-width: 76px !important;
+        max-width: 80px !important;
+    }
 }
 
 
