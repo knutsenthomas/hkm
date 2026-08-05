@@ -188,6 +188,65 @@ export class HkmGroupsManager {
         }
     }
 
+    formatEventDateTime(dateStr, timeStr) {
+        const lang = document.documentElement.lang || 'no';
+
+        // 1. Format the date
+        const dateObj = this.parseDateString(dateStr);
+        let formattedDate = dateStr;
+        if (dateObj && !isNaN(dateObj.getTime())) {
+            formattedDate = this.formatNorwegianDate(dateObj);
+        }
+
+        // 2. Format the time
+        let formattedTime = timeStr || '';
+        if (lang === 'no') {
+            // Translate AM/PM and english terms in time if any
+            formattedTime = formattedTime
+                .replace(/\bAM\b/i, '')
+                .replace(/\bPM\b/i, '')
+                .replace(/\bkl\.\s*/i, '');
+                
+            // Convert to 24h format if it contains AM/PM and hours
+            // E.g., "8:00 - 9:00 AM" -> "08:00 - 09:00"
+            const timeRangeMatch = /(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})\s*(AM|PM)?/i.exec(timeStr);
+            if (timeRangeMatch) {
+                let h1 = parseInt(timeRangeMatch[1], 10);
+                const m1 = timeRangeMatch[2];
+                let h2 = parseInt(timeRangeMatch[3], 10);
+                const m2 = timeRangeMatch[4];
+                const ampm = timeRangeMatch[5] ? timeRangeMatch[5].toUpperCase() : '';
+
+                if (ampm === 'PM') {
+                    if (h1 < 12) h1 += 12;
+                    if (h2 < 12) h2 += 12;
+                } else if (ampm === 'AM') {
+                    if (h1 === 12) h1 = 0;
+                    if (h2 === 12) h2 = 0;
+                }
+
+                const pad = (num) => String(num).padStart(2, '0');
+                
+                // Keep GMT/timezone if present
+                let tz = '';
+                if (timeStr.toUpperCase().includes('GMT')) tz = ' GMT';
+                else if (timeStr.toUpperCase().includes('UTC')) tz = ' UTC';
+                else if (timeStr.toUpperCase().includes('CET')) tz = ' CET';
+                else if (timeStr.toUpperCase().includes('CEST')) tz = ' CEST';
+
+                formattedTime = `${pad(h1)}:${m1} - ${pad(h2)}:${m2}${tz}`;
+            }
+        }
+
+        if (lang === 'no') {
+            return `${formattedDate} kl. ${formattedTime}`;
+        } else if (lang === 'es') {
+            return `${formattedDate} a las ${formattedTime}`;
+        } else {
+            return `${formattedDate} at ${formattedTime}`;
+        }
+    }
+
     renderMarkdown(text) {
         if (!text) return '';
         let html = this.escapeHtml(text);
@@ -2865,7 +2924,7 @@ export class HkmGroupsManager {
                             ${this.escapeHtml(nextEvt.title)}
                         </h4>
                         <div style="font-size: 13.5px; color: var(--text-color, #334155); font-weight: 600;">
-                            ${this.escapeHtml(formattedDate)}${nextEvt.time ? `${timePrefix}${this.escapeHtml(nextEvt.time)}` : ''}
+                            ${this.escapeHtml(this.formatEventDateTime(nextEvt.date, nextEvt.time))}
                         </div>
                         ${(() => {
                             const loc = this.formatLocation(nextEvt.location || '');
@@ -3651,7 +3710,7 @@ export class HkmGroupsManager {
                 return `
                     <div style="background: var(--card-bg, #fff); padding: 20px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;">
                         <div>
-                            <span style="font-size: 12px; font-weight: 700; color: var(--admin-orange, #d17d39); text-transform: uppercase;">${this.escapeHtml(evt.date)} kl. ${this.escapeHtml(evt.time)}</span>
+                            <span style="font-size: 12px; font-weight: 700; color: var(--admin-orange, #d17d39); text-transform: uppercase;">${this.escapeHtml(this.formatEventDateTime(evt.date, evt.time))}</span>
                             <h4 style="margin: 4px 0; font-size: 16px; font-weight: 700;">${this.escapeHtml(evt.title)}</h4>
                             ${(() => {
                                 const loc = this.formatLocation(evt.location || this.activeGroup.location || '');
