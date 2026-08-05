@@ -262,6 +262,7 @@ export class HkmGroupsManager {
         const localDict = {
             no: {
                 'groups.title': 'Smågrupper',
+                'groups.headerTitle': 'Grupper',
                 'groups.subtitle': 'Finn og bli med i et kristent fellesskap',
                 'groups.searchPlaceholder': 'Søk på navn, sted eller kategori...',
                 'groups.adminCategories': 'Administrer kategorier',
@@ -366,6 +367,7 @@ export class HkmGroupsManager {
             },
             en: {
                 'groups.title': 'Small Groups',
+                'groups.headerTitle': 'Groups',
                 'groups.subtitle': 'Find and join a Christian community',
                 'groups.searchPlaceholder': 'Search by name, location or category...',
                 'groups.adminCategories': 'Manage categories',
@@ -470,6 +472,7 @@ export class HkmGroupsManager {
             },
             es: {
                 'groups.title': 'Grupos Pequeños',
+                'groups.headerTitle': 'Grupos',
                 'groups.subtitle': 'Encuentra y únete a una comunidad cristiana',
                 'groups.searchPlaceholder': 'Buscar por nombre, ubicación o categoría...',
                 'groups.adminCategories': 'Administrar categorías',
@@ -1485,7 +1488,7 @@ export class HkmGroupsManager {
             `;
 
         } else {
-            currentTitle = this.currentView === 'directory' ? this.t('groups.exploreGroups') : this.t('groups.myGroups');
+            currentTitle = this.t('groups.headerTitle');
             
             // Switch views dropdown options
             menuOptionsHtml = `
