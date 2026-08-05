@@ -11467,6 +11467,247 @@ html[data-theme="dark"] .status-pill.status-completed {
     }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   GLOBAL PREMIUM MODERNIZATION & RESPONIVENESS OVERRIDES
+   Inspired by the HKM Groups (Planning Center) Design Language
+   ═══════════════════════════════════════════════════════════════ */
+
+/* --- 1. Premium Interactive Cards (Cubic-Bezier Hovers) --- */
+.card,
+.bento-card,
+.stat-card-premium,
+.chart-card-premium,
+.teaching-card,
+.event-card,
+.recent-signups-card,
+.course-card,
+.newsletter-card {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease !important;
+    border-radius: 16px !important;
+    border: 1px solid rgba(15, 23, 42, 0.06) !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.02) !important;
+    background: var(--card-bg, #ffffff) !important;
+}
+
+.card:hover,
+.bento-card:hover,
+.stat-card-premium:hover,
+.chart-card-premium:hover,
+.teaching-card:hover,
+.event-card:hover,
+.recent-signups-card:hover,
+.course-card:hover,
+.newsletter-card:hover {
+    transform: translateY(-3px) scale(1.01) !important;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06), 0 4px 10px rgba(15, 23, 42, 0.02) !important;
+    border-color: rgba(15, 23, 42, 0.12) !important;
+}
+
+/* --- 2. Premium Button Scales & Transitions --- */
+.btn,
+.btn-primary,
+.btn-secondary,
+.btn-outline,
+.hkm-btn,
+.action-btn,
+.groups-banner-btn,
+.tab-btn {
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    border-radius: 12px !important; /* Soft corners for buttons */
+}
+
+.btn:hover,
+.btn-primary:hover,
+.btn-secondary:hover,
+.btn-outline:hover,
+.hkm-btn:hover,
+.action-btn:hover,
+.groups-banner-btn:hover {
+    transform: translateY(-1px) scale(1.02) !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08) !important;
+}
+
+.btn:active,
+.btn-primary:active,
+.btn-secondary:active,
+.btn-outline:active,
+.hkm-btn:active,
+.action-btn:active,
+.groups-banner-btn:active {
+    transform: translateY(0) scale(0.98) !important;
+    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04) !important;
+}
+
+/* --- 3. Dynamic Tab Button Bottom Indicators --- */
+.tab-btn,
+.nav-tab,
+.filter-btn,
+.hkm-tab-btn {
+    position: relative !important;
+    border-bottom: 2px solid transparent !important;
+    transition: border-color 0.2s ease, color 0.2s ease !important;
+}
+
+.tab-btn.active,
+.nav-tab.active,
+.filter-btn.active,
+.hkm-tab-btn.active {
+    border-bottom-color: var(--admin-accent-color, #d17d39) !important;
+    color: var(--admin-accent-color, #d17d39) !important;
+    font-weight: 600 !important;
+}
+
+/* --- 4. Modals & Dialog Entry Transitions --- */
+.modal-overlay,
+.hkm-modal-overlay,
+.dialog-overlay {
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    background: rgba(15, 23, 42, 0.5) !important;
+    transition: opacity 0.2s ease-out !important;
+}
+
+.modal-card,
+.modal-content,
+.hkm-modal-content,
+.dialog-content {
+    animation: hkmSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15) !important;
+}
+
+@keyframes hkmSlideUp {
+    from { opacity: 0; transform: translateY(24px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* --- 5. Universal Responsiveness & Mobile Optimizations --- */
+@media (max-width: 768px) {
+    /* Tighten paddings for maximum screen real estate */
+    body.admin-body .main-content,
+    body.minside-body .main-content,
+    .main-content {
+        padding: 16px !important;
+        padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+
+    /* Stack flex grids and grid-rows vertically in a single column */
+    .admin-grid,
+    .crm-grid,
+    .dashboard-grid,
+    .grid-2-col,
+    .grid-3-col,
+    .grid-4-col,
+    .form-row,
+    .grid-2,
+    .grid-3,
+    .grid-4 {
+        display: flex !important;
+        flex-direction: column !important;
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+        width: 100% !important;
+    }
+
+    .admin-grid > div,
+    .crm-grid > div,
+    .dashboard-grid > div,
+    .grid-2-col > div,
+    .grid-3-col > div,
+    .grid-4-col > div,
+    .grid-2 > div,
+    .grid-3 > div,
+    .grid-4 > div {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Responsive Tables - Horizontal scroll without squishing columns */
+    .crm-table,
+    .data-table,
+    .logs-table,
+    .podcast-table,
+    .crm-table-container,
+    .table-container {
+        display: block !important;
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        white-space: nowrap !important;
+    }
+
+    /* Page Header Stack-alignments */
+    .main-header,
+    .section-header,
+    .filter-bar,
+    .toolbar {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+        padding: 12px 0 !important;
+        height: auto !important;
+    }
+
+    .section-header-actions,
+    .toolbar-right,
+    .filter-actions {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+        justify-content: flex-start !important;
+        width: 100% !important;
+    }
+
+    .section-title {
+        font-size: 1.5rem !important;
+        line-height: 1.25 !important;
+    }
+
+    /* Drawers and Todo lists slide up full screen on mobile */
+    .todo-drawer,
+    .hkm-todo-drawer,
+    .contact-drawer,
+    .recipients-drawer {
+        width: 100% !important;
+        max-width: 100% !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        height: 88vh !important;
+        border-radius: 24px 24px 0 0 !important;
+        box-shadow: 0 -10px 40px rgba(0,0,0,0.15) !important;
+        animation: hkmSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+}
+
+/* --- 6. Dark Theme Color Alignments --- */
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .bento-card,
+html[data-theme="dark"] .stat-card-premium,
+html[data-theme="dark"] .chart-card-premium,
+html[data-theme="dark"] .teaching-card,
+html[data-theme="dark"] .event-card,
+html[data-theme="dark"] .recent-signups-card,
+html[data-theme="dark"] .course-card,
+html[data-theme="dark"] .newsletter-card {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    background: var(--card-bg, #1e293b) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+html[data-theme="dark"] .card:hover,
+html[data-theme="dark"] .bento-card:hover,
+html[data-theme="dark"] .stat-card-premium:hover,
+html[data-theme="dark"] .chart-card-premium:hover,
+html[data-theme="dark"] .teaching-card:hover,
+html[data-theme="dark"] .event-card:hover,
+html[data-theme="dark"] .recent-signups-card:hover {
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28) !important;
+}
+
 
 
 
