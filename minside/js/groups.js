@@ -1598,12 +1598,10 @@ export class HkmGroupsManager {
             <!-- PC/Desktop layout: Tabs and Back button side-by-side -->
             <div class="groups-desktop-only" style="align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; width: 100%;">
                 <div style="display: flex; align-items: center; gap: 16px;">
-                    ${isHub ? `
-                        <button type="button" id="btn-desktop-back" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--card-bg, #ffffff); cursor: pointer; font-size: 14px; font-weight: 700; transition: all 0.2s ease; color: var(--text-color, #0f172a);" onmouseover="this.style.background='rgba(15,23,42,0.02)';" onmouseout="this.style.background='var(--card-bg, #ffffff)';">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
-                            <span>${this.t('groups.backToGroups')}</span>
-                        </button>
-                    ` : ''}
+                    <button type="button" id="btn-desktop-back" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--card-bg, #ffffff); cursor: pointer; font-size: 14px; font-weight: 700; transition: all 0.2s ease; color: var(--text-color, #0f172a);" onmouseover="this.style.background='rgba(15,23,42,0.02)';" onmouseout="this.style.background='var(--card-bg, #ffffff)';">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
+                        <span>${isHub ? this.t('groups.backToGroups') : 'Tilbake'}</span>
+                    </button>
                     
                     <div class="groups-nav-tabs" style="display: flex; gap: 4px; background: rgba(15, 23, 42, 0.04); padding: 4px; border-radius: 12px;">
                         <button type="button" class="desktop-tab-btn ${this.currentView === 'directory' ? 'active' : ''}" data-gview="directory">
@@ -1831,10 +1829,14 @@ export class HkmGroupsManager {
 
         // Bind desktop back button
         headerContainer.querySelector('#btn-desktop-back')?.addEventListener('click', () => {
-            this.selectedGroupId = null;
-            this.activeGroup = null;
-            this.currentView = 'directory';
-            this.render(this.container);
+            if (isHub) {
+                this.selectedGroupId = null;
+                this.activeGroup = null;
+                this.currentView = 'directory';
+                this.render(this.container);
+            } else {
+                window.location.hash = '#overview';
+            }
         });
 
         // Bind desktop actions
