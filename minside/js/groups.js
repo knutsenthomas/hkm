@@ -2979,12 +2979,26 @@ export class HkmGroupsManager {
                                 <span>${this.t('groups.hubGetFromContacts')}</span>
                             </button>
                         ` : ''}
-                        ${canManage ? `
-                            <button type="button" id="btn-remove-selected-members" style="display: none; align-items: center; gap: 6px; font-size: 13px; padding: 8px 16px; border-radius: 10px; background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; font-weight: 600; cursor: pointer; transition: all 0.15s ease;">
-                                <span class="material-symbols-outlined" style="font-size: 18px;">person_remove</span>
-                                <span>${this.t('groups.removeSelected')}</span>
+                        
+                        <!-- Bulk actions group (hidden by default) -->
+                        <div id="selected-members-actions-group" style="display: none; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <button type="button" id="btn-email-selected-members" style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 8px 14px; border-radius: 10px; background: var(--bg-muted, #f8fafc); color: var(--text-color, #334155); border: 1px solid var(--border-color, #cbd5e1); font-weight: 600; cursor: pointer; transition: all 0.15s ease;" onmouseover="this.style.background='var(--border-color, #e2e8f0)';" onmouseout="this.style.background='var(--bg-muted, #f8fafc)';">
+                                <span class="material-symbols-outlined" style="font-size: 18px; color: var(--admin-orange, #d17d39);">mail</span>
+                                <span>Send e-post</span>
                             </button>
-                        ` : ''}
+                            <button type="button" id="btn-make-selected-leaders" style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 8px 14px; border-radius: 10px; background: var(--bg-muted, #f8fafc); color: var(--text-color, #334155); border: 1px solid var(--border-color, #cbd5e1); font-weight: 600; cursor: pointer; transition: all 0.15s ease;" onmouseover="this.style.background='var(--border-color, #e2e8f0)';" onmouseout="this.style.background='var(--bg-muted, #f8fafc)';">
+                                <span class="material-symbols-outlined" style="font-size: 18px; font-variation-settings: 'FILL' 1; color: var(--admin-orange, #d17d39);">star</span>
+                                <span>Gjør til leder</span>
+                            </button>
+                            <button type="button" id="btn-make-selected-members" style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 8px 14px; border-radius: 10px; background: var(--bg-muted, #f8fafc); color: var(--text-color, #334155); border: 1px solid var(--border-color, #cbd5e1); font-weight: 600; cursor: pointer; transition: all 0.15s ease;" onmouseover="this.style.background='var(--border-color, #e2e8f0)';" onmouseout="this.style.background='var(--bg-muted, #f8fafc)';">
+                                <span class="material-symbols-outlined" style="font-size: 18px; color: var(--text-muted, #64748b);">person</span>
+                                <span>Gjør til medlem</span>
+                            </button>
+                            <button type="button" id="btn-remove-selected-members" style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 8px 14px; border-radius: 10px; background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; font-weight: 600; cursor: pointer; transition: all 0.15s ease;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">person_remove</span>
+                                <span>Fjern markerte</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -3111,6 +3125,7 @@ export class HkmGroupsManager {
 
         if (canManage) {
             const checkboxes = tabContainer.querySelectorAll('.remove-member-checkbox');
+            const actionsGroup = tabContainer.querySelector('#selected-members-actions-group');
             const removeBtn = tabContainer.querySelector('#btn-remove-selected-members');
             const selectAllCb = tabContainer.querySelector('#checkbox-select-all-members');
 
@@ -3119,22 +3134,66 @@ export class HkmGroupsManager {
                 checkboxes.forEach(cb => {
                     cb.checked = checked;
                 });
-                if (removeBtn) {
-                    removeBtn.style.display = checked && checkboxes.length > 0 ? 'inline-flex' : 'none';
+                if (actionsGroup) {
+                    actionsGroup.style.display = checked && checkboxes.length > 0 ? 'inline-flex' : 'none';
                 }
             });
 
             checkboxes.forEach(cb => {
                 cb.addEventListener('change', () => {
                     const checkedCount = Array.from(checkboxes).filter(c => c.checked).length;
-                    if (removeBtn) {
-                        removeBtn.style.display = checkedCount > 0 ? 'inline-flex' : 'none';
+                    if (actionsGroup) {
+                        actionsGroup.style.display = checkedCount > 0 ? 'inline-flex' : 'none';
                     }
                     if (selectAllCb) {
                         selectAllCb.checked = checkedCount === checkboxes.length;
                         selectAllCb.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
                     }
                 });
+            });
+
+            // Email selected members
+            tabContainer.querySelector('#btn-email-selected-members')?.addEventListener('click', () => {
+                const selectedNames = Array.from(checkboxes).filter(c => c.checked).map(c => c.dataset.name);
+                if (selectedNames.length > 0) {
+                    this.openGroupEmailModal(group, selectedNames);
+                }
+            });
+
+            // Make selected leaders
+            tabContainer.querySelector('#btn-make-selected-leaders')?.addEventListener('click', async () => {
+                const selected = Array.from(checkboxes)
+                    .filter(c => c.checked)
+                    .map(c => ({
+                        name: c.dataset.name,
+                        role: c.dataset.role
+                    }));
+                const toUpdate = selected.filter(s => s.role !== 'leader');
+                if (toUpdate.length === 0) {
+                    alert("Alle markerte er allerede gruppeledere.");
+                    return;
+                }
+                if (confirm(`Vil du gjøre ${toUpdate.length} markerte personer til gruppeledere?`)) {
+                    await this.handleBulkUpdateMemberRoles(toUpdate, 'leader', tabContainer);
+                }
+            });
+
+            // Make selected members
+            tabContainer.querySelector('#btn-make-selected-members')?.addEventListener('click', async () => {
+                const selected = Array.from(checkboxes)
+                    .filter(c => c.checked)
+                    .map(c => ({
+                        name: c.dataset.name,
+                        role: c.dataset.role
+                    }));
+                const toUpdate = selected.filter(s => s.role !== 'member');
+                if (toUpdate.length === 0) {
+                    alert("Alle markerte er allerede vanlige medlemmer.");
+                    return;
+                }
+                if (confirm(`Vil du gjøre ${toUpdate.length} markerte personer til vanlige medlemmer?`)) {
+                    await this.handleBulkUpdateMemberRoles(toUpdate, 'member', tabContainer);
+                }
             });
 
             removeBtn?.addEventListener('click', async () => {
@@ -3317,6 +3376,95 @@ export class HkmGroupsManager {
         } catch (err) {
             console.error("Error updating member role:", err);
             alert("Feil ved endring av rolle: " + err.message);
+        }
+    }
+
+    async handleBulkUpdateMemberRoles(toUpdate, newRole, tabContainer) {
+        const group = this.activeGroup;
+        if (!group) return;
+
+        try {
+            const db = firebase.firestore();
+            const groupRef = db.collection('groups').doc(group.id);
+
+            let updatedLeaders = [...(group.leaderNames || [])];
+            let updatedMembers = [...(group.memberNames || [])];
+
+            let leaderUids = [...(group.leaderUids || [])];
+            let memberUids = [...(group.memberUids || [])];
+
+            for (const item of toUpdate) {
+                const name = item.name;
+                if (newRole === 'leader') {
+                    updatedMembers = updatedMembers.filter(m => m !== name);
+                    if (!updatedLeaders.includes(name)) {
+                        updatedLeaders.push(name);
+                    }
+                } else {
+                    updatedLeaders = updatedLeaders.filter(m => m !== name);
+                    if (!updatedMembers.includes(name)) {
+                        updatedMembers.push(name);
+                    }
+                }
+
+                let targetUid = null;
+                try {
+                    const userQuery = await db.collection('users')
+                        .where('displayName', '==', name)
+                        .limit(1)
+                        .get();
+                    if (!userQuery.empty) {
+                        targetUid = userQuery.docs[0].id;
+                    }
+                } catch (err) {
+                    console.warn("[Groups] Kunne ikke søke etter bruker-UID:", err);
+                }
+
+                if (targetUid) {
+                    if (newRole === 'leader') {
+                        memberUids = memberUids.filter(u => u !== targetUid);
+                        if (!leaderUids.includes(targetUid)) {
+                            leaderUids.push(targetUid);
+                        }
+                    } else {
+                        leaderUids = leaderUids.filter(u => u !== targetUid);
+                        if (!memberUids.includes(targetUid)) {
+                            memberUids.push(targetUid);
+                        }
+                    }
+                }
+            }
+
+            const uniqueNames = Array.from(new Set([...updatedMembers, ...updatedLeaders]));
+            const newCount = uniqueNames.length || memberUids.length;
+
+            const payload = {
+                leaderNames: updatedLeaders,
+                memberNames: updatedMembers,
+                memberCount: newCount,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            if (group.leaderUids !== undefined || leaderUids.length > 0) {
+                payload.leaderUids = leaderUids;
+            }
+            if (group.memberUids !== undefined || memberUids.length > 0) {
+                payload.memberUids = memberUids;
+            }
+
+            await groupRef.update(payload);
+
+            group.leaderNames = updatedLeaders;
+            group.memberNames = updatedMembers;
+            group.leaderUids = leaderUids;
+            group.memberUids = memberUids;
+            group.memberCount = newCount;
+
+            alert("Rollene ble oppdatert.");
+            this.renderHubMembers(tabContainer);
+        } catch (err) {
+            console.error("Error bulk updating roles:", err);
+            alert("Feil ved bulk endring av roller: " + err.message);
         }
     }
 
