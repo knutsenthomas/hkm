@@ -2469,15 +2469,15 @@ export class HkmGroupsManager {
         container.innerHTML = `
             <!-- Group Banner & Header Card -->
             <div style="background: var(--card-bg, #ffffff); border-radius: 20px; border: 1px solid var(--border-color, #e2e8f0); overflow: hidden; margin-bottom: 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.04);">
-                <div style="position: relative; min-height: 220px; background: url('${img}') center/cover no-repeat; display: flex; align-items: flex-end; padding: 32px 24px;">
+                <div style="position: relative; min-height: clamp(180px, 30vw, 220px); background: url('${img}') center/cover no-repeat; display: flex; align-items: flex-end; padding: clamp(20px, 4vw, 32px) clamp(16px, 3vw, 24px);">
                     <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(15,23,42,0.9) 0%, rgba(15,23,42,0.4) 60%, rgba(15,23,42,0.1) 100%);"></div>
                     <div style="position: relative; color: white; display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; width: 100%; z-index: 2;">
                         <div>
                             <span style="background: var(--admin-orange, #d17d39); font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                 ${this.escapeHtml(this.translateCategory(group.category))}
                             </span>
-                            <h2 style="margin: 12px 0 8px 0; font-size: 32px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">${this.escapeHtml(this.t(group.name))}</h2>
-                            <p style="margin: 0; opacity: 0.95; font-size: 14.5px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; font-weight: 500;">
+                            <h2 style="margin: 12px 0 8px 0; font-size: clamp(22px, 5.5vw, 32px); font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.2); line-height: 1.25;">${this.escapeHtml(this.t(group.name))}</h2>
+                            <p style="margin: 0; opacity: 0.95; font-size: clamp(13px, 3.5vw, 14.5px); display: flex; align-items: center; gap: 12px 20px; flex-wrap: wrap; font-weight: 500; line-height: 1.4;">
                                 <style>
                                     .banner-location-label a {
                                         color: #fff !important;
