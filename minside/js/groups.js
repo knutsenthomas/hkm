@@ -649,32 +649,8 @@ export class HkmGroupsManager {
                 }
             </style>
             <div class="groups-module-wrapper">
-                <!-- Top Module Navigation & Actions -->
-                <div class="groups-header-bar" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px;">
-                    <div class="groups-nav-tabs" style="display: flex; gap: 8px; background: rgba(15, 23, 42, 0.04); padding: 4px; border-radius: 12px;">
-                        <button type="button" class="groups-tab-btn ${this.currentView === 'directory' ? 'active' : ''}" data-gview="directory" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; border: none; background: transparent; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">explore</span>
-                            <span>${this.t('groups.exploreGroups')}</span>
-                        </button>
-                        <button type="button" class="groups-tab-btn ${this.currentView === 'my-groups' ? 'active' : ''}" data-gview="my-groups" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; border: none; background: transparent; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">group_work</span>
-                            <span>${this.t('groups.myGroups')}</span>
-                        </button>
-                    </div>
-
-                    <div class="groups-header-actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        ${this.isAdmin ? `
-                            <button type="button" class="btn btn-secondary" id="groups-manage-categories-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 14px; background: #475569; color: white; border: none; cursor: pointer; transition: transform 0.2s ease, background-color 0.2s ease;">
-                                <span class="material-symbols-outlined" style="font-size: 20px;">category</span>
-                                <span>${this.t('groups.adminCategories')}</span>
-                            </button>
-                        ` : ''}
-                        <button type="button" class="btn btn-primary" id="groups-create-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 14px; background: var(--admin-orange, #d17d39); color: white; border: none; cursor: pointer; transition: transform 0.2s ease, background-color 0.2s ease;">
-                            <span class="material-symbols-outlined" style="font-size: 20px;">add</span>
-                            <span>${this.t('groups.createNew')}</span>
-                        </button>
-                    </div>
-                </div>
+                <!-- Top Module Navigation & Actions (Dynamic PCO Style) -->
+                <div id="groups-header-bar-container"></div>
 
                 <!-- Main Content Body -->
                 <div id="groups-content-body">
@@ -1027,16 +1003,6 @@ export class HkmGroupsManager {
     }
 
     bindEvents() {
-        // Tab switching
-        this.container.querySelectorAll('.groups-tab-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const targetView = btn.dataset.gview;
-                this.currentView = targetView;
-                this.container.querySelectorAll('.groups-tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                this.renderCurrentView();
-            });
-        });
 
         // Event form events
         const eventModal = this.container.querySelector('#group-event-modal');
@@ -1421,9 +1387,356 @@ export class HkmGroupsManager {
         return created;
     }
 
+    async handleLeaveGroup(groupId) {
+        const uid = firebase.auth().currentUser?.uid;
+        if (!uid) return;
+
+        try {
+            const db = firebase.firestore();
+            const groupRef = db.collection('groups').doc(groupId);
+
+            await groupRef.update({
+                memberUids: firebase.firestore.FieldValue.arrayRemove(uid)
+            });
+
+            // Also clean up from groupMembers collection if it exists
+            await db.collection('groupMembers').doc(`${groupId}_${uid}`).delete().catch(() => null);
+
+            alert("Du har meldt deg ut av gruppen.");
+            this.selectedGroupId = null;
+            this.activeGroup = null;
+            this.currentView = 'directory';
+            await this.loadGroupsData();
+        } catch (err) {
+            console.error("Error leaving group:", err);
+            alert("Kunne ikke melde deg ut av gruppen: " + err.message);
+        }
+    }
+
+    renderTopBar(headerContainer) {
+        const uid = firebase.auth().currentUser?.uid;
+        const isAdmin = this.isAdmin;
+        
+        let currentTitle = '';
+        let menuOptionsHtml = '';
+        let contextOptionsHtml = '';
+        const isHub = this.currentView === 'hub' && this.selectedGroupId;
+        const activeGroup = isHub ? this.groups.find(g => g.id === this.selectedGroupId) : null;
+
+        if (isHub && activeGroup) {
+            currentTitle = this.t(activeGroup.name);
+            
+            // Switch groups dropdown options
+            const otherGroups = this.groups.filter(g => 
+                g.id !== activeGroup.id && 
+                (isAdmin || (g.memberUids && g.memberUids.includes(uid)) || this.checkIsLeader(g))
+            );
+
+            if (otherGroups.length > 0) {
+                menuOptionsHtml = otherGroups.map(g => `
+                    <button type="button" class="pco-menu-item" data-action="switch-group" data-group-id="${g.id}">
+                        <span class="material-symbols-outlined">group</span>
+                        <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${this.escapeHtml(this.t(g.name))}</span>
+                    </button>
+                `).join('');
+            } else {
+                menuOptionsHtml = `
+                    <div style="padding: 10px 14px; font-size: 13px; color: var(--text-muted, #64748b); font-weight: 500; text-align: center;">
+                        Ingen andre grupper
+                    </div>
+                `;
+            }
+
+            // Context menu options for active group
+            const isLeader = this.checkIsLeader(activeGroup);
+            contextOptionsHtml = `
+                ${(isLeader || isAdmin) ? `
+                    <button type="button" class="pco-menu-item" id="ctx-create-event">
+                        <span class="material-symbols-outlined">add_circle</span>
+                        <span>Opprett samling</span>
+                    </button>
+                    <button type="button" class="pco-menu-item" id="ctx-email-members">
+                        <span class="material-symbols-outlined">mail</span>
+                        <span>E-post til medlemmer</span>
+                    </button>
+                    <button type="button" class="pco-menu-item" id="ctx-edit-group">
+                        <span class="material-symbols-outlined">edit</span>
+                        <span>Rediger gruppe</span>
+                    </button>
+                    <button type="button" class="pco-menu-item" id="ctx-duplicate-group">
+                        <span class="material-symbols-outlined">content_copy</span>
+                        <span>Dupliser semester</span>
+                    </button>
+                    <button type="button" class="pco-menu-item" id="ctx-delete-group" style="color: #ef4444;">
+                        <span class="material-symbols-outlined" style="color: #ef4444;">delete</span>
+                        <span>Slett gruppe</span>
+                    </button>
+                ` : `
+                    <button type="button" class="pco-menu-item" id="ctx-leave-group" style="color: #ef4444;">
+                        <span class="material-symbols-outlined" style="color: #ef4444;">logout</span>
+                        <span>Forlat gruppe</span>
+                    </button>
+                `}
+                <div style="height: 1px; background: var(--border-color, #cbd5e1); margin: 4px 0;"></div>
+                <button type="button" class="pco-menu-item" id="ctx-share-group">
+                    <span class="material-symbols-outlined">share</span>
+                    <span>Del gruppe</span>
+                </button>
+            `;
+
+        } else {
+            currentTitle = this.currentView === 'directory' ? this.t('groups.exploreGroups') : this.t('groups.myGroups');
+            
+            // Switch views dropdown options
+            menuOptionsHtml = `
+                <button type="button" class="pco-menu-item ${this.currentView === 'directory' ? 'active' : ''}" data-action="switch-view" data-view="directory">
+                    <span class="material-symbols-outlined">explore</span>
+                    <span>${this.t('groups.exploreGroups')}</span>
+                </button>
+                <button type="button" class="pco-menu-item ${this.currentView === 'my-groups' ? 'active' : ''}" data-action="switch-view" data-view="my-groups">
+                    <span class="material-symbols-outlined">group_work</span>
+                    <span>${this.t('groups.myGroups')}</span>
+                </button>
+            `;
+
+            // Context menu options for directory
+            contextOptionsHtml = `
+                <button type="button" class="pco-menu-item" id="ctx-create-group">
+                    <span class="material-symbols-outlined">add</span>
+                    <span>${this.t('groups.createNew')}</span>
+                </button>
+                ${isAdmin ? `
+                    <button type="button" class="pco-menu-item" id="ctx-manage-categories">
+                        <span class="material-symbols-outlined">category</span>
+                        <span>${this.t('groups.adminCategories')}</span>
+                    </button>
+                ` : ''}
+                <div style="height: 1px; background: var(--border-color, #cbd5e1); margin: 4px 0;"></div>
+                <button type="button" class="pco-menu-item" id="ctx-share-directory">
+                    <span class="material-symbols-outlined">share</span>
+                    <span>Del grupper</span>
+                </button>
+                <button type="button" class="pco-menu-item" id="ctx-help">
+                    <span class="material-symbols-outlined">help</span>
+                    <span>Hjelp & Support</span>
+                </button>
+                <button type="button" class="pco-menu-item" id="ctx-feedback">
+                    <span class="material-symbols-outlined">feedback</span>
+                    <span>Gi tilbakemelding</span>
+                </button>
+            `;
+        }
+
+        headerContainer.innerHTML = `
+            <style>
+                .pco-menu-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    width: 100%;
+                    padding: 10px 14px;
+                    background: transparent;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 13.5px;
+                    font-weight: 600;
+                    color: var(--text-color, #334155);
+                    cursor: pointer;
+                    text-align: left;
+                    transition: all 0.15s ease;
+                }
+                .pco-menu-item:hover {
+                    background: rgba(15, 23, 42, 0.04);
+                    color: var(--admin-orange, #d17d39);
+                }
+                .pco-menu-item.active {
+                    background: rgba(209,125,57,0.08);
+                    color: var(--admin-orange, #d17d39);
+                }
+                .pco-menu-item .material-symbols-outlined {
+                    font-size: 18px;
+                }
+            </style>
+            <div class="pco-header-bar" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--card-bg, #ffffff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); position: relative; z-index: 100; width: 100%;">
+                <!-- Left: Back Button -->
+                <button type="button" id="btn-groups-back" style="background: transparent; border: none; padding: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-color, #0f172a); transition: transform 0.2s ease, background-color 0.2s ease; border-radius: 50%;" onmouseover="this.style.background='rgba(15,23,42,0.05)';" onmouseout="this.style.background='transparent';">
+                    <span class="material-symbols-outlined" style="font-size: 24px; font-weight: 600;">chevron_left</span>
+                </button>
+
+                <!-- Center: Dropdown Selector -->
+                <div style="position: relative;">
+                    <button type="button" id="btn-groups-nav-dropdown" style="background: transparent; border: none; display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 6px 14px; border-radius: 12px; transition: background 0.2s ease; outline: none;">
+                        <div style="width: 28px; height: 28px; background: var(--admin-orange, #d17d39); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 2px 4px rgba(209,125,57,0.3);">
+                            <span class="material-symbols-outlined" style="font-size: 16px; font-variation-settings: 'FILL' 1;">groups</span>
+                        </div>
+                        <span style="font-size: 16px; font-weight: 700; color: var(--text-color, #0f172a); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${this.escapeHtml(currentTitle)}</span>
+                        <span class="material-symbols-outlined" style="font-size: 20px; color: var(--text-muted, #64748b);">expand_more</span>
+                    </button>
+
+                    <!-- Dropdown Menu Options -->
+                    <div id="groups-nav-menu" style="display: none; position: absolute; top: 110%; left: 50%; transform: translateX(-50%); background: var(--card-bg, #ffffff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 220px; z-index: 1000; padding: 6px; overflow: hidden;">
+                        ${menuOptionsHtml}
+                    </div>
+                </div>
+
+                <!-- Right: Context Menu (...) -->
+                <div style="position: relative;">
+                    <button type="button" id="btn-groups-context-menu" style="background: transparent; border: none; padding: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-color, #0f172a); transition: background-color 0.2s ease; border-radius: 50%; outline: none;" onmouseover="this.style.background='rgba(15,23,42,0.05)';" onmouseout="this.style.background='transparent';">
+                        <span class="material-symbols-outlined" style="font-size: 24px;">more_horiz</span>
+                    </button>
+
+                    <!-- Context Dropdown Menu -->
+                    <div id="groups-context-menu" style="display: none; position: absolute; top: 110%; right: 0; background: var(--card-bg, #ffffff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 220px; z-index: 1000; padding: 6px; overflow: hidden;">
+                        ${contextOptionsHtml}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Bind dropdown toggles
+        const navBtn = headerContainer.querySelector('#btn-groups-nav-dropdown');
+        const navMenu = headerContainer.querySelector('#groups-nav-menu');
+        const contextBtn = headerContainer.querySelector('#btn-groups-context-menu');
+        const contextMenu = headerContainer.querySelector('#groups-context-menu');
+
+        navBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (contextMenu) contextMenu.style.display = 'none';
+            navMenu.style.display = navMenu.style.display === 'block' ? 'none' : 'block';
+        });
+
+        contextBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (navMenu) navMenu.style.display = 'none';
+            contextMenu.style.display = contextMenu.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Close dropdowns on outside click
+        const closeDropdowns = (e) => {
+            if (navMenu && !navBtn.contains(e.target) && !navMenu.contains(e.target)) {
+                navMenu.style.display = 'none';
+            }
+            if (contextMenu && !contextBtn.contains(e.target) && !contextMenu.contains(e.target)) {
+                contextMenu.style.display = 'none';
+            }
+        };
+        window.removeEventListener('click', this._closeGroupsDropdowns);
+        this._closeGroupsDropdowns = closeDropdowns;
+        window.addEventListener('click', this._closeGroupsDropdowns);
+
+        // Bind navigation back button
+        const backBtn = headerContainer.querySelector('#btn-groups-back');
+        if (backBtn) {
+            backBtn.addEventListener('click', () => {
+                if (isHub) {
+                    this.selectedGroupId = null;
+                    this.activeGroup = null;
+                    this.currentView = 'directory';
+                    this.render(this.container);
+                } else {
+                    window.location.hash = '#overview';
+                }
+            });
+        }
+
+        // Bind switch view actions
+        headerContainer.querySelectorAll('[data-action="switch-view"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.currentView = btn.dataset.view;
+                navMenu.style.display = 'none';
+                this.renderCurrentView();
+            });
+        });
+
+        // Bind switch group actions
+        headerContainer.querySelectorAll('[data-action="switch-group"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.selectedGroupId = btn.dataset.groupId;
+                this.currentView = 'hub';
+                navMenu.style.display = 'none';
+                this.renderCurrentView();
+            });
+        });
+
+        // Bind Context Actions
+        headerContainer.querySelector('#ctx-create-group')?.addEventListener('click', () => {
+            contextMenu.style.display = 'none';
+            this.openCreateModal();
+        });
+
+        headerContainer.querySelector('#ctx-manage-categories')?.addEventListener('click', () => {
+            contextMenu.style.display = 'none';
+            this.openCategoriesModal();
+        });
+
+        headerContainer.querySelector('#ctx-share-directory')?.addEventListener('click', () => {
+            contextMenu.style.display = 'none';
+            navigator.clipboard.writeText(window.location.href);
+            alert("Lenken til medlemsgrupper er kopiert til utklippstavlen!");
+        });
+
+        headerContainer.querySelector('#ctx-help')?.addEventListener('click', () => {
+            contextMenu.style.display = 'none';
+            alert("For hjelp med grupper, kontakt HKM support på e-post eller snakk med din gruppeleder.");
+        });
+
+        headerContainer.querySelector('#ctx-feedback')?.addEventListener('click', () => {
+            contextMenu.style.display = 'none';
+            alert("Vi setter stor pris på tilbakemeldinger! Send gjerne en e-post til post@hkm.no.");
+        });
+
+        // Active Group specific actions
+        headerContainer.querySelector('#ctx-create-event')?.addEventListener('click', () => {
+            contextMenu.style.display = 'none';
+            this.openEventModal();
+        });
+
+        headerContainer.querySelector('#ctx-email-members')?.addEventListener('click', () => {
+            contextMenu.style.display = 'none';
+            this.openGroupEmailModal();
+        });
+
+        headerContainer.querySelector('#ctx-edit-group')?.addEventListener('click', () => {
+            contextMenu.style.display = 'none';
+            this.openCreateModal(activeGroup);
+        });
+
+        headerContainer.querySelector('#ctx-duplicate-group')?.addEventListener('click', () => {
+            contextMenu.style.display = 'none';
+            this.openDuplicateModal(activeGroup);
+        });
+
+        headerContainer.querySelector('#ctx-delete-group')?.addEventListener('click', () => {
+            contextMenu.style.display = 'none';
+            if (confirm(`Er du sikker på at du vil slette gruppen "${activeGroup.name}" permanent?`)) {
+                this.performDeleteGroup(activeGroup.id, activeGroup.name);
+            }
+        });
+
+        headerContainer.querySelector('#ctx-share-group')?.addEventListener('click', () => {
+            contextMenu.style.display = 'none';
+            const shareUrl = `${window.location.origin}${window.location.pathname}?view=groups&id=${activeGroup.id}`;
+            navigator.clipboard.writeText(shareUrl);
+            alert("Lenken til denne gruppen er kopiert til utklippstavlen!");
+        });
+
+        headerContainer.querySelector('#ctx-leave-group')?.addEventListener('click', () => {
+            contextMenu.style.display = 'none';
+            if (confirm(`Er du sikker på at du vil melde deg ut av "${activeGroup.name}"?`)) {
+                this.handleLeaveGroup(activeGroup.id);
+            }
+        });
+    }
+
     renderCurrentView() {
         const body = this.container.querySelector('#groups-content-body');
         if (!body) return;
+
+        // Render the top bar dynamic navigation
+        const headerContainer = this.container.querySelector('#groups-header-bar-container');
+        if (headerContainer) {
+            this.renderTopBar(headerContainer);
+        }
 
         if (this.currentView === 'directory') {
             this.renderDirectoryView(body);
@@ -2018,12 +2331,6 @@ export class HkmGroupsManager {
         const totalCount = ((group.memberNames || []).length + (group.leaderNames || []).length) || (group.memberUids || []).length;
 
         container.innerHTML = `
-            <!-- Back to groups button -->
-            <button type="button" id="btn-back-to-directory" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color, #cbd5e1); background: transparent; cursor: pointer; font-size: 13px; font-weight: 600; margin-bottom: 16px;">
-                <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
-                <span>${this.t('groups.backToGroups')}</span>
-            </button>
-
             <!-- Group Banner & Header Card -->
             <div style="background: var(--card-bg, #ffffff); border-radius: 20px; border: 1px solid var(--border-color, #e2e8f0); overflow: hidden; margin-bottom: 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.04);">
                 <div style="position: relative; min-height: 220px; background: url('${img}') center/cover no-repeat; display: flex; align-items: flex-end; padding: 32px 24px;">
@@ -2056,26 +2363,6 @@ export class HkmGroupsManager {
                                 </span>
                             </p>
                         </div>
-                        
-                        <!-- Overlayed Action buttons inside banner -->
-                        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 4px;">
-                            <button type="button" id="btn-open-group-email-modal" class="groups-banner-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; background: linear-gradient(135deg, #d17d39 0%, #b86524 100%); color: white; border: none; cursor: pointer; font-size: 13.5px; font-weight: 700; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(209,125,57,0.3);" onmouseover="this.style.transform='scale(1.03)';" onmouseout="this.style.transform='none';">
-                                <span class="material-symbols-outlined" style="font-size: 18px;">mail</span>
-                                <span>${this.t('groups.hubSendEmail')}</span>
-                            </button>
-                            ${(isLeader || this.isAdmin) ? `
-                                <button type="button" id="btn-edit-group-details" class="groups-banner-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.25); backdrop-filter: blur(8px); cursor: pointer; font-size: 13.5px; font-weight: 700; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.25)'; this.style.transform='scale(1.03)';" onmouseout="this.style.background='rgba(255,255,255,0.15)'; this.style.transform='none';">
-                                    <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
-                                    <span>${this.t('groups.hubEdit')}</span>
-                                </button>
-                            ` : ''}
-                            ${isLeader ? `
-                                <button type="button" id="btn-duplicate-group-modal" class="groups-banner-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.25); backdrop-filter: blur(8px); cursor: pointer; font-size: 13.5px; font-weight: 700; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.25)'; this.style.transform='scale(1.03)';" onmouseout="this.style.background='rgba(255,255,255,0.15)'; this.style.transform='none';">
-                                    <span class="material-symbols-outlined" style="font-size: 18px;">content_copy</span>
-                                    <span>${this.t('groups.hubDuplicate')}</span>
-                                </button>
-                            ` : ''}
-                        </div>
                     </div>
                 </div>
 
@@ -2103,17 +2390,6 @@ export class HkmGroupsManager {
             <div id="hub-tab-body"></div>
         `;
 
-        // Back button
-        container.querySelector('#btn-back-to-directory')?.addEventListener('click', () => {
-            this.currentView = 'directory';
-            this.renderCurrentView();
-        });
-
-        // Open Group Email modal
-        container.querySelector('#btn-open-group-email-modal')?.addEventListener('click', () => {
-            this.openGroupEmailModal();
-        });
-
         // Tab click
         container.querySelectorAll('.hub-tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -2122,16 +2398,6 @@ export class HkmGroupsManager {
                 btn.classList.add('active');
                 this.renderHubTabBody(container.querySelector('#hub-tab-body'));
             });
-        });
-
-        // Duplicate button
-        container.querySelector('#btn-duplicate-group-modal')?.addEventListener('click', () => {
-            this.openDuplicateModal(group);
-        });
-
-        // Edit button
-        container.querySelector('#btn-edit-group-details')?.addEventListener('click', () => {
-            this.openCreateModal(group);
         });
 
         this.renderHubTabBody(container.querySelector('#hub-tab-body'));
