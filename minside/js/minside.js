@@ -1114,10 +1114,14 @@ class MinSideManager {
                             this.applyBottomNavSettings(JSON.parse(userCustomNav));
                         } else {
                             const cachedDesign = localStorage.getItem('hkm_cache_settings_design');
+                            let defaultNav = ['overview', 'reading-plans', 'giving', 'notifications', 'tasks'];
                             if (cachedDesign) {
                                 const designObj = JSON.parse(cachedDesign);
-                                if (designObj.minsideBottomNav) this.applyBottomNavSettings(designObj.minsideBottomNav);
+                                if (designObj.minsideBottomNav && Array.isArray(designObj.minsideBottomNav)) {
+                                    defaultNav = designObj.minsideBottomNav;
+                                }
                             }
+                            this.applyBottomNavSettings(defaultNav);
                         }
                     } catch (navErr) {}
 
@@ -1150,10 +1154,11 @@ class MinSideManager {
                             this.initNotificationBadge();
                             this.showPendingFlashNotice();
 
-                            if (this.profileData && Array.isArray(this.profileData.customBottomNav) && this.profileData.customBottomNav.length > 0) {
-                                localStorage.setItem('hkm_user_custom_nav', JSON.stringify(this.profileData.customBottomNav));
-                                this.applyBottomNavSettings(this.profileData.customBottomNav);
-                            }
+                            const activeNav = (this.profileData && Array.isArray(this.profileData.customBottomNav))
+                                ? this.profileData.customBottomNav
+                                : ['overview', 'reading-plans', 'giving', 'notifications', 'tasks'];
+                            localStorage.setItem('hkm_user_custom_nav', JSON.stringify(activeNav));
+                            this.applyBottomNavSettings(activeNav);
 
                             this.refreshProfileSubCollections(user.uid);
                         } catch (pErr) {
@@ -2750,7 +2755,8 @@ class MinSideManager {
             }
         } catch (e) {}
 
-        const userCustomNav = p.customBottomNav || allowedItems;
+        const defaultActiveItems = ['overview', 'reading-plans', 'giving', 'notifications', 'tasks'];
+        const userCustomNav = p.customBottomNav || defaultActiveItems;
 
         const navLabels = {
             'overview': { label: t('sidebar.oversikt') || 'Oversikt', icon: 'home' },
