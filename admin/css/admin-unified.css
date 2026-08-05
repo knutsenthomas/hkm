@@ -11638,9 +11638,28 @@ html[data-theme="dark"] .status-pill.status-completed {
         white-space: nowrap !important;
     }
 
-    /* Page Header Stack-alignments */
+    /* Keep page headers horizontal on mobile viewports */
     .main-header,
     .section-header,
+    .section-header-content {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+    }
+
+    .section-header-actions {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        gap: 8px !important;
+        width: auto !important;
+    }
+
+    /* Filter bar and toolbar stack vertically on mobile */
     .filter-bar,
     .toolbar {
         display: flex !important;
@@ -11651,7 +11670,6 @@ html[data-theme="dark"] .status-pill.status-completed {
         height: auto !important;
     }
 
-    .section-header-actions,
     .toolbar-right,
     .filter-actions {
         display: flex !important;
