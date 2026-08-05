@@ -2886,7 +2886,53 @@ export class HkmGroupsManager {
         }
 
         tabContainer.innerHTML = `
-            <div style="background: var(--card-bg, #fff); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0); display: flex; flex-direction: column;">
+            <style>
+                .group-member-card {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: space-between;
+                    padding: 16px 24px;
+                    border-radius: 16px;
+                    border: 1px solid var(--border-color, #e2e8f0);
+                    background: var(--card-bg, #fff);
+                    transition: all 0.2s ease;
+                    gap: 16px;
+                }
+                .group-member-card:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(0,0,0,0.04);
+                    border-color: var(--admin-orange, #d17d39);
+                }
+                .group-member-info {
+                    display: flex;
+                    align-items: center;
+                    gap: 16px;
+                    flex: 1;
+                    min-width: 0;
+                }
+                .group-member-actions {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    flex-shrink: 0;
+                }
+                @media (max-width: 600px) {
+                    .group-member-card {
+                        flex-direction: column;
+                        align-items: stretch;
+                        padding: 16px;
+                        gap: 12px;
+                    }
+                    .group-member-actions {
+                        justify-content: flex-end;
+                        border-top: 1px solid var(--border-color, #f1f5f9);
+                        padding-top: 12px;
+                        width: 100%;
+                    }
+                }
+            </style>
+            <div style="background: var(--card-bg, #fff); padding: 20px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0); display: flex; flex-direction: column;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--border-color, #f1f5f9); padding-bottom: 16px;">
                     <div>
                         <h3 style="margin: 0; font-size: 18px; font-weight: 700;">${this.t('groups.hubMembersTitle')}</h3>
@@ -2919,27 +2965,27 @@ export class HkmGroupsManager {
                     ${(group.leaderNames || []).filter(Boolean).map(leader => {
                         const detail = membersDetailMap[leader.trim().toLowerCase()];
                         return `
-                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0); background: var(--card-bg, #fff); transition: all 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.04)'; this.style.borderColor='var(--admin-orange, #d17d39)';" onmouseout="this.style.transform='none'; this.style.boxShadow='none'; this.style.borderColor='var(--border-color, #e2e8f0)';">
-                                <div style="display: flex; align-items: center; gap: 16px;">
+                            <div class="group-member-card">
+                                <div class="group-member-info">
                                     ${canManage ? `
-                                        <input type="checkbox" class="remove-member-checkbox" data-name="${this.escapeHtml(leader)}" data-role="leader" style="width: 18px; height: 18px; cursor: pointer; accent-color: #ef4444;">
+                                        <input type="checkbox" class="remove-member-checkbox" data-name="${this.escapeHtml(leader)}" data-role="leader" style="width: 18px; height: 18px; cursor: pointer; accent-color: #ef4444; flex-shrink: 0;">
                                     ` : ''}
                                     <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--admin-orange, #d17d39); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0; box-shadow: 0 3px 8px rgba(209,125,57,0.15);">
                                         ${leader.charAt(0).toUpperCase()}
                                     </div>
-                                    <div style="display: flex; flex-direction: column;">
-                                        <div style="font-weight: 700; font-size: 15px; color: var(--text-color, #0f172a);">${this.escapeHtml(leader)}</div>
+                                    <div style="display: flex; flex-direction: column; min-width: 0; flex: 1;">
+                                        <div style="font-weight: 700; font-size: 15px; color: var(--text-color, #0f172a); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${this.escapeHtml(leader)}</div>
                                         ${detail && (detail.email || detail.phone) ? `
-                                            <div style="font-size: 12.5px; color: var(--text-muted, #64748b); margin-top: 4px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+                                            <div style="font-size: 12.5px; color: var(--text-muted, #64748b); margin-top: 4px; display: flex; gap: 6px 16px; align-items: center; flex-wrap: wrap; word-break: break-all;">
                                                 ${detail.email ? `
                                                     <span style="display: inline-flex; align-items: center; gap: 6px;">
-                                                        <span class="material-symbols-outlined" style="font-size: 15px; opacity: 0.7; display: block;">mail</span>
+                                                        <span class="material-symbols-outlined" style="font-size: 15px; opacity: 0.7;">mail</span>
                                                         <a href="mailto:${this.escapeHtml(detail.email)}" style="color: inherit; text-decoration: none; font-weight: 500;">${this.escapeHtml(detail.email)}</a>
                                                     </span>
                                                 ` : ''}
                                                 ${detail.phone ? `
                                                     <span style="display: inline-flex; align-items: center; gap: 6px;">
-                                                        <span class="material-symbols-outlined" style="font-size: 15px; opacity: 0.7; display: block;">call</span>
+                                                        <span class="material-symbols-outlined" style="font-size: 15px; opacity: 0.7;">call</span>
                                                         <a href="tel:${this.escapeHtml(detail.phone)}" style="color: inherit; text-decoration: none; font-weight: 500;">${this.escapeHtml(detail.phone)}</a>
                                                     </span>
                                                 ` : ''}
@@ -2948,7 +2994,7 @@ export class HkmGroupsManager {
                                     </div>
                                 </div>
                                 ${canManage ? `
-                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div class="group-member-actions">
                                         <select class="member-role-select" data-name="${this.escapeHtml(leader)}" data-current-role="leader" style="font-size: 12.5px; font-weight: 700; border: 1px solid #fde68a; border-radius: 12px; padding: 6px 14px; background: #fef3c7; color: var(--admin-orange, #d17d39); cursor: pointer; outline: none; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
                                             <option value="leader" selected>★ ${this.t('groups.groupLeder')}</option>
                                             <option value="member">${this.t('groups.groupMedlem')}</option>
@@ -2960,7 +3006,7 @@ export class HkmGroupsManager {
                                         ` : ''}
                                     </div>
                                 ` : `
-                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div class="group-member-actions">
                                         <div style="font-size: 11.5px; color: var(--admin-orange, #d17d39); font-weight: 700; background: #fffbeb; border: 1px solid #fef3c7; padding: 4px 10px; border-radius: 12px; display: inline-flex; align-items: center; gap: 4px;">
                                             <span class="material-symbols-outlined" style="font-size: 13px; color: var(--admin-orange, #d17d39); font-variation-settings: 'FILL' 1;">star</span>
                                             <span>${this.t('groups.groupLeder')}</span>
@@ -2978,27 +3024,27 @@ export class HkmGroupsManager {
                     ${(group.memberNames || []).filter(Boolean).filter(m => !(group.leaderNames || []).includes(m)).map(member => {
                         const detail = membersDetailMap[member.trim().toLowerCase()];
                         return `
-                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0); background: var(--card-bg, #fff); transition: all 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.04)'; this.style.borderColor='var(--admin-orange, #d17d39)';" onmouseout="this.style.transform='none'; this.style.boxShadow='none'; this.style.borderColor='var(--border-color, #e2e8f0)';">
-                                <div style="display: flex; align-items: center; gap: 16px;">
+                            <div class="group-member-card">
+                                <div class="group-member-info">
                                     ${canManage ? `
-                                        <input type="checkbox" class="remove-member-checkbox" data-name="${this.escapeHtml(member)}" data-role="member" style="width: 18px; height: 18px; cursor: pointer; accent-color: #ef4444;">
+                                        <input type="checkbox" class="remove-member-checkbox" data-name="${this.escapeHtml(member)}" data-role="member" style="width: 18px; height: 18px; cursor: pointer; accent-color: #ef4444; flex-shrink: 0;">
                                     ` : ''}
                                     <div style="width: 40px; height: 40px; border-radius: 50%; background: #0f172a; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0; box-shadow: 0 3px 8px rgba(15,23,42,0.15);">
                                         ${member.charAt(0).toUpperCase()}
                                     </div>
-                                    <div style="display: flex; flex-direction: column;">
-                                        <div style="font-weight: 700; font-size: 15px; color: var(--text-color, #0f172a);">${this.escapeHtml(member)}</div>
+                                    <div style="display: flex; flex-direction: column; min-width: 0; flex: 1;">
+                                        <div style="font-weight: 700; font-size: 15px; color: var(--text-color, #0f172a); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${this.escapeHtml(member)}</div>
                                         ${detail && (detail.email || detail.phone) ? `
-                                            <div style="font-size: 12.5px; color: var(--text-muted, #64748b); margin-top: 4px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+                                            <div style="font-size: 12.5px; color: var(--text-muted, #64748b); margin-top: 4px; display: flex; gap: 6px 16px; align-items: center; flex-wrap: wrap; word-break: break-all;">
                                                 ${detail.email ? `
                                                     <span style="display: inline-flex; align-items: center; gap: 6px;">
-                                                        <span class="material-symbols-outlined" style="font-size: 15px; opacity: 0.7; display: block;">mail</span>
+                                                        <span class="material-symbols-outlined" style="font-size: 15px; opacity: 0.7;">mail</span>
                                                         <a href="mailto:${this.escapeHtml(detail.email)}" style="color: inherit; text-decoration: none; font-weight: 500;">${this.escapeHtml(detail.email)}</a>
                                                     </span>
                                                 ` : ''}
                                                 ${detail.phone ? `
                                                     <span style="display: inline-flex; align-items: center; gap: 6px;">
-                                                        <span class="material-symbols-outlined" style="font-size: 15px; opacity: 0.7; display: block;">call</span>
+                                                        <span class="material-symbols-outlined" style="font-size: 15px; opacity: 0.7;">call</span>
                                                         <a href="tel:${this.escapeHtml(detail.phone)}" style="color: inherit; text-decoration: none; font-weight: 500;">${this.escapeHtml(detail.phone)}</a>
                                                     </span>
                                                 ` : ''}
@@ -3007,7 +3053,7 @@ export class HkmGroupsManager {
                                     </div>
                                 </div>
                                 ${canManage ? `
-                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div class="group-member-actions">
                                         <select class="member-role-select" data-name="${this.escapeHtml(member)}" data-current-role="member" style="font-size: 12.5px; font-weight: 600; border: 1px solid var(--border-color, #cbd5e1); border-radius: 12px; padding: 6px 14px; background: var(--bg-muted, #f8fafc); color: var(--text-muted, #64748b); cursor: pointer; outline: none; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
                                             <option value="leader">★ ${this.t('groups.groupLeder')}</option>
                                             <option value="member" selected>${this.t('groups.groupMedlem')}</option>
@@ -3019,7 +3065,7 @@ export class HkmGroupsManager {
                                         ` : ''}
                                     </div>
                                 ` : `
-                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div class="group-member-actions">
                                         <div style="font-size: 11.5px; color: var(--text-muted, #64748b); font-weight: 700; background: var(--bg-muted, #f1f5f9); padding: 4px 10px; border-radius: 12px;">
                                             ${this.t('groups.groupMedlem')}
                                         </div>
