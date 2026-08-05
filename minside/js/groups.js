@@ -2503,7 +2503,16 @@ export class HkmGroupsManager {
                 </div>
 
                 <!-- Hub Sub-navigation Tabs -->
-                <div style="display: flex; gap: 4px; padding: 12px 24px; background: var(--card-bg, #fff); border-top: 1px solid var(--border-color, #f1f5f9); overflow-x: auto;">
+                <style>
+                    .hide-scrollbar::-webkit-scrollbar {
+                        display: none;
+                    }
+                    .hide-scrollbar {
+                        -ms-overflow-style: none;
+                        scrollbar-width: none;
+                    }
+                </style>
+                <div class="hide-scrollbar" style="display: flex; gap: 4px; padding: 12px 24px; background: var(--card-bg, #fff); border-top: 1px solid var(--border-color, #f1f5f9); overflow-x: auto;">
                     <button type="button" class="hub-tab-btn ${this.selectedGroupTab === 'overview' ? 'active' : ''}" data-htab="overview" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border: none; background: transparent; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer;">
                         <span class="material-symbols-outlined" style="font-size: 18px;">info</span> ${this.t('groups.hubOverview')}
                     </button>
