@@ -2985,18 +2985,12 @@ export class HkmGroupsManager {
                                     <div class="group-member-details">
                                         <div style="font-weight: 700; font-size: 15px; color: var(--text-color, #0f172a); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${this.escapeHtml(leader)}</div>
                                         ${detail && (detail.email || detail.phone) ? `
-                                            <div style="font-size: 12.5px; color: var(--text-muted, #64748b); margin-top: 4px; display: flex; gap: 6px 16px; align-items: center; flex-wrap: wrap; word-break: break-all;">
+                                            <div style="font-size: 12px; color: var(--text-muted, #64748b); margin-top: 2px; display: flex; flex-direction: column; gap: 2px; line-height: 1.3; overflow-wrap: anywhere;">
                                                 ${detail.email ? `
-                                                    <span style="display: inline-flex; align-items: center; gap: 6px;">
-                                                        <span class="material-symbols-outlined" style="font-size: 15px; opacity: 0.7;">mail</span>
-                                                        <a href="mailto:${this.escapeHtml(detail.email)}" style="color: inherit; text-decoration: none; font-weight: 500;">${this.escapeHtml(detail.email)}</a>
-                                                    </span>
+                                                    <a href="mailto:${this.escapeHtml(detail.email)}" style="color: inherit; text-decoration: none; font-weight: 500;">${this.escapeHtml(detail.email)}</a>
                                                 ` : ''}
                                                 ${detail.phone ? `
-                                                    <span style="display: inline-flex; align-items: center; gap: 6px;">
-                                                        <span class="material-symbols-outlined" style="font-size: 15px; opacity: 0.7;">call</span>
-                                                        <a href="tel:${this.escapeHtml(detail.phone)}" style="color: inherit; text-decoration: none; font-weight: 500;">${this.escapeHtml(detail.phone)}</a>
-                                                    </span>
+                                                    <a href="tel:${this.escapeHtml(detail.phone)}" style="color: inherit; text-decoration: none; font-weight: 500;">${this.escapeHtml(detail.phone)}</a>
                                                 ` : ''}
                                             </div>
                                         ` : ''}
@@ -3035,7 +3029,7 @@ export class HkmGroupsManager {
                             <div class="group-member-card">
                                 <div class="group-member-info">
                                     ${canManage ? `
-                                        <input type="checkbox" class="remove-member-checkbox" data-name="${this.escapeHtml(member)}" data-role="member" style="width: 18px; height: 18px; cursor: pointer; accent-color: #ef4444; flex-shrink: 0; margin: 0; margin-top: 2px;">
+                                        <input type="checkbox" class="remove-member-checkbox" data-name="${this.escapeHtml(member)}" data-role="member" style="width: 18px; height: 18px; cursor: pointer; accent-color: #ef4444; flex-shrink: 0; margin: 0;">
                                     ` : ''}
                                     <div style="width: 40px; height: 40px; border-radius: 50%; background: #0f172a; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0; box-shadow: 0 3px 8px rgba(15,23,42,0.15);">
                                         ${member.charAt(0).toUpperCase()}
@@ -3043,18 +3037,12 @@ export class HkmGroupsManager {
                                     <div class="group-member-details">
                                         <div style="font-weight: 700; font-size: 15px; color: var(--text-color, #0f172a); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${this.escapeHtml(member)}</div>
                                         ${detail && (detail.email || detail.phone) ? `
-                                            <div style="font-size: 12.5px; color: var(--text-muted, #64748b); margin-top: 4px; display: flex; gap: 6px 16px; align-items: center; flex-wrap: wrap; word-break: break-all;">
+                                            <div style="font-size: 12px; color: var(--text-muted, #64748b); margin-top: 2px; display: flex; flex-direction: column; gap: 2px; line-height: 1.3; overflow-wrap: anywhere;">
                                                 ${detail.email ? `
-                                                    <span style="display: inline-flex; align-items: center; gap: 6px;">
-                                                        <span class="material-symbols-outlined" style="font-size: 15px; opacity: 0.7;">mail</span>
-                                                        <a href="mailto:${this.escapeHtml(detail.email)}" style="color: inherit; text-decoration: none; font-weight: 500;">${this.escapeHtml(detail.email)}</a>
-                                                    </span>
+                                                    <a href="mailto:${this.escapeHtml(detail.email)}" style="color: inherit; text-decoration: none; font-weight: 500;">${this.escapeHtml(detail.email)}</a>
                                                 ` : ''}
                                                 ${detail.phone ? `
-                                                    <span style="display: inline-flex; align-items: center; gap: 6px;">
-                                                        <span class="material-symbols-outlined" style="font-size: 15px; opacity: 0.7;">call</span>
-                                                        <a href="tel:${this.escapeHtml(detail.phone)}" style="color: inherit; text-decoration: none; font-weight: 500;">${this.escapeHtml(detail.phone)}</a>
-                                                    </span>
+                                                    <a href="tel:${this.escapeHtml(detail.phone)}" style="color: inherit; text-decoration: none; font-weight: 500;">${this.escapeHtml(detail.phone)}</a>
                                                 ` : ''}
                                             </div>
                                         ` : ''}
