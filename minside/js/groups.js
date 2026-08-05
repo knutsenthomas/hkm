@@ -2905,7 +2905,7 @@ export class HkmGroupsManager {
                     border-bottom: 1px solid var(--border-color, #f1f5f9);
                     background: transparent;
                     transition: background 0.15s ease;
-                    gap: 16px;
+                    gap: 12px;
                 }
                 .group-member-card:last-child {
                     border-bottom: none;
@@ -2916,7 +2916,7 @@ export class HkmGroupsManager {
                 .group-member-info {
                     display: flex;
                     align-items: center;
-                    gap: 16px;
+                    gap: 12px;
                     flex: 1;
                     min-width: 0;
                 }
@@ -2926,57 +2926,18 @@ export class HkmGroupsManager {
                     min-width: 0;
                     flex: 1;
                 }
-                .group-member-actions-desktop {
+                .group-member-actions {
                     display: flex;
                     align-items: center;
-                    gap: 12px;
+                    gap: 4px;
                     flex-shrink: 0;
-                }
-                .group-member-actions-mobile {
-                    display: none;
-                }
-                .member-role-select {
-                    font-size: 13px;
-                    font-weight: 600;
-                    border: none;
-                    background: transparent;
-                    color: var(--text-muted, #64748b);
-                    cursor: pointer;
-                    outline: none;
-                    padding: 4px 8px;
-                    border-radius: 6px;
-                    transition: background 0.15s;
-                }
-                .member-role-select:hover {
-                    background: var(--bg-muted, #f1f5f9);
-                }
-                .member-role-select[data-current-role="leader"] {
-                    color: var(--admin-orange, #d17d39);
                 }
                 @media (max-width: 600px) {
                     .group-member-card {
-                        padding: 12px 8px;
-                        gap: 12px;
+                        padding: 10px 8px;
                     }
                     .group-member-info {
-                        align-items: flex-start;
-                        gap: 12px;
-                    }
-                    .group-member-actions-desktop {
-                        display: none !important;
-                    }
-                    .group-member-actions-mobile {
-                        display: flex !important;
-                        align-items: center;
                         gap: 8px;
-                        margin-top: 6px;
-                        flex-wrap: wrap;
-                    }
-                    .member-role-select {
-                        padding: 4px 0;
-                    }
-                    .member-role-select:hover {
-                        background: transparent;
                     }
                 }
             </style>
@@ -3016,7 +2977,7 @@ export class HkmGroupsManager {
                             <div class="group-member-card">
                                 <div class="group-member-info">
                                     ${canManage ? `
-                                        <input type="checkbox" class="remove-member-checkbox" data-name="${this.escapeHtml(leader)}" data-role="leader" style="width: 18px; height: 18px; cursor: pointer; accent-color: #ef4444; flex-shrink: 0; margin: 0; margin-top: 2px;">
+                                        <input type="checkbox" class="remove-member-checkbox" data-name="${this.escapeHtml(leader)}" data-role="leader" style="width: 18px; height: 18px; cursor: pointer; accent-color: #ef4444; flex-shrink: 0; margin: 0;">
                                     ` : ''}
                                     <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--admin-orange, #d17d39); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0; box-shadow: 0 3px 8px rgba(209,125,57,0.15);">
                                         ${leader.charAt(0).toUpperCase()}
@@ -3039,51 +3000,25 @@ export class HkmGroupsManager {
                                                 ` : ''}
                                             </div>
                                         ` : ''}
-                                        
-                                        <!-- Mobile-only actions -->
-                                        <div class="group-member-actions-mobile">
-                                            ${canManage ? `
-                                                <select class="member-role-select" data-name="${this.escapeHtml(leader)}" data-current-role="leader">
-                                                    <option value="leader" selected>★ ${this.t('groups.groupLeder')}</option>
-                                                    <option value="member">${this.t('groups.groupMedlem')}</option>
-                                                </select>
-                                                ${this.isAdmin && detail && detail.contactId ? `
-                                                    <a href="/admin/admin-kommunikasjon.html?edit=${this.escapeHtml(detail.contactId)}" target="_blank" title="Endre kontaktinformasjon" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; color: var(--text-muted, #94a3b8); cursor: pointer; transition: color 0.15s ease; text-decoration: none;" onmouseover="this.style.color='var(--admin-orange, #d17d39)';" onmouseout="this.style.color='var(--text-muted, #94a3b8)';">
-                                                        <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
-                                                    </a>
-                                                ` : ''}
-                                            ` : `
-                                                <div style="font-size: 12px; color: var(--admin-orange, #d17d39); font-weight: 700; display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px;">
-                                                    <span class="material-symbols-outlined" style="font-size: 13px; color: var(--admin-orange, #d17d39); font-variation-settings: 'FILL' 1;">star</span>
-                                                    <span>${this.t('groups.groupLeder')}</span>
-                                                </div>
-                                                ${this.isAdmin && detail && detail.contactId ? `
-                                                    <a href="/admin/admin-kommunikasjon.html?edit=${this.escapeHtml(detail.contactId)}" target="_blank" title="Endre kontaktinformasjon" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; color: var(--text-muted, #94a3b8); cursor: pointer; transition: color 0.15s ease; text-decoration: none;" onmouseover="this.style.color='var(--admin-orange, #d17d39)';" onmouseout="this.style.color='var(--text-muted, #94a3b8)';">
-                                                        <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
-                                                    </a>
-                                                ` : ''}
-                                            `}
-                                        </div>
                                     </div>
                                 </div>
                                 
-                                <!-- Desktop-only actions -->
-                                <div class="group-member-actions-desktop">
+                                <div class="group-member-actions">
                                     ${canManage ? `
-                                        <select class="member-role-select" data-name="${this.escapeHtml(leader)}" data-current-role="leader">
-                                            <option value="leader" selected>★ ${this.t('groups.groupLeder')}</option>
-                                            <option value="member">${this.t('groups.groupMedlem')}</option>
-                                        </select>
+                                        <div style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; cursor: pointer;" title="Endre rolle">
+                                            <span class="material-symbols-outlined" style="font-size: 20px; color: var(--admin-orange, #d17d39); font-variation-settings: 'FILL' 1;">star</span>
+                                            <select class="member-role-select" data-name="${this.escapeHtml(leader)}" data-current-role="leader" style="position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; -webkit-appearance: none; appearance: none; border: none; background: transparent;">
+                                                <option value="leader" selected>★ ${this.t('groups.groupLeder')}</option>
+                                                <option value="member">${this.t('groups.groupMedlem')}</option>
+                                            </select>
+                                        </div>
                                         ${this.isAdmin && detail && detail.contactId ? `
                                             <a href="/admin/admin-kommunikasjon.html?edit=${this.escapeHtml(detail.contactId)}" target="_blank" title="Endre kontaktinformasjon" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; color: var(--text-muted, #94a3b8); cursor: pointer; transition: color 0.15s ease; text-decoration: none;" onmouseover="this.style.color='var(--admin-orange, #d17d39)';" onmouseout="this.style.color='var(--text-muted, #94a3b8)';">
                                                 <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
                                             </a>
                                         ` : ''}
                                     ` : `
-                                        <div style="font-size: 13px; color: var(--admin-orange, #d17d39); font-weight: 700; display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px;">
-                                            <span class="material-symbols-outlined" style="font-size: 14px; color: var(--admin-orange, #d17d39); font-variation-settings: 'FILL' 1;">star</span>
-                                            <span>${this.t('groups.groupLeder')}</span>
-                                        </div>
+                                        <span class="material-symbols-outlined" style="font-size: 20px; color: var(--admin-orange, #d17d39); font-variation-settings: 'FILL' 1; padding: 6px;" title="${this.t('groups.groupLeder')}">star</span>
                                         ${this.isAdmin && detail && detail.contactId ? `
                                             <a href="/admin/admin-kommunikasjon.html?edit=${this.escapeHtml(detail.contactId)}" target="_blank" title="Endre kontaktinformasjon" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; color: var(--text-muted, #94a3b8); cursor: pointer; transition: color 0.15s ease; text-decoration: none;" onmouseover="this.style.color='var(--admin-orange, #d17d39)';" onmouseout="this.style.color='var(--text-muted, #94a3b8)';">
                                                 <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
@@ -3124,48 +3059,25 @@ export class HkmGroupsManager {
                                             </div>
                                         ` : ''}
                                         
-                                        <!-- Mobile-only actions -->
-                                        <div class="group-member-actions-mobile">
-                                            ${canManage ? `
-                                                <select class="member-role-select" data-name="${this.escapeHtml(member)}" data-current-role="member">
-                                                    <option value="leader">★ ${this.t('groups.groupLeder')}</option>
-                                                    <option value="member" selected>${this.t('groups.groupMedlem')}</option>
-                                                </select>
-                                                ${this.isAdmin && detail && detail.contactId ? `
-                                                    <a href="/admin/admin-kommunikasjon.html?edit=${this.escapeHtml(detail.contactId)}" target="_blank" title="Endre kontaktinformasjon" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; color: var(--text-muted, #94a3b8); cursor: pointer; transition: color 0.15s ease; text-decoration: none;" onmouseover="this.style.color='var(--admin-orange, #d17d39)';" onmouseout="this.style.color='var(--text-muted, #94a3b8)';">
-                                                        <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
-                                                    </a>
-                                                ` : ''}
-                                            ` : `
-                                                <div style="font-size: 12px; color: var(--text-muted, #64748b); font-weight: 700; display: inline-flex; align-items: center; padding: 4px 8px;">
-                                                    ${this.t('groups.groupMedlem')}
-                                                </div>
-                                                ${this.isAdmin && detail && detail.contactId ? `
-                                                    <a href="/admin/admin-kommunikasjon.html?edit=${this.escapeHtml(detail.contactId)}" target="_blank" title="Endre kontaktinformasjon" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; color: var(--text-muted, #94a3b8); cursor: pointer; transition: color 0.15s ease; text-decoration: none;" onmouseover="this.style.color='var(--admin-orange, #d17d39)';" onmouseout="this.style.color='var(--text-muted, #94a3b8)';">
-                                                        <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
-                                                    </a>
-                                                ` : ''}
-                                            `}
-                                        </div>
                                     </div>
                                 </div>
                                 
-                                <!-- Desktop-only actions -->
-                                <div class="group-member-actions-desktop">
+                                <div class="group-member-actions">
                                     ${canManage ? `
-                                        <select class="member-role-select" data-name="${this.escapeHtml(member)}" data-current-role="member">
-                                            <option value="leader">★ ${this.t('groups.groupLeder')}</option>
-                                            <option value="member" selected>${this.t('groups.groupMedlem')}</option>
-                                        </select>
+                                        <div style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; cursor: pointer;" title="Endre rolle">
+                                            <span class="material-symbols-outlined" style="font-size: 20px; color: var(--text-muted, #94a3b8);">person</span>
+                                            <select class="member-role-select" data-name="${this.escapeHtml(member)}" data-current-role="member" style="position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; -webkit-appearance: none; appearance: none; border: none; background: transparent;">
+                                                <option value="leader">★ ${this.t('groups.groupLeder')}</option>
+                                                <option value="member" selected>${this.t('groups.groupMedlem')}</option>
+                                            </select>
+                                        </div>
                                         ${this.isAdmin && detail && detail.contactId ? `
                                             <a href="/admin/admin-kommunikasjon.html?edit=${this.escapeHtml(detail.contactId)}" target="_blank" title="Endre kontaktinformasjon" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; color: var(--text-muted, #94a3b8); cursor: pointer; transition: color 0.15s ease; text-decoration: none;" onmouseover="this.style.color='var(--admin-orange, #d17d39)';" onmouseout="this.style.color='var(--text-muted, #94a3b8)';">
                                                 <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
                                             </a>
                                         ` : ''}
                                     ` : `
-                                        <div style="font-size: 13px; color: var(--text-muted, #64748b); font-weight: 700; display: inline-flex; align-items: center; padding: 4px 8px;">
-                                            ${this.t('groups.groupMedlem')}
-                                        </div>
+                                        <span class="material-symbols-outlined" style="font-size: 20px; color: var(--text-muted, #94a3b8); padding: 6px;" title="${this.t('groups.groupMedlem')}">person</span>
                                         ${this.isAdmin && detail && detail.contactId ? `
                                             <a href="/admin/admin-kommunikasjon.html?edit=${this.escapeHtml(detail.contactId)}" target="_blank" title="Endre kontaktinformasjon" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; color: var(--text-muted, #94a3b8); cursor: pointer; transition: color 0.15s ease; text-decoration: none;" onmouseover="this.style.color='var(--admin-orange, #d17d39)';" onmouseout="this.style.color='var(--text-muted, #94a3b8)';">
                                                 <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
