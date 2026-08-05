@@ -12,7 +12,9 @@ const _part2 = "AelVsZnTU5xjQsjewWG7RjYEsQSHH-bkE";
 
 window.firebaseConfig = {
     apiKey: _part1 + _part2,
-    authDomain: "his-kingdom-ministry.firebaseapp.com",
+    authDomain: (typeof window !== 'undefined' && window.location && (window.location.hostname.includes('localhost') || window.location.hostname.includes('127.0.0.1')))
+        ? "his-kingdom-ministry.firebaseapp.com"
+        : (typeof window !== 'undefined' && window.location ? window.location.hostname : "his-kingdom-ministry.firebaseapp.com"),
     projectId: "his-kingdom-ministry",
     storageBucket: "his-kingdom-ministry.firebasestorage.app",
     messagingSenderId: "791237361706",
