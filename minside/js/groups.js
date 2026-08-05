@@ -1515,6 +1515,14 @@ export class HkmGroupsManager {
                     </button>
                 ` : ''}
                 <div style="height: 1px; background: var(--border-color, #cbd5e1); margin: 4px 0;"></div>
+                <div style="padding: 6px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted, #64748b); letter-spacing: 0.5px;">Kategori-filter</div>
+                ${['ALL', ...this.categories].map(cat => `
+                    <button type="button" class="pco-menu-item ctx-filter-category ${this.filterCategory === cat ? 'active' : ''}" data-cat="${cat}">
+                        <span class="material-symbols-outlined" style="font-size: 16px; color: ${this.filterCategory === cat ? 'var(--admin-orange, #d17d39)' : 'var(--text-muted, #64748b)'};">${cat === 'ALL' ? 'category' : 'circle'}</span>
+                        <span>${cat === 'ALL' ? this.t('groups.categoryAll') : this.translateCategory(cat)}</span>
+                    </button>
+                `).join('')}
+                <div style="height: 1px; background: var(--border-color, #cbd5e1); margin: 4px 0;"></div>
                 <button type="button" class="pco-menu-item" id="ctx-share-directory">
                     <span class="material-symbols-outlined">share</span>
                     <span>Del grupper</span>
@@ -1861,6 +1869,15 @@ export class HkmGroupsManager {
 
         headerContainer.querySelector('#btn-desktop-create')?.addEventListener('click', () => {
             this.openCreateModal();
+        });
+
+        // Bind category filter context menu items
+        headerContainer.querySelectorAll('.ctx-filter-category').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.filterCategory = btn.dataset.cat;
+                if (contextMenu) contextMenu.style.display = 'none';
+                this.renderCurrentView();
+            });
         });
     }
 
