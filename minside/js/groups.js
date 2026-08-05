@@ -1924,15 +1924,6 @@ export class HkmGroupsManager {
                     <span class="material-symbols-outlined" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 20px;">search</span>
                     <input type="text" id="group-search-input" value="${this.escapeHtml(this.searchQuery)}" placeholder="${this.t('groups.searchPlaceholder')}" style="width: 100%; padding: 10px 14px 10px 40px !important; padding-left: 40px !important; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); font-size: 14px;">
                 </div>
-
-                <!-- Category Filter Pills -->
-                <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
-                    ${categories.map(cat => `
-                        <button type="button" class="cat-pill-btn ${this.filterCategory === cat ? 'active' : ''}" data-cat="${cat}" style="padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; border: 1px solid ${this.filterCategory === cat ? 'var(--admin-orange, #d17d39)' : 'var(--border-color, #e2e8f0)'}; background: ${this.filterCategory === cat ? 'var(--admin-orange, #d17d39)' : 'transparent'}; color: ${this.filterCategory === cat ? '#fff' : 'inherit'}; cursor: pointer; transition: all 0.2s ease;">
-                            ${cat === 'ALL' ? this.t('groups.categoryAll') : this.translateCategory(cat)}
-                        </button>
-                    `).join('')}
-                </div>
             </div>
 
             <!-- Groups Directory Grid -->
@@ -1952,14 +1943,6 @@ export class HkmGroupsManager {
         container.querySelector('#group-search-input')?.addEventListener('input', (e) => {
             this.searchQuery = e.target.value;
             this.renderDirectoryView(container);
-        });
-
-        // Category pills event
-        container.querySelectorAll('.cat-pill-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                this.filterCategory = btn.dataset.cat;
-                this.renderDirectoryView(container);
-            });
         });
 
         this.bindCardActions(container);
