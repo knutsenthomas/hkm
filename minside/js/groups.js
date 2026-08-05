@@ -1596,7 +1596,7 @@ export class HkmGroupsManager {
             </style>
 
             <!-- PC/Desktop layout: Tabs and Back button side-by-side -->
-            <div class="groups-desktop-only" style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; width: 100%;">
+            <div class="groups-desktop-only" style="align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; width: 100%;">
                 <div style="display: flex; align-items: center; gap: 16px;">
                     ${isHub ? `
                         <button type="button" id="btn-desktop-back" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--card-bg, #ffffff); cursor: pointer; font-size: 14px; font-weight: 700; transition: all 0.2s ease; color: var(--text-color, #0f172a);" onmouseover="this.style.background='rgba(15,23,42,0.02)';" onmouseout="this.style.background='var(--card-bg, #ffffff)';">
@@ -1651,7 +1651,7 @@ export class HkmGroupsManager {
             </div>
 
             <!-- Mobile PCO-style layout -->
-            <div class="groups-mobile-only pco-header-bar" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--card-bg, #ffffff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); position: relative; z-index: 100; width: 100%;">
+            <div class="groups-mobile-only pco-header-bar" style="align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--card-bg, #ffffff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); position: relative; z-index: 100; width: 100%;">
                 <!-- Left: Back Button -->
                 <button type="button" id="btn-groups-back" style="background: transparent; border: none; padding: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-color, #0f172a); transition: transform 0.2s ease, background-color 0.2s ease; border-radius: 50%;" onmouseover="this.style.background='rgba(15,23,42,0.05)';" onmouseout="this.style.background='transparent';">
                     <span class="material-symbols-outlined" style="font-size: 24px; font-weight: 600;">chevron_left</span>
