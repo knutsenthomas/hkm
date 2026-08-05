@@ -831,17 +831,17 @@ export class HkmGroupsManager {
             <!-- Send Group Email Modal -->
             <div id="group-email-modal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 16px;">
                 <div class="modal-card" style="background: var(--card-bg, #ffffff); border-radius: 20px; width: 100%; max-width: 580px; padding: 28px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(209, 125, 57, 0.12); color: var(--admin-orange, #d17d39); display: flex; align-items: center; justify-content: center;">
-                                <span class="material-symbols-outlined" style="font-size: 22px;">mail</span>
-                            </div>
-                            <div>
-                                <h3 style="margin: 0; font-size: 20px; font-weight: 700;">Send e-post til gruppen</h3>
-                                <p id="group-email-subtitle" style="margin: 2px 0 0 0; font-size: 13px; opacity: 0.7;">Send melding til alle gruppemedlemmer</p>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; gap: 16px;">
+                        <div style="display: flex; align-items: flex-start; gap: 12px; flex: 1; min-width: 0;">
+                            <span class="material-symbols-outlined" style="font-size: 24px; color: var(--admin-orange, #d17d39); margin-top: 2px; flex-shrink: 0;">mail</span>
+                            <div style="min-width: 0; flex: 1;">
+                                <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--text-color, #0f172a);">Send e-post til gruppen</h3>
+                                <p id="group-email-subtitle" style="margin: 4px 0 0 0; font-size: 13px; color: var(--text-muted, #64748b); line-height: 1.4;">Send melding til alle gruppemedlemmer</p>
                             </div>
                         </div>
-                        <button type="button" id="close-email-modal" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: var(--text-color, #64748b);">&times;</button>
+                        <button type="button" id="close-email-modal" style="background: transparent; border: none; padding: 4px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted, #94a3b8); transition: color 0.15s;" onmouseover="this.style.color='var(--admin-orange, #d17d39)';" onmouseout="this.style.color='var(--text-muted, #94a3b8)';">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                        </button>
                     </div>
 
                     <form id="group-send-email-form" style="display: flex; flex-direction: column; gap: 16px;">
