@@ -5280,8 +5280,24 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
 }
 @media (max-width: 576px) {
     .course-lesson-row {
-        flex-wrap: wrap;
-        gap: 12px;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 16px !important;
+        padding: 16px !important;
+    }
+    .course-lesson-row > div:first-child {
+        width: 100% !important;
+    }
+    .course-lesson-row > div:last-child {
+        width: 100% !important;
+    }
+    .course-lesson-row .btn-primary {
+        display: flex !important;
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 10px 16px !important;
+        font-size: 0.9rem !important;
+        border-radius: 12px !important;
     }
 }
 .course-lesson-row:hover {
