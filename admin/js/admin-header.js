@@ -66,6 +66,10 @@ const initAdminHeader = () => {
     };
 
     setupDesktopSidebarToggle();
+    window.addEventListener('resize', () => {
+        const isMiniStored = localStorage.getItem(SIDEBAR_MINI_KEY) === 'true';
+        applySidebarMiniState(isMiniStored);
+    });
 
     // Premium Progress Bar helper
     const injectLoadingProgressBar = () => {

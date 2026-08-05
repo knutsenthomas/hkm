@@ -5025,9 +5025,14 @@ class AdminManager {
 
                 widgetsHtml += `
                     <div class="stat-card modern" data-id="${id}">
-                        <div class="stat-label">${w.label.toUpperCase()}</div>
-                        <div class="stat-value">${value}</div>
-                        ${trend}
+                        <div class="stat-icon-wrap ${w.color || 'purple'}">
+                            <span class="material-symbols-outlined">${w.icon || 'star'}</span>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-label">${w.label.toUpperCase()}</div>
+                            <div class="stat-value">${value}</div>
+                            ${trend}
+                        </div>
                     </div>
                 `;
             });
@@ -5093,7 +5098,7 @@ class AdminManager {
                                     <span style="color: var(--admin-text-muted, #64748b);">${p.pct}%</span>
                                 </div>
                                 <div style="width:100%; height:6px; background: var(--admin-surface-muted, #f1f5f9); border-radius:3px; overflow:hidden;">
-                                    <div style="width:${p.pct}%; height:100%; background: var(--admin-accent-color, #1B4965); border-radius:3px;"></div>
+                                    <div style="width:${p.pct}%; height:100%; background: linear-gradient(90deg, #e06c55 0%, #d17d39 100%) !important; border-radius:3px;"></div>
                                 </div>
                             </div>
                         `).join('')}
@@ -5136,18 +5141,37 @@ class AdminManager {
                 .stat-card.modern {
                     background: var(--admin-surface, white) !important;
                     border: 1px solid var(--admin-border, #e2e8f0) !important;
-                    border-radius: 12px !important;
-                    padding: 24px !important;
+                    border-radius: 16px !important;
+                    padding: 20px 24px !important;
                     display: flex !important;
-                    flex-direction: column !important;
-                    gap: 8px !important;
-                    transition: all 0.2s ease !important;
-                    box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+                    flex-direction: row !important;
+                    align-items: center !important;
+                    gap: 16px !important;
+                    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.015), 0 2px 6px rgba(15, 23, 42, 0.015) !important;
+                    box-sizing: border-box !important;
                 }
                 .stat-card.modern:hover {
                     border-color: var(--admin-accent-color, #d17d39) !important;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
-                    transform: translateY(-2px);
+                    box-shadow: 0 12px 30px rgba(209, 125, 57, 0.08) !important;
+                    transform: translateY(-4px) scale(1.01) !important;
+                }
+                .stat-icon-wrap {
+                    width: 48px !important;
+                    height: 48px !important;
+                    border-radius: 12px !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    flex-shrink: 0 !important;
+                    box-shadow: inset 0 -2px 4px rgba(0,0,0,0.02) !important;
+                }
+                .stat-content {
+                    flex: 1 !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    gap: 2px !important;
+                    align-items: flex-start !important;
                 }
                 .stat-label {
                     font-size: 11px !important;
@@ -5155,12 +5179,14 @@ class AdminManager {
                     color: var(--admin-text-muted, #64748b) !important;
                     text-transform: uppercase !important;
                     letter-spacing: 0.05em !important;
+                    margin: 0 !important;
                 }
                 .stat-value {
-                    font-size: 28px !important;
+                    font-size: 24px !important;
                     font-weight: 800 !important;
                     color: var(--admin-text, #1e293b) !important;
                     margin: 0 !important;
+                    line-height: 1.2 !important;
                 }
                 .trend-indicator {
                     display: flex;
@@ -5172,41 +5198,70 @@ class AdminManager {
                 }
                 .trend-up { color: #16a34a; }
                 .trend-down { color: #dc2626; }
-                
-                /* Mobile Optimizations for Hero Card */
-                @media (max-width: 768px) {
-                    .overview-hero-card {
-                        padding: 32px !important;
-                    }
-                    .overview-hero-title {
-                        font-size: 28px !important;
-                    }
-                    .hero-actions-container {
-                        flex-direction: row !important;
-                        flex-wrap: wrap !important;
-                        justify-content: flex-start !important;
-                        gap: 10px !important;
-                    }
-                    .overview-hero-action, .overview-hero-action-secondary {
-                        width: 44px !important;
-                        height: 44px !important;
-                        min-width: 44px !important;
-                        justify-content: center !important;
-                    }
+
+                /* Hero Card - Specificity boosted for neutral admin theme & mobile alignment */
+                body.admin-body #overview-section .overview-hero-card {
+                    background: var(--admin-surface, #ffffff) !important;
+                    border: 1px solid var(--admin-border, #cbd5e1) !important;
+                    border-radius: 20px !important;
+                    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03), 0 2px 6px rgba(15, 23, 42, 0.02) !important;
+                    padding: 40px !important;
+                    position: relative !important;
+                    overflow: hidden !important;
+                    color: var(--admin-text, #1e293b) !important;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                    display: flex !important;
+                    flex-direction: row !important;
+                    align-items: center !important;
+                    justify-content: space-between !important;
                 }
-                
-                /* Override dashboard.css SaaS styles with premium icon buttons */
-                .overview-hero-action {
+                body.admin-body #overview-section .overview-hero-card::before,
+                body.admin-body #overview-section .overview-hero-card::after {
+                    display: none !important;
+                }
+                body.admin-body #overview-section .overview-hero-content {
+                    position: relative !important;
+                    z-index: 2 !important;
+                    flex: 1 !important;
+                }
+                body.admin-body #overview-section .overview-hero-title {
+                    font-size: 32px !important;
+                    font-weight: 800 !important;
+                    margin-bottom: 12px !important;
+                    margin-top: 0 !important;
+                    font-family: 'Outfit', 'Inter', sans-serif !important;
+                    letter-spacing: -0.02em !important;
+                    color: var(--admin-text, #1e293b) !important;
+                }
+                body.admin-body #overview-section .overview-hero-text {
+                    font-size: 15px !important;
+                    opacity: 0.85 !important;
+                    max-width: 650px !important;
+                    line-height: 1.6 !important;
+                    margin: 0 0 24px 0 !important;
+                    color: var(--admin-text-muted, #475569) !important;
+                }
+                body.admin-body #overview-section .overview-hero-card .hero-actions-container {
+                    display: flex !important;
+                    flex-direction: row !important;
+                    flex-wrap: wrap !important;
+                    gap: 12px !important;
+                    align-items: center !important;
+                    justify-content: flex-start !important;
+                    width: 100% !important;
+                }
+
+                body.admin-body #overview-section .overview-hero-action {
                     width: 44px !important;
                     height: 44px !important;
                     min-width: 44px !important;
-                    background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
-                    color: white !important;
-                    border-radius: 10px !important;
+                    background: linear-gradient(135deg, #e06c55 0%, #d17d39 100%) !important;
+                    color: #ffffff !important;
+                    border-radius: 12px !important;
                     padding: 0 !important;
                     font-weight: 600 !important;
                     border: none !important;
-                    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.25) !important;
+                    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2) !important;
                     cursor: pointer !important;
                     display: inline-flex !important;
                     align-items: center !important;
@@ -5215,22 +5270,22 @@ class AdminManager {
                     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
                     margin: 0 !important;
                 }
-                .overview-hero-action:hover {
+                body.admin-body #overview-section .overview-hero-action:hover {
                     transform: translateY(-2px) scale(1.05) !important;
-                    box-shadow: 0 6px 16px rgba(209, 125, 57, 0.35) !important;
+                    box-shadow: 0 6px 16px rgba(209, 125, 57, 0.3) !important;
                     filter: brightness(1.05) !important;
                 }
-                .overview-hero-action-secondary {
+                body.admin-body #overview-section .overview-hero-action-secondary {
                     width: 44px !important;
                     height: 44px !important;
                     min-width: 44px !important;
-                    background: var(--admin-surface-muted, #ffffff) !important;
+                    background: var(--admin-surface, #ffffff) !important;
                     color: var(--admin-text-muted, #475569) !important;
-                    border-radius: 10px !important;
+                    border-radius: 12px !important;
                     padding: 0 !important;
                     font-weight: 600 !important;
                     border: 1px solid var(--admin-border, #cbd5e1) !important;
-                    box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03) !important;
                     cursor: pointer !important;
                     display: inline-flex !important;
                     align-items: center !important;
@@ -5239,15 +5294,15 @@ class AdminManager {
                     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
                     margin: 0 !important;
                 }
-                .overview-hero-action-secondary:hover {
-                    background: var(--admin-surface, #f8fafc) !important;
-                    color: var(--admin-text, #0f172a) !important;
-                    border-color: var(--admin-border, #94a3b8) !important;
+                body.admin-body #overview-section .overview-hero-action-secondary:hover {
+                    background: var(--admin-surface-muted, #f8fafc) !important;
+                    color: var(--admin-accent-color, #d17d39) !important;
+                    border-color: var(--admin-accent-color, #d17d39) !important;
                     transform: translateY(-2px) scale(1.05) !important;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+                    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.08) !important;
                 }
-                .overview-hero-action .material-symbols-outlined,
-                .overview-hero-action-secondary .material-symbols-outlined {
+                body.admin-body #overview-section .overview-hero-action .material-symbols-outlined,
+                body.admin-body #overview-section .overview-hero-action-secondary .material-symbols-outlined {
                     font-size: 20px !important;
                     color: inherit !important;
                     display: inline-flex !important;
@@ -5259,13 +5314,72 @@ class AdminManager {
                     height: 20px !important;
                 }
                 
+                /* Mobile Optimizations for Hero Card & Actions */
+                @media (max-width: 768px) {
+                    body.admin-body #overview-section .overview-hero-card {
+                        padding: 24px !important;
+                        border-radius: 16px !important;
+                        flex-direction: column !important;
+                        align-items: stretch !important;
+                    }
+                    body.admin-body #overview-section .overview-hero-title {
+                        font-size: 26px !important;
+                    }
+                    body.admin-body #overview-section .overview-hero-text {
+                        font-size: 14px !important;
+                        margin-bottom: 20px !important;
+                    }
+                    body.admin-body #overview-section .overview-hero-card .hero-actions-container {
+                        flex-direction: row !important;
+                        flex-wrap: wrap !important;
+                        justify-content: flex-start !important;
+                        gap: 10px !important;
+                        width: 100% !important;
+                    }
+                    body.admin-body #overview-section .overview-hero-action, 
+                    body.admin-body #overview-section .overview-hero-action-secondary {
+                        width: 44px !important;
+                        height: 44px !important;
+                        min-width: 44px !important;
+                        justify-content: center !important;
+                        padding: 0 !important;
+                    }
+                }
+                
                 /* Dark Mode overrides for local page layout */
+                html[data-theme="dark"] body.admin-body #overview-section .overview-hero-card {
+                    background: #1e293b !important;
+                    border-color: #334155 !important;
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+                    color: #f8fafc !important;
+                }
+                html[data-theme="dark"] body.admin-body #overview-section .overview-hero-title {
+                    color: #f8fafc !important;
+                }
+                html[data-theme="dark"] body.admin-body #overview-section .overview-hero-text {
+                    color: #cbd5e1 !important;
+                }
+                html[data-theme="dark"] body.admin-body #overview-section .overview-hero-action-secondary {
+                    background: #0f172a !important;
+                    color: #cbd5e1 !important;
+                    border-color: #334155 !important;
+                }
+                html[data-theme="dark"] body.admin-body #overview-section .overview-hero-action-secondary:hover {
+                    background: #1e293b !important;
+                    color: #f8fafc !important;
+                    border-color: #475569 !important;
+                }
                 html[data-theme="dark"] .dashboard-col-header {
                     color: var(--admin-text, #f8fafc) !important;
                 }
                 html[data-theme="dark"] .stat-card.modern {
                     background: #1e293b !important;
                     border-color: #334155 !important;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+                }
+                html[data-theme="dark"] .stat-card.modern:hover {
+                    border-color: #e06c55 !important;
+                    box-shadow: 0 12px 30px rgba(224, 108, 85, 0.12) !important;
                 }
                 html[data-theme="dark"] .stat-label {
                     color: #94a3b8 !important;
@@ -5273,24 +5387,30 @@ class AdminManager {
                 html[data-theme="dark"] .stat-value {
                     color: #f8fafc !important;
                 }
-                html[data-theme="dark"] .overview-hero-action-secondary {
-                    background: #0f172a !important;
-                    color: #cbd5e1 !important;
-                    border-color: #334155 !important;
-                }
-                html[data-theme="dark"] .overview-hero-action-secondary:hover {
+                html[data-theme="dark"] .big-card,
+                html[data-theme="dark"] .side-card {
                     background: #1e293b !important;
+                    border-color: #334155 !important;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+                }
+                html[data-theme="dark"] .big-card-title,
+                html[data-theme="dark"] .side-card-title {
                     color: #f8fafc !important;
-                    border-color: #475569 !important;
+                }
+                html[data-theme="dark"] .analytics-range-select {
+                    background-color: #0f172a !important;
+                    border-color: #334155 !important;
+                    color: #f8fafc !important;
+                    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%2394a3b8%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpolyline%20points%3D%276%209%2012%2015%2018%209%27%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E") !important;
                 }
             </style>
-            <div class="overview-hero-card" style="background: var(--admin-orange-gradient); border-radius: 16px; padding: 48px; position: relative; overflow: hidden; color: white;">
-                <div class="overview-hero-content" style="position: relative; z-index: 2;">
-                    <h2 class="overview-hero-title" style="font-size: 36px; font-weight: 800; margin-bottom: 12px;">Velkommen tilbake!</h2>
-                    <p class="overview-hero-text" style="font-size: 16px; opacity: 0.9; max-width: 600px; line-height: 1.6;">
+            <div class="overview-hero-card">
+                <div class="overview-hero-content">
+                    <h2 class="overview-hero-title">Velkommen tilbake!</h2>
+                    <p class="overview-hero-text">
                         Her har du en fullstendig oversikt over HKM Studio. Se sanntidsdata, administrer innhold og svar på meldinger fra én sentral flate.
                     </p>
-                    <div class="hero-actions-container" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; align-items: center !important; justify-content: flex-start !important;">
+                    <div class="hero-actions-container">
                         <button type="button" class="overview-hero-action" title="Gå til kontakter" aria-label="Gå til kontakter" onclick="window.location.href='/admin/admin-kommunikasjon.html'">
                             <span class="material-symbols-outlined">send</span>
                         </button>

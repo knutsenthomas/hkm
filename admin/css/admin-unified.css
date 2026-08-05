@@ -3952,9 +3952,12 @@ body.builder-active .newsletter-canvas {
 
   body.admin-body #overview-section .overview-hero-action,
   body.admin-body #overview-section .overview-hero-action-secondary {
-    width: 100% !important;
+    width: 44px !important;
+    min-width: 44px !important;
+    height: 44px !important;
     justify-content: center !important;
     box-sizing: border-box !important;
+    padding: 0 !important;
   }
 
   body.builder-active .workspace-header .newsletter-meta {
@@ -11331,6 +11334,112 @@ html[data-theme="dark"] .status-pill.status-pending {
 html[data-theme="dark"] .status-pill.status-completed {
     background: rgba(2, 132, 199, 0.2) !important;
     color: #38bdf8 !important;
+}
+
+/* --- Modernized Mobile Bottom Nav --- */
+@media (max-width: 768px) {
+    body.admin-body .mobile-bottom-nav,
+    .mobile-bottom-nav {
+        display: flex !important;
+        position: fixed !important;
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+        left: 16px !important;
+        right: 16px !important;
+        height: 68px !important;
+        background: rgba(255, 255, 255, 0.85) !important;
+        backdrop-filter: blur(20px) saturate(190%) !important;
+        -webkit-backdrop-filter: blur(20px) saturate(190%) !important;
+        border: 1px solid rgba(15, 23, 42, 0.08) !important;
+        border-radius: 24px !important;
+        box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05), 0 4px 12px rgba(15, 23, 42, 0.03) !important;
+        padding: 0 12px !important;
+        padding-bottom: 0 !important;
+        align-items: center !important;
+        justify-content: space-around !important;
+        z-index: 12000 !important;
+        box-sizing: border-box !important;
+    }
+
+    body.admin-body .mobile-bottom-nav .mobile-nav-item,
+    .mobile-bottom-nav .mobile-nav-item {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        color: #64748b !important;
+        text-decoration: none !important;
+        padding: 8px 0 !important;
+        border-radius: 16px !important;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        flex: 1 !important;
+        max-width: 80px !important;
+        height: 52px !important;
+        position: relative !important;
+        box-sizing: border-box !important;
+        border: none !important;
+        background: transparent !important;
+    }
+
+    body.admin-body .mobile-bottom-nav .mobile-nav-item:hover,
+    .mobile-bottom-nav .mobile-nav-item:active {
+        background: rgba(15, 23, 42, 0.03) !important;
+        color: #0f172a !important;
+    }
+
+    body.admin-body .mobile-bottom-nav .mobile-nav-item.active,
+    .mobile-bottom-nav .mobile-nav-item.active {
+        color: var(--admin-accent-color, #d17d39) !important;
+        background: rgba(209, 125, 57, 0.08) !important;
+        transform: translateY(-2px) !important;
+    }
+
+    body.admin-body .mobile-bottom-nav .mobile-nav-item.active .material-symbols-outlined,
+    .mobile-bottom-nav .mobile-nav-item.active .material-symbols-outlined {
+        font-variation-settings: 'FILL' 1 !important;
+        transform: scale(1.05) !important;
+    }
+
+    body.admin-body .mobile-bottom-nav .mobile-nav-item .material-symbols-outlined,
+    .mobile-bottom-nav .mobile-nav-item .material-symbols-outlined {
+        font-size: 22px !important;
+        margin-bottom: 2px !important;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    body.admin-body .mobile-bottom-nav .mobile-nav-item span:not(.material-symbols-outlined),
+    .mobile-bottom-nav .mobile-nav-item span:not(.material-symbols-outlined) {
+        font-size: 10px !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.01em !important;
+        margin-top: 0 !important;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        display: block !important;
+    }
+
+    /* Dark Mode specific overrides */
+    html[data-theme="dark"] body.admin-body .mobile-bottom-nav,
+    html[data-theme="dark"] .mobile-bottom-nav {
+        background: rgba(30, 41, 59, 0.85) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    html[data-theme="dark"] body.admin-body .mobile-bottom-nav .mobile-nav-item,
+    html[data-theme="dark"] .mobile-bottom-nav .mobile-nav-item {
+        color: #94a3b8 !important;
+    }
+
+    html[data-theme="dark"] body.admin-body .mobile-bottom-nav .mobile-nav-item:hover,
+    html[data-theme="dark"] .mobile-bottom-nav .mobile-nav-item:hover {
+        background: rgba(255, 255, 255, 0.05) !important;
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="dark"] body.admin-body .mobile-bottom-nav .mobile-nav-item.active,
+    html[data-theme="dark"] .mobile-bottom-nav .mobile-nav-item.active {
+        color: var(--admin-accent-color, #e06c55) !important;
+        background: rgba(224, 108, 85, 0.15) !important;
+    }
 }
 
 
