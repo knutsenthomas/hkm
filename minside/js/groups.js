@@ -593,6 +593,10 @@ export class HkmGroupsManager {
         if (queryParams && queryParams.id) {
             this.selectedGroupId = queryParams.id;
             this.currentView = 'hub';
+            this.selectedGroupTab = queryParams.tab || 'overview';
+        } else {
+            this.selectedGroupId = null;
+            this.currentView = (queryParams && queryParams.view) ? queryParams.view : 'directory';
         }
 
         container.innerHTML = `
@@ -1729,19 +1733,16 @@ export class HkmGroupsManager {
         // Bind switch view actions
         headerContainer.querySelectorAll('[data-action="switch-view"]').forEach(btn => {
             btn.addEventListener('click', () => {
-                this.currentView = btn.dataset.view;
                 navMenu.style.display = 'none';
-                this.renderCurrentView();
+                this.app.loadView('groups', { view: btn.dataset.view });
             });
         });
 
         // Bind switch group actions
         headerContainer.querySelectorAll('[data-action="switch-group"]').forEach(btn => {
             btn.addEventListener('click', () => {
-                this.selectedGroupId = btn.dataset.groupId;
-                this.currentView = 'hub';
                 navMenu.style.display = 'none';
-                this.renderCurrentView();
+                this.app.loadView('groups', { id: btn.dataset.groupId });
             });
         });
 
@@ -1817,18 +1818,14 @@ export class HkmGroupsManager {
         // Bind desktop tab buttons
         headerContainer.querySelectorAll('.desktop-tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                this.currentView = btn.dataset.gview;
-                this.renderCurrentView();
+                this.app.loadView('groups', { view: btn.dataset.gview });
             });
         });
 
         // Bind desktop back button
         headerContainer.querySelector('#btn-desktop-back')?.addEventListener('click', () => {
             if (isHub) {
-                this.selectedGroupId = null;
-                this.activeGroup = null;
-                this.currentView = 'directory';
-                this.render(this.container);
+                this.app.loadView('groups');
             } else {
                 window.location.hash = '#overview';
             }
@@ -2040,9 +2037,7 @@ export class HkmGroupsManager {
     bindCardActions(container) {
         container.querySelectorAll('.btn-open-group').forEach(btn => {
             btn.addEventListener('click', () => {
-                this.selectedGroupId = btn.dataset.id;
-                this.currentView = 'hub';
-                this.renderCurrentView();
+                this.app.loadView('groups', { id: btn.dataset.id });
             });
         });
 
@@ -2118,11 +2113,10 @@ export class HkmGroupsManager {
             alert(`Suksess! Gruppen "${groupName}" ble slettet.`);
             
             if (this.selectedGroupId === groupId) {
-                this.selectedGroupId = null;
-                this.currentView = 'directory';
+                this.app.loadView('groups');
+            } else {
+                await this.loadGroupsData();
             }
-            
-            await this.loadGroupsData();
         } catch (err) {
             console.error("Error deleting group:", err);
             alert("Kunne ikke slette gruppen: " + err.message);
@@ -2567,6 +2561,13 @@ export class HkmGroupsManager {
                 container.querySelectorAll('.hub-tab-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 this.renderHubTabBody(container.querySelector('#hub-tab-body'));
+
+                // Silently update URL hash to keep in sync for refresh without triggering a full re-render
+                if (this.app) {
+                    const hashString = `groups?id=${encodeURIComponent(group.id)}&tab=${encodeURIComponent(btn.dataset.htab)}`;
+                    this.app.lastLoadedHash = '#' + hashString;
+                    window.location.hash = hashString;
+                }
             });
         });
 
@@ -4135,9 +4136,7 @@ export class HkmGroupsManager {
             const ref = await db.collection('groups').add(copyPayload);
             this.container.querySelector('#group-duplicate-modal').style.display = 'none';
             alert(`Suksess! Gruppen ble duplisert som "${newName}".`);
-            this.selectedGroupId = ref.id;
-            this.currentView = 'hub';
-            await this.loadGroupsData();
+            this.app.loadView('groups', { id: ref.id });
         } catch (err) {
             console.error("Error duplicating group:", err);
             alert("Kunne ikke duplisere gruppe: " + err.message);
