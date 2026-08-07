@@ -12058,16 +12058,16 @@ html[data-theme="dark"] .pco-menu-item:hover {
         box-sizing: border-box !important;
     }
 
-    /* Mobile container padding: edge-to-edge 100% full screen width */
+    /* Mobile container padding: 16px side margins */
     body.admin-body #view-container,
     body.minside-body #view-container,
     body.crm-body #view-container,
     #view-container,
     .admin-main-content,
     .main-content {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        padding-top: 0 !important;
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+        padding-top: 16px !important;
         padding-bottom: 90px !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
@@ -12110,7 +12110,7 @@ html[data-theme="dark"] .pco-menu-item:hover {
         box-sizing: border-box !important;
     }
 
-    /* Mobile panels & cards: flat 0px corners, edge-to-edge full width */
+    /* Mobile panels & cards: 20px rounded corners, modern floating cards */
     .design-ui-panel,
     .card,
     .bento-card,
@@ -12130,18 +12130,16 @@ html[data-theme="dark"] .pco-menu-item:hover {
     .section-card,
     .settings-card,
     .selection-card {
-        border-radius: 0 !important;
-        border-left: none !important;
-        border-right: none !important;
-        border-top: 1px solid rgba(226, 232, 240, 0.8) !important;
-        border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
-        box-shadow: none !important;
+        border-radius: 20px !important;
+        border: 1px solid rgba(226, 232, 240, 0.9) !important;
+        box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04) !important;
         width: 100% !important;
         max-width: 100% !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
-        margin-bottom: 12px !important;
+        margin-bottom: 16px !important;
         box-sizing: border-box !important;
+        overflow: hidden !important;
     }
 
     /* Internal padding protects text, inputs and buttons from card edges */
