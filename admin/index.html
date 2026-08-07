@@ -138,8 +138,35 @@
                 padding: 0 !important;
             }
 
-            /* Hide section title/subtitle & search bar inside sticky topbar on mobile */
-            #dashboard-main-header .section-header-titles,
+            /* Centered page title in mobile top header bar */
+            #dashboard-main-header .section-header-titles {
+                display: flex !important;
+                flex: 1 !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: center !important;
+                text-align: center !important;
+                min-width: 0 !important;
+                margin: 0 !important;
+                padding: 0 4px !important;
+            }
+
+            #dashboard-main-header-title,
+            #dashboard-main-header .section-title {
+                display: block !important;
+                font-size: 16px !important;
+                font-weight: 700 !important;
+                color: #0f172a !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                line-height: 1.2 !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                max-width: 100% !important;
+            }
+
+            /* Hide subtitle, icon & search bar inside sticky topbar on mobile */
             #dashboard-main-header .section-header-icon,
             #dashboard-main-header .section-subtitle,
             #dashboard-main-header .bento-search-bar {
