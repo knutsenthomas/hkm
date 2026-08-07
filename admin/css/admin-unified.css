@@ -11963,16 +11963,16 @@ html[data-theme="dark"] .pco-menu-item:hover {
         box-shadow: none !important;
     }
 
-    /* Container 12px edge alignment on mobile */
+    /* Edge-to-edge container (0px side padding/margin) on mobile */
     body.admin-body #view-container,
     body.minside-body #view-container,
     body.crm-body #view-container,
     #view-container,
     .admin-main-content,
     .main-content {
-        padding-left: 12px !important;
-        padding-right: 12px !important;
-        padding-top: 12px !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        padding-top: 0 !important;
         padding-bottom: 80px !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
@@ -12015,7 +12015,28 @@ html[data-theme="dark"] .pco-menu-item:hover {
         box-sizing: border-box !important;
     }
 
-    /* All boxes span 100% width inside container */
+    /* Section headers & mobile top bars fill 100% width with 16px internal padding */
+    .section-header,
+    .section-header.design-ui-header,
+    .design-ui-header,
+    .pco-header-bar,
+    .crm-mobile-only,
+    .groups-mobile-only {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        margin-top: 0 !important;
+        margin-bottom: 12px !important;
+        border-radius: 0 !important;
+        border-left: none !important;
+        border-right: none !important;
+        box-shadow: none !important;
+        padding: 16px 16px !important;
+        box-sizing: border-box !important;
+    }
+
+    /* All boxes span 100% width edge-to-edge */
     .design-ui-panel,
     .card,
     .bento-card,
@@ -12035,17 +12056,24 @@ html[data-theme="dark"] .pco-menu-item:hover {
     .section-card,
     .settings-card,
     .selection-card {
-        border-radius: 16px !important;
+        border-radius: 0 !important;
+        border-left: none !important;
+        border-right: none !important;
         width: 100% !important;
         max-width: 100% !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
+        margin-bottom: 12px !important;
         box-sizing: border-box !important;
     }
 
+    /* 16px internal padding to protect text, icons, buttons from touching screen edges */
     .profile-panel-body,
-    .design-ui-panel-body {
-        padding: 16px 12px !important;
+    .design-ui-panel-body,
+    .card-body,
+    .panel-body {
+        padding: 20px 16px !important;
+        box-sizing: border-box !important;
     }
 
     /* All grids switch to 1 column */
