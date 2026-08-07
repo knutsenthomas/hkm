@@ -67,7 +67,13 @@
         }
 
         @media (max-width: 768px) {
-            body.admin-body .main-content, #content-area {
+            html, body.admin-body, body.minside-body, body.crm-body {
+                max-width: 100% !important;
+                overflow-x: hidden !important;
+                background-color: #f8fafc !important;
+            }
+
+            .main-content, #content-area {
                 padding: 0 !important;
                 margin: 0 !important;
                 width: 100% !important;
@@ -75,8 +81,25 @@
                 box-sizing: border-box !important;
             }
 
+            /* Flat top sticky navigation bar */
+            #dashboard-main-header,
+            .main-header {
+                position: sticky !important;
+                top: 0 !important;
+                z-index: 1000 !important;
+                width: 100% !important;
+                margin: 0 !important;
+                border-radius: 0 !important;
+                border-left: none !important;
+                border-right: none !important;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+                box-sizing: border-box !important;
+                background: #ffffff !important;
+            }
+
+            /* View container with top padding so sticky header never overlaps section titles */
             #view-container {
-                padding: 0 0 80px 0 !important;
+                padding: 16px 12px 80px 12px !important;
                 margin: 0 !important;
                 width: 100% !important;
                 max-width: 100% !important;
@@ -108,7 +131,7 @@
                 box-sizing: border-box !important;
             }
 
-            /* Edge-to-edge section headers and card boxes with NO side gaps */
+            /* Beautiful Soft Rounded Cards (16px border-radius) */
             .section-header,
             .section-header.design-ui-header,
             .design-ui-header,
@@ -133,15 +156,16 @@
                 margin-left: 0 !important;
                 margin-right: 0 !important;
                 margin-top: 0 !important;
-                margin-bottom: 12px !important;
-                border-radius: 0 !important;
-                border-left: none !important;
-                border-right: none !important;
-                box-shadow: none !important;
+                margin-bottom: 16px !important;
+                border-radius: 16px !important;
+                border: 1px solid rgba(219, 228, 239, 0.8) !important;
+                box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04) !important;
                 box-sizing: border-box !important;
+                background: #ffffff !important;
+                overflow: hidden !important;
             }
 
-            /* 16px internal padding for header content & card bodies to protect text/buttons */
+            /* 16px internal padding for card bodies */
             .section-header,
             .section-header.design-ui-header,
             .design-ui-header,
@@ -165,7 +189,7 @@
             .grid-4-col {
                 display: flex !important;
                 flex-direction: column !important;
-                gap: 12px !important;
+                gap: 16px !important;
                 width: 100% !important;
                 max-width: 100% !important;
                 padding: 0 !important;

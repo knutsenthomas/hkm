@@ -11963,16 +11963,16 @@ html[data-theme="dark"] .pco-menu-item:hover {
         box-shadow: none !important;
     }
 
-    /* Edge-to-edge container (0px side padding/margin) on mobile */
+    /* Edge-to-edge container on mobile with top padding so sticky header does not cover section title */
     body.admin-body #view-container,
     body.minside-body #view-container,
     body.crm-body #view-container,
     #view-container,
     .admin-main-content,
     .main-content {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        padding-top: 0 !important;
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+        padding-top: 16px !important;
         padding-bottom: 80px !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
@@ -12015,28 +12015,10 @@ html[data-theme="dark"] .pco-menu-item:hover {
         box-sizing: border-box !important;
     }
 
-    /* Section headers & mobile top bars fill 100% width with 16px internal padding */
+    /* Soft Rounded Cards (16px border-radius) */
     .section-header,
     .section-header.design-ui-header,
     .design-ui-header,
-    .pco-header-bar,
-    .crm-mobile-only,
-    .groups-mobile-only {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        margin-top: 0 !important;
-        margin-bottom: 12px !important;
-        border-radius: 0 !important;
-        border-left: none !important;
-        border-right: none !important;
-        box-shadow: none !important;
-        padding: 16px 16px !important;
-        box-sizing: border-box !important;
-    }
-
-    /* All boxes span 100% width edge-to-edge */
     .design-ui-panel,
     .card,
     .bento-card,
@@ -12056,15 +12038,17 @@ html[data-theme="dark"] .pco-menu-item:hover {
     .section-card,
     .settings-card,
     .selection-card {
-        border-radius: 0 !important;
-        border-left: none !important;
-        border-right: none !important;
+        border-radius: 16px !important;
+        border: 1px solid rgba(219, 228, 239, 0.8) !important;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04) !important;
         width: 100% !important;
         max-width: 100% !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
-        margin-bottom: 12px !important;
+        margin-bottom: 16px !important;
         box-sizing: border-box !important;
+        background: #ffffff !important;
+        overflow: hidden !important;
     }
 
     /* 16px internal padding to protect text, icons, buttons from touching screen edges */
