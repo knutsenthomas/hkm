@@ -473,6 +473,8 @@
                             flex: none !important;
                             display: flex !important;
                             flex-direction: column !important;
+                            align-items: flex-start !important;
+                            text-align: left !important;
                             gap: 8px !important;
                         }
                         .section-header.design-ui-header .section-header-titles .section-title,
@@ -484,6 +486,7 @@
                             line-height: 1.2 !important;
                             white-space: normal !important;
                             word-break: break-word !important;
+                            text-align: left !important;
                         }
                         .section-header.design-ui-header .section-header-titles .section-subtitle,
                         body.admin-body .section-content > .section-header.design-ui-header .section-header-titles .section-subtitle,
@@ -493,6 +496,7 @@
                             line-height: 1.5 !important;
                             white-space: normal !important;
                             word-break: break-word !important;
+                            text-align: left !important;
                         }
                         .section-header.design-ui-header .section-header-actions,
                         body.admin-body .section-content > .section-header.design-ui-header .section-header-actions,
@@ -536,9 +540,9 @@
                         <span class="material-symbols-outlined">${icon}</span>
                     </div>
                     <div class="section-header-content">
-                        <div class="section-header-titles" style="display: flex !important; flex-direction: column !important; gap: 4px !important; margin: 0 !important; padding: 0 !important;">
-                            <h2 class="section-title" style="margin: 0 !important; padding: 0 !important; line-height: 1.2 !important;">${title}</h2>
-                            <p class="section-subtitle" ${subtitleId ? `id="${subtitleId}"` : ''} style="margin: 0 !important; margin-top: 0 !important; padding: 0 !important; line-height: 1.45 !important;">${subtitle}</p>
+                        <div class="section-header-titles" style="display: flex !important; flex-direction: column !important; align-items: flex-start !important; text-align: left !important; gap: 4px !important; margin: 0 !important; padding: 0 !important;">
+                            <h2 class="section-title" style="margin: 0 !important; padding: 0 !important; line-height: 1.2 !important; text-align: left !important;">${title}</h2>
+                            <p class="section-subtitle" ${subtitleId ? `id="${subtitleId}"` : ''} style="margin: 0 !important; margin-top: 0 !important; padding: 0 !important; line-height: 1.45 !important; text-align: left !important;">${subtitle}</p>
                         </div>
                         ${actionsHtml ? `<div class="section-header-actions">${actionsHtml}</div>` : ''}
                     </div>
