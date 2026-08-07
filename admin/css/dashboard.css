@@ -7567,8 +7567,14 @@ body.admin-body .sidebar-nav {
 
 /* --- Universal Mobile Responsiveness for Section Headers (Kurs, Podcast, Kommentarer, etc.) --- */
 @media (max-width: 768px) {
+    .section-header,
+    .design-ui-header,
     body.admin-body .section-content > .section-header,
-    body.admin-body .section-content > .design-ui-header {
+    body.admin-body .section-content > .design-ui-header,
+    body.minside-body .section-content > .section-header,
+    body.minside-body .section-content > .design-ui-header,
+    body.crm-body .section-content > .section-header,
+    body.crm-body .section-content > .design-ui-header {
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
@@ -7576,22 +7582,35 @@ body.admin-body .sidebar-nav {
         text-align: left !important;
         padding: 16px 16px !important;
         gap: 12px !important;
-        margin-top: 16px !important;
-        margin-bottom: 16px !important;
+        margin-top: 0 !important;
+        margin-bottom: 12px !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        border-radius: 0 !important;
+        border-left: none !important;
+        border-right: none !important;
+        box-shadow: none !important;
         width: 100% !important;
+        max-width: 100% !important;
         box-sizing: border-box !important;
     }
     
+    .section-header .section-header-icon,
+    .design-ui-header .section-header-icon,
     body.admin-body .section-content > .section-header .section-header-icon,
-    body.admin-body .section-content > .design-ui-header .section-header-icon {
+    body.admin-body .section-content > .design-ui-header .section-header-icon,
+    body.minside-body .section-content > .section-header .section-header-icon {
         margin: 0 !important;
         align-self: center !important;
         display: inline-flex !important;
         flex-shrink: 0 !important;
     }
     
+    .section-header > .section-header-content,
+    .design-ui-header > .section-header-content,
     body.admin-body .section-content > .section-header > .section-header-content,
-    body.admin-body .section-content > .design-ui-header > .section-header-content {
+    body.admin-body .section-content > .design-ui-header > .section-header-content,
+    body.minside-body .section-content > .section-header > .section-header-content {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: wrap !important;
@@ -7604,8 +7623,11 @@ body.admin-body .sidebar-nav {
         padding: 0 !important;
     }
     
+    .section-header .section-header-titles,
+    .design-ui-header .section-header-titles,
     body.admin-body .section-content > .section-header .section-header-titles,
-    body.admin-body .section-content > .design-ui-header .section-header-titles {
+    body.admin-body .section-content > .design-ui-header .section-header-titles,
+    body.minside-body .section-content > .section-header .section-header-titles {
         align-items: flex-start !important;
         justify-content: center !important;
         text-align: left !important;
@@ -7613,16 +7635,22 @@ body.admin-body .sidebar-nav {
         flex: 1 !important;
     }
     
+    .section-header .section-title,
+    .design-ui-header .section-title,
     body.admin-body .section-content > .section-header .section-title,
-    body.admin-body .section-content > .design-ui-header .section-title {
+    body.admin-body .section-content > .design-ui-header .section-title,
+    body.minside-body .section-content > .section-header .section-title {
         text-align: left !important;
         align-self: flex-start !important;
         font-size: 16px !important;
         width: auto !important;
     }
     
+    .section-header .section-subtitle,
+    .design-ui-header .section-subtitle,
     body.admin-body .section-content > .section-header .section-subtitle,
-    body.admin-body .section-content > .design-ui-header .section-subtitle {
+    body.admin-body .section-content > .design-ui-header .section-subtitle,
+    body.minside-body .section-content > .section-header .section-subtitle {
         text-align: left !important;
         align-self: flex-start !important;
         font-size: 12px !important;
@@ -7630,8 +7658,11 @@ body.admin-body .sidebar-nav {
         width: auto !important;
     }
     
+    .section-header .section-header-actions,
+    .design-ui-header .section-header-actions,
     body.admin-body .section-content > .section-header .section-header-actions,
-    body.admin-body .section-content > .design-ui-header .section-header-actions {
+    body.admin-body .section-content > .design-ui-header .section-header-actions,
+    body.minside-body .section-content > .section-header .section-header-actions {
         flex-direction: row !important;
         align-items: center !important;
         justify-content: flex-start !important;
