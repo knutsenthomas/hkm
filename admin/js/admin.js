@@ -2263,37 +2263,38 @@ class AdminManager {
 
     async updateUserInfo(user) {
         const adminName = document.getElementById('admin-name');
-        const adminAvatar = document.getElementById('admin-avatar');
+        const getAvatars = () => Array.from(document.querySelectorAll('#admin-avatar, #ph-avatar, #modal-admin-avatar, .user-avatar, .user-avatar-compact, .user-profile-link'));
         const identityCacheKey = 'hkm_admin_identity_cache';
 
         const renderHeaderIdentity = (name, photoURL) => {
             const safeName = (name || '').trim() || 'Administrator';
             if (adminName) adminName.textContent = safeName;
-            if (!adminAvatar) return;
+            const avatars = getAvatars();
+            if (avatars.length === 0) return;
 
-            // Clear any previous state
-            adminAvatar.textContent = '';
-            adminAvatar.innerHTML = '';
+            avatars.forEach(adminAvatar => {
+                adminAvatar.textContent = '';
+                adminAvatar.innerHTML = '';
+                adminAvatar.title = safeName;
 
-            if (photoURL && photoURL.trim().length > 5) {
-                // Show actual photo
-                const img = document.createElement('img');
-                img.src = photoURL;
-                img.style.cssText = "width:100%; height:100%; object-fit:cover; border-radius:inherit;";
-                
-                // Fallback if image fails to load
-                img.onerror = () => {
-                    adminAvatar.innerHTML = '';
+                if (photoURL && photoURL.trim().length > 5) {
+                    adminAvatar.dataset.photoUrl = photoURL;
+                    const img = document.createElement('img');
+                    img.src = photoURL;
+                    img.style.cssText = "width:100%; height:100%; object-fit:cover; border-radius:inherit;";
+                    
+                    img.onerror = () => {
+                        adminAvatar.innerHTML = '';
+                        const initials = safeName.split(' ').map(n => n.trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase();
+                        adminAvatar.textContent = (initials || 'A').substring(0, 2);
+                    };
+                    
+                    adminAvatar.appendChild(img);
+                } else {
                     const initials = safeName.split(' ').map(n => n.trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase();
                     adminAvatar.textContent = (initials || 'A').substring(0, 2);
-                };
-                
-                adminAvatar.appendChild(img);
-            } else {
-                // Fallback: Use initials
-                const initials = safeName.split(' ').map(n => n.trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase();
-                adminAvatar.textContent = (initials || 'A').substring(0, 2);
-            }
+                }
+            });
         };
 
         const cacheHeaderIdentity = (name, photoURL) => {

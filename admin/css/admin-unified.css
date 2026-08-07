@@ -11961,7 +11961,9 @@ html[data-theme="dark"] .pco-menu-item:hover {
     /* Edge-to-edge section headers on mobile */
     .section-header,
     .section-header.design-ui-header,
-    .design-ui-header {
+    .design-ui-header,
+    .pco-header-bar,
+    #dashboard-main-header {
         border-radius: 0 !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
@@ -11971,6 +11973,7 @@ html[data-theme="dark"] .pco-menu-item:hover {
         border-left: none !important;
         border-right: none !important;
         box-shadow: none !important;
+        box-sizing: border-box !important;
     }
 
     /* Edge-to-edge container on mobile with top padding so sticky header does not cover section title */
@@ -11980,9 +11983,9 @@ html[data-theme="dark"] .pco-menu-item:hover {
     #view-container,
     .admin-main-content,
     .main-content {
-        padding-left: 12px !important;
-        padding-right: 12px !important;
-        padding-top: 16px !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        padding-top: 0 !important;
         padding-bottom: 80px !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
@@ -12025,10 +12028,7 @@ html[data-theme="dark"] .pco-menu-item:hover {
         box-sizing: border-box !important;
     }
 
-    /* Soft Rounded Cards (16px border-radius) */
-    .section-header,
-    .section-header.design-ui-header,
-    .design-ui-header,
+    /* Full width edge-to-edge flat panels & cards on mobile (0px border-radius) */
     .design-ui-panel,
     .card,
     .bento-card,
@@ -12048,25 +12048,28 @@ html[data-theme="dark"] .pco-menu-item:hover {
     .section-card,
     .settings-card,
     .selection-card {
-        border-radius: 16px !important;
-        border: 1px solid rgba(219, 228, 239, 0.8) !important;
-        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04) !important;
+        border-radius: 0 !important;
+        border-left: none !important;
+        border-right: none !important;
+        border-top: 1px solid rgba(219, 228, 239, 0.8) !important;
+        border-bottom: 1px solid rgba(219, 228, 239, 0.8) !important;
+        box-shadow: none !important;
         width: 100% !important;
         max-width: 100% !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
-        margin-bottom: 16px !important;
+        margin-bottom: 12px !important;
         box-sizing: border-box !important;
         background: #ffffff !important;
         overflow: hidden !important;
     }
 
-    /* 16px internal padding to protect text, icons, buttons from touching screen edges */
+    /* Internal padding protects text, inputs and buttons from screen edges */
     .profile-panel-body,
     .design-ui-panel-body,
     .card-body,
     .panel-body {
-        padding: 20px 16px !important;
+        padding: 16px 16px !important;
         box-sizing: border-box !important;
     }
 

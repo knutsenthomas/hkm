@@ -173,7 +173,7 @@ const initAdminHeader = () => {
 
     const getIdentityEls = () => ({
         adminNames: Array.from(document.querySelectorAll('#admin-name, .user-name, .user-name-compact')),
-        adminAvatars: Array.from(document.querySelectorAll('#admin-avatar, .user-avatar, .user-avatar-compact'))
+        adminAvatars: Array.from(document.querySelectorAll('#admin-avatar, #ph-avatar, #modal-admin-avatar, .user-avatar, .user-avatar-compact, .user-profile-link'))
     });
 
     const readCachedIdentity = () => {
@@ -602,12 +602,15 @@ const initAdminHeader = () => {
 
             let userProfile = null;
             try {
-                const userDoc = await withTimeout(firebase.firestore().collection('users').doc(user.uid).get(), 1500);
+                const userDoc = await withTimeout(firebase.firestore().collection('users').doc(user.uid).get(), 2500);
                 if (userDoc && userDoc.exists) userProfile = userDoc.data();
             } catch (e) { }
 
             const displayName = (userProfile && userProfile.displayName) || authFallbackName(user);
-            const photoURL = (userProfile && userProfile.photoURL) || user.photoURL || '';
+            const photoURL = (userProfile && (userProfile.photoURL || userProfile.photo_url || userProfile.avatarUrl)) 
+                || user.photoURL 
+                || (cachedIdentity && cachedIdentity.photoURL) 
+                || '';
             renderIdentity(displayName, photoURL);
             writeCachedIdentity(displayName, photoURL);
 
