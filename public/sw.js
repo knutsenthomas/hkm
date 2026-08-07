@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hkm-admin-v137';
+const CACHE_NAME = 'hkm-admin-v138';
 const STATIC_ASSETS = [
     '/css/notifications.css',
     '/img/logo-hkm.png',

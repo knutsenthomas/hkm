@@ -2266,6 +2266,17 @@ class AdminManager {
         const getAvatars = () => Array.from(document.querySelectorAll('#admin-avatar, #ph-avatar, #modal-admin-avatar, .user-avatar, .user-avatar-compact'));
         const identityCacheKey = 'hkm_admin_identity_cache';
 
+        const isDefaultAvatarUrl = (url) => {
+            if (!url || typeof url !== 'string') return true;
+            const lower = url.toLowerCase();
+            return lower.includes('default-user') || 
+                   lower.includes('default_avatar') || 
+                   lower.includes('avatar-placeholder') || 
+                   lower.includes('default.png') ||
+                   lower.includes('/default_user') ||
+                   lower.includes('googleusercontent.com/a/default');
+        };
+
         const renderHeaderIdentity = (name, photoURL) => {
             const safeName = (name || '').trim() || 'Administrator';
             if (adminName) adminName.textContent = safeName;
@@ -2279,7 +2290,9 @@ class AdminManager {
                 adminAvatar.title = safeName;
                 adminAvatar.classList.add('has-initials');
 
-                if (photoURL && photoURL.trim().length > 5) {
+                const isCustomPhoto = photoURL && photoURL.trim().length > 5 && !isDefaultAvatarUrl(photoURL);
+
+                if (isCustomPhoto) {
                     adminAvatar.dataset.photoUrl = photoURL;
                     adminAvatar.innerHTML = `
                         <span class="avatar-initials-text" style="position:relative; z-index:1;">${shortInitials}</span>
