@@ -286,6 +286,18 @@
         <div id="error-box" class="error-message">Feil e-post eller passord. Vennegod forsøk igjen.</div>
 
         <form id="login-form" method="post" action="">
+            <button type="button" id="google-login" class="btn-login"
+                style="background-color: white; color: var(--text-main); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px;">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="Google">
+                Logg inn med Google
+            </button>
+
+            <div style="margin: 20px 0; display: flex; align-items: center; color: var(--text-muted); font-size: 13px;">
+                <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+                <span style="padding: 0 10px;">eller logg inn med e-post</span>
+                <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+            </div>
+
             <div class="form-group">
                 <label>E-post</label>
                 <input type="email" id="email" name="email" autocomplete="username" class="form-control" placeholder="knutsenthomas@gmail.com" required>
@@ -295,16 +307,6 @@
                 <input type="password" id="password" name="password" autocomplete="current-password" class="form-control" placeholder="••••••••" required>
             </div>
             <button type="submit" class="btn-login">Logg inn</button>
-            <div style="margin: 20px 0; display: flex; align-items: center; color: var(--text-muted); font-size: 13px;">
-                <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
-                <span style="padding: 0 10px;">eller</span>
-                <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
-            </div>
-            <button type="button" id="google-login" class="btn-login"
-                style="background-color: white; color: var(--text-main); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; gap: 10px;">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="Google">
-                Logg inn med Google
-            </button>
         </form>
 
         <a href="/" class="back-link">Tilbake til nettsiden</a>

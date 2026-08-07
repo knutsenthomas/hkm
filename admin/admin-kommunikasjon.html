@@ -44,9 +44,9 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block"></noscript>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/dashboard.css?v=20260713_V1">
+    <link rel="stylesheet" href="css/dashboard.css?v=20260807_V5">
     <link rel="stylesheet" href="css/crm.css?v=20260716_V2">
-    <link rel="stylesheet" href="css/admin-unified.css?v=20260716_V2">
+    <link rel="stylesheet" href="css/admin-unified.css?v=20260807_V5">
 
     <!-- Firebase SDK (Compat) -->
     <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -279,8 +279,70 @@
         </aside>
         <!-- Main Content -->
         <main class="crm-main">
-            <!-- Page Header -->
-            <div id="dashboard-main-header" class="main-header">
+            <!-- Mobile PCO Header Bar (Identical to Grupper page in Min Side) -->
+            <div class="crm-mobile-only pco-header-bar" style="display: flex !important; flex-direction: row !important; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--card-bg, #ffffff); border: none; border-bottom: 1px solid var(--border-color, #e2e8f0); border-radius: 0 !important; box-shadow: none; position: relative; z-index: 100; width: 100%; margin-bottom: 16px;">
+                <!-- Left: Back Button -->
+                <button type="button" id="btn-crm-mobile-back" style="background: transparent; border: none; padding: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-color, #0f172a); border-radius: 50%;">
+                    <span class="material-symbols-outlined" style="font-size: 24px; font-weight: 600;">chevron_left</span>
+                </button>
+
+                <!-- Center: Dropdown Title Selector -->
+                <div style="position: relative;">
+                    <button type="button" id="btn-crm-nav-dropdown" style="background: transparent; border: none; display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 6px 14px; border-radius: 12px; outline: none;">
+                        <div style="width: 28px; height: 28px; background: var(--admin-orange, #d17d39); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 2px 4px rgba(209,125,57,0.3);">
+                            <span class="material-symbols-outlined" style="font-size: 16px; font-variation-settings: 'FILL' 1;">group</span>
+                        </div>
+                        <span id="crm-header-current-view" style="font-size: 16px; font-weight: 700; color: var(--text-color, #0f172a); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Kontakter</span>
+                        <span class="material-symbols-outlined" style="font-size: 20px; color: var(--text-muted, #64748b);">expand_more</span>
+                    </button>
+
+                    <!-- Nav Dropdown Menu -->
+                    <div id="crm-nav-menu" style="display: none; position: absolute; top: 110%; left: 50%; transform: translateX(-50%); background: var(--card-bg, #ffffff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 220px; z-index: 1000; padding: 6px; overflow: hidden;">
+                        <button type="button" class="pco-menu-item active" data-crm-filter="ALL">
+                            <span class="material-symbols-outlined">group</span>
+                            <span>Alle kontakter</span>
+                        </button>
+                        <button type="button" class="pco-menu-item" data-crm-filter="NEW">
+                            <span class="material-symbols-outlined">person_add</span>
+                            <span>Nye kontakter</span>
+                        </button>
+                        <button type="button" class="pco-menu-item" data-crm-filter="MEMBERS">
+                            <span class="material-symbols-outlined">volunteer_activism</span>
+                            <span>Givere & Medlemmer</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right: Context Menu (...) -->
+                <div style="position: relative;">
+                    <button type="button" id="btn-crm-context-menu" style="background: transparent; border: none; padding: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-color, #0f172a); border-radius: 50%;">
+                        <span class="material-symbols-outlined" style="font-size: 24px;">more_horiz</span>
+                    </button>
+
+                    <!-- Context Dropdown Menu -->
+                    <div id="crm-context-menu" style="display: none; position: absolute; top: 110%; right: 0; background: var(--card-bg, #ffffff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 220px; z-index: 1000; padding: 6px; overflow: hidden;">
+                        <button type="button" class="pco-menu-item" id="ctx-crm-create">
+                            <span class="material-symbols-outlined">person_add</span>
+                            <span>Ny kontakt</span>
+                        </button>
+                        <button type="button" class="pco-menu-item" id="ctx-crm-sync-pco">
+                            <span class="material-symbols-outlined">cloud_sync</span>
+                            <span>Planning Center Synk</span>
+                        </button>
+                        <button type="button" class="pco-menu-item" id="ctx-crm-import-export">
+                            <span class="material-symbols-outlined">import_export</span>
+                            <span>Import / Eksport</span>
+                        </button>
+                        <button type="button" class="pco-menu-item" id="ctx-crm-manage-views">
+                            <span class="material-symbols-outlined">tune</span>
+                            <span>Administrer visning</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page Header (Desktop) -->
+            <div id="dashboard-main-header" class="main-header crm-desktop-only">
                 <div class="section-header design-ui-header in-topbar" style="margin-bottom: 0;">
                     <button id="mobile-nav-toggle" class="mobile-nav-toggle">
                         <span class="material-symbols-outlined">menu</span>

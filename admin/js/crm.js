@@ -125,6 +125,81 @@ class CRMManager {
         const importExportBtn = document.getElementById('import-export-btn');
         if (importExportBtn) importExportBtn.onclick = () => this.openImportExportDialog();
 
+        // Mobile PCO Header Bar handlers (matching Groups page pattern)
+        const mobileBackBtn = document.getElementById('btn-crm-mobile-back');
+        if (mobileBackBtn) {
+            mobileBackBtn.onclick = () => {
+                if (window.history.length > 1) {
+                    window.history.back();
+                } else {
+                    window.location.href = '/admin/index.html';
+                }
+            };
+        }
+
+        const navDropdownBtn = document.getElementById('btn-crm-nav-dropdown');
+        const navMenu = document.getElementById('crm-nav-menu');
+        const contextDropdownBtn = document.getElementById('btn-crm-context-menu');
+        const contextMenu = document.getElementById('crm-context-menu');
+
+        if (navDropdownBtn && navMenu) {
+            navDropdownBtn.onclick = (e) => {
+                e.stopPropagation();
+                const isVisible = navMenu.style.display === 'block';
+                if (contextMenu) contextMenu.style.display = 'none';
+                navMenu.style.display = isVisible ? 'none' : 'block';
+            };
+        }
+
+        if (contextDropdownBtn && contextMenu) {
+            contextDropdownBtn.onclick = (e) => {
+                e.stopPropagation();
+                const isVisible = contextMenu.style.display === 'block';
+                if (navMenu) navMenu.style.display = 'none';
+                contextMenu.style.display = isVisible ? 'none' : 'block';
+            };
+        }
+
+        document.addEventListener('click', () => {
+            if (navMenu) navMenu.style.display = 'none';
+            if (contextMenu) contextMenu.style.display = 'none';
+        });
+
+        document.getElementById('ctx-crm-create')?.addEventListener('click', () => {
+            this.openCreateContactModal();
+        });
+
+        document.getElementById('ctx-crm-sync-pco')?.addEventListener('click', () => {
+            this.syncAllContactsWithPlanningCenter();
+        });
+
+        document.getElementById('ctx-crm-import-export')?.addEventListener('click', () => {
+            this.openImportExportDialog();
+        });
+
+        document.getElementById('ctx-crm-manage-views')?.addEventListener('click', () => {
+            this.openViewPresetDialog();
+        });
+
+        document.querySelectorAll('[data-crm-filter]').forEach(item => {
+            item.onclick = () => {
+                const filterVal = item.getAttribute('data-crm-filter');
+                document.querySelectorAll('[data-crm-filter]').forEach(el => el.classList.remove('active'));
+                item.classList.add('active');
+                
+                const titleSpan = document.getElementById('crm-header-current-view');
+                if (titleSpan) titleSpan.textContent = item.querySelector('span:last-child')?.textContent || 'Kontakter';
+
+                const viewSelector = document.querySelector('.view-selector');
+                if (viewSelector) {
+                    if (filterVal === 'NEW') viewSelector.selectedIndex = 1;
+                    else if (filterVal === 'MEMBERS') viewSelector.selectedIndex = 2;
+                    else viewSelector.selectedIndex = 0;
+                    viewSelector.dispatchEvent(new Event('change'));
+                }
+            };
+        });
+
         const importFileInput = document.getElementById('contacts-import-file');
         if (importFileInput) {
             importFileInput.onchange = (e) => this.handleCsvImport(e);
