@@ -425,17 +425,20 @@
                         .section-header.design-ui-header,
                         body.admin-body .section-content > .section-header.design-ui-header,
                         body.minside-body .section-content > .section-header.design-ui-header,
-                        body.crm-body .section-content > .section-header.design-ui-header {
+                        body.crm-body .section-content > .section-header.design-ui-header,
+                        body.admin-body .section-header.design-ui-header,
+                        body.minside-body .section-header.design-ui-header,
+                        body.crm-body .section-header.design-ui-header {
                             display: block !important;
-                            padding: 16px 16px !important;
-                            margin: -12px -16px 16px -16px !important;
+                            padding: 16px 14px !important;
+                            margin: 0 0 12px 0 !important;
                             border-radius: 0 !important;
                             border-left: none !important;
                             border-right: none !important;
                             box-shadow: none !important;
                             box-sizing: border-box !important;
-                            width: calc(100% + 32px) !important;
-                            max-width: none !important;
+                            width: 100% !important;
+                            max-width: 100% !important;
                         }
                         .section-header.design-ui-header .section-header-icon,
                         body.admin-body .section-content > .section-header.design-ui-header .section-header-icon,

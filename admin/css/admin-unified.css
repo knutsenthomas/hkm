@@ -5309,8 +5309,8 @@ body.builder-active .user-avatar,
 [id="ph-avatar"] {
   width: 42px !important;
   height: 42px !important;
-  background: var(--admin-border, #e2e8f0) !important;
-  color: var(--admin-text-muted, #64748b) !important;
+  background: var(--admin-orange-gradient, linear-gradient(135deg, #cc6f2c 0%, #f97316 100%)) !important;
+  color: #ffffff !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -5325,6 +5325,7 @@ body.builder-active .user-avatar,
   flex-shrink: 0 !important;
   margin-left: 8px !important;
   overflow: hidden !important;
+  position: relative !important;
 }
 
 body.admin-body .user-avatar.has-initials,
@@ -5744,8 +5745,8 @@ body.builder-active .main-header [id="admin-avatar"] {
   justify-content: center !important;
   border-radius: 12px !important;
   border: 2px solid rgba(255, 255, 255, 0.72) !important;
-  background: var(--admin-border, #e2e8f0) !important;
-  color: var(--admin-text-muted, #64748b) !important;
+  background: var(--admin-orange-gradient, linear-gradient(135deg, #cc6f2c 0%, #f97316 100%)) !important;
+  color: #ffffff !important;
   box-shadow: 0 2px 5px rgba(15, 23, 42, 0.08) !important;
   font-size: 16px !important;
   font-weight: 900 !important;
@@ -5754,6 +5755,7 @@ body.builder-active .main-header [id="admin-avatar"] {
   text-transform: uppercase !important;
   flex-shrink: 0 !important;
   overflow: hidden !important;
+  position: relative !important;
 }
 
 body.admin-body .main-header .user-avatar.has-initials,
@@ -12000,18 +12002,15 @@ html[data-theme="dark"] .pco-menu-item:hover {
         display: none !important;
     }
 
-    /* Section headers on mobile */
+    /* Section headers on mobile: flat, 100% width */
     .section-header,
     .section-header.design-ui-header,
     .design-ui-header,
     .pco-header-bar {
         border-radius: 0 !important;
-        margin-left: -16px !important;
-        margin-right: -16px !important;
-        margin-top: -12px !important;
-        margin-bottom: 16px !important;
-        width: calc(100% + 32px) !important;
-        max-width: none !important;
+        margin: 0 0 12px 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
         box-shadow: none !important;
         box-sizing: border-box !important;
         border-left: none !important;
@@ -12026,16 +12025,16 @@ html[data-theme="dark"] .pco-menu-item:hover {
         box-sizing: border-box !important;
     }
 
-    /* Mobile container padding: 16px gutters from screen edges */
+    /* Mobile container padding: edge-to-edge 100% full screen width */
     body.admin-body #view-container,
     body.minside-body #view-container,
     body.crm-body #view-container,
     #view-container,
     .admin-main-content,
     .main-content {
-        padding-left: 16px !important;
-        padding-right: 16px !important;
-        padding-top: 12px !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        padding-top: 0 !important;
         padding-bottom: 90px !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
@@ -12078,7 +12077,7 @@ html[data-theme="dark"] .pco-menu-item:hover {
         box-sizing: border-box !important;
     }
 
-    /* Mobile panels & cards: soft 16px corners & 16px bottom spacing inside container */
+    /* Mobile panels & cards: flat 0px corners, edge-to-edge full width */
     .design-ui-panel,
     .card,
     .bento-card,
@@ -12098,16 +12097,18 @@ html[data-theme="dark"] .pco-menu-item:hover {
     .section-card,
     .settings-card,
     .selection-card {
-        border-radius: 16px !important;
-        border: 1px solid rgba(226, 232, 240, 0.9) !important;
-        box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04) !important;
+        border-radius: 0 !important;
+        border-left: none !important;
+        border-right: none !important;
+        border-top: 1px solid rgba(226, 232, 240, 0.8) !important;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
+        box-shadow: none !important;
         width: 100% !important;
         max-width: 100% !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
-        margin-bottom: 16px !important;
+        margin-bottom: 12px !important;
         box-sizing: border-box !important;
-        overflow: hidden !important;
     }
 
     /* Internal padding protects text, inputs and buttons from card edges */
@@ -12115,8 +12116,9 @@ html[data-theme="dark"] .pco-menu-item:hover {
     .design-ui-panel-body,
     .card-body,
     .panel-body {
-        padding: 16px 16px !important;
+        padding: 16px 14px !important;
         box-sizing: border-box !important;
+        width: 100% !important;
     }
 
     /* All grids switch to 1 column */

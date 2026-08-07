@@ -2272,30 +2272,21 @@ class AdminManager {
             const avatars = getAvatars();
             if (avatars.length === 0) return;
 
+            const initials = safeName.split(' ').map(n => n.trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase() || 'A';
+            const shortInitials = initials.substring(0, 2);
+
             avatars.forEach(adminAvatar => {
-                adminAvatar.innerHTML = '';
                 adminAvatar.title = safeName;
+                adminAvatar.classList.add('has-initials');
 
                 if (photoURL && photoURL.trim().length > 5) {
                     adminAvatar.dataset.photoUrl = photoURL;
-                    adminAvatar.classList.remove('has-initials');
-                    const img = document.createElement('img');
-                    img.referrerPolicy = "no-referrer";
-                    img.src = photoURL;
-                    img.style.cssText = "width:100%; height:100%; object-fit:cover; border-radius:inherit;";
-                    
-                    img.onerror = () => {
-                        adminAvatar.classList.add('has-initials');
-                        adminAvatar.innerHTML = '';
-                        const initials = safeName.split(' ').map(n => n.trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase();
-                        adminAvatar.textContent = (initials || 'A').substring(0, 2);
-                    };
-                    
-                    adminAvatar.appendChild(img);
+                    adminAvatar.innerHTML = `
+                        <span class="avatar-initials-text" style="position:relative; z-index:1;">${shortInitials}</span>
+                        <img src="${photoURL}" referrerpolicy="no-referrer" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; position:absolute; inset:0; z-index:2;" onerror="this.remove();">
+                    `;
                 } else {
-                    adminAvatar.classList.add('has-initials');
-                    const initials = safeName.split(' ').map(n => n.trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase();
-                    adminAvatar.textContent = (initials || 'A').substring(0, 2);
+                    adminAvatar.innerHTML = `<span class="avatar-initials-text" style="position:relative; z-index:1;">${shortInitials}</span>`;
                 }
             });
         };

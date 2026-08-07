@@ -218,6 +218,7 @@ const initAdminHeader = () => {
     const renderIdentity = (displayName, photoURL) => {
         const { adminNames, adminAvatars } = getIdentityEls();
         const safeName = (displayName || '').trim() || 'Administrator';
+        const initials = getInitials(safeName);
 
         adminNames.forEach(adminName => {
             if (adminName) {
@@ -228,32 +229,17 @@ const initAdminHeader = () => {
         adminAvatars.forEach(adminAvatar => {
             if (!adminAvatar) return;
 
-            // Clear any previous state
-            adminAvatar.textContent = '';
-            adminAvatar.innerHTML = '';
             adminAvatar.title = safeName;
-            if (photoURL) adminAvatar.dataset.photoUrl = photoURL;
+            adminAvatar.classList.add('has-initials');
 
             if (photoURL && photoURL.trim().length > 5) {
-                adminAvatar.classList.remove('has-initials');
-                // Show actual photo
-                const img = document.createElement('img');
-                img.referrerPolicy = "no-referrer";
-                img.src = photoURL;
-                img.style.cssText = "width:100%; height:100%; object-fit:cover; border-radius:inherit;";
-                
-                // Fallback if image fails to load
-                img.onerror = () => {
-                    adminAvatar.classList.add('has-initials');
-                    adminAvatar.innerHTML = '';
-                    adminAvatar.textContent = getInitials(safeName);
-                };
-                
-                adminAvatar.appendChild(img);
+                adminAvatar.dataset.photoUrl = photoURL;
+                adminAvatar.innerHTML = `
+                    <span class="avatar-initials-text" style="position:relative; z-index:1;">${initials}</span>
+                    <img src="${photoURL}" referrerpolicy="no-referrer" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; position:absolute; inset:0; z-index:2;" onerror="this.remove();">
+                `;
             } else {
-                adminAvatar.classList.add('has-initials');
-                // Fallback: Use initials
-                adminAvatar.textContent = getInitials(safeName);
+                adminAvatar.innerHTML = `<span class="avatar-initials-text" style="position:relative; z-index:1;">${initials}</span>`;
             }
         });
     };
