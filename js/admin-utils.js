@@ -422,7 +422,14 @@
             return `
                 <style>
                     @media (max-width: 1024px) {
+                        .section-header,
                         .section-header.design-ui-header,
+                        .section-header:not(.in-topbar),
+                        .design-ui-header:not(.in-topbar),
+                        .section-content > .section-header,
+                        body.admin-body .section-content > .section-header,
+                        body.minside-body .section-content > .section-header,
+                        body.crm-body .section-content > .section-header,
                         body.admin-body .section-content > .section-header.design-ui-header,
                         body.minside-body .section-content > .section-header.design-ui-header,
                         body.crm-body .section-content > .section-header.design-ui-header,

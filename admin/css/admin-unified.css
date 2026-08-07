@@ -8449,17 +8449,19 @@ html[data-theme="dark"] .notification-btn {
 
 /* 4. User Profile Link */
 .user-profile-link {
-  height: 40px !important;
+  height: 42px !important;
   border-radius: 12px !important;
-  padding: 0 4px 0 16px !important; /* 16px left padding, 4px right padding for avatar alignment */
-  display: flex !important;
+  padding: 0 4px 0 12px !important; /* Balanced 12px left padding, 4px right padding around 34px avatar */
+  display: inline-flex !important;
   align-items: center !important;
-  justify-content: center !important;
+  justify-content: flex-start !important;
   border: 1px solid rgba(27, 73, 101, 0.08) !important;
   background: #ffffff !important;
   color: #1B4965 !important;
   cursor: pointer !important;
-  gap: 8px !important; /* 8px spacing */
+  gap: 8px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
 }
@@ -8475,26 +8477,44 @@ html[data-theme="dark"] .notification-btn {
   transform: scale(0.97) !important;
 }
 
-/* User avatar box inside link */
-.user-profile-link .user-avatar {
-  width: 32px !important;
-  height: 32px !important;
-  border-radius: 8px !important; /* rounded matching avatar card */
-  background: rgba(209, 125, 57, 0.1) !important;
-  color: #d17d39 !important;
-  font-weight: 700 !important;
+/* User avatar box inside link - Override main-header 42px rule */
+body.admin-body .main-header .user-profile-link .user-avatar,
+body.minside-body .main-header .user-profile-link .user-avatar,
+body.crm-body .main-header .user-profile-link .user-avatar,
+body.builder-active .main-header .user-profile-link .user-avatar,
+.user-profile-link .user-avatar,
+.user-profile-link [id="admin-avatar"],
+.user-profile-link [id="ph-avatar"] {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  border-radius: 8px !important;
+  background: var(--admin-orange-gradient, linear-gradient(135deg, #cc6f2c 0%, #f97316 100%)) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 13px !important;
+  line-height: 34px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   overflow: hidden !important;
-  border: 1px solid rgba(209, 125, 57, 0.15) !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  position: relative !important;
+  flex-shrink: 0 !important;
 }
 
-.user-profile-link .user-avatar img {
+.user-profile-link .user-avatar img,
+.user-profile-link [id="admin-avatar"] img,
+.user-profile-link [id="ph-avatar"] img {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
   border-radius: inherit !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 2 !important;
 }
 
 .user-profile-link .user-name {
@@ -12005,6 +12025,9 @@ html[data-theme="dark"] .pco-menu-item:hover {
     /* Section headers on mobile: flat, 100% width */
     .section-header,
     .section-header.design-ui-header,
+    .section-header:not(.in-topbar),
+    .design-ui-header:not(.in-topbar),
+    .section-content > .section-header,
     .design-ui-header,
     .pco-header-bar {
         border-radius: 0 !important;

@@ -23198,14 +23198,16 @@ class AdminManager {
             try {
                 const url = await firebaseService.uploadImage(fileInput.files[0], `profiles/${authUser.uid}/avatar.jpg`);
                 await authUser.updateProfile({ photoURL: url });
+                try { await authUser.reload(); } catch (e) { }
+                const currentName = form.querySelector('[name="displayName"]').value || authUser.displayName || '';
                 await firebase.firestore().collection('users').doc(authUser.uid).set({
                     photoURL: url,
-                    displayName: form.querySelector('[name="displayName"]').value || authUser.displayName || '',
+                    displayName: currentName,
                     email: authUser.email || '',
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
                 await firebaseService.savePageContent('settings_profile', {
-                    fullName: form.querySelector('[name="displayName"]').value || authUser.displayName || '',
+                    fullName: currentName,
                     photoUrl: url,
                     updatedAt: new Date().toISOString()
                 });
@@ -23215,6 +23217,16 @@ class AdminManager {
                 pictureContainer.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">`;
                 if (overlay) pictureContainer.appendChild(overlay);
                 if (input) pictureContainer.appendChild(input);
+
+                try {
+                    localStorage.setItem('hkm_admin_identity_cache', JSON.stringify({
+                        displayName: currentName || 'Administrator',
+                        photoURL: url,
+                        ts: Date.now()
+                    }));
+                } catch (e) { }
+
+                renderHeaderIdentity(currentName || 'Administrator', url);
                 await this.updateUserInfo(authUser);
                 this.showToast('Profilbilde oppdatert.', 'success', 4000);
             } catch (err) {
@@ -23233,17 +23245,29 @@ class AdminManager {
                 if (!provider || !provider.photoURL) return;
                 try {
                     await authUser.updateProfile({ photoURL: provider.photoURL });
+                    try { await authUser.reload(); } catch (e) { }
+                    const currentName = form.querySelector('[name="displayName"]').value || authUser.displayName || provider.displayName || '';
                     await firebase.firestore().collection('users').doc(authUser.uid).set({
                         photoURL: provider.photoURL,
-                        displayName: form.querySelector('[name="displayName"]').value || authUser.displayName || provider.displayName || '',
+                        displayName: currentName,
                         email: authUser.email || '',
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     }, { merge: true });
                     await firebaseService.savePageContent('settings_profile', {
-                        fullName: form.querySelector('[name="displayName"]').value || authUser.displayName || provider.displayName || '',
+                        fullName: currentName,
                         photoUrl: provider.photoURL,
                         updatedAt: new Date().toISOString()
                     });
+
+                    try {
+                        localStorage.setItem('hkm_admin_identity_cache', JSON.stringify({
+                            displayName: currentName || 'Administrator',
+                            photoURL: provider.photoURL,
+                            ts: Date.now()
+                        }));
+                    } catch (e) { }
+
+                    renderHeaderIdentity(currentName || 'Administrator', provider.photoURL);
                     await this.renderProfileSection();
                     await this.updateUserInfo(authUser);
                     this.showToast('Profilbilde hentet fra Google.', 'success', 4000);
