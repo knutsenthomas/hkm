@@ -11491,7 +11491,7 @@ html[data-theme="dark"] .status-pill.status-completed {
     background: var(--card-bg, #ffffff) !important;
 }
 
-.card:hover,
+.card:not(.contacts-grid):not(.table-container):not(.crm-card):hover,
 .bento-card:hover,
 .stat-card-premium:hover,
 .chart-card-premium:hover,
@@ -11503,6 +11503,40 @@ html[data-theme="dark"] .status-pill.status-completed {
     transform: translateY(-3px) scale(1.01) !important;
     box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06), 0 4px 10px rgba(15, 23, 42, 0.02) !important;
     border-color: rgba(15, 23, 42, 0.12) !important;
+}
+
+/* --- Disable all zoom, scale and move animations on contacts box, CRM tables and containers --- */
+.contacts-grid,
+.contacts-grid:hover,
+.contacts-grid:active,
+.contacts-grid:focus,
+.contacts-grid:focus-within,
+.table-container,
+.table-container:hover,
+.table-container:active,
+.table-container:focus,
+.table-container:focus-within,
+.crm-table,
+.crm-table:hover,
+.crm-table:active,
+.crm-table:focus,
+.crm-table:focus-within,
+.crm-card,
+.crm-card:hover,
+.crm-card:active,
+.crm-card:focus,
+.crm-card:focus-within,
+#contacts-list-container,
+#contacts-list-container:hover,
+#contacts-list-container:active,
+#contacts-list-container:focus,
+#contacts-list-container:focus-within,
+.contact-item,
+.contact-item:hover,
+.contact-item:active {
+    transform: none !important;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+    animation: none !important;
 }
 
 /* --- 2. Premium Button Scales & Transitions --- */
@@ -12097,6 +12131,19 @@ html[data-theme="dark"] .pco-menu-item:hover {
     .form-grid-2 .form-group {
         grid-column: span 1 !important;
         width: 100% !important;
+    }
+
+    /* Prevent mobile browser (iOS) auto-zoom on input focus */
+    .form-control,
+    input[type="text"],
+    input[type="search"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="number"],
+    input[type="password"],
+    select,
+    textarea {
+        font-size: 16px !important;
     }
 }
 
