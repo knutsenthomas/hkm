@@ -22953,19 +22953,19 @@ class AdminManager {
             <div class="design-ui-shell">
                 <div class="design-ui-workspace">
                     <div class="design-ui-panel">
-                        <div class="design-ui-panel-body" style="padding: 32px;">
-                            <div style="display: flex; align-items: center; gap: 24px; padding-bottom: 32px; border-bottom: 1px solid var(--border-color); margin-bottom: 32px;">
-                                <div id="profile-picture-container-admin" style="position: relative; width: 100px; height: 100px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem; font-weight: 700; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);">
+                        <div class="design-ui-panel-body profile-panel-body">
+                            <div class="profile-header-row" style="display: flex; align-items: center; flex-wrap: wrap; gap: 20px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); margin-bottom: 24px;">
+                                <div id="profile-picture-container-admin" style="position: relative; width: 80px; height: 80px; min-width: 80px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: 700; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
                                     ${(authUser.photoURL ? `<img src="${authUser.photoURL}" style="width: 100%; height: 100%; object-fit: cover;">` : (authUser.displayName || authUser.email || '?').charAt(0).toUpperCase())}
                                     <label for="profile-upload-admin" style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; color: white; opacity: 0; transition: opacity 0.3s ease; cursor: pointer;">
                                         <span class="material-symbols-outlined">photo_camera</span>
                                     </label>
                                     <input type="file" id="profile-upload-admin" style="display: none;" accept="image/*">
                                 </div>
-                                <div>
+                                <div style="flex: 1; min-width: 200px;">
                                     <h4 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 600;">Profilbilde</h4>
-                                    <p style="font-size: 13px; color: var(--text-muted); margin: 0 0 16px 0;">Last opp et bilde fra din enhet eller bruk bildet fra Google.</p>
-                                    <div style="display: flex; gap: 10px;">
+                                    <p style="font-size: 13px; color: var(--text-muted); margin: 0 0 12px 0; line-height: 1.4;">Last opp et bilde fra din enhet eller bruk bildet fra Google.</p>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
                                         <button type="button" class="btn btn-outline" id="upload-profile-btn-admin" style="font-size: 13px; padding: 6px 12px;">Last opp nytt</button>
                                         ${Array.isArray(authUser.providerData) && authUser.providerData.some(p => p && p.providerId === 'google.com')
                 ? `<button type="button" class="btn btn-outline" id="google-photo-btn-admin" style="font-size: 13px; padding: 6px 12px; display: flex; align-items: center;">
@@ -22979,7 +22979,7 @@ class AdminManager {
 
                             <form id="admin-profile-full-form">
                                 <h4 style="margin: 0 0 16px 0; font-size: 15px; font-weight: 600; color: var(--text-main);">Personalia</h4>
-                                <div class="form-grid-2" style="gap: 20px; margin-bottom: 32px;">
+                                <div class="form-grid-2 responsive-form-grid" style="margin-bottom: 24px;">
                                     <div class="form-group" style="margin: 0;">
                                         <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Navn</label>
                                         <input type="text" name="displayName" class="form-control" style="width: 100%;">
@@ -22988,15 +22988,15 @@ class AdminManager {
                                         <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Telefon</label>
                                         <input type="tel" name="phone" class="form-control" style="width: 100%;">
                                     </div>
-                                    <div class="form-group" style="grid-column: span 2; margin: 0;">
+                                    <div class="form-group form-group-full" style="margin: 0;">
                                         <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">E-post</label>
                                         <input type="email" name="email" class="form-control" disabled style="width: 100%; background: #f8fafc; color: #64748b; cursor: not-allowed;">
                                     </div>
                                 </div>
 
-                                <h4 style="margin: 0 0 16px 0; font-size: 15px; font-weight: 600; color: var(--text-main); border-top: 1px solid var(--border-color); padding-top: 32px;">Adresse</h4>
-                                <div class="form-grid-2" style="gap: 20px; margin-bottom: 32px;">
-                                    <div class="form-group" style="grid-column: span 2; margin: 0;">
+                                <h4 style="margin: 0 0 16px 0; font-size: 15px; font-weight: 600; color: var(--text-main); border-top: 1px solid var(--border-color); padding-top: 24px;">Adresse</h4>
+                                <div class="form-grid-2 responsive-form-grid" style="margin-bottom: 24px;">
+                                    <div class="form-group form-group-full" style="margin: 0;">
                                         <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Gateadresse</label>
                                         <input type="text" name="address" class="form-control" style="width: 100%;">
                                     </div>
