@@ -5329,10 +5329,27 @@ class AdminManager {
                 /* Mobile Optimizations for Hero Card & Actions */
                 @media (max-width: 768px) {
                     body.admin-body #overview-section .overview-hero-card {
-                        padding: 24px !important;
-                        border-radius: 16px !important;
+                        padding: 24px 16px !important;
+                        border-radius: 0 !important;
+                        border-left: none !important;
+                        border-right: none !important;
+                        margin-left: 0 !important;
+                        margin-right: 0 !important;
+                        width: 100% !important;
                         flex-direction: column !important;
                         align-items: stretch !important;
+                    }
+                    body.admin-body #overview-section .stat-card.modern,
+                    body.admin-body #overview-section .big-card,
+                    body.admin-body #overview-section .side-card,
+                    body.admin-body #overview-section .dashboard-course-signups-card {
+                        border-radius: 0 !important;
+                        border-left: none !important;
+                        border-right: none !important;
+                        margin-left: 0 !important;
+                        margin-right: 0 !important;
+                        width: 100% !important;
+                        box-sizing: border-box !important;
                     }
                     body.admin-body #overview-section .overview-hero-title {
                         font-size: 26px !important;
