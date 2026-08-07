@@ -12121,6 +12121,42 @@ html[data-theme="dark"] .pco-menu-item:hover {
         width: 100% !important;
     }
 
+    /* Profile section header row mobile styling */
+    .profile-header-row {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        gap: 16px !important;
+        width: 100% !important;
+        padding-bottom: 20px !important;
+        margin-bottom: 20px !important;
+        box-sizing: border-box !important;
+    }
+
+    #profile-picture-container-admin {
+        flex-shrink: 0 !important;
+    }
+
+    .profile-header-row > div:last-child {
+        min-width: 0 !important;
+        flex: 1 1 200px !important;
+        width: 100% !important;
+    }
+
+    .profile-header-row button,
+    #upload-profile-btn-admin,
+    #google-photo-btn-admin {
+        min-height: 44px !important;
+        padding: 8px 16px !important;
+        font-size: 14px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex: 1 1 auto !important;
+        white-space: nowrap !important;
+    }
+
     /* All grids switch to 1 column */
     .stats-grid,
     .bento-grid,
