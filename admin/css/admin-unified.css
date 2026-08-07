@@ -11847,24 +11847,34 @@ html[data-theme="dark"] .recent-signups-card:hover {
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28) !important;
 }
 
-/* --- PCO-style Header Bar (Flat Edge-to-Edge Bar) --- */
-.pco-header-bar {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    padding: 12px 16px !important;
-    background: var(--card-bg, #ffffff) !important;
-    border: none !important;
-    border-bottom: 1px solid var(--border-color, #e2e8f0) !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    position: relative !important;
-    z-index: 100 !important;
-    width: 100% !important;
-    margin-bottom: 16px !important;
-    box-sizing: border-box !important;
+/* --- PCO-style Header Bar (Mobile Only - Hidden on PC/Desktop) --- */
+.pco-header-bar,
+.crm-mobile-only,
+.groups-mobile-only {
+    display: none !important;
+}
+
+@media (max-width: 768px) {
+    .pco-header-bar,
+    .crm-mobile-only,
+    .groups-mobile-only {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 12px 16px !important;
+        background: var(--card-bg, #ffffff) !important;
+        border: none !important;
+        border-bottom: 1px solid var(--border-color, #e2e8f0) !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        position: relative !important;
+        z-index: 100 !important;
+        width: 100% !important;
+        margin-bottom: 16px !important;
+        box-sizing: border-box !important;
+    }
 }
 
 .pco-menu-item {
