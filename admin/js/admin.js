@@ -2263,7 +2263,7 @@ class AdminManager {
 
     async updateUserInfo(user) {
         const adminName = document.getElementById('admin-name');
-        const getAvatars = () => Array.from(document.querySelectorAll('#admin-avatar, #ph-avatar, #modal-admin-avatar, .user-avatar, .user-avatar-compact, .user-profile-link'));
+        const getAvatars = () => Array.from(document.querySelectorAll('#admin-avatar, #ph-avatar, #modal-admin-avatar, .user-avatar, .user-avatar-compact'));
         const identityCacheKey = 'hkm_admin_identity_cache';
 
         const renderHeaderIdentity = (name, photoURL) => {
@@ -2273,17 +2273,19 @@ class AdminManager {
             if (avatars.length === 0) return;
 
             avatars.forEach(adminAvatar => {
-                adminAvatar.textContent = '';
                 adminAvatar.innerHTML = '';
                 adminAvatar.title = safeName;
 
                 if (photoURL && photoURL.trim().length > 5) {
                     adminAvatar.dataset.photoUrl = photoURL;
+                    adminAvatar.classList.remove('has-initials');
                     const img = document.createElement('img');
+                    img.referrerPolicy = "no-referrer";
                     img.src = photoURL;
                     img.style.cssText = "width:100%; height:100%; object-fit:cover; border-radius:inherit;";
                     
                     img.onerror = () => {
+                        adminAvatar.classList.add('has-initials');
                         adminAvatar.innerHTML = '';
                         const initials = safeName.split(' ').map(n => n.trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase();
                         adminAvatar.textContent = (initials || 'A').substring(0, 2);
@@ -2291,6 +2293,7 @@ class AdminManager {
                     
                     adminAvatar.appendChild(img);
                 } else {
+                    adminAvatar.classList.add('has-initials');
                     const initials = safeName.split(' ').map(n => n.trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase();
                     adminAvatar.textContent = (initials || 'A').substring(0, 2);
                 }
@@ -2323,9 +2326,11 @@ class AdminManager {
             }
         };
 
+        const googlePhoto = (user?.providerData || []).find(p => p && p?.photoURL)?.photoURL || '';
+
         // Immediate fallback from Auth to avoid visible "Laster..." while Firestore resolves.
         const authName = user?.displayName || user?.email || 'Administrator';
-        const authPhoto = user?.photoURL || '';
+        const authPhoto = user?.photoURL || googlePhoto || '';
         renderHeaderIdentity(authName, authPhoto);
         cacheHeaderIdentity(authName, authPhoto);
 
@@ -2342,12 +2347,14 @@ class AdminManager {
         } catch (e) { }
 
         const displayName = (userProfile && userProfile.displayName)
-            || user.displayName
+            || user?.displayName
             || (profile && profile.fullName)
-            || user.email;
-        const photoURL = (userProfile && userProfile.photoURL)
-            || user.photoURL
-            || (profile && profile.photoUrl);
+            || user?.email;
+        const photoURL = (userProfile && (userProfile.photoURL || userProfile.photo_url || userProfile.avatarUrl))
+            || (profile && (profile.photoUrl || profile.photoURL))
+            || user?.photoURL
+            || googlePhoto
+            || '';
 
         renderHeaderIdentity(displayName, photoURL);
         cacheHeaderIdentity(displayName, photoURL);

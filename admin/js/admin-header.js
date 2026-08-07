@@ -173,7 +173,7 @@ const initAdminHeader = () => {
 
     const getIdentityEls = () => ({
         adminNames: Array.from(document.querySelectorAll('#admin-name, .user-name, .user-name-compact')),
-        adminAvatars: Array.from(document.querySelectorAll('#admin-avatar, #ph-avatar, #modal-admin-avatar, .user-avatar, .user-avatar-compact, .user-profile-link'))
+        adminAvatars: Array.from(document.querySelectorAll('#admin-avatar, #ph-avatar, #modal-admin-avatar, .user-avatar, .user-avatar-compact'))
     });
 
     const readCachedIdentity = () => {
@@ -238,6 +238,7 @@ const initAdminHeader = () => {
                 adminAvatar.classList.remove('has-initials');
                 // Show actual photo
                 const img = document.createElement('img');
+                img.referrerPolicy = "no-referrer";
                 img.src = photoURL;
                 img.style.cssText = "width:100%; height:100%; object-fit:cover; border-radius:inherit;";
                 
@@ -596,9 +597,12 @@ const initAdminHeader = () => {
                 return;
             }
 
+            const googlePhoto = (user.providerData || []).find(p => p && p.photoURL)?.photoURL || '';
+            const initialPhoto = user.photoURL || googlePhoto || (cachedIdentity && cachedIdentity.photoURL) || '';
+
             // Render immediately from Auth so UI never stays in "Laster..."
-            renderIdentity(authFallbackName(user), user.photoURL || '');
-            writeCachedIdentity(authFallbackName(user), user.photoURL || '');
+            renderIdentity(authFallbackName(user), initialPhoto);
+            writeCachedIdentity(authFallbackName(user), initialPhoto);
 
             let userProfile = null;
             try {
@@ -606,9 +610,19 @@ const initAdminHeader = () => {
                 if (userDoc && userDoc.exists) userProfile = userDoc.data();
             } catch (e) { }
 
-            const displayName = (userProfile && userProfile.displayName) || authFallbackName(user);
+            let settingsProfile = null;
+            try {
+                settingsProfile = await withTimeout(firebaseService.getPageContent('settings_profile'), 2000);
+            } catch (e) {}
+
+            const displayName = (userProfile && userProfile.displayName)
+                || (settingsProfile && settingsProfile.fullName)
+                || authFallbackName(user);
+
             const photoURL = (userProfile && (userProfile.photoURL || userProfile.photo_url || userProfile.avatarUrl)) 
+                || (settingsProfile && (settingsProfile.photoUrl || settingsProfile.photoURL))
                 || user.photoURL 
+                || googlePhoto
                 || (cachedIdentity && cachedIdentity.photoURL) 
                 || '';
             renderIdentity(displayName, photoURL);

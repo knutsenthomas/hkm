@@ -12005,15 +12005,17 @@ html[data-theme="dark"] .pco-menu-item:hover {
     .section-header.design-ui-header,
     .design-ui-header,
     .pco-header-bar {
-        border-radius: 14px !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        margin-top: 0 !important;
+        border-radius: 0 !important;
+        margin-left: -16px !important;
+        margin-right: -16px !important;
+        margin-top: -12px !important;
         margin-bottom: 16px !important;
-        width: 100% !important;
-        max-width: 100% !important;
+        width: calc(100% + 32px) !important;
+        max-width: none !important;
         box-shadow: none !important;
         box-sizing: border-box !important;
+        border-left: none !important;
+        border-right: none !important;
     }
 
     #dashboard-main-header {
