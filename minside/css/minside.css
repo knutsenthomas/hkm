@@ -2572,13 +2572,89 @@ body.sidebar-collapsed .nav-link .material-symbols-outlined {
     }
 
     .main-content {
-        padding: 0;
+        padding: 0 !important;
+        margin-left: 0 !important;
+        width: 100% !important;
     }
 
+    /* Universal 12px edge alignment for view container */
     #view-container {
-        padding: 12px 8px 80px 8px !important;
+        padding: 12px 12px 80px 12px !important;
         box-sizing: border-box !important;
         width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* Reset inner container paddings & margins */
+    .section-content,
+    .design-ui-shell,
+    .design-ui-workspace,
+    .design-ui-top-grid,
+    .design-ui-full-stack,
+    .design-ui-main-column,
+    .design-ui-side-column,
+    #overview-section,
+    #profile-section,
+    #courses-section,
+    #reading-plans-section,
+    #giving-section,
+    #groups-section,
+    #history-section,
+    #notifications-section,
+    #notes-section,
+    #tasks-section,
+    #help-section {
+        padding: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    /* All boxes span 100% width inside container */
+    .design-ui-panel,
+    .card,
+    .bento-card,
+    .promo-card,
+    .stat-card,
+    .stat-card.modern,
+    .overview-card,
+    .dashboard-card,
+    .crm-card,
+    .groups-card,
+    .task-card,
+    .note-card,
+    .course-card,
+    .reading-plan-card,
+    .history-card,
+    .table-container {
+        border-radius: 16px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    /* All grids switch to 1 column */
+    .stats-grid,
+    .bento-grid,
+    .overview-grid,
+    .form-grid-2,
+    .responsive-form-grid,
+    .cards-grid,
+    .grid-2-col,
+    .grid-3-col,
+    .grid-4-col {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
     }
 }
 

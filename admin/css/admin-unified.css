@@ -11963,15 +11963,16 @@ html[data-theme="dark"] .pco-menu-item:hover {
         box-shadow: none !important;
     }
 
-    /* Container 8px edge gap on mobile */
+    /* Container 12px edge alignment on mobile */
     body.admin-body #view-container,
     body.minside-body #view-container,
+    body.crm-body #view-container,
     #view-container,
     .admin-main-content,
     .main-content {
-        padding-left: 8px !important;
-        padding-right: 8px !important;
-        padding-top: 8px !important;
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+        padding-top: 12px !important;
         padding-bottom: 80px !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
@@ -11980,11 +11981,32 @@ html[data-theme="dark"] .pco-menu-item:hover {
         box-sizing: border-box !important;
     }
 
-    /* Inner shell and workspace reset padding */
+    /* Reset inner container paddings & margins */
+    .section-content,
     .design-ui-shell,
     .design-ui-workspace,
-    .section-content,
-    #profile-section {
+    .design-ui-top-grid,
+    .design-ui-full-stack,
+    .design-ui-main-column,
+    .design-ui-side-column,
+    #overview-section,
+    #profile-section,
+    #courses-section,
+    #reading-plans-section,
+    #giving-section,
+    #groups-section,
+    #history-section,
+    #notifications-section,
+    #notes-section,
+    #tasks-section,
+    #help-section,
+    #analytics-section,
+    #users-section,
+    #content-section,
+    #crm-section,
+    #messages-section,
+    #newsletter-section,
+    #settings-section {
         padding: 0 !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
@@ -11993,12 +12015,27 @@ html[data-theme="dark"] .pco-menu-item:hover {
         box-sizing: border-box !important;
     }
 
+    /* All boxes span 100% width inside container */
     .design-ui-panel,
     .card,
     .bento-card,
     .promo-card,
-    .stat-card {
-        border-radius: 12px !important;
+    .stat-card,
+    .stat-card.modern,
+    .overview-card,
+    .dashboard-card,
+    .crm-card,
+    .groups-card,
+    .task-card,
+    .note-card,
+    .course-card,
+    .reading-plan-card,
+    .history-card,
+    .table-container,
+    .section-card,
+    .settings-card,
+    .selection-card {
+        border-radius: 16px !important;
         width: 100% !important;
         max-width: 100% !important;
         margin-left: 0 !important;
@@ -12011,11 +12048,24 @@ html[data-theme="dark"] .pco-menu-item:hover {
         padding: 16px 12px !important;
     }
 
+    /* All grids switch to 1 column */
+    .stats-grid,
+    .bento-grid,
+    .overview-grid,
+    .form-grid-2,
     .responsive-form-grid,
-    .form-grid-2 {
-        display: grid !important;
-        grid-template-columns: 1fr !important;
+    .cards-grid,
+    .grid-2-col,
+    .grid-3-col,
+    .grid-4-col {
+        display: flex !important;
+        flex-direction: column !important;
         gap: 12px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
     }
 
     .form-group-full,
