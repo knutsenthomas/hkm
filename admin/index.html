@@ -165,6 +165,56 @@
                 align-self: center !important;
                 margin: 0 !important;
             }
+        }
+
+        /* STANDARD DESKTOP HEADER (PC / TABLET > 768px) */
+        @media (min-width: 769px) {
+            #dashboard-main-header,
+            .main-header,
+            body.admin-body #dashboard-main-header,
+            body.minside-body #dashboard-main-header {
+                height: 72px !important;
+                min-height: 72px !important;
+                padding: 16px 32px !important;
+                position: sticky !important;
+                top: 0 !important;
+                z-index: 1000 !important;
+                background: rgba(255, 255, 255, 0.95) !important;
+                backdrop-filter: blur(12px) !important;
+                -webkit-backdrop-filter: blur(12px) !important;
+                border-bottom: 1px solid rgba(27, 73, 101, 0.08) !important;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+                margin-bottom: 24px !important;
+            }
+
+            #dashboard-main-header .section-header-titles {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 2px !important;
+            }
+
+            #dashboard-main-header .section-header-title {
+                display: block !important;
+                font-size: 20px !important;
+                font-weight: 700 !important;
+            }
+
+            #dashboard-main-header .section-subtitle {
+                display: block !important;
+                font-size: 13px !important;
+                color: #64748b !important;
+            }
+
+            #dashboard-main-header .section-header-icon {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+
+            #dashboard-main-header .bento-search-bar {
+                display: inline-flex !important;
+            }
+        }
 
             /* View container with top padding so sticky header never overlaps section titles */
             #view-container {
