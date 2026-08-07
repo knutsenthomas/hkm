@@ -66,12 +66,112 @@
             overflow-x: clip !important;
         }
 
-        body.admin-body .main-content {
-            width: auto !important; /* Computes width as viewport minus sidebar width to prevent overflow */
-            min-width: 0 !important;
-            max-width: 100% !important;
-            overflow-x: hidden !important;
-            overflow-x: clip !important;
+        @media (max-width: 768px) {
+            body.admin-body .main-content, #content-area {
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            #view-container {
+                padding: 0 0 80px 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            .section-content,
+            .design-ui-shell,
+            .design-ui-workspace,
+            .design-ui-top-grid,
+            .design-ui-full-stack,
+            .design-ui-main-column,
+            .design-ui-side-column,
+            #overview-section,
+            #profile-section,
+            #courses-section,
+            #reading-plans-section,
+            #giving-section,
+            #groups-section,
+            #history-section,
+            #notifications-section,
+            #notes-section,
+            #tasks-section,
+            #help-section {
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Edge-to-edge section headers and card boxes with NO side gaps */
+            .section-header,
+            .section-header.design-ui-header,
+            .design-ui-header,
+            .design-ui-panel,
+            .card,
+            .bento-card,
+            .promo-card,
+            .stat-card,
+            .stat-card.modern,
+            .overview-card,
+            .dashboard-card,
+            .crm-card,
+            .groups-card,
+            .task-card,
+            .note-card,
+            .course-card,
+            .reading-plan-card,
+            .history-card,
+            .table-container {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                margin-top: 0 !important;
+                margin-bottom: 12px !important;
+                border-radius: 0 !important;
+                border-left: none !important;
+                border-right: none !important;
+                box-shadow: none !important;
+                box-sizing: border-box !important;
+            }
+
+            /* 16px internal padding for header content & card bodies to protect text/buttons */
+            .section-header,
+            .section-header.design-ui-header,
+            .design-ui-header,
+            .profile-panel-body,
+            .design-ui-panel-body,
+            .card-body,
+            .panel-body {
+                padding: 20px 16px !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Forms and grids 1-column */
+            .stats-grid,
+            .bento-grid,
+            .overview-grid,
+            .form-grid-2,
+            .responsive-form-grid,
+            .cards-grid,
+            .grid-2-col,
+            .grid-3-col,
+            .grid-4-col {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 12px !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                box-sizing: border-box !important;
+            }
         }
 
         /* Prevent long un-wrappable paths from pushing card widths and causing grids to overflow */

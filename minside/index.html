@@ -89,34 +89,118 @@
             }
         })();
     </script>
-    <!-- FORCED MENU LINE REMOVAL (IPAD / MOBILE CACHE BUSTER) -->
-    <style>
-        .sidebar-nav *, 
-        .mobile-bottom-nav .mobile-nav-item, 
-        .mobile-bottom-nav .mobile-nav-item *, 
-        .nav-link, 
-        .nav-link-wrap, 
-        .nav-item, 
-        .mobile-nav-item, 
-        .mobile-nav-item *,
-        .mega-menu *,
-        .mega-nav-list *,
-        .mega-nav-list a,
-        .menu-footer-links a,
-        #mega-menu a,
-        .header a,
-        #header a {
-            border-bottom: none !important;
-            border-bottom-width: 0px !important;
-            border-bottom-color: transparent !important;
-            border-top: none !important;
-            border-top-width: 0px !important;
-            border-top-color: transparent !important;
-            text-decoration: none !important;
-            text-decoration-line: none !important;
-            box-shadow: none !important;
-            outline: none !important;
-            border-image: none !important;
+        /* FORCED MOBILE EDGE-TO-EDGE FULL-WIDTH LAYOUT (RULE 5) */
+        @media (max-width: 768px) {
+            html, body.admin-body, body.minside-body, body.crm-body {
+                max-width: 100% !important;
+                overflow-x: hidden !important;
+            }
+
+            .main-content, #content-area {
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            #view-container {
+                padding: 0 0 80px 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            .section-content,
+            .design-ui-shell,
+            .design-ui-workspace,
+            .design-ui-top-grid,
+            .design-ui-full-stack,
+            .design-ui-main-column,
+            .design-ui-side-column,
+            #overview-section,
+            #profile-section,
+            #courses-section,
+            #reading-plans-section,
+            #giving-section,
+            #groups-section,
+            #history-section,
+            #notifications-section,
+            #notes-section,
+            #tasks-section,
+            #help-section {
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Edge-to-edge section headers and card boxes with NO side gaps */
+            .section-header,
+            .section-header.design-ui-header,
+            .design-ui-header,
+            .design-ui-panel,
+            .card,
+            .bento-card,
+            .promo-card,
+            .stat-card,
+            .stat-card.modern,
+            .overview-card,
+            .dashboard-card,
+            .crm-card,
+            .groups-card,
+            .task-card,
+            .note-card,
+            .course-card,
+            .reading-plan-card,
+            .history-card,
+            .table-container {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                margin-top: 0 !important;
+                margin-bottom: 12px !important;
+                border-radius: 0 !important;
+                border-left: none !important;
+                border-right: none !important;
+                box-shadow: none !important;
+                box-sizing: border-box !important;
+            }
+
+            /* 16px internal padding for header content & card bodies to protect text/buttons */
+            .section-header,
+            .section-header.design-ui-header,
+            .design-ui-header,
+            .profile-panel-body,
+            .design-ui-panel-body,
+            .card-body,
+            .panel-body {
+                padding: 20px 16px !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Forms and grids 1-column */
+            .stats-grid,
+            .bento-grid,
+            .overview-grid,
+            .form-grid-2,
+            .responsive-form-grid,
+            .cards-grid,
+            .grid-2-col,
+            .grid-3-col,
+            .grid-4-col {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 12px !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                box-sizing: border-box !important;
+            }
         }
     </style>
 </head>
