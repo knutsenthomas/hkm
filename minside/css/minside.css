@@ -2576,7 +2576,9 @@ body.sidebar-collapsed .nav-link .material-symbols-outlined {
     }
 
     #view-container {
-        padding: 20px 16px;
+        padding: 12px 8px 80px 8px !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
     }
 }
 

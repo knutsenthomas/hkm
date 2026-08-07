@@ -11963,14 +11963,16 @@ html[data-theme="dark"] .pco-menu-item:hover {
         box-shadow: none !important;
     }
 
-    /* Container full width on mobile */
-    .design-ui-shell,
-    .design-ui-workspace,
+    /* Container 8px edge gap on mobile */
+    body.admin-body #view-container,
+    body.minside-body #view-container,
     #view-container,
     .admin-main-content,
     .main-content {
-        padding-left: 12px !important;
-        padding-right: 12px !important;
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+        padding-top: 8px !important;
+        padding-bottom: 80px !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
         width: 100% !important;
@@ -11978,14 +11980,35 @@ html[data-theme="dark"] .pco-menu-item:hover {
         box-sizing: border-box !important;
     }
 
-    .design-ui-panel {
-        border-radius: 12px !important;
+    /* Inner shell and workspace reset padding */
+    .design-ui-shell,
+    .design-ui-workspace,
+    .section-content,
+    #profile-section {
+        padding: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
         width: 100% !important;
+        max-width: 100% !important;
         box-sizing: border-box !important;
     }
 
-    .profile-panel-body {
-        padding: 16px !important;
+    .design-ui-panel,
+    .card,
+    .bento-card,
+    .promo-card,
+    .stat-card {
+        border-radius: 12px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    .profile-panel-body,
+    .design-ui-panel-body {
+        padding: 16px 12px !important;
     }
 
     .responsive-form-grid,
