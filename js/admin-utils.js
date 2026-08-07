@@ -421,118 +421,78 @@
         renderSectionHeader(icon, title, subtitle, actionsHtml = '', subtitleId = '') {
             return `
                 <style>
-                    @media (max-width: 1024px) {
-                        .section-header,
-                        .section-header.design-ui-header,
-                        .section-header:not(.in-topbar),
-                        .design-ui-header:not(.in-topbar),
-                        .section-content > .section-header,
-                        body.admin-body .section-content > .section-header,
-                        body.minside-body .section-content > .section-header,
-                        body.crm-body .section-content > .section-header,
-                        body.admin-body .section-content > .section-header.design-ui-header,
-                        body.minside-body .section-content > .section-header.design-ui-header,
-                        body.crm-body .section-content > .section-header.design-ui-header,
-                        body.admin-body .section-header.design-ui-header,
-                        body.minside-body .section-header.design-ui-header,
-                        body.crm-body .section-header.design-ui-header {
-                            display: block !important;
-                            padding: 16px 14px !important;
-                            margin: 0 0 12px 0 !important;
-                            border-radius: 0 !important;
-                            border-left: none !important;
-                            border-right: none !important;
-                            box-shadow: none !important;
-                            box-sizing: border-box !important;
-                            width: 100% !important;
-                            max-width: 100% !important;
-                        }
-                        .section-header.design-ui-header .section-header-icon,
-                        body.admin-body .section-content > .section-header.design-ui-header .section-header-icon,
-                        body.minside-body .section-content > .section-header.design-ui-header .section-header-icon {
-                            display: none !important;
-                        }
-                        .section-header.design-ui-header > .section-header-content,
-                        body.admin-body .section-content > .section-header.design-ui-header > .section-header-content,
-                        body.minside-body .section-content > .section-header.design-ui-header > .section-header-content {
-                            display: flex !important;
-                            flex-direction: column !important;
-                            align-items: stretch !important;
-                            justify-content: flex-start !important;
-                            gap: 16px !important;
-                            width: 100% !important;
-                            min-width: 0 !important;
-                            margin: 0 !important;
-                            padding: 0 !important;
-                        }
-                        .section-header.design-ui-header .section-header-titles,
-                        body.admin-body .section-content > .section-header.design-ui-header .section-header-titles,
-                        body.minside-body .section-content > .section-header.design-ui-header .section-header-titles {
-                            width: 100% !important;
-                            min-width: 0 !important;
-                            flex: none !important;
-                            display: flex !important;
-                            flex-direction: column !important;
-                            align-items: flex-start !important;
-                            text-align: left !important;
-                            gap: 8px !important;
-                        }
-                        .section-header.design-ui-header .section-header-titles .section-title,
-                        body.admin-body .section-content > .section-header.design-ui-header .section-header-titles .section-title,
-                        body.minside-body .section-content > .section-header.design-ui-header .section-header-titles .section-title {
-                            font-size: 20px !important;
-                            font-weight: 800 !important;
-                            color: #111827 !important;
-                            line-height: 1.2 !important;
-                            white-space: normal !important;
-                            word-break: break-word !important;
-                            text-align: left !important;
-                        }
-                        .section-header.design-ui-header .section-header-titles .section-subtitle,
-                        body.admin-body .section-content > .section-header.design-ui-header .section-header-titles .section-subtitle,
-                        body.minside-body .section-content > .section-header.design-ui-header .section-header-titles .section-subtitle {
-                            font-size: 14px !important;
-                            color: #64748b !important;
-                            line-height: 1.5 !important;
-                            white-space: normal !important;
-                            word-break: break-word !important;
-                            text-align: left !important;
-                        }
-                        .section-header.design-ui-header .section-header-actions,
-                        body.admin-body .section-content > .section-header.design-ui-header .section-header-actions,
-                        body.minside-body .section-content > .section-header.design-ui-header .section-header-actions {
-                            display: flex !important;
-                            flex-direction: row !important;
-                            align-items: center !important;
-                            justify-content: flex-start !important;
-                            width: 100% !important;
-                            flex-wrap: wrap !important;
-                            gap: 16px !important;
-                            margin: 0 !important;
-                            padding: 0 !important;
-                        }
-                        .section-header.design-ui-header .section-header-actions > div,
-                        body.admin-body .section-content > .section-header.design-ui-header .section-header-actions > div,
-                        body.minside-body .section-content > .section-header.design-ui-header .section-header-actions > div {
-                            display: flex !important;
-                            flex-direction: row !important;
-                            flex-wrap: wrap !important;
-                            width: 100% !important;
-                            gap: 16px !important;
-                        }
-                        .section-header.design-ui-header .section-header-actions button,
-                        .section-header.design-ui-header .section-header-actions .btn,
-                        body.admin-body .section-content > .section-header.design-ui-header .section-header-actions button,
-                        body.admin-body .section-content > .section-header.design-ui-header .section-header-actions .btn,
-                        body.minside-body .section-content > .section-header.design-ui-header .section-header-actions button,
-                        body.minside-body .section-content > .section-header.design-ui-header .section-header-actions .btn {
-                            flex: 1 1 auto !important;
-                            width: auto !important;
-                            max-width: none !important;
-                            margin: 0 !important;
-                            justify-content: center !important;
-                            white-space: nowrap !important;
-                        }
+                    .section-header.design-ui-header,
+                    body.admin-body .section-content > .section-header.design-ui-header,
+                    body.minside-body .section-content > .section-header.design-ui-header {
+                        display: flex !important;
+                        flex-direction: row !important;
+                        align-items: center !important;
+                        justify-content: flex-start !important;
+                        gap: 16px !important;
+                        width: 100% !important;
+                        box-sizing: border-box !important;
+                        text-align: left !important;
+                    }
+                    .section-header.design-ui-header .section-header-icon,
+                    body.admin-body .section-content > .section-header.design-ui-header .section-header-icon,
+                    body.minside-body .section-content > .section-header.design-ui-header .section-header-icon {
+                        display: inline-flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                        flex-shrink: 0 !important;
+                        margin: 0 !important;
+                    }
+                    .section-header.design-ui-header > .section-header-content,
+                    body.admin-body .section-content > .section-header.design-ui-header > .section-header-content,
+                    body.minside-body .section-content > .section-header.design-ui-header > .section-header-content {
+                        display: flex !important;
+                        flex-direction: column !important;
+                        align-items: flex-start !important;
+                        justify-content: center !important;
+                        gap: 4px !important;
+                        flex: 1 !important;
+                        min-width: 0 !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        text-align: left !important;
+                    }
+                    .section-header.design-ui-header .section-header-titles,
+                    body.admin-body .section-content > .section-header.design-ui-header .section-header-titles,
+                    body.minside-body .section-content > .section-header.design-ui-header .section-header-titles {
+                        width: 100% !important;
+                        min-width: 0 !important;
+                        display: flex !important;
+                        flex-direction: column !important;
+                        align-items: flex-start !important;
+                        text-align: left !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        gap: 4px !important;
+                    }
+                    .section-header.design-ui-header .section-header-titles .section-title,
+                    body.admin-body .section-content > .section-header.design-ui-header .section-header-titles .section-title,
+                    body.minside-body .section-content > .section-header.design-ui-header .section-header-titles .section-title {
+                        font-size: 20px !important;
+                        font-weight: 800 !important;
+                        color: #111827 !important;
+                        line-height: 1.2 !important;
+                        white-space: normal !important;
+                        word-break: break-word !important;
+                        text-align: left !important;
+                        align-self: flex-start !important;
+                        margin: 0 !important;
+                    }
+                    .section-header.design-ui-header .section-header-titles .section-subtitle,
+                    body.admin-body .section-content > .section-header.design-ui-header .section-header-titles .section-subtitle,
+                    body.minside-body .section-content > .section-header.design-ui-header .section-header-titles .section-subtitle {
+                        font-size: 14px !important;
+                        color: #64748b !important;
+                        line-height: 1.5 !important;
+                        white-space: normal !important;
+                        word-break: break-word !important;
+                        text-align: left !important;
+                        align-self: flex-start !important;
+                        margin: 0 !important;
                     }
                 </style>
                 <div class="section-header design-ui-header">
@@ -540,9 +500,9 @@
                         <span class="material-symbols-outlined">${icon}</span>
                     </div>
                     <div class="section-header-content">
-                        <div class="section-header-titles" style="display: flex !important; flex-direction: column !important; align-items: flex-start !important; text-align: left !important; gap: 4px !important; margin: 0 !important; padding: 0 !important;">
-                            <h2 class="section-title" style="margin: 0 !important; padding: 0 !important; line-height: 1.2 !important; text-align: left !important;">${title}</h2>
-                            <p class="section-subtitle" ${subtitleId ? `id="${subtitleId}"` : ''} style="margin: 0 !important; margin-top: 0 !important; padding: 0 !important; line-height: 1.45 !important; text-align: left !important;">${subtitle}</p>
+                        <div class="section-header-titles" style="display: flex !important; flex-direction: column !important; align-items: flex-start !important; text-align: left !important; margin: 0 !important; padding: 0 !important; width: 100% !important;">
+                            <h2 class="section-title" style="margin: 0 !important; padding: 0 !important; line-height: 1.2 !important; text-align: left !important; align-self: flex-start !important;">${title}</h2>
+                            <p class="section-subtitle" ${subtitleId ? `id="${subtitleId}"` : ''} style="margin: 0 !important; margin-top: 2px !important; padding: 0 !important; line-height: 1.45 !important; text-align: left !important; align-self: flex-start !important;">${subtitle}</p>
                         </div>
                         ${actionsHtml ? `<div class="section-header-actions">${actionsHtml}</div>` : ''}
                     </div>

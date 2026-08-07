@@ -4743,17 +4743,24 @@ class AdminManager {
         let podcastCount = '...';
         let fullEvents = [];
 
+        // Helper to prevent slow external API calls or DB calls from hanging the overview render indefinitely
+        const withTimeout = (promise, ms = 3500, fallback = null) => 
+            Promise.race([
+                promise,
+                new Promise(resolve => setTimeout(() => resolve(fallback), ms))
+            ]);
+
         try {
             const [blogData, teachingData, eventData, causesData, indexData, yt, pod, coursesDoc, gaData] = await Promise.all([
-                firebaseService.getPageContent('collection_blog').catch(() => null),
-                firebaseService.getPageContent('collection_teaching').catch(() => null),
-                firebaseService.getPageContent('collection_events').catch(() => null),
-                firebaseService.getPageContent('collection_causes').catch(() => null),
-                firebaseService.getPageContent('settings_index').catch(() => null),
-                this.fetchYouTubeStats().catch(() => null),
-                this.fetchPodcastEpisodesForAdmin().catch(() => null),
-                firebaseService.getPageContent('collection_courses').catch(() => null),
-                this.fetchAnalyticsData(this.analyticsRangeDays).catch(() => null)
+                withTimeout(firebaseService.getPageContent('collection_blog').catch(() => null)),
+                withTimeout(firebaseService.getPageContent('collection_teaching').catch(() => null)),
+                withTimeout(firebaseService.getPageContent('collection_events').catch(() => null)),
+                withTimeout(firebaseService.getPageContent('collection_causes').catch(() => null)),
+                withTimeout(firebaseService.getPageContent('settings_index').catch(() => null)),
+                withTimeout(this.fetchYouTubeStats().catch(() => null)),
+                withTimeout(this.fetchPodcastEpisodesForAdmin().catch(() => null)),
+                withTimeout(firebaseService.getPageContent('collection_courses').catch(() => null)),
+                withTimeout(this.fetchAnalyticsData(this.analyticsRangeDays).catch(() => null))
             ]);
 
             blogCount = Array.isArray(blogData) ? blogData.length : (blogData?.items ? Object.keys(blogData.items).length : 0);
@@ -4767,18 +4774,20 @@ class AdminManager {
 
             // Count users securely directly from the 'users' collection
             try {
-                const usersSnap = await firebaseService.db.collection('users').get();
-                userCount = usersSnap.size;
+                const usersSnap = await withTimeout(firebaseService.db.collection('users').get(), 3000).catch(() => null);
+                if (usersSnap && typeof usersSnap.size === 'number') {
+                    userCount = usersSnap.size;
+                } else {
+                    const fallbackUsers = await withTimeout(firebaseService.getSiteContent('users').catch(() => null), 2000);
+                    userCount = Array.isArray(fallbackUsers) ? fallbackUsers.length : (fallbackUsers?.items ? Object.keys(fallbackUsers.items).length : 0);
+                }
             } catch (uErr) {
                 console.warn("[AdminManager] Failed to fetch users collection:", uErr);
-                // Fallback to getSiteContent summary
-                const usersSnap = await firebaseService.getSiteContent('users').catch(() => null);
-                userCount = Array.isArray(usersSnap) ? usersSnap.length : (usersSnap?.items ? Object.keys(usersSnap.items).length : 0);
             }
 
             // Fetch donations summary directly from the 'donations' collection (filtered for the last 30 days)
             try {
-                const donationsSnap = await firebaseService.db.collection('donations').get();
+                const donationsSnap = await withTimeout(firebaseService.db.collection('donations').get(), 3000).catch(() => null);
                 const now = new Date();
                 const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
