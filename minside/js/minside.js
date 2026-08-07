@@ -5698,22 +5698,26 @@ class MinSideManager {
             return { course: c, total: lessons.length, done: doneCount, pct };
         });
 
-        const inProgress = activeCourseInfo.find(ci => ci.total > 0 && ci.done > 0 && ci.pct < 100) || activeCourseInfo.find(ci => ci.total > 0 && ci.pct < 100);
+        const inProgress = activeCourseInfo.find(ci => ci.total > 0 && ci.done > 0 && ci.pct < 100) 
+                        || activeCourseInfo.find(ci => ci.total > 0 && ci.pct < 100)
+                        || activeCourseInfo[0];
 
         const continueHeroHtml = inProgress ? `
-            <div class="continue-course-hero">
+            <div class="continue-course-hero" onclick="window.location.href='/kurs-detaljer.html?id=${encodeURIComponent(inProgress.course.id)}'" style="cursor: pointer;">
                 <div style="display: flex; align-items: center; gap: 16px;">
                     <div class="hero-icon-box" style="width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                         <span class="material-symbols-outlined" style="font-size: 26px;">play_circle</span>
                     </div>
                     <div>
-                        <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent-color, #d17d39);">Fortsett der du slapp</div>
+                        <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent-color, #d17d39);">
+                            ${inProgress.done > 0 ? 'Fortsett der du slapp' : 'Utvalgt kurs'}
+                        </div>
                         <h3 class="hero-title" style="font-size: 1.1rem; font-weight: 800; margin: 2px 0;">${this._escapeHtml(inProgress.course.title || '')}</h3>
                         <p class="hero-subtitle" style="font-size: 0.8rem; margin: 0;">${inProgress.done} av ${inProgress.total} leksjoner fullført (${inProgress.pct}%)</p>
                     </div>
                 </div>
-                <a href="/kurs-detaljer.html?id=${encodeURIComponent(inProgress.course.id)}" class="btn btn-primary btn-sm" style="border-radius: 10px; font-weight: 700; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border: none; padding: 8px 18px; text-decoration: none; color: #fff; display: inline-flex; align-items: center; gap: 6px;">
-                    <span class="material-symbols-outlined">play_arrow</span> Fortsett leksjon
+                <a href="/kurs-detaljer.html?id=${encodeURIComponent(inProgress.course.id)}" onclick="event.stopPropagation();" class="btn btn-primary btn-sm" style="border-radius: 10px; font-weight: 700; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border: none; padding: 8px 18px; text-decoration: none; color: #fff; display: inline-flex; align-items: center; gap: 6px;">
+                    <span class="material-symbols-outlined">play_arrow</span> ${inProgress.done > 0 ? 'Fortsett leksjon' : 'Åpne kurset'}
                 </a>
             </div>
         ` : '';
@@ -5727,14 +5731,21 @@ class MinSideManager {
                 
                 return `
                 <div class="course-card-premium">
-                    <div style="display:flex; gap:24px; padding:24px; border-bottom:1px solid var(--border-color); align-items:center; flex-wrap:wrap;">
+                    <div class="course-card-top-link" onclick="window.location.href='/kurs-detaljer.html?id=${encodeURIComponent(c.id)}'" style="display:flex; gap:24px; padding:24px; border-bottom:1px solid var(--border-color); align-items:center; flex-wrap:wrap; cursor:pointer;">
                         <div class="course-thumbnail">
                             ${c.imageUrl ? `<img src="${c.imageUrl}" alt="${c.title}" style="width:100%; height:100%; object-fit:cover;">` : `<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#cbd5e1;"><span class="material-symbols-outlined">school</span></div>`}
                         </div>
                         <div style="flex:1; min-width:200px;">
-                            <span class="course-category-tag">${c.category || 'Generelt'}</span>
-                            <h3 style="font-size:1.25rem; font-weight:800; color:var(--text-main); margin:4px 0 6px;">${c.title || t('courses.untitled')}</h3>
-                            <p style="font-size:0.88rem; color:var(--text-muted); margin:0; line-height:1.5;">${c.excerpt || c.intro || ''}</p>
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
+                                <div>
+                                    <span class="course-category-tag">${c.category || 'Generelt'}</span>
+                                    <h3 style="font-size:1.25rem; font-weight:800; color:var(--text-main); margin:4px 0 6px;">${c.title || t('courses.untitled')}</h3>
+                                </div>
+                                <a href="/kurs-detaljer.html?id=${encodeURIComponent(c.id)}" onclick="event.stopPropagation();" class="btn btn-outline-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; border-radius:10px; font-weight:700; padding:6px 16px; text-decoration:none; background: rgba(209, 125, 57, 0.08); color: #d17d39; border: 1px solid rgba(209, 125, 57, 0.3);">
+                                    <span class="material-symbols-outlined" style="font-size:18px;">open_in_new</span> Åpne kurset
+                                </a>
+                            </div>
+                            <p style="font-size:0.88rem; color:var(--text-muted); margin:6px 0 0; line-height:1.5;">${c.excerpt || c.intro || ''}</p>
                             
                             <div style="margin-top:12px; width: 100%;">
                                 <div style="display:flex; justify-content:space-between; font-size:0.75rem; font-weight:700; color:var(--text-muted); margin-bottom:4px;">
