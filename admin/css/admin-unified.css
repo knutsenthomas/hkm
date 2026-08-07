@@ -3226,6 +3226,8 @@ body.admin-body .section-content > .design-ui-header {
 .section-header-titles {
   display: flex;
   flex-direction: column;
+  align-items: flex-start !important;
+  text-align: left !important;
   gap: 4px !important;
 }
 
@@ -3238,6 +3240,7 @@ body.admin-body .section-title {
   margin: 0 !important;
   margin-bottom: 0 !important;
   line-height: 1.2 !important;
+  text-align: left !important;
 }
 
 body.admin-body .section-header-titles .section-subtitle,
@@ -3248,6 +3251,7 @@ body.admin-body .section-subtitle {
   margin: 0 !important;
   margin-top: 0 !important;
   line-height: 1.45 !important;
+  text-align: left !important;
 }
 
 body.admin-body .section-content > .section-header::before,
@@ -5387,6 +5391,7 @@ body.builder-active .breadcrumb-current {
   color: #0f172a !important;
   margin: 0 !important;
   line-height: 1 !important;
+  text-align: left !important;
 }
 
 body.admin-body .section-subtitle,
@@ -5397,6 +5402,7 @@ body.builder-active .section-subtitle {
   font-weight: 500 !important;
   color: #64748b !important;
   margin: 4px 0 0 0 !important;
+  text-align: left !important;
 }
 
 /* 6. Action Elements (Search, Bell, Menu, Toggle) */
@@ -6508,6 +6514,8 @@ body.admin-body .section-title,
   margin-bottom: 0 !important;
   padding: 0 !important;
   line-height: 1.2 !important;
+  text-align: left !important;
+  align-self: flex-start !important;
 }
 
 body.admin-body .section-header-titles .section-subtitle,
@@ -6522,6 +6530,8 @@ body.admin-body .section-subtitle,
   margin-top: 0 !important;
   padding: 0 !important;
   line-height: 1.45 !important;
+  text-align: left !important;
+  align-self: flex-start !important;
 }
 
 /* ==========================================================================
