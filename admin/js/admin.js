@@ -22964,6 +22964,10 @@ class AdminManager {
         const settingsProfile = await firebaseService.getPageContent('settings_profile') || {};
         const p = { ...settingsProfile, ...userDocData };
 
+        const displayName = p.displayName || p.fullName || authUser.displayName || authUser.email || 'Administrator';
+        const userRole = (await firebaseService.getUserRole(uid)) || p.role || 'admin';
+        const roleName = userRole === 'superadmin' ? 'Superadministrator' : (userRole === 'admin' ? 'Administrator' : 'Redaktør');
+
         const esc = str => this.escapeHtml ? this.escapeHtml(str || '') : (str || '');
         const val = v => v ? `<span class="info-row-value">${esc(v)}</span>` : `<span class="info-row-value empty">—</span>`;
         const inputValue = v => esc(v || '');
