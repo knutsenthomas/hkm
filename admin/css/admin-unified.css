@@ -2139,6 +2139,8 @@ body.admin-body .welcome-subtitle {
   padding: 0 4px !important;
   border-radius: 0 !important;
   overflow-x: auto !important;
+  overflow-y: hidden !important;
+  touch-action: pan-x !important;
   white-space: nowrap !important;
   -webkit-overflow-scrolling: touch !important;
   scrollbar-width: none !important;
@@ -2167,7 +2169,7 @@ body.admin-body .welcome-subtitle {
   color: var(--admin-text-muted, #64748b) !important;
   background: transparent !important;
   border: none !important;
-  border-bottom: 3px solid transparent !important;
+  border-bottom: 2px solid transparent !important;
   margin-bottom: -2px !important;
   cursor: pointer !important;
   transition: color 0.15s ease, border-color 0.15s ease !important;
