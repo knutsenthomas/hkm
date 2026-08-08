@@ -71,6 +71,24 @@ if (typeof window !== 'undefined') {
     window.isDefaultAvatarUrl = isDefaultAvatarUrl;
 }
 
+async function safeUpdateAuthProfile(userObj, updates) {
+    if (!userObj || !updates || Object.keys(updates).length === 0) return;
+    try {
+        if (typeof userObj.updateProfile === 'function') {
+            await userObj.updateProfile(updates);
+        } else if (window.firebase && window.firebase.auth && window.firebase.auth().currentUser && typeof window.firebase.auth().currentUser.updateProfile === 'function') {
+            await window.firebase.auth().currentUser.updateProfile(updates);
+        } else {
+            console.warn('updateProfile var ikke tilgjengelig som funksjon på auth user.');
+        }
+    } catch (e) {
+        console.warn('Advarsel ved oppdatering av Firebase auth profil:', e);
+    }
+}
+if (typeof window !== 'undefined') {
+    window.safeUpdateAuthProfile = safeUpdateAuthProfile;
+}
+
 const firebaseService = window.firebaseService;
 const adminUtils = window.HKMAdminUtils || {};
 
@@ -2242,7 +2260,7 @@ class AdminManager {
                 if (!user.displayName && googleProvider.displayName) authUpdates.displayName = googleProvider.displayName;
                 if (!user.photoURL && googleProvider.photoURL) authUpdates.photoURL = googleProvider.photoURL;
                 if (Object.keys(authUpdates).length > 0) {
-                    await user.updateProfile(authUpdates);
+                    await safeUpdateAuthProfile(user, authUpdates);
                 }
             }
 
@@ -23508,7 +23526,7 @@ class AdminManager {
                 try {
                     this.showToast('Laster opp bilde...', 'info', 3000);
                     const url = await firebaseService.uploadImage(avatarFileInput.files[0], `profiles/${uid}/avatar.jpg`);
-                    await authUser.updateProfile({ photoURL: url });
+                    await safeUpdateAuthProfile(authUser, { photoURL: url });
                     try { await authUser.reload(); } catch (e) {}
                     const currentName = section.querySelector('[name="displayName"]')?.value || authUser.displayName || '';
 
@@ -23600,7 +23618,7 @@ class AdminManager {
                         throw new Error('Fant ikke noe eget profilbilde på den valgte Google-kontoen.');
                     }
 
-                    await authUser.updateProfile({ photoURL: googlePhoto });
+                    await safeUpdateAuthProfile(authUser, { photoURL: googlePhoto });
                     try { await authUser.reload(); } catch (e) {}
                     const currentName = section.querySelector('[name="displayName"]')?.value || authUser.displayName || '';
 
@@ -23708,7 +23726,7 @@ class AdminManager {
 
                 try {
                     if (nameVal && nameVal !== authUser.displayName) {
-                        await authUser.updateProfile({ displayName: nameVal });
+                        await safeUpdateAuthProfile(authUser, { displayName: nameVal });
                     }
 
                     await firebase.firestore().collection('users').doc(uid).set({

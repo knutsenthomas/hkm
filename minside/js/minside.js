@@ -28,6 +28,15 @@ if (typeof window !== 'undefined') {
     window.isDefaultAvatarUrl = isDefaultAvatarUrl;
 }
 
+async function safeUpdateAuthProfile(authUser, data) {
+    if (!authUser || typeof authUser.updateProfile !== 'function') return;
+    try {
+        await withTimeout(authUser.updateProfile(data), 4000);
+    } catch (err) {
+        console.warn('authUser.updateProfile safely bypassed/failed:', err?.message || err);
+    }
+}
+
 /* ═══════════════════════════════════════════════════════
    MIN SIDE — PCO-inspired Member Profile
    ═══════════════════════════════════════════════════════ */
@@ -1990,7 +1999,7 @@ class MinSideManager {
             const updates = {};
             if (!user.displayName && google.displayName) updates.displayName = google.displayName;
             if (!user.photoURL && google.photoURL) updates.photoURL = google.photoURL;
-            if (Object.keys(updates).length) await user.updateProfile(updates);
+            if (Object.keys(updates).length) await safeUpdateAuthProfile(user, updates);
             await firebase.firestore().collection('users').doc(user.uid).set({
                 displayName: user.displayName || google.displayName || '',
                 photoURL: user.photoURL || google.photoURL || '',
@@ -3384,7 +3393,7 @@ class MinSideManager {
                         throw new Error(isNo ? 'Fant ikke noe eget profilbilde på den valgte Google-kontoen.' : 'No profile photo found on the Google account.');
                     }
 
-                    await this.currentUser.updateProfile({ photoURL: photoUrl });
+                    await safeUpdateAuthProfile(this.currentUser, { photoURL: photoUrl });
                     try { await this.currentUser.reload(); } catch (e) {}
                     const currentName = p.displayName || this.currentUser.displayName || '';
 
@@ -3687,7 +3696,7 @@ class MinSideManager {
                 if (input) updates[f] = input.value;
             });
             if (updates.displayName && updates.displayName !== this.currentUser.displayName) {
-                await this.currentUser.updateProfile({ displayName: updates.displayName });
+                await safeUpdateAuthProfile(this.currentUser, { displayName: updates.displayName });
             }
             await firebase.firestore().collection('users').doc(this.currentUser.uid).set(updates, { merge: true });
 
@@ -4059,7 +4068,7 @@ class MinSideManager {
             const ref = firebase.storage().ref(`profiles/${this.currentUser.uid}/avatar`);
             await ref.put(file);
             const url = await ref.getDownloadURL();
-            await this.currentUser.updateProfile({ photoURL: url });
+            await safeUpdateAuthProfile(this.currentUser, { photoURL: url });
             await firebase.firestore().collection('users').doc(this.currentUser.uid).set({
                 photoURL: url,
                 photo_url: url,
