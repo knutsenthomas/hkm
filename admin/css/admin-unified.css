@@ -12609,10 +12609,14 @@ html body.minside-body .section-content > .design-ui-header:not(.in-topbar) {
 
 /* --- DYNAMIC TOPBAR ACTIONS & PANEL HEADER ALIGNMENT --- */
 html body.admin-body .main-header .topbar-dynamic-actions {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    margin-right: 8px !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: 8px;
+}
+
+html body.admin-body .main-header .topbar-dynamic-actions:empty {
+    display: none !important;
 }
 
 html body.admin-body .design-ui-panel-header,
