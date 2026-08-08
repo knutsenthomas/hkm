@@ -20601,7 +20601,7 @@ class AdminManager {
 
             <!-- Tabs Navigation -->
             <div class="causes-tabs-container" style="margin-bottom: 24px;">
-                <div class="automation-tabs" style="border: 1px solid #e2e8f0; background: #ffffff; border-radius: 12px; padding: 0 16px; display: flex; align-items: center; gap: 8px; overflow-x: auto; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                <div class="automation-tabs">
                     <button class="automation-tab active" data-tab="dashboard">Dashboard</button>
                     <button class="automation-tab" data-tab="causes">Innsamlinger</button>
                     <button class="automation-tab" data-tab="donations">Pr. gave</button>
@@ -21299,7 +21299,7 @@ class AdminManager {
         section.innerHTML = `
             <!-- Tabs Navigation -->
             <div class="causes-tabs-container" style="margin-bottom: 24px; margin-top: 8px;">
-                <div class="automation-tabs" style="border: 1px solid #e2e8f0; background: #ffffff; border-radius: 12px; padding: 0 16px; display: flex; align-items: center; gap: 8px; overflow-x: auto; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                <div class="automation-tabs">
                     <button class="automation-tab active" data-tab="wix">Oversikt</button>
                     <button class="automation-tab" data-tab="wix-orders">Ordrehistorikk</button>
                     <button class="automation-tab" data-tab="shop">Manuelle ordre</button>

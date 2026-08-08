@@ -2133,15 +2133,22 @@ body.admin-body .welcome-subtitle {
 /* --- Automation Section Styles (Moved outside media query) --- */
 .automation-tabs {
   display: flex !important;
-  gap: 0;
-  border-bottom: 2px solid var(--admin-border, #f1f5f9);
-  background: #fff;
-  padding: 0 16px;
-  border-radius: var(--admin-radius-lg, 16px) var(--admin-radius-lg, 16px) 0 0;
+  gap: 16px !important;
+  border-bottom: 2px solid #e2e8f0 !important;
+  background: transparent !important;
+  padding: 0 4px !important;
+  border-radius: 0 !important;
   overflow-x: auto !important;
   white-space: nowrap !important;
   -webkit-overflow-scrolling: touch !important;
   scrollbar-width: none !important;
+  margin-bottom: 20px !important;
+  box-shadow: none !important;
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .automation-tabs::-webkit-scrollbar {
@@ -2154,27 +2161,29 @@ body.admin-body .welcome-subtitle {
 }
 
 .automation-tab {
-  padding: 16px 24px 8px 24px;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--admin-text-muted, #64748b);
-  background: none;
-  border: none;
-  border-bottom: 3px solid transparent;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 12px 18px 12px 18px !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: var(--admin-text-muted, #64748b) !important;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 3px solid transparent !important;
+  margin-bottom: -2px !important;
+  cursor: pointer !important;
+  transition: color 0.15s ease, border-color 0.15s ease !important;
   flex-shrink: 0 !important;
   white-space: nowrap !important;
+  border-radius: 0 !important;
 }
 
 .automation-tab:hover {
-  color: var(--admin-text, #0f172a);
-  background: rgba(15, 23, 42, 0.02);
+  color: var(--admin-text, #0f172a) !important;
+  background: transparent !important;
 }
 
 .automation-tab.active {
-  color: var(--accent-color, #f97316);
-  border-bottom-color: var(--accent-color, #f97316);
+  color: #1B4965 !important;
+  border-bottom-color: #1B4965 !important;
 }
 
 .automation-pane {
