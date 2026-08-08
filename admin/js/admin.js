@@ -21290,20 +21290,20 @@ class AdminManager {
 
         section.innerHTML = `
             <!-- Tabs Navigation -->
-            <div class="causes-tabs-container" style="margin-bottom: 24px; margin-top: 8px;">
-                <div class="automation-tabs" style="border-bottom: 2px solid #e2e8f0; background: #fff; border-radius: 12px 12px 0 0; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-                    <div style="display: flex; gap: 8px; align-items: center;">
-                        <button class="automation-tab active" data-tab="wix">Oversikt</button>
-                        <button class="automation-tab" data-tab="wix-orders">Ordrehistorikk</button>
-                        <button class="automation-tab" data-tab="shop">Manuelle ordre</button>
-                        <button class="automation-tab" data-tab="kurs">Kurskjøp</button>
-                    </div>
-                    
-                    <!-- Global Period Selector -->
-                    <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0;">
+            <div class="causes-tabs-container" style="margin-bottom: 20px; margin-top: 8px;">
+                <div class="automation-tabs" style="border-bottom: 2px solid #e2e8f0; background: #fff; border-radius: 12px 12px 0 0; padding: 0 20px; display: flex; align-items: center; gap: 8px; overflow-x: auto;">
+                    <button class="automation-tab active" data-tab="wix">Oversikt</button>
+                    <button class="automation-tab" data-tab="wix-orders">Ordrehistorikk</button>
+                    <button class="automation-tab" data-tab="shop">Manuelle ordre</button>
+                    <button class="automation-tab" data-tab="kurs">Kurskjøp</button>
+                </div>
+                
+                <!-- Toolbar for Period Selector -->
+                <div class="causes-toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 12px 16px; background: #ffffff; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; width: 100%;">
                         <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 8px;">
                             <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; white-space: nowrap;">Periode:</label>
-                            <select id="shop-date-preset" class="form-control" style="font-weight: 600; color: #0f172a; border-radius: 8px; height: 36px; padding: 0 32px 0 8px !important; font-size: 13px; min-width: 140px; margin: 0; border: 1px solid #cbd5e1; background: #fff;">
+                            <select id="shop-date-preset" class="form-control" style="font-weight: 600; color: #0f172a; border-radius: 8px; height: 36px; padding: 0 32px 0 10px !important; font-size: 13px; min-width: 140px; margin: 0; border: 1px solid #cbd5e1; background: #fff;">
                                 <option value="7">Siste 7 dager</option>
                                 <option value="30" selected>Siste 30 dager</option>
                                 <option value="90">Siste 90 dager</option>
@@ -21355,7 +21355,7 @@ class AdminManager {
                         <div class="stat-content">
                             <h3 class="stat-label">Omsetning i perioden</h3>
                             <p class="stat-value" id="shop-total-amount">0 kr</p>
-                            <p class="stat-trend" style="padding-left: 0 !important; margin-left: 0 !important;">Fullførte butikkjøp i perioden</p>
+                            <span class="stat-meta">Fullførte butikkjøp i perioden</span>
                         </div>
                     </div>
 
@@ -21394,12 +21394,12 @@ class AdminManager {
                 </div>
 
                 <div class="card" style="margin-bottom: 24px;">
-                    <div class="card-header flex-between">
-                        <div>
-                            <h3 class="card-title">Butikktransaksjoner</h3>
+                    <div class="card-header flex-between" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <h3 class="card-title" style="margin:0 0 4px; white-space:nowrap;">Butikktransaksjoner</h3>
                             <p class="section-subtitle" style="margin-bottom: 0;">Filtrer på status, metode eller søk etter kjøper.</p>
                         </div>
-                        <div style="display:flex; align-items:center; gap:12px;">
+                        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
                             <div style="position:relative; width:180px;">
                                 <span class="material-symbols-outlined" style="position:absolute; left:10px; top:50%; transform:translateY(-50%) !important; font-size:18px; color:#64748b; pointer-events:none;">search</span>
                                 <input id="shop-search" class="form-control" type="search" placeholder="Søk etter kjøper..." style="padding-left:36px !important; height:40px; font-size:13px; border-radius:8px; border:1px solid #cbd5e1; width:100%; margin:0;">
@@ -21533,7 +21533,7 @@ class AdminManager {
                         <div class="stat-content">
                             <h3 class="stat-label">Kursomsetning i perioden</h3>
                             <p class="stat-value" id="kurs-shop-total-amount">0 kr</p>
-                            <p class="stat-trend" style="padding-left: 0 !important; margin-left: 0 !important;">Fullførte kurskjøp i perioden</p>
+                            <span class="stat-meta">Fullførte kurskjøp i perioden</span>
                         </div>
                     </div>
 
