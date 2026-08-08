@@ -6593,9 +6593,10 @@ body.admin-body .user-avatar {
 }
 
 body.admin-body .section-container {
-    padding: 28px 5% 96px;
+    padding: var(--admin-page-gutter, 24px) !important;
     max-width: 1600px;
     margin: 0 auto;
+    box-sizing: border-box;
 }
 
 /* Overview hero banner */
@@ -6603,6 +6604,8 @@ body.admin-body .section-container {
     display: flex;
     flex-direction: column;
     gap: 24px;
+    margin: 0;
+    padding: 0;
 }
 
 #overview-section .overview-hero-card {
@@ -6612,7 +6615,7 @@ body.admin-body .section-container {
     color: #fff;
     background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
     box-shadow: 0 20px 40px rgba(249, 115, 22, 0.15);
-    margin-bottom: 32px;
+    margin-bottom: 0 !important;
     overflow: hidden;
     text-align: left;
     display: flex;
@@ -6763,8 +6766,8 @@ body.admin-body .section-container {
 
 /* Stats cards / widgets */
 #overview-section .stats-grid {
-    gap: 32px;
-    margin-bottom: 40px;
+    gap: 24px !important;
+    margin-bottom: 0 !important;
 }
 
 #overview-section .stat-card.modern {

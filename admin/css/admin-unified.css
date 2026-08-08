@@ -3168,8 +3168,8 @@ body.admin-body .section-container,
 body.admin-body .content-wrapper,
 body.crm-body .crm-content,
 body.crm-body .content-wrapper {
-  padding-top: 16px !important;
-  padding-bottom: 28px !important;
+  padding-top: var(--admin-page-gutter, 24px) !important;
+  padding-bottom: var(--admin-page-gutter, 24px) !important;
 }
 
 body.builder-active .canvas-container {

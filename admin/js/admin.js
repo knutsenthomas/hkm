@@ -5118,8 +5118,8 @@ class AdminManager {
             if (catWidgets.length === 0) return;
 
             widgetsHtml += `
-                <div class="hkm-dashboard-section" style="width: 100%;">
-                    <div class="dashboard-col-header" style="margin-bottom: 16px;">
+                <div class="hkm-dashboard-section" style="width: 100%; display: flex; flex-direction: column; gap: 24px;">
+                    <div class="dashboard-col-header" style="margin-bottom: 0;">
                         <span class="material-symbols-outlined" style="color: #1B4965;">${cat.icon}</span>
                         <h4>${cat.label}</h4>
                     </div>
@@ -5242,7 +5242,7 @@ class AdminManager {
                     100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
                 }
             </style>
-            <div class="analytics-bottom-row" style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px; margin-top: 32px;">
+            <div class="analytics-bottom-row" style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-top: 24px;">
                 <div class="big-card">
                     <div class="big-card-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
                         <span style="font-weight:700; color: var(--admin-text, #1e293b);">Trafikkovervåking (Google Analytics)</span>
@@ -5281,24 +5281,40 @@ class AdminManager {
 
         section.innerHTML = `
             <style>
+                #overview-section {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    gap: 24px !important;
+                    width: 100% !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                }
                 .hkm-dashboard-grid-saas {
                     display: flex !important;
                     flex-direction: column !important;
-                    gap: 32px !important;
+                    gap: 24px !important;
                     width: 100% !important;
-                    margin-top: 32px !important;
+                    margin-top: 0 !important;
+                }
+                .hkm-dashboard-section {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    gap: 24px !important;
+                    width: 100% !important;
+                    margin: 0 !important;
                 }
                 .hkm-widgets-grid {
                     display: grid !important;
                     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
                     gap: 24px !important;
                     width: 100% !important;
+                    margin: 0 !important;
                 }
                 .dashboard-col-header {
                     display: flex;
                     align-items: center;
                     gap: 12px;
-                    margin-bottom: 8px;
+                    margin-bottom: 0 !important;
                     color: var(--admin-text, #1e293b);
                 }
                 .dashboard-col-header h4 {
@@ -5374,6 +5390,7 @@ class AdminManager {
                     border-radius: 20px !important;
                     box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03), 0 2px 6px rgba(15, 23, 42, 0.02) !important;
                     padding: 40px !important;
+                    margin: 0 !important;
                     position: relative !important;
                     overflow: hidden !important;
                     color: var(--admin-text, #1e293b) !important;
