@@ -219,6 +219,7 @@
                 box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
                 margin-bottom: 24px !important;
                 box-sizing: border-box !important;
+                overflow: visible !important;
             }
 
             #dashboard-main-header .section-header.in-topbar,
@@ -239,32 +240,74 @@
                 overflow: visible !important;
             }
 
+            #dashboard-main-header .section-header-content {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                width: 100% !important;
+                height: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
             #dashboard-main-header .section-header-titles {
                 display: flex !important;
                 flex-direction: column !important;
+                justify-content: center !important;
+                align-items: flex-start !important;
+                height: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
                 gap: 2px !important;
             }
 
+            #dashboard-main-header-title,
+            #dashboard-main-header .section-title,
             #dashboard-main-header .section-header-title {
                 display: block !important;
-                font-size: 20px !important;
+                font-size: 19px !important;
                 font-weight: 700 !important;
+                line-height: 1.2 !important;
+                color: #0f172a !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
 
+            #dashboard-main-header-subtitle,
             #dashboard-main-header .section-subtitle {
                 display: block !important;
-                font-size: 13px !important;
+                font-size: 12.5px !important;
+                font-weight: 400 !important;
+                line-height: 1.2 !important;
                 color: #64748b !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
 
             #dashboard-main-header .section-header-icon {
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
+                margin-right: 12px !important;
+            }
+
+            #dashboard-main-header .section-header-actions {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: flex-end !important;
+                gap: 12px !important;
+                height: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
 
             #dashboard-main-header .bento-search-bar {
                 display: inline-flex !important;
+                align-items: center !important;
+                height: 40px !important;
+                margin: 0 !important;
             }
 
             /* Desktop View container & Rounded cards */
