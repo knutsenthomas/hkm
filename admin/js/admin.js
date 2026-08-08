@@ -20592,21 +20592,22 @@ class AdminManager {
             </style>
 
             <!-- Tabs Navigation -->
-            <div class="causes-tabs-container" style="margin-bottom: 24px;">
-                <div class="automation-tabs" style="border-bottom: 2px solid #e2e8f0; background: #fff; border-radius: 12px 12px 0 0; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-                    <div style="display: flex; gap: 8px; align-items: center;">
-                        <button class="automation-tab active" data-tab="dashboard">Dashboard</button>
-                        <button class="automation-tab" data-tab="causes">Innsamlinger</button>
-                        <button class="automation-tab" data-tab="donations">Pr. gave</button>
-                        <button class="automation-tab" data-tab="donors">Pr. giver</button>
-                        <button class="automation-tab" data-tab="inkind">Fysiske gaver</button>
-                    </div>
-                    
-                    <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0; flex-wrap: wrap;">
-                        <!-- Global Period Selector -->
+            <div class="causes-tabs-container" style="margin-bottom: 20px;">
+                <div class="automation-tabs" style="border-bottom: 2px solid #e2e8f0; background: #fff; border-radius: 12px 12px 0 0; padding: 0 20px; display: flex; align-items: center; gap: 8px; overflow-x: auto;">
+                    <button class="automation-tab active" data-tab="dashboard">Dashboard</button>
+                    <button class="automation-tab" data-tab="causes">Innsamlinger</button>
+                    <button class="automation-tab" data-tab="donations">Pr. gave</button>
+                    <button class="automation-tab" data-tab="donors">Pr. giver</button>
+                    <button class="automation-tab" data-tab="inkind">Fysiske gaver</button>
+                </div>
+                
+                <!-- Toolbar for Filters and Actions -->
+                <div class="causes-toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 12px 16px; background: #ffffff; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px; margin-bottom: 20px;">
+                    <!-- Global Period Selector -->
+                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
                         <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 8px;">
                             <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; white-space: nowrap;">Periode:</label>
-                            <select id="global-date-preset" class="form-control" style="font-weight: 600; color: #0f172a; border-radius: 8px; height: 36px; padding: 0 32px 0 8px !important; font-size: 13px; min-width: 140px; margin: 0; border: 1px solid #cbd5e1; background: #fff;">
+                            <select id="global-date-preset" class="form-control" style="font-weight: 600; color: #0f172a; border-radius: 8px; height: 36px; padding: 0 32px 0 10px !important; font-size: 13px; min-width: 140px; margin: 0; border: 1px solid #cbd5e1; background: #fff;">
                                 <option value="today">I dag</option>
                                 <option value="7">Siste 7 dager</option>
                                 <option value="30" selected>Siste 30 dager</option>
@@ -20626,16 +20627,17 @@ class AdminManager {
                                 <input type="date" id="global-end-date" class="form-control" style="border-radius: 8px; height: 36px; padding: 4px 8px; font-size: 12px; border: 1px solid #cbd5e1;">
                             </div>
                         </div>
-                        <div style="display: flex; gap: 8px; align-items: center;">
-                            <button type="button" class="btn-primary" id="add-manual-donation-btn" style="display:flex; align-items:center; gap:8px; padding:8px 16px; border-radius:8px; font-weight:600; height:36px; font-size: 13px; margin: 0;">
-                                <span class="material-symbols-outlined" style="font-size:18px;">add_card</span>
-                                Registrer gave
-                            </button>
-                            <button type="button" class="btn-secondary" id="open-bank-import-btn" style="display:flex; align-items:center; gap:8px; padding:8px 16px; border-radius:8px; font-weight:600; height:36px; font-size: 13px; margin: 0; border: 1px solid #cbd5e1; background: #fff;">
-                                <span class="material-symbols-outlined" style="font-size:18px;">upload_file</span>
-                                Importer bank
-                            </button>
-                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                        <button type="button" class="btn-primary" id="add-manual-donation-btn" style="display:flex; align-items:center; gap:8px; padding:8px 16px; border-radius:8px; font-weight:600; height:36px; font-size: 13px; margin: 0;">
+                            <span class="material-symbols-outlined" style="font-size:18px;">add_card</span>
+                            Registrer gave
+                        </button>
+                        <button type="button" class="btn-secondary" id="open-bank-import-btn" style="display:flex; align-items:center; gap:8px; padding:8px 16px; border-radius:8px; font-weight:600; height:36px; font-size: 13px; margin: 0; border: 1px solid #cbd5e1; background: #fff;">
+                            <span class="material-symbols-outlined" style="font-size:18px;">upload_file</span>
+                            Importer bank
+                        </button>
                     </div>
                 </div>
             </div>
@@ -20682,7 +20684,7 @@ class AdminManager {
                         <div class="stat-content">
                             <h3 class="stat-label">Fullført i perioden</h3>
                             <p class="stat-value" id="donation-total-amount">${formattedTotal}</p>
-                            <p class="stat-trend" id="donation-total-subtitle" style="padding-left: 0 !important; margin-left: 0 !important;">Fullførte gaver i perioden</p>
+                            <span class="stat-meta" id="donation-total-subtitle">Fullførte gaver i perioden</span>
                         </div>
                     </div>
 
