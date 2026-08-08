@@ -1083,9 +1083,18 @@ const initAdminHeader = () => {
         const actionsContainer = document.querySelector('.main-header .section-header-actions');
         if (!actionsContainer) return;
 
-        // 1. Convert search button to bento search bar if it's still a simple button
-        const searchBtn = actionsContainer.querySelector('#global-search-opener');
-        if (searchBtn && !searchBtn.classList.contains('bento-search-bar')) {
+        // 1. Ensure dynamic actions container exists
+        let dynamicActions = actionsContainer.querySelector('#topbar-dynamic-actions');
+        if (!dynamicActions) {
+            dynamicActions = document.createElement('div');
+            dynamicActions.id = 'topbar-dynamic-actions';
+            dynamicActions.className = 'topbar-dynamic-actions';
+            dynamicActions.style.cssText = 'display: none; align-items: center; gap: 8px;';
+        }
+
+        // 2. Search bar
+        let searchBtn = actionsContainer.querySelector('#global-search-opener');
+        if (!searchBtn || !searchBtn.classList.contains('bento-search-bar')) {
             const newSearch = document.createElement('div');
             newSearch.id = 'global-search-opener';
             newSearch.className = 'bento-search-bar';
@@ -1094,10 +1103,13 @@ const initAdminHeader = () => {
                 <span class="material-symbols-outlined">search</span>
                 <span class="bento-search-text" style="user-select: none; line-height: 1;">Søk her...</span>
             `;
-            searchBtn.replaceWith(newSearch);
-            
-            // Re-bind the search opener event listener
-            newSearch.addEventListener('click', () => {
+            if (searchBtn) searchBtn.replaceWith(newSearch);
+            searchBtn = newSearch;
+        }
+
+        if (!searchBtn.dataset.bound) {
+            searchBtn.dataset.bound = 'true';
+            searchBtn.addEventListener('click', () => {
                 const searchModal = document.getElementById('search-modal') || document.getElementById('site-search-modal');
                 if (searchModal) {
                     searchModal.classList.add('active');
@@ -1107,20 +1119,41 @@ const initAdminHeader = () => {
             });
         }
 
-        // 3. Inject theme switcher if missing
+        // 3. Todo shortcut button
+        let todoBtn = actionsContainer.querySelector('#todo-shortcut-btn');
+        if (!todoBtn) {
+            todoBtn = document.createElement('button');
+            todoBtn.id = 'todo-shortcut-btn';
+            todoBtn.className = 'notification-btn';
+            todoBtn.title = 'Huskeliste';
+            todoBtn.style.position = 'relative';
+            todoBtn.innerHTML = `
+                <span class="material-symbols-outlined">playlist_add_check</span>
+                <span id="todo-badge-dot" class="notification-dot" style="display: none; background: var(--color-accent, #d17d39);"></span>
+            `;
+        }
+
+        // 4. Messages bell button
+        let messagesBell = actionsContainer.querySelector('#messages-bell');
+        if (!messagesBell) {
+            messagesBell = document.createElement('button');
+            messagesBell.id = 'messages-bell';
+            messagesBell.className = 'notification-btn';
+            messagesBell.title = 'Meldinger';
+            messagesBell.innerHTML = `
+                <span id="notification-icon" class="material-symbols-outlined">notifications</span>
+                <span id="notification-dot" class="notification-dot"></span>
+            `;
+        }
+
+        // 5. Theme toggle button
         let themeToggle = actionsContainer.querySelector('#admin-theme-toggle');
         if (!themeToggle) {
             themeToggle = document.createElement('button');
             themeToggle.id = 'admin-theme-toggle';
             themeToggle.className = 'notification-btn';
-            themeToggle.title = 'Bytt tema';
-            
-            const profileLink = actionsContainer.querySelector('.user-profile-link');
-            if (profileLink) {
-                actionsContainer.insertBefore(themeToggle, profileLink);
-            } else {
-                actionsContainer.appendChild(themeToggle);
-            }
+            themeToggle.title = 'Bytt tema (Lyst/Mørkt)';
+            themeToggle.setAttribute('aria-label', 'Bytt tema');
         }
 
         const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
@@ -1153,11 +1186,24 @@ const initAdminHeader = () => {
             });
         }
 
-        // 2. Remove language switcher from admin header (language is inherited from main website preference)
+        // 6. User profile trigger
+        let profileTrigger = actionsContainer.querySelector('#admin-profile-trigger') || actionsContainer.querySelector('.user-profile-link');
+
+        // Remove language switchers if any left
         const langSwitcher = actionsContainer.querySelector('.header-lang-switcher, .lang-switcher');
-        if (langSwitcher) {
-            langSwitcher.remove();
-        }
+        if (langSwitcher) langSwitcher.remove();
+
+        // Enforce strict element order inside actionsContainer
+        const elementsInOrder = [
+            dynamicActions,
+            searchBtn,
+            todoBtn,
+            messagesBell,
+            themeToggle,
+            profileTrigger
+        ].filter(Boolean);
+
+        elementsInOrder.forEach(el => actionsContainer.appendChild(el));
 
         // Inherit preferred language from main website (defaulting to 'no')
         const siteLang = localStorage.getItem('hkm_preferred_lang') || 'no';

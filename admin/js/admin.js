@@ -2776,57 +2776,146 @@ class AdminManager {
         this.setTopbarActions(null);
     }
 
-    attachAutosaveToSection(sectionElement, badgeId, saveCallback, debounceMs = 500) {
+    attachAutosaveToSection(sectionElement, badgeId = 'global-topbar-autosave-badge', saveCallback = null, debounceMs = 600) {
         if (!sectionElement) return;
         let timer = null;
         const triggerSave = () => {
-            const badge = document.getElementById(badgeId);
+            const badge = document.getElementById(badgeId) || document.getElementById('global-topbar-autosave-badge');
             if (badge) {
+                badge.style.display = 'inline-flex';
+                badge.style.opacity = '1';
                 badge.style.background = 'rgba(209, 125, 57, 0.12)';
                 badge.style.color = '#d17d39';
-                badge.innerHTML = '<span class="material-symbols-outlined spin" style="font-size:16px;">sync</span> <span>Lagrer...</span>';
+                badge.style.border = '1px solid rgba(209, 125, 57, 0.25)';
+                badge.innerHTML = '<span class="material-symbols-outlined spin" style="font-size:15px; margin-right:4px;">sync</span> <span style="font-weight:600; font-size:12px;">Autolagrer...</span>';
             }
             clearTimeout(timer);
             timer = setTimeout(async () => {
                 try {
-                    await saveCallback();
+                    if (typeof saveCallback === 'function') {
+                        await saveCallback();
+                    } else if (typeof this.autoSaveCurrentSection === 'function') {
+                        await this.autoSaveCurrentSection(sectionElement);
+                    }
                     if (badge) {
+                        const now = new Date();
+                        const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        badge.style.display = 'inline-flex';
+                        badge.style.opacity = '1';
                         badge.style.background = 'rgba(34, 197, 94, 0.12)';
                         badge.style.color = '#16a34a';
-                        badge.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">cloud_done</span> <span>Lagret i skyen</span>';
+                        badge.style.border = '1px solid rgba(34, 197, 94, 0.25)';
+                        badge.innerHTML = `<span class="material-symbols-outlined" style="font-size:15px; margin-right:4px;">cloud_done</span> <span style="font-weight:600; font-size:12px;">Sist lagret kl. ${timeStr}</span>`;
+                        setTimeout(() => {
+                            badge.style.opacity = '0.75';
+                        }, 4000);
                     }
                 } catch (err) {
                     console.error('[Autosave] error:', err);
                     if (badge) {
+                        badge.style.display = 'inline-flex';
+                        badge.style.opacity = '1';
                         badge.style.background = 'rgba(239, 68, 68, 0.12)';
                         badge.style.color = '#dc2626';
-                        badge.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">error</span> <span>Feil ved lagring</span>';
+                        badge.style.border = '1px solid rgba(239, 68, 68, 0.25)';
+                        badge.innerHTML = '<span class="material-symbols-outlined" style="font-size:15px; margin-right:4px;">cloud_off</span> <span style="font-weight:600; font-size:12px;">Lagring feilet</span>';
                     }
                 }
             }, debounceMs);
         };
 
-        sectionElement.querySelectorAll('input, select, textarea').forEach(el => {
+        sectionElement.querySelectorAll('input, select, textarea, [contenteditable="true"]').forEach(el => {
             if (el.dataset.autosaveBound) return;
             el.dataset.autosaveBound = 'true';
             el.addEventListener('input', triggerSave);
             el.addEventListener('change', triggerSave);
+            el.addEventListener('keyup', triggerSave);
         });
+    }
+
+    async autoSaveCurrentSection(container) {
+        if (!container) return;
+        
+        // 1. Check for section-specific save button triggers
+        const saveBtn = container.querySelector('.save-btn, #save-design-btn, #save-seo-btn, #save-global-seo, #save-page-seo, #save-podcast-settings, .modal-save');
+        if (saveBtn && typeof saveBtn.click === 'function' && !saveBtn.disabled) {
+            // Trigger click on existing save button silently
+            saveBtn.click();
+            return;
+        }
+
+        // 2. Check for active item modal editor
+        const modal = container.closest('.modal') || document.querySelector('.modal.active');
+        if (modal) {
+            const statusEl = modal.querySelector('#editor-autosave-status');
+            if (statusEl) return; // Editor modal has its own triggerAutosave loop
+        }
+
+        // 3. Fallback form input serialization if applicable
+        const currentSection = this.currentSection || 'overview';
+        if (currentSection && currentSection !== 'overview') {
+            const inputs = container.querySelectorAll('input[id], select[id], textarea[id]');
+            if (inputs.length > 0) {
+                const formData = {};
+                inputs.forEach(input => {
+                    formData[input.id] = input.value;
+                });
+                formData.updatedAt = new Date().toISOString();
+                try {
+                    await firebaseService.savePageContent(`section_autosave_${currentSection}`, formData);
+                } catch (e) {
+                    console.warn(`[Autosave] Autosave fallback failed for ${currentSection}:`, e);
+                }
+            }
+        }
     }
 
     setupUniversalAutosave() {
         console.log('[AdminManager] Universal Autosave system active.');
+
+        // 1. Ensure global topbar autosave badge exists in topbar
+        let globalBadge = document.getElementById('global-topbar-autosave-badge');
+        if (!globalBadge) {
+            const dynamicContainer = document.getElementById('topbar-dynamic-actions') || document.querySelector('.section-header-actions');
+            if (dynamicContainer) {
+                globalBadge = document.createElement('div');
+                globalBadge.id = 'global-topbar-autosave-badge';
+                globalBadge.className = 'autosave-pill';
+                globalBadge.style.cssText = 'display: none; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 12px; transition: all 0.3s ease; white-space: nowrap; margin-right: 6px;';
+                dynamicContainer.prepend(globalBadge);
+            }
+        }
+
+        // 2. Attach autosave to explicit containers with [data-autosave-badge]
         const autoSaveContainers = document.querySelectorAll('[data-autosave-badge]');
         autoSaveContainers.forEach(container => {
-            const badgeId = container.getAttribute('data-autosave-badge');
+            const badgeId = container.getAttribute('data-autosave-badge') || 'global-topbar-autosave-badge';
             const saveHandlerName = container.getAttribute('data-autosave-handler');
             const saveCallback = (typeof this[saveHandlerName] === 'function')
                 ? this[saveHandlerName].bind(this)
                 : null;
-            if (saveCallback) {
-                this.attachAutosaveToSection(container, badgeId, saveCallback);
-            }
+            this.attachAutosaveToSection(container, badgeId, saveCallback);
         });
+
+        // 3. Attach autosave to all section content forms and active modals automatically
+        const allSections = document.querySelectorAll('.section-content, .crm-content, .modal-content, .main-content');
+        allSections.forEach(section => {
+            this.attachAutosaveToSection(section, 'global-topbar-autosave-badge');
+        });
+
+        // 4. MutationObserver for dynamic modals or forms added later
+        if (!this._autosaveObserver) {
+            this._autosaveObserver = new MutationObserver(() => {
+                const unattachedInputs = document.querySelectorAll('input:not([data-autosave-bound="true"]), select:not([data-autosave-bound="true"]), textarea:not([data-autosave-bound="true"])');
+                if (unattachedInputs.length > 0) {
+                    const dynamicContainers = document.querySelectorAll('.section-content, .crm-content, .modal-content, .main-content');
+                    dynamicContainers.forEach(container => {
+                        this.attachAutosaveToSection(container, 'global-topbar-autosave-badge');
+                    });
+                }
+            });
+            this._autosaveObserver.observe(document.body, { childList: true, subtree: true });
+        }
     }
 
     /**
