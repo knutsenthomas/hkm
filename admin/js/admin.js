@@ -610,7 +610,6 @@ class AdminManager {
 
         // Replace seeded/static demo content immediately to avoid showing an outdated dashboard on hard refresh.
         section.innerHTML = `
-            ${this.renderSectionHeader('dashboard', 'Oversikt', 'HKM Studio administrasjonspanel')}
             <div class="card">
                 <div class="card-body" style="min-height:180px; display:flex; align-items:center; justify-content:center;">
                     <div class="loader"></div>
@@ -3432,12 +3431,6 @@ class AdminManager {
         section.setAttribute('data-rendered', 'true');
 
         section.innerHTML = `
-            ${this.renderSectionHeader('forum', 'Kommentarstyring', 'Her kan du moderere og slette kommentarer fra blogg og undervisning.', `
-                <button class="btn btn-primary" onclick="window.adminManager.renderCommentsSection()">
-                    Oppdater
-                </button>
-            `, '')}
-
             <div class="design-ui-shell">
                 <div class="design-ui-workspace" style="padding: 0;">
                     <div class="design-ui-panel" style="border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
@@ -3472,22 +3465,20 @@ class AdminManager {
         section.setAttribute('data-rendered', 'true');
 
         section.innerHTML = `
-            ${this.renderSectionHeader('mic_external_on', 'Podcast Administrasjon', 'Administrer episoder, AI-transkripsjoner og overstyringer.', `
-                <div style="display:flex; gap:10px; align-items:center;">
-                    <button class="btn btn-secondary" id="toggle-podcast-settings-btn" type="button" style="display:inline-flex; align-items:center; gap:6px;">
-                        <span class="material-symbols-outlined">settings</span>
-                        Innstillinger
-                        <span class="material-symbols-outlined" id="podcast-settings-chevron">expand_more</span>
-                    </button>
-                    <button class="btn btn-secondary" onclick="window.adminManager.loadPodcastEpisodes()">
-                        <span class="material-symbols-outlined">refresh</span>
-                        Synkroniser
-                    </button>
-                    <button class="btn btn-primary" id="save-podcast-overrides" style="display:none;">
-                        Lagre endringer
-                    </button>
-                </div>
-            `, '')}
+            <div style="display:flex; justify-content:flex-end; gap:10px; align-items:center; margin-bottom:16px;">
+                <button class="btn btn-secondary" id="toggle-podcast-settings-btn" type="button" style="display:inline-flex; align-items:center; gap:6px;">
+                    <span class="material-symbols-outlined">settings</span>
+                    Innstillinger
+                    <span class="material-symbols-outlined" id="podcast-settings-chevron">expand_more</span>
+                </button>
+                <button class="btn btn-secondary" onclick="window.adminManager.loadPodcastEpisodes()">
+                    <span class="material-symbols-outlined">refresh</span>
+                    Synkroniser
+                </button>
+                <button class="btn btn-primary" id="save-podcast-overrides" style="display:none;">
+                    Lagre endringer
+                </button>
+            </div>
 
             <!-- Collapsible Podcast Settings Card -->
             <div id="podcast-settings-collapsible" style="display: none; margin-bottom: 24px; transition: all 0.3s ease;">
@@ -5917,8 +5908,6 @@ class AdminManager {
         section.setAttribute('data-rendered', 'true');
 
         section.innerHTML = `
-            ${this.renderSectionHeader('description', 'Innholdsredigering', 'Administrer og rediger blogginnlegg, undervisningsserier og mer.')}
-
             <div class="grid-2-cols">
                 <div class="card">
                     <div class="card-header flex-between">
@@ -8179,9 +8168,7 @@ class AdminManager {
         if (!section) return;
 
         section.innerHTML = `
-            ${this.renderSectionHeader('smartphone', 'HKM Mobilapp & PWA', 'Administrer mobilapp-synkronisering, PWA service workers, offline-caching og installasjonsstatus for HKM appen.', '')}
-
-            <div class="app-dashboard-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-top: 24px;">
+            <div class="app-dashboard-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
                 
                 <!-- Status & Sync Control Card -->
                 <div class="card modern" style="grid-column: 1 / -1; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; border-radius: 20px; padding: 28px; box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.3);">
@@ -22835,19 +22822,17 @@ class AdminManager {
         if (!section) return;
 
         section.innerHTML = `
-            ${this.renderSectionHeader('view_carousel', 'Forside-innhold', 'Administrer slides og statistikk på forsiden.', `
+            <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
                 <button class="btn btn-primary" id="add-hero-slide">
                     <span class="material-symbols-outlined">add</span> Ny Slide
                 </button>
-            `)}
+            </div>
 
-                    <div class="collection-grid" id="hero-slides-list">
-                        <div class="loader">Laster slides...</div>
-                    </div>
+            <div class="collection-grid" id="hero-slides-list" style="margin-bottom:32px;">
+                <div class="loader">Laster slides...</div>
+            </div>
 
-                    ${this.renderSectionHeader('monitoring', 'Nøkkeltall (Forside-statistikk)', 'Rediger tallene som vises i "Funfacts"-seksjonen på forsiden.')}
-
-                    <div class="card" style="max-width: 800px;">
+            <div class="card" style="max-width: 800px;">
                         <div class="card-body">
                             <form id="stats-form">
                                 <div class="form-grid-2" style="gap: 20px;">
@@ -24721,16 +24706,6 @@ class AdminManager {
                     align-items: flex-start !important;
                 }
                 #finance-tab-view .design-ui-header .section-title {
-                    text-align: left !important;
-                    font-size: 18px !important;
-                    font-weight: 800 !important;
-                    color: #111827 !important;
-                }
-                #finance-tab-view .design-ui-header .section-subtitle {
-                    text-align: left !important;
-                    font-size: 13px !important;
-                    color: var(--admin-page-muted) !important;
-                }
             </style>
 
             <!-- Sub-tab Bar -->
@@ -24742,14 +24717,14 @@ class AdminManager {
 
             <!-- VIEW 1: COURSES VIEW -->
             <div id="courses-tab-view">
-                ${this.renderSectionHeader('menu_book', 'Kursliste', 'Opprett og administrer kurs med leksjoner – Udemy-stil.', `
-                    <button class="btn btn-secondary" style="display:inline-flex; align-items:center; gap:6px; margin-right:8px; background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px;" onclick="if(window.handleSectionSwitch){window.handleSectionSwitch('shop'); setTimeout(() => { document.querySelector('#shop-section [data-tab=\\'kurs\\']')?.click(); }, 150);}">
+                <div style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:16px;">
+                    <button class="btn btn-secondary" style="display:inline-flex; align-items:center; gap:6px; background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px;" onclick="if(window.handleSectionSwitch){window.handleSectionSwitch('shop'); setTimeout(() => { document.querySelector('#shop-section [data-tab=\\'kurs\\']')?.click(); }, 150);}">
                         <span class="material-symbols-outlined" style="font-size:18px;">payments</span> Se kurskjøp
                     </button>
                     <button class="btn btn-primary" id="create-course-btn">
                         <span class="material-symbols-outlined">add</span> Nytt kurs
                     </button>
-                `, '')}
+                </div>
 
                 <div class="design-ui-shell">
                     <div class="design-ui-workspace" style="padding: 0;">
@@ -24885,8 +24860,6 @@ class AdminManager {
 
             <!-- VIEW 3: FINANCE VIEW -->
             <div id="finance-tab-view" style="display: none;">
-                ${this.renderSectionHeader('payments', 'Kursøkonomi', 'Oversikt over omsetning, betalinger og økonomiske nøkkeltall for kurs.', '', '')}
-                
                 <div class="design-ui-shell">
                     <!-- Key stats cards grid -->
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
@@ -25680,8 +25653,6 @@ class AdminManager {
         if (!section) return;
 
         section.innerHTML = `
-            ${this.renderSectionHeader('search_insights', 'SEO & Synlighet', 'Styr hvordan nettsiden din ser ut i søkemotorer og sosiale medier.', '')}
-
             <div class="design-ui-shell">
                 <div class="design-ui-topbar design-ui-panel">
                     <div class="design-ui-topbar-main">
@@ -25968,9 +25939,7 @@ class AdminManager {
         if (!section) return;
 
         section.innerHTML = `
-            ${this.renderSectionHeader('settings', 'Innstillinger & Verktøy', 'Administrer systeminnstillinger og datasync.', '')}
-
-                    <div class="design-ui-shell">
+            <div class="design-ui-shell">
                         <div class="design-ui-workspace">
                             <div class="design-ui-top-grid">
                                 <div class="design-ui-main-column">
@@ -28245,8 +28214,6 @@ class AdminManager {
         }
 
         section.innerHTML = `
-            ${this.renderSectionHeader('person_search', 'Brukeradministrasjon', 'Oversikt over alle registrerte brukere og deres tilgangsnivåer.')}
-
             <div class="design-ui-shell">
                 <div class="design-ui-workspace">
                     <div class="design-ui-panel">
