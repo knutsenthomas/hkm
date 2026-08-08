@@ -2312,11 +2312,37 @@ class AdminManager {
             });
         };
 
+        const readCachedIdentity = () => {
+            try {
+                let displayName = '';
+                let photoURL = '';
+                const raw = localStorage.getItem(identityCacheKey);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed && typeof parsed === 'object') {
+                        displayName = typeof parsed.displayName === 'string' ? parsed.displayName : '';
+                        photoURL = typeof parsed.photoURL === 'string' ? parsed.photoURL : '';
+                    }
+                }
+                const pubRaw = localStorage.getItem('hkm_public_user_cache');
+                if (pubRaw) {
+                    const pubParsed = JSON.parse(pubRaw);
+                    if (!photoURL && pubParsed?.photoURL) photoURL = pubParsed.photoURL;
+                }
+                return { displayName, photoURL };
+            } catch (e) {
+                return null;
+            }
+        };
+
         const cacheHeaderIdentity = (name, photoURL) => {
             try {
+                const existing = readCachedIdentity();
+                const effectivePhoto = photoURL || existing?.photoURL || '';
+                const effectiveName = name || existing?.displayName || '';
                 localStorage.setItem(identityCacheKey, JSON.stringify({
-                    displayName: name || '',
-                    photoURL: photoURL || '',
+                    displayName: effectiveName,
+                    photoURL: effectivePhoto,
                     ts: Date.now()
                 }));
             } catch (e) {
@@ -2324,7 +2350,7 @@ class AdminManager {
             }
         };
 
-        const withTimeout = async (promise, ms = 1500) => {
+        const withTimeout = async (promise, ms = 3500) => {
             let timerId;
             try {
                 return await Promise.race([
@@ -2339,20 +2365,20 @@ class AdminManager {
         };
 
         const googlePhoto = (user?.providerData || []).find(p => p && p?.photoURL)?.photoURL || '';
+        const cachedIdentity = readCachedIdentity();
 
-        // Immediate fallback from Auth to avoid visible "Laster..." while Firestore resolves.
-        const authName = user?.displayName || user?.email || 'Administrator';
-        const authPhoto = user?.photoURL || googlePhoto || '';
+        // Immediate fallback from Auth or Cache to avoid visible "Laster..." while Firestore resolves.
+        const authName = user?.displayName || user?.email || cachedIdentity?.displayName || 'Administrator';
+        const authPhoto = user?.photoURL || googlePhoto || cachedIdentity?.photoURL || '';
         renderHeaderIdentity(authName, authPhoto);
-        cacheHeaderIdentity(authName, authPhoto);
 
         // Try load custom profile data
         let profile = null;
         let userProfile = null;
         try {
             const [profileRes, userDoc] = await Promise.all([
-                withTimeout(firebaseService.getPageContent('settings_profile'), 1500),
-                withTimeout(firebase.firestore().collection('users').doc(user.uid).get(), 1500)
+                withTimeout(firebaseService.getPageContent('settings_profile'), 2500),
+                withTimeout(firebase.firestore().collection('users').doc(user.uid).get(), 3500)
             ]);
             profile = profileRes;
             if (userDoc && userDoc.exists) userProfile = userDoc.data();
@@ -2362,10 +2388,11 @@ class AdminManager {
             || user?.displayName
             || (profile && profile.fullName)
             || user?.email;
-        const photoURL = (userProfile && (userProfile.photoURL || userProfile.photo_url || userProfile.avatarUrl))
+        const photoURL = (userProfile && (userProfile.photoURL || userProfile.photo_url || userProfile.photoUrl || userProfile.avatarUrl || userProfile.avatar_url || userProfile.profileImage || userProfile.image))
             || (profile && (profile.photoUrl || profile.photoURL))
             || user?.photoURL
             || googlePhoto
+            || cachedIdentity?.photoURL
             || '';
 
         renderHeaderIdentity(displayName, photoURL);
@@ -20560,20 +20587,11 @@ class AdminManager {
             <style>
                 body.admin-body .causes-stats-grid {
                     display: grid !important;
-                    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
-                    grid-auto-flow: row !important;
-                    gap: 24px !important;
+                    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+                    gap: 20px !important;
                     width: 100% !important;
                     max-width: 100% !important;
-                    align-items: stretch !important;
-                }
-                @media (max-width: 1024px) {
-                    body.admin-body .causes-stats-grid {
-                        grid-template-columns: 1fr !important;
-                    }
-                    body.admin-body .causes-stats-grid > * {
-                        grid-column: span 12 !important;
-                    }
+                    box-sizing: border-box !important;
                 }
                 .btn-link-profile, .btn-link-donor-profile {
                     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;

@@ -178,14 +178,22 @@ const initAdminHeader = () => {
 
     const readCachedIdentity = () => {
         try {
+            let displayName = '';
+            let photoURL = '';
             const raw = localStorage.getItem(ADMIN_IDENTITY_CACHE_KEY);
-            if (!raw) return null;
-            const parsed = JSON.parse(raw);
-            if (!parsed || typeof parsed !== 'object') return null;
-            return {
-                displayName: typeof parsed.displayName === 'string' ? parsed.displayName : '',
-                photoURL: typeof parsed.photoURL === 'string' ? parsed.photoURL : ''
-            };
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (parsed && typeof parsed === 'object') {
+                    displayName = typeof parsed.displayName === 'string' ? parsed.displayName : '';
+                    photoURL = typeof parsed.photoURL === 'string' ? parsed.photoURL : '';
+                }
+            }
+            const pubRaw = localStorage.getItem('hkm_public_user_cache');
+            if (pubRaw) {
+                const pubParsed = JSON.parse(pubRaw);
+                if (!photoURL && pubParsed?.photoURL) photoURL = pubParsed.photoURL;
+            }
+            return { displayName, photoURL };
         } catch (e) {
             return null;
         }
@@ -193,9 +201,12 @@ const initAdminHeader = () => {
 
     const writeCachedIdentity = (displayName, photoURL) => {
         try {
+            const existing = readCachedIdentity();
+            const effectivePhoto = photoURL || existing?.photoURL || '';
+            const effectiveName = displayName || existing?.displayName || '';
             localStorage.setItem(ADMIN_IDENTITY_CACHE_KEY, JSON.stringify({
-                displayName: displayName || '',
-                photoURL: photoURL || '',
+                displayName: effectiveName,
+                photoURL: effectivePhoto,
                 ts: Date.now()
             }));
         } catch (e) {

@@ -12287,6 +12287,32 @@ html[data-theme="dark"] .pco-menu-item:hover {
     }
 }
 
+/* --- Defensive Bounds to Prevent Whole-Section Sliding --- */
+#view-container,
+.view-section,
+.section-content,
+.causes-tabs-container,
+.card,
+.card.modern,
+.crm-main,
+.admin-page-container {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+}
+
+/* Allow horizontal scrolling strictly within dedicated scrollable areas */
+.automation-tabs,
+.table-container,
+.crm-table-container,
+.crm-editor-toolbar {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+
 
 
 
