@@ -2808,6 +2808,21 @@ class AdminManager {
         });
     }
 
+    setupUniversalAutosave() {
+        console.log('[AdminManager] Universal Autosave system active.');
+        const autoSaveContainers = document.querySelectorAll('[data-autosave-badge]');
+        autoSaveContainers.forEach(container => {
+            const badgeId = container.getAttribute('data-autosave-badge');
+            const saveHandlerName = container.getAttribute('data-autosave-handler');
+            const saveCallback = (typeof this[saveHandlerName] === 'function')
+                ? this[saveHandlerName].bind(this)
+                : null;
+            if (saveCallback) {
+                this.attachAutosaveToSection(container, badgeId, saveCallback);
+            }
+        });
+    }
+
     /**
      * Called by the inline navigation script in index.html
      */
