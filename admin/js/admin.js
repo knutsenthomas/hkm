@@ -52,6 +52,25 @@ function showErrorUI(message) {
     }
 }
 
+function isDefaultAvatarUrl(url) {
+    if (!url || typeof url !== 'string') return true;
+    const lower = url.toLowerCase().trim();
+    if (!lower || lower === 'null' || lower === 'undefined') return true;
+    return lower.includes('default-user') || 
+           lower.includes('default_user') || 
+           lower.includes('default_avatar') || 
+           lower.includes('avatar-placeholder') || 
+           lower.includes('avatar_placeholder') || 
+           lower.includes('silhouette') || 
+           lower.includes('ssl.gstatic.com/accounts/ui/avatar') || 
+           lower.includes('googleusercontent.com/a/default-user') || 
+           lower.includes('/a/default-user') ||
+           lower.includes('gstatic.com/identity/images/components/profiles');
+}
+if (typeof window !== 'undefined') {
+    window.isDefaultAvatarUrl = isDefaultAvatarUrl;
+}
+
 const firebaseService = window.firebaseService;
 const adminUtils = window.HKMAdminUtils || {};
 
