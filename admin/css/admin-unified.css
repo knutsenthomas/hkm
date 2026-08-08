@@ -3168,7 +3168,7 @@ body.admin-body .section-container,
 body.admin-body .content-wrapper,
 body.crm-body .crm-content,
 body.crm-body .content-wrapper {
-  padding-top: var(--admin-page-gutter, 24px) !important;
+  padding-top: 12px !important;
   padding-bottom: var(--admin-page-gutter, 24px) !important;
 }
 
@@ -4833,7 +4833,7 @@ body.admin-body .inbox-container,
 body.admin-body .segments-container,
 body.admin-body .analytics-container,
 body.admin-body #newsletter-dashboard-layout {
-  padding-top: var(--admin-page-gutter, 24px) !important;
+  padding-top: 12px !important;
 }
 
 /* Make topbar-to-first-box spacing clean 24px total without extra top margin */
