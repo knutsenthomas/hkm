@@ -2286,12 +2286,28 @@
                 if (centerTextEl) centerTextEl.textContent = 'laster...';
 
                 try {
-                    const user = firebase.auth().currentUser;
-                    if (!user) {
-                        console.warn("[Analytics] Ingen aktiv innlogget bruker funnet for API-forespørsel.");
+                    let user = (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) || (window.firebaseService && window.firebaseService.auth && window.firebaseService.auth.currentUser);
+                    let idToken = '';
+                    if (user && typeof user.getIdToken === 'function') {
+                        try { idToken = await user.getIdToken(); } catch (e) {}
+                    }
+                    if (!idToken) {
+                        for (let i = 0; i < 6; i++) {
+                            await new Promise(r => setTimeout(r, 200));
+                            const u = (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) || (window.firebaseService && window.firebaseService.auth && window.firebaseService.auth.currentUser);
+                            if (u && typeof u.getIdToken === 'function') {
+                                try { idToken = await u.getIdToken(); break; } catch (e) {}
+                            }
+                        }
+                    }
+
+                    if (!idToken) {
+                        console.warn("[Analytics] Ingen gyldig innloggingstoken tilgjengelig.");
+                        showDashboardError("Venter på at brukerinnlogging skal fullføres. Vennligst vent et øyeblikk eller oppdater siden.", 'warning');
+                        pageviewsValEl.textContent = '--';
+                        engagementValEl.textContent = '--';
                         return;
                     }
-                    const idToken = await user.getIdToken();
 
                     const response = await fetch(`https://getanalyticsoverview-42bhgdjkcq-uc.a.run.app?days=${days}`, {
                         headers: {

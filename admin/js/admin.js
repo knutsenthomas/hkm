@@ -7823,9 +7823,22 @@ class AdminManager {
         try {
             const safeDays = [7, 14, 30, 60, 90, 180, 365].includes(Number(days)) ? Number(days) : 30;
             
-            const user = firebase.auth().currentUser;
-            if (!user) throw new Error('Du er ikke logget inn.');
-            const idToken = await user.getIdToken();
+            let user = (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) || (window.firebaseService && window.firebaseService.auth && window.firebaseService.auth.currentUser);
+            let idToken = '';
+            if (user && typeof user.getIdToken === 'function') {
+                try { idToken = await user.getIdToken(); } catch (e) {}
+            }
+            if (!idToken) {
+                for (let i = 0; i < 6; i++) {
+                    await new Promise(r => setTimeout(r, 200));
+                    const u = (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) || (window.firebaseService && window.firebaseService.auth && window.firebaseService.auth.currentUser);
+                    if (u && typeof u.getIdToken === 'function') {
+                        try { idToken = await u.getIdToken(); break; } catch (e) {}
+                    }
+                }
+            }
+
+            if (!idToken) throw new Error('Du er ikke innlogget i Firebase. Vennligst logg inn på nytt.');
 
             // Call the Firebase Function with Authorization header
             const response = await fetch(`https://getanalyticsoverview-42bhgdjkcq-uc.a.run.app?days=${safeDays}`, {
@@ -29205,8 +29218,8 @@ class AdminManager {
         }
 
         try {
-            const user = firebase.auth().currentUser;
-            if (!user) throw new Error('Du er ikke logget inn.');
+            let user = (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) || (window.firebaseService && window.firebaseService.auth && window.firebaseService.auth.currentUser);
+            if (!user || typeof user.getIdToken !== 'function') throw new Error('Du er ikke logget inn i Firebase.');
             const idToken = await user.getIdToken();
 
             const payload = {
