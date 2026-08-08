@@ -23056,14 +23056,8 @@ class AdminManager {
         const hasGoogleAuth = (Array.isArray(authUser.providerData) && authUser.providerData.some(pr => pr && pr.providerId === 'google.com')) || (authUser.email && authUser.email.toLowerCase().includes('gmail'));
 
         section.innerHTML = `
-            ${this.renderSectionHeader('person_outline', 'Min Profil', 'Administrer din brukerkonto og personlige innstillinger for både Admin og Min Side.', `
-                <button class="btn btn-outline" id="admin-profile-reload-btn">
-                    <span class="material-symbols-outlined" style="font-size: 16px;">refresh</span> Last inn på nytt
-                </button>
-            `, '')}
-
-            <!-- EXECUTIVE PROFILE HERO CARD -->
-            <div class="ms-profile-hero-card">
+            <!-- EXECUTIVE MINIMALIST PROFILE HERO CARD -->
+            <div class="ms-profile-hero-card" style="margin-bottom: 24px;">
                 <div class="ms-profile-hero-left">
                     <div class="ms-profile-hero-avatar-wrap">
                         <div class="ms-profile-hero-avatar" id="ph-hero-avatar-admin">
@@ -23093,10 +23087,14 @@ class AdminManager {
                         </div>
                     </div>
                 </div>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <button type="button" class="btn btn-outline" id="google-photo-btn-admin" style="border-radius: 12px; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                <div style="display: flex; gap: 10px; align-items: center; justify-content: flex-end;">
+                    <button type="button" class="btn btn-outline" id="google-photo-btn-admin" style="border-radius: 12px; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 16px;">
                         <img src="https://www.google.com/favicon.ico" width="14" height="14">
-                        Hent bilde fra Google
+                        <span>Hent bilde fra Google</span>
+                    </button>
+                    <button type="button" class="btn btn-outline" id="admin-profile-reload-btn" style="border-radius: 12px; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 10px 14px;" title="Last inn på nytt">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">refresh</span>
+                        <span>Oppdater</span>
                     </button>
                 </div>
             </div>
