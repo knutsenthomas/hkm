@@ -11839,7 +11839,7 @@ html[data-theme="dark"] .status-pill.status-completed {
         height: 44px !important;
         min-width: 44px !important;
         max-width: 44px !important;
-        border-radius: 50% !important;
+        border-radius: 12px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;

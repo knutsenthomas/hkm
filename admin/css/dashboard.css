@@ -5540,7 +5540,7 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
         order: 3;
         background: white !important;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
-        border-radius: 50% !important;
+        border-radius: 12px !important;
     }
 
     /* Keep hamburger visible */
@@ -5549,7 +5549,7 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
         order: 4;
         width: 40px;
         height: 40px;
-        border-radius: 50%;
+        border-radius: 12px !important;
         background: white;
         border: none;
         align-items: center;
