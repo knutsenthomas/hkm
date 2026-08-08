@@ -19131,12 +19131,12 @@ class AdminManager {
 
         container.innerHTML = `
             <div class="stats-grid causes-stats-grid" style="margin-bottom: 24px;">
-                <div class="card" style="grid-column: span 4; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; min-height: 240px;">
-                    <div style="margin-bottom: 20px;">
+                <div class="card" style="grid-column: span 4; padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div style="margin-bottom: 16px;">
                         <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Givere i perioden</span>
                         <h4 style="margin: 4px 0 0; font-size: 24px; font-weight: 800; color: #0f172a;">${donorCount} givere</h4>
                     </div>
-                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
                         <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #f1f5f9;">
                             <div style="display:flex; align-items:center; gap:12px;">
                                 <div style="width:28px; height:28px; border-radius:50%; background:#eff6ff; color:#3b82f6; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px;">${newDonors}</div>
