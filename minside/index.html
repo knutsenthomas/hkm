@@ -334,6 +334,79 @@
                 margin: 0 !important;
             }
 
+            /* Symmetrical Avatar & Profile Capsule Sizing */
+            .user-profile-link {
+                height: 44px !important;
+                min-height: 44px !important;
+                max-height: 44px !important;
+                border-radius: 12px !important;
+                padding: 3px 6px 3px 12px !important;
+                gap: 10px !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                box-sizing: border-box !important;
+                background: var(--card-bg, #ffffff) !important;
+                border: 1px solid rgba(15, 23, 42, 0.08) !important;
+            }
+
+            .user-profile-link:not(:has(.user-info-text)),
+            .user-profile-link:not(:has(.user-name)) {
+                width: 44px !important;
+                min-width: 44px !important;
+                max-width: 44px !important;
+                padding: 0 !important;
+                justify-content: center !important;
+                align-items: center !important;
+            }
+
+            .user-profile-link:not(:has(.user-info-text)) .user-avatar,
+            .user-profile-link:not(:has(.user-name)) .user-avatar,
+            .user-profile-link:not(:has(.user-info-text)) [id="admin-avatar"],
+            .user-profile-link:not(:has(.user-name)) [id="admin-avatar"],
+            .user-profile-link:not(:has(.user-info-text)) [id="ph-avatar"],
+            .user-profile-link:not(:has(.user-name)) [id="ph-avatar"] {
+                width: 100% !important;
+                height: 100% !important;
+                min-width: 100% !important;
+                min-height: 100% !important;
+                border-radius: inherit !important;
+                border: none !important;
+                margin: 0 !important;
+            }
+
+            .user-avatar,
+            [id="admin-avatar"],
+            [id="ph-avatar"] {
+                width: 38px !important;
+                height: 38px !important;
+                min-width: 38px !important;
+                min-height: 38px !important;
+                border-radius: 10px !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden !important;
+                position: relative !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                flex-shrink: 0 !important;
+            }
+
+            .user-avatar img,
+            [id="admin-avatar"] img,
+            [id="ph-avatar"] img {
+                width: 100% !important;
+                height: 100% !important;
+                object-fit: cover !important;
+                border-radius: inherit !important;
+                display: block !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                position: absolute !important;
+                inset: 0 !important;
+            }
+
             /* Desktop View container & Rounded cards */
             #view-container {
                 padding: 16px 32px 80px 32px !important;
