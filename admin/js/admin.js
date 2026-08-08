@@ -20723,12 +20723,12 @@ class AdminManager {
                 </div>
 
                 <div class="card" style="margin-bottom: 24px;">
-                    <div class="card-header flex-between">
-                        <div>
-                            <h3 class="card-title">Gaveoversikt</h3>
+                    <div class="card-header flex-between" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <h3 class="card-title" style="margin:0 0 4px; white-space:nowrap;">Gaveoversikt</h3>
                             <p class="section-subtitle" style="margin-bottom: 0;">Filtrer på status, metode, transaksjonstype eller giver.</p>
                         </div>
-                        <div style="display:flex; align-items:center; gap:12px;">
+                        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
                             <div style="position:relative; width:220px;">
                                 <span class="material-symbols-outlined" style="position:absolute; left:10px; top:50%; transform:translateY(-50%) !important; font-size:18px; color:#64748b; pointer-events:none;">search</span>
                                 <input id="donation-search" class="form-control" type="search" placeholder="Søk..." style="padding-left:36px !important; height:40px; font-size:13px; border-radius:8px; border:1px solid #cbd5e1; width:100%; margin:0;">
@@ -20838,12 +20838,12 @@ class AdminManager {
             <!-- Tab 3: By Donor Content -->
             <div id="cause-tab-content-donors" class="cause-tab-pane" style="display: none;">
                 <div class="card" style="margin-bottom: 24px;">
-                    <div class="card-header flex-between">
-                        <div>
-                            <h3 class="card-title">Givere</h3>
+                    <div class="card-header flex-between" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <h3 class="card-title" style="margin:0 0 4px; white-space:nowrap;">Givere</h3>
                             <p class="section-subtitle" style="margin-bottom: 0;">Aggregert oversikt per giver i valgt periode.</p>
                         </div>
-                        <div style="display:flex; align-items:center; gap:12px;">
+                        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
                             <div style="position:relative; width:220px;">
                                 <span class="material-symbols-outlined" style="position:absolute; left:10px; top:50%; transform:translateY(-50%) !important; font-size:18px; color:#64748b; pointer-events:none;">search</span>
                                 <input id="donor-search" class="form-control" type="search" placeholder="Søk etter giver..." style="padding-left:36px !important; height:40px; font-size:13px; border-radius:8px; border:1px solid #cbd5e1; width:100%; margin:0;">

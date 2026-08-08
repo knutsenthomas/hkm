@@ -12154,6 +12154,19 @@ html[data-theme="dark"] .pco-menu-item:hover {
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35) !important;
     }
 
+    /* Card header flex and title text-wrapping guard */
+    .card-header.flex-between {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        gap: 16px !important;
+    }
+
+    .card-title {
+        white-space: nowrap !important;
+    }
+
     /* Internal padding protects text, inputs and buttons from card edges */
     .profile-panel-body,
     .design-ui-panel-body,
