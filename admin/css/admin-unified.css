@@ -3168,7 +3168,7 @@ body.admin-body .section-container,
 body.admin-body .content-wrapper,
 body.crm-body .crm-content,
 body.crm-body .content-wrapper {
-  padding-top: 24px !important;
+  padding-top: 12px !important;
   padding-bottom: var(--admin-page-gutter, 24px) !important;
 }
 
@@ -5462,7 +5462,7 @@ body.admin-body .crm-content,
 body.admin-body .inbox-container,
 body.admin-body .logs-container,
 body.admin-body #newsletter-dashboard-layout {
-  padding-top: 24px !important;
+  padding-top: 12px !important;
   margin-top: 0 !important;
   box-sizing: border-box !important;
 }
