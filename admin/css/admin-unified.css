@@ -13543,3 +13543,59 @@ body.builder-active .sidebar-nav {
     }
 }
 
+
+/* ==========================================================================
+   FORCE LEFT ALIGNMENT ON MOBILE SIDEBAR (Fix for admin-nyhetsbrev.html)
+   ========================================================================== */
+@media (max-width: 1024px) {
+    body.admin-body .sidebar .nav-list,
+    body.minside-body .sidebar .nav-list,
+    body.builder-active .sidebar .nav-list,
+    body.admin-body .sidebar .nav-group,
+    body.minside-body .sidebar .nav-group,
+    body.builder-active .sidebar .nav-group,
+    body.admin-body .sidebar-nav,
+    body.minside-body .sidebar-nav,
+    body.builder-active .sidebar-nav,
+    body.admin-body .sidebar,
+    body.minside-body .sidebar,
+    body.builder-active .sidebar {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        width: 100% !important;
+        text-align: left !important;
+    }
+
+    body.admin-body .sidebar .nav-item,
+    body.minside-body .sidebar .nav-item,
+    body.builder-active .sidebar .nav-item {
+        display: block !important;
+        width: 100% !important;
+        text-align: left !important;
+    }
+
+    body.admin-body .sidebar .nav-link,
+    body.minside-body .sidebar .nav-link,
+    body.builder-active .sidebar .nav-link {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        text-align: left !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    body.admin-body .sidebar .nav-category-header,
+    body.minside-body .sidebar .nav-category-header,
+    body.builder-active .sidebar .nav-category-header {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        text-align: left !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+}
