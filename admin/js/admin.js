@@ -2261,10 +2261,9 @@ class AdminManager {
         }
     }
 
-    async updateUserInfo(user) {
+    renderHeaderIdentity(name, photoURL) {
         const adminName = document.getElementById('admin-name');
         const getAvatars = () => Array.from(document.querySelectorAll('#admin-avatar, #ph-avatar, #modal-admin-avatar, .user-avatar, .user-avatar-compact'));
-        const identityCacheKey = 'hkm_admin_identity_cache';
 
         const isDefaultAvatarUrl = (url) => {
             if (!url || typeof url !== 'string') return true;
@@ -2287,31 +2286,33 @@ class AdminManager {
             return url.trim();
         };
 
-        const renderHeaderIdentity = (name, photoURL) => {
-            const safeName = (name || '').trim() || 'Administrator';
-            if (adminName) adminName.textContent = safeName;
-            const avatars = getAvatars();
-            if (avatars.length === 0) return;
+        const safeName = (name || '').trim() || 'Administrator';
+        if (adminName) adminName.textContent = safeName;
+        const avatars = getAvatars();
+        if (avatars.length === 0) return;
 
-            const initials = safeName.split(' ').map(n => n.trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase() || 'A';
-            const shortInitials = initials.substring(0, 2);
-            const formattedPhoto = formatPhotoUrl(photoURL);
-            const isCustomPhoto = formattedPhoto && formattedPhoto.length > 5 && !isDefaultAvatarUrl(formattedPhoto);
+        const initials = safeName.split(' ').map(n => n.trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase() || 'A';
+        const shortInitials = initials.substring(0, 2);
+        const formattedPhoto = formatPhotoUrl(photoURL);
+        const isCustomPhoto = formattedPhoto && formattedPhoto.length > 5 && !isDefaultAvatarUrl(formattedPhoto);
 
-            avatars.forEach(adminAvatar => {
-                adminAvatar.title = safeName;
+        avatars.forEach(adminAvatar => {
+            adminAvatar.title = safeName;
 
-                if (isCustomPhoto) {
-                    adminAvatar.dataset.photoUrl = formattedPhoto;
-                    adminAvatar.classList.remove('has-initials');
-                    const escapedName = safeName.replace(/"/g, '&quot;');
-                    adminAvatar.innerHTML = `<img src="${formattedPhoto}" alt="${escapedName}" referrerpolicy="no-referrer" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; display:block;" onerror="this.onerror=null; this.parentElement.classList.add('has-initials'); this.parentElement.innerHTML='<span class=\\'avatar-initials-text\\' style=\\'position:relative; z-index:1;\\'>${shortInitials}</span>';">`;
-                } else {
-                    adminAvatar.classList.add('has-initials');
-                    adminAvatar.innerHTML = `<span class="avatar-initials-text" style="position:relative; z-index:1;">${shortInitials}</span>`;
-                }
-            });
-        };
+            if (isCustomPhoto) {
+                adminAvatar.dataset.photoUrl = formattedPhoto;
+                adminAvatar.classList.remove('has-initials');
+                const escapedName = safeName.replace(/"/g, '&quot;');
+                adminAvatar.innerHTML = `<img src="${formattedPhoto}" alt="${escapedName}" referrerpolicy="no-referrer" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; display:block;" onerror="this.onerror=null; this.parentElement.classList.add('has-initials'); this.parentElement.innerHTML='<span class=\\'avatar-initials-text\\' style=\\'position:relative; z-index:1;\\'>${shortInitials}</span>';">`;
+            } else {
+                adminAvatar.classList.add('has-initials');
+                adminAvatar.innerHTML = `<span class="avatar-initials-text" style="position:relative; z-index:1;">${shortInitials}</span>`;
+            }
+        });
+    }
+
+    async updateUserInfo(user) {
+        const identityCacheKey = 'hkm_admin_identity_cache';
 
         const readCachedIdentity = () => {
             try {
@@ -2376,7 +2377,7 @@ class AdminManager {
         // Immediate fallback from Auth or Cache to avoid visible "Laster..." while Firestore resolves.
         const authName = user?.displayName || user?.email || cachedIdentity?.displayName || 'Administrator';
         const authPhoto = user?.photoURL || googlePhoto || cachedIdentity?.photoURL || '';
-        renderHeaderIdentity(authName, authPhoto);
+        this.renderHeaderIdentity(authName, authPhoto);
 
         // Try load custom profile data
         let profile = null;
@@ -2401,7 +2402,7 @@ class AdminManager {
             || cachedIdentity?.photoURL
             || '';
 
-        renderHeaderIdentity(displayName, photoURL);
+        this.renderHeaderIdentity(displayName, photoURL);
         cacheHeaderIdentity(displayName, photoURL);
         
         // Store for blog author attribution
@@ -22987,40 +22988,16 @@ class AdminManager {
                 : `<span class="info-row-value" style="font-family: monospace; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.08em;">${esc(ssnVal)}</span>`)
             : `<span class="info-row-value empty">—</span>`;
 
-        const displayName = p.displayName || authUser.displayName || p.fullName || 'Administrator';
-        const photoURL = p.photoURL || authUser.photoURL || p.photoUrl || '';
-        const roleName = (p.role === 'superadmin' || userDocData.role === 'superadmin') ? 'Superadministrator' : 'Administrator';
+        const rawAvatarPhoto = p.photoURL || authUser.photoURL || p.photo_url || p.photoUrl || p.avatarUrl || (authUser.providerData && authUser.providerData.find(pr => pr && pr.photoURL)?.photoURL) || '';
+        const validAvatarPhoto = rawAvatarPhoto && rawAvatarPhoto.trim().length > 5 && !isDefaultAvatarUrl(rawAvatarPhoto);
+        const avatarDisplayUrl = validAvatarPhoto ? rawAvatarPhoto.trim() : '';
+        const userInitials = (displayName || 'Bruker').split(' ').map(n => n.trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase().substring(0, 2) || 'B';
 
-        // Bottom nav preferences html
-        const allowedNavItems = ['overview', 'profile', 'courses', 'reading-plans', 'giving', 'notifications', 'tasks', 'notes'];
-        const defaultActiveItems = ['overview', 'reading-plans', 'giving', 'notifications', 'tasks'];
-        const userCustomNav = p.customBottomNav || defaultActiveItems;
-        const navLabels = {
-            'overview': { label: 'Oversikt', icon: 'home' },
-            'profile': { label: 'Profil', icon: 'person' },
-            'courses': { label: 'Kurs', icon: 'school' },
-            'reading-plans': { label: 'Leseplaner', icon: 'auto_stories' },
-            'giving': { label: 'Gaver', icon: 'volunteer_activism' },
-            'notifications': { label: 'Varslinger', icon: 'notifications' },
-            'tasks': { label: 'Huskeliste', icon: 'task_alt' },
-            'notes': { label: 'Notater', icon: 'edit_note' }
-        };
-        const customNavHtml = allowedNavItems.map(id => {
-            const checked = userCustomNav.includes(id) ? 'checked' : '';
-            const item = navLabels[id] || { label: id, icon: 'link' };
-            return `
-                <label class="custom-nav-item">
-                    <div class="custom-nav-item-left">
-                        <span class="material-symbols-outlined">${item.icon}</span>
-                        <span>${item.label}</span>
-                    </div>
-                    <label class="hkm-switch toggle-orange" style="margin: 0;">
-                        <input type="checkbox" class="custom-nav-cb-admin" value="${id}" ${checked}>
-                        <span class="hkm-slider"></span>
-                    </label>
-                </label>
-            `;
-        }).join('');
+        const avatarHtml = avatarDisplayUrl 
+            ? `<img src="${esc(avatarDisplayUrl)}" alt="${esc(displayName)}" referrerpolicy="no-referrer" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span style="display: none; align-items: center; justify-content: center; width: 100%; height: 100%;">${esc(userInitials)}</span>`
+            : `<span style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">${esc(userInitials)}</span>`;
+
+        const hasGoogleAuth = (Array.isArray(authUser.providerData) && authUser.providerData.some(pr => pr && pr.providerId === 'google.com')) || (authUser.email && authUser.email.toLowerCase().includes('gmail'));
 
         section.innerHTML = `
             ${this.renderSectionHeader('person_outline', 'Min Profil', 'Administrer din brukerkonto og personlige innstillinger for både Admin og Min Side.', `
@@ -23034,7 +23011,7 @@ class AdminManager {
                 <div class="ms-profile-hero-left">
                     <div class="ms-profile-hero-avatar-wrap">
                         <div class="ms-profile-hero-avatar" id="ph-hero-avatar-admin">
-                            ${photoURL ? `<img src="${photoURL}" style="width: 100%; height: 100%; object-fit: cover;">` : esc(displayName.charAt(0).toUpperCase())}
+                            ${avatarHtml}
                         </div>
                         <button type="button" class="ms-profile-avatar-upload-btn" id="ph-upload-hero-trigger-admin" title="Endre profilbilde">
                             <span class="material-symbols-outlined">photo_camera</span>
@@ -23061,12 +23038,10 @@ class AdminManager {
                     </div>
                 </div>
                 <div style="display: flex; gap: 10px; align-items: center;">
-                    ${Array.isArray(authUser.providerData) && authUser.providerData.some(pr => pr && pr.providerId === 'google.com') ? `
-                        <button type="button" class="btn btn-outline" id="google-photo-btn-admin" style="border-radius: 12px; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 6px;">
-                            <img src="https://www.google.com/favicon.ico" width="14" height="14">
-                            Hent bilde fra Google
-                        </button>
-                    ` : ''}
+                    <button type="button" class="btn btn-outline" id="google-photo-btn-admin" style="border-radius: 12px; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                        <img src="https://www.google.com/favicon.ico" width="14" height="14">
+                        Hent bilde fra Google
+                    </button>
                 </div>
             </div>
 
@@ -23504,7 +23479,7 @@ class AdminManager {
                         }));
                     } catch (e) {}
 
-                    renderHeaderIdentity(currentName || 'Administrator', url);
+                    this.renderHeaderIdentity(currentName || 'Administrator', url);
                     this.showToast('Profilbilde oppdatert!', 'success', 4000);
                     await this.renderProfileSection();
                 } catch (err) {
@@ -23517,15 +23492,69 @@ class AdminManager {
         const googlePhotoBtn = section.querySelector('#google-photo-btn-admin');
         if (googlePhotoBtn) {
             googlePhotoBtn.onclick = async () => {
-                const provider = (authUser.providerData || []).find(pr => pr && pr.providerId === 'google.com');
-                if (!provider || !provider.photoURL) return;
+                const originalBtnHtml = googlePhotoBtn.innerHTML;
+                googlePhotoBtn.disabled = true;
+                googlePhotoBtn.innerHTML = '<span class="material-symbols-outlined spinner" style="font-size: 14px; animation: spin 1s linear infinite;">sync</span> Henter fra Google...';
+
                 try {
-                    await authUser.updateProfile({ photoURL: provider.photoURL });
+                    if (typeof firebase === 'undefined' || !firebase.auth) {
+                        throw new Error('Firebase Auth er ikke tilgjengelig.');
+                    }
+
+                    let googlePhoto = (authUser.providerData || []).find(pr => pr && pr.photoURL && pr.photoURL.includes('googleusercontent.com'))?.photoURL || '';
+
+                    if (!googlePhoto || isDefaultAvatarUrl(googlePhoto)) {
+                        const providerObj = new firebase.auth.GoogleAuthProvider();
+                        providerObj.addScope('profile');
+                        providerObj.addScope('email');
+                        providerObj.setCustomParameters({ prompt: 'select_account' });
+
+                        let authResult = null;
+                        const currentUser = firebase.auth().currentUser || authUser;
+
+                        try {
+                            if (currentUser && typeof currentUser.linkWithPopup === 'function') {
+                                try {
+                                    authResult = await currentUser.linkWithPopup(providerObj);
+                                } catch (linkErr) {
+                                    authResult = await firebase.auth().signInWithPopup(providerObj);
+                                }
+                            } else {
+                                authResult = await firebase.auth().signInWithPopup(providerObj);
+                            }
+                        } catch (popupErr) {
+                            if (popupErr.code === 'auth/popup-closed-by-user') {
+                                throw new Error('Innloggingen ble lukket før kontoen ble valgt.');
+                            }
+                            throw new Error(popupErr.message || 'Kunne ikke åpne Google-innlogging.');
+                        }
+
+                        if (authResult) {
+                            const u = authResult.user || firebase.auth().currentUser;
+                            googlePhoto = authResult.additionalUserInfo?.profile?.picture
+                                       || u?.photoURL
+                                       || (u?.providerData && u.providerData.find(pr => pr && pr.photoURL)?.photoURL)
+                                       || '';
+                        }
+                    }
+
+                    if (googlePhoto && googlePhoto.includes('googleusercontent.com')) {
+                        googlePhoto = googlePhoto.replace(/=s\d+(-c)?/, '=s400-c');
+                    }
+
+                    if (!googlePhoto || isDefaultAvatarUrl(googlePhoto)) {
+                        throw new Error('Fant ikke noe eget profilbilde på den valgte Google-kontoen.');
+                    }
+
+                    await authUser.updateProfile({ photoURL: googlePhoto });
                     try { await authUser.reload(); } catch (e) {}
-                    const currentName = section.querySelector('[name="displayName"]')?.value || authUser.displayName || provider.displayName || '';
+                    const currentName = section.querySelector('[name="displayName"]')?.value || authUser.displayName || '';
 
                     await firebase.firestore().collection('users').doc(uid).set({
-                        photoURL: provider.photoURL,
+                        photoURL: googlePhoto,
+                        photo_url: googlePhoto,
+                        photoUrl: googlePhoto,
+                        avatarUrl: googlePhoto,
                         displayName: currentName,
                         email: authUser.email || '',
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -23533,23 +23562,28 @@ class AdminManager {
 
                     await firebaseService.savePageContent('settings_profile', {
                         fullName: currentName,
-                        photoUrl: provider.photoURL,
+                        photoUrl: googlePhoto,
+                        photoURL: googlePhoto,
                         updatedAt: new Date().toISOString()
                     });
 
                     try {
                         localStorage.setItem('hkm_admin_identity_cache', JSON.stringify({
                             displayName: currentName || 'Administrator',
-                            photoURL: provider.photoURL,
+                            photoURL: googlePhoto,
                             ts: Date.now()
                         }));
                     } catch (e) {}
 
-                    renderHeaderIdentity(currentName || 'Administrator', provider.photoURL);
-                    this.showToast('Profilbilde hentet fra Google.', 'success', 4000);
+                    this.renderHeaderIdentity(currentName || 'Administrator', googlePhoto);
+                    this.showToast('Profilbilde fra Google ble hentet og lagret!', 'success', 4000);
                     await this.renderProfileSection();
                 } catch (err) {
-                    this.showToast('Kunne ikke hente bilde fra Google.', 'error', 5000);
+                    console.error('Google photo sync error:', err);
+                    this.showToast('Kunne ikke hente bilde fra Google: ' + (err.message || 'Avbrutt'), 'warning', 5000);
+                } finally {
+                    googlePhotoBtn.disabled = false;
+                    googlePhotoBtn.innerHTML = originalBtnHtml;
                 }
             };
         }
@@ -23653,7 +23687,7 @@ class AdminManager {
                         updatedAt: new Date().toISOString()
                     });
 
-                    renderHeaderIdentity(nameVal || 'Administrator', authUser.photoURL || '');
+                    this.renderHeaderIdentity(nameVal || 'Administrator', authUser.photoURL || '');
                     this.showToast('Profilopplysninger er lagret!', 'success', 4000);
                     await this.renderProfileSection();
                 } catch (err) {

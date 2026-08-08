@@ -2833,6 +2833,12 @@ class MinSideManager {
                     </div>
                 </div>
             </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button type="button" class="btn btn-outline" id="google-photo-btn" style="border-radius: 12px; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: rgba(255,255,255,0.8); border: 1px solid var(--border-color); cursor: pointer; color: var(--text-color);">
+                    <img src="https://www.google.com/favicon.ico" width="14" height="14">
+                    <span>${isNo ? 'Hent bilde fra Google' : (isEs ? 'Obtener foto de Google' : 'Fetch photo from Google')}</span>
+                </button>
+            </div>
         </div>
 
         <div class="profile-tabs-container">
@@ -3302,6 +3308,87 @@ class MinSideManager {
         container.querySelector('#ph-hero-file-input')?.addEventListener('change', e => {
             this.handlePhotoUpload(e);
         });
+
+        // Wire up Google Photo Sync button
+        const googlePhotoBtn = container.querySelector('#google-photo-btn');
+        if (googlePhotoBtn) {
+            googlePhotoBtn.onclick = async () => {
+                const originalBtnHtml = googlePhotoBtn.innerHTML;
+                googlePhotoBtn.disabled = true;
+                googlePhotoBtn.innerHTML = '<span class="material-symbols-outlined spinner" style="font-size: 14px; animation: spin 1s linear infinite;">sync</span> ' + (isNo ? 'Henter fra Google...' : 'Fetching...');
+
+                try {
+                    if (typeof firebase === 'undefined' || !firebase.auth) {
+                        throw new Error(isNo ? 'Firebase Auth er ikke tilgjengelig.' : 'Firebase Auth unavailable.');
+                    }
+
+                    let photoUrl = (this.currentUser?.providerData || []).find(pr => pr && pr.photoURL && pr.photoURL.includes('googleusercontent.com'))?.photoURL || '';
+
+                    if (!photoUrl || isDefaultAvatarUrl(photoUrl)) {
+                        const providerObj = new firebase.auth.GoogleAuthProvider();
+                        providerObj.addScope('profile');
+                        providerObj.addScope('email');
+                        providerObj.setCustomParameters({ prompt: 'select_account' });
+
+                        let authResult = null;
+                        try {
+                            if (this.currentUser && typeof this.currentUser.linkWithPopup === 'function') {
+                                try {
+                                    authResult = await this.currentUser.linkWithPopup(providerObj);
+                                } catch (linkErr) {
+                                    authResult = await firebase.auth().signInWithPopup(providerObj);
+                                }
+                            } else {
+                                authResult = await firebase.auth().signInWithPopup(providerObj);
+                            }
+                        } catch (popupErr) {
+                            if (popupErr.code === 'auth/popup-closed-by-user') {
+                                throw new Error(isNo ? 'Innloggingen ble lukket før kontoen ble valgt.' : 'Login closed before selecting account.');
+                            }
+                            throw new Error(popupErr.message || 'Could not open Google sign-in.');
+                        }
+
+                        if (authResult) {
+                            const u = authResult.user || firebase.auth().currentUser;
+                            photoUrl = authResult.additionalUserInfo?.profile?.picture
+                                    || u?.photoURL
+                                    || (u?.providerData && u.providerData.find(pr => pr && pr.photoURL)?.photoURL)
+                                    || '';
+                        }
+                    }
+
+                    if (photoUrl && photoUrl.includes('googleusercontent.com')) {
+                        photoUrl = photoUrl.replace(/=s\d+(-c)?/, '=s400-c');
+                    }
+
+                    if (!photoUrl || isDefaultAvatarUrl(photoUrl)) {
+                        throw new Error(isNo ? 'Fant ikke noe eget profilbilde på den valgte Google-kontoen.' : 'No profile photo found on the Google account.');
+                    }
+
+                    await this.currentUser.updateProfile({ photoURL: photoUrl });
+                    try { await this.currentUser.reload(); } catch (e) {}
+                    const currentName = p.displayName || this.currentUser.displayName || '';
+
+                    await firebase.firestore().collection('users').doc(this.currentUser.uid).set({
+                        photoURL: photoUrl,
+                        photo_url: photoUrl,
+                        photoUrl: photoUrl,
+                        avatarUrl: photoUrl,
+                        displayName: currentName,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+
+                    this._notify(isNo ? 'Profilbilde fra Google ble hentet og lagret!' : 'Google profile photo updated!', 'success');
+                    await this.renderProfile();
+                } catch (err) {
+                    console.error('Google photo sync error:', err);
+                    this._notify(err.message || (isNo ? 'Kunne ikke hente bilde fra Google.' : 'Failed to fetch photo from Google.'), 'warning');
+                } finally {
+                    googlePhotoBtn.disabled = false;
+                    googlePhotoBtn.innerHTML = originalBtnHtml;
+                }
+            };
+        }
 
         // Tab switching events
         const tabBtns = container.querySelectorAll('.profile-tab-btn');

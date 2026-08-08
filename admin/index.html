@@ -204,7 +204,11 @@
             body.minside-body #dashboard-main-header {
                 height: 72px !important;
                 min-height: 72px !important;
-                padding: 16px 32px !important;
+                max-height: 72px !important;
+                padding: 0 32px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
                 position: sticky !important;
                 top: 0 !important;
                 z-index: 1000 !important;
@@ -214,6 +218,25 @@
                 border-bottom: 1px solid rgba(27, 73, 101, 0.08) !important;
                 box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
                 margin-bottom: 24px !important;
+                box-sizing: border-box !important;
+            }
+
+            #dashboard-main-header .section-header.in-topbar,
+            #dashboard-main-header .design-ui-header.in-topbar,
+            #dashboard-main-header .in-topbar {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                width: 100% !important;
+                height: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                background: transparent !important;
+                overflow: visible !important;
             }
 
             #dashboard-main-header .section-header-titles {
@@ -279,9 +302,9 @@
             }
 
             /* Beautiful Soft Rounded Cards for Desktop */
-            .section-header,
-            .section-header.design-ui-header,
-            .design-ui-header,
+            .section-header:not(.in-topbar),
+            .section-header.design-ui-header:not(.in-topbar),
+            .design-ui-header:not(.in-topbar),
             .design-ui-panel,
             .card,
             .bento-card,
@@ -313,9 +336,9 @@
             }
 
             /* 16px internal padding for card bodies */
-            .section-header,
-            .section-header.design-ui-header,
-            .design-ui-header,
+            .section-header:not(.in-topbar),
+            .section-header.design-ui-header:not(.in-topbar),
+            .design-ui-header:not(.in-topbar),
             .profile-panel-body,
             .design-ui-panel-body,
             .card-body,
