@@ -2517,6 +2517,9 @@ class AdminManager {
         // Init Automation Modal
         this.initTemplateEditorModal();
 
+        // Universal Autosave System
+        this.setupUniversalAutosave();
+
         // Chart Dropdown Logic (Delegated)
         document.addEventListener('click', (e) => {
             const btn = e.target.closest('.chart-options-btn');
