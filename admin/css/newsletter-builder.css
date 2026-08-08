@@ -8961,3 +8961,16 @@ body.builder-active.sidebar-mini .sidebar .nav-link > span:not(.material-symbols
 body.builder-active .sidebar .nav-link {
     gap: 12px !important;
 }
+
+/* ==========================================================================
+   FORCE SIDEBAR VISIBLE WHEN ACTIVE (Overrides sidebar-collapsed)
+   ========================================================================== */
+body.builder-active.sidebar-collapsed .sidebar.active,
+body.builder-active.sidebar-mini .sidebar.active {
+    display: flex !important;
+    transform: translateX(0) !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    z-index: 9999 !important;
+}
