@@ -12074,6 +12074,7 @@ html[data-theme="dark"] .pco-menu-item:hover {
         width: 100% !important;
         max-width: 100vw !important;
         box-sizing: border-box !important;
+        overflow-x: hidden !important;
     }
 
     /* Reset inner container paddings & margins */
@@ -12263,11 +12264,18 @@ html[data-theme="dark"] .pco-menu-item:hover {
     grid-column: span 2;
 }
 
-@media (min-width: 769px) {
-    .crm-mobile-only {
-        display: none !important;
+@media (max-width: 768px) {
+    .causes-toolbar, .shop-toolbar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+    }
+    .causes-toolbar > div, .shop-toolbar > div {
+        flex-wrap: wrap !important;
+        width: 100% !important;
     }
 }
+
 
 
 

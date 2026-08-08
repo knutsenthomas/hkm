@@ -20592,8 +20592,8 @@ class AdminManager {
             </style>
 
             <!-- Tabs Navigation -->
-            <div class="causes-tabs-container" style="margin-bottom: 20px;">
-                <div class="automation-tabs" style="border-bottom: 2px solid #e2e8f0; background: #fff; border-radius: 12px 12px 0 0; padding: 0 20px; display: flex; align-items: center; gap: 8px; overflow-x: auto;">
+            <div class="causes-tabs-container" style="margin-bottom: 24px;">
+                <div class="automation-tabs" style="border: 1px solid #e2e8f0; background: #ffffff; border-radius: 12px; padding: 0 16px; display: flex; align-items: center; gap: 8px; overflow-x: auto; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
                     <button class="automation-tab active" data-tab="dashboard">Dashboard</button>
                     <button class="automation-tab" data-tab="causes">Innsamlinger</button>
                     <button class="automation-tab" data-tab="donations">Pr. gave</button>
@@ -20602,7 +20602,7 @@ class AdminManager {
                 </div>
                 
                 <!-- Toolbar for Filters and Actions -->
-                <div class="causes-toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 12px 16px; background: #ffffff; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px; margin-bottom: 20px;">
+                <div class="causes-toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 14px 18px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
                     <!-- Global Period Selector -->
                     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
                         <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 8px;">
@@ -21290,8 +21290,8 @@ class AdminManager {
 
         section.innerHTML = `
             <!-- Tabs Navigation -->
-            <div class="causes-tabs-container" style="margin-bottom: 20px; margin-top: 8px;">
-                <div class="automation-tabs" style="border-bottom: 2px solid #e2e8f0; background: #fff; border-radius: 12px 12px 0 0; padding: 0 20px; display: flex; align-items: center; gap: 8px; overflow-x: auto;">
+            <div class="causes-tabs-container" style="margin-bottom: 24px; margin-top: 8px;">
+                <div class="automation-tabs" style="border: 1px solid #e2e8f0; background: #ffffff; border-radius: 12px; padding: 0 16px; display: flex; align-items: center; gap: 8px; overflow-x: auto; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
                     <button class="automation-tab active" data-tab="wix">Oversikt</button>
                     <button class="automation-tab" data-tab="wix-orders">Ordrehistorikk</button>
                     <button class="automation-tab" data-tab="shop">Manuelle ordre</button>
@@ -21299,7 +21299,7 @@ class AdminManager {
                 </div>
                 
                 <!-- Toolbar for Period Selector -->
-                <div class="causes-toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 12px 16px; background: #ffffff; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px; margin-bottom: 20px;">
+                <div class="causes-toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 14px 18px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
                     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; width: 100%;">
                         <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 8px;">
                             <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; white-space: nowrap;">Periode:</label>
