@@ -1107,14 +1107,67 @@ const initAdminHeader = () => {
             searchBtn = newSearch;
         }
 
+        const ensureSearchModal = () => {
+            let modal = document.getElementById('search-modal') || document.getElementById('site-search-modal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'search-modal';
+                modal.className = 'search-overlay';
+                modal.innerHTML = `
+                    <div class="search-modal-container">
+                        <button id="close-search-modal" class="close-search-btn" aria-label="Lukk søk">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                        <div class="search-modal-title">Søk i systemet</div>
+                        <div class="search-input-group">
+                            <span class="material-symbols-outlined">search</span>
+                            <input type="text" id="global-modal-search-input" class="search-input-field"
+                                placeholder="Hva leter du etter? Skriv for forslag..." aria-label="Søk">
+                        </div>
+                        <div id="search-suggestions" class="search-suggestions-container" style="display: none;"></div>
+                        <div class="search-help-text">Trykk 'Enter' for fullstendig søk.</div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+
+                const closeBtn = modal.querySelector('#close-search-modal');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        modal.style.display = 'none';
+                        modal.classList.remove('active');
+                    });
+                }
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.style.display = 'none';
+                        modal.classList.remove('active');
+                    }
+                });
+            }
+            return modal;
+        };
+
         if (!searchBtn.dataset.bound) {
             searchBtn.dataset.bound = 'true';
             searchBtn.addEventListener('click', () => {
-                const searchModal = document.getElementById('search-modal') || document.getElementById('site-search-modal');
-                if (searchModal) {
+                const searchModal = ensureSearchModal();
+                searchModal.style.display = 'flex';
+                searchModal.classList.add('active');
+                const searchInput = document.getElementById('global-modal-search-input') || document.getElementById('site-search-input-v2') || document.getElementById('search-input-v2') || document.getElementById('site-search-input');
+                if (searchInput) setTimeout(() => searchInput.focus(), 50);
+            });
+        }
+
+        if (!window.__HKM_CMDK_BOUND) {
+            window.__HKM_CMDK_BOUND = true;
+            document.addEventListener('keydown', (e) => {
+                if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+                    e.preventDefault();
+                    const searchModal = ensureSearchModal();
+                    searchModal.style.display = 'flex';
                     searchModal.classList.add('active');
-                    const searchInput = document.getElementById('site-search-input-v2') || document.getElementById('search-input-v2') || document.getElementById('site-search-input');
-                    if (searchInput) searchInput.focus();
+                    const searchInput = document.getElementById('global-modal-search-input') || document.getElementById('site-search-input-v2') || document.getElementById('search-input-v2') || document.getElementById('site-search-input');
+                    if (searchInput) setTimeout(() => searchInput.focus(), 50);
                 }
             });
         }

@@ -7295,20 +7295,27 @@ class AdminManager {
                 };
             });
 
-            document.getElementById('hkm-crop-rotate-l').onclick = () => cropper && cropper.rotate(-90);
-            document.getElementById('hkm-crop-rotate-r').onclick = () => cropper && cropper.rotate(90);
-            document.getElementById('hkm-crop-zoom-in').onclick = () => cropper && cropper.zoom(0.1);
-            document.getElementById('hkm-crop-zoom-out').onclick = () => cropper && cropper.zoom(-0.1);
+            const rotL = document.getElementById('hkm-crop-rotate-l');
+            if (rotL) rotL.onclick = () => cropper && cropper.rotate(-90);
+            const rotR = document.getElementById('hkm-crop-rotate-r');
+            if (rotR) rotR.onclick = () => cropper && cropper.rotate(90);
+            const zoomIn = document.getElementById('hkm-crop-zoom-in');
+            if (zoomIn) zoomIn.onclick = () => cropper && cropper.zoom(0.1);
+            const zoomOut = document.getElementById('hkm-crop-zoom-out');
+            if (zoomOut) zoomOut.onclick = () => cropper && cropper.zoom(-0.1);
 
             const closeCrop = () => cropModal.remove();
-            document.getElementById('hkm-crop-close').onclick = closeCrop;
-            document.getElementById('hkm-crop-cancel').onclick = closeCrop;
+            const cropClose = document.getElementById('hkm-crop-close');
+            if (cropClose) cropClose.onclick = closeCrop;
+            const cropCancel = document.getElementById('hkm-crop-cancel');
+            if (cropCancel) cropCancel.onclick = closeCrop;
 
-            document.getElementById('hkm-crop-save').onclick = async () => {
-                if (!cropper) return;
-                const saveBtn = document.getElementById('hkm-crop-save');
-                saveBtn.disabled = true;
-                saveBtn.innerHTML = '<span class="material-symbols-outlined spinner" style="font-size: 18px; animation: spin 1s linear infinite;">sync</span><span>Lagrer...</span>';
+            const cropSaveBtn = document.getElementById('hkm-crop-save');
+            if (cropSaveBtn) {
+                cropSaveBtn.onclick = async () => {
+                    if (!cropper) return;
+                    cropSaveBtn.disabled = true;
+                    cropSaveBtn.innerHTML = '<span class="material-symbols-outlined spinner" style="font-size: 18px; animation: spin 1s linear infinite;">sync</span><span>Lagrer...</span>';
 
                 try {
                     const canvas = cropper.getCroppedCanvas({
@@ -7337,10 +7344,11 @@ class AdminManager {
                 } catch (err) {
                     console.error("Cropping failed:", err);
                     alert("En feil oppstod under beskjæring: " + err.message);
-                    saveBtn.disabled = false;
-                    saveBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px;">check</span><span>Lagre beskjæring</span>';
+                    cropSaveBtn.disabled = false;
+                    cropSaveBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px;">check</span><span>Lagre beskjæring</span>';
                 }
             };
+        }
         });
     }
 
