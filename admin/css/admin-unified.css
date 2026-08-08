@@ -1482,21 +1482,92 @@ body.admin-body .welcome-subtitle {
 }
 
 .design-ui-color-edit-grid {
-  margin-top: 6px;
-  gap: 10px;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)) !important;
+  gap: 12px 14px !important;
+  margin-top: 6px !important;
+}
+
+.design-ui-color-edit-grid .form-group {
+  margin-bottom: 0 !important;
 }
 
 .design-ui-color-edit-grid .form-group label {
-  font-size: 12px;
-  margin-bottom: 6px;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  color: #64748b !important;
+  margin-bottom: 4px !important;
+  display: block !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
+.design-ui-color-controls .premium-color-wrapper,
 .design-ui-color-edit-grid .premium-color-wrapper {
-  max-width: none;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: #f8fafc !important;
+  padding: 4px 8px !important;
+  border-radius: 10px !important;
+  border: 1px solid #e2e8f0 !important;
+  height: 38px !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+  transition: all 0.15s ease !important;
 }
 
-.design-ui-primary-color-input {
-  max-width: 320px;
+.design-ui-color-controls .premium-color-wrapper:hover,
+.design-ui-color-controls .premium-color-wrapper:focus-within {
+  border-color: #cbd5e1 !important;
+  background: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+}
+
+.design-ui-color-controls .premium-color-picker-input,
+.design-ui-color-edit-grid .premium-color-picker-input {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  border: none !important;
+  width: 26px !important;
+  height: 26px !important;
+  min-width: 26px !important;
+  min-height: 26px !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  background: none !important;
+  padding: 0 !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12) !important;
+}
+
+.design-ui-color-controls .premium-color-picker-input::-webkit-color-swatch-wrapper,
+.design-ui-color-edit-grid .premium-color-picker-input::-webkit-color-swatch-wrapper {
+  padding: 0 !important;
+}
+
+.design-ui-color-controls .premium-color-picker-input::-webkit-color-swatch,
+.design-ui-color-edit-grid .premium-color-picker-input::-webkit-color-swatch {
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  border-radius: 6px !important;
+}
+
+.design-ui-color-controls .premium-color-hex,
+.design-ui-color-edit-grid .premium-color-hex {
+  flex: 1 !important;
+  min-width: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  font-family: "Fira Code", ui-monospace, SFMono-Regular, monospace !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+  text-transform: uppercase !important;
+  padding: 0 !important;
+  height: 100% !important;
+  outline: none !important;
 }
 
 .design-ui-inline-help {

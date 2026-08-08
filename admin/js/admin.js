@@ -14939,14 +14939,14 @@ class AdminManager {
                             </div>
                             <div class="design-ui-panel-body">
                                 <div class="design-ui-color-controls">
-                                    <div class="form-group" style="margin-bottom:0;">
-                                        <label>Primærfarge (HKM)</label>
-                                        <div class="premium-color-wrapper design-ui-primary-color-input">
-                                            <input type="color" id="primary-color-picker" class="premium-color-picker-input" value="#F97316">
-                                            <input type="text" id="primary-color-hex" class="premium-color-hex" value="#F97316" placeholder="#F97316">
-                                        </div>
-                                    </div>
                                     <div class="design-ui-form-grid design-ui-color-edit-grid">
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Primærfarge (HKM)</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="primary-color-picker" class="premium-color-picker-input" value="#F97316">
+                                                <input type="text" id="primary-color-hex" class="premium-color-hex" value="#F97316" placeholder="#F97316">
+                                            </div>
+                                        </div>
                                         <div class="form-group" style="margin-bottom:0;">
                                             <label>Sekundærfarge</label>
                                             <div class="premium-color-wrapper">
