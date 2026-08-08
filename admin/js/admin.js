@@ -2782,6 +2782,9 @@ class AdminManager {
         const triggerSave = () => {
             const badge = document.getElementById(badgeId) || document.getElementById('global-topbar-autosave-badge');
             if (badge) {
+                if (badge.parentElement && badge.parentElement.id === 'topbar-dynamic-actions') {
+                    badge.parentElement.style.display = 'inline-flex';
+                }
                 badge.style.display = 'inline-flex';
                 badge.style.opacity = '1';
                 badge.style.background = 'rgba(209, 125, 57, 0.12)';
@@ -2798,6 +2801,9 @@ class AdminManager {
                         await this.autoSaveCurrentSection(sectionElement);
                     }
                     if (badge) {
+                        if (badge.parentElement && badge.parentElement.id === 'topbar-dynamic-actions') {
+                            badge.parentElement.style.display = 'inline-flex';
+                        }
                         const now = new Date();
                         const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                         badge.style.display = 'inline-flex';
@@ -2813,6 +2819,9 @@ class AdminManager {
                 } catch (err) {
                     console.error('[Autosave] error:', err);
                     if (badge) {
+                        if (badge.parentElement && badge.parentElement.id === 'topbar-dynamic-actions') {
+                            badge.parentElement.style.display = 'inline-flex';
+                        }
                         badge.style.display = 'inline-flex';
                         badge.style.opacity = '1';
                         badge.style.background = 'rgba(239, 68, 68, 0.12)';
