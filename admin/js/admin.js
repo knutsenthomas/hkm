@@ -2880,51 +2880,13 @@ class AdminManager {
     }
 
     setupUniversalAutosave() {
-        console.log('[AdminManager] Universal Autosave system active.');
-
-        // 1. Ensure global topbar autosave badge exists in topbar
-        let globalBadge = document.getElementById('global-topbar-autosave-badge');
-        if (!globalBadge) {
-            const dynamicContainer = document.getElementById('topbar-dynamic-actions') || document.querySelector('.section-header-actions');
-            if (dynamicContainer) {
-                globalBadge = document.createElement('div');
-                globalBadge.id = 'global-topbar-autosave-badge';
-                globalBadge.className = 'autosave-pill';
-                globalBadge.style.cssText = 'display: none; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 12px; transition: all 0.3s ease; white-space: nowrap; margin-right: 6px;';
-                dynamicContainer.prepend(globalBadge);
-            }
+        console.log('[AdminManager] Universal Autosave system disabled.');
+        if (this._autosaveObserver) {
+            try { this._autosaveObserver.disconnect(); } catch (e) {}
+            this._autosaveObserver = null;
         }
-
-        // 2. Attach autosave to explicit containers with [data-autosave-badge]
-        const autoSaveContainers = document.querySelectorAll('[data-autosave-badge]');
-        autoSaveContainers.forEach(container => {
-            const badgeId = container.getAttribute('data-autosave-badge') || 'global-topbar-autosave-badge';
-            const saveHandlerName = container.getAttribute('data-autosave-handler');
-            const saveCallback = (typeof this[saveHandlerName] === 'function')
-                ? this[saveHandlerName].bind(this)
-                : null;
-            this.attachAutosaveToSection(container, badgeId, saveCallback);
-        });
-
-        // 3. Attach autosave to all section content forms and active modals automatically
-        const allSections = document.querySelectorAll('.section-content, .crm-content, .modal-content, .main-content');
-        allSections.forEach(section => {
-            this.attachAutosaveToSection(section, 'global-topbar-autosave-badge');
-        });
-
-        // 4. MutationObserver for dynamic modals or forms added later
-        if (!this._autosaveObserver) {
-            this._autosaveObserver = new MutationObserver(() => {
-                const unattachedInputs = document.querySelectorAll('input:not([data-autosave-bound="true"]), select:not([data-autosave-bound="true"]), textarea:not([data-autosave-bound="true"])');
-                if (unattachedInputs.length > 0) {
-                    const dynamicContainers = document.querySelectorAll('.section-content, .crm-content, .modal-content, .main-content');
-                    dynamicContainers.forEach(container => {
-                        this.attachAutosaveToSection(container, 'global-topbar-autosave-badge');
-                    });
-                }
-            });
-            this._autosaveObserver.observe(document.body, { childList: true, subtree: true });
-        }
+        const globalBadge = document.getElementById('global-topbar-autosave-badge');
+        if (globalBadge) globalBadge.style.display = 'none';
     }
 
     /**
