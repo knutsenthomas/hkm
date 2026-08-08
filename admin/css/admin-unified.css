@@ -2348,6 +2348,7 @@ body.crm-body .crm-table {
   color: var(--admin-text, #0f172a);
   border-bottom: 1px solid var(--admin-border, #e2e8f0);
   vertical-align: middle;
+  white-space: nowrap;
 }
 
 .crm-table th:first-child,
