@@ -8884,3 +8884,42 @@ body.builder-active .sidebar .mobile-sidebar-close-btn {
         box-sizing: border-box !important;
     }
 }
+
+/* ==========================================================================
+   FORCE LEFT ALIGNMENT ON BUILDER DRAWER SIDEBAR (Overrides sidebar-mini)
+   ========================================================================== */
+body.builder-active .sidebar .nav-list,
+body.builder-active .sidebar .nav-group,
+body.builder-active .sidebar-nav,
+body.builder-active .sidebar {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    text-align: left !important;
+}
+
+body.builder-active .sidebar .nav-item {
+    display: block !important;
+    width: 100% !important;
+    text-align: left !important;
+}
+
+body.builder-active .sidebar .nav-link {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+body.builder-active .sidebar .nav-category-header {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    text-align: left !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
