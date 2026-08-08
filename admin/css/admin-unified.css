@@ -12362,7 +12362,7 @@ html[data-theme="dark"] .pco-menu-item:hover {
 }
 
 /* ==========================================================================
-   ULTRA-HIGH SPECIFICITY ZERO-CAPSULE 44px AVATAR ENGINE FIX
+   ULTRA-HIGH SPECIFICITY ZERO-CAPSULE 42px AVATAR ENGINE FIX
    Guarantees 100% parity & zero white background box across all devices & pages
    ========================================================================== */
 html body .user-profile-link,
@@ -12383,12 +12383,12 @@ html body .section-header-actions #admin-profile-trigger {
     padding: 0 !important;
     margin: 0 !important;
     outline: none !important;
-    width: 44px !important;
-    height: 44px !important;
-    min-width: 44px !important;
-    min-height: 44px !important;
-    max-width: 44px !important;
-    max-height: 44px !important;
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    max-width: 42px !important;
+    max-height: 42px !important;
     border-radius: 12px !important;
     overflow: hidden !important;
     display: inline-flex !important;
@@ -12408,12 +12408,12 @@ html body #admin-profile-trigger [id="admin-avatar"],
 html body .user-avatar,
 html body [id="ph-avatar"],
 html body [id="admin-avatar"] {
-    width: 44px !important;
-    height: 44px !important;
-    min-width: 44px !important;
-    min-height: 44px !important;
-    max-width: 44px !important;
-    max-height: 44px !important;
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    max-width: 42px !important;
+    max-height: 42px !important;
     border-radius: 12px !important;
     border: 1.5px solid rgba(15, 23, 42, 0.12) !important;
     box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06) !important;
