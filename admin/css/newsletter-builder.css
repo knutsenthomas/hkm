@@ -8943,3 +8943,21 @@ body.builder-active .sidebar .nav-category-header {
         display: none !important;
     }
 }
+
+/* ==========================================================================
+   FIX BUILDER DRAWER ICON GAP (Override sidebar-mini margin)
+   ========================================================================== */
+body.builder-active.sidebar-mini .sidebar .nav-link span:first-child,
+body.builder-active.sidebar-mini .sidebar .nav-link .material-symbols-outlined {
+    margin: 0 !important;
+    width: auto !important;
+    justify-content: flex-start !important;
+}
+
+body.builder-active.sidebar-mini .sidebar .nav-link > span:not(.material-symbols-outlined) {
+    display: inline-block !important;
+}
+
+body.builder-active .sidebar .nav-link {
+    gap: 12px !important;
+}
