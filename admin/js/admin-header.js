@@ -11,6 +11,7 @@ const initAdminHeader = () => {
     const SIDEBAR_MINI_KEY = 'hkm_admin_sidebar_mini';
 
     const applySidebarMiniState = (isMini) => {
+        if (document.body.classList.contains('builder-active')) { isMini = false; }
         if (window.innerWidth >= 1025) {
             document.body.classList.toggle('sidebar-mini', isMini);
             if (isMini) {
