@@ -249,7 +249,9 @@ const initAdminHeader = () => {
 
     const formatPhotoUrl = (url) => {
         if (!url || typeof url !== 'string') return '';
-        return url.trim();
+        let cleaned = url.trim().replace(/&amp;/g, '&');
+        if (cleaned.startsWith('//')) cleaned = 'https:' + cleaned;
+        return cleaned;
     };
 
     const renderIdentity = (displayName, photoURL) => {
@@ -275,7 +277,7 @@ const initAdminHeader = () => {
                 adminAvatar.dataset.photoUrl = formattedPhoto;
                 adminAvatar.classList.remove('has-initials');
                 const escapedName = safeName.replace(/"/g, '&quot;');
-                adminAvatar.innerHTML = `<img src="${formattedPhoto}" alt="${escapedName}" referrerpolicy="no-referrer" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; display:block;" onerror="this.onerror=null; this.parentElement.classList.add('has-initials'); this.parentElement.innerHTML='<span class=\\'avatar-initials-text\\' style=\\'position:relative; z-index:1;\\'>${initials}</span>';">`;
+                adminAvatar.innerHTML = `<img src="${formattedPhoto}" alt="${escapedName}" referrerpolicy="no-referrer" loading="eager" decoding="sync" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; display:block; position:absolute; inset:0; z-index:2;" onerror="this.style.display='none'; this.parentElement.classList.add('has-initials');"><span class="avatar-initials-text" style="position:relative; z-index:1;">${initials}</span>`;
             } else {
                 adminAvatar.classList.add('has-initials');
                 adminAvatar.innerHTML = `<span class="avatar-initials-text" style="position:relative; z-index:1;">${initials}</span>`;

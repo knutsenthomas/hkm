@@ -1559,22 +1559,24 @@ class MinSideManager {
     _setAvatarEl(el, photoURL, name) {
         if (!el) return;
         
-        if (photoURL) {
+        let cleanedUrl = photoURL ? String(photoURL).trim().replace(/&amp;/g, '&') : '';
+        if (cleanedUrl.startsWith('//')) cleanedUrl = 'https:' + cleanedUrl;
+
+        const initials = (name || '?')
+            .split(' ')
+            .filter(n => n.length > 0)
+            .map(n => n[0].toUpperCase())
+            .slice(0, 2)
+            .join('') || '?';
+
+        if (cleanedUrl && cleanedUrl.length > 5) {
             el.classList.remove('has-initials');
-            el.innerHTML = `<img src="${photoURL}" alt="${name}" style="width: 100%; height: 100%; border-radius: inherit; object-fit: cover;">`;
+            el.dataset.photoUrl = cleanedUrl;
+            el.innerHTML = `<img src="${cleanedUrl}" alt="${name || ''}" referrerpolicy="no-referrer" loading="eager" decoding="sync" style="width: 100%; height: 100%; border-radius: inherit; object-fit: cover; position: absolute; inset: 0; z-index: 2;" onerror="this.style.display='none'; this.parentElement.classList.add('has-initials');"><span style="color: white !important; font-weight: 900 !important; visibility: visible !important; opacity: 1 !important; display: block !important; position: relative; z-index: 1;">${initials}</span>`;
         } else {
             el.classList.add('has-initials');
-            const initials = (name || '?')
-                .split(' ')
-                .filter(n => n.length > 0)
-                .map(n => n[0].toUpperCase())
-                .slice(0, 2)
-                .join('');
-            
-            el.innerHTML = `<span style="color: white !important; font-weight: 900 !important; visibility: visible !important; opacity: 1 !important; display: block !important;">${initials || '?'}</span>`;
+            el.innerHTML = `<span style="color: white !important; font-weight: 900 !important; visibility: visible !important; opacity: 1 !important; display: block !important; position: relative; z-index: 1;">${initials}</span>`;
         }
-        
-        if (photoURL) el.dataset.photoUrl = photoURL;
     }
 
     applyBottomNavSettings(activeIds) {
