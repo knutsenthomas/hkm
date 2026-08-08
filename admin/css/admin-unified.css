@@ -12361,6 +12361,97 @@ html[data-theme="dark"] .pco-menu-item:hover {
     box-sizing: border-box !important;
 }
 
+/* ==========================================================================
+   ULTRA-HIGH SPECIFICITY ZERO-CAPSULE 44px AVATAR ENGINE FIX
+   Guarantees 100% parity & zero white background box across all devices & pages
+   ========================================================================== */
+html body .user-profile-link,
+html body #actions-btn,
+html body #admin-profile-trigger,
+html body.admin-body .main-header .user-profile-link,
+html body.minside-body .main-header .user-profile-link,
+html body.admin-body #dashboard-main-header .user-profile-link,
+html body.minside-body #dashboard-main-header .user-profile-link,
+html body .section-header-actions .user-profile-link,
+html body .section-header-actions #actions-btn,
+html body .section-header-actions #admin-profile-trigger {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    outline: none !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    max-width: 44px !important;
+    max-height: 44px !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+    flex-shrink: 0 !important;
+}
+
+html body .user-profile-link .user-avatar,
+html body .user-profile-link [id="ph-avatar"],
+html body .user-profile-link [id="admin-avatar"],
+html body #actions-btn .user-avatar,
+html body #actions-btn [id="ph-avatar"],
+html body #admin-profile-trigger .user-avatar,
+html body #admin-profile-trigger [id="admin-avatar"],
+html body .user-avatar,
+html body [id="ph-avatar"],
+html body [id="admin-avatar"] {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    max-width: 44px !important;
+    max-height: 44px !important;
+    border-radius: 12px !important;
+    border: 1.5px solid rgba(15, 23, 42, 0.12) !important;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    background: linear-gradient(135deg, #cc6f2c 0%, #f97316 100%) !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    font-size: 15px !important;
+    box-sizing: border-box !important;
+}
+
+html body .user-profile-link .user-avatar img,
+html body .user-profile-link [id="ph-avatar"] img,
+html body .user-profile-link [id="admin-avatar"] img,
+html body #actions-btn img,
+html body #admin-profile-trigger img,
+html body .user-avatar img,
+html body [id="ph-avatar"] img,
+html body [id="admin-avatar"] img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: inherit !important;
+    display: block !important;
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 2 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
 
 
 
