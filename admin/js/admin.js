@@ -25673,12 +25673,14 @@ class AdminManager {
                         <div class="design-ui-main-column">
                             <div class="design-ui-panel design-ui-panel--seo">
                                 <div class="design-ui-panel-header">
-                                    <div class="design-ui-panel-header-icon">
-                                        <span class="material-symbols-outlined">language</span>
-                                    </div>
-                                    <div>
-                                        <h3 class="design-ui-panel-title">Hovedinformasjon</h3>
-                                        <p class="design-ui-panel-subtitle">Metadata som leses av søkemotorer.</p>
+                                    <div class="design-ui-panel-header-main">
+                                        <div class="design-ui-panel-header-icon">
+                                            <span class="material-symbols-outlined">language</span>
+                                        </div>
+                                        <div>
+                                            <h3 class="design-ui-panel-title">Hovedinformasjon</h3>
+                                            <p class="design-ui-panel-subtitle">Metadata som leses av søkemotorer.</p>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="design-ui-panel-body">
@@ -25700,12 +25702,14 @@ class AdminManager {
 
                             <div class="design-ui-panel">
                                 <div class="design-ui-panel-header">
-                                    <div class="design-ui-panel-header-icon">
-                                        <span class="material-symbols-outlined">share</span>
-                                    </div>
-                                    <div>
-                                        <h3 class="design-ui-panel-title">Sosiale Medier (Open Graph)</h3>
-                                        <p class="design-ui-panel-subtitle">Bildet som vises når du deler linker på Facebook, LinkedIn og SMS.</p>
+                                    <div class="design-ui-panel-header-main">
+                                        <div class="design-ui-panel-header-icon">
+                                            <span class="material-symbols-outlined">share</span>
+                                        </div>
+                                        <div>
+                                            <h3 class="design-ui-panel-title">Sosiale Medier (Open Graph)</h3>
+                                            <p class="design-ui-panel-subtitle">Bildet som vises når du deler linker på Facebook, LinkedIn og SMS.</p>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="design-ui-panel-body">
@@ -25727,11 +25731,13 @@ class AdminManager {
                         <aside class="design-ui-side-column">
                             <div class="design-ui-panel design-ui-help-panel design-ui-panel--help">
                                 <div class="design-ui-panel-header design-ui-panel-header--compact">
-                                    <div class="design-ui-panel-header-icon">
-                                        <span class="material-symbols-outlined">auto_awesome</span>
-                                    </div>
-                                    <div>
-                                        <h3 class="design-ui-panel-title">AI-Søk Optimalisering</h3>
+                                    <div class="design-ui-panel-header-main">
+                                        <div class="design-ui-panel-header-icon">
+                                            <span class="material-symbols-outlined">auto_awesome</span>
+                                        </div>
+                                        <div>
+                                            <h3 class="design-ui-panel-title">AI-Søk Optimalisering</h3>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="design-ui-panel-body">
@@ -25756,8 +25762,8 @@ class AdminManager {
 
                     <div class="design-ui-full-stack">
                         <div class="design-ui-panel">
-                            <div class="design-ui-panel-header" style="display: flex; justify-content: space-between; align-items: center;">
-                                <div style="display: flex; align-items: center; gap: 16px;">
+                            <div class="design-ui-panel-header">
+                                <div class="design-ui-panel-header-main">
                                     <div class="design-ui-panel-header-icon">
                                         <span class="material-symbols-outlined">description</span>
                                     </div>

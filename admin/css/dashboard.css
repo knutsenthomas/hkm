@@ -7977,15 +7977,15 @@ html body.minside-body .design-ui-panel-header {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    justify-content: space-between !important;
+    justify-content: flex-start !important;
     padding: 16px 20px !important;
-    gap: 16px !important;
+    gap: 14px !important;
     background: #ffffff !important;
     border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
 }
 
-html body.admin-body .design-ui-panel-header > div:first-child,
-html body.minside-body .design-ui-panel-header > div:first-child {
+html body.admin-body .design-ui-panel-header-main,
+html body.minside-body .design-ui-panel-header-main {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
@@ -8037,6 +8037,21 @@ html body.minside-body .design-ui-panel-subtitle {
     margin: 2px 0 0 !important;
     padding: 0 !important;
 }
+
+/* Any right-side action container or select element in panel headers */
+html body.admin-body .design-ui-panel-header > .design-ui-panel-actions,
+html body.admin-body .design-ui-panel-header > .design-ui-actions,
+html body.admin-body .design-ui-panel-header > div:has(select),
+html body.admin-body .design-ui-panel-header > div:has(button),
+html body.admin-body .design-ui-panel-header > select,
+html body.minside-body .design-ui-panel-header > .design-ui-panel-actions,
+html body.minside-body .design-ui-panel-header > .design-ui-actions,
+html body.minside-body .design-ui-panel-header > div:has(select),
+html body.minside-body .design-ui-panel-header > div:has(button),
+html body.minside-body .design-ui-panel-header > select {
+    margin-left: auto !important;
+}
+
 
 
 
