@@ -2323,6 +2323,23 @@ class AdminManager {
             return url.trim();
         };
 
+        let effectivePhoto = formatPhotoUrl(photoURL);
+        if (!effectivePhoto || isDefaultAvatarUrl(effectivePhoto)) {
+            try {
+                const adm = localStorage.getItem('hkm_admin_identity_cache');
+                const pub = localStorage.getItem('hkm_public_user_cache');
+                if (adm) {
+                    const parsed = JSON.parse(adm);
+                    if (parsed?.photoURL && !isDefaultAvatarUrl(parsed.photoURL)) effectivePhoto = parsed.photoURL;
+                }
+                if (!effectivePhoto && pub) {
+                    const parsedPub = JSON.parse(pub);
+                    const pUrl = parsedPub?.photoURL || parsedPub?.photoUrl || parsedPub?.avatarUrl || parsedPub?.profileImage || '';
+                    if (pUrl && !isDefaultAvatarUrl(pUrl)) effectivePhoto = pUrl;
+                }
+            } catch (e) {}
+        }
+
         const safeName = (name || '').trim() || 'Administrator';
         if (adminName) adminName.textContent = safeName;
         const avatars = getAvatars();
@@ -2330,7 +2347,7 @@ class AdminManager {
 
         const initials = safeName.split(' ').map(n => n.trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase() || 'A';
         const shortInitials = initials.substring(0, 2);
-        const formattedPhoto = formatPhotoUrl(photoURL);
+        const formattedPhoto = formatPhotoUrl(effectivePhoto);
         const isCustomPhoto = formattedPhoto && formattedPhoto.length > 5 && !isDefaultAvatarUrl(formattedPhoto);
 
         avatars.forEach(adminAvatar => {
