@@ -13179,7 +13179,7 @@ html body.minside-body .design-ui-panel-header > select {
                 border: 1px solid rgba(219, 228, 239, 0.8) !important;
                 box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04) !important;
                 box-sizing: border-box !important;
-                background: #ffffff !important;
+                background: #ffffff;
                 overflow: hidden !important;
             }
 
