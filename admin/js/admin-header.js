@@ -15,9 +15,6 @@ const initAdminHeader = () => {
             document.body.classList.toggle('sidebar-mini', isMini);
             if (isMini) {
                 document.querySelectorAll('.nav-item[data-nav-category]').forEach(item => {
-                    item.style.setProperty('display', 'flex', 'important');
-                    item.style.setProperty('visibility', 'visible', 'important');
-                    item.style.setProperty('opacity', '1', 'important');
                     item.classList.remove('nav-cat-hidden');
                     item.classList.add('visible');
                 });
@@ -630,7 +627,7 @@ const initAdminHeader = () => {
                 // Delay redirect slightly to avoid false positives during transient auth refresh.
                 pendingAuthRedirect = setTimeout(() => {
                     if (!firebaseService?.auth?.currentUser) {
-                        // window.location.href = '/admin/login.html';
+                        window.location.href = '/admin/login.html';
                     }
                 }, 2500);
                 return;
@@ -749,7 +746,7 @@ const initAdminHeader = () => {
                 } catch (e) { }
                 logoutBtn.innerHTML = originalHtml;
                 logoutBtn.disabled = false;
-                window.location.replace('/admin/login.html');
+                // disabled redirect
             }
         });
     };
@@ -855,9 +852,8 @@ const initAdminHeader = () => {
         window.hkmRestoreSidebarCategories = () => {
             if (document.body.classList.contains('sidebar-mini')) {
                 document.querySelectorAll('.nav-item[data-nav-category]').forEach(item => {
-                    item.style.setProperty('display', 'flex', 'important');
-                    item.style.setProperty('visibility', 'visible', 'important');
-                    item.style.setProperty('opacity', '1', 'important');
+                    item.classList.remove('nav-cat-hidden');
+                    item.classList.add('visible');
                 });
                 return;
             }
@@ -888,16 +884,12 @@ const initAdminHeader = () => {
                 items.forEach(item => {
                     item.classList.remove('nav-cat-hidden');
                     item.classList.add('visible');
-                    item.style.setProperty('display', 'flex', 'important');
-                    item.style.setProperty('visibility', 'visible', 'important');
-                    item.style.setProperty('opacity', '1', 'important');
                 });
             } else {
                 header.classList.add('collapsed');
                 items.forEach(item => {
                     item.classList.add('nav-cat-hidden');
                     item.classList.remove('visible');
-                    item.style.setProperty('display', 'none', 'important');
                 });
             }
         }

@@ -402,7 +402,7 @@ class NewsletterBuilder {
     startAuthListener() {
         window.firebaseService.onAuthChange(async (user) => {
             if (!user) {
-                // window.location.href = '/admin/login.html';
+                window.location.href = '/admin/login.html';
             } else {
                 console.log("[newsletter-builder] User is authenticated. Loading data...");
                 await this.loadTemplates();

@@ -13489,3 +13489,19 @@ html body.minside-body .design-ui-panel-header > select {
             margin: 0 !important;
             margin-top: 4px !important;
         }
+
+/* Fix for layout shifts when toggling builder or resizing */
+.sidebar .nav-item.nav-cat-hidden {
+    display: none !important;
+}
+.sidebar .nav-item.visible {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+body.sidebar-mini .sidebar .nav-item {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
