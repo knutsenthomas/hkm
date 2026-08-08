@@ -716,7 +716,7 @@
                 if (centerTextEl) centerTextEl.textContent = 'laster...';
 
                 try {
-                    let user = (typeof firebase !== 'undefined' && firebase.apps.length > 0 && firebase.auth && firebase.auth().currentUser) || (window.firebaseService && window.firebaseService.auth && window.firebaseService.auth.currentUser);
+                    let user = (typeof firebase !== 'undefined' && firebase.apps.length > 0 && firebase.auth && firebase.auth().currentUser);
                     let idToken = '';
                     if (user && typeof user.getIdToken === 'function') {
                         try { idToken = await user.getIdToken(); } catch (e) {}
@@ -724,7 +724,7 @@
                     if (!idToken) {
                         for (let i = 0; i < 6; i++) {
                             await new Promise(r => setTimeout(r, 200));
-                            const u = (typeof firebase !== 'undefined' && firebase.apps.length > 0 && firebase.auth && firebase.auth().currentUser) || (window.firebaseService && window.firebaseService.auth && window.firebaseService.auth.currentUser);
+                            const u = (typeof firebase !== 'undefined' && firebase.apps.length > 0 && firebase.auth && firebase.auth().currentUser);
                             if (u && typeof u.getIdToken === 'function') {
                                 try { idToken = await u.getIdToken(); break; } catch (e) {}
                             }
@@ -1133,30 +1133,16 @@
 
             // Lytter på Auth-endringer for å hente ekte data så snart bruker er klar
             const initAuthListener = async () => {
-                let service = window.firebaseService;
+                let authReady = false;
                 for (let i = 0; i < 20; i++) {
-                    if (service && service.isInitialized) break;
+                    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && firebase.auth) {
+                        authReady = true;
+                        break;
+                    }
                     await new Promise(r => setTimeout(r, 100));
-                    service = window.firebaseService;
                 }
 
-                if (service && service.isInitialized) {
-                    service.onAuthChange((user) => {
-                        if (user) {
-                            const banner = document.getElementById('analytics-error-banner');
-                            if (banner) banner.style.display = 'none';
-                            loadRealAnalytics(7); // Hent siste 7 dager som standard
-                        } else {
-                            clearAnalyticsToEmpty();
-                            setTimeout(() => {
-                                if (window.firebaseService && !window.firebaseService.auth.currentUser) {
-                                    showDashboardError("Du er ikke logget inn i Firebase. Vennligst logg inn på nytt for å se statistikk.", 'warning');
-                                }
-                            }, 2000);
-                        }
-                    });
-                } else if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-                    // Fallback to legacy auth listener
+                if (authReady) {
                     firebase.auth().onAuthStateChanged((user) => {
                         if (user) {
                             const banner = document.getElementById('analytics-error-banner');
