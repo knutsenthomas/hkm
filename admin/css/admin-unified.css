@@ -1881,16 +1881,10 @@ body.admin-body .welcome-subtitle {
 .design-ui-brand-profile {
   position: relative;
   min-height: 192px;
-  color: #fff;
+  color: #ffffff !important;
   border-color: rgba(15, 23, 42, 0.18);
-  background:
-    radial-gradient(
-      circle at 18% 22%,
-      rgba(255, 255, 255, 0.14) 0,
-      rgba(255, 255, 255, 0.02) 46%,
-      transparent 47%
-    ),
-    linear-gradient(145deg, #1e293b 0%, #0f172a 60%, #111827 100%);
+  background: linear-gradient(145deg, #1e293b 0%, #0f172a 60%, #111827 100%) !important;
+  overflow: hidden;
 }
 
 .design-ui-brand-profile-bg {
@@ -1900,13 +1894,13 @@ body.admin-body .welcome-subtitle {
   background:
     radial-gradient(
       circle at 82% 82%,
-      color-mix(in srgb, var(--design-brand-primary, #f97316) 28%, transparent)
+      color-mix(in srgb, var(--design-brand-primary, #f97316) 35%, transparent)
         0,
       transparent 55%
     ),
     radial-gradient(
       circle at 88% 20%,
-      color-mix(in srgb, var(--design-brand-primary, #f97316) 22%, transparent)
+      color-mix(in srgb, var(--design-brand-primary, #f97316) 25%, transparent)
         0,
       transparent 48%
     );
@@ -1924,15 +1918,17 @@ body.admin-body .welcome-subtitle {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.75) !important;
 }
 
-.design-ui-brand-profile h3 {
+.design-ui-brand-profile h3,
+.design-ui-brand-profile h2 {
   margin: 8px 0 0;
   font-size: 24px;
   font-weight: 800;
   line-height: 1.2;
   letter-spacing: -0.02em;
+  color: #ffffff !important;
 }
 
 /* Global Admin Pills / Badges */
@@ -1998,7 +1994,7 @@ body.admin-body .welcome-subtitle {
 
 .design-ui-brand-profile p {
   margin: 8px 0 0;
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(255, 255, 255, 0.92) !important;
   font-size: 14px;
   line-height: 1.5;
   max-width: 100%;
@@ -2016,9 +2012,9 @@ body.admin-body .welcome-subtitle {
   padding: 6px 12px;
   font-size: 12px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.95);
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.95) !important;
+  background: rgba(255, 255, 255, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
 }
 
 @media (max-width: 1180px) {
