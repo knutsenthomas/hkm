@@ -164,7 +164,7 @@
 .todo-quick-label {
     font-size: 10px;
     font-weight: 700;
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
     letter-spacing: 0.06em;
     color: #64748b;
     padding-left: 2px;
@@ -225,7 +225,7 @@
 /* 6. Section Titles */
 .todo-drawer-list-title {
     font-size: 11px;
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
     letter-spacing: 0.06em;
     color: #1B4965;
     font-weight: 700;

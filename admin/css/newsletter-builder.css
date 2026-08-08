@@ -698,7 +698,7 @@
     font-size: 12px !important;
     font-weight: 700 !important;
     color: #64748b !important;
-    text-transform: uppercase !important;
+    /* text-transform: uppercase; removed by request */
     letter-spacing: 0.5px !important;
     border-bottom: 1px solid #e2e8f0 !important;
 }
@@ -892,7 +892,7 @@
     font-size: 11px !important;
     font-weight: 700 !important;
     color: #64748b !important;
-    text-transform: uppercase !important;
+    /* text-transform: uppercase; removed by request */
     letter-spacing: 0.05em !important;
     margin-bottom: 10px !important;
 }
@@ -1158,7 +1158,7 @@
     font-size: 11px !important;
     font-weight: 700 !important;
     color: #64748b !important;
-    text-transform: uppercase !important;
+    /* text-transform: uppercase; removed by request */
     letter-spacing: 0.05em !important;
     margin-bottom: 12px !important;
 }
@@ -1558,7 +1558,7 @@
     font-size: 12px !important;
     font-weight: 700 !important;
     color: #64748b !important;
-    text-transform: uppercase !important;
+    /* text-transform: uppercase; removed by request */
     letter-spacing: 0.04em !important;
     margin-bottom: 10px !important;
 }
@@ -2186,7 +2186,7 @@ body.builder-active #newsletter-builder-layout {
 
 .templates-section-modern h3 {
     font-size: 13px;
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
     letter-spacing: 0.05em;
     color: var(--text-muted);
     margin-bottom: 16px;
@@ -2565,7 +2565,7 @@ body.builder-active .builder-workspace > .canvas-container {
     font-weight: 600;
     color: var(--text-muted);
     margin-bottom: 12px;
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
     letter-spacing: 0.05em;
 }
 
@@ -3175,7 +3175,7 @@ body.builder-recipients-open .drawer-inner-content {
     letter-spacing: 0.5px;
     padding: 3px 10px;
     border-radius: 999px;
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
 }
 
 .status-pill-live {
@@ -3371,7 +3371,7 @@ body.builder-recipients-open .drawer-inner-content {
     gap: 6px;
     font-size: 11px;
     font-weight: 800;
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
     letter-spacing: 0.5px;
     color: #64748b;
     margin-bottom: 12px;
@@ -3743,7 +3743,7 @@ body.builder-recipients-open .drawer-inner-content {
     font-size: 11px;
     font-weight: 800;
     color: #c2410c;
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
     letter-spacing: 0.5px;
 }
 
@@ -4754,7 +4754,7 @@ input:checked+.slider:before {
 .sidebar-category-header span:not(.material-symbols-outlined) {
     font-size: 12px;
     font-weight: 700;
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
     letter-spacing: 0.05em;
     color: var(--text-muted);
 }
@@ -5210,7 +5210,7 @@ body.builder-active #newsletter-editor-modal-root {
     font-size: 11px !important;
     font-weight: 700 !important;
     color: #94a3b8 !important;
-    text-transform: uppercase !important;
+    /* text-transform: uppercase; removed by request */
     letter-spacing: 0.05em !important;
     margin-bottom: 4px !important;
 }
@@ -8238,7 +8238,7 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
     font-weight: 800 !important;
     letter-spacing: 0.13em !important;
     line-height: 1 !important;
-    text-transform: uppercase !important;
+    /* text-transform: uppercase; removed by request */
 }
 
 .premium-panel-heading h3 {

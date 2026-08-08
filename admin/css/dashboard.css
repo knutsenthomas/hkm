@@ -446,7 +446,7 @@ body.admin-body {
     font-size: 11px;
     font-weight: 800;
     color: #94a3b8;
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
     letter-spacing: 1px;
     margin: 24px 0 8px 16px;
     padding-right: 16px;
@@ -648,7 +648,7 @@ body.admin-body {
     font-size: 12px !important;
     font-weight: 700 !important;
     color: #64748b !important;
-    text-transform: uppercase !important;
+    /* text-transform: uppercase; removed by request */
     letter-spacing: 0.05em !important;
     margin-bottom: 8px !important;
 }
@@ -935,7 +935,7 @@ body.admin-body {
     font-size: 10px;
     font-weight: 700;
     color: #94a3b8;
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
     letter-spacing: 0.05em;
     margin-bottom: 2px;
 }
@@ -2227,7 +2227,7 @@ textarea.form-control {
 .search-result-type-tag {
     font-size: 11px;
     font-weight: 800;
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
     letter-spacing: 0.1em;
     color: var(--accent-color);
     background: var(--accent-light);
@@ -3916,7 +3916,7 @@ div[id^="editorjs-holder-"] {
 .sidebar-section-title {
     font-size: 11px;
     font-weight: 700;
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
     letter-spacing: 0.1em;
     color: #94a3b8;
     margin-bottom: 16px;
@@ -4082,7 +4082,7 @@ div[id^="editorjs-holder-"] {
     left: 12px;
     font-size: 10px;
     font-weight: 800;
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
     letter-spacing: 0.1em;
     color: #94a3b8;
     background: white;
@@ -4193,7 +4193,7 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
     font-weight: 600;
     font-size: 16px;
     color: #1e293b;
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
 }
 
 /* HKM Unified Table (Wix-style) */
@@ -4912,7 +4912,7 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
     font-size: 11px;
     color: #94a3b8;
     font-weight: 700;
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
     letter-spacing: 0.5px;
 }
 
@@ -5161,7 +5161,7 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
     border-radius: 20px;
     font-size: 12px;
     font-weight: 700;
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
     letter-spacing: 0.5px;
 }
 
@@ -5223,7 +5223,7 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
     font-size: 11px;
     font-weight: 800;
     letter-spacing: 0.1em;
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
     opacity: 0.9;
     display: block;
     margin-bottom: 4px;
@@ -5524,7 +5524,7 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
 
     /* "VELKOMMEN TILBAKE" */
     .user-role {
-        text-transform: uppercase;
+        /* text-transform: uppercase; removed by request */
         font-size: 10px !important;
         letter-spacing: 0.5px;
         color: #94a3b8;
@@ -6389,7 +6389,7 @@ body.admin-body {
     padding: 2px 6px;
     border-radius: 4px;
     margin-left: 8px;
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
 }
 
 /* HKM site-inspired dashboard shell */
@@ -6656,7 +6656,7 @@ body.admin-body .section-container {
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.16em;
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
     color: rgba(255, 237, 213, 0.95);
     margin-bottom: 12px;
 }

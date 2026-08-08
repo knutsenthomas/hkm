@@ -630,7 +630,7 @@ const initAdminHeader = () => {
                 // Delay redirect slightly to avoid false positives during transient auth refresh.
                 pendingAuthRedirect = setTimeout(() => {
                     if (!firebaseService?.auth?.currentUser) {
-                        window.location.href = '/admin/login.html';
+                        // window.location.href = '/admin/login.html';
                     }
                 }, 2500);
                 return;

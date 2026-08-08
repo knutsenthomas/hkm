@@ -273,7 +273,7 @@ body.crm-body {
     font-size: 11px;
     font-weight: 700;
     color: #3b82f6;
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
     letter-spacing: 0.05em;
     margin-bottom: 12px !important;
     background: #eff6ff;
@@ -484,7 +484,7 @@ html[data-theme="dark"] .tag-filter-select {
     font-size: 11px;
     font-weight: 800;
     color: #475569;
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
     letter-spacing: 0.05em;
     border-bottom: 2px solid var(--border-color);
 }
@@ -635,7 +635,7 @@ html[data-theme="dark"] .tag-filter-select {
     line-height: 1;
     white-space: nowrap;
     overflow: hidden;
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
 }
 
 .avatar img {
@@ -1042,7 +1042,7 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
     font-weight: 700;
     letter-spacing: 0.02em;
     color: #475569;
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
 }
 
 .crm-tool-input {
@@ -1561,7 +1561,7 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
     font-size: 12px;
     font-weight: 800;
     color: var(--text-muted);
-    text-transform: uppercase;
+    /* text-transform: uppercase; removed by request */
     letter-spacing: 0.1em;
     margin-bottom: 20px;
     display: flex;
