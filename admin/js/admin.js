@@ -14886,365 +14886,36 @@ class AdminManager {
             surfaceColor: '#FFFFFF',
             textColor: '#2C3E50',
             textLightColor: '#7F8C8D',
+            headerBg: '#FFFFFF',
+            footerBg: '#1B4965',
+            footerText: '#FFFFFF',
+            newsletterBg: '#d17d39',
+            newsletterText: '#FFFFFF',
+            btnPrimaryBg: '#d17d39',
+            btnPrimaryText: '#FFFFFF',
+            btnSecondaryBg: '#FFFFFF',
+            btnSecondaryText: '#d17d39',
+            btnSecondaryBorder: '#d17d39'
         };
-        section.innerHTML = `
-            <style>
-                .design-studio-container {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 24px;
-                    width: 100%;
-                    max-width: 1400px;
-                    margin: 0 auto;
-                    box-sizing: border-box;
-                }
-                .design-studio-header {
-                    display: flex;
-                    flex-wrap: wrap;
-                    align-items: center;
-                    justify-content: space-between;
-                    gap: 16px;
-                    background: var(--admin-surface, #ffffff);
-                    border: 1px solid var(--admin-border, #e2e8f0);
-                    border-radius: 16px;
-                    padding: 20px 24px;
-                    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.02);
-                }
-                .design-studio-header-info {
-                    display: flex;
-                    align-items: center;
-                    gap: 16px;
-                }
-                .design-studio-icon {
-                    width: 44px;
-                    height: 44px;
-                    border-radius: 12px;
-                    background: rgba(209, 125, 57, 0.1);
-                    color: var(--admin-accent-color, #d17d39);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    flex-shrink: 0;
-                }
-                .design-studio-header-info h2 {
-                    margin: 0;
-                    font-size: 20px;
-                    font-weight: 700;
-                    color: var(--admin-text, #0f172a);
-                    line-height: 1.2;
-                }
-                .design-studio-header-info p {
-                    margin: 2px 0 0 0;
-                    font-size: 13px;
-                    color: var(--admin-text-muted, #64748b);
-                }
-                .design-studio-actions {
-                    display: flex;
-                    align-items: center;
-                    gap: 12px;
-                }
-                .design-studio-grid {
-                    display: grid;
-                    grid-template-columns: minmax(0, 1fr) 400px;
-                    gap: 24px;
-                    align-items: start;
-                }
-                @media (max-width: 1024px) {
-                    .design-studio-grid {
-                        grid-template-columns: 1fr;
-                    }
-                }
-                .design-studio-settings {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 24px;
-                }
-                .design-card {
-                    background: var(--admin-surface, #ffffff);
-                    border: 1px solid var(--admin-border, #e2e8f0);
-                    border-radius: 16px;
-                    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.02);
-                    overflow: hidden;
-                }
-                .design-card-header {
-                    display: flex;
-                    align-items: center;
-                    gap: 12px;
-                    padding: 18px 24px;
-                    border-bottom: 1px solid var(--admin-border, #f1f5f9);
-                    background: rgba(248, 250, 252, 0.5);
-                }
-                .design-card-header .material-symbols-outlined {
-                    font-size: 22px;
-                    color: var(--admin-accent-color, #d17d39);
-                }
-                .design-card-header h3 {
-                    margin: 0;
-                    font-size: 16px;
-                    font-weight: 700;
-                    color: var(--admin-text, #0f172a);
-                }
-                .design-card-header p {
-                    margin: 1px 0 0 0;
-                    font-size: 12.5px;
-                    color: var(--admin-text-muted, #64748b);
-                }
-                .design-card-body {
-                    padding: 24px;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 20px;
-                }
-                .branding-upload-grid {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 16px;
-                }
-                @media (max-width: 640px) {
-                    .branding-upload-grid { grid-template-columns: 1fr; }
-                }
-                .upload-dropzone {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 8px;
-                }
-                .upload-dropzone label {
-                    font-size: 13px;
-                    font-weight: 600;
-                    color: var(--admin-text, #334155);
-                }
-                .upload-preview-box {
-                    height: 80px;
-                    border: 1.5px dashed var(--admin-border, #cbd5e1);
-                    border-radius: 12px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: var(--admin-bg-light, #f8fafc);
-                    overflow: hidden;
-                    padding: 8px;
-                    position: relative;
-                }
-                .upload-preview-box img,
-                .upload-preview-box .preview-img,
-                .upload-preview-box .design-ui-preview-image {
-                    max-width: 100% !important;
-                    max-height: 60px !important;
-                    width: auto !important;
-                    height: auto !important;
-                    object-fit: contain !important;
-                    display: block !important;
-                    margin: 0 auto !important;
-                }
-                .design-ui-preview-caption {
-                    display: none !important;
-                }
-                .upload-input-group {
-                    display: flex;
-                    gap: 8px;
-                }
-                .upload-input-group input[type="text"] {
-                    font-size: 12px;
-                }
-                .form-row-2 {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 16px;
-                }
-                @media (max-width: 640px) {
-                    .form-row-2 { grid-template-columns: 1fr; }
-                }
-                .color-grid-compact {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-                    gap: 16px;
-                }
-                .color-picker-item {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 6px;
-                }
-                .color-picker-item label {
-                    font-size: 12px;
-                    font-weight: 600;
-                    color: var(--admin-text-muted, #475569);
-                }
-                .color-subheading {
-                    font-size: 13px;
-                    font-weight: 700;
-                    color: var(--admin-text, #0f172a);
-                    text-transform: uppercase;
-                    letter-spacing: 0.04em;
-                    padding-top: 12px;
-                    border-top: 1px dashed var(--admin-border, #e2e8f0);
-                }
-                .sliders-grid {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-                    gap: 16px;
-                }
-                .pill-checkbox-grid {
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 10px;
-                }
-                .pill-checkbox {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 8px;
-                    padding: 8px 14px;
-                    border: 1px solid var(--admin-border, #e2e8f0);
-                    border-radius: 20px;
-                    background: var(--admin-bg-light, #f8fafc);
-                    font-size: 13px;
-                    font-weight: 500;
-                    cursor: pointer;
-                    user-select: none;
-                    transition: all 0.15s ease;
-                }
-                .pill-checkbox input {
-                    accent-color: var(--admin-accent-color, #d17d39);
-                    width: 16px;
-                    height: 16px;
-                    cursor: pointer;
-                }
-                .sticky-preview-card {
-                    position: sticky;
-                    top: 88px;
-                }
-                .preview-header-bar {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    padding: 14px 20px;
-                    border-bottom: 1px solid var(--admin-border, #f1f5f9);
-                    background: rgba(248, 250, 252, 0.5);
-                }
-                .preview-title-badge {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    font-size: 13px;
-                    font-weight: 700;
-                    color: var(--admin-text, #0f172a);
-                }
-                .preview-device-toggles {
-                    display: flex;
-                    gap: 4px;
-                    background: var(--admin-border, #e2e8f0);
-                    padding: 3px;
-                    border-radius: 8px;
-                }
-                .preview-toggle {
-                    border: none;
-                    background: transparent;
-                    padding: 4px 8px;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    color: #64748b;
-                    display: flex;
-                    align-items: center;
-                }
-                .preview-toggle.active {
-                    background: #ffffff;
-                    color: var(--admin-accent-color, #d17d39);
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-                }
-                .design-ui-preview-frame {
-                    padding: 24px;
-                    background: var(--design-bg, #f8fafc);
-                    min-height: 380px;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 16px;
-                    border-radius: 0 0 16px 16px;
-                }
-                .design-ui-preview-top {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    padding-bottom: 12px;
-                    border-bottom: 1px solid rgba(0,0,0,0.06);
-                }
-                .design-ui-preview-brand {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    font-weight: 700;
-                    font-size: 14px;
-                    color: var(--design-text, #0f172a);
-                }
-                .design-ui-preview-brand-dot {
-                    width: 10px;
-                    height: 10px;
-                    border-radius: 50%;
-                    background: var(--design-primary, #d17d39);
-                }
-                .design-ui-preview-chip {
-                    font-size: 11px;
-                    font-weight: 600;
-                    padding: 3px 8px;
-                    border-radius: 12px;
-                    background: rgba(209, 125, 57, 0.1);
-                    color: var(--design-primary, #d17d39);
-                }
-                .design-ui-preview-actions {
-                    display: flex;
-                    gap: 10px;
-                }
-                .design-ui-preview-btn {
-                    padding: 10px 18px;
-                    border-radius: 10px;
-                    font-size: 13px;
-                    font-weight: 600;
-                    border: none;
-                    cursor: pointer;
-                }
-                .design-ui-preview-btn-primary {
-                    background: var(--design-primary, #d17d39);
-                    color: #ffffff;
-                }
-                .design-ui-preview-btn-secondary {
-                    background: var(--design-surface, #ffffff);
-                    color: var(--design-primary, #d17d39);
-                    border: 1px solid var(--design-primary, #d17d39);
-                }
-                .design-ui-preview-card {
-                    background: var(--design-surface, #ffffff);
-                    padding: 16px;
-                    border-radius: 12px;
-                    border: 1px solid rgba(0,0,0,0.06);
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-                }
-                .design-ui-preview-card-title {
-                    font-weight: 700;
-                    font-size: 14px;
-                    color: var(--design-text, #0f172a);
-                    margin-bottom: 4px;
-                }
-                .design-ui-preview-card-text {
-                    font-size: 12.5px;
-                    color: var(--design-muted, #64748b);
-                    line-height: 1.4;
-                }
-            </style>
 
-            <div class="design-studio-container">
-                <!-- Top Header -->
-                <div class="design-studio-header">
-                    <div class="design-studio-header-info">
-                        <div class="design-studio-icon">
+        section.innerHTML = `
+
+
+            <div class="design-ui-shell">
+                <div class="design-ui-topbar design-ui-panel">
+                    <div class="design-ui-topbar-main">
+                        <div class="design-ui-topbar-icon">
                             <span class="material-symbols-outlined">palette</span>
                         </div>
                         <div>
-                            <h2>Design & Logo</h2>
-                            <p>Administrer logo, fargepalett og visuell identitet i ett samlet panel</p>
+                            <h3 class="design-ui-title">Tema & Utseende</h3>
+                            <p class="design-ui-muted">Administrer identitet, typografi og fargepalett i ett samlet kontrollpanel.</p>
                         </div>
                     </div>
-                    <div class="design-studio-actions">
+                    <div class="design-ui-actions">
                         <button class="btn btn-outline" id="reset-design-settings" type="button">
                             <span class="material-symbols-outlined">restart_alt</span>
-                            Tilbakestill
+                            Tilbakestill tema
                         </button>
                         <button class="btn btn-primary" id="save-design-settings" type="button">
                             <span class="material-symbols-outlined">save</span>
@@ -15253,64 +14924,397 @@ class AdminManager {
                     </div>
                 </div>
 
-                <!-- Main Studio Grid -->
-                <div class="design-studio-grid">
-                    
-                    <!-- Left Column: Controls -->
-                    <div class="design-studio-settings">
-                        
-                        <!-- Card 1: Logo & Branding -->
-                        <div class="design-card">
-                            <div class="design-card-header">
-                                <span class="material-symbols-outlined">branding_watermark</span>
+                <div class="design-ui-workspace">
+                    <div class="design-ui-top-grid">
+                        <div class="design-ui-main-column">
+                            <div class="design-ui-panel design-ui-panel--palette">
+                            <div class="design-ui-panel-header">
+                                <div class="design-ui-panel-header-icon">
+                                    <span class="material-symbols-outlined">palette</span>
+                                </div>
                                 <div>
-                                    <h3>Logo & Grafisk Profil</h3>
-                                    <p>Last opp logo og ikoner for nettsted og mobil</p>
+                                    <h3 class="design-ui-panel-title">Fargepalett</h3>
+                                    <p class="design-ui-panel-subtitle">Fargene under er koblet til nettsidens globale stilvariabler og lagres i samme designinnstilling.</p>
                                 </div>
                             </div>
-                            <div class="design-card-body">
-                                <div class="branding-upload-grid">
-                                    <div class="upload-dropzone">
-                                        <label>Hovedlogo</label>
-                                        <div class="upload-preview-box" id="logo-preview-container">
+                            <div class="design-ui-panel-body">
+                                <div class="design-ui-color-controls">
+                                    <div class="form-group" style="margin-bottom:0;">
+                                        <label>Primærfarge (HKM)</label>
+                                        <div class="premium-color-wrapper design-ui-primary-color-input">
+                                            <input type="color" id="primary-color-picker" class="premium-color-picker-input" value="#F97316">
+                                            <input type="text" id="primary-color-hex" class="premium-color-hex" value="#F97316" placeholder="#F97316">
+                                        </div>
+                                    </div>
+                                    <div class="design-ui-form-grid design-ui-color-edit-grid">
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Sekundærfarge</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="secondary-color-picker" class="premium-color-picker-input" value="#FF6B2B">
+                                                <input type="text" id="secondary-color-hex" class="premium-color-hex" value="#FF6B2B" placeholder="#FF6B2B">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Bakgrunn</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="background-color-picker" class="premium-color-picker-input" value="#F8F9FA">
+                                                <input type="text" id="background-color-hex" class="premium-color-hex" value="#F8F9FA" placeholder="#F8F9FA">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Kort & elementer</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="surface-color-picker" class="premium-color-picker-input" value="#FFFFFF">
+                                                <input type="text" id="surface-color-hex" class="premium-color-hex" value="#FFFFFF" placeholder="#FFFFFF">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Hovedtekst</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="text-color-picker" class="premium-color-picker-input" value="#2C3E50">
+                                                <input type="text" id="text-color-hex" class="premium-color-hex" value="#2C3E50" placeholder="#2C3E50">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Aksent / dempet tekst</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="text-light-color-picker" class="premium-color-picker-input" value="#7F8C8D">
+                                                <input type="text" id="text-light-color-hex" class="premium-color-hex" value="#7F8C8D" placeholder="#7F8C8D">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="design-ui-divider" style="margin: 24px 0; border-top: 1px solid var(--border-color); opacity: 0.5;"></div>
+
+                                    <h4 class="design-ui-panel-subtitle" style="margin-bottom: 16px; font-weight: 700; color: var(--text-main);">Seksjonsspesifikke farger</h4>
+                                    <div class="design-ui-form-grid design-ui-color-edit-grid">
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Header Bakgrunn</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="header-bg-picker" class="premium-color-picker-input" value="#FFFFFF">
+                                                <input type="text" id="header-bg-hex" class="premium-color-hex" value="#FFFFFF" placeholder="#FFFFFF">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Footer Bakgrunn</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="footer-bg-picker" class="premium-color-picker-input" value="#2C3E50">
+                                                <input type="text" id="footer-bg-hex" class="premium-color-hex" value="#2C3E50" placeholder="#2C3E50">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Footer Tekst</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="footer-text-picker" class="premium-color-picker-input" value="#FFFFFF">
+                                                <input type="text" id="footer-text-hex" class="premium-color-hex" value="#FFFFFF" placeholder="#FFFFFF">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Nyhetsbrev Bakgrunn</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="newsletter-bg-picker" class="premium-color-picker-input" value="#d17d39">
+                                                <input type="text" id="newsletter-bg-hex" class="premium-color-hex" value="#d17d39" placeholder="#d17d39">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Nyhetsbrev Tekst</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="newsletter-text-picker" class="premium-color-picker-input" value="#FFFFFF">
+                                                <input type="text" id="newsletter-text-hex" class="premium-color-hex" value="#FFFFFF" placeholder="#FFFFFF">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="design-ui-divider" style="margin: 24px 0; border-top: 1px solid var(--border-color); opacity: 0.5;"></div>
+
+                                    <h4 class="design-ui-panel-subtitle" style="margin-bottom: 16px; font-weight: 700; color: var(--text-main);">Knapper</h4>
+                                    <div class="design-ui-form-grid design-ui-color-edit-grid">
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Primærknapp Bakgrunn</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="btn-primary-bg-picker" class="premium-color-picker-input" value="#d17d39">
+                                                <input type="text" id="btn-primary-bg-hex" class="premium-color-hex" value="#d17d39" placeholder="#d17d39">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Primærknapp Tekst</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="btn-primary-text-picker" class="premium-color-picker-input" value="#FFFFFF">
+                                                <input type="text" id="btn-primary-text-hex" class="premium-color-hex" value="#FFFFFF" placeholder="#FFFFFF">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Sekundærknapp Bakgrunn</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="btn-secondary-bg-picker" class="premium-color-picker-input" value="#FFFFFF">
+                                                <input type="text" id="btn-secondary-bg-hex" class="premium-color-hex" value="#FFFFFF" placeholder="#FFFFFF">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Sekundærknapp Tekst/Ramme</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="btn-secondary-text-picker" class="premium-color-picker-input" value="#d17d39">
+                                                <input type="text" id="btn-secondary-text-hex" class="premium-color-hex" value="#d17d39" placeholder="#d17d39">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <p class="design-ui-muted design-ui-inline-help" style="margin-top: 20px;">Tips: Bruk mørke farger på footeren for et eksklusivt uttrykk.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- Fix: Closing tag for design-ui-main-column -->
+
+                    <aside class="design-ui-side-column">
+                            <div class="design-ui-panel design-ui-help-panel design-ui-panel--help">
+                                <div class="design-ui-panel-header design-ui-panel-header--compact">
+                                    <div class="design-ui-panel-header-icon">
+                                        <span class="material-symbols-outlined">info</span>
+                                    </div>
+                                    <div>
+                                        <h3 class="design-ui-panel-title">Hva gjør disse valgene?</h3>
+                                    </div>
+                                </div>
+                                <div class="design-ui-panel-body">
+                                    <div class="design-ui-help-list">
+                                        <div class="design-ui-help-item">
+                                            <span class="material-symbols-outlined">check_circle</span>
+                                            <p><strong>Farger:</strong> påvirker knapper, markører, paneler og tydeligheten i admin/opplevelsen på nettsiden.</p>
+                                        </div>
+                                        <div class="design-ui-help-item">
+                                            <span class="material-symbols-outlined">check_circle</span>
+                                            <p><strong>Typografi:</strong> gjør uttrykket konsistent på tvers av forsider, artikler og kampanjer.</p>
+                                        </div>
+                                        <div class="design-ui-help-item">
+                                            <span class="material-symbols-outlined">check_circle</span>
+                                            <p><strong>Branding:</strong> logo og favicon brukes i faner, deling og navigasjon.</p>
+                                        </div>
+                                    </div>
+                                    <div class="design-ui-callout">
+                                        <div class="design-ui-callout-title">Merk</div>
+                                        <p>Vi anbefaler å beholde varm HKM-oransje som primærfarge og bruke mørk tekst for best kontrast og lesbarhet.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="design-ui-panel design-ui-brand-profile design-ui-panel--profile">
+                                <div class="design-ui-brand-profile-bg"></div>
+                                <div class="design-ui-brand-profile-content">
+                                    <div class="design-ui-brand-profile-kicker">Grafisk profil</div>
+                                    <h3>HKM uttrykk</h3>
+                                    <p>Varm, tydelig og tillitsvekkende. La oransje bære handlingene, og la nøytrale flater gi ro rundt budskapet.</p>
+                                    <div class="design-ui-brand-profile-chips">
+                                        <span>Inter</span>
+                                        <span>Oransje CTA</span>
+                                        <span>Lyse flater</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+
+                    <div class="design-ui-full-stack">
+                        <div class="design-ui-panel design-ui-panel--typography">
+                            <div class="design-ui-panel-header">
+                                <div class="design-ui-panel-header-icon">
+                                    <span class="material-symbols-outlined">text_fields</span>
+                                </div>
+                                <div>
+                                    <h3 class="design-ui-panel-title">Typografi & Tekststørrelser</h3>
+                                    <p class="design-ui-panel-subtitle">Kontroller fontfamilie og skalering med live forhåndsvisning av knapper, overskrift og innholdskort.</p>
+                                </div>
+                            </div>
+
+                            <div class="design-ui-panel-body">
+                                <div class="design-ui-typography-layout">
+                                    <div class="design-ui-control-stack">
+                                        <div class="design-ui-form-grid">
+                                            <div class="form-group">
+                                                <label>Overskrift font</label>
+                                                <select id="heading-font-select" class="form-control">
+                                                    <option value="Inter">Inter</option>
+                                                    <option value="DM Sans">DM Sans</option>
+                                                    <option value="Outfit">Outfit</option>
+                                                    <option value="Montserrat">Montserrat</option>
+                                                    <option value="Open Sans">Open Sans</option>
+                                                    <option value="Roboto">Roboto</option>
+                                                    <option value="Merriweather">Merriweather</option>
+                                                    <option value="Playfair Display">Playfair Display</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Brødtekst font</label>
+                                                <select id="main-font-select" class="form-control">
+                                                    <option value="Inter">Inter</option>
+                                                    <option value="DM Sans">DM Sans</option>
+                                                    <option value="Outfit">Outfit</option>
+                                                    <option value="Montserrat">Montserrat</option>
+                                                    <option value="Open Sans">Open Sans</option>
+                                                    <option value="Roboto">Roboto</option>
+                                                    <option value="Merriweather">Merriweather</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="design-ui-range-grid">
+                                            <div class="premium-range-group">
+                                                <div class="premium-range-header">
+                                                    <label>H1 Overskrift (Desktop)</label>
+                                                    <span class="premium-range-val" id="font-size-h1-desktop-val">48px</span>
+                                                </div>
+                                                <input type="range" id="font-size-h1-desktop" class="premium-slider" min="24" max="80" value="48">
+                                            </div>
+
+                                            <div class="premium-range-group">
+                                                <div class="premium-range-header">
+                                                    <label>H1 Overskrift (Mobil)</label>
+                                                    <span class="premium-range-val" id="font-size-h1-mobile-val">32px</span>
+                                                </div>
+                                                <input type="range" id="font-size-h1-mobile" class="premium-slider" min="18" max="48" value="32">
+                                            </div>
+
+                                            <div class="premium-range-group">
+                                                <div class="premium-range-header">
+                                                    <label>H2 Overskrift (Desktop)</label>
+                                                    <span class="premium-range-val" id="font-size-h2-desktop-val">32px</span>
+                                                </div>
+                                                <input type="range" id="font-size-h2-desktop" class="premium-slider" min="20" max="60" value="32">
+                                            </div>
+
+                                            <div class="premium-range-group">
+                                                <div class="premium-range-header">
+                                                    <label>H2 Overskrift (Mobil)</label>
+                                                    <span class="premium-range-val" id="font-size-h2-mobile-val">24px</span>
+                                                </div>
+                                                <input type="range" id="font-size-h2-mobile" class="premium-slider" min="16" max="40" value="24">
+                                            </div>
+
+                                            <div class="premium-range-group">
+                                                <div class="premium-range-header">
+                                                    <label>Brødtekst (PC)</label>
+                                                    <span class="premium-range-val" id="font-size-body-desktop-val">16px</span>
+                                                </div>
+                                                <input type="range" id="font-size-body-desktop" class="premium-slider" min="12" max="24" value="16">
+                                            </div>
+
+                                            <div class="premium-range-group">
+                                                <div class="premium-range-header">
+                                                    <label>Brødtekst (Mobil)</label>
+                                                    <span class="premium-range-val" id="font-size-body-mobile-val">16px</span>
+                                                </div>
+                                                <input type="range" id="font-size-body-mobile" class="premium-slider" min="12" max="24" value="16">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="live-preview-box design-ui-live-preview" id="live-preview-area">
+                                        <div class="design-ui-preview-header-flex">
+                                            <div class="design-ui-preview-label">Live forhåndsvisning</div>
+                                            <div class="design-ui-preview-toggles">
+                                                <button type="button" class="preview-toggle active" data-device="desktop">
+                                                    <span class="material-symbols-outlined">desktop_windows</span>
+                                                </button>
+                                                <button type="button" class="preview-toggle" data-device="mobile">
+                                                    <span class="material-symbols-outlined">smartphone</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="design-ui-preview-frame" id="design-preview-frame">
+                                            <div class="design-ui-preview-top">
+                                                <div class="design-ui-preview-brand">
+                                                    <div class="design-ui-preview-brand-dot"></div>
+                                                    <span>His Kingdom Ministry</span>
+                                                </div>
+                                                <div class="design-ui-preview-chip">Forside</div>
+                                            </div>
+
+                                            <h2 id="typography-preview-text">Slik ser teksten ut</h2>
+                                            <p id="design-preview-body-copy">Dette er et eksempel på brødtekst, kontrast og spacing. Bruk denne visningen for å justere uttrykket før du lagrer.</p>
+
+                                            <div class="design-ui-preview-actions">
+                                                <button type="button" class="design-ui-preview-btn design-ui-preview-btn-primary" id="design-preview-primary-btn">Gi en gave</button>
+                                                <button type="button" class="design-ui-preview-btn design-ui-preview-btn-secondary" id="design-preview-secondary-btn">Les mer</button>
+                                            </div>
+
+                                            <div class="design-ui-preview-card">
+                                                <div class="design-ui-preview-card-title">Ukens fokus</div>
+                                                <div class="design-ui-preview-card-text">Gudstjeneste, undervisning og fellesskap samlet i ett tydelig visuelt uttrykk.</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="design-ui-panel design-ui-panel--branding">
+                            <div class="design-ui-panel-header">
+                                <div class="design-ui-panel-header-icon">
+                                    <span class="material-symbols-outlined">branding_watermark</span>
+                                </div>
+                                <div>
+                                    <h3 class="design-ui-panel-title">Grafiske elementer</h3>
+                                    <p class="design-ui-panel-subtitle">Logo, favicon og sidetittel brukes i navigasjon, deling og nettleserfaner.</p>
+                                </div>
+                            </div>
+                            <div class="design-ui-panel-body">
+                                <div class="design-ui-branding-layout">
+
+                                    <!-- Logo Upload Card -->
+                                    <div class="design-ui-upload-card">
+                                        <div class="design-ui-upload-card-preview" id="logo-preview-container">
                                             <div class="design-ui-upload-card-placeholder">
                                                 <span class="material-symbols-outlined">image</span>
                                                 <span>Ingen logo lastet opp</span>
                                             </div>
                                         </div>
-                                        <div class="upload-input-group">
-                                            <input type="text" id="site-logo-url" class="form-control" placeholder="https://...">
-                                            <input type="file" id="site-logo-file" accept="image/*" style="display:none;">
-                                            <button class="btn btn-primary btn-sm" id="upload-logo-btn" type="button" onclick="document.getElementById('site-logo-file').click()">
-                                                <span class="material-symbols-outlined">upload</span> Last opp
-                                            </button>
+                                        <div class="design-ui-upload-card-body">
+                                            <label class="design-ui-upload-card-label">Logo</label>
+                                            <p class="design-ui-upload-card-hint">Anbefalt: SVG eller PNG med transparent bakgrunn</p>
+                                            <div class="design-ui-upload-card-actions">
+                                                <input type="text" id="site-logo-url" class="form-control design-ui-upload-url-input" placeholder="https://...">
+                                                <div class="design-ui-upload-card-btns">
+                                                    <input type="file" id="site-logo-file" accept="image/*" style="display:none;">
+                                                    <button class="btn btn-primary btn-sm" id="upload-logo-btn" type="button" onclick="document.getElementById('site-logo-file').click()">
+                                                        <span class="material-symbols-outlined">upload</span>
+                                                        Last opp
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div class="upload-dropzone">
-                                        <label>Favicon (Nettleserikon)</label>
-                                        <div class="upload-preview-box" id="favicon-preview-container">
+                                    <!-- Favicon Upload Card -->
+                                    <div class="design-ui-upload-card">
+                                        <div class="design-ui-upload-card-preview" id="favicon-preview-container">
                                             <div class="design-ui-upload-card-placeholder">
                                                 <span class="material-symbols-outlined">web_asset</span>
                                                 <span>Ingen favicon lastet opp</span>
                                             </div>
                                         </div>
-                                        <div class="upload-input-group">
-                                            <input type="text" id="site-favicon-url" class="form-control" placeholder="https://...">
-                                            <input type="file" id="site-favicon-file" accept="image/png,image/x-icon,image/svg+xml" style="display:none;">
-                                            <button class="btn btn-primary btn-sm" id="upload-favicon-btn" type="button" onclick="document.getElementById('site-favicon-file').click()">
-                                                <span class="material-symbols-outlined">upload</span> Last opp
-                                            </button>
+                                        <div class="design-ui-upload-card-body">
+                                            <label class="design-ui-upload-card-label">Favicon</label>
+                                            <p class="design-ui-upload-card-hint">Anbefalt: 32×32 px PNG eller ICO-format</p>
+                                            <div class="design-ui-upload-card-actions">
+                                                <input type="text" id="site-favicon-url" class="form-control design-ui-upload-url-input" placeholder="https://...">
+                                                <div class="design-ui-upload-card-btns">
+                                                    <input type="file" id="site-favicon-file" accept="image/png,image/x-icon,image/svg+xml" style="display:none;">
+                                                    <button class="btn btn-primary btn-sm" id="upload-favicon-btn" type="button" onclick="document.getElementById('site-favicon-file').click()">
+                                                        <span class="material-symbols-outlined">upload</span>
+                                                        Last opp
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
+
                                 </div>
 
-                                <div class="form-row-2">
-                                    <div class="form-group" style="margin:0;">
-                                        <label>Logo-tekst (HKM)</label>
+                                <div class="design-ui-form-grid">
+                                    <div class="form-group">
+                                        <label>Tekst ved siden av logo</label>
                                         <input type="text" id="site-logo-text" class="form-control" placeholder="His Kingdom Ministry">
                                     </div>
-                                    <div class="form-group" style="margin:0;">
+                                    <div class="form-group">
                                         <label>Sidetittel (SEO)</label>
                                         <input type="text" id="site-title-seo" class="form-control" placeholder="His Kingdom Ministry">
                                     </div>
@@ -15318,6 +15322,76 @@ class AdminManager {
                             </div>
                         </div>
 
+                        <div class="design-ui-panel" style="margin-top: 24px;">
+                            <div class="design-ui-panel-header">
+                                <div class="design-ui-panel-header-icon">
+                                    <span class="material-symbols-outlined">phone_android</span>
+                                </div>
+                                <div>
+                                    <h3 class="design-ui-panel-title">Mobil bunn-meny (Bottom Nav)</h3>
+                                    <p class="design-ui-panel-subtitle">Velg hvilke snarveier og ikoner som skal være synlige i navigasjonslinjen på mobil.</p>
+                                </div>
+                            </div>
+                            <div class="design-ui-panel-body">
+                                <h4 class="design-ui-panel-subtitle" style="margin-bottom: 16px; font-weight: 700; color: var(--text-main); font-size: 15px;">Min Side bunn-meny</h4>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-minside-overview" value="overview" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Oversikt</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-minside-profile" value="profile" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Profil</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-minside-courses" value="courses" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Kurs</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-minside-reading-plans" value="reading-plans" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Leseplaner</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-minside-giving" value="giving" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Gaver</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-minside-notifications" value="notifications" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Varslinger</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-minside-tasks" value="tasks" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Huskeliste</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-minside-notes" value="notes" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Notater</span>
+                                    </label>
+                                </div>
+
+                                <div class="design-ui-divider" style="margin: 20px 0; border-top: 1px solid var(--border-color); opacity: 0.5;"></div>
+
+                                <h4 class="design-ui-panel-subtitle" style="margin-bottom: 16px; font-weight: 700; color: var(--text-main); font-size: 15px;">Admin bunn-meny</h4>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px;">
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-admin-overview" value="overview" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Oversikt</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-admin-contacts" value="contacts" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Kontakter</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-admin-minside" value="minside" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Min Side</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-admin-settings" value="settings" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Innstillinger</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -15822,7 +15896,7 @@ class AdminManager {
             const safeUrl = this.escapeHtml ? this.escapeHtml(url) : url;
             container.innerHTML = `
                 <div class="design-ui-preview-media" style="display:flex; align-items:center; justify-content:center; width:100%; height:100%;">
-                    <img src="${safeUrl}" class="preview-img design-ui-preview-image" alt="Forhåndsvisning" style="max-height:64px; max-width:100%; object-fit:contain; width:auto; height:auto; display:block; margin:0 auto;">
+                    <img src="${safeUrl}" class="preview-img design-ui-preview-image" alt="Forhåndsvisning" style="max-height:60px; max-width:100%; object-fit:contain; width:auto; height:auto; display:block; margin:0 auto;">
                 </div>
             `;
         } else {
