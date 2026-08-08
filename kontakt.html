@@ -42,7 +42,59 @@
     <meta property="twitter:url" content="https://www.hiskingdomministry.no/kontakt">
     <meta property="twitter:title" content="Kontakt Oss | His Kingdom Ministry">
     <meta property="twitter:description" content="Ta kontakt med His Kingdom Ministry.">
-    <meta property="twitter:image" content="https://images.unsplash.com/photo-1423666639041-f56000c27a9a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80">
+    <!-- Structured Data (JSON-LD) for GEO & SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "ContactPage",
+          "name": "Kontakt His Kingdom Ministry",
+          "url": "https://www.hiskingdomministry.no/kontakt",
+          "description": "Send oss en melding, be om bønnehjelp eller ta kontakt med His Kingdom Ministry.",
+          "mainEntity": {
+            "@type": "NGO",
+            "name": "His Kingdom Ministry",
+            "email": "kontakt@hiskingdomministry.no",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Mandal",
+              "addressCountry": "NO"
+            }
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Hvordan kan jeg be om bønnehjelp fra His Kingdom Ministry?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Du kan sende inn ditt bønneemne direkte via kontaktskjemaet på denne siden eller ved å sende e-post til kontakt@hiskingdomministry.no."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Hvor er His Kingdom Ministry basert?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "His Kingdom Ministry er basert i Mandal, Norge, men reiser og underviser over hele landet samt på digitale plattformer."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Hvordan kan jeg bli fast giver eller støtte arbeidet?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Du kan bli fast giver via Vipps, kort eller bankoverføring på vår donasjonsside (bli-fast-giver.html)."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
 
     <!-- Google Fonts: Inter for hele siden -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -27,36 +27,62 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "ItemList",
-      "name": "Kurs - His Kingdom Ministry",
-      "description": "Utvalgte kurs og undervisningsrekker fra His Kingdom Ministry",
-      "url": "https://www.hiskingdomministry.no/kurs",
-      "itemListElement": [
+      "@graph": [
         {
-          "@type": "Course",
-          "position": 1,
-          "name": "Bibelens Grunnlandskap",
-          "description": "En dyptgående gjennomgang av Bibelens struktur, historiske kontekst og hovedtemaer.",
-          "provider": {
-            "@type": "Organization",
-            "name": "His Kingdom Ministry",
-            "sameAs": "https://www.hiskingdomministry.no"
-          }
+          "@type": "ItemList",
+          "name": "Kurs - His Kingdom Ministry",
+          "description": "Utvalgte kurs og undervisningsrekker fra His Kingdom Ministry",
+          "url": "https://www.hiskingdomministry.no/kurs",
+          "itemListElement": [
+            {
+              "@type": "Course",
+              "position": 1,
+              "name": "Bibelens Grunnlandskap",
+              "description": "En dyptgående gjennomgang av Bibelens struktur, historiske kontekst og hovedtemaer.",
+              "provider": {
+                "@type": "Organization",
+                "name": "His Kingdom Ministry",
+                "sameAs": "https://www.hiskingdomministry.no"
+              }
+            },
+            {
+              "@type": "Course",
+              "position": 2,
+              "name": "Bønneliv og Åndelig Vekst",
+              "description": "Praktisk og teologisk undervisning om bønn, stilletid og personlig trosutvikling.",
+              "provider": {
+                "@type": "Organization",
+                "name": "His Kingdom Ministry",
+                "sameAs": "https://www.hiskingdomministry.no"
+              }
+            }
+          ]
         },
         {
-          "@type": "Course",
-          "position": 2,
-          "name": "Bønneliv og Åndelig Vekst",
-          "description": "Praktisk og teologisk undervisning om bønn, stilletid og personlig trosutvikling.",
-          "provider": {
-            "@type": "Organization",
-            "name": "His Kingdom Ministry",
-            "sameAs": "https://www.hiskingdomministry.no"
-          }
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Koster det noe å ta kursene hos His Kingdom Ministry?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Våre nettbaserte undervisningskurs og bibelstudier er gratis tilgjengelige for alle som ønsker å vokse i troen."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Kan jeg lagre fremgangen min på kursene?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Ja, ved å opprette en bruker på Min Side blir kursprogresjonen din automatisk lagret slik at du kan fortsette der du slapp."
+              }
+            }
+          ]
         }
       ]
     }
     </script>
+
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
