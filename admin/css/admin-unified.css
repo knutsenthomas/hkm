@@ -3168,7 +3168,7 @@ body.admin-body .section-container,
 body.admin-body .content-wrapper,
 body.crm-body .crm-content,
 body.crm-body .content-wrapper {
-  padding-top: 12px !important;
+  padding-top: 6px !important;
   padding-bottom: var(--admin-page-gutter, 24px) !important;
 }
 
@@ -4833,7 +4833,7 @@ body.admin-body .inbox-container,
 body.admin-body .segments-container,
 body.admin-body .analytics-container,
 body.admin-body #newsletter-dashboard-layout {
-  padding-top: 12px !important;
+  padding-top: 6px !important;
 }
 
 body.admin-body #overview-section > style {
@@ -5470,7 +5470,7 @@ body.admin-body .crm-content,
 body.admin-body .inbox-container,
 body.admin-body .logs-container,
 body.admin-body #newsletter-dashboard-layout {
-  padding-top: 16px !important;
+  padding-top: 6px !important;
   margin-top: 0 !important;
   box-sizing: border-box !important;
 }
