@@ -5671,9 +5671,9 @@ body.builder-active .main-header .section-header-actions {
   flex-shrink: 0 !important;
 }
 
-body.admin-body .main-header .user-profile-link,
-body.crm-body .main-header .user-profile-link,
-body.builder-active .main-header .user-profile-link {
+body.admin-body .main-header .user-profile-link:has(.user-name),
+body.crm-body .main-header .user-profile-link:has(.user-name),
+body.builder-active .main-header .user-profile-link:has(.user-name) {
   order: 1 !important;
   height: 42px !important;
   min-width: 42px !important;
@@ -5686,6 +5686,17 @@ body.builder-active .main-header .user-profile-link {
   border: 1px solid rgba(15, 23, 42, 0.08) !important;
   border-radius: 12px !important;
   text-decoration: none !important;
+}
+
+body.admin-body .main-header .user-profile-link:not(:has(.user-name)),
+body.crm-body .main-header .user-profile-link:not(:has(.user-name)),
+body.builder-active .main-header .user-profile-link:not(:has(.user-name)) {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 body.admin-body .main-header .user-name,
@@ -7415,9 +7426,9 @@ body.builder-active .btn-primary:active,
   }
 
   /* Reduce profile card gap and padding for narrow screens */
-  body.admin-body .main-header .user-profile-link,
-  body.crm-body .main-header .user-profile-link,
-  body.builder-active .main-header .user-profile-link {
+  body.admin-body .main-header .user-profile-link:has(.user-name),
+  body.crm-body .main-header .user-profile-link:has(.user-name),
+  body.builder-active .main-header .user-profile-link:has(.user-name) {
     padding: 0 4px 0 12px !important;
     gap: 8px !important;
   }

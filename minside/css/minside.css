@@ -189,23 +189,16 @@ a.user-profile-link .user-avatar img,
     z-index: 2 !important;
 }
 
-/* Allow text capsule expansion ONLY if name/text exists inside */
-a.user-profile-link:has(.user-name),
-#admin-profile-trigger:has(.user-name) {
-    width: auto !important;
-    min-width: unset !important;
-    max-width: unset !important;
-    padding: 3px 6px 3px 12px !important;
-    gap: 10px !important;
-}
-
-a.user-profile-link:has(.user-name) #admin-avatar,
-#admin-profile-trigger:has(.user-name) #admin-avatar {
-    width: 36px !important;
-    height: 36px !important;
-    min-width: 36px !important;
-    min-height: 36px !important;
-    border-radius: 9px !important;
+/* Clean transparent trigger */
+a.user-profile-link,
+#actions-btn,
+#admin-profile-trigger {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 .actions-btn:hover {
@@ -3725,17 +3718,26 @@ html[data-theme="dark"] .main-content {
   display: none !important;
 }
 
-html[data-theme="dark"] body.minside-body .user-profile-link,
-html[data-theme="dark"] .user-profile-link {
+html[data-theme="dark"] body.minside-body .user-profile-link:has(.user-name),
+html[data-theme="dark"] .user-profile-link:has(.user-name) {
   background: #1e293b !important;
   background-color: #1e293b !important;
   border-color: #334155 !important;
 }
 
+html[data-theme="dark"] .user-profile-link:not(:has(.user-name)),
+html[data-theme="dark"] #actions-btn,
+html[data-theme="dark"] #admin-profile-trigger {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
 /* User profile link widget in header - hover state in dark mode */
-html[data-theme="dark"] body.minside-body .main-header .user-profile-link:hover,
-html[data-theme="dark"] body.minside-body .user-profile-link:hover,
-html[data-theme="dark"] .user-profile-link:hover {
+html[data-theme="dark"] body.minside-body .main-header .user-profile-link:has(.user-name):hover,
+html[data-theme="dark"] body.minside-body .user-profile-link:has(.user-name):hover,
+html[data-theme="dark"] .user-profile-link:has(.user-name):hover {
   background: #334155 !important;
   background-color: #334155 !important;
   border-color: rgba(209, 125, 57, 0.4) !important;

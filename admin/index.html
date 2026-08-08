@@ -51,10 +51,10 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" />
 
     <link rel="stylesheet" href="../styles.css">
-    <link rel="stylesheet" href="css/dashboard.css?v=20260808_V17">
+    <link rel="stylesheet" href="css/dashboard.css?v=20260808_V18">
     <link rel="stylesheet" href="../css/notifications.css">
-    <link rel="stylesheet" href="css/admin-unified.css?v=20260808_V17">
-    <link rel="stylesheet" href="../minside/css/minside.css?v=20260808_V17">
+    <link rel="stylesheet" href="css/admin-unified.css?v=20260808_V18">
+    <link rel="stylesheet" href="../minside/css/minside.css?v=20260808_V18">
     <link rel="stylesheet" href="css/todo.css?v=20260729_TODO_OVERHAUL">
     
     <!-- FORCED CSS FIX FOR ENGAGEMENT OVERFLOW (INLINE TO BEAT CACHE - GLOBAL) -->
@@ -395,27 +395,15 @@
                 padding: 0 !important;
             }
 
-            .user-profile-link:has(.user-name),
-            #admin-profile-trigger:has(.user-name) {
-                background: var(--card-bg, #ffffff) !important;
-                border: 1px solid rgba(15, 23, 42, 0.08) !important;
-                border-radius: 12px !important;
-                padding: 3px 6px 3px 12px !important;
-                gap: 10px !important;
-                height: 44px !important;
-            }
-
-            .user-profile-link:has(.user-name) .user-avatar,
-            .user-profile-link:has(.user-name) [id="admin-avatar"],
-            #admin-profile-trigger:has(.user-name) .user-avatar,
-            #admin-profile-trigger:has(.user-name) [id="admin-avatar"] {
-                width: 36px !important;
-                height: 36px !important;
-                min-width: 36px !important;
-                min-height: 36px !important;
-                border-radius: 9px !important;
+            .user-profile-link,
+            #admin-profile-trigger,
+            #actions-btn {
+                background: transparent !important;
+                background-color: transparent !important;
                 border: none !important;
                 box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
             }
 
             /* Desktop View container & Rounded cards */
