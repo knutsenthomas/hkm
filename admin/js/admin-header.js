@@ -627,7 +627,7 @@ const initAdminHeader = () => {
                 || (settingsProfile && settingsProfile.fullName)
                 || authFallbackName(user);
 
-            const photoURL = (userProfile && (userProfile.photoURL || userProfile.photo_url || userProfile.avatarUrl)) 
+            const photoURL = (userProfile && (userProfile.photoURL || userProfile.photo_url || userProfile.photoUrl || userProfile.avatarUrl || userProfile.avatar_url || userProfile.profileImage || userProfile.image)) 
                 || (settingsProfile && (settingsProfile.photoUrl || settingsProfile.photoURL))
                 || user.photoURL 
                 || googlePhoto
@@ -635,6 +635,13 @@ const initAdminHeader = () => {
                 || '';
             renderIdentity(displayName, photoURL);
             writeCachedIdentity(displayName, photoURL);
+
+            if (googlePhoto && !user.photoURL) {
+                try {
+                    await user.updateProfile({ photoURL: googlePhoto });
+                    await firebase.firestore().collection('users').doc(user.uid).set({ photoURL: googlePhoto }, { merge: true });
+                } catch (e) {}
+            }
 
             // Fetch and apply bottom nav settings
             try {

@@ -4938,25 +4938,33 @@ window.addEventListener('load', () => {
                 return;
             }
 
-            // Immediately update DOM with current user photoURL to avoid delay
-            let photoURL = user.photoURL || '';
-            updateProfileDOM(photoURL);
+            // Check google provider and user photo
+            const googlePhoto = (user.providerData || []).find(p => p && p.photoURL)?.photoURL || '';
+            let photoURL = user.photoURL || googlePhoto || '';
 
             try {
                 if (window.firebaseService && window.firebaseService.db) {
                     const userDoc = await window.firebaseService.db.collection('users').doc(user.uid).get();
                     if (userDoc.exists) {
-                        const userData = userDoc.data();
-                        if (userData.photoURL) {
-                            photoURL = userData.photoURL;
-                        } else if (userData.profileImage) {
-                            photoURL = userData.profileImage;
-                        }
+                        const userData = userDoc.data() || {};
+                        photoURL = userData.photoURL || userData.photo_url || userData.photoUrl || userData.avatarUrl || userData.avatar_url || userData.profileImage || userData.image || photoURL;
                     }
                 }
             } catch (docErr) {
                 console.warn('Kunne ikke hente brukerprofil for bilde:', docErr);
             }
+
+            // Auto-sync Google photoURL if missing on Auth user
+            if (googlePhoto && !user.photoURL) {
+                try {
+                    await user.updateProfile({ photoURL: googlePhoto });
+                    if (window.firebaseService && window.firebaseService.db) {
+                        await window.firebaseService.db.collection('users').doc(user.uid).set({ photoURL: googlePhoto }, { merge: true });
+                    }
+                } catch (e) {}
+            }
+
+            updateProfileDOM(photoURL);
 
             // Update cache for instant render next time
             try {

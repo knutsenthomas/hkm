@@ -1891,7 +1891,7 @@ class MinSideManager {
         return {
             ...data,
             displayName: data.displayName || user.displayName || google.displayName || user.email || '',
-            photoURL: data.photoURL || user.photoURL || google.photoURL || '',
+            photoURL: data.photoURL || data.photo_url || data.photoUrl || data.avatarUrl || data.avatar_url || data.profileImage || data.image || user.photoURL || google.photoURL || '',
             role: role || data.role || 'medlem',
             subCollections: this.profileData?.subCollections || data.subCollections || this._emptyProfileSubCollections(),
         };
@@ -3948,9 +3948,23 @@ class MinSideManager {
             await ref.put(file);
             const url = await ref.getDownloadURL();
             await this.currentUser.updateProfile({ photoURL: url });
-            await firebase.firestore().collection('users').doc(this.currentUser.uid).set({ photoURL: url }, { merge: true });
-            this.profileData.photoURL = url;
-            this._setAvatarEl(document.getElementById('ph-avatar'), url, this.profileData.displayName);
+            await firebase.firestore().collection('users').doc(this.currentUser.uid).set({
+                photoURL: url,
+                photo_url: url,
+                photoUrl: url,
+                avatarUrl: url,
+                profileImage: url,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+            if (this.profileData) this.profileData.photoURL = url;
+            this._setAvatarEl(document.getElementById('ph-avatar'), url, this.profileData?.displayName || this.currentUser.displayName);
+            try {
+                const cachedUserRaw = localStorage.getItem('hkm_public_user_cache');
+                let cachedData = cachedUserRaw ? JSON.parse(cachedUserRaw) : {};
+                cachedData.uid = this.currentUser.uid;
+                cachedData.photoURL = url;
+                localStorage.setItem('hkm_public_user_cache', JSON.stringify(cachedData));
+            } catch (cacheErr) {}
         } catch (err) {
             console.error('Photo upload failed:', err);
             alert(t('common.saveError') + ': ' + err.message);
