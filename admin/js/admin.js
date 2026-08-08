@@ -2746,10 +2746,32 @@ class AdminManager {
         }
     }
 
+    setTopbarActions(htmlOrElement) {
+        const container = document.getElementById('topbar-dynamic-actions');
+        if (!container) return;
+        if (!htmlOrElement) {
+            container.innerHTML = '';
+            container.style.display = 'none';
+            return;
+        }
+        if (typeof htmlOrElement === 'string') {
+            container.innerHTML = htmlOrElement;
+        } else if (htmlOrElement instanceof HTMLElement) {
+            container.innerHTML = '';
+            container.appendChild(htmlOrElement);
+        }
+        container.style.display = 'inline-flex';
+    }
+
+    clearTopbarActions() {
+        this.setTopbarActions(null);
+    }
+
     /**
      * Called by the inline navigation script in index.html
      */
     onSectionSwitch(sectionId) {
+        this.clearTopbarActions();
         if (typeof window.triggerProgressAnimation === 'function') {
             window.triggerProgressAnimation();
         }
@@ -14883,32 +14905,19 @@ class AdminManager {
             btnSecondaryBorder: '#d17d39'
         };
 
+        this.setTopbarActions(`
+            <button class="btn btn-outline" id="reset-design-settings" type="button" style="height: 38px; padding: 0 14px; font-size: 13px; font-weight: 600; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                <span class="material-symbols-outlined" style="font-size: 18px;">restart_alt</span>
+                Tilbakestill
+            </button>
+            <button class="btn btn-primary" id="save-design-settings" type="button" style="height: 38px; padding: 0 16px; font-size: 13.5px; font-weight: 700; border-radius: 10px; background: linear-gradient(135deg, #d17d39, #b54d2b); color: white; border: none; box-shadow: 0 2px 8px rgba(209,125,57,0.3); display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+                <span class="material-symbols-outlined" style="font-size: 18px;">save</span>
+                Lagre endringer
+            </button>
+        `);
+
         section.innerHTML = `
-
-
             <div class="design-ui-shell">
-                <div class="design-ui-topbar design-ui-panel">
-                    <div class="design-ui-topbar-main">
-                        <div class="design-ui-topbar-icon">
-                            <span class="material-symbols-outlined">palette</span>
-                        </div>
-                        <div>
-                            <h3 class="design-ui-title">Tema & Utseende</h3>
-                            <p class="design-ui-muted">Administrer identitet, typografi og fargepalett i ett samlet kontrollpanel.</p>
-                        </div>
-                    </div>
-                    <div class="design-ui-actions">
-                        <button class="btn btn-outline" id="reset-design-settings" type="button">
-                            <span class="material-symbols-outlined">restart_alt</span>
-                            Tilbakestill tema
-                        </button>
-                        <button class="btn btn-primary" id="save-design-settings" type="button">
-                            <span class="material-symbols-outlined">save</span>
-                            Lagre endringer
-                        </button>
-                    </div>
-                </div>
-
                 <div class="design-ui-workspace">
                     <div class="design-ui-top-grid">
                         <div class="design-ui-main-column">
@@ -25650,26 +25659,15 @@ class AdminManager {
         const section = document.getElementById('seo-section');
         if (!section) return;
 
+        this.setTopbarActions(`
+            <button class="btn btn-primary" id="save-global-seo" type="button" style="height: 38px; padding: 0 16px; font-size: 13.5px; font-weight: 700; border-radius: 10px; background: linear-gradient(135deg, #d17d39, #b54d2b); color: white; border: none; box-shadow: 0 2px 8px rgba(209,125,57,0.3); display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+                <span class="material-symbols-outlined" style="font-size: 18px;">save</span>
+                Lagre endringer
+            </button>
+        `);
+
         section.innerHTML = `
             <div class="design-ui-shell">
-                <div class="design-ui-topbar design-ui-panel">
-                    <div class="design-ui-topbar-main">
-                        <div class="design-ui-topbar-icon">
-                            <span class="material-symbols-outlined">search</span>
-                        </div>
-                        <div>
-                            <h3 class="design-ui-title">Globale SEO-innstillinger</h3>
-                            <p class="design-ui-muted">Grunnleggende optimalisering for at innholdet ditt skal finnes i Google og sosiale medier.</p>
-                        </div>
-                    </div>
-                    <div class="design-ui-actions">
-                        <button class="btn btn-primary" id="save-global-seo" type="button">
-                            <span class="material-symbols-outlined">save</span>
-                            Lagre endringer
-                        </button>
-                    </div>
-                </div>
-
                 <div class="design-ui-workspace">
                     <div class="design-ui-top-grid">
                         <div class="design-ui-main-column">
