@@ -335,7 +335,10 @@
             }
 
             /* Symmetrical Avatar & Profile Capsule Sizing */
-            .user-profile-link {
+            #actions-btn.user-profile-link,
+            a#actions-btn,
+            a.user-profile-link,
+            #admin-profile-trigger {
                 height: 44px !important;
                 min-height: 44px !important;
                 max-height: 44px !important;
@@ -350,6 +353,8 @@
                 border: 1px solid rgba(15, 23, 42, 0.08) !important;
             }
 
+            #actions-btn.user-profile-link,
+            a#actions-btn:not(:has(.user-name)),
             .user-profile-link:not(:has(.user-info-text)),
             .user-profile-link:not(:has(.user-name)) {
                 width: 44px !important;
@@ -360,6 +365,10 @@
                 align-items: center !important;
             }
 
+            #actions-btn.user-profile-link .user-avatar,
+            #actions-btn.user-profile-link [id="ph-avatar"],
+            a#actions-btn:not(:has(.user-name)) .user-avatar,
+            a#actions-btn:not(:has(.user-name)) [id="ph-avatar"],
             .user-profile-link:not(:has(.user-info-text)) .user-avatar,
             .user-profile-link:not(:has(.user-name)) .user-avatar,
             .user-profile-link:not(:has(.user-info-text)) [id="admin-avatar"],

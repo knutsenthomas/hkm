@@ -111,6 +111,83 @@ body {
     box-shadow: var(--shadow-sm);
 }
 
+/* Header Avatar Profile Menu Trigger (#actions-btn / .user-profile-link) */
+#actions-btn.user-profile-link,
+a#actions-btn,
+a.user-profile-link,
+#admin-profile-trigger {
+    padding: 0 !important;
+    width: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 1.5px solid rgba(15, 23, 42, 0.12) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    background: var(--card-bg, #ffffff) !important;
+}
+
+/* Outer box matches avatar picture 100% cleanly */
+#actions-btn.user-profile-link #ph-avatar,
+#actions-btn.user-profile-link .user-avatar,
+a.user-profile-link #ph-avatar,
+a.user-profile-link #admin-avatar,
+a.user-profile-link .user-avatar,
+#admin-profile-trigger #admin-avatar,
+#admin-profile-trigger .user-avatar {
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 100% !important;
+    min-height: 100% !important;
+    border-radius: inherit !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+#actions-btn.user-profile-link #ph-avatar img,
+#actions-btn.user-profile-link .user-avatar img,
+a.user-profile-link #ph-avatar img,
+a.user-profile-link #admin-avatar img,
+a.user-profile-link .user-avatar img,
+#admin-profile-trigger #admin-avatar img,
+#admin-profile-trigger .user-avatar img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: inherit !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: absolute !important;
+    inset: 0 !important;
+}
+
+/* Allow text capsule expansion ONLY if name/text exists inside */
+a.user-profile-link:has(.user-name),
+#admin-profile-trigger:has(.user-name) {
+    width: auto !important;
+    min-width: unset !important;
+    max-width: unset !important;
+    padding: 3px 6px 3px 12px !important;
+    gap: 10px !important;
+}
+
+a.user-profile-link:has(.user-name) #admin-avatar,
+#admin-profile-trigger:has(.user-name) #admin-avatar {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    border-radius: 9px !important;
+}
+
 .actions-btn:hover {
     border-color: var(--accent-color);
     box-shadow: 0 0 0 3px var(--accent-glow);
