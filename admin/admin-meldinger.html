@@ -4,6 +4,8 @@
 <head>
     <!-- HKM Global Auth & Identity Manager -->
     <script src="/js/hkm-auth-manager.js"></script>
+    <!-- HKM Global Utilities -->
+    <script src="/js/hkm-utils.js"></script>
             <!-- Theme Initializer -->
     <script>
         (function () {
@@ -46,9 +48,13 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block"></noscript>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/dashboard.css?v=20260713_V1">
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="css/dashboard.css?v=20260808_V22">
     <link rel="stylesheet" href="css/crm.css?v=20260716_V2">
-    <link rel="stylesheet" href="css/admin-unified.css?v=20260716_V2">
+    <link rel="stylesheet" href="../css/notifications.css">
+    <link rel="stylesheet" href="css/admin-unified.css?v=20260808_V22">
+    <link rel="stylesheet" href="../minside/css/minside.css?v=20260808_V22">
+    <link rel="stylesheet" href="css/todo.css?v=20260729_TODO_OVERHAUL">
     <link rel="stylesheet" href="css/inbox.css?v=20260508_G41">
 
     <style>
@@ -463,7 +469,7 @@
                                     <span class="user-role">Administrator</span>
                                 </div>
                                 <div id="admin-avatar" class="user-avatar">TK</div>
-                                <script>(function(){try{var a=document.getElementById('admin-avatar');var c=localStorage.getItem('hkm_admin_identity_cache')||localStorage.getItem('hkm_public_user_cache');if(a&&c){var p=JSON.parse(c).photoURL||JSON.parse(c).photoUrl||JSON.parse(c).avatarUrl;if(p&&p.length>5&&!p.includes('default-user')){a.innerHTML='<img src="'+p+'" referrerpolicy="no-referrer" loading="eager" decoding="sync" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;position:absolute;inset:0;z-index:2;" onerror="this.style.display=\'none\'"><span class="avatar-initials-text" style="position:relative;z-index:1;">'+(a.textContent||'TK')+'</span>';}}}catch(e){}})();</script>
+                                <script>(function(){try{var a=document.getElementById('admin-avatar');var c=localStorage.getItem('hkm_admin_identity_cache')||localStorage.getItem('hkm_public_user_cache');if(a&&c){var obj=JSON.parse(c)||{};var p=obj.photoURL||obj.photoUrl||obj.avatarUrl||obj.profileImage||obj.image;if(p&&p.length>5&&!p.includes('default-user')){a.innerHTML='<img src="'+p+'" referrerpolicy="no-referrer" loading="eager" decoding="sync" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;position:absolute;inset:0;z-index:2;" onerror="this.style.display=\'none\'"><span class="avatar-initials-text" style="position:relative;z-index:1;">'+(a.textContent||'TK')+'</span>';}}}catch(e){}})();</script>
                             </a>
                         </div>
                     </div>

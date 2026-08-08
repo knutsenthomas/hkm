@@ -1136,7 +1136,7 @@
                                 <span class="user-role">Administrator</span>
                             </div>
                             <div id="admin-avatar" class="user-avatar">TK</div>
-                            <script>(function(){try{var a=document.getElementById('admin-avatar');var c=localStorage.getItem('hkm_admin_identity_cache')||localStorage.getItem('hkm_public_user_cache');if(a&&c){var p=JSON.parse(c).photoURL||JSON.parse(c).photoUrl;if(p&&p.length>5&&!p.includes('default-user')){a.innerHTML='<img src="'+p+'" referrerpolicy="no-referrer" loading="eager" decoding="sync" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;position:absolute;inset:0;z-index:2;" onerror="this.style.display=\'none\'"><span class="avatar-initials-text" style="position:relative;z-index:1;">'+(a.textContent||'TK')+'</span>';}}}catch(e){}})();</script>
+                            <script>(function(){try{var a=document.getElementById('admin-avatar');var c=localStorage.getItem('hkm_admin_identity_cache')||localStorage.getItem('hkm_public_user_cache');if(a&&c){var obj=JSON.parse(c)||{};var p=obj.photoURL||obj.photoUrl||obj.avatarUrl||obj.profileImage||obj.image;if(p&&p.length>5&&!p.includes('default-user')){a.innerHTML='<img src="'+p+'" referrerpolicy="no-referrer" loading="eager" decoding="sync" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;position:absolute;inset:0;z-index:2;" onerror="this.style.display=\'none\'"><span class="avatar-initials-text" style="position:relative;z-index:1;">'+(a.textContent||'TK')+'</span>';}}}catch(e){}})();</script>
                         </a>
                     </div>
                 </div>
