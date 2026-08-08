@@ -443,26 +443,8 @@ import '../css/todo-drawer.css';
         }
     };
 
-    // HTML escape utility
-    const escapeHtml = (str) => {
-        return str
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    };
-
-    // Date formatting helper
-    const formatDate = (dateStr) => {
-        try {
-            const date = new Date(dateStr);
-            if (isNaN(date.getTime())) return dateStr;
-            return date.toLocaleDateString('no-NO', { day: 'numeric', month: 'short' });
-        } catch (e) {
-            return dateStr;
-        }
-    };
+    const escapeHtml = (str) => window.HKMUtils?.escapeHTML ? window.HKMUtils.escapeHTML(str) : String(str || '');
+    const formatDate = (dateStr) => window.HKMUtils?.formatDate ? window.HKMUtils.formatDate(dateStr, { day: 'numeric', month: 'short' }) : String(dateStr || '');
 
     // Event listener setup for buttons
     const bindUiEvents = () => {

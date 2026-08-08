@@ -512,15 +512,7 @@ class CRMManager {
             const initials = firstName ? (firstName[0] + (lastName ? lastName[0] : '')).toUpperCase() : fullName[0].toUpperCase();
             const colorClass = this.getAvatarColorClass(fullName);
             const statusClass = this.getStatusClass(contact.status);
-            const formatDate = (dateVal) => {
-                if (!dateVal) return '-';
-                // Handle Firestore Timestamps
-                if (dateVal.toDate && typeof dateVal.toDate === 'function') {
-                    return dateVal.toDate().toLocaleDateString('no-NO');
-                }
-                const d = new Date(dateVal);
-                return isNaN(d) ? '-' : d.toLocaleDateString('no-NO');
-            };
+            const formatDate = (dateVal) => window.HKMUtils?.formatDate ? window.HKMUtils.formatDate(dateVal) : '-';
 
             const lastActivity = formatDate(contact.lastLogin || contact.updatedAt || contact.createdAt);
             const isMenuOpen = this.openContactMenuId === contact.id;
