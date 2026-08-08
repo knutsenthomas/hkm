@@ -2288,7 +2288,6 @@ class AdminManager {
 
             const initials = safeName.split(' ').map(n => n.trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase() || 'A';
             const shortInitials = initials.substring(0, 2);
-
             const formattedPhoto = formatPhotoUrl(photoURL);
             const isCustomPhoto = formattedPhoto && formattedPhoto.length > 5 && !isDefaultAvatarUrl(formattedPhoto);
 
@@ -2299,7 +2298,7 @@ class AdminManager {
                     adminAvatar.dataset.photoUrl = formattedPhoto;
                     adminAvatar.classList.remove('has-initials');
                     const escapedName = safeName.replace(/"/g, '&quot;');
-                    adminAvatar.innerHTML = `<img src="${formattedPhoto}" alt="${escapedName}" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; display:block;" onerror="this.onerror=null; this.parentElement.classList.add('has-initials'); this.parentElement.innerHTML='<span class=\\'avatar-initials-text\\' style=\\'position:relative; z-index:1;\\'>${shortInitials}</span>';">`;
+                    adminAvatar.innerHTML = `<img src="${formattedPhoto}" alt="${escapedName}" referrerpolicy="no-referrer" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; display:block;" onerror="this.onerror=null; this.parentElement.classList.add('has-initials'); this.parentElement.innerHTML='<span class=\\'avatar-initials-text\\' style=\\'position:relative; z-index:1;\\'>${shortInitials}</span>';">`;
                 } else {
                     adminAvatar.classList.add('has-initials');
                     adminAvatar.innerHTML = `<span class="avatar-initials-text" style="position:relative; z-index:1;">${shortInitials}</span>`;
