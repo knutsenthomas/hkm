@@ -329,7 +329,7 @@
 
                 async function routeByRole() {
                     const service = window.firebaseService;
-                    const user = firebase.auth().currentUser;
+                    const user = firebase.apps.length > 0 ? firebase.auth().currentUser : null;
                     if (!user || !service) {
                         window.location.href = '/admin/index.html';
                         return;
@@ -483,19 +483,27 @@
                 }
 
                 // Auto-redirect if already logged in globally
-                if (typeof firebase !== 'undefined') {
-                    firebase.auth().onAuthStateChanged(async (user) => {
-                        if (user) {
-                            console.log("[HKM] Already logged in globally, routing...");
-                            let count = 0;
-                            while ((!window.firebaseService || !window.firebaseService.isInitialized) && count < 100) {
-                                await new Promise(r => setTimeout(r, 50));
-                                count++;
+                const initLoginListener = async () => {
+                    let count = 0;
+                    while ((typeof firebase === 'undefined' || firebase.apps.length === 0) && count < 40) {
+                        await new Promise(r => setTimeout(r, 100));
+                        count++;
+                    }
+                    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+                        firebase.auth().onAuthStateChanged(async (user) => {
+                            if (user) {
+                                console.log("[HKM] Already logged in globally, routing...");
+                                let c = 0;
+                                while ((!window.firebaseService || !window.firebaseService.isInitialized) && c < 100) {
+                                    await new Promise(r => setTimeout(r, 50));
+                                    c++;
+                                }
+                                await routeByRole();
                             }
-                            await routeByRole();
-                        }
-                    });
-                }
+                        });
+                    }
+                };
+                initLoginListener();
             })();
     </script>
     
