@@ -15014,7 +15014,7 @@ class AdminManager {
                     color: var(--admin-text, #334155);
                 }
                 .upload-preview-box {
-                    height: 100px;
+                    height: 80px;
                     border: 1.5px dashed var(--admin-border, #cbd5e1);
                     border-radius: 12px;
                     display: flex;
@@ -15025,10 +15025,19 @@ class AdminManager {
                     padding: 8px;
                     position: relative;
                 }
-                .upload-preview-box img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    object-fit: contain;
+                .upload-preview-box img,
+                .upload-preview-box .preview-img,
+                .upload-preview-box .design-ui-preview-image {
+                    max-width: 100% !important;
+                    max-height: 60px !important;
+                    width: auto !important;
+                    height: auto !important;
+                    object-fit: contain !important;
+                    display: block !important;
+                    margin: 0 auto !important;
+                }
+                .design-ui-preview-caption {
+                    display: none !important;
                 }
                 .upload-input-group {
                     display: flex;
@@ -15812,15 +15821,14 @@ class AdminManager {
         if (url && url.startsWith('http')) {
             const safeUrl = this.escapeHtml ? this.escapeHtml(url) : url;
             container.innerHTML = `
-                <div class="design-ui-preview-media">
-                    <img src="${safeUrl}" class="preview-img design-ui-preview-image" alt="Forhåndsvisning">
-                    <div class="design-ui-preview-caption">${safeUrl}</div>
+                <div class="design-ui-preview-media" style="display:flex; align-items:center; justify-content:center; width:100%; height:100%;">
+                    <img src="${safeUrl}" class="preview-img design-ui-preview-image" alt="Forhåndsvisning" style="max-height:64px; max-width:100%; object-fit:contain; width:auto; height:auto; display:block; margin:0 auto;">
                 </div>
             `;
         } else {
             const icon = containerId.includes('favicon') ? 'web_asset' : 'image';
             container.innerHTML = `
-                <div class="design-ui-empty-preview">
+                <div class="design-ui-empty-preview" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; color:#94a3b8; font-size:12px;">
                     <span class="material-symbols-outlined">${icon}</span>
                     <span>${containerId.includes('favicon') ? 'Favicon-forhåndsvisning' : 'Logo-forhåndsvisning'}</span>
                 </div>
