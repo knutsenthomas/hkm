@@ -7954,23 +7954,125 @@ html[data-theme="dark"] body.admin-body .mobile-nav-toggle {
     color: #f1f5f9 !important;
 }
 
-/* --- HIDE DUPLICATE/REDUNDANT SECTION HEADER CARDS INSIDE MAIN CONTENT BODY --- */
+/* --- PREMIUM UNIFIED SECTION & DESIGN UI HEADER PANEL --- */
+html body.admin-body .design-ui-topbar,
 html body.admin-body .section-content > .section-header:not(.in-topbar),
 html body.admin-body .section-content > .design-ui-header:not(.in-topbar),
-html body.admin-body .section-content > .kinetic-header-card,
-html body.admin-body .design-ui-topbar-main,
-html body.minside-body .section-content > .section-header:not(.in-topbar),
-html body.minside-body .section-content > .design-ui-header:not(.in-topbar) {
-    display: none !important;
+html body.minside-body .section-content > .section-header:not(.in-topbar) {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 20px !important;
+    padding: 20px 24px !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
+    margin-bottom: 24px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
 }
 
-html body.admin-body .design-ui-topbar:has(.design-ui-topbar-main) {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    padding: 0 0 16px 0 !important;
-    justify-content: flex-end !important;
+html body.admin-body .design-ui-topbar-main,
+html body.admin-body .section-header-content,
+html body.minside-body .section-header-content {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 16px !important;
+    min-width: 0 !important;
+    flex: 1 !important;
 }
+
+html body.admin-body .design-ui-topbar-icon,
+html body.admin-body .section-header-icon,
+html body.minside-body .section-header-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    border-radius: 12px !important;
+    background: linear-gradient(135deg, rgba(209, 125, 57, 0.1), rgba(181, 77, 43, 0.15)) !important;
+    border: 1px solid rgba(209, 125, 57, 0.2) !important;
+    color: #d17d39 !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+}
+
+html body.admin-body .design-ui-topbar-icon .material-symbols-outlined,
+html body.admin-body .section-header-icon .material-symbols-outlined {
+    font-size: 22px !important;
+    color: #d17d39 !important;
+}
+
+html body.admin-body .design-ui-topbar-main > div,
+html body.admin-body .section-header-titles,
+html body.minside-body .section-header-titles {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    gap: 3px !important;
+    min-width: 0 !important;
+    flex: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+html body.admin-body .design-ui-title,
+html body.admin-body .section-title,
+html body.minside-body .section-title {
+    font-size: 18px !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    line-height: 1.25 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: left !important;
+}
+
+html body.admin-body .design-ui-muted,
+html body.admin-body .section-subtitle,
+html body.minside-body .section-subtitle {
+    font-size: 13.5px !important;
+    font-weight: 400 !important;
+    color: #64748b !important;
+    line-height: 1.45 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: left !important;
+}
+
+html body.admin-body .design-ui-actions,
+html body.admin-body .section-header-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 12px !important;
+    flex-shrink: 0 !important;
+}
+
+html body.admin-body .design-ui-actions button,
+html body.admin-body .design-ui-actions .btn,
+html body.admin-body .section-header-actions button,
+html body.admin-body .section-header-actions .btn {
+    height: 42px !important;
+    padding: 0 20px !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    margin: 0 !important;
+}
+
 
 
 
