@@ -2882,17 +2882,18 @@ body.admin-body .page-title {
     display: none !important;
   }
 
-  .user-profile-link {
+  .user-profile-link,
+  #actions-btn,
+  #admin-profile-trigger {
     width: auto !important;
-    min-width: 42px !important;
-    height: 42px !important;
-    padding: 0 4px !important;
+    height: auto !important;
+    padding: 0 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     background: transparent !important;
-    border-radius: 12px !important;
-    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    border: none !important;
+    box-shadow: none !important;
     margin-right: 0 !important;
   }
 
@@ -2928,11 +2929,17 @@ body.admin-body .page-title {
   gap: 10px !important;
 }
 
-.user-profile-link {
+.user-profile-link,
+#actions-btn,
+#admin-profile-trigger {
   order: 0 !important;
   display: flex !important;
   align-items: center !important;
   text-decoration: none !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
 }
 
 #messages-bell,
@@ -2960,32 +2967,16 @@ body.admin-body .page-title {
   justify-content: center !important;
   border: 1px solid rgba(0, 0, 0, 0.05) !important;
   flex-shrink: 0 !important;
+  background: #ffffff !important;
 }
 
-.user-profile-link {
-  width: auto !important;
-  min-width: 42px !important;
-  height: 42px !important;
-  border-radius: 12px !important;
-  padding: 0 4px 0 12px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+.user-profile-link:has(.user-name),
+#admin-profile-trigger:has(.user-name) {
+  background: #ffffff !important;
   border: 1px solid rgba(0, 0, 0, 0.05) !important;
-  flex-shrink: 0 !important;
+  border-radius: 12px !important;
+  padding: 3px 6px 3px 12px !important;
   gap: 8px !important;
-}
-
-body.admin-body .user-profile-link,
-body.minside-body .user-profile-link,
-body.crm-body .user-profile-link,
-body.builder-active .user-profile-link {
-  background: #ffffff !important;
-}
-
-.notification-btn,
-.mobile-nav-toggle {
-  background: #ffffff !important;
 }
 
 /* Avatar styling - Force initials display */
@@ -8118,22 +8109,31 @@ html[data-theme="dark"] .newsletter-dashboard-layout {
 }
 
 /* User profile link widget in header */
-html[data-theme="dark"] body.admin-body .user-profile-link,
-html[data-theme="dark"] body.minside-body .user-profile-link,
-html[data-theme="dark"] body.crm-body .user-profile-link,
-html[data-theme="dark"] body.builder-active .user-profile-link,
-html[data-theme="dark"] .user-profile-link {
+html[data-theme="dark"] body.admin-body .user-profile-link:has(.user-name),
+html[data-theme="dark"] body.minside-body .user-profile-link:has(.user-name),
+html[data-theme="dark"] body.crm-body .user-profile-link:has(.user-name),
+html[data-theme="dark"] body.builder-active .user-profile-link:has(.user-name),
+html[data-theme="dark"] .user-profile-link:has(.user-name) {
   background: #1e293b !important;
   background-color: #1e293b !important;
   border-color: #334155 !important;
 }
 
+html[data-theme="dark"] .user-profile-link:not(:has(.user-name)),
+html[data-theme="dark"] #actions-btn,
+html[data-theme="dark"] #admin-profile-trigger {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
 /* User profile link widget in header - hover state in dark mode */
-html[data-theme="dark"] body.admin-body .main-header .user-profile-link:hover,
-html[data-theme="dark"] body.minside-body .main-header .user-profile-link:hover,
-html[data-theme="dark"] body.crm-body .main-header .user-profile-link:hover,
-html[data-theme="dark"] body.builder-active .main-header .user-profile-link:hover,
-html[data-theme="dark"] .user-profile-link:hover {
+html[data-theme="dark"] body.admin-body .main-header .user-profile-link:has(.user-name):hover,
+html[data-theme="dark"] body.minside-body .main-header .user-profile-link:has(.user-name):hover,
+html[data-theme="dark"] body.crm-body .main-header .user-profile-link:has(.user-name):hover,
+html[data-theme="dark"] body.builder-active .main-header .user-profile-link:has(.user-name):hover,
+html[data-theme="dark"] .user-profile-link:has(.user-name):hover {
   background: #334155 !important;
   background-color: #334155 !important;
   border-color: rgba(209, 125, 57, 0.4) !important;

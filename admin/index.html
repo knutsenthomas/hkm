@@ -51,10 +51,10 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" />
 
     <link rel="stylesheet" href="../styles.css">
-    <link rel="stylesheet" href="css/dashboard.css?v=20260808_V16">
+    <link rel="stylesheet" href="css/dashboard.css?v=20260808_V17">
     <link rel="stylesheet" href="../css/notifications.css">
-    <link rel="stylesheet" href="css/admin-unified.css?v=20260808_V16">
-    <link rel="stylesheet" href="../minside/css/minside.css?v=20260808_V16">
+    <link rel="stylesheet" href="css/admin-unified.css?v=20260808_V17">
+    <link rel="stylesheet" href="../minside/css/minside.css?v=20260808_V17">
     <link rel="stylesheet" href="css/todo.css?v=20260729_TODO_OVERHAUL">
     
     <!-- FORCED CSS FIX FOR ENGAGEMENT OVERFLOW (INLINE TO BEAT CACHE - GLOBAL) -->
@@ -311,10 +311,11 @@
             }
 
             /* --- ZERO-BOX TRANSPARENT AVATAR TRIGGER FIX --- */
-            .user-profile-link,
+            .user-profile-link:not(:has(.user-name)),
             #actions-btn,
             #admin-profile-trigger {
                 background: transparent !important;
+                background-color: transparent !important;
                 border: none !important;
                 box-shadow: none !important;
                 padding: 0 !important;
@@ -324,6 +325,8 @@
                 align-items: center !important;
                 justify-content: center !important;
                 text-decoration: none !important;
+                width: auto !important;
+                height: auto !important;
             }
 
             .user-profile-link .user-avatar,
