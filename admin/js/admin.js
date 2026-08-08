@@ -2268,11 +2268,18 @@ class AdminManager {
 
         const isDefaultAvatarUrl = (url) => {
             if (!url || typeof url !== 'string') return true;
-            const lower = url.toLowerCase();
-            return lower.includes('default-user.png') || 
-                   lower.includes('default_avatar.png') || 
+            const lower = url.toLowerCase().trim();
+            if (!lower || lower === 'null' || lower === 'undefined') return true;
+            return lower.includes('default-user') || 
+                   lower.includes('default_user') || 
+                   lower.includes('default_avatar') || 
                    lower.includes('avatar-placeholder') || 
-                   lower.includes('/default_user.png');
+                   lower.includes('avatar_placeholder') || 
+                   lower.includes('silhouette') || 
+                   lower.includes('ssl.gstatic.com/accounts/ui/avatar') || 
+                   lower.includes('googleusercontent.com/a/default-user') || 
+                   lower.includes('/a/default-user') ||
+                   lower.includes('gstatic.com/identity/images/components/profiles');
         };
 
         const formatPhotoUrl = (url) => {
@@ -2451,6 +2458,9 @@ class AdminManager {
         if (!profileModal) return;
 
         const displayName = profile.displayName || user.displayName || user.email || 'Bruker';
+        const rawPhoto = (profile.photoURL || profile.photo_url || profile.photoUrl || user.photoURL || '');
+        const currentPhoto = isDefaultAvatarUrl(rawPhoto) ? '' : rawPhoto;
+
         const setText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
         const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
 
@@ -2459,25 +2469,125 @@ class AdminManager {
         setText('modal-admin-email', user.email || '');
 
         const modalAvatar = document.getElementById('modal-admin-avatar');
-        if (modalAvatar) {
+        const removePhotoBtn = document.getElementById('admin-modal-remove-photo-btn');
+        const uploadPhotoBtn = document.getElementById('admin-modal-upload-photo-btn');
+        const photoFileInput = document.getElementById('admin-modal-photo-file');
+        const photoUrlInput = document.getElementById('admin-modal-photo-url');
+
+        const updateAvatarPreview = (photoUrlToUse) => {
+            if (!modalAvatar) return;
             modalAvatar.innerHTML = '';
             modalAvatar.textContent = '';
-            if (profile.photoURL && profile.photoURL.trim().length > 5) {
+            const validPhoto = photoUrlToUse && photoUrlToUse.trim().length > 5 && !isDefaultAvatarUrl(photoUrlToUse);
+
+            if (validPhoto) {
                 const img = document.createElement('img');
-                img.src = profile.photoURL;
+                img.src = photoUrlToUse.trim();
                 img.alt = "Profile";
-                img.style.cssText = "width: 100%; height: 100%; border-radius: inherit; object-fit: cover;";
+                img.referrerPolicy = "no-referrer";
+                img.style.cssText = "width: 100%; height: 100%; border-radius: inherit; object-fit: cover; display: block;";
                 img.onerror = () => {
                     modalAvatar.innerHTML = '';
                     const initials = displayName.split(' ').map(n => n.trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase();
                     modalAvatar.textContent = (initials || 'B').substring(0, 2);
+                    if (removePhotoBtn) removePhotoBtn.style.display = 'none';
                 };
                 modalAvatar.appendChild(img);
+                if (removePhotoBtn) removePhotoBtn.style.display = 'inline-flex';
             } else {
                 const initials = displayName.split(' ').map(n => n.trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase();
                 modalAvatar.textContent = (initials || 'B').substring(0, 2);
+                if (removePhotoBtn) removePhotoBtn.style.display = 'none';
+            }
+        };
+
+        if (photoUrlInput) {
+            photoUrlInput.value = currentPhoto;
+            if (!photoUrlInput.dataset.boundPreview) {
+                photoUrlInput.dataset.boundPreview = '1';
+                photoUrlInput.addEventListener('input', (e) => {
+                    updateAvatarPreview(e.target.value);
+                });
             }
         }
+
+        if (uploadPhotoBtn && photoFileInput && !uploadPhotoBtn.dataset.boundUpload) {
+            uploadPhotoBtn.dataset.boundUpload = '1';
+            uploadPhotoBtn.addEventListener('click', () => {
+                photoFileInput.click();
+            });
+
+            photoFileInput.addEventListener('change', async (e) => {
+                const file = e.target.files && e.target.files[0];
+                if (!file) return;
+
+                uploadPhotoBtn.disabled = true;
+                uploadPhotoBtn.textContent = 'Laster opp...';
+
+                try {
+                    let photoUrl = '';
+                    if (typeof firebase !== 'undefined' && firebase.storage && user?.uid) {
+                        try {
+                            const ref = firebase.storage().ref(`profiles/${user.uid}/avatar`);
+                            await ref.put(file);
+                            photoUrl = await ref.getDownloadURL();
+                        } catch (storageErr) {
+                            console.warn('Firebase storage put failed, falling back to compressed canvas:', storageErr);
+                        }
+                    }
+
+                    if (!photoUrl) {
+                        // Compressed canvas fallback
+                        photoUrl = await new Promise((resolve) => {
+                            const reader = new FileReader();
+                            reader.onload = (event) => {
+                                const img = new Image();
+                                img.onload = () => {
+                                    const canvas = document.createElement('canvas');
+                                    const maxDim = 400;
+                                    let width = img.width;
+                                    let height = img.height;
+                                    if (width > height) {
+                                        if (width > maxDim) { height *= maxDim / width; width = maxDim; }
+                                    } else {
+                                        if (height > maxDim) { width *= maxDim / height; height = maxDim; }
+                                    }
+                                    canvas.width = width;
+                                    canvas.height = height;
+                                    const ctx = canvas.getContext('2d');
+                                    ctx.drawImage(img, 0, 0, width, height);
+                                    resolve(canvas.toDataURL('image/jpeg', 0.85));
+                                };
+                                img.onerror = () => resolve('');
+                                img.src = event.target.result;
+                            };
+                            reader.onerror = () => resolve('');
+                            reader.readAsDataURL(file);
+                        });
+                    }
+
+                    if (photoUrl) {
+                        if (photoUrlInput) photoUrlInput.value = photoUrl;
+                        updateAvatarPreview(photoUrl);
+                    }
+                } catch (uploadErr) {
+                    console.error('Kunne ikke laste opp bilde:', uploadErr);
+                } finally {
+                    uploadPhotoBtn.disabled = false;
+                    uploadPhotoBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">photo_camera</span> Velg bilde...';
+                }
+            });
+        }
+
+        if (removePhotoBtn && !removePhotoBtn.dataset.boundRemove) {
+            removePhotoBtn.dataset.boundRemove = '1';
+            removePhotoBtn.addEventListener('click', () => {
+                if (photoUrlInput) photoUrlInput.value = '';
+                updateAvatarPreview('');
+            });
+        }
+
+        updateAvatarPreview(currentPhoto);
 
         setVal('admin-modal-display-name', displayName);
         setVal('admin-modal-phone', profile.phone || '');
@@ -2497,24 +2607,42 @@ class AdminManager {
 
         try {
             const displayName = (document.getElementById('admin-modal-display-name').value || '').trim();
+            const photoURLInput = document.getElementById('admin-modal-photo-url');
+            const photoURL = photoURLInput ? (photoURLInput.value || '').trim() : '';
             const phone = (document.getElementById('admin-modal-phone').value || '').trim();
             const address = (document.getElementById('admin-modal-address').value || '').trim();
             const bio = (document.getElementById('admin-modal-bio').value || '').trim();
 
-            if (displayName && displayName !== user.displayName) {
-                await user.updateProfile({ displayName });
+            const profileUpdates = { displayName };
+            if (photoURL !== undefined) {
+                profileUpdates.photoURL = photoURL;
             }
 
-            await firebase.firestore().collection('users').doc(user.uid).set({
+            try {
+                await user.updateProfile(profileUpdates);
+            } catch (e) {
+                console.warn('Auth profile update failed:', e);
+            }
+
+            const firestoreUpdates = {
                 displayName,
                 phone,
                 address,
                 bio,
+                photoURL,
+                photo_url: photoURL,
+                photoUrl: photoURL,
+                avatarUrl: photoURL,
+                profileImage: photoURL,
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            }, { merge: true });
+            };
+
+            await firebase.firestore().collection('users').doc(user.uid).set(firestoreUpdates, { merge: true });
 
             await firebaseService.savePageContent('settings_profile', {
                 fullName: displayName,
+                photoUrl: photoURL,
+                photoURL: photoURL,
                 phone,
                 address,
                 bio,
@@ -2524,7 +2652,7 @@ class AdminManager {
             const profileModal = document.getElementById('profile-modal');
             if (profileModal) profileModal.style.display = 'none';
             await this.updateUserInfo(user);
-            this.showToast('Profil oppdatert.', 'success', 4000);
+            this.showToast('Profil og profilbilde ble oppdatert!', 'success', 4000);
         } catch (error) {
             console.error('Kunne ikke lagre admin-profil:', error);
             this.showToast('Kunne ikke lagre profil.', 'error', 5000);

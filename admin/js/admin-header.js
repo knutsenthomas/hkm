@@ -221,11 +221,18 @@ const initAdminHeader = () => {
 
     const isDefaultAvatarUrl = (url) => {
         if (!url || typeof url !== 'string') return true;
-        const lower = url.toLowerCase();
-        return lower.includes('default-user.png') || 
-               lower.includes('default_avatar.png') || 
+        const lower = url.toLowerCase().trim();
+        if (!lower || lower === 'null' || lower === 'undefined') return true;
+        return lower.includes('default-user') || 
+               lower.includes('default_user') || 
+               lower.includes('default_avatar') || 
                lower.includes('avatar-placeholder') || 
-               lower.includes('/default_user.png');
+               lower.includes('avatar_placeholder') || 
+               lower.includes('silhouette') || 
+               lower.includes('ssl.gstatic.com/accounts/ui/avatar') || 
+               lower.includes('googleusercontent.com/a/default-user') || 
+               lower.includes('/a/default-user') ||
+               lower.includes('gstatic.com/identity/images/components/profiles');
     };
 
     const getInitials = (displayName) => {
@@ -637,12 +644,15 @@ const initAdminHeader = () => {
                 || (settingsProfile && settingsProfile.fullName)
                 || authFallbackName(user);
 
-            const photoURL = user.photoURL 
+            const customPhoto = (userProfile && (userProfile.photoURL || userProfile.photo_url || userProfile.photoUrl || userProfile.avatarUrl || userProfile.avatar_url || userProfile.profileImage || userProfile.profile_image || userProfile.profileImageUrl || userProfile.photo || userProfile.picture || userProfile.avatar || userProfile.image)) 
+                || (settingsProfile && (settingsProfile.photoUrl || settingsProfile.photoURL));
+
+            const rawPhoto = customPhoto 
+                || user.photoURL 
                 || googlePhoto
-                || (userProfile && (userProfile.photoURL || userProfile.photo_url || userProfile.photoUrl || userProfile.avatarUrl || userProfile.avatar_url || userProfile.profileImage || userProfile.profile_image || userProfile.profileImageUrl || userProfile.photo || userProfile.picture || userProfile.avatar || userProfile.image)) 
-                || (settingsProfile && (settingsProfile.photoUrl || settingsProfile.photoURL))
                 || (cachedIdentity && cachedIdentity.photoURL) 
                 || '';
+            const photoURL = isDefaultAvatarUrl(rawPhoto) ? '' : rawPhoto;
             renderIdentity(displayName, photoURL);
             writeCachedIdentity(displayName, photoURL);
 

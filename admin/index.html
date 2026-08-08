@@ -987,12 +987,21 @@
                 <button id="close-profile-modal"
                     style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#888;">&times;</button>
                 <div style="display:flex; align-items:center; gap:20px; margin-bottom:24px;">
-                    <div id="modal-admin-avatar" class="user-avatar">
+                    <div id="modal-admin-avatar" class="user-avatar" style="width:64px; height:64px; font-size:24px; border-radius:16px;">
                     </div>
-                    <div>
-                        <div id="modal-admin-name" class="user-name" style="font-size:20px; font-weight:700;">
+                    <div style="flex:1;">
+                        <div id="modal-admin-name" class="user-name" style="font-size:20px; font-weight:700; color:#0f172a;">
                             Navn</div>
-                        <div id="modal-admin-role" class="user-role">Administrator</div>
+                        <div id="modal-admin-role" class="user-role" style="font-size:13px; color:#64748b;">Administrator</div>
+                        <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+                            <button type="button" id="admin-modal-upload-photo-btn" class="btn-secondary" style="font-size:12px; padding:6px 12px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; font-weight:600;">
+                                <span class="material-symbols-outlined" style="font-size:16px;">photo_camera</span> Velg bilde...
+                            </button>
+                            <button type="button" id="admin-modal-remove-photo-btn" class="btn-secondary" style="font-size:12px; padding:6px 12px; border-radius:8px; cursor:pointer; display:none; align-items:center; gap:4px; border:1px solid #fca5a5; background:#fef2f2; color:#dc2626; font-weight:600;">
+                                Fjern bilde
+                            </button>
+                            <input type="file" id="admin-modal-photo-file" accept="image/png, image/jpeg, image/webp" style="display:none;">
+                        </div>
                     </div>
                 </div>
                 <div style="margin-bottom:16px;">
@@ -1003,6 +1012,12 @@
                         <label for="admin-modal-display-name"
                             style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Navn</label>
                         <input id="admin-modal-display-name" name="displayName" type="text"
+                            style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
+                    </div>
+                    <div>
+                        <label for="admin-modal-photo-url"
+                            style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Profilbilde-URL (eller velg fil over)</label>
+                        <input id="admin-modal-photo-url" name="photoURL" type="url" placeholder="https://..."
                             style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
                     </div>
                     <div>
