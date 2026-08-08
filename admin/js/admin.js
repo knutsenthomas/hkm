@@ -14919,13 +14919,13 @@ class AdminManager {
         };
 
         this.setTopbarActions(`
-            <button class="btn btn-outline" id="reset-design-settings" type="button" style="height: 38px; padding: 0 14px; font-size: 13px; font-weight: 600; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+            <button class="btn btn-outline" id="reset-design-settings" type="button" title="Tilbakestill" style="height: 38px; padding: 0 14px; font-size: 13px; font-weight: 600; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;">
                 <span class="material-symbols-outlined" style="font-size: 18px;">restart_alt</span>
-                Tilbakestill
+                <span class="btn-text">Tilbakestill</span>
             </button>
-            <button class="btn btn-primary" id="save-design-settings" type="button" style="height: 38px; padding: 0 16px; font-size: 13.5px; font-weight: 700; border-radius: 10px; background: linear-gradient(135deg, #d17d39, #b54d2b); color: white; border: none; box-shadow: 0 2px 8px rgba(209,125,57,0.3); display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+            <button class="btn btn-primary" id="save-design-settings" type="button" title="Lagre endringer" style="height: 38px; padding: 0 16px; font-size: 13.5px; font-weight: 700; border-radius: 10px; background: linear-gradient(135deg, #d17d39, #b54d2b); color: white; border: none; box-shadow: 0 2px 8px rgba(209,125,57,0.3); display: inline-flex; align-items: center; gap: 6px; cursor: pointer; flex-shrink: 0;">
                 <span class="material-symbols-outlined" style="font-size: 18px;">save</span>
-                Lagre endringer
+                <span class="btn-text">Lagre</span>
             </button>
         `);
 
