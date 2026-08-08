@@ -5293,7 +5293,7 @@ body.admin-body .nav-link,
 body.minside-body .nav-link,
 body.crm-body .nav-link,
 body.builder-active .nav-link {
-  display: inline-flex !important;
+  display: flex !important;
   align-items: center !important;
   padding: 10px 16px !important;
   gap: 12px !important;
