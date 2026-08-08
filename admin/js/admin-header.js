@@ -286,6 +286,19 @@ const initAdminHeader = () => {
     const authFallbackName = (user) => user?.displayName || user?.email || 'Administrator';
     const cachedIdentity = readCachedIdentity();
 
+    // Render cached identity INSTANTLY on load so image never disappears on page refresh
+    if (cachedIdentity && (cachedIdentity.displayName || cachedIdentity.photoURL)) {
+        renderIdentity(cachedIdentity.displayName, cachedIdentity.photoURL);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            const fresh = readCachedIdentity();
+            if (fresh && (fresh.displayName || fresh.photoURL)) {
+                renderIdentity(fresh.displayName, fresh.photoURL);
+            }
+        });
+    }
+
     // Inject Favorites Helper styles & listener
     const injectFavoritesUiHelper = () => {
         const styleId = 'hkm-admin-favorites-styles';
@@ -647,12 +660,19 @@ const initAdminHeader = () => {
             const customPhoto = (userProfile && (userProfile.photoURL || userProfile.photo_url || userProfile.photoUrl || userProfile.avatarUrl || userProfile.avatar_url || userProfile.profileImage || userProfile.profile_image || userProfile.profileImageUrl || userProfile.photo || userProfile.picture || userProfile.avatar || userProfile.image)) 
                 || (settingsProfile && (settingsProfile.photoUrl || settingsProfile.photoURL));
 
+            const freshCache = readCachedIdentity();
             const rawPhoto = customPhoto 
                 || user.photoURL 
                 || googlePhoto
+                || (freshCache && freshCache.photoURL)
                 || (cachedIdentity && cachedIdentity.photoURL) 
                 || '';
-            const photoURL = isDefaultAvatarUrl(rawPhoto) ? '' : rawPhoto;
+
+            let photoURL = isDefaultAvatarUrl(rawPhoto) ? '' : rawPhoto;
+            if (!photoURL && freshCache?.photoURL && !isDefaultAvatarUrl(freshCache.photoURL)) {
+                photoURL = freshCache.photoURL;
+            }
+
             renderIdentity(displayName, photoURL);
             writeCachedIdentity(displayName, photoURL);
 

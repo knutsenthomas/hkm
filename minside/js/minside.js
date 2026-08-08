@@ -1441,15 +1441,33 @@ class MinSideManager {
     // HEADER
     // ──────────────────────────────────────────────────────────
     updateHeader() {
-        const p = this.profileData;
-        const name = p.displayName || this.currentUser?.email || t('role.fallbackUser');
+        const p = this.profileData || {};
+        let name = p.displayName || this.currentUser?.displayName || this.currentUser?.email || t('role.fallbackUser');
+        let photoURL = p.photoURL;
+
+        if (!photoURL) {
+            try {
+                const pubRaw = localStorage.getItem('hkm_public_user_cache');
+                const admRaw = localStorage.getItem('hkm_admin_identity_cache');
+                if (pubRaw) {
+                    const pub = JSON.parse(pubRaw);
+                    photoURL = pub?.photoURL || pub?.photoUrl || pub?.avatarUrl || pub?.profileImage || '';
+                    if (!name || name === t('role.fallbackUser')) name = pub?.displayName || name;
+                }
+                if (!photoURL && admRaw) {
+                    const adm = JSON.parse(admRaw);
+                    photoURL = adm?.photoURL || '';
+                    if (!name || name === t('role.fallbackUser')) name = adm?.displayName || name;
+                }
+            } catch (e) {}
+        }
 
         // Name
         const nameEl = document.getElementById('ph-name');
         if (nameEl) nameEl.textContent = name;
 
         // Avatar
-        this._setAvatarEl(document.getElementById('ph-avatar'), p.photoURL, name);
+        this._setAvatarEl(document.getElementById('ph-avatar'), photoURL, name);
 
         // Role
         const roleEl = document.getElementById('ph-role');
@@ -1916,10 +1934,30 @@ class MinSideManager {
             role = data.role || 'medlem';
         }
 
+        let cachedPhoto = '';
+        try {
+            const pubRaw = localStorage.getItem('hkm_public_user_cache');
+            const admRaw = localStorage.getItem('hkm_admin_identity_cache');
+            if (pubRaw) cachedPhoto = JSON.parse(pubRaw)?.photoURL || '';
+            if (!cachedPhoto && admRaw) cachedPhoto = JSON.parse(admRaw)?.photoURL || '';
+        } catch (e) {}
+
+        const resolvedPhoto = data.photoURL || data.photo_url || data.photoUrl || data.avatarUrl || data.avatar_url || data.profileImage || data.image || user.photoURL || google.photoURL || cachedPhoto || '';
+        if (resolvedPhoto) {
+            try {
+                localStorage.setItem('hkm_public_user_cache', JSON.stringify({
+                    uid: user.uid,
+                    displayName: data.displayName || user.displayName || google.displayName || user.email || '',
+                    photoURL: resolvedPhoto,
+                    ts: Date.now()
+                }));
+            } catch (e) {}
+        }
+
         return {
             ...data,
             displayName: data.displayName || user.displayName || google.displayName || user.email || '',
-            photoURL: data.photoURL || data.photo_url || data.photoUrl || data.avatarUrl || data.avatar_url || data.profileImage || data.image || user.photoURL || google.photoURL || '',
+            photoURL: resolvedPhoto,
             role: role || data.role || 'medlem',
             subCollections: this.profileData?.subCollections || data.subCollections || this._emptyProfileSubCollections(),
         };
