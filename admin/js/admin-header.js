@@ -206,12 +206,10 @@ const initAdminHeader = () => {
     const isDefaultAvatarUrl = (url) => {
         if (!url || typeof url !== 'string') return true;
         const lower = url.toLowerCase();
-        return lower.includes('default-user') || 
-               lower.includes('default_avatar') || 
+        return lower.includes('default-user.png') || 
+               lower.includes('default_avatar.png') || 
                lower.includes('avatar-placeholder') || 
-               lower.includes('default.png') ||
-               lower.includes('/default_user') ||
-               lower.includes('googleusercontent.com/a/default');
+               lower.includes('/default_user.png');
     };
 
     const getInitials = (displayName) => {
@@ -226,6 +224,16 @@ const initAdminHeader = () => {
             .substring(0, 2) || 'A';
     };
 
+    const formatPhotoUrl = (url) => {
+        if (!url || typeof url !== 'string') return '';
+        let cleanUrl = url.trim();
+        // If Google user content URL without size param, add size for crisp rendering
+        if (cleanUrl.includes('googleusercontent.com') && !cleanUrl.includes('=s')) {
+            cleanUrl += cleanUrl.includes('?') ? '&sz=192' : '=s192-c';
+        }
+        return cleanUrl;
+    };
+
     const renderIdentity = (displayName, photoURL) => {
         const { adminNames, adminAvatars } = getIdentityEls();
         const safeName = (displayName || '').trim() || 'Administrator';
@@ -237,19 +245,20 @@ const initAdminHeader = () => {
             }
         });
 
+        const formattedPhoto = formatPhotoUrl(photoURL);
+        const isCustomPhoto = formattedPhoto && formattedPhoto.length > 5 && !isDefaultAvatarUrl(formattedPhoto);
+
         adminAvatars.forEach(adminAvatar => {
             if (!adminAvatar) return;
 
             adminAvatar.title = safeName;
             adminAvatar.classList.add('has-initials');
 
-            const isCustomPhoto = photoURL && photoURL.trim().length > 5 && !isDefaultAvatarUrl(photoURL);
-
             if (isCustomPhoto) {
-                adminAvatar.dataset.photoUrl = photoURL;
+                adminAvatar.dataset.photoUrl = formattedPhoto;
                 adminAvatar.innerHTML = `
                     <span class="avatar-initials-text" style="position:relative; z-index:1;">${initials}</span>
-                    <img src="${photoURL}" referrerpolicy="no-referrer" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; position:absolute; inset:0; z-index:2;" onerror="this.remove();">
+                    <img src="${formattedPhoto}" referrerpolicy="no-referrer" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; position:absolute; inset:0; z-index:2;" onerror="this.onerror=null; if(this.src.includes('=s192-c')){this.src='${formattedPhoto.replace('=s192-c','')}';}else{this.remove();}">
                 `;
             } else {
                 adminAvatar.innerHTML = `<span class="avatar-initials-text" style="position:relative; z-index:1;">${initials}</span>`;
