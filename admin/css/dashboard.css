@@ -8052,14 +8052,35 @@ html body.minside-body .design-ui-panel-header > select {
     margin-left: auto !important;
 }
 
+/* Ensure topbar profile trigger is a clean 42px avatar button without text overflow */
+html body .section-header-actions .user-profile-link .user-info-text,
+html body .section-header-actions #admin-profile-trigger .user-info-text,
+html body .section-header-actions .user-info-text {
+    display: none !important;
+}
 
-
-
-
-
-
-
-
-
-
-
+html body .section-header-actions .user-profile-link,
+html body .section-header-actions #actions-btn,
+html body .section-header-actions #admin-profile-trigger {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    outline: none !important;
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    max-width: 42px !important;
+    max-height: 42px !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+    flex-shrink: 0 !important;
+}

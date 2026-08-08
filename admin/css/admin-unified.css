@@ -12467,6 +12467,12 @@ html body.admin-body .main-header .user-profile-link,
 html body.minside-body .main-header .user-profile-link,
 html body.admin-body #dashboard-main-header .user-profile-link,
 html body.minside-body #dashboard-main-header .user-profile-link,
+html body .section-header-actions .user-profile-link .user-info-text,
+html body .section-header-actions #admin-profile-trigger .user-info-text,
+html body .section-header-actions .user-info-text {
+    display: none !important;
+}
+
 html body .section-header-actions .user-profile-link,
 html body .section-header-actions #actions-btn,
 html body .section-header-actions #admin-profile-trigger {
