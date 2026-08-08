@@ -6,7 +6,8 @@
     <script src="/js/hkm-auth-manager.js"></script>
     <!-- HKM Global Utilities -->
     <script src="/js/hkm-utils.js"></script>
-            <!-- Theme Initializer -->
+
+    <!-- Theme Initializer -->
     <script>
         (function () {
             const savedTheme = localStorage.getItem('hkm_theme');
@@ -36,892 +37,38 @@
         })();
     </script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analyse & Statistikk | HKM Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Admin Dashboard | His Kingdom Ministry</title>
 
-    <!-- Google Fonts -->
+    <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 
-    <!-- Material Symbols -->
-    <!-- Material Symbols Outlined (Deferred) -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block"></noscript>
+    <!-- Preload critical fonts -->
+    <link rel="preload" href="/fonts/min-font.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" as="style">
 
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts & Material Symbols -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Merriweather:wght@700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" />
 
-    <!-- Google Charts API (For GeoChart) -->
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-
-    <!-- CSS -->
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="css/dashboard.css?v=20260808_V36">
     <link rel="stylesheet" href="../css/notifications.css">
     <link rel="stylesheet" href="css/admin-unified.css?v=20260808_V36">
     <link rel="stylesheet" href="../minside/css/minside.css?v=20260808_V36">
     <link rel="stylesheet" href="css/todo.css?v=20260729_TODO_OVERHAUL">
+    
+    
+    <!-- Firebase Config & Service (Moved to head for early loading) -->
+    <script type="module" src="../js/firebase-config.js"></script>
+    <script type="module" src="../js/firebase-service.js?v=2026.04.27.13.05"></script>
+    <script type="module" src="../js/content-manager.js"></script>
+    <link rel="stylesheet" href="css/version-history.css?v=20260728_V1">
 
-    <style>
-        /* Layer Isolation & Chrome Jitter Fix (Gold Standard) */
-        .analytics-container,
-        .analytics-grid,
-        .stat-card-premium,
-        .chart-card-premium {
-            transform: translateZ(0) !important;
-            backface-visibility: hidden !important;
-            will-change: transform;
-        }
-
-        body.admin-analytics-page {
-            overflow-x: hidden !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            box-sizing: border-box !important;
-        }
-
-        @media (min-width: 1025px) {
-            body.admin-analytics-page .main-content {
-                flex: 1 1 0% !important;
-                width: calc(100% - 260px) !important;
-                max-width: calc(100% - 260px) !important;
-                margin-left: 260px !important;
-                box-sizing: border-box !important;
-                min-width: 0 !important;
-                overflow-x: hidden !important;
-            }
-        }
-
-        @media (max-width: 1024px) {
-            body.admin-analytics-page .main-content {
-                width: 100% !important;
-                max-width: 100% !important;
-                margin-left: 0 !important;
-                box-sizing: border-box !important;
-                min-width: 0 !important;
-                overflow-x: hidden !important;
-            }
-        }
-
-        .analytics-container {
-            width: 100% !important;
-            max-width: 100% !important;
-            margin: 0 !important;
-            padding: var(--admin-page-gutter, 24px) var(--admin-page-gutter, 24px) 28px !important;
-            box-sizing: border-box !important;
-        }
-
-        @media (max-width: 768px) {
-            .analytics-container {
-                padding: 16px 12px 28px !important;
-                overflow-x: hidden !important;
-            }
-            .chart-card-premium {
-                padding: 16px !important;
-                width: 100% !important;
-                box-sizing: border-box !important;
-                overflow: hidden !important;
-            }
-            .stats-grid-premium, .analytics-main-grid {
-                gap: 16px !important;
-            }
-        }
-
-        /* Prevent long page paths from causing horizontal overflow */
-        .top-page-info, .page-info, .top-page-path, .page-url {
-            white-space: nowrap !important;
-            text-overflow: ellipsis !important;
-            overflow: hidden !important;
-            min-width: 0 !important;
-        }
-
-        body.admin-analytics-page .content-wrapper {
-            width: 100% !important;
-            max-width: none !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-
-        /* Spacing adhering to 8px Grid Rule */
-        .analytics-header-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            padding-bottom: 8px;
-        }
-
-        .period-selector {
-            display: flex;
-            background: #f1f5f9;
-            border-radius: 24px;
-            padding: 4px;
-            border: 1px solid #e2e8f0;
-            gap: 4px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none; /* Firefox */
-        }
-        
-        .period-selector::-webkit-scrollbar {
-            display: none; /* Chrome/Safari */
-        }
-
-        @media (max-width: 768px) {
-            .analytics-header-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 16px;
-            }
-            .period-selector {
-                width: 100%;
-            }
-            .period-btn {
-                flex: 1 0 auto;
-                text-align: center;
-                white-space: nowrap;
-            }
-        }
-
-        .period-btn {
-            padding: 8px 16px;
-            border-radius: 20px;
-            border: none;
-            background: transparent;
-            color: #64748b;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .period-btn:hover {
-            color: #d17d39;
-        }
-
-        .period-btn.active {
-            background: linear-gradient(135deg, #d17d39, #bd4f2a);
-            color: white;
-            box-shadow: 0 4px 10px rgba(209, 125, 57, 0.2);
-        }
-
-        /* Premium Metric Cards Grid */
-        .stats-grid-premium {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-
-        @media (min-width: 1200px) {
-            .stats-grid-premium {
-                grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr);
-            }
-        }
-
-        .stat-card-premium {
-            background: white;
-            border-radius: 16px;
-            border: 1px solid #e2e8f0;
-            padding: 24px;
-            box-shadow: 0 4px 20px -2px rgba(27, 73, 101, 0.04), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
-        }
-
-        .stat-card-premium:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 30px -4px rgba(27, 73, 101, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.02);
-            border-color: rgba(27, 73, 101, 0.15);
-        }
-
-        /* Live User Card Styling */
-        .live-users-card {
-            border-left: 4px solid #bd4f2a;
-            background: linear-gradient(to right, white, #fffdfb);
-        }
-
-        .pageviews-card {
-            border-left: 4px solid #3b82f6;
-            background: linear-gradient(to right, white, #fafdff);
-        }
-
-        .engagement-card {
-            border-left: 4px solid #10b981;
-            background: linear-gradient(to right, white, #fafffc);
-        }
-
-        .live-indicator-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #ef4444;
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
-            animation: pulse-red 2s infinite;
-            margin-right: 6px;
-        }
-
-        @keyframes pulse-red {
-            0% {
-                transform: scale(0.95);
-                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
-            }
-            70% {
-                transform: scale(1);
-                box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
-            }
-            100% {
-                transform: scale(0.95);
-                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-            }
-        }
-
-        .stat-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .stat-card-title {
-            font-size: 11px;
-            font-weight: 700;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .stat-card-value {
-            font-size: 32px;
-            font-weight: 800;
-            color: #1e293b;
-            line-height: 1;
-            margin-bottom: 8px;
-            font-feature-settings: "tnum";
-        }
-
-        .stat-card-trend {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 8px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .stat-card-trend.up {
-            background: #dcfce7;
-            color: #15803d;
-        }
-
-        .stat-card-trend.down {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .stat-card-trend.live {
-            background: #fff7ed;
-            color: #c2410c;
-            border: 1px solid #ffedd5;
-            font-weight: 700;
-        }
-
-        .stat-card-meta {
-            font-size: 12px;
-            color: #94a3b8;
-            margin-top: 4px;
-        }
-
-        /* Mini Realtime Sparkline Chart styling */
-        .mini-sparkline {
-            display: flex;
-            align-items: flex-end;
-            gap: 6px;
-            height: 48px;
-            margin-top: 12px;
-            width: 100%;
-        }
-
-        .mini-bar {
-            flex: 1;
-            background: #ffedd5;
-            border-radius: 2px 2px 0 0;
-            min-height: 4px;
-            transition: height 0.3s ease, background-color 0.3s ease;
-        }
-
-        .mini-bar.highlighted {
-            background: linear-gradient(to top, #bd4f2a, #d17d39);
-        }
-
-        /* Quick Action Icon link */
-        .stat-action-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: #f1f5f9;
-            color: #475569;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-        }
-
-        .stat-card-premium .material-symbols-outlined,
-        .stat-action-btn .material-symbols-outlined {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            line-height: 1 !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            letter-spacing: normal !important;
-        }
-
-        .stat-action-btn:hover {
-            background: #d17d39;
-            color: white;
-            transform: scale(1.05);
-        }
-
-        .stat-action-btn:active {
-            transform: scale(0.95);
-        }
-
-        /* Premium Two Column Dashboard Layout */
-        .analytics-main-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-
-        @media (min-width: 1024px) {
-            .analytics-main-grid {
-                grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
-            }
-        }
-
-        .chart-card-premium {
-            background: white;
-            border-radius: 16px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 20px -2px rgba(27, 73, 101, 0.04);
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chart-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 24px;
-        }
-
-        .chart-card-title-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .chart-card-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: #1e293b;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .chart-card-subtitle {
-            font-size: 12px;
-            color: #64748b;
-            margin: 0;
-        }
-
-        .chart-container-inner {
-            position: relative;
-            flex-grow: 1;
-            min-height: 300px;
-            width: 100%;
-        }
-
-        /* Top Pages & Sources Widget */
-        .top-pages-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .top-page-item {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            width: 100%;
-            min-width: 0;
-        }
-
-        .top-page-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 13px;
-            width: 100%;
-            min-width: 0;
-        }
-
-        .top-page-name {
-            font-weight: 600;
-            color: #334155;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
-            max-width: 70%;
-            min-width: 0;
-        }
-
-        .top-page-count {
-            font-family: 'Fira Code', monospace;
-            font-size: 12px;
-            font-weight: 700;
-            color: #d17d39;
-            background: #fff7ed;
-            padding: 2px 8px;
-            border-radius: 4px;
-        }
-
-        .top-page-bar-wrapper {
-            height: 8px;
-            background: #f1f5f9;
-            border-radius: 4px;
-            overflow: hidden;
-            width: 100%;
-        }
-
-        .top-page-bar {
-            height: 100%;
-            border-radius: 4px;
-            background: linear-gradient(to right, #1b4965, #3b82f6);
-            transition: width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .top-page-bar.accent {
-            background: linear-gradient(to right, #bd4f2a, #d17d39);
-        }
-
-        /* Geografisk / Norway Map Visual */
-        .geo-card-content {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .norway-map-visual {
-            width: 100%;
-            height: 200px;
-            background: #0f172a;
-            border-radius: 12px;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid #1e293b;
-        }
-
-        .norway-map-visual svg {
-            width: 80%;
-            height: 90%;
-            opacity: 0.85;
-        }
-
-        .norway-land {
-            fill: #1e293b;
-            stroke: #334155;
-            stroke-width: 1.5;
-        }
-
-        /* Glimrende orange punkter på kartet (Oslo, Bergen, Trondheim, Mandal) */
-        .map-hotspot {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background: #f97316;
-            border-radius: 50%;
-            box-shadow: 0 0 12px 4px #f97316;
-        }
-
-        .hotspot-label {
-            position: absolute;
-            font-size: 9px;
-            color: #94a3b8;
-            font-weight: 700;
-            background: rgba(15, 23, 42, 0.8);
-            padding: 1px 4px;
-            border-radius: 3px;
-            pointer-events: none;
-            border: 1px solid #334155;
-        }
-
-        .hotspot-mandal {
-            top: 92% !important;
-            left: 21% !important;
-            bottom: auto !important;
-            animation: pulse-orange 1.5s infinite;
-            background: #ef4444;
-            box-shadow: 0 0 16px 6px #ef4444;
-            width: 10px;
-            height: 10px;
-        }
-
-        .label-mandal {
-            top: 85% !important;
-            left: -15px !important;
-            bottom: auto !important;
-            color: white;
-            border-color: #bd4f2a;
-            background: #bd4f2a;
-        }
-
-        @keyframes pulse-orange {
-            0% {
-                transform: scale(0.9);
-                box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.8);
-            }
-            70% {
-                transform: scale(1.1);
-                box-shadow: 0 0 0 10px rgba(249, 115, 22, 0);
-            }
-            100% {
-                transform: scale(0.9);
-                box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
-            }
-        }
-
-        /* Donut Chart Center Value wrapper */
-        .donut-chart-wrapper {
-            position: relative;
-            width: 200px;
-            height: 200px;
-            margin: 0 auto;
-        }
-
-        .donut-center-label {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            pointer-events: none;
-        }
-
-        .donut-center-val {
-            font-size: 28px;
-            font-weight: 800;
-            color: #1e293b;
-            line-height: 1;
-        }
-
-        .donut-center-text {
-            font-size: 11px;
-            font-weight: 700;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-top: 4px;
-        }
-
-        /* Custom Source Legends matching layout style */
-        .source-legends {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            width: 100%;
-            margin-top: 8px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 13px;
-        }
-
-        .legend-left {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .legend-color-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-
-        .legend-color-dot.direkte { background: #bd4f2a; }
-        .legend-color-dot.sok { background: #d17d39; }
-        .legend-color-dot.sosial { background: #cbd5e1; }
-
-        .legend-name {
-            font-weight: 500;
-            color: #475569;
-        }
-
-        .legend-description {
-            font-size: 11px;
-            color: #94a3b8;
-            margin-left: 18px;
-            display: block;
-        }
-
-        .legend-pct {
-            font-family: 'Fira Code', monospace;
-            font-weight: 700;
-            color: #1e293b;
-        }
-
-        /* Detailed Sideresultater Modal styling */
-        .modal-overlay-premium {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(4px);
-            z-index: 99999; /* Higher than mobile bottom nav */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .modal-card-premium {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            width: 100%;
-            max-width: 700px;
-            max-height: 90vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid #e2e8f0;
-        }
-
-        .modal-header-premium {
-            padding: 24px 32px;
-            border-bottom: 1px solid #e2e8f0;
-            background: #f8fafc;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-
-        .modal-body-premium {
-            padding: 32px;
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        .modal-footer-premium {
-            padding: 20px 32px;
-            border-top: 1px solid #e2e8f0;
-            background: #f8fafc;
-            display: flex;
-            justify-content: flex-end;
-        }
-
-        @media (max-width: 768px) {
-            .modal-overlay-premium {
-                padding: 16px;
-            }
-            .modal-header-premium {
-                padding: 16px;
-            }
-            .modal-body-premium {
-                padding: 16px;
-            }
-            .modal-footer-premium {
-                padding: 16px;
-            }
-            .modal-header-premium h2 {
-                font-size: 16px !important;
-            }
-        }
-
-        .close-btn-premium {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #64748b;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: color 0.2s;
-        }
-
-        .close-btn-premium:hover {
-            color: #1e293b;
-        }
-
-        /* Form Controls */
-        .btn-premium {
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid #cbd5e1;
-            background: white;
-            color: #475569;
-        }
-
-        .btn-premium:hover {
-            background: #f8fafc;
-            border-color: #94a3b8;
-        }
-
-        .btn-premium-primary {
-            background: linear-gradient(135deg, #d17d39, #bd4f2a);
-            color: white;
-            border: none;
-            box-shadow: 0 4px 10px rgba(209, 125, 57, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .btn-premium-primary:hover {
-            background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
-            color: white !important;
-            box-shadow: 0 6px 16px rgba(209, 125, 57, 0.3);
-            filter: brightness(1.05);
-            transform: translateY(-1px);
-        }
-
-        .btn-premium-primary:active {
-            background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
-            color: white !important;
-            transform: translateY(0);
-            box-shadow: 0 4px 10px rgba(209, 125, 57, 0.2);
-            filter: brightness(0.95);
-        }
-
-        /* Search Console & Gen AI Visibility Styles (Oransje gradient accents) */
-        .gsc-metric-container {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        @media (max-width: 640px) {
-            .gsc-metric-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        .gsc-metric-box {
-            background: #f8fafc;
-            padding: 14px 12px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            text-align: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-        }
-        .gsc-metric-box:hover {
-            border-color: rgba(209, 125, 57, 0.3);
-            background: #fffdfb;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(27, 73, 101, 0.03);
-        }
-        .ai-alert-box {
-            background: rgba(209, 125, 57, 0.04);
-            border: 1px solid rgba(209, 125, 57, 0.15);
-            padding: 14px;
-            border-radius: 10px;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            transition: border-color 0.2s ease;
-        }
-        .ai-alert-box:hover {
-            border-color: rgba(209, 125, 57, 0.3);
-        }
-        .badge-orange-gradient {
-            background: linear-gradient(135deg, #d17d39, #bd4f2a);
-            color: white;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 4px 8px;
-            border-radius: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .platform-icon-circle {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 9px;
-            font-weight: 800;
-            flex-shrink: 0;
-            box-sizing: border-box;
-            background: #f1f5f9;
-            color: #64748b;
-        }
-        .platform-icon-circle.chatgpt {
-            background: rgba(16, 163, 127, 0.08);
-            color: #10a37f;
-            border: 1px solid rgba(16, 163, 127, 0.15);
-        }
-        .platform-icon-circle.gemini {
-            background: rgba(26, 115, 232, 0.08);
-            color: #1a73e8;
-            border: 1px solid rgba(26, 115, 232, 0.15);
-        }
-        .platform-icon-circle.claude {
-            background: rgba(217, 119, 6, 0.08);
-            color: #d97706;
-            border: 1px solid rgba(217, 119, 6, 0.15);
-        }
-        .platform-icon-circle.perplexity {
-            background: rgba(20, 184, 166, 0.08);
-            color: #14b8a6;
-            border: 1px solid rgba(20, 184, 166, 0.15);
-        }
-        .ai-query-row {
-            margin-bottom: 12px;
-        }
-        .ai-query-row:last-child {
-            margin-bottom: 0;
-        }
-    </style>
     <!-- Admin PWA -->
     <link rel="manifest" href="/admin/manifest.webmanifest">
     <meta name="theme-color" content="#cc6f2c">
@@ -931,8 +78,24 @@
     <meta name="apple-mobile-web-app-title" content="HKM Admin">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="/img/logo-hkm.png">
-    <script type="module" src="js/admin-pwa.js?v=20260616_PWA3"></script>
+    <script type="module" src="js/admin-pwa.js"></script>
 
+    <!-- Error Logger (Deferred by default as module) -->
+    <script type="module" src="../js/error-logger.js"></script>
+    <!-- Loader Safety Net -->
+    <script type="module">
+        (function() {
+            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
+                }
+            }, 4000);
+        })();
+    </script>
     <link rel="icon" type="image/png" href="/img/logo-hkm.png">
     <!-- FORCED MENU LINE REMOVAL (IPAD / MOBILE CACHE BUSTER) -->
     <style>
@@ -964,41 +127,260 @@
             border-image: none !important;
         }
     </style>
+    <link rel="stylesheet" href="css/admin-analytics.css">
 </head>
 
-<body class="admin-body admin-analytics-page">
-    <!-- Sidebar Navigation (Hydrated dynamically by admin-header.js) -->
+<body class="admin-body main-dashboard cloak">
+    <!-- Global Error UI (Hidden by default) -->
+    <div id="global-error-container"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+        <span class="material-symbols-outlined"
+            style="font-size: 64px; color: #ef4444; margin-bottom: 20px;">error</span>
+        <h2 style="font-size: 24px; color: #1e293b; margin-bottom: 10px;">Noe gikk galt</h2>
+        <p id="global-error-message" style="color: #64748b; max-width: 500px; margin-bottom: 30px;">En uventet feil har
+            oppstått.</p>
+        <button onclick="window.location.reload()"
+            style="padding: 12px 24px; background: #ef4444; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Last
+            inn på nytt</button>
+    </div>
+
+    <!-- Sidebar Navigation -->
     <aside class="sidebar">
         <div class="sidebar-header" style="display: flex; align-items: center; justify-content: space-between;">
             <a href="/admin/index.html" class="logo" style="margin-bottom: 0; text-decoration: none;">
                 <img src="/img/logo-hkm.png" alt="HKM Logo">
                 <h1 class="logo-text">HKM Studio</h1>
             </a>
-            <button id="mobile-sidebar-close" style="display: none; background: none; border: none; font-size: 24px; color: #64748b; cursor: pointer; align-items: center; justify-content: center;" class="mobile-sidebar-close-btn">
+            <button id="mobile-sidebar-close"
+                style="display: none; background: none; border: none; font-size: 24px; color: #64748b; cursor: pointer; align-items: center; justify-content: center;"
+                class="mobile-sidebar-close-btn">
                 <span class="material-symbols-outlined">close</span>
             </button>
         </div>
 
         <nav class="sidebar-nav">
-            <!-- Injected by admin-header.js -->
+            <div class="nav-group">
+                <ul class="nav-list">
+                    <li class="nav-item visible" data-nav-category="all">
+                        <a href="javascript:void(0)" class="nav-link" data-section="overview">
+                            <span class="material-symbols-outlined">home</span>
+                            <span>Oversikt</span>
+                        </a>
+                    </li>
+                    <li class="nav-category-header" data-target-category="nettsted"><span>Nettsted</span><span
+                            class="material-symbols-outlined expand-icon">expand_more</span></li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="javascript:void(0)" class="nav-link" data-section="content">
+                            <span class="material-symbols-outlined">description</span>
+                            <span>Sideinnhold</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="javascript:void(0)" class="nav-link" data-section="blog">
+                            <span class="material-symbols-outlined">edit_note</span>
+                            <span>Blogg</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="javascript:void(0)" class="nav-link" data-section="media">
+                            <span class="material-symbols-outlined">perm_media</span>
+                            <span>Mediebibliotek</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="javascript:void(0)" class="nav-link" data-section="podcast">
+                            <span class="material-symbols-outlined">podcasts</span>
+                            <span>Podcast</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="javascript:void(0)" class="nav-link" data-section="hero">
+                            <span class="material-symbols-outlined">view_carousel</span>
+                            <span>Hero Slider</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="javascript:void(0)" class="nav-link" data-section="teaching">
+                            <span class="material-symbols-outlined">school</span>
+                            <span>Undervisning</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="javascript:void(0)" class="nav-link" data-section="courses">
+                            <span class="material-symbols-outlined">menu_book</span>
+                            <span>Kursadministrasjon</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="javascript:void(0)" class="nav-link" data-section="reading-plans">
+                            <span class="material-symbols-outlined">auto_stories</span>
+                            <span>Leseplaner</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="javascript:void(0)" class="nav-link" data-section="design">
+                            <span class="material-symbols-outlined">palette</span>
+                            <span>Design & Logo</span>
+                        </a>
+                    </li>
+                    <li class="nav-category-header" data-target-category="kommunikasjon"><span>Kommunikasjon</span><span
+                            class="material-symbols-outlined expand-icon">expand_more</span></li>
+                    <li class="nav-item" data-nav-category="kommunikasjon">
+                        <a href="javascript:void(0)" class="nav-link" data-section="events">
+                            <span class="material-symbols-outlined">event</span>
+                            <span>Arrangementer</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="kommunikasjon">
+                        <a href="/admin/admin-kommunikasjon.html" class="nav-link">
+                            <span class="material-symbols-outlined">group</span>
+                            <span>Kontakter</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="kommunikasjon">
+                        <a href="/admin/admin-segmenter.html" class="nav-link">
+                            <span class="material-symbols-outlined">segment</span>
+                            <span>Segmenter</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="kommunikasjon">
+                        <a href="/admin/admin-meldinger.html" class="nav-link">
+                            <span class="material-symbols-outlined">inbox</span>
+                            <span>Meldinger</span>
+                            <span id="messages-badge" class="nav-badge" style="display: none;">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="kommunikasjon">
+                        <a href="javascript:void(0)" class="nav-link" data-section="comments">
+                            <span class="material-symbols-outlined">forum</span>
+                            <span>Kommentarer</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="kommunikasjon">
+                        <a href="/admin/admin-nyhetsbrev.html" class="nav-link">
+                            <span class="material-symbols-outlined">auto_awesome</span>
+                            <span>HKM Studio</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="kommunikasjon">
+                        <a href="/admin/admin-nyhetsbrev.html" class="nav-link">
+                            <span class="material-symbols-outlined">mail</span>
+                            <span>Nyhetsbrev</span>
+                        </a>
+                    </li>
+                    <li class="nav-category-header" data-target-category="administrasjon">
+                        <span>Administrasjon</span><span
+                            class="material-symbols-outlined expand-icon">expand_more</span>
+                    </li>
+                    <li class="nav-item" data-nav-category="administrasjon">
+                        <a href="javascript:void(0)" class="nav-link" data-section="causes">
+                            <span class="material-symbols-outlined">volunteer_activism</span>
+                            <span>Gaver</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="administrasjon">
+                        <a href="javascript:void(0)" class="nav-link" data-section="shop">
+                            <span class="material-symbols-outlined">shopping_cart</span>
+                            <span>Nettbutikk & Salg</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="administrasjon">
+                        <a href="javascript:void(0)" class="nav-link" data-section="users">
+                            <span class="material-symbols-outlined">group</span>
+                            <span>Brukere</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="administrasjon">
+                        <a href="javascript:void(0)" class="nav-link" data-section="automation">
+                            <span class="material-symbols-outlined">auto_mode</span>
+                            <span>Automatisering</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="administrasjon">
+                        <a href="javascript:void(0)" class="nav-link" data-section="seo">
+                            <span class="material-symbols-outlined">search_check</span>
+                            <span>SEO & Meta</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="administrasjon">
+                        <a href="javascript:void(0)" class="nav-link" data-section="integrations">
+                            <span class="material-symbols-outlined">hub</span>
+                            <span>Integrasjoner</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="administrasjon">
+                        <a href="javascript:void(0)" class="nav-link" data-section="app">
+                            <span class="material-symbols-outlined">smartphone</span>
+                            <span>HKM Mobilapp</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="administrasjon">
+                        <a href="javascript:void(0)" class="nav-link" data-section="settings">
+                            <span class="material-symbols-outlined">settings</span>
+                            <span>Innstillinger</span>
+                        </a>
+                    </li>
+                    <li class="nav-item visible" data-nav-category="administrasjon">
+                        <a href="/admin/admin-analytics.html" class="nav-link active">
+                            <span class="material-symbols-outlined">insert_chart_outlined</span>
+                            <span>Analyse</span>
+                        </a>
+                    </li>
+                    <li class="nav-item visible" data-nav-category="administrasjon">
+                        <a href="/admin/admin-logger.html" class="nav-link ">
+                            <span class="material-symbols-outlined">assignment</span>
+                            <span>Systemlogger</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="nav-group bottom">
+                <ul class="nav-list">
+                    <li class="nav-item" data-nav-category="all">
+                        <a href="/minside/index.html" class="nav-link" id="admin-profile-trigger-sidebar">
+                            <span class="material-symbols-outlined">account_circle</span>
+                            <span>Min Side</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="all">
+                        <a href="/" target="_blank" class="nav-link">
+                            <span class="material-symbols-outlined">visibility</span>
+                            <span>Se nettside</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="all">
+                        <button id="logout-btn" class="nav-link logout">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span>Logg ut</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
         </nav>
     </aside>
 
     <!-- Main Content Area -->
     <main class="main-content">
+        <!-- Header -->
         <div id="dashboard-main-header" class="main-header">
             <div class="section-header design-ui-header in-topbar" style="margin-bottom: 0;">
+
+                <!-- ← Hamburger on the LEFT -->
                 <button id="mobile-nav-toggle" class="mobile-nav-toggle">
                     <span class="material-symbols-outlined">menu</span>
                 </button>
+
                 <div class="section-header-icon">
-                    <span id="dashboard-main-header-icon" class="material-symbols-outlined">analytics</span>
+                    <span id="dashboard-main-header-icon" class="material-symbols-outlined">grid_view</span>
                 </div>
                 <div class="section-header-content">
                     <div class="section-header-titles">
-                        <h2 id="dashboard-main-header-title" class="section-title">Analyse & Statistikk</h2>
-                        <p id="dashboard-main-header-subtitle" class="section-subtitle">Google Analytics og nettstedstrafikk i sanntid.</p>
+                        <h2 id="dashboard-main-header-title" class="section-title">Oversikt</h2>
+                        <p id="dashboard-main-header-subtitle" class="section-subtitle">HKM Studio administrasjonspanel
+                        </p>
                     </div>
+
                     <div class="section-header-actions">
                         <div id="topbar-dynamic-actions" class="topbar-dynamic-actions" style="display: none; align-items: center; gap: 8px;"></div>
                         <div id="global-search-opener" class="bento-search-bar" title="Søk (CMD+K)">
@@ -1032,7 +414,118 @@
             </div>
         </div>
 
-        <div class="analytics-container">
+
+        <!-- Global Search Modal -->
+        <div id="search-modal" class="search-overlay">
+            <div class="search-modal-container">
+                <button id="close-search-modal" class="close-search-btn" aria-label="Lukk søk">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+                <div class="search-modal-title">Søk i systemet</div>
+                <div class="search-input-group">
+                    <span class="material-symbols-outlined">search</span>
+                    <input type="text" id="global-modal-search-input" class="search-input-field"
+                        placeholder="Hva leter du etter? Skriv for forslag..." aria-label="Søk">
+                </div>
+                <div id="search-suggestions" class="search-suggestions-container" style="display: none;"></div>
+                <div class="search-help-text">Trykk 'Enter' for fullstendig søk.</div>
+            </div>
+        </div>
+
+
+
+        <!-- Template Editor Modal -->
+        <div id="template-editor-modal" class="profile-modal"
+            style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); z-index:2100; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
+            <div class="profile-modal-content card modern"
+                style="padding: 0; width:100%; max-width:800px; max-height:90vh; overflow:hidden; display:flex; flex-direction:column;">
+
+                <div class="modal-header"
+                    style="padding: 24px 32px; border-bottom: 1px solid var(--admin-border); background: var(--admin-surface-muted); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h2 style="font-size: 20px; font-weight: 800; margin: 0;" id="template-editor-title">Rediger mal
+                        </h2>
+                        <p style="font-size: 13px; color: var(--admin-text-muted); margin: 4px 0 0 0;">Tilpass innholdet
+                            i den automatiserte e-posten.</p>
+                    </div>
+                    <button id="close-template-modal"
+                        style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--admin-text-muted); display: flex; align-items: center; justify-content: center;">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <div style="padding: 32px; overflow-y: auto; flex: 1;">
+                    <form id="template-editor-form">
+                        <input type="hidden" id="edit-template-id">
+
+                        <div class="form-group" style="margin-bottom: 24px;">
+                            <label
+                                style="display: block; font-size: 13px; font-weight: 700; color: var(--admin-text); margin-bottom: 8px;">Emnefelt</label>
+                            <input type="text" id="edit-template-subject" class="form-control"
+                                style="width: 100%; padding: 12px 16px; border: 1px solid var(--admin-border); border-radius: 10px; font-size: 15px; outline: none; transition: border-color 0.2s;"
+                                placeholder="Skriv inn emnefelt...">
+                        </div>
+
+                        <div class="form-group">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <label style="font-size: 13.5px; font-weight: 800; color: var(--admin-text); margin: 0; white-space: nowrap;">E-postinnhold</label>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <button type="button" id="toggle-preview-mode-btn" class="btn btn-sm"
+                                        style="background: #1B4965; color: #ffffff; padding: 6px 16px; font-size: 12px; cursor: pointer; font-weight: 700; border-radius: 20px; border: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(27, 73, 101, 0.15);">
+                                        <span class="material-symbols-outlined" style="font-size: 16px;">visibility</span> Visuelt utseende
+                                    </button>
+                                    <button type="button" id="toggle-code-mode-btn" class="btn btn-sm"
+                                        style="background: #f1f5f9; color: #475569; padding: 6px 16px; font-size: 12px; cursor: pointer; font-weight: 600; border-radius: 20px; border: 1px solid #cbd5e1; display: inline-flex; align-items: center; gap: 6px;">
+                                        <span class="material-symbols-outlined" style="font-size: 16px;">code</span> Rediger HTML-kode
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div style="background: #f8fafc; padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; border: 1px solid #e2e8f0;">
+                                <p style="font-size: 12px; color: #64748b; margin: 0 0 10px 0;">
+                                    <strong>Hurtig-innsetting:</strong> Klikk på knappene under for å lime inn variabler i teksten.
+                                </p>
+                                <div id="template-variables-container" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                                    <!-- Dynamic variables will be inserted here from admin.js -->
+                                </div>
+                                <p id="template-editor-warning" style="display: none; font-size: 12px; color: #d17d39; font-weight: 600; margin: 8px 0 0 0;"></p>
+                                <p id="template-permission-notice" style="display: none; font-size: 12px; color: #0284c7; background: #e0f2fe; padding: 8px 12px; border-radius: 6px; font-weight: 600; margin: 8px 0 0 0; border: 1px solid #bae6fd;"></p>
+                            </div>
+                            
+                            <!-- Live Rendered Preview Container (Default Active View) -->
+                            <div id="template-live-preview-container" style="display: block; width: 100%; height: 500px; border: 1px solid var(--admin-border); border-radius: 12px; overflow: hidden; background: #FCF9F5; box-sizing: border-box; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+                                <iframe id="template-preview-iframe" style="width: 100%; height: 100%; border: none; background: #FCF9F5;" title="Forhåndsvisning av e-post"></iframe>
+                            </div>
+
+                            <div id="quill-editor-container"
+                                style="display: none; height: 400px; border: 1px solid var(--admin-border); border-radius: 10px; overflow: hidden; background: #fff;">
+                                <div id="edit-template-body" style="height: 100%; border: none;"></div>
+                            </div>
+
+                            <!-- Raw Code Textarea (Hidden by default, opened via Rediger HTML-kode tab) -->
+                            <textarea id="edit-template-body-raw"
+                                style="display: none; width: 100%; height: 500px; padding: 16px; border: 1px solid var(--admin-border); border-radius: 12px; font-family: 'Fira Code', Monaco, Consolas, monospace; font-size: 13px; line-height: 1.5; box-sizing: border-box; resize: none; background: #0f172a; color: #f8fafc; outline: none;"></textarea>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer"
+                    style="padding: 20px 32px; border-top: 1px solid var(--admin-border); background: var(--admin-surface-muted); display: flex; justify-content: flex-end; gap: 12px; align-items: center;">
+                    <button type="button" id="send-test-template-btn" class="btn"
+                        style="background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; margin-right: auto; padding: 10px 18px; font-weight: 600; font-size: 14px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px !important; line-height: 1;">
+                        <span class="material-symbols-outlined" style="font-size: 20px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transform: translateY(1px); margin-right: -2px !important;">send</span><span style="display: inline-flex; align-items: center; line-height: 1;">Send test-e-post</span>
+                    </button>
+                    <button type="button" id="cancel-template-edit" class="btn"
+                        style="background: #fff; border: 1px solid var(--admin-border); color: var(--admin-text-muted); padding: 10px 18px; font-weight: 600; font-size: 14px; border-radius: 8px; cursor: pointer;">Avbryt</button>
+                    <button id="save-template-btn" class="btn btn-primary" style="padding: 10px 18px; font-weight: 600; font-size: 14px; border-radius: 8px; cursor: pointer;">Lagre mal</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Section Content -->
+        <section id="content-area" class="section-container">
+<div class="analytics-container">
+
             <!-- Global Diagnostic Banner -->
             <div id="analytics-error-banner" style="display: none; background-color: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; padding: 16px 20px; border-radius: 12px; margin-bottom: 24px; font-size: 14px; font-weight: 600; align-items: center; gap: 12px; transition: all 0.3s ease;">
                 <span class="material-symbols-outlined" style="color: #ef4444;">error</span>
@@ -1512,43 +1005,11 @@
                 </div>
             </div>
         </div>
+        </section>
     </main>
 
-    <!-- Detailed Pages Modal -->
-    <div id="pages-results-modal" class="modal-overlay-premium" style="display: none;">
-        <div class="modal-card-premium">
-            <div class="modal-header-premium">
-                <div>
-                    <h2 style="font-size: 18px; font-weight: 800; margin: 0; color: #1e293b;">Alle Sideresultater</h2>
-                    <p style="font-size: 13px; color: #64748b; margin: 4px 0 0 0;">Oversikt over sidevisninger for hele nettstedet.</p>
-                </div>
-                <button class="close-btn-premium" id="close-pages-modal-btn">&times;</button>
-            </div>
-            <div class="modal-body-premium">
-                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
-                    <thead>
-                        <tr style="border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600;">
-                            <th style="padding: 12px 8px;">Side-URL</th>
-                            <th style="padding: 12px 8px; text-align: right;">Visninger</th>
-                            <th style="padding: 12px 8px; text-align: right;">Andel %</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="3" style="padding: 20px 8px; text-align: center; color: #64748b;">Laster sider...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="modal-footer-premium">
-                <button class="btn-premium btn-premium-primary" id="close-pages-modal-btn-2">Lukk</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Mobile Bottom Navigation bar matching standard admin panel structure -->
     <nav class="mobile-bottom-nav">
-        <a href="/admin/index.html" class="mobile-nav-item">
+        <a href="/admin/index.html#overview" class="mobile-nav-item active" data-section="overview">
             <span class="material-symbols-outlined">grid_view</span>
             <span>Oversikt</span>
         </a>
@@ -1560,1432 +1021,602 @@
             <span class="material-symbols-outlined">account_circle</span>
             <span>Min Side</span>
         </a>
-        <a href="/admin/index.html#settings" class="mobile-nav-item">
+        <a href="/admin/index.html#settings" class="mobile-nav-item" data-section="settings">
             <span class="material-symbols-outlined">settings</span>
             <span>Innstillinger</span>
         </a>
     </nav>
 
-    <!-- Firebase SDK (Compat) -->
-    <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    <div class="fab-menu-container">
+        <div class="fab-menu" id="fab-menu">
+            <button class="fab-item" id="add-contact-fab-item" onclick="window.location.href='admin-kommunikasjon.html?action=add-contact';">
+                <span class="fab-label">Ny kontakt</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">person_add</span></div>
+            </button>
+            <button class="fab-item" onclick="triggerFabAction('blog', 'add-new-blog')">
+                <span class="fab-label">Ny blogg</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">edit_document</span></div>
+            </button>
+            <button class="fab-item" onclick="window.location.href='admin-nyhetsbrev.html'">
+                <span class="fab-label">Nytt nyhetsbrev</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">mark_email_unread</span></div>
+            </button>
+            <button class="fab-item" onclick="triggerFabAction('teaching', 'add-new-teaching')">
+                <span class="fab-label">Ny undervisning</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">school</span></div>
+            </button>
+            <button class="fab-item" onclick="triggerFabAction('courses', 'new-course-btn')">
+                <span class="fab-label">Nytt kurs</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">menu_book</span></div>
+            </button>
+            <button class="fab-item" onclick="triggerFabAction('events', 'add-new-events')">
+                <span class="fab-label">Nytt arrangement</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">event</span></div>
+            </button>
+            <button class="fab-item" onclick="triggerFabAction('users', 'add-user-btn')">
+                <span class="fab-label">Ny bruker</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">person_add</span></div>
+            </button>
+            <button class="fab-item" onclick="if(window.openGlobalSearch) window.openGlobalSearch()">
+                <span class="fab-label">Søk i systemet</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">search</span></div>
+            </button>
+            <button class="fab-item" id="todo-fab-item">
+                <span class="fab-label">Huskeliste</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">playlist_add_check</span></div>
+            </button>
 
-    <!-- Core Firebase configuration & routing -->
-    <script type="module" src="../js/firebase-config.js"></script>
-    <script type="module" src="../js/firebase-service.js"></script>
+        </div>
+        <button class="mobile-fab" id="main-fab">
+            <span class="material-symbols-outlined">add</span>
+        </button>
+    </div>
+
+    <!-- App Scripts -->
     <script type="module" src="../js/admin-utils.js?v=20260714_V1"></script>
-    <script type="module" src="js/admin-header.js?v=20260602_V3"></script>
-    <script type="module" src="js/todo-drawer.js?v=20260602_V3"></script>
+    <!-- Core Dashboard Logic (Non-Module for compatibility) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.querySelector('.sidebar');
+            const mobileToggle = document.getElementById('mobile-nav-toggle');
+            const topbarTitle = document.getElementById('dashboard-main-header-title');
+            const topbarIcon = document.getElementById('dashboard-main-header-icon');
+            const topbarSubtitle = document.getElementById('dashboard-main-header-subtitle');
+            const ADMIN_LAST_DASHBOARD_SECTION_KEY = 'hkm_admin_last_dashboard_section';
 
-    <!-- Live Analytics Dashboard Logic -->
+            const topbarSectionOverrides = {
+                overview: { icon: 'grid_view', title: 'Oversikt' },
+                todo: { icon: 'playlist_add_check', title: 'Huskeliste' }
+            };
+
+            function getNavLabelFromLink(link) {
+                if (!link) return '';
+                const spans = link.querySelectorAll('span');
+                if (!spans || spans.length === 0) return '';
+                const textSpan = Array.from(spans)
+                    .find(span => span && span.classList && !span.classList.contains('material-symbols-outlined') && !span.classList.contains('nav-badge'));
+                return (textSpan?.textContent || '').trim();
+            }
+
+            function getSectionMeta(sectionId, sourceLink) {
+                const sectionEl = sectionId ? document.getElementById(`${sectionId}-section`) : null;
+                const sectionHeaderTitle = sectionEl?.querySelector('.section-header .section-title, .design-ui-header .section-title, .section-header h2, .section-header h3');
+                const sectionHeaderSubtitle = sectionEl?.querySelector('.section-header .section-subtitle, .design-ui-header .section-subtitle');
+                const sectionHeaderIcon = sectionEl?.querySelector('.section-header-icon .material-symbols-outlined');
+                const navIcon = sourceLink?.querySelector('.material-symbols-outlined');
+                const navTitle = getNavLabelFromLink(sourceLink);
+                const override = topbarSectionOverrides[sectionId] || {};
+
+                return {
+                    title: override.title || navTitle || sectionHeaderTitle?.textContent?.trim() || 'Oversikt',
+                    icon: override.icon || navIcon?.textContent?.trim() || sectionHeaderIcon?.textContent?.trim() || 'grid_view',
+                    subtitle: sectionHeaderSubtitle?.textContent?.trim() || 'HKM Studio administrasjonspanel'
+                };
+            }
+
+            function syncTopbarForSection(sectionId, sourceLink) {
+                if (!topbarTitle || !topbarIcon) return;
+                const meta = getSectionMeta(sectionId, sourceLink);
+                topbarTitle.textContent = meta.title;
+                topbarIcon.textContent = meta.icon;
+                if (topbarSubtitle) {
+                    topbarSubtitle.textContent = meta.subtitle;
+                }
+            }
+
+            // All hamburger/overlay logic is now handled by admin-header.js
+
+            const mobileSidebarClose = document.getElementById('mobile-sidebar-close');
+            if (mobileSidebarClose) {
+                mobileSidebarClose.addEventListener('click', () => {
+                    sidebar?.classList.remove('active');
+                    const overlay = document.querySelector('.sidebar-overlay');
+                    if (overlay && overlay.classList) {
+                        overlay.classList.remove('active');
+                        overlay.style.removeProperty('display');
+                        overlay.style.removeProperty('opacity');
+                        overlay.style.removeProperty('pointer-events');
+                    }
+                });
+            }
+
+            // Navigation logic with event delegation to handle dynamic sidebar replacement
+            function handleSectionSwitch(targetSectionId, sourceLink = null) {
+                if (!targetSectionId) return;
+
+                console.log(`[Navigation] Navigating to section: ${targetSectionId}`);
+                sessionStorage.setItem(ADMIN_LAST_DASHBOARD_SECTION_KEY, targetSectionId);
+                
+                // Update URL hash if needed (without triggering a second switch)
+                if (window.location.hash !== `#${targetSectionId}`) {
+                    try {
+                        history.pushState(null, '', `#${targetSectionId}`);
+                    } catch (_) {
+                        window.location.hash = targetSectionId;
+                    }
+                }
+
+                // Update Visible Section
+                const sections = document.querySelectorAll('.section-content');
+                console.log(`[Navigation] Found ${sections.length} sections. Hiding all, showing ${targetSectionId}-section.`);
+                sections.forEach(section => {
+                    if (section && section.classList) {
+                        section.classList.remove('active');
+                        if (section.id === `${targetSectionId}-section`) {
+                            section.classList.add('active');
+                            console.log(`[Navigation] Activated section: ${section.id}`);
+                        }
+                    }
+                });
+
+                // Trigger module-based rendering if available
+                if (window.adminManager && typeof window.adminManager.onSectionSwitch === 'function') {
+                    window.adminManager.onSectionSwitch(targetSectionId);
+                }
+
+                // Update Active Link UI
+                document.querySelectorAll('.nav-link, .mobile-nav-item').forEach(l => {
+                    if (l && l.classList) {
+                        const isMatch = l.getAttribute('data-section') === targetSectionId;
+                        l.classList.toggle('active', isMatch);
+                    }
+                });
+
+                // Sync topbar
+                const activeLink = sourceLink || document.querySelector(`.nav-link[data-section="${targetSectionId}"], .mobile-nav-item[data-section="${targetSectionId}"]`);
+                syncTopbarForSection(targetSectionId, activeLink);
+
+                // Close sidebar on mobile
+                sidebar?.classList.remove('active');
+                const overlay = document.querySelector('.sidebar-overlay');
+                if (overlay && overlay.classList) {
+                    overlay.classList.remove('active');
+                }
+            }
+
+            // Global click delegation
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('.nav-link[data-section], .mobile-nav-item[data-section]');
+                if (link) {
+                    e.preventDefault();
+                    const targetSectionId = link.getAttribute('data-section');
+                    handleSectionSwitch(targetSectionId, link);
+                }
+            });
+
+            // Handle browser back/forward and direct hash changes
+            window.addEventListener('hashchange', () => {
+                const hash = window.location.hash.substring(1);
+                if (hash) {
+                    handleSectionSwitch(hash);
+                }
+            });
+
+            // Initial load
+            const hash = window.location.hash.substring(1);
+            const rememberedSection = sessionStorage.getItem(ADMIN_LAST_DASHBOARD_SECTION_KEY);
+            const initialSection = hash || rememberedSection || 'overview';
+            
+            // Wait slightly for AdminManager to be ready before initial switch
+            setTimeout(() => {
+                handleSectionSwitch(initialSection);
+            }, 200);
+
+            // FAB Action Restoration
+            const pendingBtnId = sessionStorage.getItem('pendingFabAction');
+            if (pendingBtnId) {
+                sessionStorage.removeItem('pendingFabAction');
+                setTimeout(() => {
+                    const btn = document.getElementById(pendingBtnId);
+                    if (btn) btn.click();
+                }, 800);
+            }
+
+
+            // FAB Menu Logic
+            const mainFab = document.getElementById('main-fab');
+            const fabMenu = document.getElementById('fab-menu');
+            if (mainFab && fabMenu) {
+                mainFab.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    mainFab.classList.toggle('active');
+                    fabMenu.classList.toggle('active');
+                });
+                document.addEventListener('click', (e) => {
+                    if (fabMenu.classList.contains('active') && !fabMenu.contains(e.target) && e.target !== mainFab) {
+                        mainFab.classList.remove('active');
+                        fabMenu.classList.remove('active');
+                    }
+                });
+            }
+
+            // Global function to trigger specific add buttons
+            window.triggerFabAction = function (sectionId, btnId) {
+                // Navigate to section
+                const link = document.querySelector(`.nav-link[data-section="${sectionId}"]`);
+                if (link) {
+                    link.click();
+                }
+                // Close FAB
+                if (mainFab) mainFab.classList.remove('active');
+                if (fabMenu) fabMenu.classList.remove('active');
+
+                // Wait for render, then click add button
+                setTimeout(() => {
+                    const btn = document.getElementById(btnId);
+                    if (btn) {
+                        if (btn.tagName === 'INPUT' || btn.tagName === 'TEXTAREA') {
+                            btn.focus();
+                        } else {
+                            btn.click();
+                        }
+                    }
+                }, 300);
+            };
+        });
+    </script>
+
+    <!-- Firebase SDK (Compat) - Removed defer to ensure global 'firebase' is available immediately -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
+    
+    <!-- Image Compression Library -->
+    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
+
+
+    <!-- Editor.js & Plugins (Versioned) -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@2.29.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@1.9.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/image@2.9.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@2.6.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/delimiter@1.4.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/editorjs-undo@2.0.28/dist/bundle.js"></script>
+
+    <!-- @editorjs/embed removed – using custom built-in YoutubeVideoTool instead -->
+
+    <!-- Quill Editor for Email Templates -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+    <!-- Widget Config Modal -->
+    <!-- Widget Config Modal -->
+    <div id="widget-config-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"
+                style="padding: 24px 32px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="font-size: 18px; font-weight: 700; margin: 0;">Tilpass oversikt</h2>
+                <button class="close-modal" id="close-widget-config"
+                    style="background: none; border: none; cursor: pointer;">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 24px 32px; max-height: 450px; overflow-y: auto;">
+                <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">Velg hvilke analysebokser du
+                    ønsker å se på din oversikt.</p>
+                <div id="widget-list-container" style="display: flex; flex-direction: column;">
+                    <!-- Widgets injected via JS -->
+                </div>
+            </div>
+            <div class="modal-footer"
+                style="padding: 24px 32px; background: #f8fafc; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 12px;">
+                <button id="save-widgets-btn" class="btn btn-primary" style="padding: 12px 24px;">Lagre
+                    endringer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SortableJS for Drag and Drop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+
+    <script type="module" src="../js/user-roles.js"></script>
+    <script type="module" src="../js/notifications.js"></script>
+    <script type="module" src="js/admin-header.js?v=20260616_V1"></script>
+    <script type="module" src="js/todo-drawer.js?v=20260616_V1"></script>
+    <script type="module" src="js/todo-init.jsx"></script>
+    <script type="module" src="js/google-tasks-init.jsx"></script>
+    <script type="module" src="js/reading-plans-init.jsx"></script>
+    <script type="module" src="js/unsplash.js?v=20260511_G1"></script>
+    <script type="module" src="js/version-history.js?v=20260728_V1"></script>
+    <script src="js/modules/admin-crm.js"></script>
+    <script src="js/modules/admin-content.js"></script>
+    <script src="js/modules/admin-ui.js"></script>
+    <script type="module" src="js/admin.js?v=20260808_V36"></script>
     <script type="module">
-        // Diagnostic Logger
-        (function() {
-            const logs = [];
-            const originalLog = console.log;
-            const originalError = console.error;
-            const originalWarn = console.warn;
-            
-            function saveLog(type, args) {
-                const msg = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
-                logs.push({ type, msg, ts: new Date().toISOString() });
-                
-                // Write to Firestore if firebase is initialized
-                if (window.firebase && firebase.apps.length > 0) {
-                    firebase.firestore().collection('system_logs').doc('admin_analytics_diagnostic').set({
-                        logs: logs,
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    }).catch(() => {});
-                }
-            }
-            
-            console.log = function(...args) {
-                originalLog.apply(console, args);
-                saveLog('log', args);
-            };
-            console.error = function(...args) {
-                originalError.apply(console, args);
-                saveLog('error', args);
-            };
-            console.warn = function(...args) {
-                originalWarn.apply(console, args);
-                saveLog('warn', args);
-            };
-            
-            window.addEventListener('error', (event) => {
-                saveLog('uncaught_error', [event.message, event.error?.stack]);
-            });
-            window.addEventListener('unhandledrejection', (event) => {
-                saveLog('unhandled_rejection', [event.reason?.message || event.reason]);
-            });
-        })();
-
-        function showDashboardError(message, type = 'error') {
-            const banner = document.getElementById('analytics-error-banner');
-            const textEl = document.getElementById('analytics-error-text');
-            if (banner && textEl) {
-                textEl.textContent = message;
-                banner.style.display = 'flex';
-                const iconEl = banner.querySelector('.material-symbols-outlined');
-                if (type === 'warning') {
-                    banner.style.backgroundColor = '#fffbeb';
-                    banner.style.borderColor = '#fde047';
-                    banner.style.color = '#854d0e';
-                    if (iconEl) {
-                        iconEl.style.color = '#eab308';
-                        iconEl.textContent = 'warning';
-                    }
-                } else {
-                    banner.style.backgroundColor = '#fef2f2';
-                    banner.style.borderColor = '#fca5a5';
-                    banner.style.color = '#991b1b';
-                    if (iconEl) {
-                        iconEl.style.color = '#ef4444';
-                        iconEl.textContent = 'error';
-                    }
-                }
-            }
-        }
-
-        // Register global error listeners immediately to catch any crashes
-        window.addEventListener('error', (event) => {
-            const err = event.error;
-            const msg = err?.message || event.message || "Ukjent feil";
-            const stack = err?.stack ? " | Stack: " + err.stack.substring(0, 180) : "";
-            showDashboardError("Det oppstod en nettleser-feil: " + msg + stack);
-        });
-        window.addEventListener('unhandledrejection', (event) => {
-            const err = event.reason;
-            const msg = err?.message || String(err || "Ukjent feil");
-            const stack = err?.stack ? " | Stack: " + err.stack.substring(0, 180) : "";
-            showDashboardError("Det oppstod en uventet feil i en bakgrunnsprosess: " + msg + stack);
-        });
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            if (typeof firebase === 'undefined') {
-                showDashboardError("Firebase SDK ble ikke lastet inn. Dette kan skyldes en nettverksfeil eller at en annonseblokkerer (AdBlocker) hindrer Google-tjenester i å kjøre.");
-                return;
-            }
-
-            // Declare all state and chart variables at the top to avoid Temporal Dead Zone (TDZ) reference errors
-            let trafficChart = null;
-            let sourcesChart = null;
-            let gscChart = null;
-            let gscIndexingChart = null;
-            let activeDays = 7;
-            let lastLoadedCities = null;
-            let chartsLoaded = false;
-            let lastDrawnCitiesJSON = null;
-            let lastWidth = 0;
-            let lastHeight = 0;
-            // Wait for Firebase to load and fetch actual real-time counts from collections
-            setTimeout(async () => {
-                try {
-                    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-                        const db = firebase.firestore();
-                        
-                        // 1. Fetch live Podcast count from firestore
-                        const podcastSnap = await db.collection('podcast_transcripts').get();
-                        const podcastCount = podcastSnap.size || 0;
-                        document.getElementById('real-podcast-count').textContent = podcastCount;
-
-                        // 2. Fetch live Blog post count from site_content pageContent
-                        const blogData = await window.firebaseService.getPageContent('collection_blog');
-                        const blogList = blogData?.items || [];
-                        const blogCount = blogList.length || 0;
-                        document.getElementById('real-blog-count').textContent = blogCount;
-                        // 3. Fetch real monthly donation sum from Firestore
-                        const now = new Date();
-                        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-                        const donationsSnap = await db.collection('donations')
-                            .where('timestamp', '>=', firebase.firestore.Timestamp.fromDate(startOfMonth))
-                            .get();
-                        
-                        let monthlyTotal = 0;
-                        donationsSnap.forEach(doc => {
-                            const data = doc.data();
-                            const isCompleted = ['completed', 'succeeded', 'captured'].includes(String(data.status || '').toLowerCase());
-                            if (isCompleted) {
-                                const amt = parseFloat(data.amountNok || data.amount || 0);
-                                monthlyTotal += amt;
-                            }
-                        });
-                        
-                        const donationsValEl = document.getElementById('real-donations-value');
-                        if (donationsValEl) {
-                            donationsValEl.textContent = monthlyTotal.toLocaleString('no-NO', { style: 'currency', currency: 'NOK', maximumFractionDigits: 0 });
-                        }
-                    }
-                } catch (e) {
-                    console.warn('Kunne ikke laste dynamiske Firebase counts til Analytics:', e);
-                }
-            }, 3000);
-
-            // clear dashboard values to loading/empty state initially
-
-            function clearAnalyticsToEmpty() {
-                document.getElementById('live-user-count').textContent = '--';
-                document.getElementById('pageviews-value').textContent = '--';
-                document.getElementById('engagement-value').textContent = '--';
-                
-                // Clear Traffic Chart
-                if (trafficChart) {
-                    trafficChart.data.labels = [];
-                    trafficChart.data.datasets[0].data = [];
-                    if (trafficChart.data.datasets[1]) {
-                        trafficChart.data.datasets[1].data = [];
-                        trafficChart.data.datasets[1].label = '';
-                    }
-                    trafficChart.update();
-                }
-
-                // Clear Top Pages
-                const topPagesList = document.querySelector('.top-pages-list');
-                if (topPagesList) {
-                    topPagesList.innerHTML = '<li style="font-size: 13px; color: #64748b; text-align: center; padding: 20px 0;">Laster sider...</li>';
-                }
-
-                // Clear Modal Table
-                const modalTableBody = document.querySelector('.modal-body-premium tbody');
-                if (modalTableBody) {
-                    modalTableBody.innerHTML = '<tr><td colspan="3" style="padding:20px 8px; text-align:center; color: #64748b;">Laster sider...</td></tr>';
-                }
-
-                // Clear City List
-                const citiesListContainer = document.querySelector('.analytics-grid > div:last-child > div');
-                if (citiesListContainer) {
-                    citiesListContainer.innerHTML = '<div style="font-size: 13px; color: #64748b; text-align: center; padding: 20px 0;">Laster geografisk statistikk...</div>';
-                }
-
-                // Clear GeoChart
-                if (chartsLoaded && typeof google !== 'undefined' && google.visualization) {
-                    drawRegionsMapReal([]);
-                }
-
-                // Clear Sources Chart
-                if (sourcesChart) {
-                    sourcesChart.data.datasets[0].data = [0, 0, 0];
-                    sourcesChart.update();
-                }
-                document.querySelector('.donut-center-val').textContent = '--';
-                const centerTextEl = document.querySelector('.donut-center-text');
-                if (centerTextEl) centerTextEl.textContent = 'laster...';
-                const legendPcts = document.querySelectorAll('.legend-pct');
-                if (legendPcts[0]) legendPcts[0].textContent = '--';
-                if (legendPcts[1]) legendPcts[1].textContent = '--';
-                if (legendPcts[2]) legendPcts[2].textContent = '--';
-
-                // Clear GSC
-                const gscNotConnectedNotice = document.getElementById('gsc-not-connected-notice');
-                const gscMetricsRow = document.getElementById('gsc-metrics-row');
-                const gscChartContainer = document.getElementById('gsc-chart-container');
-                if (gscNotConnectedNotice) gscNotConnectedNotice.style.display = 'block';
-                if (gscMetricsRow) gscMetricsRow.style.display = 'none';
-                if (gscChartContainer) gscChartContainer.style.display = 'none';
-
-                document.getElementById('gsc-clicks-val').textContent = '--';
-                document.getElementById('gsc-impressions-val').textContent = '--';
-                document.getElementById('gsc-ctr-val').textContent = '--';
-                document.getElementById('gsc-position-val').textContent = '--';
-
-                if (gscChart) {
-                    gscChart.data.labels = [];
-                    gscChart.data.datasets[0].data = [];
-                    gscChart.data.datasets[1].data = [];
-                    gscChart.update();
-                }
-
-                // Clear Gen AI
-                document.getElementById('crawl-chatgpt').textContent = '--';
-                document.getElementById('crawl-gemini').textContent = '--';
-                document.getElementById('crawl-claude').textContent = '--';
-                document.getElementById('crawl-perplexity').textContent = '--';
-
-                document.getElementById('ai-queries-home').textContent = '--';
-                document.getElementById('ai-queries-teaching').textContent = '--';
-                document.getElementById('ai-queries-giver').textContent = '--';
-
-                const homeBar = document.getElementById('ai-queries-home-bar');
-                const teachingBar = document.getElementById('ai-queries-teaching-bar');
-                const giverBar = document.getElementById('ai-queries-giver-bar');
-                if (homeBar) homeBar.style.width = '0%';
-                if (teachingBar) teachingBar.style.width = '0%';
-                if (giverBar) giverBar.style.width = '0%';
-
-                const aiAlertBox = document.querySelector('.ai-alert-box');
-                if (aiAlertBox) {
-                    const aiAlertTitle = aiAlertBox.querySelector('h5');
-                    const aiAlertText = aiAlertBox.querySelector('p');
-                    if (aiAlertTitle) aiAlertTitle.textContent = 'AI-trafikkandel: --';
-                    if (aiAlertText) aiAlertText.textContent = 'Venter på data...';
-                }
-
-                // Clear GSC Indexation
-                const indexingCard = document.getElementById('gsc-indexing-card');
-                if (indexingCard) indexingCard.style.display = 'none';
-                
-                const indexedVal = document.getElementById('gsc-indexed-val');
-                const nonIndexedVal = document.getElementById('gsc-nonindexed-val');
-                const totalVal = document.getElementById('gsc-total-pages-val');
-                const rateVal = document.getElementById('gsc-index-rate-val');
-                const dateBadge = document.getElementById('gsc-indexing-date');
-                const reasonsBody = document.getElementById('gsc-indexing-reasons-body');
-
-                if (indexedVal) indexedVal.textContent = '--';
-                if (nonIndexedVal) nonIndexedVal.textContent = '--';
-                if (totalVal) totalVal.textContent = '--';
-                if (rateVal) rateVal.textContent = '--';
-                if (dateBadge) dateBadge.textContent = 'Siste: --';
-                if (reasonsBody) reasonsBody.innerHTML = '<tr><td colspan="4" style="padding: 12px 4px; color: #64748b; text-align: center;">Laster årsaker...</td></tr>';
-
-                if (gscIndexingChart) {
-                    gscIndexingChart.data.labels = [];
-                    gscIndexingChart.data.datasets[0].data = [];
-                    gscIndexingChart.data.datasets[1].data = [];
-                    gscIndexingChart.update();
-                }
-            }
-
-            // 2. Setup Chart.js Charts
-            const ctxTraffic = document.getElementById('traffic-line-chart').getContext('2d');
-            const ctxSources = document.getElementById('sources-donut-chart').getContext('2d');
-
-            // Colors
-            const colorBrandOrange = '#d17d39';
-            const colorAccentRed = '#bd4f2a';
-
-            // Generate last 7 days of dates dynamically for the demo/placeholder view
-            // Setup empty Chart.js Charts (no mockup or fictional data)
-
-            // Gradients for line charts
-            const gradientPrimary = ctxTraffic.createLinearGradient(0, 0, 0, 300);
-            gradientPrimary.addColorStop(0, 'rgba(209, 125, 57, 0.3)');
-            gradientPrimary.addColorStop(1, 'rgba(209, 125, 57, 0.0)');
-
-            const gradientSecondary = ctxTraffic.createLinearGradient(0, 0, 0, 300);
-            gradientSecondary.addColorStop(0, 'rgba(189, 79, 42, 0.2)');
-            gradientSecondary.addColorStop(1, 'rgba(189, 79, 42, 0.0)');
-
-            // 2a. Traffic Line Chart initialization
-            trafficChart = new Chart(ctxTraffic, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [
-                        {
-                            label: 'Brukersesjoner',
-                            data: [],
-                            borderColor: colorBrandOrange,
-                            backgroundColor: gradientPrimary,
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4,
-                            pointBackgroundColor: colorBrandOrange,
-                            pointBorderColor: '#fff',
-                            pointHoverRadius: 6,
-                            pointHoverBackgroundColor: colorBrandOrange,
-                            pointHoverBorderColor: '#fff'
-                        },
-                        {
-                            label: 'Unike besøkende',
-                            data: [],
-                            borderColor: colorAccentRed,
-                            backgroundColor: gradientSecondary,
-                            borderWidth: 2,
-                            borderDash: [5, 5],
-                            fill: true,
-                            tension: 0.4,
-                            pointBackgroundColor: colorAccentRed,
-                            pointBorderColor: '#fff',
-                            pointHoverRadius: 6,
-                            pointHoverBackgroundColor: colorAccentRed,
-                            pointHoverBorderColor: '#fff'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                            labels: {
-                                boxWidth: 16,
-                                font: {
-                                    family: 'Inter',
-                                    weight: 600,
-                                    size: 12
-                                },
-                                color: '#475569'
-                            }
-                        },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false,
-                            backgroundColor: '#0f172a',
-                            titleFont: { family: 'Inter', weight: 700, size: 12 },
-                            bodyFont: { family: 'Inter', size: 12 },
-                            padding: 12,
-                            cornerRadius: 8,
-                            boxPadding: 6
-                        }
-                    },
-                    scales: {
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                font: {
-                                    family: 'Inter',
-                                    size: 11
-                                },
-                                color: '#64748b'
-                            }
-                        },
-                        y: {
-                            grid: {
-                                color: '#f1f5f9'
-                            },
-                            ticks: {
-                                font: {
-                                    family: 'Inter',
-                                    size: 11
-                                },
-                                color: '#64748b'
-                            }
-                        }
-                    }
-                }
-            });
-
-            // 2b. Sources Donut Chart initialization
-            sourcesChart = new Chart(ctxSources, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Direkte trafikk', 'Organisk søk', 'Sosiale medier'],
-                    datasets: [{
-                        data: [0, 0, 0],
-                        backgroundColor: [
-                            colorAccentRed,
-                            colorBrandOrange,
-                            '#cbd5e1'
-                        ],
-                        borderWidth: 0,
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '80%',
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: '#0f172a',
-                            titleFont: { family: 'Inter', weight: 700, size: 12 },
-                            bodyFont: { family: 'Inter', size: 12 },
-                            padding: 12,
-                            cornerRadius: 8
-                        }
-                    }
-                }
-            });
-
-            // 2c. GSC Line Chart initialization
-            const ctxGsc = document.getElementById('gsc-line-chart').getContext('2d');
-            gscChart = new Chart(ctxGsc, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [
-                        {
-                            label: 'Klikk',
-                            data: [],
-                            borderColor: '#d17d39', // Brand orange
-                            backgroundColor: 'rgba(209, 125, 57, 0.05)',
-                            borderWidth: 2,
-                            pointRadius: 3,
-                            fill: true,
-                            tension: 0.4
-                        },
-                        {
-                            label: 'Visninger',
-                            data: [],
-                            borderColor: '#bd4f2a', // Brand dark red/orange
-                            backgroundColor: 'transparent',
-                            borderWidth: 1.5,
-                            borderDash: [4, 4],
-                            pointRadius: 0,
-                            yAxisID: 'y1',
-                            tension: 0.4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        x: {
-                            grid: { display: false },
-                            ticks: { font: { family: 'Inter', size: 10 }, color: '#64748b' }
-                        },
-                        y: {
-                            grid: { color: '#f1f5f9' },
-                            ticks: { font: { family: 'Inter', size: 10 }, color: '#64748b' }
-                        },
-                        y1: {
-                            position: 'right',
-                            grid: { drawOnChartArea: false },
-                            ticks: { font: { family: 'Inter', size: 10 }, color: '#64748b' }
-                        }
-                    }
-                }
-            });
-
-            // 2d. GSC Indexing Chart initialization
-            const ctxIndexing = document.getElementById('gsc-indexing-chart').getContext('2d');
-            gscIndexingChart = new Chart(ctxIndexing, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [
-                        {
-                            label: 'Indeksert',
-                            data: [],
-                            borderColor: '#16a34a', // Green
-                            backgroundColor: 'rgba(22, 163, 74, 0.05)',
-                            borderWidth: 2,
-                            pointRadius: 2,
-                            fill: true,
-                            tension: 0.2
-                        },
-                        {
-                            label: 'Ikke indeksert',
-                            data: [],
-                            borderColor: '#dc2626', // Red
-                            backgroundColor: 'rgba(220, 38, 38, 0.03)',
-                            borderWidth: 2,
-                            pointRadius: 2,
-                            fill: true,
-                            tension: 0.2
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { 
-                            display: true,
-                            position: 'top',
-                            labels: {
-                                boxWidth: 12,
-                                font: { family: 'Inter', size: 10 }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            grid: { display: false },
-                            ticks: { font: { family: 'Inter', size: 10 }, color: '#64748b' }
-                        },
-                        y: {
-                            grid: { color: '#f1f5f9' },
-                            ticks: { font: { family: 'Inter', size: 10 }, color: '#64748b' }
-                        }
-                    }
-                }
-            });
-
-            // No initial static/fictional data is populated on load.
-            clearAnalyticsToEmpty();
-
-            function updateChartColors(theme) {
-                const isDark = theme === 'dark';
-                const gridColor = isDark ? '#334155' : '#f1f5f9';
-                const tickColor = isDark ? '#94a3b8' : '#64748b';
-                const legendColor = isDark ? '#94a3b8' : '#475569';
-
-                if (trafficChart) {
-                    trafficChart.options.scales.x.ticks.color = tickColor;
-                    trafficChart.options.scales.y.ticks.color = tickColor;
-                    trafficChart.options.scales.y.grid.color = gridColor;
-                    trafficChart.options.plugins.legend.labels.color = legendColor;
-                    trafficChart.update();
-                }
-                if (gscChart) {
-                    gscChart.options.scales.x.ticks.color = tickColor;
-                    gscChart.options.scales.y.ticks.color = tickColor;
-                    gscChart.options.scales.y.grid.color = gridColor;
-                    if (gscChart.options.scales.y1) {
-                        gscChart.options.scales.y1.ticks.color = tickColor;
-                    }
-                    gscChart.update();
-                }
-                if (gscIndexingChart) {
-                    gscIndexingChart.options.scales.x.ticks.color = tickColor;
-                    gscIndexingChart.options.scales.y.ticks.color = tickColor;
-                    gscIndexingChart.options.scales.y.grid.color = gridColor;
-                    if (gscIndexingChart.options.plugins.legend.labels) {
-                        gscIndexingChart.options.plugins.legend.labels.color = tickColor;
-                    }
-                    gscIndexingChart.update();
-                }
-            }
-
-            // Sync charts with current theme on load
-            const initialTheme = document.documentElement.getAttribute('data-theme') || 'light';
-            updateChartColors(initialTheme);
-
-            // Listen for theme change events to dynamically update chart colors
-            window.addEventListener('hkmThemeChanged', (e) => {
-                const nextTheme = e.detail.theme;
-                updateChartColors(nextTheme);
-                
-                // Redraw Google GeoChart if it exists
-                if (typeof drawRegionsMapReal === 'function') {
-                    lastDrawnCitiesJSON = null;
-                    drawRegionsMapReal(lastLoadedCities || []);
-                }
-            });
-
-            // 3. Reell GA4 Datainnhenting og API-integrasjon
-
-            async function loadGscIndexation(days) {
-                try {
-                    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-                        const db = firebase.firestore();
-                        const idxSnap = await db.collection('content').doc('gsc_indexation_status').get();
-                        if (idxSnap.exists) {
-                            const idxData = idxSnap.data();
-                            const summary = idxData.summary || {};
-                            const history = idxData.history || [];
-
-                            // Vis kortet
-                            const card = document.getElementById('gsc-indexing-card');
-                            if (card) card.style.display = 'block';
-
-                            // Sett tallverdier
-                            const indexedValEl = document.getElementById('gsc-indexed-val');
-                            const nonIndexedValEl = document.getElementById('gsc-nonindexed-val');
-                            const totalValEl = document.getElementById('gsc-total-pages-val');
-                            const rateValEl = document.getElementById('gsc-index-rate-val');
-                            const dateBadgeEl = document.getElementById('gsc-indexing-date');
-
-                            if (indexedValEl) indexedValEl.textContent = (summary.indexed || 0).toLocaleString('no-NO');
-                            if (nonIndexedValEl) nonIndexedValEl.textContent = (summary.nonIndexed || 0).toLocaleString('no-NO');
-                            if (totalValEl) totalValEl.textContent = (summary.total || 0).toLocaleString('no-NO');
-                            if (rateValEl) rateValEl.textContent = `${summary.indexingRate || 0}%`;
-
-                            const latestDate = summary.latestDate || "";
-                            if (latestDate && dateBadgeEl) {
-                                const parts = latestDate.split('-');
-                                if (parts.length === 3) {
-                                    const day = parseInt(parts[2], 10);
-                                    const monthNum = parseInt(parts[1], 10);
-                                    const months = ['jan', 'feb', 'mar', 'apr', 'mai', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'des'];
-                                    dateBadgeEl.textContent = `Siste: ${day}. ${months[monthNum - 1]}`;
-                                } else {
-                                    dateBadgeEl.textContent = `Siste: ${latestDate}`;
-                                }
-                            }
-
-                            // Oppdater grafen
-                            if (history.length > 0 && gscIndexingChart) {
-                                // Filtrer historikk basert på valgte dager
-                                const cutDate = new Date();
-                                cutDate.setDate(cutDate.getDate() - days);
-                                const filteredHistory = history.filter(h => {
-                                    const hDate = new Date(h.date);
-                                    return hDate >= cutDate;
-                                });
-
-                                // Sikkerhetsnett: vis de siste 30 målingene dersom filteret gir for få punkter
-                                const chartData = (filteredHistory.length >= 3) ? filteredHistory : history.slice(-Math.min(30, history.length));
-
-                                const labels = chartData.map(h => {
-                                    const parts = h.date.split('-');
-                                    if (parts.length === 3) {
-                                        const day = parseInt(parts[2], 10);
-                                        const monthNum = parseInt(parts[1], 10);
-                                        const months = ['jan', 'feb', 'mar', 'apr', 'mai', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'des'];
-                                        return `${day}. ${months[monthNum - 1] || ''}`;
-                                    }
-                                    return h.date;
-                                });
-
-                                const indexedSeries = chartData.map(h => h.indexed);
-                                const nonIndexedSeries = chartData.map(h => h.nonIndexed);
-
-                                gscIndexingChart.data.labels = labels;
-                                gscIndexingChart.data.datasets[0].data = indexedSeries;
-                                gscIndexingChart.data.datasets[1].data = nonIndexedSeries;
-                                gscIndexingChart.update();
-                            }
-
-                            // Populer årsaker (reasons) tabell
-                            const reasonsBody = document.getElementById('gsc-indexing-reasons-body');
-                            if (reasonsBody) {
-                                const reasonsList = idxData.reasons || [];
-                                reasonsBody.innerHTML = '';
-                                
-                                if (reasonsList.length === 0) {
-                                    reasonsBody.innerHTML = '<tr><td colspan="4" style="padding: 12px 4px; color: #64748b; text-align: center;">Ingen registrerte feil eller årsaker</td></tr>';
-                                } else {
-                                    const totalNonIndexed = summary.nonIndexed || 1;
-                                    reasonsList.forEach(r => {
-                                        const tr = document.createElement('tr');
-                                        tr.style.borderBottom = '1px solid #f1f5f9';
-                                        
-                                        const pct = totalNonIndexed > 0 ? ((r.count / totalNonIndexed) * 100).toFixed(1) : 0;
-                                        
-                                        const isGoogle = r.source === 'Google-systemer';
-                                        const sourceBadge = `<span class="badge" style="font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 500; background: ${isGoogle ? 'rgba(27, 73, 101, 0.05)' : 'rgba(209, 125, 57, 0.05)'}; color: ${isGoogle ? '#1b4965' : '#d17d39'};">${r.source}</span>`;
-                                        
-                                        // Highlight 404 with red and others with regular color
-                                        const barColor = r.reason.toLowerCase().includes('404') ? '#dc2626' : '#1b4965';
-                                        
-                                        tr.innerHTML = `
-                                            <td style="padding: 10px 4px; font-weight: 600; color: #334155; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${r.reason}">${r.reason}</td>
-                                            <td style="padding: 10px 4px;">${sourceBadge}</td>
-                                            <td style="padding: 10px 4px; text-align: right; font-weight: 700; color: #1e293b; font-family: 'Fira Code', monospace;">${r.count.toLocaleString('no-NO')}</td>
-                                            <td style="padding: 10px 4px; text-align: right;">
-                                                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
-                                                    <span style="font-size: 11px; font-weight: 600; color: #64748b; font-family: 'Fira Code', monospace; min-width: 36px; text-align: right;">${pct}%</span>
-                                                    <div style="width: 60px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; display: inline-block; vertical-align: middle;">
-                                                        <div style="width: ${pct}%; height: 100%; background: ${barColor}; border-radius: 3px;"></div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        `;
-                                        reasonsBody.appendChild(tr);
-                                    });
-                                }
-                            }
-                        }
-                    }
-                } catch (err) {
-                    console.warn("[Analytics] Feil ved lasting av indekseringsstatus fra Firestore:", err);
-                }
-            }
-
-            async function loadRealAnalytics(days) {
-                activeDays = days;
-                const pageviewsValEl = document.getElementById('pageviews-value');
-                const engagementValEl = document.getElementById('engagement-value');
-                const pageviewsMetaEl = document.getElementById('pageviews-meta');
- 
-                // Hent GSC-indeksering uavhengig av GA4 API-tilkobling
-                try {
-                    await loadGscIndexation(days);
-                } catch (gscErr) {
-                    console.warn("[Analytics] Feil ved lasting av GSC-indeksering:", gscErr.message);
-                }
-
-                pageviewsValEl.textContent = 'Laster...';
-                engagementValEl.textContent = 'Laster...';
-                
-                const centerTextEl = document.querySelector('.donut-center-text');
-                if (centerTextEl) centerTextEl.textContent = 'laster...';
-
-                try {
-                    let user = (typeof firebase !== 'undefined' && firebase.apps.length > 0 && firebase.auth && firebase.auth().currentUser) || (window.firebaseService && window.firebaseService.auth && window.firebaseService.auth.currentUser);
-                    let idToken = '';
-                    if (user && typeof user.getIdToken === 'function') {
-                        try { idToken = await user.getIdToken(); } catch (e) {}
-                    }
-                    if (!idToken) {
-                        for (let i = 0; i < 6; i++) {
-                            await new Promise(r => setTimeout(r, 200));
-                            const u = (typeof firebase !== 'undefined' && firebase.apps.length > 0 && firebase.auth && firebase.auth().currentUser) || (window.firebaseService && window.firebaseService.auth && window.firebaseService.auth.currentUser);
-                            if (u && typeof u.getIdToken === 'function') {
-                                try { idToken = await u.getIdToken(); break; } catch (e) {}
-                            }
-                        }
-                    }
-
-                    if (!idToken) {
-                        console.warn("[Analytics] Ingen gyldig innloggingstoken tilgjengelig.");
-                        showDashboardError("Venter på at brukerinnlogging skal fullføres. Vennligst vent et øyeblikk eller oppdater siden.", 'warning');
-                        pageviewsValEl.textContent = '--';
-                        engagementValEl.textContent = '--';
-                        return;
-                    }
-
-                    const response = await fetch(`https://getanalyticsoverview-42bhgdjkcq-uc.a.run.app?days=${days}`, {
-                        headers: {
-                            'Authorization': `Bearer ${idToken}`
-                        }
-                    });
-
-                    if (!response.ok) throw new Error(`GA4 API returnerte status ${response.status}`);
-                    const result = await response.json();
-
-                    if (result.status === 'success' && result.data) {
-                        const data = result.data;
-
-                        // 3a. Live Brukere (med tilfeldig mikrosvingning for dynamisk effekt)
-                        const liveCounterEl = document.getElementById('live-user-count');
-                        const baseUsers = parseInt(data.activeUsers) || 0;
-                        liveCounterEl.textContent = baseUsers;
-
-                        if (window.liveOscillateInterval) clearInterval(window.liveOscillateInterval);
-                        window.liveOscillateInterval = setInterval(() => {
-                            const current = parseInt(liveCounterEl.textContent) || baseUsers;
-                            const shift = Math.random() > 0.5 ? 1 : -1;
-                            let next = current + shift;
-                            if (next < Math.max(0, baseUsers - 3)) next = Math.max(0, baseUsers - 3);
-                            if (next > baseUsers + 3) next = baseUsers + 3;
-                            liveCounterEl.textContent = next;
-
-                            // Beveg sparkline-søylene til venstre
-                            const bars = document.getElementById('live-sparkline').children;
-                            for (let i = 0; i < bars.length - 1; i++) {
-                                bars[i].style.height = bars[i + 1].style.height;
-                            }
-                            const newHeight = Math.floor(Math.random() * 60) + 30;
-                            bars[bars.length - 1].style.height = newHeight + '%';
-                        }, 4000);
-
-                        // 3b. Oversiktskort
-                        pageviewsValEl.textContent = parseInt(data.screenPageViews || 0).toLocaleString('no-NO');
-                        
-                        const mins = Math.floor((parseInt(data.avgDuration) || 0) / 60);
-                        const secs = Math.round((parseInt(data.avgDuration) || 0) % 60);
-                        engagementValEl.textContent = `${mins}m ${secs}s`;
-                        
-                        pageviewsMetaEl.textContent = days === 1 ? 'Siste 24 timer' : `Siste ${days} dager`;
-
-                        // 3c. Line Chart (Trafikkovervåking)
-                        const daily = data.dailyTraffic || [];
-                        const chartLabels = daily.map((d, i) => {
-                            const rawDate = d.date || '';
-                            if (/^\d{8}$/.test(rawDate)) {
-                                const day = parseInt(rawDate.substring(6, 8), 10);
-                                const monthNum = parseInt(rawDate.substring(4, 6), 10);
-                                const months = ['jan', 'feb', 'mar', 'apr', 'mai', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'des'];
-                                return `${day}. ${months[monthNum - 1] || ''}`;
-                            }
-                            return rawDate || `Pkt ${i+1}`;
-                        });
-                        const chartValues = daily.map(d => parseInt(d.users) || 0);
-
-                        trafficChart.data.labels = chartLabels;
-                        trafficChart.data.datasets[0].data = chartValues;
-                        trafficChart.data.datasets[0].label = 'Aktive brukere';
-                        if (trafficChart.data.datasets[1]) {
-                            trafficChart.data.datasets[1].data = []; // Skjul det sekundære mock-datasettet
-                            trafficChart.data.datasets[1].label = '';
-                        }
-                        trafficChart.update();
-
-                        // 3d. Topp Sider
-                        const topPages = data.topPages || [];
-                        const topPagesList = document.querySelector('.top-pages-list');
-                        const totalViews = topPages.reduce((acc, curr) => acc + (parseInt(curr.views) || 0), 0) || 1;
-
-                        let topPagesHtml = '';
-                        topPages.slice(0, 5).forEach((page, index) => {
-                            const viewsVal = parseInt(page.views) || 0;
-                            const pct = Math.round((viewsVal / totalViews) * 100);
-                            topPagesHtml += `
-                                <li class="top-page-item">
-                                    <div class="top-page-meta">
-                                        <span class="top-page-name">${page.title || 'Ukjent side'}</span>
-                                        <span class="top-page-count">${viewsVal.toLocaleString('no-NO')} (${pct}%)</span>
-                                    </div>
-                                    <div class="top-page-bar-wrapper">
-                                        <div class="top-page-bar ${index === 0 ? 'accent' : ''}" style="width: ${pct}%;"></div>
-                                    </div>
-                                </li>
-                            `;
-                        });
-                        if (topPagesList) topPagesList.innerHTML = topPagesHtml || '<li>Ingen data registrert</li>';
-
-                        // Populer Modal-tabellen for alle sideresultater
-                        const modalTableBody = document.querySelector('.modal-body-premium tbody');
-                        if (modalTableBody) {
-                            let modalHtml = '';
-                            topPages.forEach(page => {
-                                const viewsVal = parseInt(page.views) || 0;
-                                const pct = Math.round((viewsVal / totalViews) * 100);
-                                modalHtml += `
-                                    <tr style="border-bottom: 1px solid #f1f5f9;">
-                                        <td style="padding: 12px 8px; font-weight: 600; color: #334155;">${page.title || '/'}</td>
-                                        <td style="padding: 12px 8px; text-align: right; font-family: 'Fira Code', monospace;">${viewsVal.toLocaleString('no-NO')}</td>
-                                        <td style="padding: 12px 8px; text-align: right; font-family: 'Fira Code', monospace; color: #bd4f2a; font-weight: 700;">${pct}%</td>
-                                    </tr>
-                                `;
-                            });
-                            modalTableBody.innerHTML = modalHtml || '<tr><td colspan="3" style="padding:12px; text-align:center;">Ingen data</td></tr>';
-                        }
-
-                        // 3e. Geografisk oversikt (Topp byer i Norge)
-                        const topCities = data.topCities || [];
-                        const citiesListContainer = document.querySelector('.analytics-grid > div:last-child > div');
-                        if (citiesListContainer) {
-                            const totalCityUsers = topCities.reduce((acc, curr) => acc + (parseInt(curr.users) || 0), 0) || 1;
-                            let citiesHtml = '';
-                            topCities.slice(0, 4).forEach(cityData => {
-                                const cityUsers = parseInt(cityData.users) || 0;
-                                const pct = Math.round((cityUsers / totalCityUsers) * 100);
-                                const rawCityName = cityData.city || 'Ukjent';
-                                const cleanCityName = rawCityName.replace(/\s+municipality/i, '').trim();
-                                citiesHtml += `
-                                    <div>
-                                        <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
-                                            <span style="font-weight: 600; color: #334155;">${cleanCityName}</span>
-                                            <span style="font-family: 'Fira Code', monospace; font-weight: 700; color: #d17d39;">${pct}%</span>
-                                        </div>
-                                        <div class="top-page-bar-wrapper">
-                                            <div class="top-page-bar" style="width: ${pct}%; background: linear-gradient(to right, #bd4f2a, #d17d39);"></div>
-                                        </div>
-                                    </div>
-                                `;
-                            });
-                            citiesListContainer.innerHTML = citiesHtml || '<p>Ingen bydata tilgjengelig</p>';
-                        }
-
-                        // Oppdater Google GeoChart med virkelige byer
-                        lastLoadedCities = topCities;
-                        if (chartsLoaded && typeof google !== 'undefined' && google.visualization && google.visualization.arrayToDataTable) {
-                            drawRegionsMapReal(topCities);
-                        }
-
-                        // 3f. Trafikkilder
-                        const sources = data.trafficSources || [];
-                        const totalSessions = sources.reduce((acc, curr) => acc + (parseInt(curr.sessions) || 0), 0) || 1;
-                        
-                        let directVal = 0, searchVal = 0, socialVal = 0;
-                        sources.forEach(s => {
-                            const name = String(s.source || '').toLowerCase();
-                            const val = parseInt(s.sessions) || 0;
-                            if (name.includes('direct') || name.includes('(none)')) directVal += val;
-                            else if (name.includes('search') || name.includes('google') || name.includes('bing') || name.includes('yahoo')) searchVal += val;
-                            else if (name.includes('social') || name.includes('facebook') || name.includes('instagram') || name.includes('t.co')) socialVal += val;
-                            else directVal += val;
-                        });
-
-                        const directPct = Math.round((directVal / totalSessions) * 100) || 0;
-                        const searchPct = Math.round((searchVal / totalSessions) * 100) || 0;
-                        const socialPct = Math.round((socialVal / totalSessions) * 100) || 0;
-
-                        sourcesChart.data.datasets[0].data = [directPct, searchPct, socialPct];
-                        sourcesChart.update();
-
-                        document.querySelector('.donut-center-val').textContent = `${directPct}%`;
-                        const centerTextEl = document.querySelector('.donut-center-text');
-                        if (centerTextEl) centerTextEl.textContent = 'direkte';
-                        const legendPcts = document.querySelectorAll('.legend-pct');
-                        if (legendPcts[0]) legendPcts[0].textContent = `${directPct}%`;
-                        if (legendPcts[1]) legendPcts[1].textContent = `${searchPct}%`;
-                        if (legendPcts[2]) legendPcts[2].textContent = `${socialPct}%`;
-
-                        // 3g. Google Search Console & Gen AI Visibility updates (100% Real Data)
-                        const gscNotConnectedNotice = document.getElementById('gsc-not-connected-notice');
-                        const gscMetricsRow = document.getElementById('gsc-metrics-row');
-                        const gscChartContainer = document.getElementById('gsc-chart-container');
-
-                        if (data.gscSummary) {
-                            const gscNoDataNotice = document.getElementById('gsc-no-data-notice');
-                            if (gscNotConnectedNotice) gscNotConnectedNotice.style.display = 'none';
-                            
-                            if (data.gscSummary.noData) {
-                                // Connected but no data in this period
-                                if (gscMetricsRow) gscMetricsRow.style.display = 'grid';
-                                if (gscChartContainer) gscChartContainer.style.display = 'none';
-                                if (gscNoDataNotice) {
-                                    gscNoDataNotice.style.display = 'flex';
-                                }
-                            } else {
-                                // Connected and has data
-                                if (gscMetricsRow) gscMetricsRow.style.display = 'grid';
-                                if (gscChartContainer) gscChartContainer.style.display = 'block';
-                                if (gscNoDataNotice) gscNoDataNotice.style.display = 'none';
-                            }
-
-                            // Populate real summary values
-                            const clicksVal = parseInt(data.gscSummary.clicks) || 0;
-                            const impressionsVal = parseInt(data.gscSummary.impressions) || 0;
-                            document.getElementById('gsc-clicks-val').textContent = clicksVal.toLocaleString('no-NO');
-                            document.getElementById('gsc-impressions-val').textContent = impressionsVal.toLocaleString('no-NO');
-                            document.getElementById('gsc-ctr-val').textContent = data.gscSummary.ctr || '0.0%';
-                            document.getElementById('gsc-position-val').textContent = data.gscSummary.position || '0.0';
-
-                            // Populate real daily values to chart
-                            if (data.gscDaily && data.gscDaily.length > 0 && !data.gscSummary.noData) {
-                                const gscChartLabels = data.gscDaily.map((d, i) => {
-                                    const rawDate = d.date || '';
-                                    if (/^\d{8}$/.test(rawDate)) {
-                                        const day = parseInt(rawDate.substring(6, 8), 10);
-                                        const monthNum = parseInt(rawDate.substring(4, 6), 10);
-                                        const months = ['jan', 'feb', 'mar', 'apr', 'mai', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'des'];
-                                        return `${day}. ${months[monthNum - 1] || ''}`;
-                                    }
-                                    return rawDate || `Pkt ${i+1}`;
-                                });
-                                const gscClicksDaily = data.gscDaily.map(d => parseInt(d.clicks) || 0);
-                                const gscImpressionsDaily = data.gscDaily.map(d => parseInt(d.impressions) || 0);
-
-                                gscChart.data.labels = gscChartLabels;
-                                gscChart.data.datasets[0].data = gscClicksDaily;
-                                gscChart.data.datasets[1].data = gscImpressionsDaily;
-                                gscChart.update();
-                            } else {
-                                // Default/clear chart if no daily rows or no data
-                                gscChart.data.labels = chartLabels;
-                                gscChart.data.datasets[0].data = chartLabels.map(() => 0);
-                                gscChart.data.datasets[1].data = chartLabels.map(() => 0);
-                                gscChart.update();
-                            }
-                        } else {
-                            // Show warning notice, hide data
-                            const gscNoDataNotice = document.getElementById('gsc-no-data-notice');
-                            if (gscNotConnectedNotice) gscNotConnectedNotice.style.display = 'block';
-                            if (gscMetricsRow) gscMetricsRow.style.display = 'none';
-                            if (gscChartContainer) gscChartContainer.style.display = 'none';
-                            if (gscNoDataNotice) gscNoDataNotice.style.display = 'none';
-                        }
-
-                        // Gen AI real traffic updates
-                        const crawlChatgptEl = document.getElementById('crawl-chatgpt');
-                        const crawlGeminiEl = document.getElementById('crawl-gemini');
-                        const crawlClaudeEl = document.getElementById('crawl-claude');
-                        const crawlPerplexityEl = document.getElementById('crawl-perplexity');
-
-                        // Update sub-section header text to clarify it is real traffic
-                        const aiCrawlerTitleEl = document.getElementById('ai-crawler-title');
-                        if (aiCrawlerTitleEl) {
-                            aiCrawlerTitleEl.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px; color: #d17d39;">hub</span> Referansetrafikk fra AI-søk (Besøk)`;
-                        }
-
-                        let gptSessions = 0;
-                        let geminiSessions = 0;
-                        let claudeSessions = 0;
-                        let perplexitySessions = 0;
-
-                        const sourcesList = data.aiSources || [];
-                        sourcesList.forEach(s => {
-                            const src = String(s.source || '').toLowerCase();
-                            const sess = parseInt(s.sessions) || 0;
-                            if (src.includes('chatgpt') || src.includes('openai')) {
-                                gptSessions += sess;
-                            } else if (src.includes('gemini')) {
-                                geminiSessions += sess;
-                            } else if (src.includes('claude') || src.includes('anthropic')) {
-                                claudeSessions += sess;
-                            } else if (src.includes('perplexity')) {
-                                perplexitySessions += sess;
-                            }
-                        });
-
-                        const formatSess = (val) => val > 0 ? `${val} besøk` : 'Ingen besøk';
-                        const setStyleForSess = (el, val) => {
-                            if (!el) return;
-                            el.textContent = formatSess(val);
-                            if (val > 0) {
-                                el.style.color = '#10b981'; // Green accent
-                                el.style.fontWeight = '700';
-                            } else {
-                                el.style.color = '#64748b'; // Slate gray
-                                el.style.fontWeight = 'normal';
-                            }
-                        };
-
-                        setStyleForSess(crawlChatgptEl, gptSessions);
-                        setStyleForSess(crawlGeminiEl, geminiSessions);
-                        setStyleForSess(crawlClaudeEl, claudeSessions);
-                        setStyleForSess(crawlPerplexityEl, perplexitySessions);
-
-                        // AI interest/top pages mapping (100% Real pageviews of key pages)
-                        const aiQueriesTitleEl = document.getElementById('ai-queries-title');
-                        if (aiQueriesTitleEl) {
-                            aiQueriesTitleEl.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px; color: #d17d39;">bar_chart</span> Reell trafikk på nøkkelsider`;
-                        }
-
-                        // Let's find the views for '/', '/undervisning', '/bli-fast-giver' in the real topPages report
-                        let homeViews = 0;
-                        let teachingViews = 0;
-                        let giverViews = 0;
-
-                        topPages.forEach(p => {
-                            const title = String(p.title || '').toLowerCase().trim();
-                            const v = parseInt(p.views) || 0;
-                            
-                            const isHome = title === 'his kingdom ministry' || 
-                                           title === '/' || 
-                                           title.startsWith('forside') || 
-                                           title.startsWith('home') || 
-                                           title.startsWith('inicio');
-                                           
-                            if (isHome) {
-                                homeViews += v;
-                            } else if (title.includes('undervisning')) {
-                                teachingViews += v;
-                            } else if (title.includes('giver') || title.includes('donasjon') || title.includes('fast-giver')) {
-                                giverViews += v;
-                            }
-                        });
-
-                        const totalPageviewsSum = topPages.reduce((acc, curr) => acc + (parseInt(curr.views) || 0), 0) || 1;
-
-                        const homePct = Math.round((homeViews / totalPageviewsSum) * 100);
-                        const teachingPct = Math.round((teachingViews / totalPageviewsSum) * 100);
-                        const giverPct = Math.round((giverViews / totalPageviewsSum) * 100);
-
-                        // Populate real views count
-                        const aiQueriesHome = document.getElementById('ai-queries-home');
-                        const aiQueriesTeaching = document.getElementById('ai-queries-teaching');
-                        const aiQueriesGiver = document.getElementById('ai-queries-giver');
-
-                        if (aiQueriesHome) aiQueriesHome.textContent = `${homeViews.toLocaleString('no-NO')} visninger`;
-                        if (aiQueriesTeaching) aiQueriesTeaching.textContent = `${teachingViews.toLocaleString('no-NO')} visninger`;
-                        if (aiQueriesGiver) aiQueriesGiver.textContent = `${giverViews.toLocaleString('no-NO')} visninger`;
-
-                        // Populate actual share text instead of fake trend changes
-                        const aiQueriesHomeChange = document.getElementById('ai-queries-home-change');
-                        const aiQueriesTeachingChange = document.getElementById('ai-queries-teaching-change');
-                        const aiQueriesGiverChange = document.getElementById('ai-queries-giver-change');
-
-                        if (aiQueriesHomeChange) {
-                            aiQueriesHomeChange.textContent = `${homePct}% andel`;
-                            aiQueriesHomeChange.style.color = '#64748b';
-                        }
-                        if (aiQueriesTeachingChange) {
-                            aiQueriesTeachingChange.textContent = `${teachingPct}% andel`;
-                            aiQueriesTeachingChange.style.color = '#64748b';
-                        }
-                        if (aiQueriesGiverChange) {
-                            aiQueriesGiverChange.textContent = `${giverPct}% andel`;
-                            aiQueriesGiverChange.style.color = '#64748b';
-                        }
-
-                        // Adjust progress bars based on actual share
-                        const homeBar = document.getElementById('ai-queries-home-bar');
-                        const teachingBar = document.getElementById('ai-queries-teaching-bar');
-                        const giverBar = document.getElementById('ai-queries-giver-bar');
-
-                        if (homeBar) homeBar.style.width = `${homePct}%`;
-                        if (teachingBar) teachingBar.style.width = `${teachingPct}%`;
-                        if (giverBar) giverBar.style.width = `${giverPct}%`;
-
-                        // Update ChatGPT-synlighetsresultat Alert Box to be 100% Real AI Share of Traffic
-                        const totalAiVisits = gptSessions + geminiSessions + claudeSessions + perplexitySessions;
-                        const aiAlertBox = document.querySelector('.ai-alert-box');
-                        if (aiAlertBox) {
-                            const aiAlertTitle = aiAlertBox.querySelector('h5');
-                            const aiAlertText = aiAlertBox.querySelector('p');
-
-                            if (totalAiVisits > 0) {
-                                const totalOverallSessions = data.trafficSources ? data.trafficSources.reduce((acc, curr) => acc + (parseInt(curr.sessions) || 0), 0) : 1;
-                                const aiSharePct = ((totalAiVisits / (totalOverallSessions || 1)) * 100).toFixed(2);
-                                if (aiAlertTitle) aiAlertTitle.textContent = `AI-trafikkandel: ${aiSharePct}%`;
-                                if (aiAlertText) aiAlertText.textContent = `Nettstedet har registrert ${totalAiVisits} reelle besøk fra AI-tjenester i denne perioden (totalt ${totalOverallSessions} sesjoner).`;
-                            } else {
-                                if (aiAlertTitle) aiAlertTitle.textContent = `Ingen AI-trafikk registrert`;
-                                if (aiAlertText) aiAlertText.textContent = `Det er ikke registrert noen henvisninger fra ChatGPT, Gemini, Claude eller Perplexity i denne perioden (0 av ${data.trafficSources ? data.trafficSources.reduce((acc, curr) => acc + (parseInt(curr.sessions) || 0), 0) : 0} sesjoner).`;
-                            }
-                        }
-                    } else {
-                        throw new Error(result.message || `Uventet API-status: ${result.status}`);
-                    }
-                } catch (error) {
-                    console.error("[Analytics] Feil under lasting av reell statistikk:", error);
-                    pageviewsValEl.textContent = 'Feil';
-                    engagementValEl.textContent = 'Feil';
-                    
-                    if (error.message.includes('403') || error.message.includes('Forbidden') || error.message.includes('permission')) {
-                        showDashboardError("Rettighetsfeil (403): Brukerkontoen din har ikke tilgang til å hente Google Analytics-data. Vennligst kontakt superadmin.");
-                    } else if (error.message.includes('unconfigured') || error.message.includes('mangler')) {
-                        showDashboardError("Google Analytics er ikke ferdig konfigurert i integrasjonsinnstillingene: " + error.message, 'warning');
-                    } else {
-                        showDashboardError("Kunne ikke laste statistikk: " + error.message);
-                    }
-                }
-            }
-
-            // Lytter på Auth-endringer for å hente ekte data så snart bruker er klar
-            const initAuthListener = async () => {
-                let service = window.firebaseService;
-                for (let i = 0; i < 20; i++) {
-                    if (service && service.isInitialized) break;
-                    await new Promise(r => setTimeout(r, 100));
-                    service = window.firebaseService;
-                }
-
-                if (service && service.isInitialized) {
-                    service.onAuthChange((user) => {
-                        if (user) {
-                            const banner = document.getElementById('analytics-error-banner');
-                            if (banner) banner.style.display = 'none';
-                            loadRealAnalytics(7); // Hent siste 7 dager som standard
-                        } else {
-                            clearAnalyticsToEmpty();
-                            setTimeout(() => {
-                                if (window.firebaseService && !window.firebaseService.auth.currentUser) {
-                                    showDashboardError("Du er ikke logget inn i Firebase. Vennligst logg inn på nytt for å se statistikk.", 'warning');
-                                }
-                            }, 2000);
-                        }
-                    });
-                } else if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-                    // Fallback to legacy auth listener
-                    firebase.auth().onAuthStateChanged((user) => {
-                        if (user) {
-                            const banner = document.getElementById('analytics-error-banner');
-                            if (banner) banner.style.display = 'none';
-                            loadRealAnalytics(7);
-                        } else {
-                            clearAnalyticsToEmpty();
-                            setTimeout(() => {
-                                if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && !firebase.auth().currentUser) {
-                                    showDashboardError("Du er ikke logget inn i Firebase. Vennligst logg inn på nytt for å se statistikk.", 'warning');
-                                }
-                            }, 2000);
-                        }
-                    });
-                }
-            };
-            initAuthListener();
-
-            // 4. Period velger klikk-lyttere
-            const periodButtons = document.querySelectorAll('.period-btn');
-            periodButtons.forEach(btn => {
-                btn.addEventListener('click', async (e) => {
-                    periodButtons.forEach(b => b.classList.remove('active'));
-                    e.target.classList.add('active');
-
-                    const period = e.target.dataset.period;
-                    let days = 7;
-                    if (period === '1') days = 1;
-                    else if (period === '30') days = 30;
-                    else if (period === 'year') days = 365;
-
-                    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && firebase.auth().currentUser) {
-                        await loadRealAnalytics(days);
-                    } else {
-                        clearAnalyticsToEmpty();
-                    }
-                });
-            });
-
-            // 5. Modal event-lyttere
-            const modalEl = document.getElementById('pages-results-modal');
-            const openModalBtn = document.getElementById('open-all-pages-btn');
-            const closeBtn1 = document.getElementById('close-pages-modal-btn');
-            const closeBtn2 = document.getElementById('close-pages-modal-btn-2');
-
-            openModalBtn.addEventListener('click', () => {
-                modalEl.style.display = 'flex';
-            });
-
-            [closeBtn1, closeBtn2].forEach(btn => {
-                btn.addEventListener('click', () => {
-                    modalEl.style.display = 'none';
-                });
-            });
-
-            modalEl.addEventListener('click', (e) => {
-                if (e.target === modalEl) {
-                    modalEl.style.display = 'none';
-                }
-            });
-
-            // 6. Google GeoChart-initialisering
-            google.charts.load('current', {
-                'packages':['geochart'],
-            });
-            google.charts.setOnLoadCallback(() => {
-                chartsLoaded = true;
-                if (lastLoadedCities) {
-                    drawRegionsMapReal(lastLoadedCities);
-                } else {
-                    // Initialiser tomt eller med standardverdier
-                    drawRegionsMapReal([]);
-                }
-            });
-
-            function drawRegionsMapReal(cities = []) {
-                const citiesJSON = JSON.stringify(cities);
-                if (citiesJSON === lastDrawnCitiesJSON) {
-                    return; // Unngå duplikat tegning av nøyaktig samme data
-                }
-
-                const containerEl = document.getElementById('regions_div');
-                if (!containerEl) return;
-
-                // Ikke tegn hvis containeren er skjult eller har 0 bredde/høyde
-                if (containerEl.offsetWidth === 0 || containerEl.offsetHeight === 0) {
-                    return;
-                }
-
-                const cityCoords = {
-                    'oslo': { lat: 59.9139, lon: 10.7522 },
-                    'bergen': { lat: 60.3913, lon: 5.3221 },
-                    'trondheim': { lat: 63.4305, lon: 10.3951 },
-                    'stavanger': { lat: 58.9700, lon: 5.7331 },
-                    'kristiansand': { lat: 58.1467, lon: 7.9949 },
-                    'fredrikstad': { lat: 59.2205, lon: 10.9347 },
-                    'sandnes': { lat: 58.8524, lon: 5.7352 },
-                    'tromsø': { lat: 69.6492, lon: 18.9553 },
-                    'tromso': { lat: 69.6492, lon: 18.9553 },
-                    'drammen': { lat: 59.7440, lon: 10.2045 },
-                    'sarpsborg': { lat: 59.2839, lon: 11.1096 },
-                    'skien': { lat: 59.2096, lon: 9.6090 },
-                    'porsgrunn': { lat: 59.1395, lon: 9.6568 },
-                    'bodø': { lat: 67.2804, lon: 14.4049 },
-                    'bodo': { lat: 67.2804, lon: 14.4049 },
-                    'ålesund': { lat: 62.4722, lon: 6.1549 },
-                    'alesund': { lat: 62.4722, lon: 6.1549 },
-                    'arendal': { lat: 58.4618, lon: 8.7663 },
-                    'sandefjord': { lat: 59.1312, lon: 10.2168 },
-                    'larvik': { lat: 59.0533, lon: 10.0270 },
-                    'tønsberg': { lat: 59.2676, lon: 10.4076 },
-                    'tonsberg': { lat: 59.2676, lon: 10.4076 },
-                    'horten': { lat: 59.4136, lon: 10.4862 },
-                    'moss': { lat: 59.4340, lon: 10.6577 },
-                    'hamar': { lat: 60.7945, lon: 11.0680 },
-                    'halden': { lat: 59.1200, lon: 11.3800 },
-                    'harstad': { lat: 68.7986, lon: 16.5414 },
-                    'molde': { lat: 62.7375, lon: 7.1610 },
-                    'kristiansund': { lat: 63.1115, lon: 7.7320 },
-                    'gjøvik': { lat: 60.7957, lon: 10.6915 },
-                    'gjovik': { lat: 60.7957, lon: 10.6915 },
-                    'asker': { lat: 59.8351, lon: 10.4392 },
-                    'bærum': { lat: 59.8973, lon: 10.5222 },
-                    'baerum': { lat: 59.8973, lon: 10.5222 },
-                    'lillestrøm': { lat: 59.9560, lon: 11.0492 },
-                    'lillestrom': { lat: 59.9560, lon: 11.0492 },
-                    'steinkjer': { lat: 64.0150, lon: 11.4950 },
-                    'alta': { lat: 69.9689, lon: 23.2716 },
-                    'elverum': { lat: 60.8816, lon: 11.5623 },
-                    'mandal': { lat: 58.0294, lon: 7.4534 },
-                    'grimstad': { lat: 58.3405, lon: 8.5936 },
-                    'lillehammer': { lat: 61.1153, lon: 10.4662 },
-                    // International cities
-                    'helsinki': { lat: 60.1699, lon: 24.9384 },
-                    'stockholm': { lat: 59.3293, lon: 18.0686 },
-                    'copenhagen': { lat: 55.6761, lon: 12.5683 },
-                    'københavn': { lat: 55.6761, lon: 12.5683 },
-                    'gothenburg': { lat: 57.7089, lon: 11.9746 },
-                    'göteborg': { lat: 57.7089, lon: 11.9746 },
-                    'malmö': { lat: 55.6050, lon: 13.0038 },
-                    'malmo': { lat: 55.6050, lon: 13.0038 },
-                    'london': { lat: 51.5074, lon: -0.1278 },
-                    'paris': { lat: 48.8566, lon: 2.3522 },
-                    'berlin': { lat: 52.5200, lon: 13.4050 },
-                    'new york': { lat: 40.7128, lon: -74.0060 },
-                    'washington': { lat: 38.9072, lon: -77.0369 },
-                    'chicago': { lat: 41.8781, lon: -87.6298 },
-                    'los angeles': { lat: 34.0522, lon: -118.2437 },
-                    'reykjavik': { lat: 64.1466, lon: -21.9426 },
-                    'reykjavík': { lat: 64.1466, lon: -21.9426 }
-                };
-
-                let hasForeignVisitors = false;
-                cities.forEach(c => {
-                    const country = c.country || '';
-                    if (country && country.toLowerCase() !== 'norway' && country.toLowerCase() !== 'no') {
-                        hasForeignVisitors = true;
-                    }
-                });
-
-                var chartData = [];
-                var hasCoordsData = false;
-
-                cities.forEach(c => {
-                    let cityName = c.city || '';
-                    if (cityName && cityName !== 'Ukjent' && cityName !== '(not set)' && cityName.toLowerCase() !== 'unknown') {
-                        cityName = cityName.replace(/\s+municipality/i, '').trim();
-                        const key = cityName.toLowerCase();
-                        if (cityCoords[key]) {
-                            const countryName = c.country || 'Norway';
-                            chartData.push([cityCoords[key].lat, cityCoords[key].lon, cityName + ', ' + countryName, parseInt(c.users) || 0]);
-                            hasCoordsData = true;
-                        }
-                    }
-                });
-
-                if (hasCoordsData) {
-                    chartData.unshift(['Lat', 'Long', 'By', 'Besøkende']);
-                } else {
-                    chartData = [['By', 'Besøkende']];
-                    cities.forEach(c => {
-                        let cityName = c.city || '';
-                        if (cityName && cityName !== 'Ukjent' && cityName !== '(not set)' && cityName.toLowerCase() !== 'unknown') {
-                            cityName = cityName.replace(/\s+municipality/i, '').trim();
-                            const countryName = c.country || 'Norway';
-                            chartData.push([cityName + ', ' + countryName, parseInt(c.users) || 0]);
-                        }
-                    });
-                    if (chartData.length === 1) {
-                        chartData.push(['Mandal, Norway', 0]);
-                    }
-                }
-
-                var dataTable = google.visualization.arrayToDataTable(chartData);
-                const isDarkGeo = document.documentElement.getAttribute('data-theme') === 'dark';
-                var options = {
-                    region: hasForeignVisitors ? 'world' : 'NO', // Zoom inn på Norge hvis kun Norge, ellers hele verden
-                    displayMode: 'markers', // Vis byer som sirkler/markører
-                    colorAxis: {colors: [isDarkGeo ? '#334155' : '#e2e8f0', '#d17d39']}, 
-                    backgroundColor: isDarkGeo ? '#1e293b' : '#f8fafc',
-                    datalessRegionColor: isDarkGeo ? '#0f172a' : '#f1f5f9',
-                    defaultColor: isDarkGeo ? '#1e293b' : '#f8fafc',
-                    legend: 'none',
-                    tooltip: { textStyle: { fontName: 'Inter', fontSize: 13 } }
-                };
-
-                var chart = new google.visualization.GeoChart(containerEl);
-                chart.draw(dataTable, options);
-
-                window.activeGeoChart = chart;
-                window.activeGeoChartDataTable = dataTable;
-                window.activeGeoChartOptions = options;
-                
-                lastDrawnCitiesJSON = citiesJSON;
-                lastWidth = containerEl.offsetWidth;
-                lastHeight = containerEl.offsetHeight;
-
-                if (!window.geoChartResizeListenerAdded) {
-                    let resizeTimeout = null;
-                    window.addEventListener('resize', function() {
-                        const currentContainer = document.getElementById('regions_div');
-                        if (!currentContainer) return;
-
-                        const newWidth = currentContainer.offsetWidth;
-                        const newHeight = currentContainer.offsetHeight;
-
-                        // Bare tegn på nytt hvis bredde eller høyde faktisk har endret seg
-                        if (newWidth !== lastWidth || newHeight !== lastHeight) {
-                            lastWidth = newWidth;
-                            lastHeight = newHeight;
-
-                            clearTimeout(resizeTimeout);
-                            resizeTimeout = setTimeout(() => {
-                                if (window.activeGeoChart && window.activeGeoChartDataTable && window.activeGeoChartOptions) {
-                                    if (newWidth > 0 && newHeight > 0) {
-                                        window.activeGeoChart.draw(window.activeGeoChartDataTable, window.activeGeoChartOptions);
-                                    }
-                                }
-                            }, 250); // Debounce på 250ms
-                        }
-                    });
-                    window.geoChartResizeListenerAdded = true;
-                }
+        window.addEventListener('load', () => {
+            if (!window.adminManager) {
+                window.adminManager = new AdminManager();
             }
         });
     </script>
-    
+    <!-- TERMINAL LAYOUT FIX - FORCES 3 COLUMNS ON DESKTOP -->
+    <style>
+        @media (min-width: 1025px) {
+            .stats-grid {
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important;
+                grid-auto-flow: column !important;
+                gap: 24px !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                align-items: start !important;
+            }
+            .dashboard-col {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 16px !important;
+                min-width: 0 !important;
+                width: 100% !important;
+            }
+            .stat-card.modern {
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+        }
+
+        /* --- MODERN COURSE EDITOR STYLES --- */
+        .admin-input {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            border: 1.5px solid #e2e8f0 !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02) !important;
+        }
+        .admin-input:focus {
+            outline: none !important;
+            border-color: #1B4965 !important;
+            box-shadow: 0 0 0 3px rgba(27, 73, 101, 0.12), 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+            background: #fff !important;
+        }
+        .lesson-row-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important;
+        }
+        .lesson-row-item:hover {
+            box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.03) !important;
+            border-color: #cbd5e1 !important;
+            transform: translateY(-1px);
+        }
+        .lesson-drag-handle:hover {
+            color: #1B4965 !important;
+        }
+        .lesson-row-ghost {
+            opacity: 0.4 !important;
+            background: #cbd5e1 !important;
+            border: 2px dashed #94a3b8 !important;
+        }
+        .lesson-delete-btn:hover {
+            background: #fecaca !important;
+            transform: scale(1.05);
+        }
+        .lesson-delete-btn:active {
+            transform: scale(0.95);
+        }
+        .rte-wrapper {
+            border: 1.5px solid #e2e8f0 !important;
+            border-radius: 8px !important;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+        .rte-wrapper:focus-within {
+            border-color: #1B4965 !important;
+            box-shadow: 0 0 0 3px rgba(27, 73, 101, 0.12) !important;
+        }
+        .rte-toolbar {
+            background: #f8fafc !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+            padding: 6px 8px !important;
+            gap: 4px !important;
+        }
+        .rte-btn {
+            border-radius: 6px !important;
+            transition: all 0.2s ease !important;
+        }
+        .rte-btn:hover {
+            background: #e2e8f0 !important;
+            color: #1B4965 !important;
+        }
+        .rte-editor {
+            min-height: 120px !important;
+            padding: 12px !important;
+            font-size: 0.9rem !important;
+            line-height: 1.5 !important;
+        }
+    </style>
+    <!-- Unsplash Image Search Modal -->
+    <div id="unsplash-modal" class="profile-modal" style="display: none; z-index: 12000; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+        <div class="profile-modal-content card modern" style="max-width: 850px; width: 90%; height: 85vh; padding: 0; overflow: hidden; border-radius: 24px; background: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4); display: flex; flex-direction: column;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #d17d39, #bd4f2a); color: white; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span class="material-symbols-outlined" style="font-size: 28px;">image_search</span>
+                    <h3 style="margin: 0; font-size: 20px; font-weight: 700;">Hent bilde fra Unsplash</h3>
+                </div>
+                <button id="close-unsplash-modal" style="background: rgba(255,255,255,0.1); border: none; color: white; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            
+            <div class="modal-body" style="padding: 24px 32px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 24px;">
+                <div class="unsplash-search-bar" style="display: flex; gap: 12px;">
+                    <div style="flex: 1; position: relative;">
+                        <span class="material-symbols-outlined" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 22px; pointer-events: none; z-index: 2;">search</span>
+                        <input type="text" id="unsplash-search-input" placeholder="Søk etter bilder (f.eks: bibel, natur...)" 
+                            style="width: 100% !important; padding: 14px 20px 14px 52px !important; border-radius: 14px !important; border: 2px solid #e2e8f0 !important; font-size: 16px !important; outline: none !important; transition: all 0.2s !important; box-sizing: border-box !important; background: white !important;">
+                    </div>
+                    <button id="unsplash-search-trigger" class="btn-primary" style="padding: 0 24px; border-radius: 14px; font-weight: 700; background: #d17d39; border: none; color: white; cursor: pointer;">Søk</button>
+                </div>
+                
+                <div id="unsplash-results" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px;">
+                    <!-- Results injected here -->
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px 0; color: #94a3b8;">
+                        <span class="material-symbols-outlined" style="font-size: 48px; display: block; margin-bottom: 12px; opacity: 0.5;">photo_library</span>
+                        Søk etter bilder for å se resultater
+                    </div>
+                </div>
+                
+                <div id="unsplash-loader" style="display: none; text-align: center; padding: 40px 0;">
+                    <div class="loader" style="margin: 0 auto;"></div>
+                    <p style="margin-top: 12px; color: #64748b; font-weight: 500;">Henter bilder...</p>
+                </div>
+            </div>
+            
+            <div class="modal-footer" style="padding: 16px 32px; background: #f8fafc; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+                <div style="font-size: 12px; color: #94a3b8;">
+                    Drevet av <a href="https://unsplash.com" target="_blank" style="color: #64748b; font-weight: 600;">Unsplash</a>
+                </div>
+                <button id="unsplash-cancel" class="btn-secondary" style="padding: 10px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; background: white; border: 1px solid #e2e8f0; color: #64748b;">Avbryt</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Confirmation Modal (Premium Design) -->
+    <div id="hkm-confirm-modal" class="profile-modal" style="display: none; z-index: 11000; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div class="profile-modal-content card modern" style="max-width: 480px !important; width: 90% !important; padding: 0; overflow: hidden; border-radius: 24px; background: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); height: auto !important; min-height: auto !important; margin: auto !important; transform: translateZ(0); backface-visibility: hidden; display: flex; flex-direction: column;">
+            <div class="modal-header" style="background: #1e293b; color: white; padding: 24px 32px; display: flex; align-items: center; gap: 16px; border-bottom: none;">
+                <div style="background: rgba(255,255,255,0.1); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-outlined" style="font-size: 24px; color: white;">warning</span>
+                </div>
+                <h3 id="confirm-modal-title" style="margin: 0; font-size: 20px; font-weight: 700; color: white; letter-spacing: -0.01em;">Bekreft handling</h3>
+            </div>
+            <div class="modal-body" style="padding: 32px; font-size: 16px; line-height: 1.6; color: #475569;">
+                <p id="confirm-modal-message" style="margin: 0; font-weight: 500;">Er du sikker på at du vil utføre denne handlingen?</p>
+            </div>
+            <div class="modal-footer" style="padding: 24px 32px; background: #f8fafc; display: flex; justify-content: flex-end; gap: 16px; border-top: 1px solid #f1f5f9;">
+                <button id="confirm-modal-cancel" class="btn-secondary" style="padding: 12px 24px; border-radius: 12px; font-weight: 600; min-width: 100px; cursor: pointer; transition: all 0.2s; border: 1px solid #e2e8f0; background: white; color: #64748b; font-size: 14px;">Avbryt</button>
+                <button id="confirm-modal-confirm" class="btn-primary" style="padding: 12px 24px; border-radius: 12px; font-weight: 700; min-width: 100px; cursor: pointer; transition: all 0.2s; background: #d17d39; color: white; border: none; font-size: 14px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">Slett</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Prompt Modal (Premium Design) -->
+    <div id="hkm-prompt-modal" class="profile-modal" style="display: none; z-index: 11000; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div class="profile-modal-content card modern" style="max-width: 480px !important; width: 90% !important; padding: 0; overflow: hidden; border-radius: 24px; background: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); height: auto !important; min-height: auto !important; margin: auto !important; transform: translateZ(0); backface-visibility: hidden; display: flex; flex-direction: column;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: white; padding: 24px 32px; display: flex; align-items: center; gap: 16px; border-bottom: none;">
+                <div style="background: rgba(255,255,255,0.1); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-outlined" style="font-size: 24px; color: white;">mail</span>
+                </div>
+                <h3 id="prompt-modal-title" style="margin: 0; font-size: 20px; font-weight: 700; color: white; letter-spacing: -0.01em;">Motta test-e-post</h3>
+            </div>
+            <div class="modal-body" style="padding: 32px; font-size: 16px; line-height: 1.6; color: #475569; display: flex; flex-direction: column; gap: 16px;">
+                <p id="prompt-modal-message" style="margin: 0; font-weight: 500;">Oppgi e-postadresse du vil sende test-e-post til:</p>
+                <input type="email" id="prompt-modal-input" style="width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 14px; font-weight: 500; color: #1e293b; outline: none; transition: border-color 0.2s; box-sizing: border-box;" onfocus="this.style.borderColor='#1B4965'" onblur="this.style.borderColor='#e2e8f0'" />
+            </div>
+            <div class="modal-footer" style="padding: 24px 32px; background: #f8fafc; display: flex; justify-content: flex-end; gap: 16px; border-top: 1px solid #f1f5f9;">
+                <button id="prompt-modal-cancel" class="btn-secondary" style="padding: 12px 24px; border-radius: 12px; font-weight: 600; min-width: 100px; cursor: pointer; transition: all 0.2s; border: 1px solid #e2e8f0; background: white; color: #64748b; font-size: 14px;">Avbryt</button>
+                <button id="prompt-modal-confirm" class="btn-primary" style="padding: 12px 24px; border-radius: 12px; font-weight: 700; min-width: 100px; cursor: pointer; transition: all 0.2s; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: white; border: none; font-size: 14px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">Send</button>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="../script.js?v=2026.05.15.1"></script>
+    <!-- Global Search Modal -->
+    <div id="site-search-modal" class="search-overlay">
+        <div class="search-modal-container">
+            <button class="close-search-btn" id="close-site-search" aria-label="Lukk søk">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="search-modal-title" data-content-doc="settings_global" data-content-key="search.modalTitle">Søk i systemet</div>
+            <div class="search-input-group">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" id="site-search-input-v2" class="search-input-field" placeholder="Hva leter du etter? Skriv for forslag..." autocomplete="off">
+            </div>
+            
+            <!-- Live Suggestions Container -->
+            <div id="site-search-suggestions" class="search-suggestions-container hidden"></div>
+            
+            <!-- Full Results Container (When Enter is pressed) -->
+            <div id="site-search-results-v2" class="search-suggestions-container hidden"></div>
+            
+            <div class="search-help-text">
+                <span data-content-doc="settings_global" data-content-key="search.helpText">Trykk 'Enter' for fullstendig søk.</span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Email Log Detail Modal -->
+    <div id="email-log-detail-modal" class="profile-modal" style="display: none; z-index: 12000; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div class="profile-modal-content card modern" style="max-width: 680px; width: 92%; max-height: 85vh; border-radius: 20px; background: #ffffff; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+            <div class="modal-header" style="padding: 20px 24px; background: linear-gradient(135deg, #1e293b, #0f172a); color: white; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span class="material-symbols-outlined" style="font-size: 24px; color: #38bdf8; display: block;">mark_email_read</span>
+                    <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: white;">E-post Utsendelsesdetaljer</h3>
+                </div>
+                <button id="close-email-log-modal" style="background: rgba(255,255,255,0.15); border: none; color: white; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                    <span class="material-symbols-outlined" style="font-size: 20px; display: block;">close</span>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;">
+                <!-- Key Details Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; background: #f8fafc; padding: 16px; border-radius: 14px; border: 1px solid #e2e8f0;">
+                    <div>
+                        <span style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Mottaker</span>
+                        <strong id="modal-log-to" style="font-size: 14px; color: #0f172a; word-break: break-all;">-</strong>
+                    </div>
+                    <div>
+                        <span style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Sendt Tidspunkt</span>
+                        <span id="modal-log-date" style="font-size: 14px; color: #0f172a; font-weight: 500;">-</span>
+                    </div>
+                    <div>
+                        <span style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Type</span>
+                        <span id="modal-log-type" class="badge status-read" style="margin-top: 2px;">-</span>
+                    </div>
+                    <div>
+                        <span style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Status</span>
+                        <span id="modal-log-status" style="margin-top: 2px;">-</span>
+                    </div>
+                </div>
+
+                <!-- Subject -->
+                <div>
+                    <label style="font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 6px; display: block;">Emne</label>
+                    <div id="modal-log-subject" style="padding: 12px 16px; background: #ffffff; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 14px; font-weight: 600; color: #0f172a;"></div>
+                </div>
+
+                <!-- Error message if failed -->
+                <div id="modal-log-error-container" style="display: none; background: #fef2f2; border: 1px solid #fecaca; padding: 14px 16px; border-radius: 12px; color: #991b1b;">
+                    <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; margin-bottom: 4px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">error</span> Feilmelding ved sending
+                    </div>
+                    <div id="modal-log-error-text" style="font-size: 13px; font-family: monospace; white-space: pre-wrap; word-break: break-all;"></div>
+                </div>
+
+                <!-- Body preview / HTML snippet -->
+                <div>
+                    <label style="font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 6px; display: block;">E-post innhold / Forhåndsvisning</label>
+                    <div id="modal-log-body-container" style="background: #ffffff; border-radius: 12px; border: 1px solid #cbd5e1; padding: 16px; min-height: 120px; max-height: 280px; overflow-y: auto; font-size: 14px; color: #334155;">
+                        <span style="color: #94a3b8; font-style: italic;">Ingen forhåndsvisning tilgjengelig for denne e-posten.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 16px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end;">
+                <button id="modal-log-close-btn" class="btn btn-secondary" style="padding: 10px 20px; border-radius: 10px; font-weight: 600; cursor: pointer;">Lukk</button>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="js/admin-analytics.js"></script>
 </body>
 
 </html>
