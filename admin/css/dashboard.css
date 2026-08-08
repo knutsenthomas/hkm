@@ -5616,32 +5616,18 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
         box-shadow: 0 6px 16px var(--accent-glow) !important;
     }
 
-    /* 2x2 Stats Grid with simulated title */
+    /* 2x2 Stats Grid styling */
     .stats-grid {
         grid-template-columns: 1fr 1fr !important;
         gap: 16px !important;
         position: relative;
-        margin-top: 45px !important;
+        margin-top: 0 !important;
     }
 
-    .stats-grid::before {
-        content: "Nøkkeltall";
-        position: absolute;
-        top: -36px;
-        left: 0;
-        font-size: 18px;
-        font-weight: 800;
-        color: var(--text-main);
-    }
-
+    .stats-grid::before,
     .stats-grid::after {
-        content: "Siste 30 dager";
-        position: absolute;
-        top: -30px;
-        right: 0;
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--accent-color);
+        display: none !important;
+        content: none !important;
     }
 
     /* Stats cards styling */
