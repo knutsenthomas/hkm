@@ -19214,12 +19214,12 @@ class AdminManager {
                 </div>
 
                 <div class="card" style="grid-column: span 12; padding: 24px;">
-                    <div style="margin-bottom: 16px; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="margin-bottom: 16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
                         <div>
-                            <span style="font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Donasjonshistorikk</span>
-                            <h4 style="margin: 4px 0 0; font-size: 18px; font-weight: 700; color: #0f172a;">${periodTitle}</h4>
+                            <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Donasjonshistorikk</span>
+                            <h4 style="margin: 4px 0 0; font-size: 24px; font-weight: 800; color: #0f172a;">${periodTitle}</h4>
                         </div>
-                        <span style="font-size: 14px; font-weight: 700; color: #1B4965; background: #eff6ff; padding: 6px 12px; border-radius: 6px;">${rangeText}</span>
+                        <span style="font-size: 13px; font-weight: 700; color: #1B4965; background: #eff6ff; border: 1px solid #dbeafe; padding: 6px 14px; border-radius: 999px; white-space: nowrap;">${rangeText}</span>
                     </div>
                     <div style="height: 260px; position: relative; border-bottom: 1px solid #e2e8f0; margin-bottom: 8px;">
                         <!-- SVG background -->
