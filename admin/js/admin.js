@@ -19056,12 +19056,11 @@ class AdminManager {
             }
         });
         const fundLabelsHtml = Array.from(fundDonationsMap.entries()).map(([fund, sum]) => {
+            const displayFundName = (fund === 'general' ? 'Generelt' : fund.charAt(0).toUpperCase() + fund.slice(1));
             return `
-                <div style="margin-bottom: 12px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                        <span class="cms-pill" style="background:#f1f5f9; color:#475569; border-radius:4px; font-weight:600; text-transform:lowercase; font-size:12px;">${fund}</span>
-                        <strong style="color:#0f172a; font-size:13px;">${sum.toLocaleString('no-NO')} kr</strong>
-                    </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #f1f5f9;">
+                    <span style="font-size:13px; font-weight:600; color:#475569;">${displayFundName}</span>
+                    <strong style="color:#0f172a; font-size:13px; font-weight:700;">${sum.toLocaleString('no-NO', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} kr</strong>
                 </div>
             `;
         }).join('') || '<p style="color:#64748b; font-size:13px; text-align:center;">Ingen merkelapper brukt ennå</p>';
@@ -19204,12 +19203,12 @@ class AdminManager {
                     </div>
                 </div>
 
-                <div class="card" style="grid-column: span 4; padding: 24px; min-height: 240px; display: flex; flex-direction: column;">
+                <div class="card" style="grid-column: span 4; padding: 24px; display: flex; flex-direction: column;">
                     <div style="margin-bottom: 16px;">
                         <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Fordelt på formål</span>
-                        <h4 style="margin: 4px 0 0; font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 12px;">Aktive formål</h4>
+                        <h4 style="margin: 4px 0 0; font-size: 24px; font-weight: 800; color: #0f172a;">Aktive formål</h4>
                     </div>
-                    <div style="flex:1; overflow-y:auto; max-height:140px;">
+                    <div style="display: flex; flex-direction: column; gap: 8px; max-height: 140px; overflow-y: auto;">
                         ${fundLabelsHtml}
                     </div>
                 </div>
