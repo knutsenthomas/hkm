@@ -5287,7 +5287,7 @@ class AdminManager {
                     gap: 24px !important;
                     width: 100% !important;
                     margin: 0 !important;
-                    padding-top: 12px !important;
+                    padding-top: 0 !important;
                     padding-bottom: 0 !important;
                 }
                 .hkm-dashboard-grid-saas {
