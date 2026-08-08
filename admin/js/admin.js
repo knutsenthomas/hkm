@@ -7937,7 +7937,6 @@ class AdminManager {
         if (!section) return;
 
         section.innerHTML = `
-            ${this.renderSectionHeader('hub', 'Integrasjoner', 'Administrer YouTube, Google Calendar, AI, Podcast og eksterne tjenester.', '')}
             <div class="integrations-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; align-items: stretch;">
                 <div class="card modern" style="height: 100%; display: flex; flex-direction: column;">
                     <div class="card-header flex-between">
