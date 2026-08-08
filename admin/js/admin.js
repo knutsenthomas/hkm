@@ -20534,11 +20534,20 @@ class AdminManager {
             <style>
                 body.admin-body .causes-stats-grid {
                     display: grid !important;
-                    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+                    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
                     gap: 20px !important;
                     width: 100% !important;
                     max-width: 100% !important;
                     box-sizing: border-box !important;
+                }
+                @media (max-width: 1024px) {
+                    body.admin-body .causes-stats-grid {
+                        grid-template-columns: 1fr !important;
+                    }
+                    body.admin-body .causes-stats-grid > .card,
+                    body.admin-body .causes-stats-grid > * {
+                        grid-column: span 1 !important;
+                    }
                 }
                 .btn-link-profile, .btn-link-donor-profile {
                     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
