@@ -1445,21 +1445,11 @@ class MinSideManager {
         let name = p.displayName || this.currentUser?.displayName || this.currentUser?.email || t('role.fallbackUser');
         let photoURL = p.photoURL;
 
-        if (!photoURL) {
-            try {
-                const pubRaw = localStorage.getItem('hkm_public_user_cache');
-                const admRaw = localStorage.getItem('hkm_admin_identity_cache');
-                if (pubRaw) {
-                    const pub = JSON.parse(pubRaw);
-                    photoURL = pub?.photoURL || pub?.photoUrl || pub?.avatarUrl || pub?.profileImage || '';
-                    if (!name || name === t('role.fallbackUser')) name = pub?.displayName || name;
-                }
-                if (!photoURL && admRaw) {
-                    const adm = JSON.parse(admRaw);
-                    photoURL = adm?.photoURL || '';
-                    if (!name || name === t('role.fallbackUser')) name = adm?.displayName || name;
-                }
-            } catch (e) {}
+        if (window.HKMAuthManager) {
+            const ident = window.HKMAuthManager.getIdentity();
+            if (!photoURL && ident.photoURL) photoURL = ident.photoURL;
+            if ((!name || name === t('role.fallbackUser')) && ident.displayName) name = ident.displayName;
+            window.HKMAuthManager.writeIdentity({ displayName: name, photoURL, uid: this.currentUser?.uid, role: p.role });
         }
 
         // Name
