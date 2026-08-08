@@ -616,10 +616,12 @@ html[data-theme="dark"] #contact-modal select {
   background: #f1f5f9;
   color: var(--admin-text-muted);
   font-weight: 700;
+  white-space: nowrap !important;
 }
 
 .logs-table td {
   border-bottom: 1px solid var(--admin-border);
+  white-space: nowrap !important;
 }
 
 .log-filter-btn {
