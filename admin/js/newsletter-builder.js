@@ -4257,7 +4257,7 @@ class NewsletterBuilder {
                     font-family: 'Inter', sans-serif;
                 `;
                 modal.innerHTML = `
-                    <div class="profile-modal-content card modern" style="max-width: 440px; padding: 0; overflow: hidden; border-radius: 24px; background: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); width: 90%; height: auto !important; min-height: auto !important; transform: translateZ(0); backface-visibility: hidden; display: flex; flex-direction: column;">
+                    <div class="profile-modal-content card modern" style="max-width: 480px !important; width: 90% !important; height: auto !important; min-height: auto !important; margin: auto !important; padding: 0; overflow: hidden; border-radius: 24px; background: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); transform: translateZ(0); backface-visibility: hidden; display: flex; flex-direction: column;">
                         <div class="modal-header" style="background: #1e293b; color: white; padding: 24px 32px; display: flex; align-items: center; gap: 16px; border-bottom: none;">
                             <div style="background: rgba(255,255,255,0.1); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
                                 <span class="material-symbols-outlined" style="font-size: 24px; color: white;">warning</span>

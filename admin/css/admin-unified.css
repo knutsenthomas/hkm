@@ -12142,6 +12142,18 @@ html[data-theme="dark"] .pco-menu-item:hover {
         overflow: hidden !important;
     }
 
+    /* Modal dialog exception: prevent modals from stretching 100% full-bleed width */
+    .profile-modal .profile-modal-content,
+    .profile-modal-content,
+    #hkm-confirm-modal .profile-modal-content,
+    #hkm-prompt-modal .profile-modal-content {
+        max-width: 480px !important;
+        width: 90% !important;
+        margin: auto !important;
+        border-radius: 20px !important;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35) !important;
+    }
+
     /* Internal padding protects text, inputs and buttons from card edges */
     .profile-panel-body,
     .design-ui-panel-body,

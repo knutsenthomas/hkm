@@ -1376,7 +1376,7 @@ class MessagesManager {
                 const borderColor = isDark ? '#334155' : '#e2e8f0';
 
                 modal.innerHTML = `
-                    <div class="profile-modal-content card modern" style="max-width: 420px; width: 100%; height: auto !important; min-height: 0 !important; flex: 0 1 auto !important; margin: auto !important; padding: 0; overflow: hidden; border-radius: 20px; background: ${cardBg}; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35); display: flex; flex-direction: column; border: 1px solid ${borderColor};">
+                    <div class="profile-modal-content card modern" style="max-width: 480px !important; width: 90% !important; height: auto !important; min-height: 0 !important; flex: 0 1 auto !important; margin: auto !important; padding: 0; overflow: hidden; border-radius: 20px; background: ${cardBg}; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35); display: flex; flex-direction: column; border: 1px solid ${borderColor};">
                         <div class="modal-header" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 20px 24px; display: flex; align-items: center; gap: 14px; border-bottom: none;">
                             <div style="background: rgba(255,255,255,0.2); width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                 <span class="material-symbols-outlined" style="font-size: 22px; color: white;">delete</span>
