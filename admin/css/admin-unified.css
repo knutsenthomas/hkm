@@ -4824,16 +4824,28 @@ body.admin-body .sidebar-header .logo-text {
   line-height: 1.1;
 }
 
-/* Tighten the gap between topbar and first content card */
-body.admin-body .section-container {
-  padding-top: 16px !important;
+/* Tighten the gap between topbar and first content card so top distance equals side gutter (24px) */
+body.admin-body .section-container,
+body.admin-body .content-wrapper,
+body.admin-body .crm-content,
+body.admin-body .logs-container,
+body.admin-body .inbox-container,
+body.admin-body .segments-container,
+body.admin-body .analytics-container,
+body.admin-body #newsletter-dashboard-layout {
+  padding-top: var(--admin-page-gutter, 24px) !important;
 }
 
-/* Make topbar-to-first-box spacing clean 16px total without extra top margin */
+/* Make topbar-to-first-box spacing clean 24px total without extra top margin */
 body.admin-body .section-content > .section-header:first-child,
 body.admin-body .section-content > .design-ui-header:first-child,
 body.admin-body .section-content > .section-header-row:first-child,
-body.admin-body #overview-section > .overview-hero-card:first-child {
+body.admin-body #overview-section > .overview-hero-card:first-child,
+body.admin-body .analytics-container > *:first-child,
+body.admin-body .crm-content > *:first-child,
+body.admin-body .logs-container > *:first-child,
+body.admin-body .inbox-container > *:first-child,
+body.admin-body #newsletter-dashboard-layout > *:first-child {
   margin-top: 0 !important;
 }
 
