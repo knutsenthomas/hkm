@@ -4830,7 +4830,7 @@ body.admin-body #overview-section > style {
 }
 
 body.admin-body #overview-section .overview-hero-card {
-  margin-top: 12px !important;
+  margin-top: 6px !important;
 }
 
 /* Make topbar-to-first-box spacing clean without extra top margin */

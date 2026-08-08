@@ -5397,7 +5397,8 @@ class AdminManager {
                     border-radius: 20px !important;
                     box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03), 0 2px 6px rgba(15, 23, 42, 0.02) !important;
                     padding: 40px !important;
-                    margin: 0 !important;
+                    margin: 6px 0 0 0 !important;
+                    margin-top: 6px !important;
                     position: relative !important;
                     overflow: hidden !important;
                     color: var(--admin-text, #1e293b) !important;
