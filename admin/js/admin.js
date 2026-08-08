@@ -5290,6 +5290,12 @@ class AdminManager {
                     padding-top: 0 !important;
                     padding-bottom: 0 !important;
                 }
+                #overview-section > style {
+                    display: none !important;
+                }
+                #overview-section > .overview-hero-card {
+                    margin-top: 0 !important;
+                }
                 .hkm-dashboard-grid-saas {
                     display: flex !important;
                     flex-direction: column !important;

@@ -4836,11 +4836,15 @@ body.admin-body #newsletter-dashboard-layout {
   padding-top: 12px !important;
 }
 
-/* Make topbar-to-first-box spacing clean 24px total without extra top margin */
+body.admin-body #overview-section > style {
+  display: none !important;
+}
+
+/* Make topbar-to-first-box spacing clean 12px total without extra top margin */
 body.admin-body .section-content > .section-header:first-child,
 body.admin-body .section-content > .design-ui-header:first-child,
 body.admin-body .section-content > .section-header-row:first-child,
-body.admin-body #overview-section > .overview-hero-card:first-child,
+body.admin-body #overview-section > .overview-hero-card,
 body.admin-body .analytics-container > *:first-child,
 body.admin-body .crm-content > *:first-child,
 body.admin-body .logs-container > *:first-child,
