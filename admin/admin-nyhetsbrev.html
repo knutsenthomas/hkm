@@ -681,7 +681,7 @@
 </head>
 
 <body class="admin-body main-dashboard">
-    <div class="builder-app-container">
+    <div class="main-wrapper">
         <!-- 1. Nav-Rail (Extreme Left) -->
         <!-- Sidebar Navigation (Standardized) -->
         <aside class="sidebar">
@@ -900,7 +900,7 @@
     </aside>
 
         <!-- Modus-svitsj: Dashboard (Standard) -->
-        <main id="newsletter-dashboard-wrapper" class="newsletter-dashboard-wrapper">
+        <main id="newsletter-dashboard-wrapper" class="main-content" style="padding-top: 0; min-height: 100vh; overflow-y: auto; overflow-x: hidden;">
             <!-- Header for Dashboard Mode -->
             <div id="dashboard-main-header" class="main-header">
                 <div class="section-header design-ui-header in-topbar" style="margin-bottom: 0;">
@@ -1099,7 +1099,6 @@
                 </div>
             </div>
         </div> <!-- Close newsletter-dashboard-layout -->
-    </main> <!-- Close newsletter-dashboard-wrapper -->
 
         <div id="newsletter-builder-layout" style="display: none;">
             <!-- Mørk bakgrunn for mobil-skuffer -->
@@ -1943,6 +1942,7 @@
 
             </div> <!-- Close builder-main-layout -->
         </div> <!-- Close newsletter-builder-layout -->
+    </main> <!-- Close main-content -->
 
     <div id="builder-tools-backdrop" class="builder-tools-backdrop"></div>
     <div class="fab-menu-container" id="builder-tools-fab-container">

@@ -8785,118 +8785,10 @@ body.builder-recipients-open #newsletter-builder-layout .sidebar-zoom-controls {
     }
 }
 
-/* Main HKM Studio navigation as a drawer above the full-screen editor. */
-body.builder-active .sidebar {
-    display: flex !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: auto !important;
-    width: min(300px, 88vw) !important;
-    height: 100vh !important;
-    height: 100dvh !important;
-    margin: 0 !important;
-    transform: translateX(-105%) !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    z-index: 190000 !important;
-    background: #ffffff !important;
-    box-shadow: 18px 0 55px rgba(15, 23, 42, 0.28) !important;
-    transition:
-        transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-        opacity 0.2s ease,
-        visibility 0.2s ease !important;
-}
 
-body.builder-active .sidebar.active {
-    transform: translateX(0) !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-}
 
-body.builder-active .sidebar-overlay {
-    z-index: 180000 !important;
-}
 
-body.builder-active .sidebar-overlay.active {
-    display: block !important;
-    opacity: 1 !important;
-}
 
-body.builder-active .sidebar .mobile-sidebar-close-btn {
-    display: inline-flex !important;
-}
-
-/* ==========================================================================
-   FORCE LEFT ALIGNMENT ON MOBILE SIDEBAR (Fix for admin-nyhetsbrev.html)
-   ========================================================================== */
-@media (max-width: 1024px) {
-    body.admin-body .sidebar .nav-list,
-    body.minside-body .sidebar .nav-list,
-    body.builder-active .sidebar .nav-list,
-    body.admin-body .sidebar .nav-group,
-    body.minside-body .sidebar .nav-group,
-    body.builder-active .sidebar .nav-group,
-    body.admin-body .sidebar-nav,
-    body.minside-body .sidebar-nav,
-    body.builder-active .sidebar-nav,
-    body.admin-body .sidebar,
-    body.minside-body .sidebar,
-    body.builder-active .sidebar {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: stretch !important;
-        width: 100% !important;
-        text-align: left !important;
-    }
-
-    body.admin-body .sidebar .nav-item,
-    body.minside-body .sidebar .nav-item,
-    body.builder-active .sidebar .nav-item {
-        display: block !important;
-        width: 100% !important;
-        text-align: left !important;
-    }
-
-    body.admin-body .sidebar .nav-link,
-    body.minside-body .sidebar .nav-link,
-    body.builder-active .sidebar .nav-link {
-        display: flex !important;
-        flex-direction: row !important;
-        align-items: center !important;
-        justify-content: flex-start !important;
-        text-align: left !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-    }
-
-    body.admin-body .sidebar .nav-category-header,
-    body.minside-body .sidebar .nav-category-header,
-    body.builder-active .sidebar .nav-category-header {
-        display: flex !important;
-        flex-direction: row !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-        text-align: left !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-    }
-}
-
-/* ==========================================================================
-   FORCE LEFT ALIGNMENT ON BUILDER DRAWER SIDEBAR (Overrides sidebar-mini)
-   ========================================================================== */
-body.builder-active .sidebar .nav-list,
-body.builder-active .sidebar .nav-group,
-body.builder-active .sidebar-nav,
-body.builder-active .sidebar {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: stretch !important;
-    text-align: left !important;
-}
 
 body.builder-active .sidebar .nav-item {
     display: block !important;
@@ -8944,15 +8836,6 @@ body.builder-active .sidebar .nav-category-header {
     }
 }
 
-/* ==========================================================================
-   FIX BUILDER DRAWER ICON GAP (Override sidebar-mini margin)
-   ========================================================================== */
-body.builder-active.sidebar-mini .sidebar .nav-link span:first-child,
-body.builder-active.sidebar-mini .sidebar .nav-link .material-symbols-outlined {
-    margin: 0 !important;
-    width: auto !important;
-    justify-content: flex-start !important;
-}
 
 body.builder-active.sidebar-mini .sidebar .nav-link > span:not(.material-symbols-outlined) {
     display: inline-block !important;
@@ -8962,15 +8845,3 @@ body.builder-active .sidebar .nav-link {
     gap: 12px !important;
 }
 
-/* ==========================================================================
-   FORCE SIDEBAR VISIBLE WHEN ACTIVE (Overrides sidebar-collapsed)
-   ========================================================================== */
-body.builder-active.sidebar-collapsed .sidebar.active,
-body.builder-active.sidebar-mini .sidebar.active {
-    display: flex !important;
-    transform: translateX(0) !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-    opacity: 1 !important;
-    z-index: 9999 !important;
-}
