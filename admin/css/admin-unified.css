@@ -3168,7 +3168,7 @@ body.admin-body .section-container,
 body.admin-body .content-wrapper,
 body.crm-body .crm-content,
 body.crm-body .content-wrapper {
-  padding-top: 6px !important;
+  padding-top: 0 !important;
   padding-bottom: var(--admin-page-gutter, 24px) !important;
 }
 
@@ -4825,26 +4825,18 @@ body.admin-body .sidebar-header .logo-text {
 }
 
 /* Tighten the gap between topbar and first content card so top distance equals side gutter (24px) */
-body.admin-body .section-container,
-body.admin-body .content-wrapper,
-body.admin-body .crm-content,
-body.admin-body .logs-container,
-body.admin-body .inbox-container,
-body.admin-body .segments-container,
-body.admin-body .analytics-container,
-body.admin-body #newsletter-dashboard-layout {
-  padding-top: 6px !important;
-}
-
 body.admin-body #overview-section > style {
   display: none !important;
 }
 
-/* Make topbar-to-first-box spacing clean 12px total without extra top margin */
+body.admin-body #overview-section .overview-hero-card {
+  margin-top: 12px !important;
+}
+
+/* Make topbar-to-first-box spacing clean without extra top margin */
 body.admin-body .section-content > .section-header:first-child,
 body.admin-body .section-content > .design-ui-header:first-child,
 body.admin-body .section-content > .section-header-row:first-child,
-body.admin-body #overview-section > .overview-hero-card,
 body.admin-body .analytics-container > *:first-child,
 body.admin-body .crm-content > *:first-child,
 body.admin-body .logs-container > *:first-child,
@@ -5470,7 +5462,7 @@ body.admin-body .crm-content,
 body.admin-body .inbox-container,
 body.admin-body .logs-container,
 body.admin-body #newsletter-dashboard-layout {
-  padding-top: 6px !important;
+  padding-top: 0 !important;
   margin-top: 0 !important;
   box-sizing: border-box !important;
 }

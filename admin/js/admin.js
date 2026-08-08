@@ -5293,8 +5293,8 @@ class AdminManager {
                 #overview-section > style {
                     display: none !important;
                 }
-                #overview-section > .overview-hero-card {
-                    margin-top: 0 !important;
+                body.admin-body #overview-section .overview-hero-card {
+                    margin-top: 12px !important;
                 }
                 .hkm-dashboard-grid-saas {
                     display: flex !important;
