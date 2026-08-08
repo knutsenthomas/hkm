@@ -610,7 +610,7 @@ class AdminManager {
 
         // Replace seeded/static demo content immediately to avoid showing an outdated dashboard on hard refresh.
         section.innerHTML = `
-            ${this.renderSectionHeader('dashboard', 'Oversikt', 'Laster analyseoversikt...')}
+            ${this.renderSectionHeader('dashboard', 'Oversikt', 'HKM Studio administrasjonspanel')}
             <div class="card">
                 <div class="card-body" style="min-height:180px; display:flex; align-items:center; justify-content:center;">
                     <div class="loader"></div>
@@ -4712,6 +4712,11 @@ class AdminManager {
         if (!section) return;
 
         section.setAttribute('data-rendered', 'true');
+
+        const titleEl = document.getElementById('dashboard-main-header-title');
+        const subEl = document.getElementById('dashboard-main-header-subtitle');
+        if (titleEl) titleEl.textContent = 'Oversikt';
+        if (subEl) subEl.textContent = 'HKM Studio administrasjonspanel';
 
         // Fetch Data
         let blogCount = 0, teachingCount = 0, eventCount = 0, campaignCount = 0, userCount = 0;
