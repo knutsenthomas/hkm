@@ -13490,18 +13490,35 @@ html body.minside-body .design-ui-panel-header > select {
             margin-top: 4px !important;
         }
 
-/* Fix for layout shifts when toggling builder or resizing */
+/* Sidebar category collapse & flex layout fix */
+.sidebar-nav,
+body.admin-body .sidebar-nav,
+body.crm-body .sidebar-nav,
+body.minside-body .sidebar-nav {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+}
+
+.sidebar-nav .nav-group.bottom {
+    margin-top: auto !important;
+}
+
 .sidebar .nav-item.nav-cat-hidden {
     display: none !important;
 }
+
 .sidebar .nav-item.visible {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
 }
-body.sidebar-mini .sidebar .nav-item {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+
+@media (min-width: 1025px) {
+    body.sidebar-mini .sidebar .nav-item {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
 }
 
