@@ -2299,70 +2299,16 @@ class AdminManager {
     }
 
     renderHeaderIdentity(name, photoURL) {
-        const adminName = document.getElementById('admin-name');
-        const getAvatars = () => Array.from(document.querySelectorAll('#admin-avatar, #ph-avatar, #modal-admin-avatar, .user-avatar, .user-avatar-compact'));
-
-        const isDefaultAvatarUrl = (url) => {
-            if (!url || typeof url !== 'string') return true;
-            const lower = url.toLowerCase().trim();
-            if (!lower || lower === 'null' || lower === 'undefined') return true;
-            return lower.includes('default-user') || 
-                   lower.includes('default_user') || 
-                   lower.includes('default_avatar') || 
-                   lower.includes('avatar-placeholder') || 
-                   lower.includes('avatar_placeholder') || 
-                   lower.includes('silhouette') || 
-                   lower.includes('ssl.gstatic.com/accounts/ui/avatar') || 
-                   lower.includes('googleusercontent.com/a/default-user') || 
-                   lower.includes('/a/default-user') ||
-                   lower.includes('gstatic.com/identity/images/components/profiles');
-        };
-
-        const formatPhotoUrl = (url) => {
-            if (!url || typeof url !== 'string') return '';
-            return url.trim();
-        };
-
-        let effectivePhoto = formatPhotoUrl(photoURL);
-        if (!effectivePhoto || isDefaultAvatarUrl(effectivePhoto)) {
-            try {
-                const adm = localStorage.getItem('hkm_admin_identity_cache');
-                const pub = localStorage.getItem('hkm_public_user_cache');
-                if (adm) {
-                    const parsed = JSON.parse(adm);
-                    if (parsed?.photoURL && !isDefaultAvatarUrl(parsed.photoURL)) effectivePhoto = parsed.photoURL;
-                }
-                if (!effectivePhoto && pub) {
-                    const parsedPub = JSON.parse(pub);
-                    const pUrl = parsedPub?.photoURL || parsedPub?.photoUrl || parsedPub?.avatarUrl || parsedPub?.profileImage || '';
-                    if (pUrl && !isDefaultAvatarUrl(pUrl)) effectivePhoto = pUrl;
-                }
-            } catch (e) {}
-        }
-
-        const safeName = (name || '').trim() || 'Administrator';
-        if (adminName) adminName.textContent = safeName;
-        const avatars = getAvatars();
-        if (avatars.length === 0) return;
-
-        const initials = safeName.split(' ').map(n => n.trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase() || 'A';
-        const shortInitials = initials.substring(0, 2);
-        const formattedPhoto = formatPhotoUrl(effectivePhoto);
-        const isCustomPhoto = formattedPhoto && formattedPhoto.length > 5 && !isDefaultAvatarUrl(formattedPhoto);
-
-        avatars.forEach(adminAvatar => {
-            adminAvatar.title = safeName;
-
-            if (isCustomPhoto) {
-                adminAvatar.dataset.photoUrl = formattedPhoto;
-                adminAvatar.classList.remove('has-initials');
-                const escapedName = safeName.replace(/"/g, '&quot;');
-                adminAvatar.innerHTML = `<img src="${formattedPhoto}" alt="${escapedName}" referrerpolicy="no-referrer" loading="eager" decoding="sync" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; display:block; position:absolute; inset:0; z-index:2;" onerror="this.style.display='none'; this.parentElement.classList.add('has-initials');"><span class="avatar-initials-text" style="position:relative; z-index:1;">${shortInitials}</span>`;
+        if (window.HKMAuthManager) {
+            if (name || photoURL) {
+                window.HKMAuthManager.writeIdentity({ displayName: name, photoURL });
             } else {
-                adminAvatar.classList.add('has-initials');
-                adminAvatar.innerHTML = `<span class="avatar-initials-text" style="position:relative; z-index:1;">${shortInitials}</span>`;
+                window.HKMAuthManager.syncDOM();
             }
-        });
+            return;
+        }
+        const adminName = document.getElementById('admin-name');
+        if (adminName && name) adminName.textContent = name;
     }
 
     async updateUserInfo(user) {
