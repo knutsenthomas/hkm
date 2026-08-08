@@ -51,10 +51,10 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" />
 
     <link rel="stylesheet" href="../styles.css">
-    <link rel="stylesheet" href="css/dashboard.css?v=20260808_V18">
+    <link rel="stylesheet" href="css/dashboard.css?v=20260808_V19">
     <link rel="stylesheet" href="../css/notifications.css">
-    <link rel="stylesheet" href="css/admin-unified.css?v=20260808_V18">
-    <link rel="stylesheet" href="../minside/css/minside.css?v=20260808_V18">
+    <link rel="stylesheet" href="css/admin-unified.css?v=20260808_V19">
+    <link rel="stylesheet" href="../minside/css/minside.css?v=20260808_V19">
     <link rel="stylesheet" href="css/todo.css?v=20260729_TODO_OVERHAUL">
     
     <!-- FORCED CSS FIX FOR ENGAGEMENT OVERFLOW (INLINE TO BEAT CACHE - GLOBAL) -->
@@ -310,8 +310,8 @@
                 margin: 0 !important;
             }
 
-            /* --- ZERO-BOX TRANSPARENT AVATAR TRIGGER FIX --- */
-            .user-profile-link:not(:has(.user-name)),
+            /* --- ZERO-BOX TRANSPARENT AVATAR TRIGGER FIX (44px EQUAL SIZE WITH OTHER BUTTONS) --- */
+            .user-profile-link,
             #actions-btn,
             #admin-profile-trigger {
                 background: transparent !important;
@@ -325,8 +325,15 @@
                 align-items: center !important;
                 justify-content: center !important;
                 text-decoration: none !important;
-                width: auto !important;
-                height: auto !important;
+                width: 44px !important;
+                height: 44px !important;
+                min-width: 44px !important;
+                min-height: 44px !important;
+                max-width: 44px !important;
+                max-height: 44px !important;
+                border-radius: 12px !important;
+                overflow: hidden !important;
+                flex-shrink: 0 !important;
             }
 
             .user-profile-link .user-avatar,
@@ -339,12 +346,12 @@
             .user-avatar,
             [id="ph-avatar"],
             [id="admin-avatar"] {
-                width: 42px !important;
-                height: 42px !important;
-                min-width: 42px !important;
-                min-height: 42px !important;
-                max-width: 42px !important;
-                max-height: 42px !important;
+                width: 44px !important;
+                height: 44px !important;
+                min-width: 44px !important;
+                min-height: 44px !important;
+                max-width: 44px !important;
+                max-height: 44px !important;
                 border-radius: 12px !important;
                 border: 1.5px solid rgba(15, 23, 42, 0.12) !important;
                 box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06) !important;
@@ -361,6 +368,7 @@
                 font-weight: 800 !important;
                 font-size: 15px !important;
                 transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                box-sizing: border-box !important;
             }
 
             .user-profile-link:hover .user-avatar,

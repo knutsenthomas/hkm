@@ -144,12 +144,12 @@ a.user-profile-link .user-avatar,
 .user-avatar,
 [id="ph-avatar"],
 [id="admin-avatar"] {
-    width: 42px !important;
-    height: 42px !important;
-    min-width: 42px !important;
-    min-height: 42px !important;
-    max-width: 42px !important;
-    max-height: 42px !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    max-width: 44px !important;
+    max-height: 44px !important;
     border-radius: 12px !important;
     border: 1.5px solid rgba(15, 23, 42, 0.12) !important;
     box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06) !important;

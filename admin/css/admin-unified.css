@@ -5313,8 +5313,10 @@ body.crm-body .user-avatar,
 body.builder-active .user-avatar,
 [id="admin-avatar"],
 [id="ph-avatar"] {
-  width: 42px !important;
-  height: 42px !important;
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
   background: var(--admin-orange-gradient, linear-gradient(135deg, #cc6f2c 0%, #f97316 100%)) !important;
   color: #ffffff !important;
   display: flex !important;
@@ -5324,8 +5326,8 @@ body.builder-active .user-avatar,
   font-weight: 800 !important;
   font-size: 15px !important;
   text-transform: uppercase !important;
-  border: 2px solid #ffffff !important;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08) !important;
+  border: 1.5px solid rgba(15, 23, 42, 0.12) !important;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06) !important;
   visibility: visible !important;
   opacity: 1 !important;
   flex-shrink: 0 !important;
@@ -5756,20 +5758,24 @@ body.admin-body .main-header [id="admin-avatar"],
 body.minside-body .main-header [id="ph-avatar"],
 body.crm-body .main-header [id="admin-avatar"],
 body.builder-active .main-header [id="admin-avatar"] {
-  width: 42px !important;
-  height: 42px !important;
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  max-width: 44px !important;
+  max-height: 44px !important;
   margin: 0 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   border-radius: 12px !important;
-  border: 2px solid rgba(255, 255, 255, 0.72) !important;
+  border: 1.5px solid rgba(15, 23, 42, 0.12) !important;
   background: var(--admin-orange-gradient, linear-gradient(135deg, #cc6f2c 0%, #f97316 100%)) !important;
   color: #ffffff !important;
-  box-shadow: 0 2px 5px rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06) !important;
   font-size: 16px !important;
   font-weight: 900 !important;
-  line-height: 42px !important;
+  line-height: 44px !important;
   text-align: center !important;
   text-transform: uppercase !important;
   flex-shrink: 0 !important;
