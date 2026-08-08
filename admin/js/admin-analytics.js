@@ -657,7 +657,7 @@
                                 reasonsBody.innerHTML = '';
                                 
                                 if (reasonsList.length === 0) {
-                                    reasonsBody.innerHTML = '<tr><td colspan="4" style="padding: 12px 4px; color: #64748b; text-align: center;">Ingen registrerte feil eller årsaker</td></tr>';
+                                    reasonsBody.innerHTML = '<tr><td colspan="4" style="padding: 12px; color: #64748b; text-align: center;">Ingen registrerte feil eller årsaker</td></tr>';
                                 } else {
                                     const totalNonIndexed = summary.nonIndexed || 1;
                                     reasonsList.forEach(r => {
@@ -673,10 +673,10 @@
                                         const barColor = r.reason.toLowerCase().includes('404') ? '#dc2626' : '#1b4965';
                                         
                                         tr.innerHTML = `
-                                            <td style="padding: 10px 4px; font-weight: 600; color: #334155; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${r.reason}">${r.reason}</td>
-                                            <td style="padding: 10px 4px;">${sourceBadge}</td>
-                                            <td style="padding: 10px 4px; text-align: right; font-weight: 700; color: #1e293b; font-family: 'Fira Code', monospace;">${r.count.toLocaleString('no-NO')}</td>
-                                            <td style="padding: 10px 4px; text-align: right;">
+                                            <td style="padding: 12px; font-weight: 600; color: #334155; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${r.reason}">${r.reason}</td>
+                                            <td style="padding: 12px;">${sourceBadge}</td>
+                                            <td style="padding: 12px; text-align: right; font-weight: 700; color: #1e293b; font-family: 'Fira Code', monospace;">${r.count.toLocaleString('no-NO')}</td>
+                                            <td style="padding: 12px; text-align: right;">
                                                 <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
                                                     <span style="font-size: 11px; font-weight: 600; color: #64748b; font-family: 'Fira Code', monospace; min-width: 36px; text-align: right;">${pct}%</span>
                                                     <div style="width: 60px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; display: inline-block; vertical-align: middle;">
