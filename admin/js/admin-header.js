@@ -721,7 +721,23 @@ const initAdminHeader = () => {
         }
     })();
 
-    // Keep profile links as normal navigation (e.g. to ../minside/index.html).
+    // Global Header Profile Links -> Navigate to Admin profile section (#profile)
+    document.querySelectorAll('.user-profile-link, #admin-profile-trigger').forEach(link => {
+        if (link.dataset.boundGlobalProfileNav === '1') return;
+        link.dataset.boundGlobalProfileNav = '1';
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const path = window.location.pathname;
+            if (path.endsWith('/admin/index.html') || path === '/admin/' || path === '/admin') {
+                window.location.hash = 'profile';
+                if (window.adminManager && typeof window.adminManager.renderProfileSection === 'function') {
+                    window.adminManager.renderProfileSection();
+                }
+            } else {
+                window.location.href = '/admin/index.html#profile';
+            }
+        });
+    });
 
 
     // Mobile Nav Toggle (Supports both dashboard and builder instances)

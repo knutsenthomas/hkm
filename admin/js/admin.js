@@ -2454,213 +2454,9 @@ class AdminManager {
     }
 
     openAdminProfileModal(user, profile) {
-        const profileModal = document.getElementById('profile-modal');
-        if (!profileModal) return;
-
-        const displayName = profile.displayName || user.displayName || user.email || 'Bruker';
-        const rawPhoto = (profile.photoURL || profile.photo_url || profile.photoUrl || user.photoURL || '');
-        const currentPhoto = isDefaultAvatarUrl(rawPhoto) ? '' : rawPhoto;
-
-        const setText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
-        const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
-
-        setText('modal-admin-name', displayName);
-        setText('modal-admin-role', 'Administrator');
-        setText('modal-admin-email', user.email || '');
-
-        const modalAvatar = document.getElementById('modal-admin-avatar');
-        const removePhotoBtn = document.getElementById('admin-modal-remove-photo-btn');
-        const uploadPhotoBtn = document.getElementById('admin-modal-upload-photo-btn');
-        const photoFileInput = document.getElementById('admin-modal-photo-file');
-        const photoUrlInput = document.getElementById('admin-modal-photo-url');
-
-        const updateAvatarPreview = (photoUrlToUse) => {
-            if (!modalAvatar) return;
-            modalAvatar.innerHTML = '';
-            modalAvatar.textContent = '';
-            const validPhoto = photoUrlToUse && photoUrlToUse.trim().length > 5 && !isDefaultAvatarUrl(photoUrlToUse);
-
-            if (validPhoto) {
-                const img = document.createElement('img');
-                img.src = photoUrlToUse.trim();
-                img.alt = "Profile";
-                img.referrerPolicy = "no-referrer";
-                img.style.cssText = "width: 100%; height: 100%; border-radius: inherit; object-fit: cover; display: block;";
-                img.onerror = () => {
-                    modalAvatar.innerHTML = '';
-                    const initials = displayName.split(' ').map(n => n.trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase();
-                    modalAvatar.textContent = (initials || 'B').substring(0, 2);
-                    if (removePhotoBtn) removePhotoBtn.style.display = 'none';
-                };
-                modalAvatar.appendChild(img);
-                if (removePhotoBtn) removePhotoBtn.style.display = 'inline-flex';
-            } else {
-                const initials = displayName.split(' ').map(n => n.trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase();
-                modalAvatar.textContent = (initials || 'B').substring(0, 2);
-                if (removePhotoBtn) removePhotoBtn.style.display = 'none';
-            }
-        };
-
-        if (photoUrlInput) {
-            photoUrlInput.value = currentPhoto;
-            if (!photoUrlInput.dataset.boundPreview) {
-                photoUrlInput.dataset.boundPreview = '1';
-                photoUrlInput.addEventListener('input', (e) => {
-                    updateAvatarPreview(e.target.value);
-                });
-            }
-        }
-
-        if (uploadPhotoBtn && photoFileInput && !uploadPhotoBtn.dataset.boundUpload) {
-            uploadPhotoBtn.dataset.boundUpload = '1';
-            uploadPhotoBtn.addEventListener('click', () => {
-                photoFileInput.click();
-            });
-
-            photoFileInput.addEventListener('change', async (e) => {
-                const file = e.target.files && e.target.files[0];
-                if (!file) return;
-
-                uploadPhotoBtn.disabled = true;
-                uploadPhotoBtn.textContent = 'Laster opp...';
-
-                try {
-                    let photoUrl = '';
-                    if (typeof firebase !== 'undefined' && firebase.storage && user?.uid) {
-                        try {
-                            const ref = firebase.storage().ref(`profiles/${user.uid}/avatar`);
-                            await ref.put(file);
-                            photoUrl = await ref.getDownloadURL();
-                        } catch (storageErr) {
-                            console.warn('Firebase storage put failed, falling back to compressed canvas:', storageErr);
-                        }
-                    }
-
-                    if (!photoUrl) {
-                        // Compressed canvas fallback
-                        photoUrl = await new Promise((resolve) => {
-                            const reader = new FileReader();
-                            reader.onload = (event) => {
-                                const img = new Image();
-                                img.onload = () => {
-                                    const canvas = document.createElement('canvas');
-                                    const maxDim = 400;
-                                    let width = img.width;
-                                    let height = img.height;
-                                    if (width > height) {
-                                        if (width > maxDim) { height *= maxDim / width; width = maxDim; }
-                                    } else {
-                                        if (height > maxDim) { width *= maxDim / height; height = maxDim; }
-                                    }
-                                    canvas.width = width;
-                                    canvas.height = height;
-                                    const ctx = canvas.getContext('2d');
-                                    ctx.drawImage(img, 0, 0, width, height);
-                                    resolve(canvas.toDataURL('image/jpeg', 0.85));
-                                };
-                                img.onerror = () => resolve('');
-                                img.src = event.target.result;
-                            };
-                            reader.onerror = () => resolve('');
-                            reader.readAsDataURL(file);
-                        });
-                    }
-
-                    if (photoUrl) {
-                        if (photoUrlInput) photoUrlInput.value = photoUrl;
-                        updateAvatarPreview(photoUrl);
-                    }
-                } catch (uploadErr) {
-                    console.error('Kunne ikke laste opp bilde:', uploadErr);
-                } finally {
-                    uploadPhotoBtn.disabled = false;
-                    uploadPhotoBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">photo_camera</span> Velg bilde...';
-                }
-            });
-        }
-
-        if (removePhotoBtn && !removePhotoBtn.dataset.boundRemove) {
-            removePhotoBtn.dataset.boundRemove = '1';
-            removePhotoBtn.addEventListener('click', () => {
-                if (photoUrlInput) photoUrlInput.value = '';
-                updateAvatarPreview('');
-            });
-        }
-
-        updateAvatarPreview(currentPhoto);
-
-        setVal('admin-modal-display-name', displayName);
-        setVal('admin-modal-phone', profile.phone || '');
-        setVal('admin-modal-address', profile.address || '');
-        setVal('admin-modal-bio', profile.bio || '');
-
-        profileModal.style.display = 'flex';
-    }
-
-    async saveAdminProfileModal(user) {
-        const btn = document.getElementById('admin-modal-save-btn');
-        const originalText = btn ? btn.textContent : '';
-        if (btn) {
-            btn.disabled = true;
-            btn.textContent = 'Lagrer...';
-        }
-
-        try {
-            const displayName = (document.getElementById('admin-modal-display-name').value || '').trim();
-            const photoURLInput = document.getElementById('admin-modal-photo-url');
-            const photoURL = photoURLInput ? (photoURLInput.value || '').trim() : '';
-            const phone = (document.getElementById('admin-modal-phone').value || '').trim();
-            const address = (document.getElementById('admin-modal-address').value || '').trim();
-            const bio = (document.getElementById('admin-modal-bio').value || '').trim();
-
-            const profileUpdates = { displayName };
-            if (photoURL !== undefined) {
-                profileUpdates.photoURL = photoURL;
-            }
-
-            try {
-                await user.updateProfile(profileUpdates);
-            } catch (e) {
-                console.warn('Auth profile update failed:', e);
-            }
-
-            const firestoreUpdates = {
-                displayName,
-                phone,
-                address,
-                bio,
-                photoURL,
-                photo_url: photoURL,
-                photoUrl: photoURL,
-                avatarUrl: photoURL,
-                profileImage: photoURL,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-
-            await firebase.firestore().collection('users').doc(user.uid).set(firestoreUpdates, { merge: true });
-
-            await firebaseService.savePageContent('settings_profile', {
-                fullName: displayName,
-                photoUrl: photoURL,
-                photoURL: photoURL,
-                phone,
-                address,
-                bio,
-                updatedAt: new Date().toISOString()
-            });
-
-            const profileModal = document.getElementById('profile-modal');
-            if (profileModal) profileModal.style.display = 'none';
-            await this.updateUserInfo(user);
-            this.showToast('Profil og profilbilde ble oppdatert!', 'success', 4000);
-        } catch (error) {
-            console.error('Kunne ikke lagre admin-profil:', error);
-            this.showToast('Kunne ikke lagre profil.', 'error', 5000);
-        } finally {
-            if (btn) {
-                btn.disabled = false;
-                btn.textContent = originalText;
-            }
+        window.location.hash = 'profile';
+        if (typeof this.renderProfileSection === 'function') {
+            this.renderProfileSection();
         }
     }
 
@@ -23134,302 +22930,607 @@ class AdminManager {
         const authUser = firebaseService.auth && firebaseService.auth.currentUser ? firebaseService.auth.currentUser : null;
         if (!authUser) return;
 
+        const uid = authUser.uid;
+
+        // Fresh fetch user doc from Firestore
+        let userDocData = {};
+        try {
+            const doc = await firebase.firestore().collection('users').doc(uid).get();
+            if (doc.exists) userDocData = doc.data() || {};
+        } catch (e) {
+            console.warn('Kunne ikke hente users-dokument i admin profile:', e);
+        }
+
+        const settingsProfile = await firebaseService.getPageContent('settings_profile') || {};
+        const p = { ...settingsProfile, ...userDocData };
+
+        const esc = str => this.escapeHtml ? this.escapeHtml(str || '') : (str || '');
+        const val = v => v ? `<span class="info-row-value">${esc(v)}</span>` : `<span class="info-row-value empty">—</span>`;
+        const inputValue = v => esc(v || '');
+
+        const phoneCountryCode = p.phoneCountryCode || (String(p.phone || '').trim().startsWith('+') ? '' : '+47');
+        const phoneDisplay = [phoneCountryCode, p.phone].filter(Boolean).join(' ').trim();
+        const phoneCountryOptions = [
+            ['NO', '+47', 'Norge'],
+            ['SE', '+46', 'Sverige'],
+            ['DK', '+45', 'Danmark'],
+            ['FI', '+358', 'Finland'],
+            ['IS', '+354', 'Island'],
+            ['DE', '+49', 'Tyskland'],
+            ['UK', '+44', 'Storbritannia'],
+            ['US', '+1', 'USA'],
+            ['ES', '+34', 'Spania']
+        ].map(([iso, dial, name]) => {
+            const selected = dial === phoneCountryCode ? 'selected' : '';
+            return `<option value="${esc(dial)}" data-country="${esc(iso)}" ${selected}>${esc(`${dial} ${name}`)}</option>`;
+        }).join('');
+
+        const joinYear = p.createdAt?.toDate
+            ? p.createdAt.toDate().getFullYear()
+            : (userDocData.createdAt?.toDate ? userDocData.createdAt.toDate().getFullYear() : new Date().getFullYear());
+
+        const genderVal = p.gender || '';
+        const maritalVal = p.maritalStatus || '';
+
+        const activeTab = this._activeAdminProfileTab || 'my-profile';
+
+        const ssnVal = p.ssn || p.nationalIdNumber || p.personnummer || '';
+        const ssnDisplayFormatted = ssnVal
+            ? (ssnVal.length === 11
+                ? `<div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="info-row-value" id="ssn-masked-val-admin" style="font-family: monospace; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.08em;">${esc(ssnVal.substring(0, 6))} •••••</span>
+                    <span class="info-row-value" id="ssn-full-val-admin" style="display: none; font-family: monospace; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.08em;">${esc(ssnVal.substring(0, 6))} ${esc(ssnVal.substring(6))}</span>
+                    <button type="button" id="toggle-ssn-eye-admin" style="background: none; border: none; cursor: pointer; color: var(--text-muted); display: inline-flex; align-items: center; padding: 3px 6px; border-radius: 6px; transition: color 0.2s;" title="Vis/skjul fødselsnummer">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">visibility</span>
+                    </button>
+                   </div>`
+                : `<span class="info-row-value" style="font-family: monospace; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.08em;">${esc(ssnVal)}</span>`)
+            : `<span class="info-row-value empty">—</span>`;
+
+        const displayName = p.displayName || authUser.displayName || p.fullName || 'Administrator';
+        const photoURL = p.photoURL || authUser.photoURL || p.photoUrl || '';
+        const roleName = (p.role === 'superadmin' || userDocData.role === 'superadmin') ? 'Superadministrator' : 'Administrator';
+
+        // Bottom nav preferences html
+        const allowedNavItems = ['overview', 'profile', 'courses', 'reading-plans', 'giving', 'notifications', 'tasks', 'notes'];
+        const defaultActiveItems = ['overview', 'reading-plans', 'giving', 'notifications', 'tasks'];
+        const userCustomNav = p.customBottomNav || defaultActiveItems;
+        const navLabels = {
+            'overview': { label: 'Oversikt', icon: 'home' },
+            'profile': { label: 'Profil', icon: 'person' },
+            'courses': { label: 'Kurs', icon: 'school' },
+            'reading-plans': { label: 'Leseplaner', icon: 'auto_stories' },
+            'giving': { label: 'Gaver', icon: 'volunteer_activism' },
+            'notifications': { label: 'Varslinger', icon: 'notifications' },
+            'tasks': { label: 'Huskeliste', icon: 'task_alt' },
+            'notes': { label: 'Notater', icon: 'edit_note' }
+        };
+        const customNavHtml = allowedNavItems.map(id => {
+            const checked = userCustomNav.includes(id) ? 'checked' : '';
+            const item = navLabels[id] || { label: id, icon: 'link' };
+            return `
+                <label class="custom-nav-item">
+                    <div class="custom-nav-item-left">
+                        <span class="material-symbols-outlined">${item.icon}</span>
+                        <span>${item.label}</span>
+                    </div>
+                    <label class="hkm-switch toggle-orange" style="margin: 0;">
+                        <input type="checkbox" class="custom-nav-cb-admin" value="${id}" ${checked}>
+                        <span class="hkm-slider"></span>
+                    </label>
+                </label>
+            `;
+        }).join('');
+
         section.innerHTML = `
-            ${this.renderSectionHeader('person_outline', 'Min Profil', 'Administrer din brukerkonto og personlige innstillinger.', `
-                <button class="btn btn-primary" onclick="location.reload()">Last inn på nytt</button>
+            ${this.renderSectionHeader('person_outline', 'Min Profil', 'Administrer din brukerkonto og personlige innstillinger for både Admin og Min Side.', `
+                <button class="btn btn-outline" id="admin-profile-reload-btn">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">refresh</span> Last inn på nytt
+                </button>
             `, '')}
 
-            <div class="design-ui-shell">
-                <div class="design-ui-workspace">
-                    <div class="design-ui-panel">
-                        <div class="design-ui-panel-body profile-panel-body">
-                            <div class="profile-header-row" style="display: flex; align-items: center; flex-wrap: wrap; gap: 20px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); margin-bottom: 24px;">
-                                <div id="profile-picture-container-admin" style="position: relative; width: 80px; height: 80px; min-width: 80px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: 700; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
-                                    ${(authUser.photoURL ? `<img src="${authUser.photoURL}" style="width: 100%; height: 100%; object-fit: cover;">` : (authUser.displayName || authUser.email || '?').charAt(0).toUpperCase())}
-                                    <label for="profile-upload-admin" style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; color: white; opacity: 0; transition: opacity 0.3s ease; cursor: pointer;">
-                                        <span class="material-symbols-outlined">photo_camera</span>
-                                    </label>
-                                    <input type="file" id="profile-upload-admin" style="display: none;" accept="image/*">
+            <!-- EXECUTIVE PROFILE HERO CARD -->
+            <div class="ms-profile-hero-card">
+                <div class="ms-profile-hero-left">
+                    <div class="ms-profile-hero-avatar-wrap">
+                        <div class="ms-profile-hero-avatar" id="ph-hero-avatar-admin">
+                            ${photoURL ? `<img src="${photoURL}" style="width: 100%; height: 100%; object-fit: cover;">` : esc(displayName.charAt(0).toUpperCase())}
+                        </div>
+                        <button type="button" class="ms-profile-avatar-upload-btn" id="ph-upload-hero-trigger-admin" title="Endre profilbilde">
+                            <span class="material-symbols-outlined">photo_camera</span>
+                        </button>
+                        <input type="file" id="ph-hero-file-input-admin" accept="image/*" style="display: none;">
+                    </div>
+                    <div class="ms-profile-hero-info">
+                        <h1 class="ms-profile-hero-name">${esc(displayName)}</h1>
+                        <div class="ms-profile-hero-email">${esc(authUser.email)}</div>
+                        <div class="ms-profile-hero-badges">
+                            <span class="ms-profile-badge active-member">
+                                <span class="material-symbols-outlined" style="font-size: 14px;">verified</span>
+                                <span>Aktivt medlem</span>
+                            </span>
+                            <span class="ms-profile-badge admin-badge" style="background: rgba(124, 58, 237, 0.12); border-color: rgba(124, 58, 237, 0.25); color: #7c3aed;">
+                                <span class="material-symbols-outlined" style="font-size: 14px;">admin_panel_settings</span>
+                                <span>${esc(roleName)}</span>
+                            </span>
+                            <span class="ms-profile-badge">
+                                <span class="material-symbols-outlined" style="font-size: 14px;">calendar_today</span>
+                                <span>Siden ${joinYear}</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    ${Array.isArray(authUser.providerData) && authUser.providerData.some(pr => pr && pr.providerId === 'google.com') ? `
+                        <button type="button" class="btn btn-outline" id="google-photo-btn-admin" style="border-radius: 12px; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+                            <img src="https://www.google.com/favicon.ico" width="14" height="14">
+                            Hent bilde fra Google
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+
+            <div class="profile-tabs-container" style="margin-bottom: 24px;">
+                <button class="profile-tab-btn ${activeTab === 'my-profile' ? 'active' : ''}" data-profile-tab="my-profile">
+                    <span class="material-symbols-outlined profile-tab-icon">person</span>
+                    <span>Min profil</span>
+                </button>
+                <button class="profile-tab-btn ${activeTab === 'notifications' ? 'active' : ''}" data-profile-tab="notifications">
+                    <span class="material-symbols-outlined profile-tab-icon">notifications</span>
+                    <span>Varsler & Innstillinger</span>
+                </button>
+            </div>
+
+            <!-- TAB 1: MY PROFILE -->
+            <div id="profile-tab-content-my-profile" class="profile-tab-content" style="${activeTab === 'my-profile' ? '' : 'display: none;'}">
+                <div class="profile-grid">
+                    <!-- LEFT COLUMN -->
+                    <div class="profile-left">
+
+                        <!-- Personalia & Kontakt -->
+                        <div class="info-card profile-edit-card" id="contact-card-admin">
+                            <div class="info-card-header">
+                                <h3>Profilopplysninger</h3>
+                                <button class="edit-icon-btn profile-edit-toggle" id="toggle-contact-edit-admin" title="Rediger profil" type="button">
+                                    <span class="material-symbols-outlined">edit</span>
+                                </button>
+                            </div>
+                            <div class="info-rows">
+                                <!-- Fullt Navn -->
+                                <div class="info-row editable-info-row">
+                                    <span class="material-symbols-outlined info-row-icon" style="color: #f97316 !important; background: rgba(249, 115, 22, 0.1) !important;">badge</span>
+                                    <div class="info-row-content">
+                                        <div class="info-row-label">Fullt navn</div>
+                                        <div class="info-row-display">${val(displayName)}</div>
+                                        <div class="info-row-edit">
+                                            <input name="displayName" value="${inputValue(displayName)}" autocomplete="name" placeholder="Fullt navn">
+                                        </div>
+                                    </div>
                                 </div>
-                                <div style="flex: 1; min-width: 200px;">
-                                    <h4 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 600;">Profilbilde</h4>
-                                    <p style="font-size: 13px; color: var(--text-muted); margin: 0 0 12px 0; line-height: 1.4;">Last opp et bilde fra din enhet eller bruk bildet fra Google.</p>
-                                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                                        <button type="button" class="btn btn-outline" id="upload-profile-btn-admin" style="font-size: 13px; padding: 6px 12px;">Last opp nytt</button>
-                                        ${Array.isArray(authUser.providerData) && authUser.providerData.some(p => p && p.providerId === 'google.com')
-                ? `<button type="button" class="btn btn-outline" id="google-photo-btn-admin" style="font-size: 13px; padding: 6px 12px; display: flex; align-items: center;">
-                     <img src="https://www.google.com/favicon.ico" width="14" height="14" style="margin-right: 6px;">
-                     Hent fra Google
-                   </button>`
-                : ''}
+
+                                <!-- E-post -->
+                                <div class="info-row">
+                                    <span class="material-symbols-outlined info-row-icon" style="color: #f97316 !important; background: rgba(249, 115, 22, 0.1) !important;">mail</span>
+                                    <div class="info-row-content">
+                                        <div class="info-row-label">E-post</div>
+                                        <div class="info-row-display">${val(authUser.email)}</div>
+                                    </div>
+                                </div>
+
+                                <!-- Telefon -->
+                                <div class="info-row editable-info-row">
+                                    <span class="material-symbols-outlined info-row-icon" style="color: #f97316 !important; background: rgba(249, 115, 22, 0.1) !important;">phone</span>
+                                    <div class="info-row-content">
+                                        <div class="info-row-label">Telefon</div>
+                                        <div class="info-row-display">${val(phoneDisplay)}</div>
+                                        <div class="info-row-edit">
+                                            <div class="phone-inline-grid">
+                                                <select name="phoneCountryCode" autocomplete="tel-country-code">${phoneCountryOptions}</select>
+                                                <input name="phone" type="tel" value="${inputValue(p.phone)}" autocomplete="tel-national" placeholder="Telefonnummer">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Fødselsnummer -->
+                                <div class="info-row editable-info-row">
+                                    <span class="material-symbols-outlined info-row-icon" style="color: #7c3aed !important; background: rgba(124, 58, 237, 0.1) !important;">fingerprint</span>
+                                    <div class="info-row-content">
+                                        <div class="info-row-label">Fødselsnummer (11 siffer)</div>
+                                        <div class="info-row-display">${ssnDisplayFormatted}</div>
+                                        <div class="info-row-edit">
+                                            <input name="ssn" type="text" value="${inputValue(ssnVal)}" maxlength="11" placeholder="11 siffer (f.eks. 12039512345)" autocomplete="off">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Adresse med globalt adressesøk -->
+                                <div class="info-row editable-info-row">
+                                    <span class="material-symbols-outlined info-row-icon" style="color: #f97316 !important; background: rgba(249, 115, 22, 0.1) !important;">location_on</span>
+                                    <div class="info-row-content">
+                                        <div class="info-row-label">Adresse</div>
+                                        <div class="info-row-display">${p.address || p.zip || p.city || p.country
+                                            ? `<span class="info-row-value">${[esc(p.address), [esc(p.zip), esc(p.city)].filter(Boolean).join(' '), esc(p.country)].filter(Boolean).join('<br>')}</span>`
+                                            : `<span class="info-row-value empty">—</span>`}</div>
+                                        <div class="info-row-edit">
+                                            <input id="profile-address-input-admin" name="address" value="${inputValue(p.address)}" autocomplete="street-address" placeholder="Søk etter adresse i hele verden">
+                                            <div id="address-search-status-admin" class="address-search-status"></div>
+                                            <div id="address-search-results-admin" class="address-search-results"></div>
+                                            <div class="profile-inline-grid">
+                                                <input name="zip" value="${inputValue(p.zip)}" autocomplete="postal-code" placeholder="Postnr">
+                                                <input name="city" value="${inputValue(p.city)}" autocomplete="address-level2" placeholder="By / Sted">
+                                            </div>
+                                            <input name="country" value="${inputValue(p.country)}" autocomplete="country-name" placeholder="Land">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Kjønn -->
+                                <div class="info-row editable-info-row">
+                                    <span class="material-symbols-outlined info-row-icon" style="color: #0d9488 !important; background: rgba(13, 148, 136, 0.1) !important;">person</span>
+                                    <div class="info-row-content">
+                                        <div class="info-row-label">Kjønn</div>
+                                        <div class="info-row-display">${val(genderVal)}</div>
+                                        <div class="info-row-edit">
+                                            <select name="gender">
+                                                <option value="">Velg...</option>
+                                                <option value="Mann" ${genderVal === 'Mann' ? 'selected' : ''}>Mann</option>
+                                                <option value="Kvinne" ${genderVal === 'Kvinne' ? 'selected' : ''}>Kvinne</option>
+                                                <option value="Annet" ${genderVal === 'Annet' ? 'selected' : ''}>Annet</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Fødselsdato -->
+                                <div class="info-row editable-info-row">
+                                    <span class="material-symbols-outlined info-row-icon" style="color: #0d9488 !important; background: rgba(13, 148, 136, 0.1) !important;">cake</span>
+                                    <div class="info-row-content">
+                                        <div class="info-row-label">Fødselsdato</div>
+                                        <div class="info-row-display">${val(p.birthday ? new Date(p.birthday).toLocaleDateString('no-NO', { day: 'numeric', month: 'long', year: 'numeric' }) : '')}</div>
+                                        <div class="info-row-edit">
+                                            <input type="date" name="birthday" value="${inputValue(p.birthday)}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Sivilstatus -->
+                                <div class="info-row editable-info-row">
+                                    <span class="material-symbols-outlined info-row-icon" style="color: #0d9488 !important; background: rgba(13, 148, 136, 0.1) !important;">favorite</span>
+                                    <div class="info-row-content">
+                                        <div class="info-row-label">Sivilstatus</div>
+                                        <div class="info-row-display">${val(maritalVal)}</div>
+                                        <div class="info-row-edit">
+                                            <select name="maritalStatus">
+                                                <option value="">Velg...</option>
+                                                <option value="Ugift" ${maritalVal === 'Ugift' ? 'selected' : ''}>Ugift</option>
+                                                <option value="Gift" ${maritalVal === 'Gift' ? 'selected' : ''}>Gift</option>
+                                                <option value="Samboer" ${maritalVal === 'Samboer' ? 'selected' : ''}>Samboer</option>
+                                                <option value="Skilt" ${maritalVal === 'Skilt' ? 'selected' : ''}>Skilt</option>
+                                                <option value="Enke/Enkemann" ${maritalVal === 'Enke/Enkemann' ? 'selected' : ''}>Enke/Enkemann</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Medlem siden -->
+                                <div class="info-row">
+                                    <span class="material-symbols-outlined info-row-icon" style="color: #0d9488 !important; background: rgba(13, 148, 136, 0.1) !important;">calendar_today</span>
+                                    <div class="info-row-content">
+                                        <div class="info-row-label">Medlem siden</div>
+                                        <div class="info-row-display"><span class="info-row-value">${joinYear}</span></div>
                                     </div>
                                 </div>
                             </div>
 
-                            <form id="admin-profile-full-form">
-                                <h4 style="margin: 0 0 16px 0; font-size: 15px; font-weight: 600; color: var(--text-main);">Personalia</h4>
-                                <div class="form-grid-2 responsive-form-grid" style="margin-bottom: 24px;">
-                                    <div class="form-group" style="margin: 0;">
-                                        <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Navn</label>
-                                        <input type="text" name="displayName" class="form-control" style="width: 100%;">
-                                    </div>
-                                    <div class="form-group" style="margin: 0;">
-                                        <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Telefon</label>
-                                        <input type="tel" name="phone" class="form-control" style="width: 100%;">
-                                    </div>
-                                    <div class="form-group form-group-full" style="margin: 0;">
-                                        <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">E-post</label>
-                                        <input type="email" name="email" class="form-control" disabled style="width: 100%; background: #f8fafc; color: #64748b; cursor: not-allowed;">
+                            <div class="profile-edit-actions">
+                                <button class="btn btn-ghost btn-sm" id="cancel-contact-edit-admin" type="button">Avbryt</button>
+                                <button class="btn btn-primary btn-sm" id="save-contact-btn-admin" type="button">
+                                    <span class="material-symbols-outlined">save</span> Lagre profil
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Sikkerhet & kontoadministrasjon -->
+                        <div class="info-card">
+                            <div class="info-card-header">
+                                <h3>Sikkerhet & kontoadministrasjon</h3>
+                            </div>
+                            <div class="info-rows">
+                                <div class="info-row">
+                                    <span class="material-symbols-outlined info-row-icon" style="color: #7c3aed !important; background: rgba(124, 58, 237, 0.1) !important;">lock_reset</span>
+                                    <div class="info-row-content">
+                                        <div class="info-row-label">Passord</div>
+                                        <div class="info-row-display" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 4px;">
+                                            <span class="info-row-value" style="font-weight: 700; letter-spacing: 0.15em;">••••••••••••</span>
+                                            <button type="button" class="btn btn-ghost btn-sm" id="reset-password-btn-admin" style="border-radius: 10px; font-weight: 700;">
+                                                <span class="material-symbols-outlined" style="font-size: 16px;">key</span>
+                                                <span>Send tilbakestillings-epost</span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <h4 style="margin: 0 0 16px 0; font-size: 15px; font-weight: 600; color: var(--text-main); border-top: 1px solid var(--border-color); padding-top: 24px;">Adresse</h4>
-                                <div class="form-grid-2 responsive-form-grid" style="margin-bottom: 24px;">
-                                    <div class="form-group form-group-full" style="margin: 0;">
-                                        <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Gateadresse</label>
-                                        <input type="text" name="address" class="form-control" style="width: 100%;">
-                                    </div>
-                                    <div class="form-group" style="margin: 0;">
-                                        <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Postnummer</label>
-                                        <input type="text" name="zip" class="form-control" style="width: 100%;">
-                                    </div>
-                                    <div class="form-group" style="margin: 0;">
-                                        <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Sted</label>
-                                        <input type="text" name="city" class="form-control" style="width: 100%;">
-                                    </div>
-                                </div>
-
-                                <h4 style="margin: 0 0 16px 0; font-size: 15px; font-weight: 600; color: var(--text-main); border-top: 1px solid var(--border-color); padding-top: 32px;">Kommunikasjon</h4>
-                                <div style="margin-bottom: 24px; padding: 20px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 10px;">
-                                    <!-- Newsletter toggle -->
-                                    <div class="admin-setting-row">
-                                        <div>
-                                            <div class="admin-setting-row-label">E-postvarslinger</div>
-                                            <div class="admin-setting-row-sub">Motta nyhetsbrev og oppdateringer på e-post</div>
-                                        </div>
-                                        <label class="admin-toggle">
-                                            <input type="checkbox" name="newsletter" id="admin-newsletter-toggle">
-                                            <span class="admin-toggle-slider"></span>
-                                        </label>
-                                    </div>
-                                    <!-- Push toggle -->
-                                    <div class="admin-setting-row">
-                                        <div>
-                                            <div class="admin-setting-row-label">Push-varslinger</div>
-                                            <div class="admin-setting-row-sub">Motta push-varslinger på denne enheten</div>
-                                        </div>
-                                        <label class="admin-toggle">
-                                            <input type="checkbox" name="pushEnabled" id="admin-push-toggle">
-                                            <span class="admin-toggle-slider"></span>
-                                        </label>
-                                    </div>
-                                    <!-- Push sub-category toggles -->
-                                    <div class="admin-push-sub-settings" id="admin-push-sub-settings" style="display:none;">
-                                        <div class="admin-setting-row admin-setting-row-sub-item">
-                                            <div>
-                                                <div class="admin-setting-row-label">Ny undervisning</div>
-                                                <div class="admin-setting-row-sub">Få pushvarsel når ny undervisning publiseres</div>
+                                <div class="info-row">
+                                    <span class="material-symbols-outlined info-row-icon" style="color: #0284c7 !important; background: rgba(2, 132, 199, 0.1) !important;">devices</span>
+                                    <div class="info-row-content">
+                                        <div class="info-row-label">Innlogget enhet & økt</div>
+                                        <div class="info-row-display" style="margin-top: 6px;">
+                                            <div style="font-size: 0.88rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+                                                <span class="material-symbols-outlined" style="font-size: 16px; color: #16a34a;">check_circle</span>
+                                                <span>${esc(navigator.platform || 'Nettleser')} • ${esc(authUser.providerData[0]?.providerId === 'google.com' ? 'Google Login' : 'E-post')}</span>
                                             </div>
-                                            <label class="admin-toggle admin-toggle-sm">
-                                                <input type="checkbox" name="pushTeachings" id="admin-push-teachings-toggle">
-                                                <span class="admin-toggle-slider"></span>
-                                            </label>
-                                        </div>
-                                        <div class="admin-setting-row admin-setting-row-sub-item">
-                                            <div>
-                                                <div class="admin-setting-row-label">Ny podcast</div>
-                                                <div class="admin-setting-row-sub">Få pushvarsel når ny podcastepisode legges ut</div>
+                                            <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 3px;">
+                                                Aktiv sesjon (Sist innlogget: ${authUser.metadata?.lastSignInTime ? new Date(authUser.metadata.lastSignInTime).toLocaleDateString('no-NO') : 'Akkurat nå'})
                                             </div>
-                                            <label class="admin-toggle admin-toggle-sm">
-                                                <input type="checkbox" name="pushPodcasts" id="admin-push-podcasts-toggle">
-                                                <span class="admin-toggle-slider"></span>
-                                            </label>
-                                        </div>
-                                        <div class="admin-setting-row admin-setting-row-sub-item">
-                                            <div>
-                                                <div class="admin-setting-row-label">Nytt blogginnlegg</div>
-                                                <div class="admin-setting-row-sub">Få pushvarsel når nytt blogginnlegg publiseres</div>
-                                            </div>
-                                            <label class="admin-toggle admin-toggle-sm">
-                                                <input type="checkbox" name="pushBlogs" id="admin-push-blogs-toggle">
-                                                <span class="admin-toggle-slider"></span>
-                                            </label>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
 
-
-                                <h4 style="margin: 0 0 16px 0; font-size: 15px; font-weight: 600; color: var(--text-main); border-top: 1px solid var(--border-color); padding-top: 32px;">Personvern & Samtykke</h4>
-                                <div id="admin-consent-status-display" style="padding: 16px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 32px; font-size: 14px;">
-                                    <div class="loader" style="margin: 0 auto;"></div>
+                            <!-- GDPR Danger Zone -->
+                            <div class="ms-security-danger-box">
+                                <div class="ms-security-danger-header">
+                                    <span class="material-symbols-outlined">warning</span>
+                                    <span>Permanentsletting (GDPR)</span>
                                 </div>
-
-                                <div style="display: flex; gap: 16px; align-items: center; border-top: 1px solid var(--border-color); padding-top: 24px; justify-content: flex-end;">
-                                    <button type="submit" class="btn btn-primary" id="save-profile-btn" style="min-width: 180px;">
-                                        <span class="material-symbols-outlined" style="font-size: 18px;">save</span> 
-                                        Lagre endringer
+                                <p class="ms-danger-copy" style="margin: 0 !important; font-size: 0.83rem; line-height: 1.5; color: #475569;">
+                                    Sletting av konto er permanent og kan ikke angres.
+                                </p>
+                                <div>
+                                    <button class="btn btn-danger btn-sm" id="delete-account-btn-admin" style="margin: 0 !important; border-radius: 10px; font-weight: 700;">
+                                        <span class="material-symbols-outlined">delete_forever</span>
+                                        Slett konto
                                     </button>
                                 </div>
-                            </form>
+                            </div>
                         </div>
+
+                    </div>
+
+                    <!-- RIGHT COLUMN -->
+                    <div class="profile-right">
+
+                        <!-- Husstand & Familie -->
+                        <div class="info-card">
+                            <div class="info-card-header">
+                                <h3>Familie & Husstand</h3>
+                            </div>
+                            <div class="family-search">
+                                <div class="family-search-box">
+                                    <span class="material-symbols-outlined">search</span>
+                                    <input id="family-search-input-admin" type="search" placeholder="Søk etter navn, e-post eller telefon" autocomplete="off">
+                                </div>
+                                <div id="family-search-status-admin" class="family-search-status"></div>
+                                <div id="family-search-results-admin" class="family-search-results"></div>
+                            </div>
+                            <div id="household-content-admin">
+                                ${Array.isArray(p.familyMembers) && p.familyMembers.length ? `
+                                    <p class="household-name">${esc(displayName.split(' ').pop() || '')} Husstand</p>
+                                    <div class="household-members">
+                                        ${p.familyMembers.map(m => `
+                                            <div class="member-row">
+                                                <div class="member-avatar">${m.photoURL ? `<img src="${esc(m.photoURL)}" alt="">` : esc((m.name || '?').charAt(0).toUpperCase())}</div>
+                                                <div class="member-info">
+                                                    <div class="member-info-name">${esc(m.name || 'Uten navn')}</div>
+                                                    <div class="member-info-sub">${esc(m.role || m.email || '')}</div>
+                                                </div>
+                                                <button class="member-remove-btn member-remove-btn-admin" data-member-uid="${esc(m.uid || '')}" type="button" title="Fjern">
+                                                    <span class="material-symbols-outlined">close</span>
+                                                </button>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                ` : `
+                                    <div class="empty-state ms-empty-state-compact">
+                                        <span class="material-symbols-outlined ms-empty-state-icon-compact">group_off</span>
+                                        <p class="ms-empty-state-copy-compact">Ingen familiemedlemmer registrert.</p>
+                                    </div>
+                                `}
+                            </div>
+                        </div>
+
+                        <!-- Mobilnavigasjon Menyvalg -->
+                        <div class="info-card">
+                            <div class="info-card-header" style="justify-content: flex-start !important; gap: 12px;">
+                                <span class="material-symbols-outlined" style="color: #d17d39; font-size: 22px;">phone_android</span>
+                                <h3 style="color: #d17d39;">Navigasjon på mobil (Min Side)</h3>
+                            </div>
+                            <div class="ms-card-body-pad" style="padding: 24px !important; display: block !important;">
+                                <p style="margin: 0 0 16px 0; color: var(--text-muted) !important; font-size: 13px; line-height: 1.5; font-weight: 500;">
+                                    Velg hvilke snarveier og ikoner du ønsker å ha i menylinjen nederst på skjermen i Min Side:
+                                </p>
+                                <div style="display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 24px;">
+                                    ${customNavHtml}
+                                </div>
+                                <button class="btn btn-primary" id="save-custom-nav-btn-admin" style="border-radius: 12px; padding: 12px 24px; font-weight: 700; font-size: 13.5px; width: 100%; justify-content: center; margin: 0 !important;">
+                                    <span class="material-symbols-outlined">save</span> Lagre menyvalg
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: NOTIFICATIONS & SETTINGS -->
+            <div id="profile-tab-content-notifications" class="profile-tab-content" style="${activeTab === 'notifications' ? '' : 'display: none;'}">
+                <div class="notif-settings-container">
+                    <div class="notif-header-banner">
+                        <div class="notif-header-icon-badge">
+                            <span class="material-symbols-outlined">tune</span>
+                        </div>
+                        <div class="notif-header-text">
+                            <h2 class="notif-header-title">Varslingspreferanser</h2>
+                            <p class="notif-header-description">Styr pushvarsler og e-postutsendelser på tvers av enhetene dine.</p>
+                        </div>
+                    </div>
+
+                    <div class="notif-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+                        <!-- Push Varsler Card -->
+                        <div class="notif-settings-card">
+                            <div class="notif-card-header">
+                                <div class="notif-icon-circle push">
+                                    <span class="material-symbols-outlined">notifications_active</span>
+                                </div>
+                                <div class="notif-card-title-container">
+                                    <h3 class="notif-card-title">Push-varslinger</h3>
+                                    <p class="notif-card-description">Varsler på din enhet</p>
+                                </div>
+                            </div>
+                            <div class="notif-settings-list" style="display: grid; gap: 16px; padding: 16px 0;">
+                                <div class="notif-setting-item" style="display: flex; align-items: center; justify-content: space-between;">
+                                    <div>
+                                        <div style="font-weight: 600; font-size: 14px;">Aktiver pushvarsler</div>
+                                        <div style="font-size: 12px; color: var(--text-muted);">Motta pushvarsler fra HKM</div>
+                                    </div>
+                                    <label class="admin-toggle">
+                                        <input type="checkbox" id="push-enabled-toggle-admin" ${p.pushEnabled !== false ? 'checked' : ''}>
+                                        <span class="admin-toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="notif-setting-item" style="display: flex; align-items: center; justify-content: space-between;">
+                                    <div>
+                                        <div style="font-weight: 600; font-size: 14px;">Ny undervisning</div>
+                                        <div style="font-size: 12px; color: var(--text-muted);">Pushvarsel når ny undervisning publiseres</div>
+                                    </div>
+                                    <label class="admin-toggle">
+                                        <input type="checkbox" id="push-teachings-toggle-admin" ${p.pushTeachings !== false ? 'checked' : ''}>
+                                        <span class="admin-toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="notif-setting-item" style="display: flex; align-items: center; justify-content: space-between;">
+                                    <div>
+                                        <div style="font-weight: 600; font-size: 14px;">Ny podcast</div>
+                                        <div style="font-size: 12px; color: var(--text-muted);">Pushvarsel når ny podcastepisode legges ut</div>
+                                    </div>
+                                    <label class="admin-toggle">
+                                        <input type="checkbox" id="push-podcasts-toggle-admin" ${p.pushPodcasts !== false ? 'checked' : ''}>
+                                        <span class="admin-toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="notif-setting-item" style="display: flex; align-items: center; justify-content: space-between;">
+                                    <div>
+                                        <div style="font-weight: 600; font-size: 14px;">Nytt blogginnlegg</div>
+                                        <div style="font-size: 12px; color: var(--text-muted);">Pushvarsel ved nye artikler</div>
+                                    </div>
+                                    <label class="admin-toggle">
+                                        <input type="checkbox" id="push-blogs-toggle-admin" ${p.pushBlogs !== false ? 'checked' : ''}>
+                                        <span class="admin-toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- E-post & Samtykke Card -->
+                        <div class="notif-settings-card">
+                            <div class="notif-card-header">
+                                <div class="notif-icon-circle email">
+                                    <span class="material-symbols-outlined">mail</span>
+                                </div>
+                                <div class="notif-card-title-container">
+                                    <h3 class="notif-card-title">E-post & Samtykke</h3>
+                                    <p class="notif-card-description">Varslingsvalg og Personvern</p>
+                                </div>
+                            </div>
+                            <div class="notif-settings-list" style="display: grid; gap: 16px; padding: 16px 0;">
+                                <div class="notif-setting-item" style="display: flex; align-items: center; justify-content: space-between;">
+                                    <div>
+                                        <div style="font-weight: 600; font-size: 14px;">Nyhetsbrev</div>
+                                        <div style="font-size: 12px; color: var(--text-muted);">Motta e-postnyhetsbrev og nyheter</div>
+                                    </div>
+                                    <label class="admin-toggle">
+                                        <input type="checkbox" id="email-toggle-admin" ${p.newsletter !== false ? 'checked' : ''}>
+                                        <span class="admin-toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div style="margin-top: 12px; padding: 16px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px;">
+                                    <div style="font-weight: 600; font-size: 13px; margin-bottom: 6px;">Personvern & Samtykkestatus:</div>
+                                    <div id="admin-consent-status-display" style="font-size: 13px;">
+                                        <div class="loader" style="margin: 0 auto;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
+                        <button class="btn btn-primary" id="save-prefs-btn-admin" style="min-width: 200px; padding: 12px 24px; border-radius: 12px; font-weight: 700;">
+                            <span class="material-symbols-outlined">save</span> Lagre preferanser
+                        </button>
                     </div>
                 </div>
             </div>
         `;
+
         section.setAttribute('data-rendered', 'true');
 
-        // Load existing profile data from the same source as Min Side
-        const profile = await firebaseService.getPageContent('settings_profile');
-        let userProfile = null;
-        try {
-            const userDoc = await firebase.firestore().collection('users').doc(authUser.uid).get();
-            if (userDoc.exists) userProfile = userDoc.data();
-        } catch (e) {
-            console.warn('Kunne ikke hente users-profil i admin:', e);
-        }
+        // Reload button
+        document.getElementById('admin-profile-reload-btn')?.addEventListener('click', () => this.renderProfileSection());
 
-        const mergedName = (userProfile && userProfile.displayName) || (authUser && authUser.displayName) || (profile && profile.fullName) || '';
-        const mergedPhoto = (userProfile && userProfile.photoURL) || authUser.photoURL || (profile && profile.photoUrl) || '';
-        const mergedAddress = (userProfile && userProfile.address) || (profile && profile.address) || '';
-        const mergedZip = (userProfile && userProfile.zip) || (profile && profile.zip) || '';
-        const mergedCity = (userProfile && userProfile.city) || (profile && profile.city) || '';
-        const mergedPhone = (userProfile && userProfile.phone) || (profile && profile.phone) || '';
-        const mergedBio = (userProfile && userProfile.bio) || (profile && profile.bio) || '';
-        const mergedNewsletter = userProfile && typeof userProfile.newsletter === 'boolean' ? userProfile.newsletter : true;
-        const mergedPushEnabled = userProfile && typeof userProfile.pushEnabled === 'boolean' ? userProfile.pushEnabled : false;
-        const mergedPushTeachings = userProfile && typeof userProfile.pushTeachings === 'boolean' ? userProfile.pushTeachings : true;
-        const mergedPushPodcasts = userProfile && typeof userProfile.pushPodcasts === 'boolean' ? userProfile.pushPodcasts : true;
-        const mergedPushBlogs = userProfile && typeof userProfile.pushBlogs === 'boolean' ? userProfile.pushBlogs : true;
-
-        const form = document.getElementById('admin-profile-full-form');
-        if (!form) return;
-
-        form.querySelector('[name="displayName"]').value = mergedName;
-        form.querySelector('[name="email"]').value = authUser.email || '';
-        form.querySelector('[name="address"]').value = mergedAddress;
-        form.querySelector('[name="zip"]').value = mergedZip;
-        form.querySelector('[name="city"]').value = mergedCity;
-        form.querySelector('[name="phone"]').value = mergedPhone;
-        form.querySelector('[name="newsletter"]').checked = mergedNewsletter;
-        form.querySelector('[name="pushEnabled"]').checked = mergedPushEnabled;
-        form.querySelector('[name="pushTeachings"]').checked = mergedPushTeachings;
-        form.querySelector('[name="pushPodcasts"]').checked = mergedPushPodcasts;
-        form.querySelector('[name="pushBlogs"]').checked = mergedPushBlogs;
-
-        // Show/hide sub-settings based on saved state
-        const adminPushSubSettings = document.getElementById('admin-push-sub-settings');
-        if (adminPushSubSettings) {
-            adminPushSubSettings.style.display = mergedPushEnabled ? '' : 'none';
-        }
-
-        // Wire push toggle show/hide
-        const adminPushToggle = document.getElementById('admin-push-toggle');
-        if (adminPushToggle && adminPushSubSettings) {
-            adminPushToggle.addEventListener('change', (e) => {
-                adminPushSubSettings.style.display = e.target.checked ? '' : 'none';
-            });
-        }
-
-
-        const pictureContainer = document.getElementById('profile-picture-container-admin');
-        if (mergedPhoto) {
-            const overlay = pictureContainer.querySelector('label[for="profile-upload-admin"]');
-            const input = pictureContainer.querySelector('#profile-upload-admin');
-            pictureContainer.innerHTML = `<img src="${mergedPhoto}" style="width: 100%; height: 100%; object-fit: cover;">`;
-            if (overlay) pictureContainer.appendChild(overlay);
-            if (input) pictureContainer.appendChild(input);
-        }
-
-        // Consent status
-        try {
-            const consentDiv = document.getElementById('admin-consent-status-display');
-            const userDoc = await firebase.firestore().collection("users").doc(authUser.uid).get();
-            if (consentDiv) {
-                if (userDoc.exists && userDoc.data().privacySettings) {
-                    const choices = userDoc.data().privacySettings.choices || {};
-                    consentDiv.innerHTML = `
-                        <p style="font-size: 0.95rem; line-height: 1.5;">
-                            <strong>Aktivt samtykke:</strong><br>
-                                Nødvendige: <span style="color: green;">Ja</span><br>
-                                    Statistikk: ${choices.analytics ? '<span style="color: green;">Ja</span>' : '<span style="color: red;">Nei</span>'}<br>
-                                        Markedsføring: ${choices.marketing ? '<span style="color: green;">Ja</span>' : '<span style="color: red;">Nei</span>'}
-                                    </p>
-                                    `;
-                } else {
-                    consentDiv.innerHTML = '<p style="font-size: 0.95rem;">Ingen lagret samtykkestatus funnet.</p>';
-                }
-            }
-        } catch (e) {
-            const consentDiv = document.getElementById('admin-consent-status-display');
-            if (consentDiv) consentDiv.textContent = 'Kunne ikke hente samtykkestatus.';
-        }
-
-        // Image upload
-        const fileInput = document.getElementById('profile-upload-admin');
-        const uploadBtn = document.getElementById('upload-profile-btn-admin');
-        if (uploadBtn && fileInput) uploadBtn.onclick = () => fileInput.click();
-        fileInput.onchange = async () => {
-            if (fileInput.files.length === 0) return;
-            uploadBtn.disabled = true;
-            uploadBtn.textContent = 'Laster opp...';
-            try {
-                const url = await firebaseService.uploadImage(fileInput.files[0], `profiles/${authUser.uid}/avatar.jpg`);
-                await authUser.updateProfile({ photoURL: url });
-                try { await authUser.reload(); } catch (e) { }
-                const currentName = form.querySelector('[name="displayName"]').value || authUser.displayName || '';
-                await firebase.firestore().collection('users').doc(authUser.uid).set({
-                    photoURL: url,
-                    displayName: currentName,
-                    email: authUser.email || '',
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
-                await firebaseService.savePageContent('settings_profile', {
-                    fullName: currentName,
-                    photoUrl: url,
-                    updatedAt: new Date().toISOString()
-                });
-
-                const overlay = pictureContainer.querySelector('label[for="profile-upload-admin"]');
-                const input = pictureContainer.querySelector('#profile-upload-admin');
-                pictureContainer.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">`;
-                if (overlay) pictureContainer.appendChild(overlay);
-                if (input) pictureContainer.appendChild(input);
-
+        // Avatar upload trigger
+        const avatarUploadTrigger = section.querySelector('#ph-upload-hero-trigger-admin');
+        const avatarFileInput = section.querySelector('#ph-hero-file-input-admin');
+        if (avatarUploadTrigger && avatarFileInput) {
+            avatarUploadTrigger.onclick = () => avatarFileInput.click();
+            avatarFileInput.onchange = async () => {
+                if (avatarFileInput.files.length === 0) return;
                 try {
-                    localStorage.setItem('hkm_admin_identity_cache', JSON.stringify({
-                        displayName: currentName || 'Administrator',
-                        photoURL: url,
-                        ts: Date.now()
-                    }));
-                } catch (e) { }
+                    this.showToast('Laster opp bilde...', 'info', 3000);
+                    const url = await firebaseService.uploadImage(avatarFileInput.files[0], `profiles/${uid}/avatar.jpg`);
+                    await authUser.updateProfile({ photoURL: url });
+                    try { await authUser.reload(); } catch (e) {}
+                    const currentName = section.querySelector('[name="displayName"]')?.value || authUser.displayName || '';
 
-                renderHeaderIdentity(currentName || 'Administrator', url);
-                await this.updateUserInfo(authUser);
-                this.showToast('Profilbilde oppdatert.', 'success', 4000);
-            } catch (err) {
-                this.showToast('Opplasting feilet: ' + err.message, 'error', 6000);
-            } finally {
-                uploadBtn.disabled = false;
-                uploadBtn.textContent = 'Last opp nytt';
-            }
-        };
+                    await firebase.firestore().collection('users').doc(uid).set({
+                        photoURL: url,
+                        displayName: currentName,
+                        email: authUser.email || '',
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+
+                    await firebaseService.savePageContent('settings_profile', {
+                        fullName: currentName,
+                        photoUrl: url,
+                        updatedAt: new Date().toISOString()
+                    });
+
+                    try {
+                        localStorage.setItem('hkm_admin_identity_cache', JSON.stringify({
+                            displayName: currentName || 'Administrator',
+                            photoURL: url,
+                            ts: Date.now()
+                        }));
+                    } catch (e) {}
+
+                    renderHeaderIdentity(currentName || 'Administrator', url);
+                    this.showToast('Profilbilde oppdatert!', 'success', 4000);
+                    await this.renderProfileSection();
+                } catch (err) {
+                    this.showToast('Opplasting feilet: ' + err.message, 'error', 5000);
+                }
+            };
+        }
 
         // Google photo sync
-        const googlePhotoBtn = document.getElementById('google-photo-btn-admin');
+        const googlePhotoBtn = section.querySelector('#google-photo-btn-admin');
         if (googlePhotoBtn) {
             googlePhotoBtn.onclick = async () => {
-                const provider = (authUser.providerData || []).find(p => p && p.providerId === 'google.com');
+                const provider = (authUser.providerData || []).find(pr => pr && pr.providerId === 'google.com');
                 if (!provider || !provider.photoURL) return;
                 try {
                     await authUser.updateProfile({ photoURL: provider.photoURL });
-                    try { await authUser.reload(); } catch (e) { }
-                    const currentName = form.querySelector('[name="displayName"]').value || authUser.displayName || provider.displayName || '';
-                    await firebase.firestore().collection('users').doc(authUser.uid).set({
+                    try { await authUser.reload(); } catch (e) {}
+                    const currentName = section.querySelector('[name="displayName"]')?.value || authUser.displayName || provider.displayName || '';
+
+                    await firebase.firestore().collection('users').doc(uid).set({
                         photoURL: provider.photoURL,
                         displayName: currentName,
                         email: authUser.email || '',
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     }, { merge: true });
+
                     await firebaseService.savePageContent('settings_profile', {
                         fullName: currentName,
                         photoUrl: provider.photoURL,
@@ -23442,81 +23543,384 @@ class AdminManager {
                             photoURL: provider.photoURL,
                             ts: Date.now()
                         }));
-                    } catch (e) { }
+                    } catch (e) {}
 
                     renderHeaderIdentity(currentName || 'Administrator', provider.photoURL);
-                    await this.renderProfileSection();
-                    await this.updateUserInfo(authUser);
                     this.showToast('Profilbilde hentet fra Google.', 'success', 4000);
+                    await this.renderProfileSection();
                 } catch (err) {
                     this.showToast('Kunne ikke hente bilde fra Google.', 'error', 5000);
                 }
             };
         }
 
-        // Save full profile
-        form.onsubmit = async (event) => {
-            event.preventDefault();
-            const btn = document.getElementById('save-profile-btn');
-            const pushEnabled = form.querySelector('[name="pushEnabled"]')?.checked ?? false;
-            const pushTeachings = form.querySelector('[name="pushTeachings"]')?.checked ?? true;
-            const pushPodcasts = form.querySelector('[name="pushPodcasts"]')?.checked ?? true;
-            const pushBlogs = form.querySelector('[name="pushBlogs"]')?.checked ?? true;
-            const data = {
-                fullName: form.querySelector('[name="displayName"]').value || '',
-                address: form.querySelector('[name="address"]').value || '',
-                zip: form.querySelector('[name="zip"]').value || '',
-                city: form.querySelector('[name="city"]').value || '',
-                phone: form.querySelector('[name="phone"]').value || '',
-                bio: mergedBio || '',
-                newsletter: form.querySelector('[name="newsletter"]').checked,
-                photoUrl: authUser.photoURL || mergedPhoto || '',
-                updatedAt: new Date().toISOString()
-            };
+        // Tab switching
+        const tabBtns = section.querySelectorAll('.profile-tab-btn');
+        tabBtns.forEach(btn => {
+            btn?.addEventListener('click', () => {
+                const target = btn.getAttribute('data-profile-tab');
+                this._activeAdminProfileTab = target;
+                tabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
 
-            const original = btn.innerHTML;
-            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">sync</span> Lagrer...';
-            btn.disabled = true;
+                section.querySelectorAll('.profile-tab-content').forEach(c => {
+                    c.style.display = 'none';
+                });
+                const activeContent = section.querySelector(`#profile-tab-content-${target}`);
+                if (activeContent) activeContent.style.display = 'block';
+            });
+        });
+
+        // SSN Eye toggle
+        const toggleSsnEye = section.querySelector('#toggle-ssn-eye-admin');
+        if (toggleSsnEye) {
+            toggleSsnEye.addEventListener('click', () => {
+                const maskedVal = section.querySelector('#ssn-masked-val-admin');
+                const fullVal = section.querySelector('#ssn-full-val-admin');
+                const icon = toggleSsnEye.querySelector('.material-symbols-outlined');
+                if (maskedVal && fullVal && icon) {
+                    const isShowing = fullVal.style.display !== 'none';
+                    maskedVal.style.display = isShowing ? 'inline' : 'none';
+                    fullVal.style.display = isShowing ? 'none' : 'inline';
+                    icon.textContent = isShowing ? 'visibility' : 'visibility_off';
+                }
+            });
+        }
+
+        // Contact card edit toggle
+        const contactCard = section.querySelector('#contact-card-admin');
+        const toggleContactEdit = section.querySelector('#toggle-contact-edit-admin');
+        toggleContactEdit?.addEventListener('click', () => {
+            contactCard?.classList.toggle('is-editing');
+            contactCard?.querySelector('[name="displayName"]')?.focus();
+        });
+        section.querySelector('#cancel-contact-edit-admin')?.addEventListener('click', () => {
+            contactCard?.classList.remove('is-editing');
+        });
+
+        // Save Personalia handler
+        const saveContactBtn = section.querySelector('#save-contact-btn-admin');
+        if (saveContactBtn && contactCard) {
+            saveContactBtn.addEventListener('click', async () => {
+                const nameVal = contactCard.querySelector('[name="displayName"]')?.value || '';
+                const phoneCountryCodeVal = contactCard.querySelector('[name="phoneCountryCode"]')?.value || '+47';
+                const phoneVal = contactCard.querySelector('[name="phone"]')?.value || '';
+                const ssnVal = contactCard.querySelector('[name="ssn"]')?.value || '';
+                const addressVal = contactCard.querySelector('[name="address"]')?.value || '';
+                const zipVal = contactCard.querySelector('[name="zip"]')?.value || '';
+                const cityVal = contactCard.querySelector('[name="city"]')?.value || '';
+                const countryVal = contactCard.querySelector('[name="country"]')?.value || '';
+                const genderVal = contactCard.querySelector('[name="gender"]')?.value || '';
+                const birthdayVal = contactCard.querySelector('[name="birthday"]')?.value || '';
+                const maritalStatusVal = contactCard.querySelector('[name="maritalStatus"]')?.value || '';
+
+                const origText = saveContactBtn.innerHTML;
+                saveContactBtn.disabled = true;
+                saveContactBtn.innerHTML = '<span class="material-symbols-outlined">sync</span> Lagrer...';
+
+                try {
+                    if (nameVal && nameVal !== authUser.displayName) {
+                        await authUser.updateProfile({ displayName: nameVal });
+                    }
+
+                    await firebase.firestore().collection('users').doc(uid).set({
+                        displayName: nameVal,
+                        phoneCountryCode: phoneCountryCodeVal,
+                        phone: phoneVal,
+                        ssn: ssnVal,
+                        nationalIdNumber: ssnVal,
+                        address: addressVal,
+                        zip: zipVal,
+                        city: cityVal,
+                        country: countryVal,
+                        gender: genderVal,
+                        birthday: birthdayVal,
+                        maritalStatus: maritalStatusVal,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+
+                    await firebaseService.savePageContent('settings_profile', {
+                        fullName: nameVal,
+                        phoneCountryCode: phoneCountryCodeVal,
+                        phone: phoneVal,
+                        address: addressVal,
+                        zip: zipVal,
+                        city: cityVal,
+                        country: countryVal,
+                        gender: genderVal,
+                        birthday: birthdayVal,
+                        maritalStatus: maritalStatusVal,
+                        updatedAt: new Date().toISOString()
+                    });
+
+                    renderHeaderIdentity(nameVal || 'Administrator', authUser.photoURL || '');
+                    this.showToast('Profilopplysninger er lagret!', 'success', 4000);
+                    await this.renderProfileSection();
+                } catch (err) {
+                    console.error('Lagre profil feilet:', err);
+                    this.showToast('Kunne ikke lagre profil: ' + err.message, 'error', 5000);
+                } finally {
+                    saveContactBtn.disabled = false;
+                    saveContactBtn.innerHTML = origText;
+                }
+            });
+        }
+
+        // Global Address Search Autocomplete Wiring
+        const addressInput = section.querySelector('#profile-address-input-admin');
+        const resultsEl = section.querySelector('#address-search-results-admin');
+        const statusEl = section.querySelector('#address-search-status-admin');
+        if (addressInput && resultsEl && statusEl) {
+            let searchTimer = null;
+            addressInput.addEventListener('input', () => {
+                clearTimeout(searchTimer);
+                const q = addressInput.value.trim();
+                if (q.length < 3) {
+                    resultsEl.innerHTML = '';
+                    statusEl.textContent = '';
+                    return;
+                }
+                statusEl.textContent = 'Søker etter adresser...';
+                searchTimer = setTimeout(async () => {
+                    try {
+                        const resp = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=6`);
+                        if (!resp.ok) throw new Error('Søk feilet');
+                        const resData = await resp.json();
+                        const suggestions = (resData.features || []).map(f => {
+                            const props = f.properties || {};
+                            const street = [props.street, props.housenumber].filter(Boolean).join(' ').trim();
+                            const primary = props.name && !street ? props.name : street || props.name || '';
+                            const locality = props.city || props.locality || props.district || props.county || props.state || '';
+                            const regionLine = [props.postcode, locality].filter(Boolean).join(' ').trim();
+                            const country = props.country || '';
+                            const label = [primary, regionLine, country].filter(Boolean).join(', ');
+                            return { address: primary || label, zip: props.postcode || '', city: locality, country, label };
+                        }).filter(item => item.label);
+
+                        if (!suggestions.length) {
+                            resultsEl.innerHTML = '';
+                            statusEl.textContent = 'Ingen adresseforslag.';
+                            return;
+                        }
+
+                        statusEl.textContent = '';
+                        resultsEl.innerHTML = suggestions.map((item, idx) => `
+                            <button class="address-result-row" type="button" data-idx="${idx}" style="width: 100%; text-align: left; padding: 8px 12px; background: none; border: none; border-bottom: 1px solid #f1f5f9; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                                <span class="material-symbols-outlined" style="font-size: 16px; color: #d17d39;">location_on</span>
+                                <span>
+                                    <strong style="display: block; font-size: 13px;">${esc(item.address || item.label)}</strong>
+                                    <small style="color: #64748b; font-size: 11px;">${esc([item.zip, item.city, item.country].filter(Boolean).join(', '))}</small>
+                                </span>
+                            </button>
+                        `).join('');
+
+                        resultsEl.querySelectorAll('.address-result-row').forEach(row => {
+                            row.addEventListener('click', () => {
+                                const idx = Number(row.dataset.idx);
+                                const sel = suggestions[idx];
+                                if (!sel) return;
+                                const addIn = contactCard.querySelector('[name="address"]');
+                                const zipIn = contactCard.querySelector('[name="zip"]');
+                                const cityIn = contactCard.querySelector('[name="city"]');
+                                const countryIn = contactCard.querySelector('[name="country"]');
+                                if (addIn) addIn.value = sel.address || sel.label;
+                                if (zipIn) zipIn.value = sel.zip || '';
+                                if (cityIn) cityIn.value = sel.city || '';
+                                if (countryIn) countryIn.value = sel.country || '';
+                                resultsEl.innerHTML = '';
+                                statusEl.textContent = sel.country ? `Valgt: ${sel.country}` : 'Adresse valgt.';
+                            });
+                        });
+                    } catch (err) {
+                        resultsEl.innerHTML = '';
+                        statusEl.textContent = 'Kunne ikke hente adresseforslag.';
+                    }
+                }, 350);
+            });
+        }
+
+        // Password Reset E-post
+        section.querySelector('#reset-password-btn-admin')?.addEventListener('click', async () => {
+            if (!authUser.email) return;
+            try {
+                await firebase.auth().sendPasswordResetEmail(authUser.email);
+                this.showToast(`E-post for å tilbakestille passord er sendt til ${authUser.email}!`, 'success', 5000);
+            } catch (err) {
+                this.showToast('Kunne ikke sende e-post for passordtilbakestilling: ' + err.message, 'error', 5000);
+            }
+        });
+
+        // Account deletion (GDPR Danger Zone)
+        section.querySelector('#delete-account-btn-admin')?.addEventListener('click', async () => {
+            const confirmed = await this.confirmDialog(
+                'Er du sikker på at du vil slette din konto permanent? Dette kan ikke angres!',
+                'Slett konto permanent'
+            );
+            if (!confirmed) return;
+            try {
+                await firebase.firestore().collection('users').doc(uid).delete();
+                await authUser.delete();
+                window.location.href = '/minside/login.html';
+            } catch (err) {
+                this.showToast('Sletting av konto feilet (krever nylig innlogging): ' + err.message, 'error', 6000);
+            }
+        });
+
+        // Family Search & Management
+        const familyInput = section.querySelector('#family-search-input-admin');
+        const familyResultsEl = section.querySelector('#family-search-results-admin');
+        const familyStatusEl = section.querySelector('#family-search-status-admin');
+        if (familyInput && familyResultsEl && familyStatusEl) {
+            let famTimer = null;
+            familyInput.addEventListener('input', () => {
+                clearTimeout(famTimer);
+                const q = familyInput.value.trim().toLowerCase();
+                if (q.length < 2) {
+                    familyResultsEl.innerHTML = '';
+                    familyStatusEl.textContent = '';
+                    return;
+                }
+                familyStatusEl.textContent = 'Søker etter familiemedlemmer...';
+                famTimer = setTimeout(async () => {
+                    try {
+                        const snap = await firebase.firestore().collection('users').limit(40).get();
+                        const matches = [];
+                        snap.forEach(d => {
+                            if (d.id === uid) return;
+                            const u = d.data() || {};
+                            const name = (u.displayName || u.fullName || '').toLowerCase();
+                            const email = (u.email || '').toLowerCase();
+                            const phone = (u.phone || '').toLowerCase();
+                            if (name.includes(q) || email.includes(q) || phone.includes(q)) {
+                                matches.push({ uid: d.id, name: u.displayName || u.fullName || 'Uten navn', email: u.email || '', photoURL: u.photoURL || '' });
+                            }
+                        });
+
+                        if (!matches.length) {
+                            familyResultsEl.innerHTML = '';
+                            familyStatusEl.textContent = 'Ingen treff.';
+                            return;
+                        }
+
+                        familyStatusEl.textContent = '';
+                        familyResultsEl.innerHTML = matches.map((m, idx) => `
+                            <button class="family-result-row" type="button" data-idx="${idx}" style="width: 100%; text-align: left; padding: 10px 12px; background: none; border: none; border-bottom: 1px solid #f1f5f9; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                                <div style="width: 32px; height: 32px; border-radius: 50%; background: #d17d39; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; overflow: hidden;">
+                                    ${m.photoURL ? `<img src="${esc(m.photoURL)}" style="width: 100%; height: 100%; object-fit: cover;">` : esc(m.name.charAt(0).toUpperCase())}
+                                </div>
+                                <div style="flex: 1;">
+                                    <strong style="display: block; font-size: 13px;">${esc(m.name)}</strong>
+                                    <small style="color: #64748b; font-size: 11px;">${esc(m.email)}</small>
+                                </div>
+                                <span class="material-symbols-outlined" style="font-size: 18px; color: #d17d39;">person_add</span>
+                            </button>
+                        `).join('');
+
+                        familyResultsEl.querySelectorAll('.family-result-row').forEach(row => {
+                            row.addEventListener('click', async () => {
+                                const idx = Number(row.dataset.idx);
+                                const member = matches[idx];
+                                if (!member) return;
+                                const existingMembers = Array.isArray(p.familyMembers) ? [...p.familyMembers] : [];
+                                if (!existingMembers.some(em => em.uid === member.uid)) {
+                                    existingMembers.push({ uid: member.uid, name: member.name, email: member.email, photoURL: member.photoURL, role: 'Familiemedlem' });
+                                    await firebase.firestore().collection('users').doc(uid).set({ familyMembers: existingMembers }, { merge: true });
+                                    this.showToast(`${member.name} lagt til i husstanden!`, 'success', 3000);
+                                    await this.renderProfileSection();
+                                }
+                            });
+                        });
+                    } catch (err) {
+                        familyResultsEl.innerHTML = '';
+                        familyStatusEl.textContent = 'Kunne ikke søke etter familiemedlemmer.';
+                    }
+                }, 350);
+            });
+        }
+
+        // Remove family member buttons
+        section.querySelectorAll('.member-remove-btn-admin').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const memberUid = btn.dataset.memberUid;
+                if (!memberUid) return;
+                const existingMembers = (Array.isArray(p.familyMembers) ? p.familyMembers : []).filter(m => m.uid !== memberUid);
+                await firebase.firestore().collection('users').doc(uid).set({ familyMembers: existingMembers }, { merge: true });
+                this.showToast('Familiemedlem fjernet.', 'info', 3000);
+                await this.renderProfileSection();
+            });
+        });
+
+        // Save Custom Bottom Nav Preferences (Mobilnavigasjon)
+        section.querySelector('#save-custom-nav-btn-admin')?.addEventListener('click', async () => {
+            const btn = section.querySelector('#save-custom-nav-btn-admin');
+            if (btn) btn.disabled = true;
+            try {
+                const checkedBoxes = Array.from(section.querySelectorAll('.custom-nav-cb-admin:checked'));
+                const customBottomNav = checkedBoxes.map(cb => cb.value);
+                localStorage.setItem('hkm_user_custom_nav', JSON.stringify(customBottomNav));
+                await firebase.firestore().collection('users').doc(uid).set({ customBottomNav }, { merge: true });
+                this.showToast('Mobilmenybunn-innstillinger lagret!', 'success', 4000);
+            } catch (err) {
+                this.showToast('Kunne ikke lagre menyvalg: ' + err.message, 'error', 5000);
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        });
+
+        // Notifications Preferences Save Button
+        section.querySelector('#save-prefs-btn-admin')?.addEventListener('click', async () => {
+            const btn = section.querySelector('#save-prefs-btn-admin');
+            const orig = btn ? btn.innerHTML : '';
+            if (btn) { btn.disabled = true; btn.innerHTML = '<span class="material-symbols-outlined">sync</span> Lagrer...'; }
+
+            const pushEnabled = section.querySelector('#push-enabled-toggle-admin')?.checked ?? true;
+            const pushTeachings = section.querySelector('#push-teachings-toggle-admin')?.checked ?? true;
+            const pushPodcasts = section.querySelector('#push-podcasts-toggle-admin')?.checked ?? true;
+            const pushBlogs = section.querySelector('#push-blogs-toggle-admin')?.checked ?? true;
+            const newsletter = section.querySelector('#email-toggle-admin')?.checked ?? true;
 
             try {
-                const authUpdates = {};
-                if (data.fullName && data.fullName !== authUser.displayName) authUpdates.displayName = data.fullName;
-                if (Object.keys(authUpdates).length > 0) {
-                    await authUser.updateProfile(authUpdates);
-                }
-
-                await firebase.firestore().collection('users').doc(authUser.uid).set({
-                    displayName: data.fullName,
-                    address: data.address,
-                    zip: data.zip,
-                    city: data.city,
-                    phone: data.phone,
-                    bio: data.bio,
-                    newsletter: data.newsletter,
+                await firebase.firestore().collection('users').doc(uid).set({
                     pushEnabled,
                     pushTeachings,
                     pushPodcasts,
                     pushBlogs,
-                    photoURL: data.photoUrl,
-                    email: authUser.email || '',
+                    newsletter,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
 
                 if (pushEnabled) {
-                    this._requestAdminPushPermission(authUser.uid).catch(e => console.warn(e));
+                    this._requestAdminPushPermission(uid).catch(e => console.warn(e));
                 }
 
-                await firebaseService.savePageContent('settings_profile', data);
-                this.showToast('Profilen er lagret!', 'success', 5000);
-                await this.updateUserInfo(authUser);
+                this.showToast('Varslingspreferanser er lagret!', 'success', 4000);
             } catch (err) {
-                console.error(err);
-                this.showToast('Feil ved lagring', 'error', 5000);
+                this.showToast('Kunne ikke lagre preferanser: ' + err.message, 'error', 5000);
             } finally {
-                btn.innerHTML = original;
-                btn.disabled = false;
+                if (btn) { btn.disabled = false; btn.innerHTML = orig; }
             }
-        };
+        });
+
+        // Privacy Consent Status display
+        try {
+            const consentDiv = section.querySelector('#admin-consent-status-display');
+            if (consentDiv) {
+                if (userDocData.privacySettings && userDocData.privacySettings.choices) {
+                    const choices = userDocData.privacySettings.choices;
+                    consentDiv.innerHTML = `
+                        <p style="margin: 0; line-height: 1.6;">
+                            <strong>Nødvendige:</strong> <span style="color: green; font-weight:700;">Ja</span><br>
+                            <strong>Statistikk:</strong> ${choices.analytics ? '<span style="color: green; font-weight:700;">Ja</span>' : '<span style="color: red; font-weight:700;">Nei</span>'}<br>
+                            <strong>Markedsføring:</strong> ${choices.marketing ? '<span style="color: green; font-weight:700;">Ja</span>' : '<span style="color: red; font-weight:700;">Nei</span>'}
+                        </p>
+                    `;
+                } else {
+                    consentDiv.innerHTML = '<p style="margin: 0; color: #64748b;">Ingen spesifikke samtykkevalg lagret ennå.</p>';
+                }
+            }
+        } catch (e) {
+            console.warn('Kunne ikke hente samtykke i admin:', e);
+        }
     }
 
     async _requestAdminPushPermission(uid) {

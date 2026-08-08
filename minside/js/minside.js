@@ -2820,6 +2820,12 @@ class MinSideManager {
                             <span class="material-symbols-outlined" style="font-size: 14px;">verified</span>
                             <span>${isNo ? 'Aktivt medlem' : (isEs ? 'Miembro activo' : 'Active member')}</span>
                         </span>
+                        ${(p.role === 'admin' || p.role === 'superadmin') ? `
+                        <span class="ms-profile-badge admin-badge" style="background: rgba(124, 58, 237, 0.12); border-color: rgba(124, 58, 237, 0.25); color: #7c3aed;">
+                            <span class="material-symbols-outlined" style="font-size: 14px;">admin_panel_settings</span>
+                            <span>${esc(p.role === 'superadmin' ? 'Superadministrator' : 'Administrator')}</span>
+                        </span>
+                        ` : ''}
                         <span class="ms-profile-badge">
                             <span class="material-symbols-outlined" style="font-size: 14px;">calendar_today</span>
                             <span>${isNo ? 'Siden ' : (isEs ? 'Desde ' : 'Since ')}${joinYear}</span>

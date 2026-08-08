@@ -54,6 +54,7 @@
     <link rel="stylesheet" href="css/dashboard.css?v=20260807_V13">
     <link rel="stylesheet" href="../css/notifications.css">
     <link rel="stylesheet" href="css/admin-unified.css?v=20260807_V13">
+    <link rel="stylesheet" href="../minside/css/minside.css?v=20260808_PROFILE">
     <link rel="stylesheet" href="css/todo.css?v=20260729_TODO_OVERHAUL">
     
     <!-- FORCED CSS FIX FOR ENGAGEMENT OVERFLOW (INLINE TO BEAT CACHE - GLOBAL) -->
@@ -979,70 +980,7 @@
             </div>
         </div>
 
-        <!-- Profile Modal -->
-        <div id="profile-modal" class="profile-modal"
-            style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.25); z-index:2000; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
-            <div class="profile-modal-content"
-                style="background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.15); padding:32px; width:100%; max-width:600px; max-height:90vh; overflow-y:auto; position:relative;">
-                <button id="close-profile-modal"
-                    style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#888;">&times;</button>
-                <div style="display:flex; align-items:center; gap:20px; margin-bottom:24px;">
-                    <div id="modal-admin-avatar" class="user-avatar" style="width:64px; height:64px; font-size:24px; border-radius:16px;">
-                    </div>
-                    <div style="flex:1;">
-                        <div id="modal-admin-name" class="user-name" style="font-size:20px; font-weight:700; color:#0f172a;">
-                            Navn</div>
-                        <div id="modal-admin-role" class="user-role" style="font-size:13px; color:#64748b;">Administrator</div>
-                        <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
-                            <button type="button" id="admin-modal-upload-photo-btn" class="btn-secondary" style="font-size:12px; padding:6px 12px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; font-weight:600;">
-                                <span class="material-symbols-outlined" style="font-size:16px;">photo_camera</span> Velg bilde...
-                            </button>
-                            <button type="button" id="admin-modal-remove-photo-btn" class="btn-secondary" style="font-size:12px; padding:6px 12px; border-radius:8px; cursor:pointer; display:none; align-items:center; gap:4px; border:1px solid #fca5a5; background:#fef2f2; color:#dc2626; font-weight:600;">
-                                Fjern bilde
-                            </button>
-                            <input type="file" id="admin-modal-photo-file" accept="image/png, image/jpeg, image/webp" style="display:none;">
-                        </div>
-                    </div>
-                </div>
-                <div style="margin-bottom:16px;">
-                    <strong>E-post:</strong> <span id="modal-admin-email">epost@eksempel.no</span>
-                </div>
-                <form id="admin-modal-profile-form" style="width:100%; display:grid; gap:12px; margin-top:8px;">
-                    <div>
-                        <label for="admin-modal-display-name"
-                            style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Navn</label>
-                        <input id="admin-modal-display-name" name="displayName" type="text"
-                            style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
-                    </div>
-                    <div>
-                        <label for="admin-modal-photo-url"
-                            style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Profilbilde-URL (eller velg fil over)</label>
-                        <input id="admin-modal-photo-url" name="photoURL" type="url" placeholder="https://..."
-                            style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
-                    </div>
-                    <div>
-                        <label for="admin-modal-phone"
-                            style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Telefon</label>
-                        <input id="admin-modal-phone" name="phone" type="tel"
-                            style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
-                    </div>
-                    <div>
-                        <label for="admin-modal-address"
-                            style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Adresse</label>
-                        <input id="admin-modal-address" name="address" type="text"
-                            style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
-                    </div>
-                    <div>
-                        <label for="admin-modal-bio"
-                            style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Bio</label>
-                        <textarea id="admin-modal-bio" name="bio"
-                            style="width:100%; min-height:78px; padding:10px; border:1px solid #e2e8f0; border-radius:8px;"></textarea>
-                    </div>
-                    <button id="admin-modal-save-btn" type="submit" class="btn-primary" style="margin-top:4px;">Lagre
-                        profil</button>
-                </form>
-            </div>
-        </div>
+
 
         <!-- Template Editor Modal -->
         <div id="template-editor-modal" class="profile-modal"
