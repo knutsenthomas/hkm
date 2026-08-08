@@ -12601,13 +12601,80 @@ html body.minside-body .section-content > .design-ui-header:not(.in-topbar) {
     display: none !important;
 }
 
-/* Dynamic Topbar Actions Styling in Main Header */
+/* --- DYNAMIC TOPBAR ACTIONS & PANEL HEADER ALIGNMENT --- */
 html body.admin-body .main-header .topbar-dynamic-actions {
     display: inline-flex !important;
     align-items: center !important;
     gap: 8px !important;
     margin-right: 8px !important;
 }
+
+html body.admin-body .design-ui-panel-header,
+html body.minside-body .design-ui-panel-header {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 16px 20px !important;
+    gap: 16px !important;
+    background: #ffffff !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+html body.admin-body .design-ui-panel-header > div:first-child,
+html body.minside-body .design-ui-panel-header > div:first-child {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 14px !important;
+    min-width: 0 !important;
+}
+
+html body.admin-body .design-ui-panel-header-icon,
+html body.minside-body .design-ui-panel-header-icon {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
+    border-radius: 10px !important;
+    background: linear-gradient(135deg, rgba(209, 125, 57, 0.1), rgba(181, 77, 43, 0.14)) !important;
+    border: 1px solid rgba(209, 125, 57, 0.22) !important;
+    color: #d17d39 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+}
+
+html body.admin-body .design-ui-panel-header-icon .material-symbols-outlined,
+html body.minside-body .design-ui-panel-header-icon .material-symbols-outlined {
+    font-size: 20px !important;
+    color: #d17d39 !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+}
+
+html body.admin-body .design-ui-panel-title,
+html body.minside-body .design-ui-panel-title {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+html body.admin-body .design-ui-panel-subtitle,
+html body.minside-body .design-ui-panel-subtitle {
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    color: #64748b !important;
+    line-height: 1.35 !important;
+    margin: 2px 0 0 !important;
+    padding: 0 !important;
+}
+
 
 
 
