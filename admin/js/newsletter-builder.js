@@ -10963,7 +10963,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
 
     toggleMode(mode) {
         this.currentMode = mode;
-        const dashboard = document.getElementById('newsletter-dashboard-layout');
+        const dashboard = document.getElementById('newsletter-dashboard-wrapper') || document.getElementById('newsletter-dashboard-layout');
         const builder = document.getElementById('newsletter-builder-layout');
         const mainHeader = document.getElementById('dashboard-main-header');
         
@@ -10972,7 +10972,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             if (dashboard) dashboard.style.display = 'none';
             if (builder) builder.style.display = 'block';
             if (mainHeader) mainHeader.style.setProperty('display', 'none', 'important');
-            document.body.classList.add('builder-active');
+            document.body.className = 'builder-active';
 
             // Maintain URL search parameters
             const url = new URL(window.location.href);
@@ -10995,7 +10995,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             if (mainHeader) {
                 mainHeader.style.removeProperty('display');
             }
-            document.body.classList.remove('builder-active');
+            document.body.className = 'admin-body main-dashboard';
 
             // Clear active draft from URL search parameter
             const url = new URL(window.location.href);
