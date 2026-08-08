@@ -8483,67 +8483,71 @@ html[data-theme="dark"] .notification-btn {
   color: #f1f5f9 !important;
 }
 
-/* 4. User Profile Link */
-.user-profile-link {
-  height: 42px !important;
-  border-radius: 12px !important;
-  padding: 0 4px 0 12px !important; /* Balanced 12px left padding, 4px right padding around 34px avatar */
+/* 4. User Profile Link & Avatar (Zero-box single avatar trigger fix) */
+body.admin-body .main-header .user-profile-link,
+body.minside-body .main-header .user-profile-link,
+body.crm-body .main-header .user-profile-link,
+body.builder-active .main-header .user-profile-link,
+.user-profile-link,
+#actions-btn,
+#admin-profile-trigger {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  outline: none !important;
   display: inline-flex !important;
   align-items: center !important;
-  justify-content: flex-start !important;
-  border: 1px solid rgba(27, 73, 101, 0.08) !important;
-  background: #ffffff !important;
-  color: #1B4965 !important;
-  cursor: pointer !important;
-  gap: 8px !important;
-  overflow: hidden !important;
-  box-sizing: border-box !important;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+  justify-content: center !important;
+  text-decoration: none !important;
 }
 
-.user-profile-link:hover {
-  background-color: rgba(27, 73, 101, 0.04) !important;
-  border-color: rgba(27, 73, 101, 0.2) !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 12px rgba(27, 73, 101, 0.05) !important;
-}
-
-.user-profile-link:active {
-  transform: scale(0.97) !important;
-}
-
-/* User avatar box inside link - Override main-header 42px rule */
 body.admin-body .main-header .user-profile-link .user-avatar,
 body.minside-body .main-header .user-profile-link .user-avatar,
 body.crm-body .main-header .user-profile-link .user-avatar,
 body.builder-active .main-header .user-profile-link .user-avatar,
 .user-profile-link .user-avatar,
 .user-profile-link [id="admin-avatar"],
-.user-profile-link [id="ph-avatar"] {
-  width: 34px !important;
-  height: 34px !important;
-  min-width: 34px !important;
-  border-radius: 8px !important;
-  background: var(--admin-orange-gradient, linear-gradient(135deg, #cc6f2c 0%, #f97316 100%)) !important;
+.user-profile-link [id="ph-avatar"],
+#actions-btn .user-avatar,
+#actions-btn [id="ph-avatar"],
+#admin-profile-trigger .user-avatar,
+#admin-profile-trigger [id="admin-avatar"],
+.user-avatar,
+[id="ph-avatar"],
+[id="admin-avatar"] {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  min-height: 42px !important;
+  max-width: 42px !important;
+  max-height: 42px !important;
+  border-radius: 12px !important;
+  border: 1.5px solid rgba(15, 23, 42, 0.12) !important;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06) !important;
+  background: linear-gradient(135deg, #cc6f2c 0%, #f97316 100%) !important;
   color: #ffffff !important;
   font-weight: 800 !important;
-  font-size: 13px !important;
-  line-height: 34px !important;
+  font-size: 15px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  position: relative !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  overflow: hidden !important;
-  border: none !important;
-  box-shadow: none !important;
-  margin: 0 !important;
-  position: relative !important;
   flex-shrink: 0 !important;
 }
 
 .user-profile-link .user-avatar img,
 .user-profile-link [id="admin-avatar"] img,
-.user-profile-link [id="ph-avatar"] img {
+.user-profile-link [id="ph-avatar"] img,
+#actions-btn img,
+#admin-profile-trigger img,
+.user-avatar img,
+[id="ph-avatar"] img,
+[id="admin-avatar"] img {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
@@ -8551,6 +8555,9 @@ body.builder-active .main-header .user-profile-link .user-avatar,
   position: absolute !important;
   inset: 0 !important;
   z-index: 2 !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .user-profile-link .user-name {
