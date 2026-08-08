@@ -2767,6 +2767,44 @@ class AdminManager {
         this.setTopbarActions(null);
     }
 
+    attachAutosaveToSection(sectionElement, badgeId, saveCallback, debounceMs = 500) {
+        if (!sectionElement) return;
+        let timer = null;
+        const triggerSave = () => {
+            const badge = document.getElementById(badgeId);
+            if (badge) {
+                badge.style.background = 'rgba(209, 125, 57, 0.12)';
+                badge.style.color = '#d17d39';
+                badge.innerHTML = '<span class="material-symbols-outlined spin" style="font-size:16px;">sync</span> <span>Lagrer...</span>';
+            }
+            clearTimeout(timer);
+            timer = setTimeout(async () => {
+                try {
+                    await saveCallback();
+                    if (badge) {
+                        badge.style.background = 'rgba(34, 197, 94, 0.12)';
+                        badge.style.color = '#16a34a';
+                        badge.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">cloud_done</span> <span>Lagret i skyen</span>';
+                    }
+                } catch (err) {
+                    console.error('[Autosave] error:', err);
+                    if (badge) {
+                        badge.style.background = 'rgba(239, 68, 68, 0.12)';
+                        badge.style.color = '#dc2626';
+                        badge.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">error</span> <span>Feil ved lagring</span>';
+                    }
+                }
+            }, debounceMs);
+        };
+
+        sectionElement.querySelectorAll('input, select, textarea').forEach(el => {
+            if (el.dataset.autosaveBound) return;
+            el.dataset.autosaveBound = 'true';
+            el.addEventListener('input', triggerSave);
+            el.addEventListener('change', triggerSave);
+        });
+    }
+
     /**
      * Called by the inline navigation script in index.html
      */
