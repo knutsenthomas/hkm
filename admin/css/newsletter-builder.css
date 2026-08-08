@@ -8923,3 +8923,23 @@ body.builder-active .sidebar .nav-category-header {
     width: 100% !important;
     box-sizing: border-box !important;
 }
+
+/* ==========================================================================
+   FIX MOBILE BUILDER TOOLBAR OVERFLOW
+   ========================================================================== */
+@media (max-width: 991px) {
+    #mobile-add-element-btn span:not(.material-symbols-outlined) {
+        display: none !important;
+    }
+    #mobile-add-element-btn {
+        width: 36px !important;
+        min-width: 36px !important;
+        padding: 0 !important;
+        justify-content: center !important;
+    }
+    
+    /* Hide language switcher on mobile to save space */
+    #editor-language-switcher {
+        display: none !important;
+    }
+}
