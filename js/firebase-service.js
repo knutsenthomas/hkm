@@ -1377,23 +1377,16 @@ class FirebaseService {
             this.tryAutoInit();
         }
         if (!this.isInitialized) return false;
-
-        const mockUser = {
-            uid: "test-admin-123",
-            email: "knutsenthomas@gmail.com",
-            displayName: "Thomas Knutsen",
-            photoURL: "https://lh3.googleusercontent.com/a/default-user",
-            providerData: [{ providerId: "google.com" }]
-        };
-
+        
+        // Subscribe to auth changes immediately to avoid hangs
         if (this.auth) {
-            Object.defineProperty(this.auth, 'currentUser', {
-                get: function() { return mockUser; },
-                configurable: true
-            });
+            this.auth.onAuthStateChanged(callback);
         }
 
-        callback(mockUser);
+        // Ensure persistence settles in the background asynchronously
+        if (typeof this.ensureAuthPersistence === 'function') {
+            this.ensureAuthPersistence().catch(() => false);
+        }
 
         return true;
     }
