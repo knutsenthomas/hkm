@@ -2880,13 +2880,43 @@ class AdminManager {
     }
 
     setupUniversalAutosave() {
-        console.log('[AdminManager] Universal Autosave system disabled.');
         if (this._autosaveObserver) {
             try { this._autosaveObserver.disconnect(); } catch (e) {}
             this._autosaveObserver = null;
         }
-        const globalBadge = document.getElementById('global-topbar-autosave-badge');
-        if (globalBadge) globalBadge.style.display = 'none';
+
+        const attachToActiveSection = () => {
+            const activeSection = document.querySelector('.admin-section.active, section.active, #' + (this.currentSection || 'overview') + '-section') || document.querySelector('.main-content');
+            if (activeSection) {
+                this.attachAutosaveToSection(activeSection);
+            }
+        };
+
+        attachToActiveSection();
+
+        this._autosaveObserver = new MutationObserver((mutations) => {
+            let hasNewInputs = false;
+            for (const mutation of mutations) {
+                if (mutation.addedNodes.length > 0) {
+                    for (const node of mutation.addedNodes) {
+                        if (node.nodeType === 1 && (node.querySelector('input, select, textarea, [contenteditable="true"]') || (typeof node.matches === 'function' && node.matches('input, select, textarea, [contenteditable="true"]')))) {
+                            hasNewInputs = true;
+                            break;
+                        }
+                    }
+                }
+                if (hasNewInputs) break;
+            }
+            if (hasNewInputs) {
+                attachToActiveSection();
+            }
+        });
+
+        const target = document.querySelector('.main-content') || document.body;
+        if (target) {
+            this._autosaveObserver.observe(target, { childList: true, subtree: true });
+        }
+        console.log('[AdminManager] Universal Autosave system activated.');
     }
 
     /**
