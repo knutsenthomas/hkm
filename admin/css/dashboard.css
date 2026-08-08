@@ -6593,7 +6593,7 @@ body.admin-body .user-avatar {
 }
 
 body.admin-body .section-container {
-    padding: 8px var(--admin-page-gutter, 24px) 24px !important;
+    padding: 24px var(--admin-page-gutter, 24px) 24px !important;
     max-width: 1600px;
     margin: 0 auto;
     box-sizing: border-box;
