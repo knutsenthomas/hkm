@@ -22998,6 +22998,39 @@ class AdminManager {
 
         const activeTab = this._activeAdminProfileTab || 'my-profile';
 
+        const userCustomNav = Array.isArray(p.customMobileNav) && p.customMobileNav.length
+            ? p.customMobileNav
+            : ['overview', 'courses', 'reading-plans', 'profile'];
+
+        const allowedItems = ['overview', 'profile', 'courses', 'reading-plans', 'giving', 'notifications', 'tasks', 'notes'];
+        const navLabels = {
+            'overview': { label: 'Oversikt', icon: 'home' },
+            'profile': { label: 'Profil', icon: 'person' },
+            'courses': { label: 'Kurs', icon: 'school' },
+            'reading-plans': { label: 'Leseplaner', icon: 'auto_stories' },
+            'giving': { label: 'Gaver', icon: 'volunteer_activism' },
+            'notifications': { label: 'Varslinger', icon: 'notifications' },
+            'tasks': { label: 'Huskeliste', icon: 'task_alt' },
+            'notes': { label: 'Notater', icon: 'edit_note' }
+        };
+
+        const customNavHtml = allowedItems.map(id => {
+            const checked = userCustomNav.includes(id) ? 'checked' : '';
+            const item = navLabels[id] || { label: id, icon: 'link' };
+            return `
+                <label class="custom-nav-item" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #f8fafc; border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px;">
+                    <div class="custom-nav-item-left" style="display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 14px;">
+                        <span class="material-symbols-outlined" style="color: #d17d39;">${item.icon}</span>
+                        <span>${item.label}</span>
+                    </div>
+                    <label class="admin-toggle">
+                        <input type="checkbox" class="custom-nav-cb-admin" value="${id}" ${checked}>
+                        <span class="admin-toggle-slider"></span>
+                    </label>
+                </label>
+            `;
+        }).join('');
+
         const ssnVal = p.ssn || p.nationalIdNumber || p.personnummer || '';
         const ssnDisplayFormatted = ssnVal
             ? (ssnVal.length === 11
