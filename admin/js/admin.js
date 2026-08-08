@@ -19163,30 +19163,30 @@ class AdminManager {
                         <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Gaver registrert</span>
                         <h4 style="margin: 4px 0 0; font-size: 24px; font-weight: 800; color: #0f172a;">${donationCountPeriod} gaver</h4>
                     </div>
-                    <div style="display: flex; gap: 20px; align-items: center;">
-                        <div style="flex: 1; display:flex; flex-direction:column; gap:8px;">
+                    <div style="display: flex; gap: 16px; align-items: center; justify-content: space-between;">
+                        <div style="flex: 1; min-width: 0; display:flex; flex-direction:column; gap:10px;">
                             <div>
-                                <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:#475569; margin-bottom:2px;">
-                                    <span>Vipps</span>
-                                    <span>${vippsPct}%</span>
+                                <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; font-weight:700; color:#475569; margin-bottom:3px; gap:6px;">
+                                    <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Vipps</span>
+                                    <span style="white-space:nowrap; font-family:'Fira Code', monospace; color:#0f172a;">${vippsPct}%</span>
                                 </div>
                                 <div style="height:6px; background:#f1f5f9; border-radius:99px; overflow:hidden;">
                                     <div style="width:${vippsPct}%; height:100%; background:#3b82f6;"></div>
                                 </div>
                             </div>
                             <div>
-                                <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:#475569; margin-bottom:2px;">
-                                    <span>Kort (Stripe)</span>
-                                    <span>${stripePct}%</span>
+                                <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; font-weight:700; color:#475569; margin-bottom:3px; gap:6px;">
+                                    <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="Kort (Stripe)">Kort</span>
+                                    <span style="white-space:nowrap; font-family:'Fira Code', monospace; color:#0f172a;">${stripePct}%</span>
                                 </div>
                                 <div style="height:6px; background:#f1f5f9; border-radius:99px; overflow:hidden;">
                                     <div style="width:${stripePct}%; height:100%; background:#f59e0b;"></div>
                                 </div>
                             </div>
                             <div>
-                                <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:#475569; margin-bottom:2px;">
-                                    <span>Bank</span>
-                                    <span>${bankPct}%</span>
+                                <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; font-weight:700; color:#475569; margin-bottom:3px; gap:6px;">
+                                    <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Bank</span>
+                                    <span style="white-space:nowrap; font-family:'Fira Code', monospace; color:#0f172a;">${bankPct}%</span>
                                 </div>
                                 <div style="height:6px; background:#f1f5f9; border-radius:99px; overflow:hidden;">
                                     <div style="width:${bankPct}%; height:100%; background:#a855f7;"></div>
@@ -19194,7 +19194,7 @@ class AdminManager {
                             </div>
                         </div>
                         
-                        <div style="position:relative; width:90px; height:90px; flex-shrink:0;">
+                        <div style="position:relative; width:80px; height:80px; flex-shrink:0;">
                             <svg width="100%" height="100%" viewBox="0 0 42 42" class="donut">
                                 <circle class="donut-hole" cx="21" cy="21" r="15.91549430918954" fill="#fff"></circle>
                                 <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#f1f5f9" stroke-width="4"></circle>
