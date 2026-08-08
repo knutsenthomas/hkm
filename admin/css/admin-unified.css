@@ -12407,6 +12407,50 @@ html body #admin-profile-trigger .user-avatar,
 html body #admin-profile-trigger [id="admin-avatar"],
 html body .user-avatar,
 html body [id="ph-avatar"],
+/* ==========================================================================
+   HKM UI COMPONENT SYSTEM: Header & Avatar Targets (8px Grid, 42px Touch Target)
+   ========================================================================== */
+
+html body .user-profile-link,
+html body #actions-btn,
+html body #admin-profile-trigger {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    border-radius: 12px !important;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease !important;
+}
+
+html body .user-profile-link:hover,
+html body #actions-btn:hover,
+html body #admin-profile-trigger:hover {
+    transform: scale(1.04) !important;
+}
+
+html body .user-profile-link:active,
+html body #actions-btn:active,
+html body #admin-profile-trigger:active {
+    transform: scale(0.96) !important;
+}
+
+html body .user-profile-link .user-avatar,
+html body .user-profile-link [id="ph-avatar"],
+html body .user-profile-link [id="admin-avatar"],
+html body #actions-btn .user-avatar,
+html body #admin-profile-trigger .user-avatar,
+html body .user-avatar,
+html body [id="ph-avatar"],
 html body [id="admin-avatar"] {
     width: 42px !important;
     height: 42px !important;
