@@ -209,11 +209,25 @@ const initAdminHeader = () => {
             const existing = readCachedIdentity();
             const effectivePhoto = photoURL || existing?.photoURL || '';
             const effectiveName = displayName || existing?.displayName || '';
-            localStorage.setItem(ADMIN_IDENTITY_CACHE_KEY, JSON.stringify({
+            const cacheObj = {
                 displayName: effectiveName,
                 photoURL: effectivePhoto,
+                photoUrl: effectivePhoto,
+                avatarUrl: effectivePhoto,
                 ts: Date.now()
-            }));
+            };
+            localStorage.setItem(ADMIN_IDENTITY_CACHE_KEY, JSON.stringify(cacheObj));
+
+            const pubRaw = localStorage.getItem('hkm_public_user_cache');
+            let pubObj = {};
+            if (pubRaw) {
+                try { pubObj = JSON.parse(pubRaw) || {}; } catch(e) {}
+            }
+            pubObj.displayName = effectiveName || pubObj.displayName || pubObj.fullName || '';
+            pubObj.photoURL = effectivePhoto || pubObj.photoURL || pubObj.photoUrl || pubObj.avatarUrl || '';
+            pubObj.photoUrl = pubObj.photoURL;
+            pubObj.avatarUrl = pubObj.photoURL;
+            localStorage.setItem('hkm_public_user_cache', JSON.stringify(pubObj));
         } catch (e) {
             // noop
         }

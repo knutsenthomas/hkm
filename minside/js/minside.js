@@ -1947,10 +1947,20 @@ class MinSideManager {
         const resolvedPhoto = data.photoURL || data.photo_url || data.photoUrl || data.avatarUrl || data.avatar_url || data.profileImage || data.image || user.photoURL || google.photoURL || cachedPhoto || '';
         if (resolvedPhoto) {
             try {
+                const nameVal = data.displayName || user.displayName || google.displayName || user.email || '';
                 localStorage.setItem('hkm_public_user_cache', JSON.stringify({
                     uid: user.uid,
-                    displayName: data.displayName || user.displayName || google.displayName || user.email || '',
+                    displayName: nameVal,
                     photoURL: resolvedPhoto,
+                    photoUrl: resolvedPhoto,
+                    avatarUrl: resolvedPhoto,
+                    ts: Date.now()
+                }));
+                localStorage.setItem('hkm_admin_identity_cache', JSON.stringify({
+                    displayName: nameVal,
+                    photoURL: resolvedPhoto,
+                    photoUrl: resolvedPhoto,
+                    avatarUrl: resolvedPhoto,
                     ts: Date.now()
                 }));
             } catch (e) {}

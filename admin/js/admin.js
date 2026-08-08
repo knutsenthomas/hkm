@@ -2401,11 +2401,25 @@ class AdminManager {
                 const existing = readCachedIdentity();
                 const effectivePhoto = photoURL || existing?.photoURL || '';
                 const effectiveName = name || existing?.displayName || '';
-                localStorage.setItem(identityCacheKey, JSON.stringify({
+                const cacheObj = {
                     displayName: effectiveName,
                     photoURL: effectivePhoto,
+                    photoUrl: effectivePhoto,
+                    avatarUrl: effectivePhoto,
                     ts: Date.now()
-                }));
+                };
+                localStorage.setItem(identityCacheKey, JSON.stringify(cacheObj));
+
+                const pubRaw = localStorage.getItem('hkm_public_user_cache');
+                let pubObj = {};
+                if (pubRaw) {
+                    try { pubObj = JSON.parse(pubRaw) || {}; } catch(e) {}
+                }
+                pubObj.displayName = effectiveName || pubObj.displayName || pubObj.fullName || '';
+                pubObj.photoURL = effectivePhoto || pubObj.photoURL || pubObj.photoUrl || pubObj.avatarUrl || '';
+                pubObj.photoUrl = pubObj.photoURL;
+                pubObj.avatarUrl = pubObj.photoURL;
+                localStorage.setItem('hkm_public_user_cache', JSON.stringify(pubObj));
             } catch (e) {
                 // noop
             }
