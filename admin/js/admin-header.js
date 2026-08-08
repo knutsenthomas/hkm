@@ -177,10 +177,13 @@ const initAdminHeader = () => {
     });
 
     const readCachedIdentity = () => {
+        if (window.HKMAuthManager) {
+            return window.HKMAuthManager.getIdentity();
+        }
         try {
+            const raw = localStorage.getItem(ADMIN_IDENTITY_CACHE_KEY);
             let displayName = '';
             let photoURL = '';
-            const raw = localStorage.getItem(ADMIN_IDENTITY_CACHE_KEY);
             if (raw) {
                 const parsed = JSON.parse(raw);
                 if (parsed && typeof parsed === 'object') {
@@ -205,6 +208,10 @@ const initAdminHeader = () => {
     };
 
     const writeCachedIdentity = (displayName, photoURL) => {
+        if (window.HKMAuthManager) {
+            window.HKMAuthManager.writeIdentity({ displayName, photoURL });
+            return;
+        }
         try {
             const existing = readCachedIdentity();
             const effectivePhoto = photoURL || existing?.photoURL || '';

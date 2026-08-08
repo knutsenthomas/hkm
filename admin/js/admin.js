@@ -2369,6 +2369,7 @@ class AdminManager {
         const identityCacheKey = 'hkm_admin_identity_cache';
 
         const readCachedIdentity = () => {
+            if (window.HKMAuthManager) return window.HKMAuthManager.getIdentity();
             try {
                 let displayName = '';
                 let photoURL = '';
@@ -2397,6 +2398,10 @@ class AdminManager {
         };
 
         const cacheHeaderIdentity = (name, photoURL) => {
+            if (window.HKMAuthManager) {
+                window.HKMAuthManager.writeIdentity({ displayName: name, photoURL });
+                return;
+            }
             try {
                 const existing = readCachedIdentity();
                 const effectivePhoto = photoURL || existing?.photoURL || '';

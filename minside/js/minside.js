@@ -1945,24 +1945,28 @@ class MinSideManager {
         } catch (e) {}
 
         const resolvedPhoto = data.photoURL || data.photo_url || data.photoUrl || data.avatarUrl || data.avatar_url || data.profileImage || data.image || user.photoURL || google.photoURL || cachedPhoto || '';
-        if (resolvedPhoto) {
+        if (resolvedPhoto || data.displayName || user.displayName) {
             try {
                 const nameVal = data.displayName || user.displayName || google.displayName || user.email || '';
-                localStorage.setItem('hkm_public_user_cache', JSON.stringify({
-                    uid: user.uid,
-                    displayName: nameVal,
-                    photoURL: resolvedPhoto,
-                    photoUrl: resolvedPhoto,
-                    avatarUrl: resolvedPhoto,
-                    ts: Date.now()
-                }));
-                localStorage.setItem('hkm_admin_identity_cache', JSON.stringify({
-                    displayName: nameVal,
-                    photoURL: resolvedPhoto,
-                    photoUrl: resolvedPhoto,
-                    avatarUrl: resolvedPhoto,
-                    ts: Date.now()
-                }));
+                if (window.HKMAuthManager) {
+                    window.HKMAuthManager.writeIdentity({
+                        uid: user.uid,
+                        displayName: nameVal,
+                        photoURL: resolvedPhoto,
+                        role: role || data.role || ''
+                    });
+                } else {
+                    const cacheObj = {
+                        uid: user.uid,
+                        displayName: nameVal,
+                        photoURL: resolvedPhoto,
+                        photoUrl: resolvedPhoto,
+                        avatarUrl: resolvedPhoto,
+                        ts: Date.now()
+                    };
+                    localStorage.setItem('hkm_public_user_cache', JSON.stringify(cacheObj));
+                    localStorage.setItem('hkm_admin_identity_cache', JSON.stringify(cacheObj));
+                }
             } catch (e) {}
         }
 
