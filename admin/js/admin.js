@@ -5392,7 +5392,7 @@ class AdminManager {
                     background: var(--admin-surface, #ffffff) !important;
                     border: 1px solid var(--admin-border, #cbd5e1) !important;
                     border-radius: 20px !important;
-                    padding: 40px !important;
+                    padding: 24px !important;
                     margin: 0 !important;
                     position: relative !important;
                     overflow: hidden !important;

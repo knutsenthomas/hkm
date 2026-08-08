@@ -6610,7 +6610,7 @@ body.admin-body .section-container {
 
 #overview-section .overview-hero-card {
     position: relative;
-    padding: 60px 48px;
+    padding: 24px !important;
     border-radius: 24px;
     color: #fff;
     background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
