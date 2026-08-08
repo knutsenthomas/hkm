@@ -4241,7 +4241,6 @@ class AdminManager {
         section.classList.add('active');
 
         section.innerHTML = `
-            ${this.renderSectionHeader('search', 'Søk', `Resultater for "${this.escapeHtml(q)}"`)}
             <div class="card">
                 <div class="card-body" id="search-results">
                     <p style="font-size:14px; color:#64748b;">Søker i dashboard-innhold...</p>
@@ -24822,7 +24821,6 @@ class AdminManager {
 
             <!-- VIEW 2: ENROLLMENTS VIEW -->
             <div id="enrollments-tab-view" style="display: none;">
-                ${this.renderSectionHeader('group', 'Kurs-påmeldinger & Tilganger', 'Administrer registreringer, godkjenn betalinger og tilpass leksjonstilgang.', '', '')}
 
                 <div class="design-ui-shell">
                     <!-- Search & Filter Controls -->
@@ -28782,14 +28780,13 @@ class AdminManager {
         if (!section) return;
 
         section.innerHTML = `
-            ${this.renderSectionHeader('person', 'Brukerprofil', 'Detaljert informasjon og rettigheter for valgt bruker.', `
-                <button id="back-to-users-btn" class="btn btn-outline">
+            <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
+                <button id="back-to-users-btn" class="btn btn-outline" style="display:inline-flex; align-items:center; gap:6px;">
                     <span class="material-symbols-outlined">arrow_back</span> Tilbake til oversikt
                 </button>
-            `)}
-
-                                                                            <div id="user-detail-container" class="loader"></div>
-                                                                            `;
+            </div>
+            <div id="user-detail-container" class="loader"></div>
+        `;
 
         const backBtn = document.getElementById('back-to-users-btn');
         if (backBtn) {

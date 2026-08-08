@@ -419,6 +419,7 @@
             return iconMap[sectionId] || 'apps';
         },
         renderSectionHeader(icon, title, subtitle, actionsHtml = '', subtitleId = '') {
+            const safeIcon = icon || 'apps';
             return `
                 <style>
                     .section-header.design-ui-header,
@@ -497,7 +498,7 @@
                 </style>
                 <div class="section-header design-ui-header">
                     <div class="section-header-icon">
-                        <span class="material-symbols-outlined">${icon}</span>
+                        <span class="material-symbols-outlined">${safeIcon}</span>
                     </div>
                     <div class="section-header-content">
                         <div class="section-header-titles" style="display: flex !important; flex-direction: column !important; align-items: flex-start !important; text-align: left !important; margin: 0 !important; padding: 0 !important; width: 100% !important;">
