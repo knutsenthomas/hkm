@@ -19058,9 +19058,9 @@ class AdminManager {
         const fundLabelsHtml = Array.from(fundDonationsMap.entries()).map(([fund, sum]) => {
             const displayFundName = (fund === 'general' ? 'Generelt' : fund.charAt(0).toUpperCase() + fund.slice(1));
             return `
-                <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #f1f5f9;">
-                    <span style="font-size:13px; font-weight:600; color:#475569;">${displayFundName}</span>
-                    <strong style="color:#0f172a; font-size:13px; font-weight:700;">${sum.toLocaleString('no-NO', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} kr</strong>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #f1f5f9; gap: 8px;">
+                    <span style="font-size:13px; font-weight:600; color:#475569; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${displayFundName}</span>
+                    <strong style="color:#0f172a; font-size:13px; font-weight:700; white-space:nowrap; flex-shrink:0;">${Math.round(sum).toLocaleString('no-NO')} kr</strong>
                 </div>
             `;
         }).join('') || '<p style="color:#64748b; font-size:13px; text-align:center;">Ingen merkelapper brukt ennå</p>';
@@ -19130,39 +19130,39 @@ class AdminManager {
 
         container.innerHTML = `
             <div class="stats-grid causes-stats-grid" style="margin-bottom: 24px;">
-                <div class="card" style="grid-column: span 4; padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
-                    <div style="margin-bottom: 16px;">
-                        <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Givere i perioden</span>
-                        <h4 style="margin: 4px 0 0; font-size: 24px; font-weight: 800; color: #0f172a;">${donorCount} givere</h4>
+                <div class="card" style="grid-column: span 4; padding: 24px; display: flex; flex-direction: column; gap: 16px; align-self: start;">
+                    <div>
+                        <span style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Givere i perioden</span>
+                        <h4 style="margin: 4px 0 0; font-size: 20px; font-weight: 800; color: #0f172a; white-space: nowrap;">${donorCount} givere</h4>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 8px;">
                         <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #f1f5f9;">
-                            <div style="display:flex; align-items:center; gap:12px;">
-                                <div style="width:28px; height:28px; border-radius:50%; background:#eff6ff; color:#3b82f6; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px;">${newDonors}</div>
-                                <span style="font-size:13px; font-weight:600; color:#475569;">Nye givere</span>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <div style="width:26px; height:26px; border-radius:50%; background:#eff6ff; color:#3b82f6; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; flex-shrink:0;">${newDonors}</div>
+                                <span style="font-size:13px; font-weight:600; color:#475569; white-space:nowrap;">Nye givere</span>
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #f1f5f9;">
-                            <div style="display:flex; align-items:center; gap:12px;">
-                                <div style="width:28px; height:28px; border-radius:50%; background:#f0fdf4; color:#16a34a; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px;">${recurringDonors}</div>
-                                <span style="font-size:13px; font-weight:600; color:#475569;">Faste givere</span>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <div style="width:26px; height:26px; border-radius:50%; background:#f0fdf4; color:#16a34a; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; flex-shrink:0;">${recurringDonors}</div>
+                                <span style="font-size:13px; font-weight:600; color:#475569; white-space:nowrap;">Faste givere</span>
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #f1f5f9;">
-                            <div style="display:flex; align-items:center; gap:12px;">
-                                <div style="width:28px; height:28px; border-radius:50%; background:#fdf2f8; color:#db2777; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px;">${textDonors}</div>
-                                <span style="font-size:13px; font-weight:600; color:#475569;">Vipps-givere</span>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <div style="width:26px; height:26px; border-radius:50%; background:#fdf2f8; color:#db2777; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; flex-shrink:0;">${textDonors}</div>
+                                <span style="font-size:13px; font-weight:600; color:#475569; white-space:nowrap;">Vipps-givere</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="card" style="grid-column: span 4; padding: 24px; min-height: 240px;">
-                    <div style="margin-bottom: 16px;">
-                        <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Gaver registrert</span>
-                        <h4 style="margin: 4px 0 0; font-size: 24px; font-weight: 800; color: #0f172a;">${donationCountPeriod} gaver</h4>
+                <div class="card" style="grid-column: span 4; padding: 24px; display: flex; flex-direction: column; gap: 16px; align-self: start;">
+                    <div>
+                        <span style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Gaver registrert</span>
+                        <h4 style="margin: 4px 0 0; font-size: 20px; font-weight: 800; color: #0f172a; white-space: nowrap;">${donationCountPeriod} gaver</h4>
                     </div>
-                    <div style="display: flex; gap: 16px; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; gap: 12px; align-items: center; justify-content: space-between;">
                         <div style="flex: 1; min-width: 0; display:flex; flex-direction:column; gap:10px;">
                             <div>
                                 <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; font-weight:700; color:#475569; margin-bottom:3px; gap:6px;">
@@ -19193,7 +19193,7 @@ class AdminManager {
                             </div>
                         </div>
                         
-                        <div style="position:relative; width:80px; height:80px; flex-shrink:0;">
+                        <div style="position:relative; width:72px; height:72px; flex-shrink:0;">
                             <svg width="100%" height="100%" viewBox="0 0 42 42" class="donut">
                                 <circle class="donut-hole" cx="21" cy="21" r="15.91549430918954" fill="#fff"></circle>
                                 <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#f1f5f9" stroke-width="4"></circle>
@@ -19203,12 +19203,12 @@ class AdminManager {
                     </div>
                 </div>
 
-                <div class="card" style="grid-column: span 4; padding: 24px; display: flex; flex-direction: column;">
-                    <div style="margin-bottom: 16px;">
-                        <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Fordelt på formål</span>
-                        <h4 style="margin: 4px 0 0; font-size: 24px; font-weight: 800; color: #0f172a;">Aktive formål</h4>
+                <div class="card" style="grid-column: span 4; padding: 24px; display: flex; flex-direction: column; gap: 16px; align-self: start;">
+                    <div>
+                        <span style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Fordelt på formål</span>
+                        <h4 style="margin: 4px 0 0; font-size: 20px; font-weight: 800; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="Aktive formål">Aktive formål</h4>
                     </div>
-                    <div style="display: flex; flex-direction: column; gap: 8px; max-height: 140px; overflow-y: auto;">
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
                         ${fundLabelsHtml}
                     </div>
                 </div>
