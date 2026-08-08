@@ -128,27 +128,43 @@ a.user-profile-link,
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    border: 1.5px solid rgba(15, 23, 42, 0.12) !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
-    background: var(--card-bg, #ffffff) !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
 }
 
-/* Outer box matches avatar picture 100% cleanly */
+/* Inner avatar is the ONE AND ONLY visible box */
 #actions-btn.user-profile-link #ph-avatar,
 #actions-btn.user-profile-link .user-avatar,
 a.user-profile-link #ph-avatar,
 a.user-profile-link #admin-avatar,
 a.user-profile-link .user-avatar,
 #admin-profile-trigger #admin-avatar,
-#admin-profile-trigger .user-avatar {
-    width: 100% !important;
-    height: 100% !important;
-    min-width: 100% !important;
-    min-height: 100% !important;
-    border-radius: inherit !important;
-    border: none !important;
+#admin-profile-trigger .user-avatar,
+.user-avatar,
+[id="ph-avatar"],
+[id="admin-avatar"] {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    max-width: 42px !important;
+    max-height: 42px !important;
+    border-radius: 12px !important;
+    border: 1.5px solid rgba(15, 23, 42, 0.12) !important;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06) !important;
     margin: 0 !important;
     padding: 0 !important;
+    overflow: hidden !important;
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    background: linear-gradient(135deg, #cc6f2c 0%, #f97316 100%) !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    font-size: 15px !important;
 }
 
 #actions-btn.user-profile-link #ph-avatar img,
@@ -157,7 +173,10 @@ a.user-profile-link #ph-avatar img,
 a.user-profile-link #admin-avatar img,
 a.user-profile-link .user-avatar img,
 #admin-profile-trigger #admin-avatar img,
-#admin-profile-trigger .user-avatar img {
+#admin-profile-trigger .user-avatar img,
+.user-avatar img,
+[id="ph-avatar"] img,
+[id="admin-avatar"] img {
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
@@ -167,6 +186,7 @@ a.user-profile-link .user-avatar img,
     padding: 0 !important;
     position: absolute !important;
     inset: 0 !important;
+    z-index: 2 !important;
 }
 
 /* Allow text capsule expansion ONLY if name/text exists inside */
