@@ -12029,7 +12029,7 @@ html[data-theme="dark"] .status-pill.status-completed {
         border: none !important;
         border-bottom: 1px solid rgba(27, 73, 101, 0.08) !important;
         padding: 14px 20px !important;
-        margin-bottom: 24px !important;
+        margin-bottom: 0 !important;
         box-sizing: border-box !important;
     }
 }
@@ -12049,7 +12049,7 @@ html[data-theme="dark"] .status-pill.status-completed {
         border: none !important;
         border-bottom: 1px solid rgba(27, 73, 101, 0.08) !important;
         padding: 16px 32px !important;
-        margin-bottom: 32px !important;
+        margin-bottom: 0 !important;
         box-sizing: border-box !important;
     }
 }
