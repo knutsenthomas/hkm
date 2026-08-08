@@ -2518,7 +2518,13 @@ class AdminManager {
         this.initTemplateEditorModal();
 
         // Universal Autosave System
-        this.setupUniversalAutosave();
+        if (typeof this.setupUniversalAutosave === 'function') {
+            try {
+                this.setupUniversalAutosave();
+            } catch (err) {
+                console.warn('[AdminManager] Autosave setup warning:', err);
+            }
+        }
 
         // Chart Dropdown Logic (Delegated)
         document.addEventListener('click', (e) => {
