@@ -6203,13 +6203,15 @@ html, body {
   overflow-x: clip !important;
 }
 
-/* Donation admin metrics need denser type than dashboard hero stats. */
-body.admin-body #causes-section .donation-metrics-grid .stat-card.modern {
+/* Donation & Shop admin metrics need denser type than dashboard hero stats. */
+body.admin-body #causes-section .donation-metrics-grid .stat-card.modern,
+body.admin-body #shop-admin-section .donation-metrics-grid .stat-card.modern {
   min-height: auto !important;
   padding: 16px 20px !important; /* Kompakt og konsistent padding */
 }
 
-body.admin-body #causes-section .donation-metrics-grid .stat-card.modern .stat-label {
+body.admin-body #causes-section .donation-metrics-grid .stat-card.modern .stat-label,
+body.admin-body #shop-admin-section .donation-metrics-grid .stat-card.modern .stat-label {
   font-size: 11px !important;
   font-weight: 700 !important;
   text-transform: uppercase !important;
@@ -6218,7 +6220,8 @@ body.admin-body #causes-section .donation-metrics-grid .stat-card.modern .stat-l
   margin-bottom: 6px !important;
 }
 
-body.admin-body #causes-section .donation-metrics-grid .stat-card.modern .stat-value {
+body.admin-body #causes-section .donation-metrics-grid .stat-card.modern .stat-value,
+body.admin-body #shop-admin-section .donation-metrics-grid .stat-card.modern .stat-value {
   font-size: 20px !important; /* Mer balansert og elegant verdi-størrelse */
   font-weight: 700 !important;
   color: #0f172a !important;
@@ -6227,7 +6230,8 @@ body.admin-body #causes-section .donation-metrics-grid .stat-card.modern .stat-v
   overflow-wrap: anywhere;
 }
 
-body.admin-body #causes-section .donation-metrics-grid .stat-card.modern .stat-meta {
+body.admin-body #causes-section .donation-metrics-grid .stat-card.modern .stat-meta,
+body.admin-body #shop-admin-section .donation-metrics-grid .stat-card.modern .stat-meta {
   display: block !important;
   margin-top: 6px !important;
   font-size: 12px !important;
@@ -12241,7 +12245,10 @@ html[data-theme="dark"] .pco-menu-item:hover {
         width: 100% !important;
         max-width: 100% !important;
         padding: 0 !important;
-        margin: 0 !important;
+        margin-top: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        margin-bottom: 24px !important;
         box-sizing: border-box !important;
     }
 
@@ -12291,12 +12298,17 @@ html[data-theme="dark"] .pco-menu-item:hover {
 #view-container,
 .view-section,
 .section-content,
-.causes-tabs-container,
+#causes-section,
+#shop-admin-section,
+#shop-section,
+.cause-tab-pane,
 .card,
 .card.modern,
 .crm-main,
 .admin-page-container {
     max-width: 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
     box-sizing: border-box !important;
     overflow-x: hidden !important;
 }
@@ -12304,11 +12316,13 @@ html[data-theme="dark"] .pco-menu-item:hover {
 /* Allow horizontal scrolling strictly within dedicated scrollable areas */
 .automation-tabs,
 .table-container,
+.table-responsive,
 .crm-table-container,
 .crm-editor-toolbar {
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch !important;
     max-width: 100% !important;
+    width: 100% !important;
     box-sizing: border-box !important;
 }
 

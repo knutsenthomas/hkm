@@ -191,7 +191,12 @@ const initAdminHeader = () => {
             const pubRaw = localStorage.getItem('hkm_public_user_cache');
             if (pubRaw) {
                 const pubParsed = JSON.parse(pubRaw);
-                if (!photoURL && pubParsed?.photoURL) photoURL = pubParsed.photoURL;
+                if (!photoURL) {
+                    photoURL = pubParsed?.photoURL || pubParsed?.photoUrl || pubParsed?.avatarUrl || pubParsed?.profileImage || pubParsed?.image || '';
+                }
+                if (!displayName && (pubParsed?.displayName || pubParsed?.fullName)) {
+                    displayName = pubParsed.displayName || pubParsed.fullName;
+                }
             }
             return { displayName, photoURL };
         } catch (e) {
@@ -237,12 +242,7 @@ const initAdminHeader = () => {
 
     const formatPhotoUrl = (url) => {
         if (!url || typeof url !== 'string') return '';
-        let cleanUrl = url.trim();
-        // If Google user content URL without size param, add size for crisp rendering
-        if (cleanUrl.includes('googleusercontent.com') && !cleanUrl.includes('=s')) {
-            cleanUrl += cleanUrl.includes('?') ? '&sz=192' : '=s192-c';
-        }
-        return cleanUrl;
+        return url.trim();
     };
 
     const renderIdentity = (displayName, photoURL) => {
@@ -263,15 +263,14 @@ const initAdminHeader = () => {
             if (!adminAvatar) return;
 
             adminAvatar.title = safeName;
-            adminAvatar.classList.add('has-initials');
 
             if (isCustomPhoto) {
                 adminAvatar.dataset.photoUrl = formattedPhoto;
-                adminAvatar.innerHTML = `
-                    <span class="avatar-initials-text" style="position:relative; z-index:1;">${initials}</span>
-                    <img src="${formattedPhoto}" referrerpolicy="no-referrer" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; position:absolute; inset:0; z-index:2;" onerror="this.onerror=null; if(this.src.includes('=s192-c')){this.src='${formattedPhoto.replace('=s192-c','')}';}else{this.remove();}">
-                `;
+                adminAvatar.classList.remove('has-initials');
+                const escapedName = safeName.replace(/"/g, '&quot;');
+                adminAvatar.innerHTML = `<img src="${formattedPhoto}" alt="${escapedName}" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; display:block;" onerror="this.onerror=null; this.parentElement.classList.add('has-initials'); this.parentElement.innerHTML='<span class=\\'avatar-initials-text\\' style=\\'position:relative; z-index:1;\\'>${initials}</span>';">`;
             } else {
+                adminAvatar.classList.add('has-initials');
                 adminAvatar.innerHTML = `<span class="avatar-initials-text" style="position:relative; z-index:1;">${initials}</span>`;
             }
         });
@@ -638,10 +637,10 @@ const initAdminHeader = () => {
                 || (settingsProfile && settingsProfile.fullName)
                 || authFallbackName(user);
 
-            const photoURL = (userProfile && (userProfile.photoURL || userProfile.photo_url || userProfile.photoUrl || userProfile.avatarUrl || userProfile.avatar_url || userProfile.profileImage || userProfile.image)) 
-                || (settingsProfile && (settingsProfile.photoUrl || settingsProfile.photoURL))
-                || user.photoURL 
+            const photoURL = user.photoURL 
                 || googlePhoto
+                || (userProfile && (userProfile.photoURL || userProfile.photo_url || userProfile.photoUrl || userProfile.avatarUrl || userProfile.avatar_url || userProfile.profileImage || userProfile.profile_image || userProfile.profileImageUrl || userProfile.photo || userProfile.picture || userProfile.avatar || userProfile.image)) 
+                || (settingsProfile && (settingsProfile.photoUrl || settingsProfile.photoURL))
                 || (cachedIdentity && cachedIdentity.photoURL) 
                 || '';
             renderIdentity(displayName, photoURL);

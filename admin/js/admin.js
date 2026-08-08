@@ -2277,11 +2277,7 @@ class AdminManager {
 
         const formatPhotoUrl = (url) => {
             if (!url || typeof url !== 'string') return '';
-            let cleanUrl = url.trim();
-            if (cleanUrl.includes('googleusercontent.com') && !cleanUrl.includes('=s')) {
-                cleanUrl += cleanUrl.includes('?') ? '&sz=192' : '=s192-c';
-            }
-            return cleanUrl;
+            return url.trim();
         };
 
         const renderHeaderIdentity = (name, photoURL) => {
@@ -2298,15 +2294,14 @@ class AdminManager {
 
             avatars.forEach(adminAvatar => {
                 adminAvatar.title = safeName;
-                adminAvatar.classList.add('has-initials');
 
                 if (isCustomPhoto) {
                     adminAvatar.dataset.photoUrl = formattedPhoto;
-                    adminAvatar.innerHTML = `
-                        <span class="avatar-initials-text" style="position:relative; z-index:1;">${shortInitials}</span>
-                        <img src="${formattedPhoto}" referrerpolicy="no-referrer" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; position:absolute; inset:0; z-index:2;" onerror="this.onerror=null; if(this.src.includes('=s192-c')){this.src='${formattedPhoto.replace('=s192-c','')}';}else{this.remove();}">
-                    `;
+                    adminAvatar.classList.remove('has-initials');
+                    const escapedName = safeName.replace(/"/g, '&quot;');
+                    adminAvatar.innerHTML = `<img src="${formattedPhoto}" alt="${escapedName}" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; display:block;" onerror="this.onerror=null; this.parentElement.classList.add('has-initials'); this.parentElement.innerHTML='<span class=\\'avatar-initials-text\\' style=\\'position:relative; z-index:1;\\'>${shortInitials}</span>';">`;
                 } else {
+                    adminAvatar.classList.add('has-initials');
                     adminAvatar.innerHTML = `<span class="avatar-initials-text" style="position:relative; z-index:1;">${shortInitials}</span>`;
                 }
             });
@@ -2327,7 +2322,12 @@ class AdminManager {
                 const pubRaw = localStorage.getItem('hkm_public_user_cache');
                 if (pubRaw) {
                     const pubParsed = JSON.parse(pubRaw);
-                    if (!photoURL && pubParsed?.photoURL) photoURL = pubParsed.photoURL;
+                    if (!photoURL) {
+                        photoURL = pubParsed?.photoURL || pubParsed?.photoUrl || pubParsed?.avatarUrl || pubParsed?.profileImage || pubParsed?.image || '';
+                    }
+                    if (!displayName && (pubParsed?.displayName || pubParsed?.fullName)) {
+                        displayName = pubParsed.displayName || pubParsed.fullName;
+                    }
                 }
                 return { displayName, photoURL };
             } catch (e) {
@@ -2388,7 +2388,7 @@ class AdminManager {
             || user?.displayName
             || (profile && profile.fullName)
             || user?.email;
-        const photoURL = (userProfile && (userProfile.photoURL || userProfile.photo_url || userProfile.photoUrl || userProfile.avatarUrl || userProfile.avatar_url || userProfile.profileImage || userProfile.image))
+        const photoURL = (userProfile && (userProfile.photoURL || userProfile.photo_url || userProfile.photoUrl || userProfile.avatarUrl || userProfile.avatar_url || userProfile.profileImage || userProfile.profile_image || userProfile.profileImageUrl || userProfile.photo || userProfile.picture || userProfile.avatar || userProfile.image))
             || (profile && (profile.photoUrl || profile.photoURL))
             || user?.photoURL
             || googlePhoto
@@ -20618,53 +20618,51 @@ class AdminManager {
             </style>
 
             <!-- Tabs Navigation -->
-            <div class="causes-tabs-container" style="margin-bottom: 24px;">
-                <div class="automation-tabs">
-                    <button class="automation-tab active" data-tab="dashboard">Dashboard</button>
-                    <button class="automation-tab" data-tab="causes">Innsamlinger</button>
-                    <button class="automation-tab" data-tab="donations">Pr. gave</button>
-                    <button class="automation-tab" data-tab="donors">Pr. giver</button>
-                    <button class="automation-tab" data-tab="inkind">Fysiske gaver</button>
+            <div class="automation-tabs">
+                <button class="automation-tab active" data-tab="dashboard">Dashboard</button>
+                <button class="automation-tab" data-tab="causes">Innsamlinger</button>
+                <button class="automation-tab" data-tab="donations">Pr. gave</button>
+                <button class="automation-tab" data-tab="donors">Pr. giver</button>
+                <button class="automation-tab" data-tab="inkind">Fysiske gaver</button>
+            </div>
+            
+            <!-- Toolbar for Filters and Actions -->
+            <div class="causes-toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 14px 18px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                <!-- Global Period Selector -->
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 8px;">
+                        <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; white-space: nowrap;">Periode:</label>
+                        <select id="global-date-preset" class="form-control" style="font-weight: 600; color: #0f172a; border-radius: 8px; height: 36px; padding: 0 32px 0 10px !important; font-size: 13px; min-width: 140px; margin: 0; border: 1px solid #cbd5e1; background: #fff;">
+                            <option value="today">I dag</option>
+                            <option value="7">Siste 7 dager</option>
+                            <option value="30" selected>Siste 30 dager</option>
+                            <option value="month">Denne måneden</option>
+                            <option value="year">I år</option>
+                            <option value="all">Alle</option>
+                            <option value="custom">Egendefinert</option>
+                        </select>
+                    </div>
+                    <div id="global-custom-dates" style="display: none; gap: 8px; align-items: center;">
+                        <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 4px;">
+                            <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; margin: 0;">Fra:</label>
+                            <input type="date" id="global-start-date" class="form-control" style="border-radius: 8px; height: 36px; padding: 4px 8px; font-size: 12px; border: 1px solid #cbd5e1;">
+                        </div>
+                        <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 4px;">
+                            <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; margin: 0;">Til:</label>
+                            <input type="date" id="global-end-date" class="form-control" style="border-radius: 8px; height: 36px; padding: 4px 8px; font-size: 12px; border: 1px solid #cbd5e1;">
+                        </div>
+                    </div>
                 </div>
                 
-                <!-- Toolbar for Filters and Actions -->
-                <div class="causes-toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 14px 18px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
-                    <!-- Global Period Selector -->
-                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                        <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 8px;">
-                            <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; white-space: nowrap;">Periode:</label>
-                            <select id="global-date-preset" class="form-control" style="font-weight: 600; color: #0f172a; border-radius: 8px; height: 36px; padding: 0 32px 0 10px !important; font-size: 13px; min-width: 140px; margin: 0; border: 1px solid #cbd5e1; background: #fff;">
-                                <option value="today">I dag</option>
-                                <option value="7">Siste 7 dager</option>
-                                <option value="30" selected>Siste 30 dager</option>
-                                <option value="month">Denne måneden</option>
-                                <option value="year">I år</option>
-                                <option value="all">Alle</option>
-                                <option value="custom">Egendefinert</option>
-                            </select>
-                        </div>
-                        <div id="global-custom-dates" style="display: none; gap: 8px; align-items: center;">
-                            <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 4px;">
-                                <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; margin: 0;">Fra:</label>
-                                <input type="date" id="global-start-date" class="form-control" style="border-radius: 8px; height: 36px; padding: 4px 8px; font-size: 12px; border: 1px solid #cbd5e1;">
-                            </div>
-                            <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 4px;">
-                                <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; margin: 0;">Til:</label>
-                                <input type="date" id="global-end-date" class="form-control" style="border-radius: 8px; height: 36px; padding: 4px 8px; font-size: 12px; border: 1px solid #cbd5e1;">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                        <button type="button" class="btn-primary" id="add-manual-donation-btn" style="display:flex; align-items:center; gap:8px; padding:8px 16px; border-radius:8px; font-weight:600; height:36px; font-size: 13px; margin: 0;">
-                            <span class="material-symbols-outlined" style="font-size:18px;">add_card</span>
-                            Registrer gave
-                        </button>
-                        <button type="button" class="btn-secondary" id="open-bank-import-btn" style="display:flex; align-items:center; gap:8px; padding:8px 16px; border-radius:8px; font-weight:600; height:36px; font-size: 13px; margin: 0; border: 1px solid #cbd5e1; background: #fff;">
-                            <span class="material-symbols-outlined" style="font-size:18px;">upload_file</span>
-                            Importer bank
-                        </button>
-                    </div>
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                    <button type="button" class="btn-primary" id="add-manual-donation-btn" style="display:flex; align-items:center; gap:8px; padding:8px 16px; border-radius:8px; font-weight:600; height:36px; font-size: 13px; margin: 0;">
+                        <span class="material-symbols-outlined" style="font-size:18px;">add_card</span>
+                        Registrer gave
+                    </button>
+                    <button type="button" class="btn-secondary" id="open-bank-import-btn" style="display:flex; align-items:center; gap:8px; padding:8px 16px; border-radius:8px; font-weight:600; height:36px; font-size: 13px; margin: 0; border: 1px solid #cbd5e1; background: #fff;">
+                        <span class="material-symbols-outlined" style="font-size:18px;">upload_file</span>
+                        Importer bank
+                    </button>
                 </div>
             </div>
 
@@ -21316,38 +21314,36 @@ class AdminManager {
 
         section.innerHTML = `
             <!-- Tabs Navigation -->
-            <div class="causes-tabs-container" style="margin-bottom: 24px; margin-top: 8px;">
-                <div class="automation-tabs">
-                    <button class="automation-tab active" data-tab="wix">Oversikt</button>
-                    <button class="automation-tab" data-tab="wix-orders">Ordrehistorikk</button>
-                    <button class="automation-tab" data-tab="shop">Manuelle ordre</button>
-                    <button class="automation-tab" data-tab="kurs">Kurskjøp</button>
-                </div>
-                
-                <!-- Toolbar for Period Selector -->
-                <div class="causes-toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 14px 18px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
-                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; width: 100%;">
-                        <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 8px;">
-                            <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; white-space: nowrap;">Periode:</label>
-                            <select id="shop-date-preset" class="form-control" style="font-weight: 600; color: #0f172a; border-radius: 8px; height: 36px; padding: 0 32px 0 10px !important; font-size: 13px; min-width: 140px; margin: 0; border: 1px solid #cbd5e1; background: #fff;">
-                                <option value="7">Siste 7 dager</option>
-                                <option value="30" selected>Siste 30 dager</option>
-                                <option value="90">Siste 90 dager</option>
-                                <option value="365">Siste 365 dager</option>
-                                <option value="year">Dette året</option>
-                                <option value="all">Alt tid</option>
-                                <option value="custom">Egendefinert...</option>
-                            </select>
+            <div class="automation-tabs">
+                <button class="automation-tab active" data-tab="wix">Oversikt</button>
+                <button class="automation-tab" data-tab="wix-orders">Ordrehistorikk</button>
+                <button class="automation-tab" data-tab="shop">Manuelle ordre</button>
+                <button class="automation-tab" data-tab="kurs">Kurskjøp</button>
+            </div>
+            
+            <!-- Toolbar for Period Selector -->
+            <div class="causes-toolbar shop-toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 14px 18px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; width: 100%;">
+                    <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 8px;">
+                        <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; white-space: nowrap;">Periode:</label>
+                        <select id="shop-date-preset" class="form-control" style="font-weight: 600; color: #0f172a; border-radius: 8px; height: 36px; padding: 0 32px 0 10px !important; font-size: 13px; min-width: 140px; margin: 0; border: 1px solid #cbd5e1; background: #fff;">
+                            <option value="7">Siste 7 dager</option>
+                            <option value="30" selected>Siste 30 dager</option>
+                            <option value="90">Siste 90 dager</option>
+                            <option value="365">Siste 365 dager</option>
+                            <option value="year">Dette året</option>
+                            <option value="all">Alt tid</option>
+                            <option value="custom">Egendefinert...</option>
+                        </select>
+                    </div>
+                    <div id="shop-custom-dates" style="display: none; gap: 8px; align-items: center;">
+                        <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 4px;">
+                            <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; margin: 0;">Fra:</label>
+                            <input type="date" id="shop-start-date" class="form-control" style="border-radius: 8px; height: 36px; padding: 4px 8px; font-size: 12px; border: 1px solid #cbd5e1;">
                         </div>
-                        <div id="shop-custom-dates" style="display: none; gap: 8px; align-items: center;">
-                            <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 4px;">
-                                <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; margin: 0;">Fra:</label>
-                                <input type="date" id="shop-start-date" class="form-control" style="border-radius: 8px; height: 36px; padding: 4px 8px; font-size: 12px; border: 1px solid #cbd5e1;">
-                            </div>
-                            <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 4px;">
-                                <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; margin: 0;">Til:</label>
-                                <input type="date" id="shop-end-date" class="form-control" style="border-radius: 8px; height: 36px; padding: 4px 8px; font-size: 12px; border: 1px solid #cbd5e1;">
-                            </div>
+                        <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 4px;">
+                            <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; margin: 0;">Til:</label>
+                            <input type="date" id="shop-end-date" class="form-control" style="border-radius: 8px; height: 36px; padding: 4px 8px; font-size: 12px; border: 1px solid #cbd5e1;">
                         </div>
                     </div>
                 </div>
