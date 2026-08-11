@@ -367,6 +367,9 @@ async function syncPersonTags(authHeader, personId, tags = []) {
         }).catch(err => console.warn(`Kunne ikke tagge ${tagName} på person ${personId}:`, err));
         existingTagIds.add(matchedTag.id);
       }
+
+      // Automatically ensure a matching List exists on the Planning Center Lists page
+      await ensurePcoList(authHeader, tagName).catch(() => {});
     }
   } catch (err) {
     console.warn('syncPersonTags error:', err);
@@ -425,6 +428,40 @@ async function createPcoTag(authHeader, tagGroupId, tagName) {
     return data.data;
   } catch (e) {
     console.warn(`createPcoTag error for ${tagName}:`, e);
+    return null;
+  }
+}
+
+async function ensurePcoList(authHeader, listName) {
+  if (!listName) return null;
+  try {
+    const listRes = await fetchPCO('https://api.planningcenteronline.com/people/v2/lists?per_page=100', {
+      headers: { Authorization: authHeader }
+    });
+    const listData = await listRes.json();
+    const existingLists = listData.data || [];
+    const formattedName = `HKM - ${listName.trim()}`;
+
+    const matchedList = existingLists.find(l => (l.attributes?.name || '').toLowerCase() === formattedName.toLowerCase() || (l.attributes?.name || '').toLowerCase() === listName.trim().toLowerCase());
+    if (matchedList) return matchedList.id;
+
+    const createRes = await fetchPCO('https://api.planningcenteronline.com/people/v2/lists', {
+      method: 'POST',
+      headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        data: {
+          type: 'List',
+          attributes: {
+            name: formattedName,
+            description: `Automatisk synkronisert fra HKM CRM for etiketten ${listName}`
+          }
+        }
+      })
+    });
+    const createData = await createRes.json();
+    return createData.data?.id;
+  } catch (e) {
+    console.warn(`ensurePcoList error for ${listName}:`, e);
     return null;
   }
 }
