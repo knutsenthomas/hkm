@@ -6876,6 +6876,14 @@ html[data-theme="dark"] .hkm-tasks-filters button:not(.active) {
     color: #cbd5e1 !important;
 }
 
+/* Ensure main header is ALWAYS visible across Min Side, including groups view */
+body.minside-body #dashboard-main-header,
+body.minside-body #dashboard-main-header.main-header,
+body.minside-body:has(.pco-header-bar) #dashboard-main-header {
+    display: flex !important;
+}
+
+
 
 
 

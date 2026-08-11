@@ -11998,10 +11998,10 @@ html[data-theme="dark"] .status-pill.status-completed {
         overflow: hidden !important;
     }
 
-    body.admin-body:has(.pco-header-bar) #dashboard-main-header.main-header,
-    body.minside-body:has(.pco-header-bar) #dashboard-main-header.main-header,
-    body.admin-body .crm-main #dashboard-main-header.main-header {
-        display: none !important;
+    /* Main header remains visible across all pages including groups */
+    body.minside-body #dashboard-main-header.main-header,
+    body.minside-body:has(.pco-header-bar) #dashboard-main-header.main-header {
+        display: flex !important;
     }
 
     /* Prevent header action buttons from stretching to 100% width on mobile */
