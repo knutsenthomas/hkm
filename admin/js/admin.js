@@ -14121,7 +14121,7 @@ class AdminManager {
                     }
 
                     const titleText = safeItem.title || 'Uten tittel';
-                    const author = safeItem.author || 'Mandal Regnskapskontor';
+                    const author = safeItem.author || 'His Kingdom Ministry';
                     const dateStr = safeItem.date ? new Date(safeItem.date).toLocaleDateString('no') : '';
                     const category = safeItem.category || '';
                     const coverImage = safeItem.imageUrl || '';

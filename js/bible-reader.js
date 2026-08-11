@@ -11553,7 +11553,7 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
         const copyBtn = modal.querySelector('#verse-image-copy-btn');
         if (copyBtn) {
             copyBtn.onclick = () => {
-                const shareText = `«${verseText}»\n— ${reference} ${translation ? '(' + translation + ')' : ''}\n\nLest via Mandal Regnskapskontor / HKM`;
+                const shareText = `«${verseText}»\n— ${reference} ${translation ? '(' + translation + ')' : ''}\n\nLest via His Kingdom Ministry (HKM)`;
                 navigator.clipboard.writeText(shareText).then(() => {
                     if (typeof this.showToast === 'function') {
                         this.showToast(window.location.pathname.includes('/en/') ? 'Verse text copied!' : 'Verstekst kopiert til utklippstavlen!');
@@ -11611,7 +11611,7 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                 return tempDiv.innerText.trim();
             }).join(' ');
 
-            const shareText = `«${combinedText}»\n— ${refRange} ${translation ? `(${translation})` : ''}\n\nLest via Mandal Regnskapskontor / HKM`;
+            const shareText = `«${combinedText}»\n— ${refRange} ${translation ? `(${translation})` : ''}\n\nLest via His Kingdom Ministry (HKM)`;
 
             if (navigator.share) {
                 navigator.share({

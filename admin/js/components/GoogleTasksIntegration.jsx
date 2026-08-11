@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 /**
  * GoogleTasksIntegration Component
  * Self-contained component for Google Tasks Synchronization status, connection and configuration settings.
- * Mounts dynamically onto the Integrations section of the Mandal Regnskapskontor CMS / HKM Studio.
+ * Mounts dynamically onto the Integrations section of HKM Studio.
  */
 export default function GoogleTasksIntegration() {
     const [currentUser, setCurrentUser] = useState(null);
@@ -182,7 +182,7 @@ export default function GoogleTasksIntegration() {
                 </div>
                 <div className="card-body" style={{ padding: 0, flex: 1, display: 'flex', flexDirection: 'column', justifyBetween: 'space-between', justifyContent: 'space-between' }}>
                     <p style={{ margin: '0 0 16px 0', fontSize: '13px', color: 'var(--text-secondary, #94a3b8)', lineHeight: '1.5' }}>
-                        Synkroniser oppgaver og huskelister i Mandal Regnskapskontor CMS med Google Tasks i sanntid.
+                        Synkroniser oppgaver og huskelister i HKM Studio med Google Tasks i sanntid.
                     </p>
 
                     <div className="flex flex-wrap gap-3 items-center" style={{ marginTop: '20px' }}>
