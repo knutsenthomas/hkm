@@ -2728,10 +2728,10 @@ export class HkmGroupsManager {
                                         <p style="margin: 2px 0 0 0; font-size: 13.5px; color: #174ea6; opacity: 0.9;">${this.t('groups.googleDriveDesc')}</p>
                                     </div>
                                 </div>
-                                <a href="${this.escapeHtml(group.googleDriveUrl)}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 8px; justify-content: center; padding: 10px 20px; border-radius: 12px; background: #4285f4; color: white; border: none; font-weight: 700; font-size: 13.5px; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(66,133,244,0.2);" onmouseover="this.style.transform='scale(1.03)';" onmouseout="this.style.transform='none';">
-                                    <span>${this.t('groups.googleDriveOpen')}</span>
-                                    <span class="material-symbols-outlined" style="font-size: 16px; display: block;">open_in_new</span>
-                                </a>
+                                <button type="button" class="btn-nav-to-drive-resources" style="display: inline-flex; align-items: center; gap: 8px; justify-content: center; padding: 10px 20px; border-radius: 12px; background: #4285f4; color: white; border: none; font-weight: 700; font-size: 13.5px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(66,133,244,0.2);" onmouseover="this.style.transform='scale(1.03)';" onmouseout="this.style.transform='none';">
+                                    <span>Se synkroniserte filer</span>
+                                    <span class="material-symbols-outlined" style="font-size: 18px; display: block;">folder</span>
+                                </button>
                             </div>
                         ` : ''}
                     </div>
@@ -2974,6 +2974,11 @@ export class HkmGroupsManager {
                 }
             }
         })();
+
+        tabContainer.querySelector('.btn-nav-to-drive-resources')?.addEventListener('click', () => {
+            const resTabBtn = document.querySelector('.hub-tab-btn[data-htab="resources"]');
+            if (resTabBtn) resTabBtn.click();
+        });
     }
 
     async renderHubMembers(tabContainer) {
@@ -3827,20 +3832,16 @@ export class HkmGroupsManager {
                                 </div>
                                 <div>
                                     <h3 style="margin: 0; font-size: 17.5px; font-weight: 800; color: var(--text-color, #0f172a); display: flex; align-items: center; gap: 8px;">
-                                        <span>Google Disk-område</span>
-                                        <span style="font-size: 11px; background: rgba(66,133,244,0.12); color: #1a73e8; padding: 2px 8px; border-radius: 12px; font-weight: 700;">Synkronisert</span>
+                                        <span>Google Disk (Synkronisert mappe)</span>
+                                        <span style="font-size: 11px; background: rgba(66,133,244,0.12); color: #1a73e8; padding: 2px 8px; border-radius: 12px; font-weight: 700;">Direkte i gruppen</span>
                                     </h3>
-                                    <p style="margin: 2px 0 0 0; font-size: 13px; color: var(--text-muted, #64748b);">Automatisk synkroniserte filer fra gruppens Google Disk-mappe</p>
+                                    <p style="margin: 2px 0 0 0; font-size: 13px; color: var(--text-muted, #64748b);">Filer fra gruppens Google Disk-område synkronisert på siden</p>
                                 </div>
                             </div>
-                            <a href="${this.escapeHtml(driveUrl)}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: 10px; background: #4285f4; color: white; text-decoration: none; font-size: 13px; font-weight: 700; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(66,133,244,0.2);" onmouseover="this.style.transform='scale(1.02)';" onmouseout="this.style.transform='none';">
-                                <span>Åpne i Google Disk</span>
-                                <span class="material-symbols-outlined" style="font-size: 16px;">open_in_new</span>
-                            </a>
                         </div>
                         
-                        <div style="width: 100%; height: 500px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color, #e2e8f0); background: #f8fafc; position: relative;">
-                            <iframe src="https://drive.google.com/embeddedfolderview?id=${driveFolderId}#list" style="width: 100%; height: 100%; border: none;" title="Google Disk Mappe"></iframe>
+                        <div style="width: 100%; height: 550px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color, #e2e8f0); background: #f8fafc; position: relative;">
+                            <iframe src="https://drive.google.com/embeddedfolderview?id=${driveFolderId}#list" style="width: 100%; height: 100%; border: none;" title="Google Disk Synkronisert Område"></iframe>
                         </div>
                     </div>
                 `;
@@ -3856,10 +3857,6 @@ export class HkmGroupsManager {
                                 <p style="margin: 2px 0 0 0; font-size: 13px; color: #174ea6;">Delt område for gruppens dokumenter og filer</p>
                             </div>
                         </div>
-                        <a href="${this.escapeHtml(driveUrl)}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; border-radius: 10px; background: #4285f4; color: white; font-weight: 700; font-size: 13px; text-decoration: none;">
-                            <span>Åpne Google Disk</span>
-                            <span class="material-symbols-outlined" style="font-size: 16px;">open_in_new</span>
-                        </a>
                     </div>
                 `;
             }
