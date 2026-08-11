@@ -8028,16 +8028,19 @@ class AdminManager {
 
         section.innerHTML = `
             <div class="integrations-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; align-items: stretch;">
-                <div class="card modern" style="height: 100%; display: flex; flex-direction: column;">
-                    <div class="card-header flex-between">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div style="width: 32px; height: 32px; border-radius: 8px; background: #fff1f2; color: #e11d48; display: flex; align-items: center; justify-content: center;">
-                                <span class="material-symbols-outlined" style="font-size: 20px;">video_library</span>
+                
+                <!-- YouTube Integration Card -->
+                <div class="card modern" style="height: 100%; display: flex; flex-direction: column; border-radius: 16px; padding: 24px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; border-bottom: 1px solid var(--border-color, #e2e8f0); padding-bottom: 12px;">
+                        <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+                            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(225, 29, 72, 0.15); border: 1px solid rgba(225, 29, 72, 0.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <span class="material-symbols-outlined" style="font-size: 22px; color: #e11d48; display: block;">video_library</span>
                             </div>
-                            <h3 class="card-title">YouTube</h3>
+                            <h3 class="card-title" style="margin: 0; font-size: 17px; font-weight: 700; color: var(--text-color, #f8fafc);">YouTube</h3>
                         </div>
+                        <span class="status-badge" style="background: rgba(225, 29, 72, 0.15); color: #fb7185; border: 1px solid rgba(225, 29, 72, 0.3); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 99px; white-space: nowrap;">Aktiv</span>
                     </div>
-                    <div class="card-body" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div class="card-body" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 0;">
                         <div class="form-section">
                             <div class="form-group">
                                 <label>YouTube Channel ID</label>
@@ -8058,17 +8061,18 @@ class AdminManager {
                     </div>
                 </div>
 
-                <div class="card modern" style="height: 100%; display: flex; flex-direction: column;">
-                    <div class="card-header flex-between">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div style="width: 32px; height: 32px; border-radius: 8px; background: #e0f2fe; color: #0ea5e9; display: flex; align-items: center; justify-content: center;">
-                                <span class="material-symbols-outlined" style="font-size: 20px;">calendar_month</span>
+                <!-- Google Calendar API Card -->
+                <div class="card modern" style="height: 100%; display: flex; flex-direction: column; border-radius: 16px; padding: 24px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; border-bottom: 1px solid var(--border-color, #e2e8f0); padding-bottom: 12px;">
+                        <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+                            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <span class="material-symbols-outlined" style="font-size: 22px; color: #0ea5e9; display: block;">calendar_month</span>
                             </div>
-                            <h3 class="card-title">Google Calendar API</h3>
+                            <h3 class="card-title" style="margin: 0; font-size: 17px; font-weight: 700; color: var(--text-color, #f8fafc);">Google Calendar API</h3>
                         </div>
-                        <div class="status-badge" id="gcal-status" style="font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #fee2e2; color: #991b1b; font-weight: 600;">Frakoblet</div>
+                        <div class="status-badge" id="gcal-status" style="background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 99px; white-space: nowrap;">Frakoblet</div>
                     </div>
-                    <div class="card-body" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div class="card-body" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 0;">
                         <div>
                             <div class="form-group">
                                 <label>Google API Key</label>
@@ -8087,16 +8091,18 @@ class AdminManager {
                     </div>
                 </div>
 
-                <div class="card modern" style="height: 100%; display: flex; flex-direction: column;">
-                    <div class="card-header flex-between">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div style="width: 32px; height: 32px; border-radius: 8px; background: #fef2f2; color: #ef4444; display: flex; align-items: center; justify-content: center;">
-                                <span class="material-symbols-outlined" style="font-size: 20px;">monitoring</span>
+                <!-- Google Analytics 4 Card -->
+                <div class="card modern" style="height: 100%; display: flex; flex-direction: column; border-radius: 16px; padding: 24px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; border-bottom: 1px solid var(--border-color, #e2e8f0); padding-bottom: 12px;">
+                        <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+                            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <span class="material-symbols-outlined" style="font-size: 22px; color: #ef4444; display: block;">monitoring</span>
                             </div>
-                            <h3 class="card-title">Google Analytics 4</h3>
+                            <h3 class="card-title" style="margin: 0; font-size: 17px; font-weight: 700; color: var(--text-color, #f8fafc);">Google Analytics 4</h3>
                         </div>
+                        <span class="status-badge" style="background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 99px; white-space: nowrap;">Sanntid aktiv</span>
                     </div>
-                    <div class="card-body" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div class="card-body" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 0;">
                         <div>
                             <div class="form-group" style="margin-bottom: 12px;">
                                 <label>GA4 Property ID</label>
@@ -8117,16 +8123,18 @@ class AdminManager {
                     </div>
                 </div>
 
-                <div class="card modern" style="height: 100%; display: flex; flex-direction: column;">
-                    <div class="card-header flex-between">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div style="width: 32px; height: 32px; border-radius: 8px; background: #f5f3ff; color: #7c3aed; display: flex; align-items: center; justify-content: center;">
-                                <span class="material-symbols-outlined" style="font-size: 20px;">translate</span>
+                <!-- AI & Oversettelse Card -->
+                <div class="card modern" style="height: 100%; display: flex; flex-direction: column; border-radius: 16px; padding: 24px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; border-bottom: 1px solid var(--border-color, #e2e8f0); padding-bottom: 12px;">
+                        <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+                            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(124, 58, 237, 0.15); border: 1px solid rgba(124, 58, 237, 0.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <span class="material-symbols-outlined" style="font-size: 22px; color: #a855f7; display: block;">translate</span>
                             </div>
-                            <h3 class="card-title">AI & Oversettelse</h3>
+                            <h3 class="card-title" style="margin: 0; font-size: 17px; font-weight: 700; color: var(--text-color, #f8fafc);">AI & Oversettelse</h3>
                         </div>
+                        <span class="status-badge" style="background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 99px; white-space: nowrap;">AI Aktiv</span>
                     </div>
-                    <div class="card-body" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div class="card-body" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 0;">
                         <div>
                             <div class="form-group" style="margin-bottom: 15px;">
                                 <label>Leverandør</label>
@@ -8150,16 +8158,18 @@ class AdminManager {
                     </div>
                 </div>
 
-                <div class="card modern" style="height: 100%; display: flex; flex-direction: column;">
-                    <div class="card-header flex-between">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div style="width: 32px; height: 32px; border-radius: 8px; background: #fff7ed; color: #d17d39; display: flex; align-items: center; justify-content: center;">
-                                <span class="material-symbols-outlined" style="font-size: 20px;">podcasts</span>
+                <!-- Podcast & RSS Feed Card -->
+                <div class="card modern" style="height: 100%; display: flex; flex-direction: column; border-radius: 16px; padding: 24px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; border-bottom: 1px solid var(--border-color, #e2e8f0); padding-bottom: 12px;">
+                        <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+                            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(209, 125, 57, 0.15); border: 1px solid rgba(209, 125, 57, 0.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <span class="material-symbols-outlined" style="font-size: 22px; color: #d17d39; display: block;">podcasts</span>
                             </div>
-                            <h3 class="card-title">Podcast & RSS Feed</h3>
+                            <h3 class="card-title" style="margin: 0; font-size: 17px; font-weight: 700; color: var(--text-color, #f8fafc);">Podcast & RSS Feed</h3>
                         </div>
+                        <span class="status-badge" style="background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 99px; white-space: nowrap;">RSS Synkronisert</span>
                     </div>
-                    <div class="card-body" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div class="card-body" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 0;">
                         <div>
                             <div class="form-group" style="margin-bottom: 15px;">
                                 <label>RSS Feed URL</label>
