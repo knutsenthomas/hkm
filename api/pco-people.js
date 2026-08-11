@@ -194,11 +194,17 @@ async function createOrSyncPerson(authHeader, { firstName, lastName, email, phon
 
     const data = await pcoRes.json();
     if (!pcoRes.ok) {
-      return { success: false, error: data.errors?.[0]?.detail || 'Kunne ikke opprette person i Planning Center', details: data };
+      const fallbackPerson = await findExistingPerson(authHeader, firstName, lastName, email);
+      if (fallbackPerson?.id) {
+        personId = fallbackPerson.id;
+        personData = fallbackPerson;
+      } else {
+        return { success: false, error: data.errors?.[0]?.detail || 'Kunne ikke opprette person i Planning Center', details: data };
+      }
+    } else {
+      personId = data.data?.id;
+      personData = data.data;
     }
-
-    personId = data.data?.id;
-    personData = data.data;
   }
 
   // Add email if provided and not already associated

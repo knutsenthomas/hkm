@@ -3783,9 +3783,15 @@ class CRMManager {
                 }
             }
 
-            // 3. Enroll exact members
+            // 3. Enroll exact members with rate-limiting & fallback
             let successCount = 0;
+            let i = 0;
             for (const p of syncedPeople) {
+                i++;
+                if (btn) {
+                    btn.innerHTML = `<span class="material-symbols-outlined spin" style="font-size: 16px;">sync</span> Synkroniserer (${i}/${syncedPeople.length})...`;
+                }
+
                 if (!p.email && !p.firstName) continue;
                 try {
                     const pcoPersonRes = await fetch('/api/pco-people', {
@@ -3795,7 +3801,8 @@ class CRMManager {
                             firstName: p.firstName,
                             lastName: p.lastName,
                             email: p.email,
-                            phone: p.phone
+                            phone: p.phone,
+                            createFollowupTask: false
                         })
                     });
                     const pcoPersonData = await pcoPersonRes.json();
@@ -3808,14 +3815,19 @@ class CRMManager {
                             body: JSON.stringify({ groupId: pcoGroupId, personId })
                         });
                         if (enrollRes.ok) successCount++;
+                    } else {
+                        console.warn(`Kunne ikke finne/opprette PCO personId for ${p.firstName} ${p.lastName}:`, pcoPersonData);
                     }
                 } catch (err) {
                     console.warn(`Sync error for ${p.firstName} ${p.lastName}:`, err);
                 }
+
+                // Throttle requests to stay well within Planning Center API rate limits
+                await new Promise(resolve => setTimeout(resolve, 200));
             }
 
             const pruneMsg = prunedCount > 0 ? ` (${prunedCount} overflødige medlemmer ble fjernet).` : '.';
-            alert(`✅ Suksess! Gruppen "${groupName}" er nå oppdatert med nøyaktig ${successCount} medlemmer${pruneMsg}`);
+            alert(`✅ Suksess! Gruppen "${groupName}" er nå oppdatert med ${successCount} medlemmer${pruneMsg}`);
             await this.loadPcoGroups();
         } catch (err) {
             console.error('syncHkmMembersToPcoGroup error:', err);
