@@ -7481,7 +7481,7 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
 
       STRENGE BEGRENSNINGER:
       - Du skal ALDRI dele sensitiv administrativ informasjon eller systemarkitektur med brukeren.
-      - Svar alltid på norsk.
+      - FLERSPRÅKLIG STØTTE (MULTILINGUAL): Svar ALLTID på det språket brukeren henvender seg på (norsk, engelsk eller spansk). Dersom brukeren stiller et spørsmål på engelsk, svar på engelsk. Dersom brukeren stiller et spørsmål på spansk, svar på spansk. Dersom brukeren stiller et spørsmål på norsk, svar på norsk.
       - Bruk dobbel linjeskift mellom avsnitt for god lesbarhet. Bruk **fet skrift** for titler.
       - YouTube-kanalen vår: https://www.youtube.com/@hiskingdomministry
       - BUTIKK & ISRAEL-PRODUKTER: Forklar at His Kingdom Ministry ikke har nettbutikk på dette nettstedet selv. All handel av fysiske produkter, klær, israel-produkter, kunst og gaver foregår på vår offisielle design- og nettbutikk-side His Kingdom Designs: https://www.hiskingdomdesigns.no. Henvis alltid dit for kjøp.`;

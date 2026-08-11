@@ -995,8 +995,15 @@ const minsideTranslations = {
 };
 
 // Translation Helper
+function getActiveLang() {
+    let rawLang = (document.documentElement.lang || localStorage.getItem('hkm_lang') || 'no').toLowerCase();
+    if (rawLang.startsWith('en')) return 'en';
+    if (rawLang.startsWith('es')) return 'es';
+    return 'no';
+}
+
 function t(key, vars = {}) {
-    const lang = document.documentElement.lang || 'no';
+    const lang = getActiveLang();
     let text = minsideTranslations[lang]?.[key] || minsideTranslations['no']?.[key] || key;
     Object.entries(vars).forEach(([k, v]) => {
         text = text.replace(`{${k}}`, v);
@@ -1006,7 +1013,7 @@ function t(key, vars = {}) {
 
 // Static DOM Translation Utility
 function translateStaticHTML() {
-    const lang = document.documentElement.lang || 'no';
+    const lang = getActiveLang();
     
     // Elements with data-i18n
     document.querySelectorAll('[data-i18n]').forEach(el => {
