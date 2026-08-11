@@ -3481,7 +3481,7 @@ class CRMManager {
         } finally {
             if (btn) {
                 btn.disabled = false;
-                btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px;">cloud_sync</span> <span>Planning Center Synk</span>`;
+                btn.innerHTML = `<img src="/img/pco-logo.png" alt="Planning Center" style="width: 20px; height: 20px; object-fit: contain; border-radius: 4px; display: inline-block; vertical-align: middle;"> <span>Synk</span>`;
             }
         }
     }
