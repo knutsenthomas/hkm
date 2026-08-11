@@ -12,6 +12,9 @@ const authTranslations = {
         'login.passwordPlaceholder': '••••••••',
         'login.submitLogin': 'Logg inn',
         'login.forgotPassword': 'Glemt passord?',
+        'login.forgotSubtitle': 'Skriv inn din e-postadresse, så sender vi deg en lenke for å tilbakestille passordet ditt.',
+        'login.submitForgot': 'Send tilbakestillingslenke',
+        'login.backToLogin': 'Tilbake til innlogging',
         'login.registerSubtitle': 'Opprett en profil for å få tilgang til kurs og ressurser.',
         'login.nameLabel': 'Fullt navn',
         'login.namePlaceholder': 'Ola Nordmann',
@@ -28,6 +31,8 @@ const authTranslations = {
         'auth.creatingProfile': 'Oppretter profil...',
         'auth.sendingLink': 'Sender link...',
         'auth.linkSent': 'Link sendt!',
+        'auth.sendingResetLink': 'Sender lenke...',
+        'auth.resetLinkSent': 'E-post med instruksjoner for å tilbakestille passord er sendt!',
         'auth.openingGoogle': 'Åpner Google...',
         'auth.googleSuccess': 'Google-innlogging fullført. Sender deg videre...',
         'auth.roleVerificationSlow': 'Innlogging er gjennomført, men rolleverifisering er treg. Prøver medlemssiden først.',
@@ -38,10 +43,11 @@ const authTranslations = {
         'auth.googleUnauthorizedDomain': 'Domenet er ikke godkjent for Google-innlogging i Firebase.',
         
         // Errors
-        'error.userNotFound': 'Ingen bruker funnet.',
+        'error.userNotFound': 'Ingen bruker funnet med denne e-posten.',
         'error.wrongPassword': 'Feil passord.',
         'error.emailInUse': 'Denne e-posten er allerede i bruk.',
         'error.weakPassword': 'Passordet må ha minst 6 tegn.',
+        'error.invalidEmail': 'Ugyldig e-postadresse.',
         'error.unknown': 'En ukjent feil oppstod.'
     },
     en: {
@@ -56,6 +62,9 @@ const authTranslations = {
         'login.passwordPlaceholder': '••••••••',
         'login.submitLogin': 'Log in',
         'login.forgotPassword': 'Forgot password?',
+        'login.forgotSubtitle': 'Enter your email address and we will send you a link to reset your password.',
+        'login.submitForgot': 'Send reset link',
+        'login.backToLogin': 'Back to login',
         'login.registerSubtitle': 'Create a profile to access courses and resources.',
         'login.nameLabel': 'Full name',
         'login.namePlaceholder': 'John Doe',
@@ -72,6 +81,8 @@ const authTranslations = {
         'auth.creatingProfile': 'Creating profile...',
         'auth.sendingLink': 'Sending link...',
         'auth.linkSent': 'Link sent!',
+        'auth.sendingResetLink': 'Sending link...',
+        'auth.resetLinkSent': 'An email with instructions to reset your password has been sent!',
         'auth.openingGoogle': 'Opening Google...',
         'auth.googleSuccess': 'Google login completed. Redirecting...',
         'auth.roleVerificationSlow': 'Login completed, but role verification is slow. Retrying dashboard.',
@@ -82,10 +93,11 @@ const authTranslations = {
         'auth.googleUnauthorizedDomain': 'The domain is not authorized for Google login in Firebase.',
         
         // Errors
-        'error.userNotFound': 'No user found.',
+        'error.userNotFound': 'No user found with this email.',
         'error.wrongPassword': 'Incorrect password.',
         'error.emailInUse': 'This email is already in use.',
         'error.weakPassword': 'Password must be at least 6 characters.',
+        'error.invalidEmail': 'Invalid email address.',
         'error.unknown': 'An unknown error occurred.'
     },
     es: {
@@ -100,6 +112,9 @@ const authTranslations = {
         'login.passwordPlaceholder': '••••••••',
         'login.submitLogin': 'Iniciar sesión',
         'login.forgotPassword': '¿Olvidaste tu contraseña?',
+        'login.forgotSubtitle': 'Introduce tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.',
+        'login.submitForgot': 'Enviar enlace de restablecimiento',
+        'login.backToLogin': 'Volver al inicio de sesión',
         'login.registerSubtitle': 'Crea un perfil para acceder a cursos y recursos.',
         'login.nameLabel': 'Nombre completo',
         'login.namePlaceholder': 'Juan Pérez',
@@ -116,6 +131,8 @@ const authTranslations = {
         'auth.creatingProfile': 'Creando perfil...',
         'auth.sendingLink': 'Enviando enlace...',
         'auth.linkSent': '¡Enlace enviado!',
+        'auth.sendingResetLink': 'Enviando enlace...',
+        'auth.resetLinkSent': '¡Hemos enviado un correo electrónico con instrucciones para restablecer tu contraseña!',
         'auth.openingGoogle': 'Abriendo Google...',
         'auth.googleSuccess': 'Inicio de sesión con Google completado. Redirigiendo...',
         'auth.roleVerificationSlow': 'Inicio de sesión completado, pero la verificación de rol es lenta. Intentando panel.',
@@ -126,10 +143,11 @@ const authTranslations = {
         'auth.googleUnauthorizedDomain': 'El dominio no está autorizado para el inicio de sesión de Google en Firebase.',
         
         // Errors
-        'error.userNotFound': 'No se encontró ningún usuario.',
+        'error.userNotFound': 'No se encontró ningún usuario con este correo.',
         'error.wrongPassword': 'Contraseña incorrecta.',
         'error.emailInUse': 'Este correo electrónico ya está en uso.',
         'error.weakPassword': 'La contraseña debe tener al menos 6 caracteres.',
+        'error.invalidEmail': 'Dirección de correo electrónico no válida.',
         'error.unknown': 'Ocurrió un error desconocido.'
     }
 };
@@ -417,6 +435,54 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // --- 3b. Forgot Password Form ---
+    const btnShowForgot = document.getElementById('btn-show-forgot');
+    if (btnShowForgot) {
+        btnShowForgot.addEventListener('click', () => {
+            const loginEmail = document.getElementById('login-email')?.value || '';
+            const forgotEmailInput = document.getElementById('forgot-email');
+            if (loginEmail && forgotEmailInput && !forgotEmailInput.value) {
+                forgotEmailInput.value = loginEmail;
+            }
+            setMode('forgot');
+        });
+    }
+
+    const btnCancelForgot = document.getElementById('btn-cancel-forgot');
+    if (btnCancelForgot) {
+        btnCancelForgot.addEventListener('click', () => {
+            setMode('login');
+        });
+    }
+
+    const forgotForm = document.getElementById('forgot-form');
+    if (forgotForm) {
+        forgotForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('forgot-email').value.trim();
+            const btn = e.target.querySelector('button[type="submit"]');
+
+            if (!email) return;
+
+            btn.disabled = true;
+            btn.textContent = t('auth.sendingResetLink');
+            hideMessage();
+
+            try {
+                await waitForFirebaseReady();
+                await firebase.auth().sendPasswordResetEmail(email);
+                showMessage(t('auth.resetLinkSent'), 'success');
+                btn.disabled = false;
+                btn.textContent = t('login.submitForgot');
+            } catch (error) {
+                console.error(error);
+                showMessage(getErrorMessage(error), 'error');
+                btn.disabled = false;
+                btn.textContent = t('login.submitForgot');
+            }
+        });
+    }
+
     const handleGoogleError = (error, btn, origContent) => {
         console.error(error);
         let msg = getErrorMessage(error);
@@ -546,6 +612,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             case 'auth/wrong-password': return t('error.wrongPassword');
             case 'auth/email-already-in-use': return t('error.emailInUse');
             case 'auth/weak-password': return t('error.weakPassword');
+            case 'auth/invalid-email': return t('error.invalidEmail');
+            case 'auth/missing-email': return t('error.invalidEmail');
             case 'auth/popup-blocked': return t('auth.googlePopupBlocked');
             case 'auth/popup-closed-by-user': return t('auth.googlePopupClosed');
             case 'auth/unauthorized-domain': return t('auth.googleUnauthorizedDomain');

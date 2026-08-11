@@ -496,8 +496,7 @@
                     <input type="password" id="login-password" name="password" autocomplete="current-password" class="form-control" placeholder="••••••••" data-i18n-placeholder="login.passwordPlaceholder" required>
                 </div>
                 <button type="submit" class="btn btn-primary" data-i18n="login.submitLogin">Logg inn</button>
-                <button type="button" class="toggle-auth-mode" data-i18n="login.forgotPassword"
-                    onclick="alert('Glemt passord funksjon kommer snart!')">Glemt passord?</button>
+                <button type="button" id="btn-show-forgot" class="toggle-auth-mode" data-i18n="login.forgotPassword">Glemt passord?</button>
             </form>
         </div>
 
@@ -540,6 +539,21 @@
                     <input type="email" id="email-magic" name="email" autocomplete="email" class="form-control" placeholder="din@epost.no" data-i18n-placeholder="login.emailPlaceholder" required>
                 </div>
                 <button type="submit" class="btn btn-primary" data-i18n="login.submitMagic">Send meg link</button>
+            </form>
+        </div>
+
+        <!-- Forgot Password Form -->
+        <div id="section-forgot" class="auth-mode-section">
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;" data-i18n="login.forgotSubtitle">
+                Skriv inn din e-postadresse, så sender vi deg en lenke for å tilbakestille passordet ditt.
+            </p>
+            <form id="forgot-form" method="post" action="">
+                <div class="form-group">
+                    <label data-i18n="login.emailLabel">E-post</label>
+                    <input type="email" id="forgot-email" name="email" autocomplete="email" class="form-control" placeholder="din@epost.no" data-i18n-placeholder="login.emailPlaceholder" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-bottom: 12px;" data-i18n="login.submitForgot">Send tilbakestillingslenke</button>
+                <button type="button" id="btn-cancel-forgot" class="toggle-auth-mode" style="display: block; margin: 0 auto;" data-i18n="login.backToLogin">Tilbake til innlogging</button>
             </form>
         </div>
 
