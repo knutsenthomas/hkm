@@ -3654,7 +3654,7 @@ class CRMManager {
                 }
             });
 
-            // Extract exact memberNames, leaderNames, and members from Firestore group documents
+            // Extract all memberNames, leaderNames, and members from Firestore group documents
             hkmGroupDocs.forEach(g => {
                 const rawNames = [...(g.leaderNames || []), ...(g.memberNames || []), ...(g.members || [])];
                 rawNames.forEach(n => {
@@ -3680,6 +3680,35 @@ class CRMManager {
                     }
                 });
             });
+
+            // Gather all user UIDs from memberUids & leaderUids & fetch profiles from 'users' collection
+            const uidsToSync = new Set();
+            hkmGroupDocs.forEach(g => {
+                (g.memberUids || []).forEach(uid => uidsToSync.add(uid));
+                (g.leaderUids || []).forEach(uid => uidsToSync.add(uid));
+                (g.pendingUids || []).forEach(uid => uidsToSync.add(uid));
+            });
+
+            for (const uid of uidsToSync) {
+                try {
+                    const userDoc = await db.collection('users').doc(uid).get();
+                    if (userDoc.exists) {
+                        const uData = userDoc.data();
+                        const nameParts = (uData.displayName || uData.name || '').trim().split(' ');
+                        const firstName = nameParts[0] || 'Medlem';
+                        const lastName = nameParts.slice(1).join(' ') || '';
+                        const email = uData.email || '';
+                        const phone = uData.phone || uData.phoneNumber || '';
+                        if (firstName || email) {
+                            if (!syncedPeople.some(p => (p.email && email && p.email.toLowerCase() === email.toLowerCase()) || (p.firstName.toLowerCase() === firstName.toLowerCase() && p.lastName.toLowerCase() === lastName.toLowerCase()))) {
+                                syncedPeople.push({ firstName, lastName, fullName: `${firstName} ${lastName}`.trim(), email, phone });
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.warn(`Feil ved oppslag på brukersyntaks ${uid}:`, e);
+                }
+            }
 
             // 2. Also gather contacts from CRM contacts collection matching group tags/name
             const groupNameLower = groupName.toLowerCase();
