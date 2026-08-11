@@ -1315,7 +1315,7 @@ class CRMManager {
                 <div class="crm-tool-form-grid">
                     <label class="crm-tool-field">
                         <span class="crm-tool-field-label">Gruppe E-postadresse <span style="color:red">*</span></span>
-                        <input id="crm-google-group-email" class="crm-tool-input" type="email" placeholder="f.eks. hkmprayerteam@hkm.no" required>
+                        <input id="crm-google-group-email" class="crm-tool-input" type="email" placeholder="f.eks. hkmprayerteam@hiskingdomministry.no" required>
                     </label>
                 </div>
             `,
