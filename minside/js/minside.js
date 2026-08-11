@@ -1613,9 +1613,9 @@ class MinSideManager {
             const view = el.getAttribute('data-view');
             if (view) {
                 if (activeIds.includes(view)) {
-                    el.style.display = 'flex';
+                    el.style.setProperty('display', 'flex', 'important');
                 } else {
-                    el.style.display = 'none';
+                    el.style.setProperty('display', 'none', 'important');
                 }
             }
         });
@@ -3564,6 +3564,24 @@ class MinSideManager {
             this.profileData = await this.getMergedProfile(this.currentUser);
             this.updateHeader();
             this.loadView('profile');
+        });
+
+        document.querySelectorAll('.custom-nav-cb').forEach(cb => {
+            cb.addEventListener('change', () => {
+                const checkedBoxes = Array.from(document.querySelectorAll('.custom-nav-cb:checked'));
+                const customBottomNav = checkedBoxes.map(c => c.value);
+                this.profileData.customBottomNav = customBottomNav;
+                localStorage.setItem('hkm_user_custom_nav', JSON.stringify(customBottomNav));
+                this.applyBottomNavSettings(customBottomNav);
+                
+                // Debounced background sync to Firestore
+                if (this.currentUser?.uid) {
+                    firebase.firestore().collection('users').doc(this.currentUser.uid).set(
+                        { customBottomNav },
+                        { merge: true }
+                    ).catch(err => console.warn('Background nav save error:', err));
+                }
+            });
         });
 
         document.getElementById('save-custom-nav-btn')?.addEventListener('click', async () => {

@@ -6851,5 +6851,31 @@ html[data-theme="dark"] textarea::placeholder {
     color: #64748b !important;
 }
 
+/* Dark Theme Protection for Huskeliste (Tasks) App */
+html[data-theme="dark"] #hkm-add-task-form,
+html[data-theme="dark"] .hkm-tasks-list > div,
+html[data-theme="dark"] .recent-signup-item {
+    background-color: #1e293b !important;
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] #task-input-title,
+html[data-theme="dark"] #task-input-priority {
+    background-color: #0f172a !important;
+    background: #0f172a !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .hkm-tasks-filters button:not(.active) {
+    background-color: #1e293b !important;
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #cbd5e1 !important;
+}
+
+
 
 
