@@ -8188,27 +8188,27 @@ class AdminManager {
 
                 <!-- HKM Mobilapp Card inside Integrasjoner -->
                 <div class="card modern" style="height: 100%; display: flex; flex-direction: column; border-radius: 16px; padding: 24px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid var(--border-color, #e2e8f0); padding-bottom: 12px;">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div style="width: 36px; height: 36px; border-radius: 10px; background: #fff7ed; border: 1px solid rgba(209, 125, 57, 0.2); display: flex; align-items: center; justify-content: center;">
-                                <span class="material-symbols-outlined" style="font-size: 22px; color: #d17d39;&display=block">smartphone</span>
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; border-bottom: 1px solid var(--border-color, #e2e8f0); padding-bottom: 12px;">
+                        <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+                            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(209, 125, 57, 0.15); border: 1px solid rgba(209, 125, 57, 0.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <span class="material-symbols-outlined" style="font-size: 22px; color: #d17d39; display: block;">smartphone</span>
                             </div>
-                            <h3 class="card-title" style="margin: 0; font-size: 17px; font-weight: 700;">HKM Mobilapp & PWA</h3>
+                            <h3 class="card-title" style="margin: 0; font-size: 17px; font-weight: 700; color: var(--text-color, #f8fafc);">HKM Mobilapp & PWA</h3>
                         </div>
-                        <span class="status-badge" style="background: #dcfce7; color: #15803d; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 10px;">Synkronisert</span>
+                        <span class="status-badge" style="background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 99px; white-space: nowrap;">Synkronisert</span>
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
                         <div>
-                            <p style="font-size: 13px; color: var(--text-secondary, #64748b); margin: 0 0 16px 0; line-height: 1.5;">
+                            <p style="font-size: 13px; color: var(--text-secondary, #94a3b8); margin: 0 0 16px 0; line-height: 1.5;">
                                 Sanntidssynkronisering av bibeloversettelser, leseplaner, undervisning og podcaster til mobilappen (PWA).
                             </p>
-                            <div style="font-size: 12px; color: var(--text-muted, #64748b); margin-bottom: 16px;">
+                            <div style="font-size: 12px; color: var(--text-muted, #94a3b8); margin-bottom: 16px;">
                                 Sist synkronisert: <span id="integ-pwa-last-sync" style="color: #d17d39; font-weight: 600;">Henter...</span>
                             </div>
                         </div>
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                             <button class="btn btn-primary" id="btn-integ-force-app-sync" style="background: #d17d39; color: white; font-weight: 700; border: none; padding: 10px 16px; border-radius: 10px; cursor: pointer; flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                                <span class="material-symbols-outlined" style="font-size: 18px;&display=block">sync</span>
+                                <span class="material-symbols-outlined" style="font-size: 18px; display: block;">sync</span>
                                 Tving app-synk
                             </button>
                             <button class="btn btn-secondary" onclick="window.location.hash='app'" style="padding: 10px 14px; border-radius: 10px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px;">
@@ -8276,7 +8276,7 @@ class AdminManager {
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
                         <div style="display: flex; align-items: center; gap: 16px;">
                             <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(209, 125, 57, 0.2); border: 1px solid rgba(209, 125, 57, 0.4); display: flex; align-items: center; justify-content: center;">
-                                <span class="material-symbols-outlined" style="font-size: 32px; color: #d17d39;&display=block">cloud_sync</span>
+                                <span class="material-symbols-outlined" style="font-size: 32px; color: #d17d39; display: block;">cloud_sync</span>
                             </div>
                             <div>
                                 <h3 style="margin: 0; font-size: 20px; font-weight: 700; color: white;">Sanntidssynkronisering til HKM App</h3>
@@ -8285,7 +8285,7 @@ class AdminManager {
                         </div>
                         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                             <button id="btn-force-app-sync" class="btn" style="background: #d17d39; color: white; font-weight: 700; border: none; padding: 12px 24px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: transform 0.2s, background 0.2s;">
-                                <span class="material-symbols-outlined" style="font-size: 20px;&display=block">sync</span>
+                                <span class="material-symbols-outlined" style="font-size: 20px; display: block;">sync</span>
                                 Tving synkronisering til mobilapper
                             </button>
                         </div>
@@ -8297,17 +8297,17 @@ class AdminManager {
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <div style="width: 40px; height: 40px; border-radius: 12px; background: #eff6ff; color: #3b82f6; display: flex; align-items: center; justify-content: center;">
-                                <span class="material-symbols-outlined" style="font-size: 22px;&display=block">menu_book</span>
+                                <span class="material-symbols-outlined" style="font-size: 22px; display: block;">menu_book</span>
                             </div>
                             <h4 style="margin: 0; font-size: 16px; font-weight: 700;">Bibelleser & 7 Oversettelser</h4>
                         </div>
-                        <span class="status-badge" style="background: #dcfce7; color: #15803d; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 99px;">Synkronisert</span>
+                        <span class="status-badge" style="background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 99px;">Synkronisert</span>
                     </div>
-                    <p style="font-size: 13px; color: #64748b; margin: 0 0 16px 0; line-height: 1.5;">
+                    <p style="font-size: 13px; color: #94a3b8; margin: 0 0 16px 0; line-height: 1.5;">
                         7 oversettelser (DNB 1930, NOR1921, OpenBible OTB-NB, WEB, KJV, RV1960, NVI) er tilgjengelige via Edge API-caching (<code>s-maxage=3600</code>) og hurtig-caching i PWA.
                     </p>
-                    <div style="display: flex; gap: 8px; align-items: center; font-size: 12px; color: #0f172a; font-weight: 600;">
-                        <span class="material-symbols-outlined" style="font-size: 16px; color: #22c55e;&display=block">check_circle</span>
+                    <div style="display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--text-color, #f8fafc); font-weight: 600;">
+                        <span class="material-symbols-outlined" style="font-size: 16px; color: #22c55e; display: block;">check_circle</span>
                         Offline IndexedDB cache aktiv
                     </div>
                 </div>
@@ -8316,17 +8316,17 @@ class AdminManager {
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <div style="width: 40px; height: 40px; border-radius: 12px; background: #fdf4ff; color: #c026d3; display: flex; align-items: center; justify-content: center;">
-                                <span class="material-symbols-outlined" style="font-size: 22px;&display=block">auto_stories</span>
+                                <span class="material-symbols-outlined" style="font-size: 22px; display: block;">auto_stories</span>
                             </div>
                             <h4 style="margin: 0; font-size: 16px; font-weight: 700;">Leseplaner & Devotionals</h4>
                         </div>
-                        <span class="status-badge" style="background: #dcfce7; color: #15803d; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 99px;">Synkronisert</span>
+                        <span class="status-badge" style="background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 99px;">Synkronisert</span>
                     </div>
-                    <p style="font-size: 13px; color: #64748b; margin: 0 0 16px 0; line-height: 1.5;">
+                    <p style="font-size: 13px; color: #94a3b8; margin: 0 0 16px 0; line-height: 1.5;">
                         Leseplanene synkroniseres automatisk med sidepanelet og Devotional Modal i mobilappen.
                     </p>
-                    <div style="display: flex; gap: 8px; align-items: center; font-size: 12px; color: #0f172a; font-weight: 600;">
-                        <span class="material-symbols-outlined" style="font-size: 16px; color: #22c55e;&display=block">check_circle</span>
+                    <div style="display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--text-color, #f8fafc); font-weight: 600;">
+                        <span class="material-symbols-outlined" style="font-size: 16px; color: #22c55e; display: block;">check_circle</span>
                         Sidepanel & Modal leseplan-arkitektur aktiv
                     </div>
                 </div>
@@ -8335,17 +8335,17 @@ class AdminManager {
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <div style="width: 40px; height: 40px; border-radius: 12px; background: #fff7ed; color: #ea580c; display: flex; align-items: center; justify-content: center;">
-                                <span class="material-symbols-outlined" style="font-size: 22px;&display=block">podcasts</span>
+                                <span class="material-symbols-outlined" style="font-size: 22px; display: block;">podcasts</span>
                             </div>
                             <h4 style="margin: 0; font-size: 16px; font-weight: 700;">Podcaster & Videoer</h4>
                         </div>
-                        <span class="status-badge" style="background: #dcfce7; color: #15803d; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 99px;">Synkronisert</span>
+                        <span class="status-badge" style="background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 99px;">Synkronisert</span>
                     </div>
-                    <p style="font-size: 13px; color: #64748b; margin: 0 0 16px 0; line-height: 1.5;">
+                    <p style="font-size: 13px; color: #94a3b8; margin: 0 0 16px 0; line-height: 1.5;">
                         Podcast-strøm fra Anchor.fm via <code>/api/podcast</code> API-proxy samt YouTube API-spillelister oppdateres direkte i appen.
                     </p>
-                    <div style="display: flex; gap: 8px; align-items: center; font-size: 12px; color: #0f172a; font-weight: 600;">
-                        <span class="material-symbols-outlined" style="font-size: 16px; color: #22c55e;&display=block">check_circle</span>
+                    <div style="display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--text-color, #f8fafc); font-weight: 600;">
+                        <span class="material-symbols-outlined" style="font-size: 16px; color: #22c55e; display: block;">check_circle</span>
                         Serverless API Proxy & RSS aktiv
                     </div>
                 </div>
@@ -8354,17 +8354,17 @@ class AdminManager {
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <div style="width: 40px; height: 40px; border-radius: 12px; background: #f0fdf4; color: #16a34a; display: flex; align-items: center; justify-content: center;">
-                                <span class="material-symbols-outlined" style="font-size: 22px;&display=block">calendar_month</span>
+                                <span class="material-symbols-outlined" style="font-size: 22px; display: block;">calendar_month</span>
                             </div>
                             <h4 style="margin: 0; font-size: 16px; font-weight: 700;">Arrangementer & Kalender</h4>
                         </div>
-                        <span class="status-badge" style="background: #dcfce7; color: #15803d; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 99px;">Synkronisert</span>
+                        <span class="status-badge" style="background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 99px;">Synkronisert</span>
                     </div>
-                    <p style="font-size: 13px; color: #64748b; margin: 0 0 16px 0; line-height: 1.5;">
+                    <p style="font-size: 13px; color: #94a3b8; margin: 0 0 16px 0; line-height: 1.5;">
                         To-veis synkronisering med His Kingdom Ministry Google Kalender og sanntidsoppdateringer i Firestore collection <code>content/collection_courses</code> og arrangementer.
                     </p>
-                    <div style="display: flex; gap: 8px; align-items: center; font-size: 12px; color: #0f172a; font-weight: 600;">
-                        <span class="material-symbols-outlined" style="font-size: 16px; color: #22c55e;&display=block">check_circle</span>
+                    <div style="display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--text-color, #f8fafc); font-weight: 600;">
+                        <span class="material-symbols-outlined" style="font-size: 16px; color: #22c55e; display: block;">check_circle</span>
                         Google Calendar 2-veis synk aktiv
                     </div>
                 </div>
