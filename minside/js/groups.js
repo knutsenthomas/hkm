@@ -341,6 +341,9 @@ export class HkmGroupsManager {
                 'groups.openGroup': 'Åpne gruppe',
                 'groups.noGroups': 'Ingen grupper funnet.',
                 'groups.noMyGroups': 'Du er ikke medlem av noen grupper ennå.',
+                'groups.googleDriveTitle': 'Google Disk-område',
+                'groups.googleDriveDesc': 'Delt område for gruppens dokumenter, filer og ressurser',
+                'groups.googleDriveOpen': 'Åpne Google Disk',
                 
                 // Group Hub
                 'groups.hubOverview': 'Oversikt',
@@ -446,6 +449,9 @@ export class HkmGroupsManager {
                 'groups.openGroup': 'Open group',
                 'groups.noGroups': 'No groups found.',
                 'groups.noMyGroups': 'You are not a member of any groups yet.',
+                'groups.googleDriveTitle': 'Google Drive Area',
+                'groups.googleDriveDesc': 'Shared area for group documents and files',
+                'groups.googleDriveOpen': 'Open Google Drive',
                 
                 // Group Hub
                 'groups.hubOverview': 'Overview',
@@ -796,6 +802,10 @@ export class HkmGroupsManager {
                             <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">WhatsApp Gruppelenke (valgfri)</label>
                             <input type="url" id="group-whatsapp-input" placeholder="f.eks. https://chat.whatsapp.com/..." style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a);">
                         </div>
+                        <div>
+                            <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Google Disk Mappelenke (valgfri)</label>
+                            <input type="url" id="group-google-drive-input" placeholder="f.eks. https://drive.google.com/drive/folders/..." style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a);">
+                        </div>
                         <div style="display: grid; grid-template-columns: 1fr; gap: 16px;">
                             <div>
                                 <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Påmeldingstype</label>
@@ -1051,6 +1061,7 @@ export class HkmGroupsManager {
                             <select id="group-resource-type-input" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color, #cbd5e1); background: var(--input-bg, #fff); color: var(--text-color, #0f172a);">
                                 <option value="PDF">PDF-hefte</option>
                                 <option value="Dokument">Dokument / Ark</option>
+                                <option value="Google Disk">Google Disk-mappe / Fil</option>
                                 <option value="Lenke">Nettside-lenke</option>
                                 <option value="Video">Video-lenke</option>
                             </select>
@@ -2704,6 +2715,25 @@ export class HkmGroupsManager {
                                 </a>
                             </div>
                         ` : ''}
+
+                        <!-- Google Drive Widget -->
+                        ${group.googleDriveUrl ? `
+                            <div style="background: linear-gradient(135deg, rgba(66,133,244,0.08) 0%, rgba(66,133,244,0.02) 100%); border: 1px solid rgba(66,133,244,0.2); border-radius: 16px; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(66,133,244,0.05);" onmouseover="this.style.borderColor='rgba(66,133,244,0.4)';" onmouseout="this.style.borderColor='rgba(66,133,244,0.2)';">
+                                <div style="display: flex; align-items: center; gap: 16px; min-width: 250px;">
+                                    <div style="background: #4285f4; color: white; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(66,133,244,0.3);">
+                                        <span class="material-symbols-outlined" style="font-size: 24px;">folder_shared</span>
+                                    </div>
+                                    <div>
+                                        <h4 style="margin: 0; font-size: 15.5px; font-weight: 700; color: #1a73e8;">${this.t('groups.googleDriveTitle')}</h4>
+                                        <p style="margin: 2px 0 0 0; font-size: 13.5px; color: #174ea6; opacity: 0.9;">${this.t('groups.googleDriveDesc')}</p>
+                                    </div>
+                                </div>
+                                <a href="${this.escapeHtml(group.googleDriveUrl)}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 8px; justify-content: center; padding: 10px 20px; border-radius: 12px; background: #4285f4; color: white; border: none; font-weight: 700; font-size: 13.5px; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(66,133,244,0.2);" onmouseover="this.style.transform='scale(1.03)';" onmouseout="this.style.transform='none';">
+                                    <span>${this.t('groups.googleDriveOpen')}</span>
+                                    <span class="material-symbols-outlined" style="font-size: 16px; display: block;">open_in_new</span>
+                                </a>
+                            </div>
+                        ` : ''}
                     </div>
 
                     <!-- Right Column: Practical Info Card -->
@@ -3835,6 +3865,7 @@ export class HkmGroupsManager {
                 if (res.type === 'PDF') icon = 'picture_as_pdf';
                 else if (res.type === 'Lenke') icon = 'link';
                 else if (res.type === 'Video') icon = 'video_library';
+                else if (res.type === 'Google Disk') icon = 'folder_shared';
 
                 return `
                     <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-radius: 12px; background: var(--bg-muted, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); gap: 16px; flex-wrap: wrap;">
@@ -4087,6 +4118,7 @@ export class HkmGroupsManager {
             form.querySelector('#group-zoom-passcode-input').value = groupToEdit.zoomPasscode || '';
             form.querySelector('#group-description-input').value = groupToEdit.description || '';
             form.querySelector('#group-whatsapp-input').value = groupToEdit.whatsappUrl || '';
+            form.querySelector('#group-google-drive-input').value = groupToEdit.googleDriveUrl || '';
             form.querySelector('#group-policy-input').value = groupToEdit.joinPolicy || 'open';
             form.querySelector('#group-image-input').value = groupToEdit.imageUrl || '';
             if (previewEl) previewEl.src = groupToEdit.imageUrl || defaultImg;
@@ -4096,6 +4128,7 @@ export class HkmGroupsManager {
             form.querySelector('#group-zoom-id-input').value = '';
             form.querySelector('#group-zoom-passcode-input').value = '';
             form.querySelector('#group-whatsapp-input').value = '';
+            form.querySelector('#group-google-drive-input').value = '';
             form.querySelector('#group-image-input').value = '';
             if (previewEl) previewEl.src = defaultImg;
         }
@@ -4156,6 +4189,7 @@ export class HkmGroupsManager {
             zoomPasscode: form.querySelector('#group-zoom-passcode-input').value.trim(),
             description: form.querySelector('#group-description-input').value.trim(),
             whatsappUrl: form.querySelector('#group-whatsapp-input').value.trim(),
+            googleDriveUrl: form.querySelector('#group-google-drive-input').value.trim(),
             joinPolicy: form.querySelector('#group-policy-input').value,
             imageUrl: form.querySelector('#group-image-input').value.trim() || 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80',
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
