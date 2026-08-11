@@ -152,6 +152,7 @@ const minsideTranslations = {
         'overview.noEvents': 'Ingen planlagte arrangementer for øyeblikket.',
         'overview.noPrayersYet': 'Ingen bønneemner ennå. Bli den første til å legge inn et bønneemne på veggen.',
         'overview.prayedCountText': '{n} ber',
+        'overview.noActivePlan': 'Ingen aktiv plan',
 
         // Profile
         'profile.contactInfo': 'Kontaktinformasjon',
@@ -351,7 +352,23 @@ const minsideTranslations = {
         'prayer.editModalSaving': 'Lagrer...',
         'prayer.errUpdate': 'Kunne ikke oppdatere bønneemnet: ',
         'prayer.disabledTitle': 'Bønneveggen er deaktivert',
-        'prayer.disabledMsg': 'Bønneveggen er for øyeblikket ikke tilgjengelig.'
+        'prayer.disabledMsg': 'Bønneveggen er for øyeblikket ikke tilgjengelig.',
+
+        // Reading Plans
+        'readingPlans.startedTitle': 'Dine påbegynte leseplaner',
+        'readingPlans.daysUnit': '{n} dager',
+        'readingPlans.completedPct': '{n}% fullført',
+        'readingPlans.btnSeeDays': 'Se dager',
+        'readingPlans.btnContinue': 'Fortsett plan',
+        'readingPlans.completedTitle': 'Fullførte leseplaner 🎉',
+        'readingPlans.completedPctBadge': '100% Fullført',
+        'readingPlans.btnSeeNotesDays': 'Se notater / dager',
+        'readingPlans.btnReadAgain': 'Les på nytt',
+        'readingPlans.emptyTitle': 'Ingen leseplaner ennå',
+        'readingPlans.emptySub': 'Du har ikke startet noen leseplaner ennå.',
+        'readingPlans.btnFindPlan': 'Finn en leseplan',
+        'readingPlans.previewNotice': 'Du forhåndsviser denne leseplanen',
+        'readingPlans.btnSelectThisPlan': 'Velg denne planen'
     },
     en: {
         'common.loading': 'Loading',
@@ -462,6 +479,7 @@ const minsideTranslations = {
         'overview.noEvents': 'No scheduled events at the moment.',
         'overview.noPrayersYet': 'No prayer requests yet. Be the first to post a request on the wall.',
         'overview.prayedCountText': '{n} praying',
+        'overview.noActivePlan': 'No active plan',
 
         // Profile
         'profile.contactInfo': 'Contact Information',
@@ -772,6 +790,7 @@ const minsideTranslations = {
         'overview.noEvents': 'No hay eventos programados en este momento.',
         'overview.noPrayersYet': 'No hay peticiones de oración aún. Sé el primero en publicar una petición.',
         'overview.prayedCountText': '{n} orando',
+        'overview.noActivePlan': 'Sin plan activo',
 
         // Profile
         'profile.contactInfo': 'Información de Contacto',
@@ -2423,7 +2442,7 @@ class MinSideManager {
 
             // Progress render
             let progressPct = 0;
-            let progressTitle = 'Ingen aktiv plan';
+            let progressTitle = t('overview.noActivePlan');
             if (plansSnap && !plansSnap.empty) {
                 // Sort active plans in memory by lastActiveAt desc
                 const activePlans = plansSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -2763,7 +2782,7 @@ class MinSideManager {
                     ovEventsFeed.innerHTML = `
                         <div class="empty-state ms-empty-state-compact" style="grid-column: 1 / -1; padding: 24px; text-align: center; width: 100%;">
                             <span class="material-symbols-outlined" style="font-size: 32px; color: var(--text-muted);">calendar_today</span>
-                            <p style="font-size: 13.5px; color: var(--text-muted); margin: 8px 0 0 0;">Ingen planlagte arrangementer for øyeblikket.</p>
+                            <p style="font-size: 13.5px; color: var(--text-muted); margin: 8px 0 0 0;">${t('overview.noEvents')}</p>
                         </div>
                     `;
                 }

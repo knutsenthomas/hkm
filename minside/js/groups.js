@@ -316,8 +316,17 @@ export class HkmGroupsManager {
         return clean;
     }
 
+    getLang() {
+        let raw = (document.documentElement.lang || localStorage.getItem('hkm_lang') || 'no').toLowerCase();
+        if (raw.startsWith('en')) return 'en';
+        if (raw.startsWith('es')) return 'es';
+        return 'no';
+    }
+
     t(key) {
-        const lang = document.documentElement.lang || 'no';
+        if (!key) return '';
+        const lang = this.getLang();
+        const cleanKey = typeof key === 'string' ? key.trim() : key;
         const localDict = {
             no: {
                 'groups.title': 'Smågrupper',
@@ -636,14 +645,18 @@ export class HkmGroupsManager {
 
         try {
             if (typeof window.t === 'function') {
-                const globalVal = window.t(key);
-                if (globalVal && globalVal !== key) {
+                const globalVal = window.t(cleanKey);
+                if (globalVal && globalVal !== cleanKey && globalVal !== key) {
                     return globalVal;
                 }
             }
         } catch (e) {}
 
-        return localDict[lang]?.[key] || localDict['no']?.[key] || key;
+        return localDict[lang]?.[cleanKey] || 
+               localDict[lang]?.[key] || 
+               localDict['no']?.[cleanKey] || 
+               localDict['no']?.[key] || 
+               key;
     }
 
     translateCategory(categoryName) {
