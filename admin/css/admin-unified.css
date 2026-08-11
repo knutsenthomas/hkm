@@ -5374,7 +5374,7 @@ body.builder-active #dashboard-main-header {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  padding: 0 40px !important;
+  padding: 0 24px !important;
   position: sticky !important;
   top: 0 !important;
   z-index: 1000 !important;
@@ -5705,7 +5705,7 @@ body.builder-active #dashboard-main-header {
   height: 72px !important;
   min-height: 72px !important;
   width: 100% !important;
-  padding: 0 40px !important;
+  padding: 0 24px !important;
   margin: 0 !important;
   background: #ffffff !important;
   border-bottom: 1px solid rgba(15, 23, 42, 0.06) !important;
