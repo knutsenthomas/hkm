@@ -31241,25 +31241,59 @@ class AdminManager {
             }
 
             return `
+            const isApproved = status === 'paid' || status === 'success';
+            const approveBtn = !isApproved ? `
+                <button class="btn-primary" onclick="window.adminManager._approveEnrollment('${item.id}')" style="padding:5px 8px;border-radius:6px;font-size:11px;background:#16a34a;border:none;color:white;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:3px;white-space:nowrap;">
+                    <span class="material-symbols-outlined" style="font-size:13px;">check_circle</span> Godkjenn
+                </button>
+            ` : '';
+
+            const refundBtn = status !== 'refunded' ? `
+                <button class="btn-secondary" onclick="window.adminManager._markEnrollmentRefunded('${item.id}')" style="padding:5px 6px;border-radius:6px;font-size:11px;color:#ef4444;border-color:#fee2e2;background:white;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;" title="Marker som refundert">
+                    <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">keyboard_return</span>
+                </button>
+            ` : '';
+
+            const paidLessonsCount = Array.isArray(item.paidLessons) ? item.paidLessons.length : 0;
+            const courseObj = (this.coursesItems || []).find(c => c.id === item.courseId || c.title === item.courseTitle);
+            const totalLessons = courseObj && Array.isArray(courseObj.lessons) ? courseObj.lessons.length : 0;
+
+            let accessIcon = 'lock';
+            let accessColor = '#ef4444';
+            let accessText = 'Ingen tilgang';
+
+            if (isApproved) {
+                accessIcon = 'lock_open';
+                accessColor = '#16a34a';
+                accessText = paidLessonsCount > 0 && paidLessonsCount < totalLessons
+                    ? `${paidLessonsCount}/${totalLessons} deler`
+                    : 'Full tilgang';
+            } else if (paidLessonsCount > 0) {
+                accessIcon = 'lock_open';
+                accessColor = '#d17d39';
+                accessText = `${paidLessonsCount}/${totalLessons} godkjent`;
+            }
+
+            return `
                 <tr>
-                    <td style="width: 25%; min-width: 140px; padding-right: 8px;">
+                    <td style="width: 22%; min-width: 140px; padding-right: 8px;">
                         <div style="font-weight: 600; color: #1e293b; font-size: 0.88rem;">${name}</div>
                         <div style="font-size: 0.8rem; color: #64748b; word-break: break-all; overflow-wrap: anywhere;">${email}</div>
                         <div style="font-size: 0.8rem; color: #64748b;">${phone}</div>
                     </td>
-                    <td style="width: 22%; min-width: 130px; padding-right: 8px;">
+                    <td style="width: 20%; min-width: 130px; padding-right: 8px;">
                         <div style="font-weight: 600; color: #1e293b; font-size: 0.88rem;">${courseTitle}</div>
                         <div style="font-size: 0.8rem; color: ${accessColor}; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;">
                             <span class="material-symbols-outlined" style="font-size: 13px;">${accessIcon}</span> ${accessText}
                         </div>
                     </td>
-                    <td style="width: 12%; min-width: 85px; padding-right: 8px;">
+                    <td style="width: 11%; min-width: 85px; padding-right: 8px;">
                         <div style="font-weight: 600; color: #1e293b; font-size: 0.88rem;">kr ${amount.toLocaleString('no-NO')}</div>
                         <div style="font-size: 0.8rem; color: #64748b;">${method}</div>
                     </td>
-                    <td style="width: 13%; min-width: 95px; font-size: 0.8rem; color: #475569; padding-right: 8px;">${dateStr}</td>
-                    <td style="width: 10%; min-width: 85px; padding-right: 8px;"><span class="badge ${badgeClass}">${badgeText}</span></td>
-                    <td class="col-actions" style="width: 220px; min-width: 220px; text-align: right; white-space: nowrap; padding-right: 12px;">
+                    <td style="width: 11%; min-width: 95px; font-size: 0.8rem; color: #475569; padding-right: 8px;">${dateStr}</td>
+                    <td style="width: 8%; min-width: 85px; padding-right: 8px;"><span class="badge ${badgeClass}">${badgeText}</span></td>
+                    <td class="col-actions" style="width: 28%; min-width: 230px; text-align: right; white-space: nowrap; padding-right: 12px;">
                         <div style="display:flex; gap:3px; justify-content:flex-end; align-items:center;">
                             ${approveBtn}
                             <button class="btn-secondary" onclick="window.adminManager._openLessonAccessModal('${item.id}')" style="padding:5px 8px;border-radius:6px;font-size:11px;display:inline-flex;align-items:center;gap:3px;cursor:pointer;font-weight:600;white-space:nowrap;">
@@ -31277,15 +31311,15 @@ class AdminManager {
 
         list.innerHTML = `
             <div class="table-container full-bleed" style="overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; box-sizing: border-box;">
-                <table class="crm-table" style="table-layout: fixed; width: 100%; min-width: 760px;">
+                <table class="crm-table enrollment-responsive-table" style="table-layout: fixed; width: 100%; min-width: 850px;">
                     <thead>
                         <tr>
-                            <th style="width: 25%; min-width: 140px; padding-right: 8px;">Deltaker</th>
-                            <th style="width: 22%; min-width: 130px; padding-right: 8px;">Kurs & Tilgang</th>
-                            <th style="width: 12%; min-width: 85px; padding-right: 8px;">Beløp / Metode</th>
-                            <th style="width: 13%; min-width: 95px; padding-right: 8px;">Dato registrert</th>
-                            <th style="width: 10%; min-width: 85px; padding-right: 8px;">Status</th>
-                            <th style="width: 220px; min-width: 220px; text-align: right; padding-right: 12px;">Handlinger</th>
+                            <th style="width: 22%; min-width: 140px; padding-right: 8px;">Deltaker</th>
+                            <th style="width: 20%; min-width: 130px; padding-right: 8px;">Kurs & Tilgang</th>
+                            <th style="width: 11%; min-width: 85px; padding-right: 8px;">Beløp / Metode</th>
+                            <th style="width: 11%; min-width: 95px; padding-right: 8px;">Dato registrert</th>
+                            <th style="width: 8%; min-width: 85px; padding-right: 8px;">Status</th>
+                            <th style="width: 28%; min-width: 230px; text-align: right; padding-right: 12px;">Handlinger</th>
                         </tr>
                     </thead>
                     <tbody>${rows}</tbody>
