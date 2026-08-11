@@ -31215,8 +31215,8 @@ class AdminManager {
             ` : '';
 
             const refundBtn = status !== 'refunded' ? `
-                <button class="btn-secondary" onclick="window.adminManager._markEnrollmentRefunded('${item.id}')" style="padding:6px 10px;border-radius:6px;font-size:12px;color:#ef4444;border-color:#fee2e2;background:white;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:4px;">
-                    <span class="material-symbols-outlined" style="font-size:14px;">keyboard_return</span> Refundert
+                <button class="btn-secondary" onclick="window.adminManager._markEnrollmentRefunded('${item.id}')" style="padding:6px 8px;border-radius:6px;font-size:12px;color:#ef4444;border-color:#fee2e2;background:white;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:4px;" title="Marker som refundert">
+                    <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">keyboard_return</span>
                 </button>
             ` : '';
 
@@ -31242,31 +31242,31 @@ class AdminManager {
 
             return `
                 <tr>
-                    <td style="min-width: 180px;">
+                    <td style="min-width: 150px; padding-right: 12px;">
                         <div style="font-weight: 600; color: #1e293b;">${name}</div>
                         <div style="font-size: 0.85rem; color: #64748b; word-break: break-all;">${email}</div>
                         <div style="font-size: 0.85rem; color: #64748b;">${phone}</div>
                     </td>
-                    <td style="min-width: 160px;">
+                    <td style="min-width: 140px; padding-right: 12px;">
                         <div style="font-weight: 600; color: #1e293b;">${courseTitle}</div>
                         <div style="font-size: 0.85rem; color: ${accessColor}; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
                             <span class="material-symbols-outlined" style="font-size: 14px;">${accessIcon}</span> ${accessText}
                         </div>
                     </td>
-                    <td style="min-width: 110px;">
+                    <td style="min-width: 90px; padding-right: 12px;">
                         <div style="font-weight: 600; color: #1e293b;">kr ${amount.toLocaleString('no-NO')}</div>
                         <div style="font-size: 0.85rem; color: #64748b;">${method}</div>
                     </td>
-                    <td style="font-size: 0.9rem; color: #475569; min-width: 110px;">${dateStr}</td>
-                    <td style="min-width: 100px;"><span class="badge ${badgeClass}">${badgeText}</span></td>
-                    <td class="col-actions" style="text-align:right;white-space:nowrap; min-width: 150px;">
-                        <div style="display:flex;gap:6px;justify-content:flex-end;align-items:center;">
+                    <td style="font-size: 0.85rem; color: #475569; min-width: 100px; padding-right: 12px;">${dateStr}</td>
+                    <td style="min-width: 90px; padding-right: 12px;"><span class="badge ${badgeClass}">${badgeText}</span></td>
+                    <td class="col-actions" style="text-align:right; white-space:nowrap; min-width: 250px; width: 250px; padding-right: 16px;">
+                        <div style="display:flex;gap:4px;justify-content:flex-end;align-items:center;">
                             ${approveBtn}
                             <button class="btn-secondary" onclick="window.adminManager._openLessonAccessModal('${item.id}')" style="padding:6px 10px;border-radius:6px;font-size:12px;display:inline-flex;align-items:center;gap:4px;cursor:pointer;font-weight:600;">
                                 <span class="material-symbols-outlined" style="font-size:14px;">rule</span> Leksjoner
                             </button>
                             ${refundBtn}
-                            <button class="btn-secondary" onclick="window.adminManager._deleteEnrollment('${item.id}')" style="padding:6px 10px;border-radius:6px;font-size:12px;color:#ef4444;background:#fef2f2;border:none;cursor:pointer;" title="Slett påmelding">
+                            <button class="btn-secondary" onclick="window.adminManager._deleteEnrollment('${item.id}')" style="padding:6px 8px;border-radius:6px;font-size:12px;color:#ef4444;background:#fef2f2;border:none;cursor:pointer;" title="Slett påmelding">
                                 <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">delete</span>
                             </button>
                         </div>
@@ -31276,16 +31276,16 @@ class AdminManager {
         }).join('');
 
         list.innerHTML = `
-            <div class="table-container full-bleed" style="overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%;">
-                <table class="crm-table" style="min-width: 700px; width: 100%;">
+            <div class="table-container full-bleed" style="overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; box-sizing: border-box;">
+                <table class="crm-table" style="min-width: 820px; width: 100%;">
                     <thead>
                         <tr>
-                            <th style="min-width: 180px;">Deltaker</th>
-                            <th style="min-width: 160px;">Kurs & Tilgang</th>
-                            <th style="min-width: 110px;">Beløp / Metode</th>
-                            <th style="min-width: 110px;">Dato registrert</th>
-                            <th style="min-width: 100px;">Status</th>
-                            <th style="text-align:right; min-width: 150px;">Handlinger</th>
+                            <th style="min-width: 150px; padding-right: 12px;">Deltaker</th>
+                            <th style="min-width: 140px; padding-right: 12px;">Kurs & Tilgang</th>
+                            <th style="min-width: 90px; padding-right: 12px;">Beløp / Metode</th>
+                            <th style="min-width: 100px; padding-right: 12px;">Dato registrert</th>
+                            <th style="min-width: 90px; padding-right: 12px;">Status</th>
+                            <th style="text-align:right; min-width: 250px; width: 250px; padding-right: 16px;">Handlinger</th>
                         </tr>
                     </thead>
                     <tbody>${rows}</tbody>

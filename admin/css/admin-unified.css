@@ -2424,8 +2424,8 @@ body.crm-body .crm-table {
 .crm-table td.col-actions {
   display: table-cell !important;
   white-space: nowrap;
-  width: 110px;
-  min-width: 110px;
+  width: auto;
+  min-width: 140px;
   text-align: right;
   padding-right: 24px;
 }
