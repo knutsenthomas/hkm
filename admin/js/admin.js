@@ -9983,16 +9983,18 @@ class AdminManager {
         if (!authContainer) return;
 
         authContainer.innerHTML = this.googleAccessToken ? `
-            <div style="display: flex; align-items: center; gap: 10px; padding: 12px; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0;">
-                <span class="material-symbols-outlined" style="color: #16a34a; pointer-events: none;">check_circle</span>
-                <div style="flex: 1; pointer-events: none;">
-                    <p style="font-size: 13px; font-weight: 600; color: #166534; margin: 0;">Tilkoblet Google</p>
-                    <p style="font-size: 11px; color: #15803d; margin: 0;">Skrivetilgang er aktivert</p>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; background: rgba(34, 197, 94, 0.1); border-radius: 12px; border: 1px solid rgba(34, 197, 94, 0.25);">
+                <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                    <span class="material-symbols-outlined" style="color: #4ade80; font-size: 22px; pointer-events: none; display: block; flex-shrink: 0;">check_circle</span>
+                    <div style="pointer-events: none; min-width: 0;">
+                        <p style="font-size: 13px; font-weight: 700; color: var(--text-color, #f8fafc); margin: 0;">Tilkoblet Google</p>
+                        <p style="font-size: 11px; color: #4ade80; margin: 2px 0 0 0; font-weight: 500;">Skrivetilgang er aktivert</p>
+                    </div>
                 </div>
-                <button id="disconnect-google" class="btn btn-outline" style="color: #dc2626; border-color: #fca5a5; font-size: 12px; padding: 4px 8px;">Koble fra</button>
+                <button id="disconnect-google" class="btn" style="background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); font-size: 12px; font-weight: 600; padding: 8px 14px; border-radius: 10px; cursor: pointer; transition: all 0.2s; white-space: nowrap;">Koble fra</button>
             </div>
         ` : `
-            <button class="btn btn-outline" id="connect-google-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <button class="btn btn-outline" id="connect-google-btn" style="width: 100%; height: 42px; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 10px; font-weight: 600; cursor: pointer;">
                 <img src="https://www.google.com/favicon.ico" width="16" height="16" alt="Google" style="pointer-events: none;">
                 <span style="pointer-events: none;">Koble til Google for skrivetilgang</span>
             </button>
