@@ -5283,7 +5283,10 @@ class AdminManager {
             const styleEl = document.createElement('style');
             styleEl.id = 'overview-dashboard-styles';
             styleEl.textContent = `
-                #overview-section {
+                #overview-section:not(.active) {
+                    display: none !important;
+                }
+                #overview-section.active {
                     display: flex !important;
                     flex-direction: column !important;
                     gap: 24px !important;
