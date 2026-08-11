@@ -3649,9 +3649,36 @@ class CRMManager {
             let hkmGroupDocs = [];
             groupsSnap.forEach(doc => {
                 const data = doc.data();
-                if (data.pcoGroupId === pcoGroupId || (data.name || '').toLowerCase().includes('bønn') || (data.name || '').toLowerCase().includes('prayer')) {
+                if (data.pcoGroupId === pcoGroupId || (data.name || '').toLowerCase().includes('bønn') || (data.name || '').toLowerCase().includes('prayer') || doc.id === 'tQwjAxNHl7Ihk6jwcW2') {
                     hkmGroupDocs.push({ id: doc.id, ...data });
                 }
+            });
+
+            // Extract all memberNames, leaderNames, and members from Firestore group documents
+            hkmGroupDocs.forEach(g => {
+                const rawNames = [...(g.leaderNames || []), ...(g.memberNames || []), ...(g.members || [])];
+                rawNames.forEach(n => {
+                    if (typeof n === 'string' && n.trim()) {
+                        const nameParts = n.trim().split(' ');
+                        const firstName = nameParts[0] || 'Medlem';
+                        const lastName = nameParts.slice(1).join(' ') || '';
+                        if (!syncedPeople.some(p => p.firstName.toLowerCase() === firstName.toLowerCase() && p.lastName.toLowerCase() === lastName.toLowerCase())) {
+                            syncedPeople.push({ firstName, lastName, email: '', phone: '' });
+                        }
+                    } else if (typeof n === 'object' && n) {
+                        const nName = n.name || `${n.firstName || ''} ${n.lastName || ''}`.trim();
+                        if (nName) {
+                            const nameParts = nName.split(' ');
+                            const firstName = nameParts[0] || 'Medlem';
+                            const lastName = nameParts.slice(1).join(' ') || '';
+                            const email = n.email || '';
+                            const phone = n.phone || n.phoneNumber || '';
+                            if (!syncedPeople.some(p => (p.email && email && p.email.toLowerCase() === email.toLowerCase()) || (p.firstName.toLowerCase() === firstName.toLowerCase() && p.lastName.toLowerCase() === lastName.toLowerCase()))) {
+                                syncedPeople.push({ firstName, lastName, email, phone });
+                            }
+                        }
+                    }
+                });
             });
 
             // Gather all user UIDs from memberUids & leaderUids
@@ -3674,7 +3701,9 @@ class CRMManager {
                         const email = uData.email || '';
                         const phone = uData.phone || uData.phoneNumber || '';
                         if (email || firstName) {
-                            syncedPeople.push({ firstName, lastName, email, phone });
+                            if (!syncedPeople.some(p => (p.email && email && p.email.toLowerCase() === email.toLowerCase()) || (p.firstName.toLowerCase() === firstName.toLowerCase() && p.lastName.toLowerCase() === lastName.toLowerCase()))) {
+                                syncedPeople.push({ firstName, lastName, email, phone });
+                            }
                         }
                     }
                 } catch (e) {}
@@ -3689,26 +3718,11 @@ class CRMManager {
                 const lastName = nameParts.slice(1).join(' ') || '';
                 const email = c.email || '';
                 const phone = c.phone || c.phoneNumber || '';
-                const labelsStr = JSON.stringify(c.labels || [c.label] || []).toLowerCase();
 
-                if (labelsStr.includes('bønn') || labelsStr.includes('prayer') || labelsStr.includes('leder') || labelsStr.includes('frivillig')) {
-                    if (!syncedPeople.some(p => p.email && email && p.email.toLowerCase() === email.toLowerCase())) {
-                        syncedPeople.push({ firstName, lastName, email, phone });
-                    }
+                if (!syncedPeople.some(p => (p.email && email && p.email.toLowerCase() === email.toLowerCase()) || (p.firstName.toLowerCase() === firstName.toLowerCase() && p.lastName.toLowerCase() === lastName.toLowerCase()))) {
+                    syncedPeople.push({ firstName, lastName, email, phone });
                 }
             });
-
-            // Fallback: If no specific group matches, sync all CRM contacts to PCO group
-            if (syncedPeople.length === 0 && this.contacts && this.contacts.length > 0) {
-                this.contacts.forEach(c => {
-                    const nameParts = (c.name || c.displayName || `${c.firstName || ''} ${c.lastName || ''}`).trim().split(' ');
-                    const firstName = nameParts[0] || 'Medlem';
-                    const lastName = nameParts.slice(1).join(' ') || '';
-                    const email = c.email || '';
-                    const phone = c.phone || c.phoneNumber || '';
-                    if (email) syncedPeople.push({ firstName, lastName, email, phone });
-                });
-            }
 
             let successCount = 0;
             for (const p of syncedPeople) {
