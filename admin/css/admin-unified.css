@@ -2858,7 +2858,7 @@ body.builder-active .main-header {
   min-height: 72px !important;
   background: #ffffff !important;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
-  padding: 0 32px !important;
+  padding: 0 20px !important;
   position: sticky !important;
   top: 0 !important;
   z-index: 1000 !important;
@@ -2873,8 +2873,8 @@ body.builder-active .main-header {
   body.crm-body .main-header,
   body.minside-body .main-header,
   body.builder-active .main-header {
-    padding-left: 32px;
-    padding-right: 32px;
+    padding-left: 20px;
+    padding-right: 20px;
   }
 }
 
@@ -12080,7 +12080,7 @@ html[data-theme="dark"] .status-pill.status-completed {
         border-radius: 0 !important;
         border: none !important;
         border-bottom: 1px solid rgba(27, 73, 101, 0.08) !important;
-        padding: 16px 32px !important;
+        padding: 16px 20px !important;
         margin-bottom: 0 !important;
         box-sizing: border-box !important;
     }
@@ -12928,7 +12928,7 @@ html body.minside-body .design-ui-panel-header > select {
                 height: 72px !important;
                 min-height: 72px !important;
                 max-height: 72px !important;
-                padding: 0 32px !important;
+                padding: 0 20px !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: space-between !important;
@@ -13776,7 +13776,21 @@ body.crm-body #dashboard-main-header,
 body.minside-body #dashboard-main-header,
 body.builder-active #dashboard-main-header,
 #dashboard-main-header,
-.main-header,
+.main-header {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+    border-radius: 0 !important;
+    box-sizing: border-box !important;
+}
+
+body.admin-body .main-header > .section-header,
+body.crm-body .main-header > .section-header,
+body.minside-body .main-header > .section-header,
+body.builder-active .main-header > .section-header,
 .main-header > .section-header,
 .main-header > .design-ui-header,
 .main-header .section-header-content {
@@ -13784,6 +13798,9 @@ body.builder-active #dashboard-main-header,
     max-width: 100% !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    border-radius: 0 !important;
     box-sizing: border-box !important;
 }
 
