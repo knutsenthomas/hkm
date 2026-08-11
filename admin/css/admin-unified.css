@@ -13189,8 +13189,7 @@ html body.minside-body .design-ui-panel-header > select {
             .note-card,
             .course-card,
             .reading-plan-card,
-            .history-card,
-            .table-container {
+            .history-card {
                 width: 100% !important;
                 max-width: 100% !important;
                 margin-left: 0 !important;
@@ -13203,6 +13202,21 @@ html body.minside-body .design-ui-panel-header > select {
                 box-sizing: border-box !important;
                 background: #ffffff;
                 overflow: hidden !important;
+            }
+
+            .table-container,
+            .table-container.full-bleed {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                margin-top: 0 !important;
+                margin-bottom: 16px !important;
+                box-sizing: border-box !important;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                -webkit-overflow-scrolling: touch !important;
+                display: block !important;
             }
 
             /* 16px internal padding for card bodies */
@@ -13246,7 +13260,8 @@ html body.minside-body .design-ui-panel-header > select {
             .course-card,
             .reading-plan-card,
             .history-card,
-            .table-container {
+            .table-container,
+            .table-container.full-bleed {
                 border-radius: 0 !important;
                 border-left: none !important;
                 border-right: none !important;
@@ -13258,6 +13273,10 @@ html body.minside-body .design-ui-panel-header > select {
                 width: 100% !important;
                 max-width: 100% !important;
                 box-sizing: border-box !important;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                -webkit-overflow-scrolling: touch !important;
+                display: block !important;
             }
 
             .profile-panel-body,
