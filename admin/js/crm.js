@@ -3504,19 +3504,34 @@ class CRMManager {
 
             for (const p of pcoPeople) {
                 const attrs = p.attributes || {};
-                const name = `${attrs.first_name || ''} ${attrs.last_name || ''}`.trim() || 'Medlem';
+                const firstName = attrs.first_name || '';
+                const lastName = attrs.last_name || '';
+                const name = `${firstName} ${lastName}`.trim() || 'Medlem';
                 const email = attrs.primary_email_address || emailsMap[p.id] || '';
                 const phone = phonesMap[p.id] || '';
 
-                const exists = (this.contacts || []).some(c => (email && c.email && c.email.toLowerCase() === email.toLowerCase()) || (c.name && c.name.toLowerCase() === name.toLowerCase()));
+                const exists = (this.contacts || []).some(c => 
+                    (email && c.email && c.email.toLowerCase() === email.toLowerCase()) || 
+                    (c.name && c.name.toLowerCase() === name.toLowerCase()) ||
+                    (c.displayName && c.displayName.toLowerCase() === name.toLowerCase())
+                );
+
                 if (!exists) {
-                    await this.addContact({
+                    await window.firebaseService.db.collection('contacts').add({
+                        firstName: firstName || name.split(' ')[0] || 'Medlem',
+                        lastName: lastName || name.split(' ').slice(1).join(' ') || '',
                         name,
+                        displayName: name,
                         email,
                         phone,
-                        status: 'KUNDE',
-                        tags: ['Planning Center']
-                    }, true);
+                        status: 'IKKE_MEDLEM',
+                        label: 'Planning Center',
+                        labels: ['Planning Center'],
+                        pcoPersonId: p.id,
+                        createdAt: new Date().toISOString(),
+                        createdBy: 'Planning Center Import',
+                        updatedAt: new Date().toISOString()
+                    });
                     importedCount++;
                 }
             }
@@ -3528,6 +3543,30 @@ class CRMManager {
             console.error('Import PCO People error:', err);
             alert(`⚠️ Import feilet: ${err.message}`);
         }
+    }
+
+    async addContact(data) {
+        if (!window.firebaseService || !window.firebaseService.db) {
+            throw new Error("Database er ikke tilgjengelig");
+        }
+        const firstName = data.firstName || (data.name ? data.name.split(' ')[0] : 'Medlem');
+        const lastName = data.lastName || (data.name ? data.name.split(' ').slice(1).join(' ') : '');
+        const name = data.name || `${firstName} ${lastName}`.trim();
+
+        await window.firebaseService.db.collection('contacts').add({
+            firstName,
+            lastName,
+            name,
+            displayName: name,
+            email: data.email || '',
+            phone: data.phone || '',
+            status: data.status || 'IKKE_MEDLEM',
+            label: data.label || (data.tags ? data.tags[0] : 'Ny'),
+            labels: data.labels || data.tags || ['Ny'],
+            createdAt: new Date().toISOString(),
+            createdBy: 'admin',
+            updatedAt: new Date().toISOString()
+        });
     }
 
     async loadPcoGroups() {
