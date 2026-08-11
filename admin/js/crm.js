@@ -3681,26 +3681,27 @@ class CRMManager {
                 });
             });
 
-            // If syncedPeople is still empty, fallback to users/contacts matching group
-            if (syncedPeople.length === 0) {
-                const contactsSnap = await db.collection('contacts').get();
-                contactsSnap.forEach(doc => {
-                    const c = doc.data();
-                    const nameParts = (c.name || c.displayName || `${c.firstName || ''} ${c.lastName || ''}`).trim().split(' ');
-                    const firstName = nameParts[0] || 'Medlem';
-                    const lastName = nameParts.slice(1).join(' ') || '';
-                    const email = c.email || '';
-                    const phone = c.phone || c.phoneNumber || '';
-                    const labelsArr = Array.isArray(c.labels) ? c.labels : (c.label ? [c.label] : []);
-                    const labelsStr = labelsArr.join(' ').toLowerCase();
+            // 2. Also gather contacts from CRM contacts collection matching group tags/name
+            const groupNameLower = groupName.toLowerCase();
+            const contactsSnap = await db.collection('contacts').get();
+            contactsSnap.forEach(doc => {
+                const c = doc.data();
+                const nameParts = (c.name || c.displayName || `${c.firstName || ''} ${c.lastName || ''}`).trim().split(' ');
+                const firstName = nameParts[0] || 'Medlem';
+                const lastName = nameParts.slice(1).join(' ') || '';
+                const email = c.email || '';
+                const phone = c.phone || c.phoneNumber || '';
+                const labelsArr = Array.isArray(c.labels) ? c.labels : (c.label ? [c.label] : []);
+                const labelsStr = labelsArr.join(' ').toLowerCase();
 
-                    if (labelsStr.includes('bønn') || labelsStr.includes('prayer') || c.groupId === pcoGroupId) {
-                        if (!syncedPeople.some(p => (p.email && email && p.email.toLowerCase() === email.toLowerCase()) || (p.firstName.toLowerCase() === firstName.toLowerCase() && p.lastName.toLowerCase() === lastName.toLowerCase()))) {
-                            syncedPeople.push({ firstName, lastName, fullName: `${firstName} ${lastName}`.trim(), email, phone });
-                        }
+                const isMatch = labelsStr.includes('bønn') || labelsStr.includes('prayer') || labelsStr.includes('bønneteam') || labelsStr.includes('bønnegruppe') || labelsStr.includes(groupNameLower) || c.groupId === pcoGroupId || c.group === groupName;
+
+                if (isMatch) {
+                    if (!syncedPeople.some(p => (p.email && email && p.email.toLowerCase() === email.toLowerCase()) || (p.firstName.toLowerCase() === firstName.toLowerCase() && p.lastName.toLowerCase() === lastName.toLowerCase()))) {
+                        syncedPeople.push({ firstName, lastName, fullName: `${firstName} ${lastName}`.trim(), email, phone });
                     }
-                });
-            }
+                }
+            });
 
             // 2. Fetch current PCO memberships to prune extra members
             const pcoGroupsRes = await fetch('/api/pco-groups', { method: 'GET' });
