@@ -3625,6 +3625,8 @@ html[data-theme="dark"] {
     --main-bg: #0f172a;
     --text-main: #f8fafc;
     --text-muted: #94a3b8;
+    --text-color: #f8fafc;
+    --heading-color: #f8fafc;
     --border-color: #334155;
     --border-solid: #334155;
     --card-bg: #1e293b;
@@ -3771,13 +3773,66 @@ html[data-theme="dark"] .user-role {
 }
 
 /* Force section title and subtitle to be light/white in minside */
+html[data-theme="dark"] #dashboard-main-header-title,
 html[data-theme="dark"] body.minside-body .section-title,
-html[data-theme="dark"] .section-title {
+html[data-theme="dark"] .section-title,
+html[data-theme="dark"] .section-header-title {
   color: #ffffff !important;
 }
 html[data-theme="dark"] body.minside-body .section-subtitle,
 html[data-theme="dark"] .section-subtitle {
   color: #94a3b8 !important;
+}
+
+/* Dark Theme Readability Overrides for Groups & Cards */
+html[data-theme="dark"] .group-card {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+html[data-theme="dark"] .group-card h3 {
+  color: #f8fafc !important;
+}
+html[data-theme="dark"] .group-card p {
+  color: #cbd5e1 !important;
+}
+html[data-theme="dark"] .group-card span {
+  color: #e2e8f0 !important;
+}
+
+/* Group Hub Overview (Group Detail Page) */
+html[data-theme="dark"] .hub-overview-grid h3,
+html[data-theme="dark"] .hub-overview-grid h4 {
+  color: #f8fafc !important;
+  border-bottom-color: #334155 !important;
+}
+html[data-theme="dark"] .hub-overview-grid p,
+html[data-theme="dark"] .hub-overview-grid div {
+  color: #e2e8f0 !important;
+}
+html[data-theme="dark"] .hub-overview-grid span {
+  color: #cbd5e1 !important;
+}
+html[data-theme="dark"] .hub-overview-grid .material-symbols-outlined {
+  color: #94a3b8 !important;
+}
+html[data-theme="dark"] .hub-overview-grid h3 .material-symbols-outlined,
+html[data-theme="dark"] .hub-overview-grid h4 .material-symbols-outlined {
+  color: #d17d39 !important;
+}
+
+/* WhatsApp & Google Drive Widgets in Dark Mode */
+html[data-theme="dark"] [style*="color: #1b5e20"] {
+  color: #4ade80 !important;
+}
+html[data-theme="dark"] [style*="color: #2e7d32"] {
+  color: #86efac !important;
+}
+html[data-theme="dark"] [style*="color: #1a73e8"] {
+  color: #60a5fa !important;
+}
+html[data-theme="dark"] [style*="color: #174ea6"] {
+  color: #93c5fd !important;
 }
 
 html[data-theme="dark"] body.minside-body .main-header .mobile-nav-toggle,
