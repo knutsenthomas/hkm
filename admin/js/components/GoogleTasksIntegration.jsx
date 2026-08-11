@@ -148,36 +148,40 @@ export default function GoogleTasksIntegration() {
     return (
         <div className="flex flex-col gap-6 w-full transform translate-z-0 backface-hidden">
             {/* Google Tasks Card */}
-            <div className="card modern">
-                <div className="card-header flex-between">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div className="card modern" style={{ height: '100%', display: 'flex', flexDirection: 'column', borderRadius: '16px', padding: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyBetween: 'space-between', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap', marginBottom: '16px', borderBottom: '1px solid var(--border-color, #e2e8f0)', paddingBottom: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
                         <div style={{
-                            width: '32px',
-                            height: '32px',
-                            borderRadius: '8px',
-                            background: googleConnected ? '#ecfdf5' : '#f1f5f9',
-                            color: googleConnected ? '#10b981' : '#64748b',
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '10px',
+                            background: googleConnected ? 'rgba(34, 197, 94, 0.15)' : 'rgba(100, 116, 139, 0.15)',
+                            border: googleConnected ? '1px solid rgba(34, 197, 94, 0.3)' : '1px solid rgba(100, 116, 139, 0.3)',
+                            color: googleConnected ? '#4ade80' : '#94a3b8',
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center'
+                            justifyContent: 'center',
+                            flexShrink: 0
                         }}>
-                            <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>sync_alt</span>
+                            <span className="material-symbols-outlined" style={{ fontSize: '22px', display: 'block' }}>sync_alt</span>
                         </div>
-                        <h3 className="card-title">Google Tasks</h3>
+                        <h3 className="card-title" style={{ margin: 0, fontSize: '17px', fontWeight: '700', color: 'var(--text-color, #f8fafc)' }}>Google Tasks</h3>
                     </div>
-                    <div className="status-badge" style={{
+                    <span className="status-badge" style={{
                         fontSize: '11px',
-                        padding: '2px 8px',
-                        borderRadius: '10px',
-                        background: googleConnected ? '#d1fae5' : '#f1f5f9',
-                        color: googleConnected ? '#065f46' : '#475569',
-                        fontWeight: '600'
+                        padding: '4px 10px',
+                        borderRadius: '99px',
+                        background: googleConnected ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                        color: googleConnected ? '#4ade80' : '#f87171',
+                        border: googleConnected ? '1px solid rgba(34, 197, 94, 0.3)' : '1px solid rgba(239, 68, 68, 0.3)',
+                        fontWeight: '700',
+                        whiteSpace: 'nowrap'
                     }}>
                         {googleConnected ? 'Tilkoblet' : 'Frakoblet'}
-                    </div>
+                    </span>
                 </div>
-                <div className="card-body" style={{ padding: '24px' }}>
-                    <p style={{ margin: '0 0 16px 0', fontSize: '13px', color: '#64748b', lineHeight: '1.5' }}>
+                <div className="card-body" style={{ padding: 0, flex: 1, display: 'flex', flexDirection: 'column', justifyBetween: 'space-between', justifyContent: 'space-between' }}>
+                    <p style={{ margin: '0 0 16px 0', fontSize: '13px', color: 'var(--text-secondary, #94a3b8)', lineHeight: '1.5' }}>
                         Synkroniser oppgaver og huskelister i Mandal Regnskapskontor CMS med Google Tasks i sanntid.
                     </p>
 
