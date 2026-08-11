@@ -370,14 +370,14 @@
                 <div class="contacts-grid card modern">
                     <div class="table-header">
                         <div class="header-left-actions">
-                            <select class="view-selector">
+                            <select class="view-selector" title="Velg visning / segment">
                                 <option>Alle kontakter (0)</option>
                                 <option>Nye kontakter</option>
                                 <option>Givere</option>
                             </select>
                             <div class="search-box">
-                                <span class="material-symbols-outlined">search</span>
-                                <input type="text" id="contact-search" placeholder="Søk...">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">search</span>
+                                <input type="text" id="contact-search" placeholder="Søk i kontakter...">
                             </div>
                             <select id="contact-tag-filter" class="form-control tag-filter-select">
                                 <option value="ALL">Alle etiketter</option>
@@ -385,24 +385,26 @@
                             </select>
                         </div>
                         <div class="header-right-actions" id="contacts-tools">
-                            <button class="btn btn-outline" id="filter-contacts-btn" type="button" title="Filtrer kontakter" style="display: inline-flex; align-items: center; justify-content: center; padding: 8px 12px;">
+                            <button class="btn btn-outline" id="filter-contacts-btn" type="button" title="Filtrer kontakter" style="display: none;">
                                 <span class="material-symbols-outlined">filter_list</span>
                             </button>
-                            <button class="btn btn-danger" id="bulk-delete-btn" title="Slett valgte kontakter" style="display: none; align-items: center; justify-content: center; padding: 8px 12px;">
+                            <button class="btn btn-danger" id="bulk-delete-btn" title="Slett valgte kontakter" style="display: none;">
                                 <span class="material-symbols-outlined" style="font-size: 18px;">delete_sweep</span>
-                                <span id="bulk-delete-text" style="display: none;">Slett valgte</span>
+                                <span id="bulk-delete-text" style="margin-left: 4px;">Slett valgte</span>
                             </button>
-                            <button class="btn btn-outline" id="manage-view-btn" type="button" title="Administrer visning" style="display: inline-flex; align-items: center; justify-content: center; padding: 8px 12px;">
-                                <span class="material-symbols-outlined">tune</span>
+                            <div class="crm-toolbar-divider" style="width: 1px; height: 22px; background: #e2e8f0; margin: 0 4px;"></div>
+                            <button class="btn btn-outline" id="manage-view-btn" type="button" title="Administrer visning">
+                                <span class="material-symbols-outlined" style="font-size: 19px;">tune</span>
                             </button>
-                            <button class="btn btn-outline" id="import-export-btn" title="Import / Eksport" style="display: inline-flex; align-items: center; justify-content: center; padding: 8px 12px;">
-                                <span class="material-symbols-outlined">import_export</span>
+                            <button class="btn btn-outline" id="import-export-btn" type="button" title="Import / Eksport">
+                                <span class="material-symbols-outlined" style="font-size: 19px;">import_export</span>
                             </button>
-                            <button class="btn btn-outline" id="sync-pco-btn" title="Synkroniser med Planning Center People" style="display: inline-flex; align-items: center; justify-content: center; padding: 8px 12px; border-color: rgba(37, 99, 235, 0.3);">
+                            <button class="btn btn-outline" id="sync-pco-btn" type="button" title="Synkroniser med Planning Center People">
                                 <img src="/img/pco-logo.png" alt="Planning Center Synk" style="width: 20px; height: 20px; object-fit: contain; border-radius: 4px; display: block;">
                             </button>
-                            <button class="btn btn-primary" id="add-contact-btn" type="button" title="Ny kontakt" onclick="if(window.crmSystem) window.crmSystem.openCreateContactModal();" style="display: inline-flex; align-items: center; justify-content: center; padding: 8px 12px;">
+                            <button class="btn btn-primary" id="add-contact-btn" type="button" title="Ny kontakt" onclick="if(window.crmSystem) window.crmSystem.openCreateContactModal();">
                                 <span class="material-symbols-outlined" style="font-size: 18px;">person_add</span>
+                                <span>Ny kontakt</span>
                             </button>
                         </div>
                     </div>
