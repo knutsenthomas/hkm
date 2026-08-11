@@ -2621,10 +2621,194 @@ window.addEventListener('load', () => {
         if (document.getElementById('hkm-visitor-chat-widget')) return;
         injectChatStyles();
 
+        const getChatLanguage = () => {
+            const path = (window.location.pathname || '').toLowerCase();
+            const htmlLang = (document.documentElement.lang || '').toLowerCase();
+            if (path.startsWith('/en/') || htmlLang.startsWith('en')) return 'en';
+            if (path.startsWith('/es/') || htmlLang.startsWith('es')) return 'es';
+            return 'no';
+        };
+        const chatLang = getChatLanguage();
+
+        const CHAT_I18N = {
+            no: {
+                title: 'HKM Assistent',
+                statusAi: 'AI-svar',
+                statusLive: 'Live Chat',
+                statusEmail: 'E-post',
+                toggleOpen: 'Åpne chat',
+                historyToggle: 'Vis samtalelogg',
+                closeChat: 'Lukk chat',
+                modeAi: 'AI-assistent',
+                modeLive: 'Google Chat-team',
+                modeEmail: 'E-post',
+                introAi: 'AI-chat: få raske svar fra HKM Assistent.',
+                emptyAi: 'Still et spørsmål, så svarer AI-assistenten med en gang.',
+                introLive: 'Google Chat: skriv til teamet og få svar fra en person her i chatten.',
+                emptyLive: 'Skriv til teamet, så kommer svaret tilbake i denne chatten.',
+                introEmail: 'E-post: fyll inn skjemaet, så sender vi meldingen videre til teamet.',
+                welcomeMsg: 'Hei! Hva kan jeg hjelpe deg med i dag? 😊',
+                initialQuestions: [
+                    'Hva er His Kingdom Ministry?',
+                    'Har dere en bibelsk tidslinje?',
+                    'Hvordan kan jeg bli fast giver?'
+                ],
+                followUpLabel: 'Forslag til neste spørsmål:',
+                inputPlaceholder: 'Skriv melding...',
+                inputClosedPlaceholder: 'Chat er stengt',
+                sendMsg: 'Send melding',
+                typingMsg: 'HKM Assistent skriver <span class="hkm-typing-dots"><span>.</span><span>.</span><span>.</span></span>',
+                closedNotice: (nextInfo) => `Vi er stengt akkurat nå. Chatten åpner ${nextInfo}.`,
+                privacyFooter: 'Jeg samtykker til behandling av data. <a href="/personvern" target="_blank" rel="noopener">Les personvern</a>',
+                privacyEmail: 'Jeg samtykker til <a href="/personvern" target="_blank" style="color: inherit; text-decoration: underline;">personvernreglene</a>. *',
+                labelName: 'Navn *',
+                labelEmail: 'E-post *',
+                labelPhone: 'Telefon',
+                labelMessage: 'Melding *',
+                btnSendEmail: 'Send e-post',
+                humanBridgeQuestion: 'Ønsker du å snakke med en person?',
+                humanBridgeBtn: 'Be om menneskelig hjelp',
+                btnNotifyingTeam: 'Varsler teamet...',
+                msgHumanNotified: 'En veileder er varslet og vil svare deg her i chatten om kort tid.',
+                msgClosedEmailNotice: 'Vi har stengt akkurat nå. Fyll ut kontaktskjemaet under for å få svar på e-post.',
+                errNameRequired: 'Navn er obligatorisk.',
+                errEmailRequired: 'E-post er obligatorisk.',
+                errEmailInvalid: 'Skriv inn en gyldig e-postadresse.',
+                errMessageRequired: 'Melding er obligatorisk.',
+                errPrivacyRequired: 'Du må samtykke til personvern for å sende e-post.',
+                errPrivacyRequiredMsg: 'Du må samtykke til personvern for å sende melding.',
+                sendingEmail: 'Sender e-post...',
+                sendingMsg: 'Sender melding...',
+                successEmail: 'Takk! Meldingen er sendt til teamet.',
+                failEmail: 'Kunne ikke sende meldingen. Prøv igjen.',
+                failSendMsg: 'Kunne ikke sende meldingen. Prøv igjen.',
+                errChatUnavailable: 'Chat er midlertidig utilgjengelig. Prøv igjen senere.',
+                errChatStartFailed: 'Chat kunne ikke starte.',
+                errConnectionLost: 'Mistet tilkoblingen til chatten.',
+                errMaxChars: (max) => `Maks ${max} tegn per melding.`,
+                noMessagesYet: 'Ingen meldinger enda.'
+            },
+            en: {
+                title: 'HKM Assistant',
+                statusAi: 'AI Answer',
+                statusLive: 'Live Chat',
+                statusEmail: 'Email',
+                toggleOpen: 'Open chat',
+                historyToggle: 'View chat history',
+                closeChat: 'Close chat',
+                modeAi: 'AI Assistant',
+                modeLive: 'Live Team Chat',
+                modeEmail: 'Email',
+                introAi: 'AI Chat: Get quick answers from HKM Assistant.',
+                emptyAi: 'Ask a question, and the AI assistant will reply right away.',
+                introLive: 'Live Chat: Message our team and get a reply directly in this chat.',
+                emptyLive: 'Write to our team, and their answer will appear here.',
+                introEmail: 'Email: Fill out the form to forward your message to our team.',
+                welcomeMsg: 'Hello! How can I help you today? 😊',
+                initialQuestions: [
+                    'What is His Kingdom Ministry?',
+                    'Do you have a biblical timeline?',
+                    'How can I become a regular donor?'
+                ],
+                followUpLabel: 'Suggested next questions:',
+                inputPlaceholder: 'Type a message...',
+                inputClosedPlaceholder: 'Chat is closed',
+                sendMsg: 'Send message',
+                typingMsg: 'HKM Assistant is typing <span class="hkm-typing-dots"><span>.</span><span>.</span><span>.</span></span>',
+                closedNotice: (nextInfo) => `We are closed right now. Chat opens ${nextInfo}.`,
+                privacyFooter: 'I consent to data processing. <a href="/en/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>',
+                privacyEmail: 'I consent to the <a href="/en/privacy.html" target="_blank" style="color: inherit; text-decoration: underline;">privacy policy</a>. *',
+                labelName: 'Name *',
+                labelEmail: 'Email *',
+                labelPhone: 'Phone',
+                labelMessage: 'Message *',
+                btnSendEmail: 'Send email',
+                humanBridgeQuestion: 'Would you like to speak to a person?',
+                humanBridgeBtn: 'Request human assistance',
+                btnNotifyingTeam: 'Notifying team...',
+                msgHumanNotified: 'A team member has been notified and will reply here shortly.',
+                msgClosedEmailNotice: 'We are currently closed. Please fill out the contact form below to get a reply by email.',
+                errNameRequired: 'Name is required.',
+                errEmailRequired: 'Email is required.',
+                errEmailInvalid: 'Please enter a valid email address.',
+                errMessageRequired: 'Message is required.',
+                errPrivacyRequired: 'You must accept the privacy policy to send an email.',
+                errPrivacyRequiredMsg: 'You must accept the privacy policy to send a message.',
+                sendingEmail: 'Sending email...',
+                sendingMsg: 'Sending message...',
+                successEmail: 'Thank you! Your message has been sent to our team.',
+                failEmail: 'Could not send message. Please try again.',
+                failSendMsg: 'Could not send message. Please try again.',
+                errChatUnavailable: 'Chat is temporarily unavailable. Please try again later.',
+                errChatStartFailed: 'Could not start chat.',
+                errConnectionLost: 'Lost connection to chat.',
+                errMaxChars: (max) => `Max ${max} characters per message.`,
+                noMessagesYet: 'No messages yet.'
+            },
+            es: {
+                title: 'Asistente HKM',
+                statusAi: 'Respuesta IA',
+                statusLive: 'Chat en Vivo',
+                statusEmail: 'Correo electrónico',
+                toggleOpen: 'Abrir chat',
+                historyToggle: 'Ver historial de chat',
+                closeChat: 'Cerrar chat',
+                modeAi: 'Asistente IA',
+                modeLive: 'Chat de equipo',
+                modeEmail: 'Correo electrónico',
+                introAi: 'Chat IA: obtén respuestas rápidas del Asistente HKM.',
+                emptyAi: 'Haz una pregunta y el asistente de IA responderá de inmediato.',
+                introLive: 'Chat en vivo: escribe a nuestro equipo y recibe respuesta aquí mismo.',
+                emptyLive: 'Escribe a nuestro equipo y la respuesta aparecerá aquí.',
+                introEmail: 'Correo: completa el formulario para enviar tu mensaje a nuestro equipo.',
+                welcomeMsg: '¡Hola! ¿En qué puedo ayudarte hoy? 😊',
+                initialQuestions: [
+                    '¿Qué es His Kingdom Ministry?',
+                    '¿Tienen una línea de tiempo bíblica?',
+                    '¿Cómo puedo ser un donante mensual?'
+                ],
+                followUpLabel: 'Sugerencias de preguntas:',
+                inputPlaceholder: 'Escribe un mensaje...',
+                inputClosedPlaceholder: 'El chat está cerrado',
+                sendMsg: 'Enviar mensaje',
+                typingMsg: 'El Asistente HKM está escribiendo <span class="hkm-typing-dots"><span>.</span><span>.</span><span>.</span></span>',
+                closedNotice: (nextInfo) => `Estamos cerrados en este momento. El chat abre ${nextInfo}.`,
+                privacyFooter: 'Consiento el procesamiento de datos. <a href="/es/privacidad.html" target="_blank" rel="noopener">Política de privacidad</a>',
+                privacyEmail: 'Consiento la <a href="/es/privacidad.html" target="_blank" style="color: inherit; text-decoration: underline;">política de privacidad</a>. *',
+                labelName: 'Nombre *',
+                labelEmail: 'Correo electrónico *',
+                labelPhone: 'Teléfono',
+                labelMessage: 'Mensaje *',
+                btnSendEmail: 'Enviar correo',
+                humanBridgeQuestion: '¿Deseas hablar con una persona?',
+                humanBridgeBtn: 'Solicitar asistencia humana',
+                btnNotifyingTeam: 'Notificando al equipo...',
+                msgHumanNotified: 'Se ha notificado a un miembro del equipo y responderá aquí en breve.',
+                msgClosedEmailNotice: 'Estamos cerrados en este momento. Por favor completa el formulario a continuación para recibir respuesta por correo.',
+                errNameRequired: 'El nombre es obligatorio.',
+                errEmailRequired: 'El correo electrónico es obligatorio.',
+                errEmailInvalid: 'Por favor, ingresa un correo electrónico válido.',
+                errMessageRequired: 'El mensaje es obligatorio.',
+                errPrivacyRequired: 'Debes aceptar la política de privacidad para enviar el correo.',
+                errPrivacyRequiredMsg: 'Debes aceptar la política de privacidad para enviar un mensaje.',
+                sendingEmail: 'Enviando correo...',
+                sendingMsg: 'Enviando mensaje...',
+                successEmail: '¡Gracias! Tu mensaje ha sido enviado a nuestro equipo.',
+                failEmail: 'No se pudo enviar el mensaje. Inténtalo de nuevo.',
+                failSendMsg: 'No se pudo enviar el mensaje. Inténtalo de nuevo.',
+                errChatUnavailable: 'El chat no está disponible temporalmente. Inténtalo más tarde.',
+                errChatStartFailed: 'No se pudo iniciar el chat.',
+                errConnectionLost: 'Conexión con el chat perdida.',
+                errMaxChars: (max) => `Máximo ${max} caracteres por mensaje.`,
+                noMessagesYet: 'Aún no hay mensajes.'
+            }
+        };
+        const t = CHAT_I18N[chatLang] || CHAT_I18N.no;
+
         const root = document.createElement('div');
         root.id = 'hkm-visitor-chat-widget';
         root.innerHTML = `
-            <button type="button" class="hkm-chat-toggle" aria-label="Apne chat">
+            <button type="button" class="hkm-chat-toggle" aria-label="${t.toggleOpen}">
                 <div class="hkm-chat-dot"></div>
                 <svg class="hkm-chat-icon-chat" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
@@ -2641,27 +2825,27 @@ window.addEventListener('load', () => {
                             <img src="/img/logo-hkm.png" alt="HKM" />
                         </div>
                         <div>
-                            <h3>HKM Assistent</h3>
+                            <h3>${t.title}</h3>
                             <div class="hkm-chat-online-status" style="display: flex; align-items: center; gap: 4px;">
                                 <span class="status-dot"></span>
-                                <span class="status-text" style="font-size: 11px; opacity: 0.85;">AI-svar</span>
+                                <span class="status-text" style="font-size: 11px; opacity: 0.85;">${t.statusAi}</span>
                             </div>
                         </div>
                     </div>
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <button type="button" class="hkm-chat-history-toggle" aria-label="Vis historikk" title="Vis samtalelogg" style="background: transparent; border: none; color: #fff; opacity: 0.65; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; transition: opacity 0.2s;">
+                        <button type="button" class="hkm-chat-history-toggle" aria-label="${t.historyToggle}" title="${t.historyToggle}" style="background: transparent; border: none; color: #fff; opacity: 0.65; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; transition: opacity 0.2s;">
                             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="12" cy="12" r="10"></circle>
                                 <polyline points="12 6 12 12 16 14"></polyline>
                             </svg>
                         </button>
-                        <button type="button" class="hkm-chat-close" aria-label="Lukk chat" style="background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; line-height: 1;">×</button>
+                        <button type="button" class="hkm-chat-close" aria-label="${t.closeChat}" style="background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; line-height: 1;">×</button>
                     </div>
                 </header>
                 
                 <div class="hkm-chat-closed-notice hkm-chat-hidden" aria-live="polite" aria-atomic="true"></div>
                 <nav class="hkm-chat-mode-switch" role="group" aria-label="Velg chatmodus" style="display: none !important;">
-                    <button type="button" class="hkm-chat-mode-btn active" data-mode="ai" aria-label="AI-assistent" title="AI-assistent">
+                    <button type="button" class="hkm-chat-mode-btn active" data-mode="ai" aria-label="${t.modeAi}" title="${t.modeAi}">
                         <span class="hkm-chat-mode-icon" aria-hidden="true">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M12 3v4" />
@@ -2669,24 +2853,24 @@ window.addEventListener('load', () => {
                                 <path d="M4 11h2M18 11h2M9 14h.01M15 14h.01" />
                             </svg>
                         </span>
-                        <span class="sr-only">AI-assistent</span>
+                        <span class="sr-only">${t.modeAi}</span>
                     </button>
-                    <button type="button" class="hkm-chat-mode-btn" data-mode="google_chat" aria-label="Google Chat-team" title="Google Chat-team">
+                    <button type="button" class="hkm-chat-mode-btn" data-mode="google_chat" aria-label="${t.modeLive}" title="${t.modeLive}">
                         <span class="hkm-chat-mode-icon" aria-hidden="true">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7A2.5 2.5 0 0 1 17.5 16H10l-4.5 4v-4A2.5 2.5 0 0 1 4 13.5z" />
                             </svg>
                         </span>
-                        <span class="sr-only">Google Chat-team</span>
+                        <span class="sr-only">${t.modeLive}</span>
                     </button>
-                    <button type="button" class="hkm-chat-mode-btn" data-mode="email" aria-label="E-post" title="E-post">
+                    <button type="button" class="hkm-chat-mode-btn" data-mode="email" aria-label="${t.modeEmail}" title="${t.modeEmail}">
                         <span class="hkm-chat-mode-icon" aria-hidden="true">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="4" y="6" width="16" height="12" rx="2" />
                                 <path d="m5 7 7 6 7-6" />
                             </svg>
                         </span>
-                        <span class="sr-only">E-post</span>
+                        <span class="sr-only">${t.modeEmail}</span>
                     </button>
                 </nav>
 
@@ -2697,34 +2881,34 @@ window.addEventListener('load', () => {
 		                    <div class="hkm-chat-email-panel hkm-chat-hidden">
 		                        <form class="hkm-chat-email-form" novalidate>
                             <div class="hkm-chat-field">
-                                <label for="hkm-chat-name">Navn *</label>
+                                <label for="hkm-chat-name">${t.labelName}</label>
                                 <input type="text" id="hkm-chat-name" name="name" autocomplete="name" class="hkm-chat-email-name" maxlength="120" required />
                             </div>
                             <div class="hkm-chat-field">
-                                <label for="hkm-chat-email">E-post *</label>
+                                <label for="hkm-chat-email">${t.labelEmail}</label>
                                 <input type="email" id="hkm-chat-email" name="email" autocomplete="email" class="hkm-chat-email-email" maxlength="254" required />
                             </div>
                             <div class="hkm-chat-field">
-                                <label for="hkm-chat-phone">Telefon</label>
+                                <label for="hkm-chat-phone">${t.labelPhone}</label>
                                 <input type="tel" id="hkm-chat-phone" name="tel" autocomplete="tel" class="hkm-chat-email-phone" maxlength="40" />
                             </div>
                             <div class="hkm-chat-field">
-                                <label for="hkm-chat-message">Melding *</label>
+                                <label for="hkm-chat-message">${t.labelMessage}</label>
                                 <textarea id="hkm-chat-message" name="message" class="hkm-chat-email-message" rows="4" maxlength="${MAX_MESSAGE_LENGTH}" required></textarea>
                             </div>
                             <div class="hkm-chat-privacy">
                                 <label class="hkm-chat-privacy-label">
                                     <input type="checkbox" class="hkm-chat-privacy-checkbox" required>
-                                    <span>Jeg samtykker til <a href="/personvern" target="_blank" style="color: inherit; text-decoration: underline;">personvernreglene</a>. *</span>
+                                    <span>${t.privacyEmail}</span>
                                 </label>
                             </div>
-                            <button type="submit" class="hkm-chat-email-submit">Send e-post</button>
+                            <button type="submit" class="hkm-chat-email-submit">${t.btnSendEmail}</button>
                             <p class="hkm-chat-email-status" aria-live="polite"></p>
                         </form>
                     </div>
                     <div class="hkm-chat-human-bridge" style="display:none;">
-                        <p>Ønsker du å snakke med en person?</p>
-                        <button type="button" class="hkm-chat-request-human">Be om menneskelig hjelp</button>
+                        <p>${t.humanBridgeQuestion}</p>
+                        <button type="button" class="hkm-chat-request-human">${t.humanBridgeBtn}</button>
                     </div>
                 </div>
 
@@ -2732,15 +2916,15 @@ window.addEventListener('load', () => {
                     <div class="hkm-chat-privacy" id="hkm-chat-privacy-footer">
                         <label class="hkm-chat-privacy-label">
                             <input type="checkbox" class="hkm-chat-privacy-checkbox" />
-                            <span>Jeg samtykker til behandling av data. <a href="/personvern" target="_blank" rel="noopener">Les personvern</a></span>
+                            <span>${t.privacyFooter}</span>
                         </label>
                     </div>
                     <form class="hkm-chat-form">
                         <div class="hkm-chat-input-wrapper">
-                            <input type="text" class="hkm-chat-input" maxlength="${MAX_MESSAGE_LENGTH}" placeholder="Skriv melding..." />
+                            <input type="text" class="hkm-chat-input" maxlength="${MAX_MESSAGE_LENGTH}" placeholder="${t.inputPlaceholder}" />
                             <p class="hkm-chat-status" aria-live="polite"></p>
                         </div>
-                        <button type="submit" class="hkm-chat-send" aria-label="Send melding">
+                        <button type="submit" class="hkm-chat-send" aria-label="${t.sendMsg}">
                             <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="transform: translate(1px, -1px);"><path d="M22 12L2 21L5 12.5L13 12L5 11.5L2 3L22 12Z"/></svg>
                         </button>
                     </form>
@@ -2875,8 +3059,13 @@ window.addEventListener('load', () => {
 	            return holidays.has(toMonthDayKey(parts.month, parts.day));
 	        }
 
-	        function getNextOpeningInfo(now = new Date()) {
-	            const dayNames = ['s\u00f8ndag', 'mandag', 'tirsdag', 'onsdag', 'torsdag', 'fredag', 'l\u00f8rdag'];
+	        function getNextOpeningInfo(now = new Date(), lang = chatLang) {
+	            const dayNames = {
+	                no: ['søndag', 'mandag', 'tirsdag', 'onsdag', 'torsdag', 'fredag', 'lørdag'],
+	                en: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+	                es: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado']
+	            };
+	            const days = dayNames[lang] || dayNames.no;
 	            const todayParts = getOsloNowParts(now);
 
 	            for (let offset = 0; offset <= 10; offset++) {
@@ -2889,13 +3078,18 @@ window.addEventListener('load', () => {
 
 	                if (offset === 0) {
 	                    const minuteOfDay = (todayParts.hour * 60) + todayParts.minute;
-	                    if (minuteOfDay < 9 * 60) return 'i dag kl.\u00a009:00';
+	                    if (minuteOfDay < 9 * 60) {
+	                        return lang === 'en' ? 'today at 09:00 AM' : lang === 'es' ? 'hoy a las 09:00' : 'i dag kl.\u00a009:00';
+	                    }
 	                    continue;
 	                }
-	                if (offset === 1) return 'i morgen kl.\u00a009:00';
-	                return `${dayNames[cp.weekday]} kl.\u00a009:00`;
+	                if (offset === 1) {
+	                    return lang === 'en' ? 'tomorrow at 09:00 AM' : lang === 'es' ? 'mañana a las 09:00' : 'i morgen kl.\u00a009:00';
+	                }
+	                const timeStr = lang === 'en' ? 'at 09:00 AM' : lang === 'es' ? 'a las 09:00' : 'kl.\u00a009:00';
+	                return `${days[cp.weekday]} ${timeStr}`;
 	            }
-	            return 'neste virkedag kl.\u00a009:00';
+	            return lang === 'en' ? 'next business day at 09:00 AM' : lang === 'es' ? 'próximo día hábil a las 09:00' : 'neste virkedag kl.\u00a009:00';
 	        }
 
 	        function isWithinNorwegianBusinessHours(now = new Date()) {
@@ -2923,14 +3117,14 @@ window.addEventListener('load', () => {
 	            if (input) input.disabled = isGoogleChatClosed;
 	            if (sendBtn) sendBtn.disabled = isGoogleChatClosed;
 	            if (input) input.placeholder = isGoogleChatClosed
-	                ? 'Chat er stengt'
-	                : 'Skriv melding...';
+	                ? t.inputClosedPlaceholder
+	                : t.inputPlaceholder;
 	            form?.classList.toggle('hkm-chat-form-disabled', isGoogleChatClosed);
 
 	            if (closedNotice) {
 	                if (isGoogleChatClosed) {
 	                    const nextInfo = getNextOpeningInfo();
-	                    closedNotice.textContent = `Vi er stengt akkurat nå. Chatten åpner ${nextInfo}.`;
+	                    closedNotice.textContent = t.closedNotice(nextInfo);
 	                    closedNotice.classList.remove('hkm-chat-hidden');
 	                } else {
 	                    closedNotice.textContent = '';
@@ -2964,7 +3158,7 @@ window.addEventListener('load', () => {
 	            console.log('[VisitorChat] Email submit triggered');
 
 	            if (!db) {
-	                setEmailStatus('Tjenesten er ikke klar ennå. Prøv å laste siden på nytt.', 'error');
+	                setEmailStatus(t.errChatUnavailable, 'error');
 	                return;
 	            }
 
@@ -2981,34 +3175,34 @@ window.addEventListener('load', () => {
 		            // Unnga native browser "reportValidity()" popups, som kan skape layout-jitter i chat-widgeten.
 		            // Vi viser i stedet en stabil statuslinje + flytter fokus til feltet som mangler.
 		            if (!name) {
-		                setEmailStatus('Navn er obligatorisk.', 'error');
+		                setEmailStatus(t.errNameRequired, 'error');
 		                emailNameInput.focus();
 		                return;
 		            }
 		            if (!email) {
-		                setEmailStatus('E-post er obligatorisk.', 'error');
+		                setEmailStatus(t.errEmailRequired, 'error');
 		                emailEmailInput.focus();
 		                return;
 		            }
 		            // Bruk inputens innebygde e-postvalidering (uten popup).
 		            if (!emailEmailInput.checkValidity()) {
-		                setEmailStatus('Skriv inn en gyldig e-postadresse.', 'error');
+		                setEmailStatus(t.errEmailInvalid, 'error');
 		                emailEmailInput.focus();
 		                return;
 		            }
 		            if (!message) {
-		                setEmailStatus('Melding er obligatorisk.', 'error');
+		                setEmailStatus(t.errMessageRequired, 'error');
 		                emailMessageInput.focus();
 		                return;
 		            }
 		            if (emailPrivacyCheckbox && !emailPrivacyCheckbox.checked) {
-		                setEmailStatus('Du må samtykke til personvern for å sende e-post.', 'error');
+		                setEmailStatus(t.errPrivacyRequired, 'error');
 		                emailPrivacyCheckbox.focus();
 		                return;
 		            }
 
 	            emailSubmitBtn.disabled = true;
-	            setEmailStatus('Sender e-post...', 'muted');
+	            setEmailStatus(t.sendingEmail, 'muted');
 
 	            try {
 	                const finalChatId = localStorage.getItem('hkm_visitor_chat_id') || 'unknown';
@@ -3060,10 +3254,10 @@ window.addEventListener('load', () => {
 	                }).catch(() => {});
 
 	                emailMessageInput.value = '';
-	                setEmailStatus('Takk! Meldingen er sendt til teamet.', 'success');
+	                setEmailStatus(t.successEmail, 'success');
 	            } catch (error) {
 	                console.error('[VisitorChat] Email submit failed:', error);
-	                setEmailStatus('Kunne ikke sende meldingen. Prøv igjen.', 'error');
+	                setEmailStatus(t.failEmail, 'error');
 	            } finally {
 	                emailSubmitBtn.disabled = false;
 	            }
@@ -3082,15 +3276,15 @@ window.addEventListener('load', () => {
         };
         const modeCopy = {
             ai: {
-                intro: 'AI-chat: få raske svar fra HKM Assistent.',
-                empty: 'Still et spørsmål, så svarer AI-assistenten med en gang.'
+                intro: t.introAi,
+                empty: t.emptyAi
             },
             google_chat: {
-                intro: 'Google Chat: skriv til teamet og få svar fra en person her i chatten.',
-                empty: 'Skriv til teamet, så kommer svaret tilbake i denne chatten.'
+                intro: t.introLive,
+                empty: t.emptyLive
             },
             email: {
-                intro: 'E-post: fyll inn skjemaet, så sender vi meldingen videre til teamet.',
+                intro: t.introEmail,
                 empty: ''
             }
         };
@@ -3112,11 +3306,11 @@ window.addEventListener('load', () => {
 
             if (headerStatusText) {
                 if (activeMode === 'ai') {
-                    headerStatusText.textContent = 'AI-svar';
+                    headerStatusText.textContent = t.statusAi;
                 } else if (activeMode === 'google_chat') {
-                    headerStatusText.textContent = 'Live Chat';
+                    headerStatusText.textContent = t.statusLive;
                 } else if (activeMode === 'email') {
-                    headerStatusText.textContent = 'E-post';
+                    headerStatusText.textContent = t.statusEmail;
                 }
             }
 
@@ -3193,34 +3387,79 @@ window.addEventListener('load', () => {
                 questions.push(text);
             };
 
-            if (/donasjon|gave|vipps|fast giver|støtt/.test(haystack)) {
-                addQuestion('Hvordan kan jeg bli fast giver?');
-                addQuestion('Hvilke prosjekter trenger mest støtte akkurat nå?');
-                addQuestion('Kan du forklare hvordan jeg gir via Vipps?');
+            if (chatLang === 'en') {
+                if (/donat|give|vipps|partner|support/.test(haystack)) {
+                    addQuestion('How can I become a regular donor?');
+                    addQuestion('Which projects need support right now?');
+                    addQuestion('How can I donate?');
+                }
+                if (/event|calendar|seminar|course/.test(haystack)) {
+                    addQuestion('What events are happening this month?');
+                    addQuestion('How do I register for an event?');
+                    addQuestion('Can you recommend a course for beginners?');
+                }
+                if (/bible|faith|prayer|jesus|teaching|podcast|youtube|media/.test(haystack)) {
+                    addQuestion('Can you recommend a teaching series on this topic?');
+                    addQuestion('Do you have a podcast episode about this?');
+                    addQuestion('Can you share a short Bible verse about this?');
+                }
+                if (/contact|help|speak|person|advice/.test(haystack)) {
+                    addQuestion('How can I contact the team directly?');
+                    addQuestion('Can you follow up with me by email?');
+                    addQuestion('Can I speak with a person instead of AI?');
+                }
+                addQuestion('Can you explain this more simply?');
+                addQuestion('Can you give a concrete example?');
+                addQuestion('What is the best next step for me now?');
+            } else if (chatLang === 'es') {
+                if (/donac|dar|vipps|socio|apoy/.test(haystack)) {
+                    addQuestion('¿Cómo puedo ser un donante mensual?');
+                    addQuestion('¿Qué proyectos necesitan apoyo en este momento?');
+                    addQuestion('¿Cómo puedo donar?');
+                }
+                if (/evento|calendario|seminario|curso/.test(haystack)) {
+                    addQuestion('¿Qué eventos hay este mes?');
+                    addQuestion('¿Cómo me inscribo en un evento?');
+                    addQuestion('¿Puedes recomendarme un curso para principiantes?');
+                }
+                if (/biblia|fe|oración|jesús|enseñanza|podcast|youtube|media/.test(haystack)) {
+                    addQuestion('¿Puedes recomendar una serie de enseñanza sobre este tema?');
+                    addQuestion('¿Tienen un episodio de podcast sobre esto?');
+                    addQuestion('¿Puedes compartir un versículo bíblico corto sobre esto?');
+                }
+                if (/contacto|ayuda|hablar|persona|consejo/.test(haystack)) {
+                    addQuestion('¿Cómo puedo contactar al equipo directamente?');
+                    addQuestion('¿Pueden darme seguimiento por correo?');
+                    addQuestion('¿Puedo hablar con una persona en lugar de la IA?');
+                }
+                addQuestion('¿Puedes explicar esto de forma más sencilla?');
+                addQuestion('¿Puedes dar un ejemplo concreto?');
+                addQuestion('¿Cuál es el mejor siguiente paso para mí?');
+            } else {
+                if (/donasjon|gave|vipps|fast giver|støtt/.test(haystack)) {
+                    addQuestion('Hvordan kan jeg bli fast giver?');
+                    addQuestion('Hvilke prosjekter trenger mest støtte akkurat nå?');
+                    addQuestion('Kan du forklare hvordan jeg gir via Vipps?');
+                }
+                if (/arrangement|kalender|event|seminar|kurs/.test(haystack)) {
+                    addQuestion('Hvilke arrangementer skjer denne måneden?');
+                    addQuestion('Hvordan melder jeg meg på et arrangement?');
+                    addQuestion('Kan du anbefale et kurs som passer for nybegynnere?');
+                }
+                if (/bibel|tro|bønn|jesus|undervisning|podcast|youtube|media/.test(haystack)) {
+                    addQuestion('Kan du anbefale en undervisningsserie om dette temaet?');
+                    addQuestion('Har dere en podcast-episode som passer til dette?');
+                    addQuestion('Kan du gi et kort bibelvers om dette?');
+                }
+                if (/kontakt|hjelp|snakke med|person|råd/.test(haystack)) {
+                    addQuestion('Hvordan kan jeg kontakte teamet direkte?');
+                    addQuestion('Kan dere følge meg opp på e-post?');
+                    addQuestion('Kan jeg få snakke med en person i stedet for AI?');
+                }
+                addQuestion('Kan du forklare dette enklere?');
+                addQuestion('Kan du gi et konkret eksempel?');
+                addQuestion('Hva er beste neste steg for meg nå?');
             }
-
-            if (/arrangement|kalender|event|seminar|kurs/.test(haystack)) {
-                addQuestion('Hvilke arrangementer skjer denne måneden?');
-                addQuestion('Hvordan melder jeg meg på et arrangement?');
-                addQuestion('Kan du anbefale et kurs som passer for nybegynnere?');
-            }
-
-            if (/bibel|tro|bønn|jesus|undervisning|podcast|youtube|media/.test(haystack)) {
-                addQuestion('Kan du anbefale en undervisningsserie om dette temaet?');
-                addQuestion('Har dere en podcast-episode som passer til dette?');
-                addQuestion('Kan du gi et kort bibelvers om dette?');
-            }
-
-            if (/kontakt|hjelp|snakke med|person|råd/.test(haystack)) {
-                addQuestion('Hvordan kan jeg kontakte teamet direkte?');
-                addQuestion('Kan dere følge meg opp på e-post?');
-                addQuestion('Kan jeg få snakke med en person i stedet for AI?');
-            }
-
-            // Always include useful generic follow-ups as fallback.
-            addQuestion('Kan du forklare dette enklere?');
-            addQuestion('Kan du gi et konkret eksempel?');
-            addQuestion('Hva er beste neste steg for meg nå?');
 
             return questions.slice(0, 3);
         };
@@ -3233,7 +3472,7 @@ window.addEventListener('load', () => {
 
             const label = document.createElement('p');
             label.className = 'hkm-chat-followups-label';
-            label.textContent = 'Forslag til neste sporsmal:';
+            label.textContent = t.followUpLabel;
             wrap.appendChild(label);
 
             const list = document.createElement('div');
@@ -3354,9 +3593,16 @@ window.addEventListener('load', () => {
         };
 
         const renderMessages = () => {
-            if (activeMode === 'email') {
-                bodyEl.innerHTML = '';
-                return;
+            if (!bodyEl) return;
+
+            if (showAllHistory && activeMode === 'ai') {
+                const historyNotice = document.createElement('div');
+                historyNotice.className = 'hkm-chat-msg system';
+                historyNotice.style.fontSize = '11px';
+                historyNotice.style.opacity = '0.7';
+                historyNotice.style.textAlign = 'center';
+                historyNotice.textContent = '--- Visar all samtalelogg ---';
+                bodyEl.appendChild(historyNotice);
             }
 
             bodyEl.innerHTML = '';
@@ -3366,17 +3612,12 @@ window.addEventListener('load', () => {
                 if (activeMode === 'ai') {
                     const welcomeMsg = document.createElement('div');
                     welcomeMsg.className = 'hkm-chat-msg agent';
-                    welcomeMsg.innerHTML = 'Hei! Hva kan jeg hjelpe deg med i dag? 😊';
+                    welcomeMsg.innerHTML = t.welcomeMsg;
                     bodyEl.appendChild(welcomeMsg);
 
-                    // Vis start-spørsmål som forslag
-                    renderFollowUpSuggestions([
-                        'Hva er His Kingdom Ministry?',
-                        'Har dere en bibelsk tidslinje?',
-                        'Hvordan kan jeg bli fast giver?'
-                    ]);
+                    renderFollowUpSuggestions(t.initialQuestions);
                 } else {
-                    addSystemMessage((modeCopy[activeMode] && modeCopy[activeMode].empty) || 'Ingen meldinger enda.');
+                    addSystemMessage((modeCopy[activeMode] && modeCopy[activeMode].empty) || t.noMessagesYet);
                 }
                 return;
             }
@@ -3404,7 +3645,7 @@ window.addEventListener('load', () => {
                 typingMsg.className = 'hkm-chat-msg agent typing';
                 typingMsg.style.fontStyle = 'italic';
                 typingMsg.style.opacity = '0.7';
-                typingMsg.innerHTML = 'HKM Assistent skriver <span class="hkm-typing-dots"><span>.</span><span>.</span><span>.</span></span>';
+                typingMsg.innerHTML = t.typingMsg;
                 bodyEl.appendChild(typingMsg);
             }
 
@@ -3442,7 +3683,7 @@ window.addEventListener('load', () => {
                 } else {
                     bodyEl.scrollTop = bodyEl.scrollHeight;
                 }
-            }, 100);
+            }, 50);
         };
 
         const setActiveMode = async (mode) => {
@@ -3502,7 +3743,7 @@ window.addEventListener('load', () => {
             localStorage.setItem(privacyConsentKey, String(hasConsent));
             sendBtn.disabled = !hasConsent;
             if (!hasConsent) {
-                setStatus('Du må samtykke til personvern for å sende melding.', 'error');
+                setStatus(t.errPrivacyRequiredMsg, 'error');
                 return;
             }
             setStatus('');
@@ -3523,7 +3764,7 @@ window.addEventListener('load', () => {
                 await auth.signInAnonymously();
             } catch (error) {
                 console.error('[VisitorChat] Anonymous auth failed:', error);
-                setStatus('Chat er midlertidig utilgjengelig. Prov igjen senere.', 'error');
+                setStatus(t.errChatUnavailable, 'error');
                 form.style.display = 'none';
                 return;
             }
@@ -3531,7 +3772,7 @@ window.addEventListener('load', () => {
 
         const uid = auth.currentUser && auth.currentUser.uid;
         if (!uid) {
-            setStatus('Chat kunne ikke starte.', 'error');
+            setStatus(t.errChatStartFailed, 'error');
             return;
         }
 
@@ -3619,7 +3860,7 @@ window.addEventListener('load', () => {
             humanBridge.classList.toggle('hkm-chat-hidden', !showBridge);
         }, (error) => {
             console.error('[VisitorChat] Snapshot error:', error);
-            setStatus('Mistet tilkoblingen til chatten.', 'error');
+            setStatus(t.errConnectionLost, 'error');
         });
 
         form.addEventListener('submit', async (event) => {
@@ -3628,16 +3869,16 @@ window.addEventListener('load', () => {
             if (!text) return;
 
             if (text.length > MAX_MESSAGE_LENGTH) {
-                setStatus(`Maks ${MAX_MESSAGE_LENGTH} tegn per melding.`, 'error');
+                setStatus(t.errMaxChars(MAX_MESSAGE_LENGTH), 'error');
                 return;
             }
             if (!privacyCheckbox.checked) {
-                setStatus('Du må samtykke til personvern for å sende melding.', 'error');
+                setStatus(t.errPrivacyRequiredMsg, 'error');
                 return;
             }
 
             sendBtn.disabled = true;
-            setStatus('Sender melding...');
+            setStatus(t.sendingMsg);
             try {
                 await db.collection('visitorChats')
                     .doc(chatId)

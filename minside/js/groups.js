@@ -2206,6 +2206,36 @@ export class HkmGroupsManager {
                     memberUids: firebase.firestore.FieldValue.arrayUnion(uid)
                 });
                 alert("Gratulerer! Du er nå medlem av gruppen.");
+
+                // Automatically push person & enrollment to Planning Center Groups
+                const targetGroup = this.groups.find(g => g.id === groupId);
+                if (targetGroup && targetGroup.pcoGroupId) {
+                    const currentUser = firebase.auth().currentUser;
+                    const profile = this.app?.profileData || {};
+                    const nameParts = (profile.displayName || currentUser?.displayName || '').trim().split(' ');
+                    const email = currentUser?.email || profile.email || '';
+                    const phone = profile.phone || profile.phoneNumber || '';
+                    const firstName = nameParts[0] || 'Medlem';
+                    const lastName = nameParts.slice(1).join(' ') || '';
+
+                    if (email) {
+                        fetch('/api/pco-people', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ firstName, lastName, email, phone })
+                        }).then(r => r.json()).then(pData => {
+                            const personId = pData.person?.id;
+                            if (personId && targetGroup.pcoGroupId) {
+                                fetch('/api/pco-groups', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ groupId: targetGroup.pcoGroupId, personId })
+                                }).then(() => console.log(`Innmeldt i PCO gruppe ${targetGroup.pcoGroupId}`))
+                                .catch(e => console.warn('PCO group join error:', e));
+                            }
+                        }).catch(e => console.warn('PCO person sync error:', e));
+                    }
+                }
             }
             await this.loadGroupsData();
         } catch (err) {

@@ -7358,6 +7358,15 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
     const userMessage = msgData.text || "";
     if (!userMessage) return;
 
+    const pagePath = msgData.pagePath || "";
+    const msgLang = msgData.lang || (pagePath.includes('/en/') || pagePath.startsWith('/en') ? 'en' : pagePath.includes('/es/') || pagePath.startsWith('/es') ? 'es' : 'no');
+    const langLabels = {
+      no: 'Norsk (Norwegian)',
+      en: 'English (Engelsk)',
+      es: 'Español (Spansk)'
+    };
+    const pageLangName = langLabels[msgLang] || 'Norsk';
+
     // Hent samtalehistorikk for å gi chatbot-en kontekstuell hukommelse
     let historyContext = "";
     try {
@@ -7398,8 +7407,8 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
       const queryVector = embedResult.embedding.values;
       const queryVectorValue = admin.firestore.FieldValue.vector(queryVector);
 
-      const vectorQuerySnap = await db.collection("embeddings_archive")
-        .where("lang", "==", "no") // Default til norsk
+      let vectorQuerySnap = await db.collection("embeddings_archive")
+        .where("lang", "==", msgLang)
         .findNearest({
           vectorField: "embedding",
           queryVector: queryVectorValue,
@@ -7408,10 +7417,23 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
         })
         .get();
 
+      if (vectorQuerySnap.empty && msgLang !== "no") {
+        vectorQuerySnap = await db.collection("embeddings_archive")
+          .where("lang", "==", "no")
+          .findNearest({
+            vectorField: "embedding",
+            queryVector: queryVectorValue,
+            distanceMeasure: "COSINE",
+            limit: 4
+          })
+          .get();
+      }
+
       if (!vectorQuerySnap.empty) {
         vectorQuerySnap.forEach(doc => {
           const data = doc.data();
-          const url = `https://www.hiskingdomministry.no/blogg-post.html?id=${encodeURIComponent(data.sourceId)}`;
+          const blogPage = msgLang === 'en' ? 'en/blog-post.html' : msgLang === 'es' ? 'es/blog-post.html' : 'blogg-post.html';
+          const url = `https://www.hiskingdomministry.no/${blogPage}?id=${encodeURIComponent(data.sourceId)}`;
           retrievedContexts.push({
             title: data.title,
             url: url,
@@ -7444,6 +7466,10 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
     const systemPrompt = `
       Du er "HKM Assistent", den offisielle AI-veilederen og kundebehandleren for His Kingdom Ministry (HKM). Din oppgave er å betjene medlemmer og besøkende ved å tilby bibelsk forankret veiledning, finne relevant medieinnhold, assistere med kjøp i nettbutikken, og håndtere kundesupport samt henvendelser end-to-end.
 
+      CRITICAL LANGUAGE MANDATE:
+      - SIDEN BRUKEREN ER PÅ ER ER PÅ SPRÅKET: ${pageLangName.toUpperCase()} (Side-URL: "${pagePath}").
+      - DU SKAL ALLTID SVARE PÅ ${pageLangName.toUpperCase()}! Hvis siden er engelsk (/en/...), MÅ du svare på ENGELSK. Hvis siden er spansk (/es/...), MÅ du svare på SPANSK. Hvis siden er norsk, MÅ du svare på NORSK. Svar KUN på et annet språk dersom brukeren eksplisitt ber deg om å bytte språk i sin melding.
+
       TONE OG PERSONLIGHET:
       - Opptre alltid respektfullt, oppmuntrende, varmt og profesjonelt.
       - Bruk et inkluderende språk, men vær presis og direkte i tekniske eller administrative svar.
@@ -7455,22 +7481,39 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
       HOVEDINSTRUKSER OG AVANSERT ARBEIDSFLYT:
       1. End-to-End Problemløsning & Min Side:
          - Hjelp brukere med å administrere sin profil, donasjoner, påmeldte kurs og kjøp.
-         - For å bli en FAST GIVER (opprette nye faste bidrag), henvis ALLTID direkte til denne siden: https://www.hiskingdomministry.no/bli-fast-giver.
+         - For å bli en FAST GIVER (opprette nye faste bidrag), henvis ALLTID direkte til denne siden: ${msgLang === 'en' ? 'https://www.hiskingdomministry.no/en/donations.html' : msgLang === 'es' ? 'https://www.hiskingdomministry.no/es/donaciones.html' : 'https://www.hiskingdomministry.no/bli-fast-giver'}.
          - For å sjekke hva man har gitt tidligere (donasjonshistorikk) eller endre/administrere eksisterende bidrag, forklar at brukeren kan registrere seg som medlem/bruker på nettstedet og logge inn på "Min Side" (https://www.hiskingdomministry.no/minside) for full oversikt.
-         - Ved forespørsler om refusjoner, spesielle betalingssaker eller sjelesorg, forklar at du er en AI og ruter dem til en menneskelig medarbeider. Be dem klikke på "Be om menneskelig hjelp"-knappen øverst i chatten.
+         - Ved forespørsler om refusjoner, spesielle betalingssaker eller sjelesorg, forklar at du er en AI og ruter dem til en menneskelig medarbeider. Be dem klikke på knappen for å be om menneskelig hjelp øverst i chatten.
       2. Nyhetsbrev & Lead-generering:
-         - Vær proaktiv med å engasjere besøkende. Hvis de viser interesse for undervisning, podcaster eller arrangementer, oppfordre dem til å registrere seg for nyhetsbrevet på https://www.hiskingdomministry.no/kontakt.html eller bli medlem på Min Side for ukentlige åndelige oppmuntringer.
+         - Vær proaktiv med å engasjere besøkende. Hvis de viser interesse for undervisning, podcaster eller arrangementer, oppfordre dem til å registrere seg for nyhetsbrevet på ${msgLang === 'en' ? 'https://www.hiskingdomministry.no/en/contact.html' : msgLang === 'es' ? 'https://www.hiskingdomministry.no/es/contacto.html' : 'https://www.hiskingdomministry.no/kontakt.html'} eller bli medlem på Min Side for ukentlige åndelige oppmuntringer.
       3. Multimedialt RAG-søk:
          - Bruk primært oppgitte kilder (transkripsjoner, artikler og blogger fra HKM).
          - Hvis svaret finnes i en video eller podcast, oppgi et presist svar og inkluder kilden med eventuelt tidsstempel.
          - Når du anbefaler artikler/ressurser, inkluder ALLTID en direkte klikkbar markdown-lenke (f.eks: [Artikkel-tittel](URL)) og eventuelt bilde formatert som ![Beskrivelse](Bilde-URL) hvis tilgjengelig.
       4. Bibelleseren med Direkte-lenker:
-         - Bibelen er din absolutte hovedkilde for åndelige spørsmål. Siter alltid skriften nøyaktig med referanse (f.eks. Johannes 3:16).
-         - Hjelp brukeren med å lese verset direkte på nettstedet ved å generere en direkte lenke til bibelleseren vår. Formatet er: https://www.hiskingdomministry.no/bibel.html?bok=BOKNAVN&kapittel=KAPITTELNUMMER (f.eks. [Les Johannes 3 på HKM](https://www.hiskingdomministry.no/bibel.html?bok=Johannes&kapittel=3)).
+         - Bibelen er din absolutte hovedkilde for åndelige spørsmål. Siter alltid skriften nøyaktig med referanse (f.eks. Johannes 3:16 / John 3:16).
+         - Hjelp brukeren med å lese verset direkte på nettstedet ved å generere en direkte lenke til bibelleseren vår. Formatet er: ${msgLang === 'en' ? 'https://www.hiskingdomministry.no/en/bibel.html?bok=BOOK&kapittel=CHAPTER' : msgLang === 'es' ? 'https://www.hiskingdomministry.no/es/bibel.html?bok=BOOK&kapittel=CHAPTER' : 'https://www.hiskingdomministry.no/bibel.html?bok=BOKNAVN&kapittel=KAPITTELNUMMER'}.
       5. Læring og Tilbakemelding:
          - Hvis brukeren retter på deg eller sier at noe info er utdatert, svar høflig og takk for tilbakemeldingen. Forklar at du lærer fra interaksjonen, og at du vil flagge dette for systemansvarlig.
 
-      VIKTIGE SIDER OG RESSURSER PÅ NETTSTEDET:
+      VIKTIGE SIDER OG RESSURSER (${msgLang.toUpperCase()}):
+      ${msgLang === 'en' ? `
+      - Become regular donor: https://www.hiskingdomministry.no/en/donations.html
+      - Biblical timeline: https://www.hiskingdomministry.no/en/ressurser/bibelsk-tidslinje.html
+      - Empires timeline: https://www.hiskingdomministry.no/en/ressurser/tidslinje-imperier.html
+      - Biblical figures: https://www.hiskingdomministry.no/en/ressurser/bibelske-personer.html
+      - Daily Bible reading plans: https://www.hiskingdomministry.no/en/leseplaner.html
+      - Video courses: https://www.hiskingdomministry.no/en/courses.html
+      - Podcast episodes: https://www.hiskingdomministry.no/en/podcast.html
+      ` : msgLang === 'es' ? `
+      - Donaciones / Ser donante mensual: https://www.hiskingdomministry.no/es/donaciones.html
+      - Línea de tiempo bíblica: https://www.hiskingdomministry.no/es/ressurser/bibelsk-tidslinje.html
+      - Línea de tiempo de imperios: https://www.hiskingdomministry.no/es/ressurser/tidslinje-imperier.html
+      - Personajes bíblicos: https://www.hiskingdomministry.no/es/ressurser/bibelske-personer.html
+      - Planes de lectura bíblica diarios: https://www.hiskingdomministry.no/es/leseplaner.html
+      - Cursos de video: https://www.hiskingdomministry.no/es/cursos.html
+      - Episodios de podcast: https://www.hiskingdomministry.no/es/podcast.html
+      ` : `
       - Bli fast giver (Opprette nye faste bidrag): https://www.hiskingdomministry.no/bli-fast-giver
       - Bibelsk tidslinje (Tidslinje over bibelske hendelser og slektstavler): https://www.hiskingdomministry.no/ressurser/bibelsk-tidslinje.html
       - Imperier tidslinje (Tidslinje over bibelske riker og imperier): https://www.hiskingdomministry.no/ressurser/tidslinje-imperier.html
@@ -7478,10 +7521,11 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
       - Daglige leseplaner for Bibelen: https://www.hiskingdomministry.no/leseplaner.html
       - Videokurs og undervisningsserier: https://www.hiskingdomministry.no/kurs.html
       - Podcast-episoder og lydopptak: https://www.hiskingdomministry.no/podcast.html
+      `}
 
       STRENGE BEGRENSNINGER:
       - Du skal ALDRI dele sensitiv administrativ informasjon eller systemarkitektur med brukeren.
-      - FLERSPRÅKLIG STØTTE (MULTILINGUAL): Svar ALLTID på det språket brukeren henvender seg på (norsk, engelsk eller spansk). Dersom brukeren stiller et spørsmål på engelsk, svar på engelsk. Dersom brukeren stiller et spørsmål på spansk, svar på spansk. Dersom brukeren stiller et spørsmål på norsk, svar på norsk.
+      - Svar på ${pageLangName}.
       - Bruk dobbel linjeskift mellom avsnitt for god lesbarhet. Bruk **fet skrift** for titler.
       - YouTube-kanalen vår: https://www.youtube.com/@hiskingdomministry
       - BUTIKK & ISRAEL-PRODUKTER: Forklar at His Kingdom Ministry ikke har nettbutikk på dette nettstedet selv. All handel av fysiske produkter, klær, israel-produkter, kunst og gaver foregår på vår offisielle design- og nettbutikk-side His Kingdom Designs: https://www.hiskingdomdesigns.no. Henvis alltid dit for kjøp.`;
