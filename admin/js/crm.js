@@ -321,6 +321,9 @@ class CRMManager {
         const hkmBulkExport = document.getElementById('hkm-bulk-export-btn');
         if (hkmBulkExport) hkmBulkExport.onclick = () => this.bulkExportCsv();
 
+        const hkmBulkExportGoogle = document.getElementById('hkm-bulk-export-google-btn');
+        if (hkmBulkExportGoogle) hkmBulkExportGoogle.onclick = () => this.exportGoogleGroupsCsv(true);
+
         const hkmBulkClear = document.getElementById('hkm-bulk-clear-btn');
         if (hkmBulkClear) {
             hkmBulkClear.onclick = () => {
@@ -1229,6 +1232,13 @@ class CRMManager {
                     onSelect: async () => this.exportContactsCsv()
                 },
                 {
+                    id: 'export-google-groups',
+                    icon: 'group_add',
+                    title: 'Google Groups',
+                    description: 'Eksportér i spesialformat for bulk-opplasting til Google Groups.',
+                    onSelect: async () => this.exportGoogleGroupsCsv(false)
+                },
+                {
                     id: 'copy-emails',
                     icon: 'content_copy',
                     title: 'Kopier e-postliste',
@@ -1256,11 +1266,11 @@ class CRMManager {
         const headers = ['id', 'firstName', 'lastName', 'displayName', 'email', 'phone', 'role', 'status', 'labels'];
         const escapeCsv = (val) => {
             const str = String(val ?? '');
-            return /[",;\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
+            return /[";\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
         };
 
         const lines = [
-            headers.join(','),
+            headers.join(';'),
             ...rows.map((c) => [
                 c.id,
                 c.firstName || '',
@@ -1271,12 +1281,51 @@ class CRMManager {
                 c.role || '',
                 c.status || '',
                 Array.isArray(c.labels) ? c.labels.join('|') : (c.label || '')
+            ].map(escapeCsv).join(';'))
+        ];
+
+        const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+        const bom = '\uFEFF';
+        this.downloadTextFile(`hkm-kontakter-${stamp}.csv`, bom + lines.join('\n'), 'text/csv;charset=utf-8;');
+        this.notify(`Eksporterte ${rows.length} kontakter til CSV.`);
+    }
+
+    exportGoogleGroupsCsv(selectedOnly = false) {
+        let rows = [];
+        if (selectedOnly) {
+            const selectedIds = this.selectedContactIds;
+            if (selectedIds.size === 0) return;
+            rows = this.contacts.filter(c => selectedIds.has(c.id));
+        } else {
+            rows = this.filteredContacts;
+        }
+
+        if (!rows.length) {
+            this.notify('Ingen kontakter å eksportere.', 'error');
+            return;
+        }
+
+        // Google Workspace Groups bulk upload requires comma separation and specific headers.
+        const headers = ['Group Email [Required]', 'Member Email', 'Member Type', 'Member Role'];
+        const escapeCsv = (val) => {
+            const str = String(val ?? '');
+            return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
+        };
+
+        const lines = [
+            headers.join(','),
+            ...rows.map((c) => [
+                '', // User must fill this in Excel, or we leave it blank so they can paste the column easily.
+                c.email || '',
+                'USER', // Default Member Type
+                'MEMBER' // Default Member Role
             ].map(escapeCsv).join(','))
         ];
 
         const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
-        this.downloadTextFile(`hkm-kontakter-${stamp}.csv`, lines.join('\n'), 'text/csv;charset=utf-8;');
-        this.notify(`Eksporterte ${rows.length} kontakter til CSV.`);
+        // Do not add BOM or use semicolon for Google Groups specific export, to ensure compatibility with Google parser.
+        this.downloadTextFile(`hkm-google-groups-${stamp}.csv`, lines.join('\n'), 'text/csv;charset=utf-8;');
+        this.notify(`Eksporterte ${rows.length} kontakter for Google Groups.`);
     }
 
     async copyFilteredEmails() {
@@ -3032,11 +3081,11 @@ class CRMManager {
         const headers = ['id', 'firstName', 'lastName', 'displayName', 'email', 'phone', 'role', 'status', 'labels'];
         const escapeCsv = (val) => {
             const str = String(val ?? '');
-            return /[",;\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
+            return /[";\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
         };
 
         const lines = [
-            headers.join(','),
+            headers.join(';'),
             ...rows.map((c) => [
                 c.id,
                 c.firstName || '',
@@ -3047,11 +3096,12 @@ class CRMManager {
                 c.role || '',
                 c.status || '',
                 Array.isArray(c.labels) ? c.labels.join('|') : (c.label || '')
-            ].map(escapeCsv).join(','))
+            ].map(escapeCsv).join(';'))
         ];
 
         const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
-        this.downloadTextFile(`hkm-kontakter-valgte-${stamp}.csv`, lines.join('\n'), 'text/csv;charset=utf-8;');
+        const bom = '\uFEFF';
+        this.downloadTextFile(`hkm-kontakter-valgte-${stamp}.csv`, bom + lines.join('\n'), 'text/csv;charset=utf-8;');
         this.notify(`Eksporterte ${rows.length} valgte kontakter til CSV.`);
     }
 
