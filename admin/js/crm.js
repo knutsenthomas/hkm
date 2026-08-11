@@ -1929,8 +1929,8 @@ class CRMManager {
                 this.notify("Kontakt lagret!");
             }
 
-            // Live Background Sync to Planning Center People
-            this.syncSingleContactToPlanningCenter(firstName, lastName, email, phone);
+            // Live Background Sync to Planning Center People (with tags)
+            this.syncSingleContactToPlanningCenter(firstName, lastName, email, phone, labelsArray);
 
             if (status === 'NETTSTEDSMEDLEM') {
                 await this.syncContactToUserCollection(email, `${firstName} ${lastName}`.trim(), phone, address, zip, city, country);
@@ -3623,11 +3623,13 @@ class CRMManager {
             const contactsToSync = (this.contacts || []).map(c => {
                 const nameStr = (c.name || c.displayName || `${c.firstName || ''} ${c.lastName || ''}`).trim();
                 const nameParts = nameStr.split(' ');
+                const tags = Array.isArray(c.labels) ? c.labels : (c.label ? [c.label] : (Array.isArray(c.tags) ? c.tags : []));
                 return {
                     firstName: nameParts[0] || 'Medlem',
                     lastName: nameParts.slice(1).join(' ') || '',
                     email: c.email || '',
-                    phone: c.phone || c.phoneNumber || ''
+                    phone: c.phone || c.phoneNumber || '',
+                    tags
                 };
             }).filter(c => c.firstName || c.email);
 
@@ -3677,13 +3679,13 @@ class CRMManager {
         }
     }
 
-    async syncSingleContactToPlanningCenter(firstName, lastName, email, phone) {
+    async syncSingleContactToPlanningCenter(firstName, lastName, email, phone, tags = []) {
         if (!firstName && !lastName && !email) return;
         try {
             await fetch('/api/pco-people', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ firstName, lastName, email, phone })
+                body: JSON.stringify({ firstName, lastName, email, phone, tags })
             });
             console.log(`PCO live-synk fullført for ${firstName} ${lastName}`);
         } catch (e) {

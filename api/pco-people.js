@@ -87,11 +87,13 @@ export default async function handler(req, res) {
           const fn = c.firstName || (c.name ? c.name.split(' ')[0] : 'Medlem');
           const ln = c.lastName || (c.name ? c.name.split(' ').slice(1).join(' ') : '');
           try {
+            const contactTags = Array.isArray(c.tags) ? c.tags : (Array.isArray(c.labels) ? c.labels : (c.label ? [c.label] : []));
             const syncRes = await createOrSyncPerson(authHeader, {
               firstName: fn,
               lastName: ln,
               email: c.email,
               phone: c.phone,
+              tags: contactTags,
               createFollowupTask: false
             });
             if (syncRes && syncRes.success) syncedCount++;
@@ -108,12 +110,12 @@ export default async function handler(req, res) {
       }
 
       // Handle Single Contact Sync
-      const { firstName, lastName, email, phone, note, createFollowupTask } = body;
+      const { firstName, lastName, email, phone, tags, note, createFollowupTask } = body;
       if (!firstName && !lastName) {
         return res.status(400).json({ error: 'firstName eller lastName er påkrevd.' });
       }
 
-      const syncRes = await createOrSyncPerson(authHeader, { firstName, lastName, email, phone, note, createFollowupTask });
+      const syncRes = await createOrSyncPerson(authHeader, { firstName, lastName, email, phone, tags, note, createFollowupTask });
       return res.status(200).json(syncRes);
     }
 
@@ -166,7 +168,7 @@ async function findExistingPerson(authHeader, firstName, lastName, email) {
   return null;
 }
 
-async function createOrSyncPerson(authHeader, { firstName, lastName, email, phone, note, createFollowupTask }) {
+async function createOrSyncPerson(authHeader, { firstName, lastName, email, phone, tags, note, createFollowupTask }) {
   // Search for existing person first to avoid creating duplicates in Planning Center
   const existingPerson = await findExistingPerson(authHeader, firstName, lastName, email);
   let personId = existingPerson?.id;
@@ -240,6 +242,11 @@ async function createOrSyncPerson(authHeader, { firstName, lastName, email, phon
     }
   }
 
+  // Sync tags/labels from HKM CRM to Planning Center People
+  if (Array.isArray(tags) && tags.length > 0 && personId) {
+    await syncPersonTags(authHeader, personId, tags);
+  }
+
   return {
     success: true,
     person: personData,
@@ -304,6 +311,111 @@ async function createWorkflowCard(authHeader, workflowId, personId, note = '') {
     return await cardRes.json();
   } catch (err) {
     console.warn('Workflow card creation warning:', err);
+    return null;
+  }
+}
+
+async function syncPersonTags(authHeader, personId, tags = []) {
+  if (!personId || !Array.isArray(tags) || tags.length === 0) return;
+
+  try {
+    const pcoTagsRes = await fetchPCO('https://api.planningcenteronline.com/people/v2/tags?per_page=100', {
+      headers: { Authorization: authHeader }
+    });
+    const pcoTagsData = await pcoTagsRes.json();
+    const existingPcoTags = pcoTagsData.data || [];
+
+    const personTaggingsRes = await fetchPCO(`https://api.planningcenteronline.com/people/v2/people/${personId}/taggings?include=tag`, {
+      headers: { Authorization: authHeader }
+    });
+    const personTaggingsData = await personTaggingsRes.json();
+    const existingTagIds = new Set((personTaggingsData.included || []).filter(inc => inc.type === 'Tag').map(t => t.id));
+
+    let hkmGroupTagId = null;
+
+    for (const rawTag of tags) {
+      if (!rawTag || typeof rawTag !== 'string') continue;
+      const tagName = rawTag.trim();
+      if (!tagName) continue;
+
+      let matchedTag = existingPcoTags.find(t => (t.attributes?.name || '').toLowerCase() === tagName.toLowerCase());
+
+      if (!matchedTag) {
+        if (!hkmGroupTagId) {
+          hkmGroupTagId = await ensureHkmTagGroup(authHeader);
+        }
+        if (hkmGroupTagId) {
+          matchedTag = await createPcoTag(authHeader, hkmGroupTagId, tagName);
+          if (matchedTag) existingPcoTags.push(matchedTag);
+        }
+      }
+
+      if (matchedTag && matchedTag.id && !existingTagIds.has(matchedTag.id)) {
+        await fetchPCO(`https://api.planningcenteronline.com/people/v2/people/${personId}/taggings`, {
+          method: 'POST',
+          headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            data: {
+              type: 'Tagging',
+              relationships: {
+                tag: {
+                  data: { type: 'Tag', id: matchedTag.id }
+                }
+              }
+            }
+          })
+        }).catch(err => console.warn(`Kunne ikke tagge ${tagName} på person ${personId}:`, err));
+        existingTagIds.add(matchedTag.id);
+      }
+    }
+  } catch (err) {
+    console.warn('syncPersonTags error:', err);
+  }
+}
+
+async function ensureHkmTagGroup(authHeader) {
+  try {
+    const res = await fetchPCO('https://api.planningcenteronline.com/people/v2/tag_groups', {
+      headers: { Authorization: authHeader }
+    });
+    const data = await res.json();
+    const existingGroup = (data.data || []).find(g => (g.attributes?.name || '').toLowerCase() === 'hkm crm');
+    if (existingGroup) return existingGroup.id;
+
+    const createRes = await fetchPCO('https://api.planningcenteronline.com/people/v2/tag_groups', {
+      method: 'POST',
+      headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        data: {
+          type: 'TagGroup',
+          attributes: { name: 'HKM CRM' }
+        }
+      })
+    });
+    const createData = await createRes.json();
+    return createData.data?.id;
+  } catch (e) {
+    console.warn('ensureHkmTagGroup error:', e);
+    return null;
+  }
+}
+
+async function createPcoTag(authHeader, tagGroupId, tagName) {
+  try {
+    const res = await fetchPCO(`https://api.planningcenteronline.com/people/v2/tag_groups/${tagGroupId}/tags`, {
+      method: 'POST',
+      headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        data: {
+          type: 'Tag',
+          attributes: { name: tagName }
+        }
+      })
+    });
+    const data = await res.json();
+    return data.data;
+  } catch (e) {
+    console.warn(`createPcoTag error for ${tagName}:`, e);
     return null;
   }
 }
