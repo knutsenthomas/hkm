@@ -113,6 +113,8 @@ const minsideTranslations = {
         'view.notes': 'Notater',
         'view.prayerWall': 'Bønnevegg',
         'view.groups': 'Grupper',
+        'view.tasks': 'Huskeliste',
+        'view.help': 'Hjelp & Support',
 
         // Overview
         'overview.goodMorning': 'God morgen',
@@ -375,7 +377,9 @@ const minsideTranslations = {
         'sidebar.kurs': 'Courses',
         'sidebar.readingPlans': 'Reading Plans',
         'sidebar.gaver': 'Giving',
+        'sidebar.grupper': 'Groups',
         'sidebar.aktivitet': 'ACTIVITY',
+        'sidebar.historikk': 'Activity',
         'sidebar.varslinger': 'Notifications',
         'sidebar.logg': 'Log',
         'sidebar.notater': 'Notes',
@@ -418,6 +422,9 @@ const minsideTranslations = {
         'overview.btnReadingPlansLabel': 'Reading Plans',
         'view.notes': 'Notes',
         'view.prayerWall': 'Prayer Wall',
+        'view.groups': 'Groups',
+        'view.tasks': 'Task List',
+        'view.help': 'Help & Support',
 
         // Overview
         'overview.goodMorning': 'Good morning',
@@ -680,7 +687,9 @@ const minsideTranslations = {
         'sidebar.kurs': 'Cursos',
         'sidebar.readingPlans': 'Planes de Lectura',
         'sidebar.gaver': 'Ofrendas',
+        'sidebar.grupper': 'Grupos',
         'sidebar.aktivitet': 'ACTIVIDAD',
+        'sidebar.historikk': 'Actividad',
         'sidebar.varslinger': 'Notificaciones',
         'sidebar.logg': 'Historial',
         'sidebar.notater': 'Notas',
@@ -723,6 +732,9 @@ const minsideTranslations = {
         'overview.btnReadingPlansLabel': 'Planes de Lectura',
         'view.notes': 'Notas',
         'view.prayerWall': 'Muro de Oración',
+        'view.groups': 'Grupos',
+        'view.tasks': 'Lista de tareas',
+        'view.help': 'Ayuda y Soporte',
 
         // Overview
         'overview.goodMorning': 'Buen día',
