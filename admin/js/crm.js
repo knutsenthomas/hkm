@@ -1305,27 +1305,54 @@ class CRMManager {
             return;
         }
 
-        // Google Workspace Groups bulk upload requires comma separation and specific headers.
-        const headers = ['Group Email [Required]', 'Member Email', 'Member Type', 'Member Role'];
-        const escapeCsv = (val) => {
-            const str = String(val ?? '');
-            return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
-        };
+        this.openCrmToolDialog({
+            mode: 'custom-html',
+            title: 'Eksport for Google Groups',
+            subtitle: 'Google Workspace krever at gruppe-e-posten er fylt ut for hver rad. Skriv den inn her, så fylles den ut automatisk i filen.',
+            confirmLabel: 'Eksporter fil',
+            cancelLabel: 'Avbryt',
+            html: `
+                <div class="crm-tool-form-grid">
+                    <label class="crm-tool-field">
+                        <span class="crm-tool-field-label">Gruppe E-postadresse <span style="color:red">*</span></span>
+                        <input id="crm-google-group-email" class="crm-tool-input" type="email" placeholder="f.eks. prayerteam@hkm.no" required>
+                    </label>
+                </div>
+            `,
+            onConfirm: async () => {
+                const emailInput = document.getElementById('crm-google-group-email');
+                const groupEmail = String(emailInput?.value || '').trim();
+                
+                if (!groupEmail || !groupEmail.includes('@')) {
+                    this.notify('Du må fylle inn en gyldig e-postadresse for gruppen.', 'error');
+                    emailInput?.focus();
+                    return false;
+                }
 
-        const lines = [
-            headers.join(','),
-            ...rows.map((c) => [
-                '', // User must fill this in Excel, or we leave it blank so they can paste the column easily.
-                c.email || '',
-                'USER', // Default Member Type
-                'MEMBER' // Default Member Role
-            ].map(escapeCsv).join(','))
-        ];
+                // Google Workspace Groups bulk upload requires comma separation and specific headers.
+                const headers = ['Group Email [Required]', 'Member Email', 'Member Type', 'Member Role'];
+                const escapeCsv = (val) => {
+                    const str = String(val ?? '');
+                    return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
+                };
 
-        const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
-        // Do not add BOM or use semicolon for Google Groups specific export, to ensure compatibility with Google parser.
-        this.downloadTextFile(`hkm-google-groups-${stamp}.csv`, lines.join('\n'), 'text/csv;charset=utf-8;');
-        this.notify(`Eksporterte ${rows.length} kontakter for Google Groups.`);
+                const lines = [
+                    headers.join(','),
+                    ...rows.map((c) => [
+                        groupEmail,
+                        c.email || '',
+                        'USER', // Default Member Type
+                        'MEMBER' // Default Member Role
+                    ].map(escapeCsv).join(','))
+                ];
+
+                const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+                // Do not add BOM or use semicolon for Google Groups specific export, to ensure compatibility with Google parser.
+                this.downloadTextFile(`hkm-google-groups-${stamp}.csv`, lines.join('\n'), 'text/csv;charset=utf-8;');
+                this.notify(`Eksporterte ${rows.length} kontakter for Google Groups.`);
+                return true;
+            }
+        });
     }
 
     async copyFilteredEmails() {
