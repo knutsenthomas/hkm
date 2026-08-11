@@ -1388,6 +1388,49 @@ export class HkmGroupsManager {
                 fetchedGroups.push({ id: doc.id, ...doc.data() });
             });
 
+            // Live Background Sync from Planning Center Groups API
+            try {
+                const pcoRes = await fetch('/api/pco-groups');
+                const pcoData = await pcoRes.json();
+                if (pcoRes.ok && Array.isArray(pcoData.groups) && pcoData.groups.length > 0) {
+                    for (const pcoG of pcoData.groups) {
+                        const existingMatch = fetchedGroups.find(g => 
+                            (g.pcoGroupId && g.pcoGroupId === pcoG.id) ||
+                            (g.name || '').toLowerCase().trim() === (pcoG.name || '').toLowerCase().trim()
+                        );
+
+                        const pcoPayload = {
+                            name: pcoG.name,
+                            description: pcoG.description || 'Gruppe fra Planning Center',
+                            meetingSchedule: pcoG.schedule || 'Fast samling',
+                            location: pcoG.location?.name || pcoG.location?.fullAddress || 'Zoom-møte',
+                            pcoGroupId: pcoG.id,
+                            churchCenterUrl: pcoG.churchCenterUrl,
+                            category: pcoG.groupType || 'Husfellesskap',
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        };
+
+                        if (existingMatch) {
+                            await db.collection('groups').doc(existingMatch.id).set(pcoPayload, { merge: true });
+                        } else {
+                            await db.collection('groups').add({
+                                ...pcoPayload,
+                                isPublic: pcoG.enrollmentOpen !== false,
+                                joinPolicy: pcoG.enrollmentOpen ? 'open' : 'closed',
+                                memberUids: [],
+                                leaderUids: [],
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        }
+                    }
+                    const freshSnap = await db.collection('groups').get();
+                    fetchedGroups = [];
+                    freshSnap.forEach(doc => fetchedGroups.push({ id: doc.id, ...doc.data() }));
+                }
+            } catch (pcoSyncErr) {
+                console.warn("PCO Groups sync warning on Min Side:", pcoSyncErr);
+            }
+
             this.groups = fetchedGroups;
             const uid = firebase.auth().currentUser?.uid;
 
