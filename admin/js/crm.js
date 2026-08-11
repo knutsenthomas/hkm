@@ -3637,24 +3637,24 @@ class CRMManager {
         const btn = document.querySelector(`.sync-group-members-btn[data-group-id="${pcoGroupId}"]`);
         if (btn) {
             btn.disabled = true;
-            btn.innerHTML = `<span class="material-symbols-outlined spin" style="font-size: 16px;">sync</span> Synkroniserer...`;
+            btn.innerHTML = `<span class="material-symbols-outlined spin" style="font-size: 16px;">sync</span> Renser og synkroniserer...`;
         }
 
         try {
             const db = window.firebaseService.db;
             const syncedPeople = [];
 
-            // 1. Gather matching HKM Firestore groups
+            // 1. Gather exact group document from Firestore
             const groupsSnap = await db.collection('groups').get();
             let hkmGroupDocs = [];
             groupsSnap.forEach(doc => {
                 const data = doc.data();
-                if (data.pcoGroupId === pcoGroupId || (data.name || '').toLowerCase().includes('bønn') || (data.name || '').toLowerCase().includes('prayer') || doc.id === 'tQwjAxNHl7Ihk6jwcW2') {
+                if (data.pcoGroupId === pcoGroupId || doc.id === 'tQwjAxNHl7Ihk6jwcW2' || (data.name || '').toLowerCase().includes('bønn') || (data.name || '').toLowerCase().includes('prayer')) {
                     hkmGroupDocs.push({ id: doc.id, ...data });
                 }
             });
 
-            // Extract all memberNames, leaderNames, and members from Firestore group documents
+            // Extract exact memberNames, leaderNames, and members from Firestore group documents
             hkmGroupDocs.forEach(g => {
                 const rawNames = [...(g.leaderNames || []), ...(g.memberNames || []), ...(g.members || [])];
                 rawNames.forEach(n => {
@@ -3663,7 +3663,7 @@ class CRMManager {
                         const firstName = nameParts[0] || 'Medlem';
                         const lastName = nameParts.slice(1).join(' ') || '';
                         if (!syncedPeople.some(p => p.firstName.toLowerCase() === firstName.toLowerCase() && p.lastName.toLowerCase() === lastName.toLowerCase())) {
-                            syncedPeople.push({ firstName, lastName, email: '', phone: '' });
+                            syncedPeople.push({ firstName, lastName, fullName: `${firstName} ${lastName}`.trim(), email: '', phone: '' });
                         }
                     } else if (typeof n === 'object' && n) {
                         const nName = n.name || `${n.firstName || ''} ${n.lastName || ''}`.trim();
@@ -3674,68 +3674,67 @@ class CRMManager {
                             const email = n.email || '';
                             const phone = n.phone || n.phoneNumber || '';
                             if (!syncedPeople.some(p => (p.email && email && p.email.toLowerCase() === email.toLowerCase()) || (p.firstName.toLowerCase() === firstName.toLowerCase() && p.lastName.toLowerCase() === lastName.toLowerCase()))) {
-                                syncedPeople.push({ firstName, lastName, email, phone });
+                                syncedPeople.push({ firstName, lastName, fullName: `${firstName} ${lastName}`.trim(), email, phone });
                             }
                         }
                     }
                 });
             });
 
-            // Gather all user UIDs from memberUids & leaderUids
-            const uidsToSync = new Set();
-            hkmGroupDocs.forEach(g => {
-                (g.memberUids || []).forEach(uid => uidsToSync.add(uid));
-                (g.leaderUids || []).forEach(uid => uidsToSync.add(uid));
-                (g.pendingUids || []).forEach(uid => uidsToSync.add(uid));
-            });
+            // If syncedPeople is still empty, fallback to users/contacts matching group
+            if (syncedPeople.length === 0) {
+                const contactsSnap = await db.collection('contacts').get();
+                contactsSnap.forEach(doc => {
+                    const c = doc.data();
+                    const nameParts = (c.name || c.displayName || `${c.firstName || ''} ${c.lastName || ''}`).trim().split(' ');
+                    const firstName = nameParts[0] || 'Medlem';
+                    const lastName = nameParts.slice(1).join(' ') || '';
+                    const email = c.email || '';
+                    const phone = c.phone || c.phoneNumber || '';
+                    const labelsArr = Array.isArray(c.labels) ? c.labels : (c.label ? [c.label] : []);
+                    const labelsStr = labelsArr.join(' ').toLowerCase();
 
-            // 2. Fetch users from Firestore 'users' collection
-            for (const uid of uidsToSync) {
-                try {
-                    const userDoc = await db.collection('users').doc(uid).get();
-                    if (userDoc.exists) {
-                        const uData = userDoc.data();
-                        const nameParts = (uData.displayName || uData.name || '').trim().split(' ');
-                        const firstName = nameParts[0] || 'Medlem';
-                        const lastName = nameParts.slice(1).join(' ') || '';
-                        const email = uData.email || '';
-                        const phone = uData.phone || uData.phoneNumber || '';
-                        if (email || firstName) {
-                            if (!syncedPeople.some(p => (p.email && email && p.email.toLowerCase() === email.toLowerCase()) || (p.firstName.toLowerCase() === firstName.toLowerCase() && p.lastName.toLowerCase() === lastName.toLowerCase()))) {
-                                syncedPeople.push({ firstName, lastName, email, phone });
-                            }
+                    if (labelsStr.includes('bønn') || labelsStr.includes('prayer') || c.groupId === pcoGroupId) {
+                        if (!syncedPeople.some(p => (p.email && email && p.email.toLowerCase() === email.toLowerCase()) || (p.firstName.toLowerCase() === firstName.toLowerCase() && p.lastName.toLowerCase() === lastName.toLowerCase()))) {
+                            syncedPeople.push({ firstName, lastName, fullName: `${firstName} ${lastName}`.trim(), email, phone });
                         }
                     }
-                } catch (e) {}
+                });
             }
 
-            // 3. Only add contacts from CRM contacts collection if their label/tag explicitly matches the group name/tag
-            const groupNameLower = groupName.toLowerCase();
-            const contactsSnap = await db.collection('contacts').get();
-            contactsSnap.forEach(doc => {
-                const c = doc.data();
-                const nameParts = (c.name || c.displayName || `${c.firstName || ''} ${c.lastName || ''}`).trim().split(' ');
-                const firstName = nameParts[0] || 'Medlem';
-                const lastName = nameParts.slice(1).join(' ') || '';
-                const email = c.email || '';
-                const phone = c.phone || c.phoneNumber || '';
-                const labelsArr = Array.isArray(c.labels) ? c.labels : (c.label ? [c.label] : []);
-                const labelsStr = labelsArr.join(' ').toLowerCase();
+            // 2. Fetch current PCO memberships to prune extra members
+            const pcoGroupsRes = await fetch('/api/pco-groups', { method: 'GET' });
+            const pcoGroupsData = await pcoGroupsRes.json();
+            const currentPcoGroup = (pcoGroupsData.groups || []).find(g => g.id === pcoGroupId);
+            const currentPcoMembers = currentPcoGroup?.members || [];
 
-                const isMatch = labelsStr.includes('bønn') || labelsStr.includes('prayer') || labelsStr.includes(groupNameLower) || c.groupId === pcoGroupId || c.group === groupName;
+            let prunedCount = 0;
+            for (const pcoMem of currentPcoMembers) {
+                const pcoMemName = (pcoMem.name || '').toLowerCase().trim();
+                const isAllowed = syncedPeople.some(sp => 
+                    sp.fullName.toLowerCase() === pcoMemName || 
+                    pcoMemName.includes(sp.firstName.toLowerCase()) && pcoMemName.includes(sp.lastName.toLowerCase())
+                );
 
-                if (isMatch) {
-                    if (!syncedPeople.some(p => (p.email && email && p.email.toLowerCase() === email.toLowerCase()) || (p.firstName.toLowerCase() === firstName.toLowerCase() && p.lastName.toLowerCase() === lastName.toLowerCase()))) {
-                        syncedPeople.push({ firstName, lastName, email, phone });
+                if (!isAllowed && pcoMem.id) {
+                    try {
+                        await fetch('/api/pco-groups', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ action: 'delete', membershipId: pcoMem.id, groupId: pcoGroupId })
+                        });
+                        prunedCount++;
+                    } catch (e) {
+                        console.warn(`Feil ved utmelding av ${pcoMem.name}:`, e);
                     }
                 }
-            });
+            }
 
+            // 3. Enroll exact members
             let successCount = 0;
             for (const p of syncedPeople) {
                 if (!p.email && !p.firstName) continue;
                 try {
-                    // Create/ensure person in Planning Center
                     const pcoPersonRes = await fetch('/api/pco-people', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -3750,7 +3749,6 @@ class CRMManager {
                     const personId = pcoPersonData.person?.id;
 
                     if (personId) {
-                        // Enroll in PCO Group
                         const enrollRes = await fetch('/api/pco-groups', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -3763,7 +3761,8 @@ class CRMManager {
                 }
             }
 
-            alert(`✅ Suksess! ${successCount} medlemmer ble synkronisert direkte inn i Planning Center-gruppen "${groupName}".`);
+            const pruneMsg = prunedCount > 0 ? ` (${prunedCount} overflødige medlemmer ble fjernet).` : '.';
+            alert(`✅ Suksess! Gruppen "${groupName}" er nå oppdatert med nøyaktig ${successCount} medlemmer${pruneMsg}`);
             await this.loadPcoGroups();
         } catch (err) {
             console.error('syncHkmMembersToPcoGroup error:', err);

@@ -120,6 +120,30 @@ export default async function handler(req, res) {
       });
     }
 
+    if (req.method === 'DELETE' || (req.method === 'POST' && req.body?.action === 'delete')) {
+      const membershipId = req.query?.membershipId || req.body?.membershipId;
+      const groupId = req.query?.groupId || req.body?.groupId;
+
+      if (!membershipId) {
+        return res.status(400).json({ error: 'membershipId er påkrevd for utmelding.' });
+      }
+
+      const url = groupId 
+        ? `https://api.planningcenteronline.com/groups/v2/groups/${groupId}/memberships/${membershipId}`
+        : `https://api.planningcenteronline.com/groups/v2/memberships/${membershipId}`;
+
+      const pcoRes = await fetch(url, {
+        method: 'DELETE',
+        headers: { Authorization: authHeader }
+      });
+
+      if (!pcoRes.ok && pcoRes.status !== 404) {
+        return res.status(pcoRes.status).json({ error: 'Kunne ikke melde ut bruker fra Planning Center-gruppe.' });
+      }
+
+      return res.status(200).json({ success: true, membershipId });
+    }
+
     if (req.method === 'POST') {
       const { groupId, personId, role = 'member' } = req.body || {};
       if (!groupId || !personId) {
