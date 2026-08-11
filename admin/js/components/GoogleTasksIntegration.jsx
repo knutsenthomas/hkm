@@ -185,33 +185,65 @@ export default function GoogleTasksIntegration() {
                         Synkroniser oppgaver og huskelister i HKM Studio med Google Tasks i sanntid.
                     </p>
 
-                    <div className="flex flex-wrap gap-3 items-center" style={{ marginTop: '20px' }}>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginTop: '20px', flexWrap: 'wrap' }}>
                         <button 
                             type="button"
                             onClick={() => setShowConfig(!showConfig)} 
-                            className={`flex items-center justify-center p-3 rounded-xl border-2 transition-all duration-300 cursor-pointer ${showConfig ? 'border-[#d17d39] text-[#d17d39] bg-orange-50' : 'border-slate-200 text-slate-500 hover:border-[#1B4965] hover:text-[#1B4965]'}`} 
+                            className="btn btn-secondary"
                             title="Google Tasks API-innstillinger"
-                            style={{ background: 'transparent', height: '42px', width: '42px', boxSizing: 'border-box' }}
+                            style={{
+                                height: '42px',
+                                width: '42px',
+                                borderRadius: '10px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                padding: 0,
+                                cursor: 'pointer',
+                                flexShrink: 0
+                            }}
                         >
-                            <span className="material-symbols-outlined text-lg" style={{ margin: 0 }}>settings</span>
+                            <span className="material-symbols-outlined" style={{ fontSize: '20px', display: 'block' }}>settings</span>
                         </button>
 
                         {googleConnected ? (
-                            <div className="flex gap-2 items-center flex-1 justify-end">
+                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flex: 1, flexWrap: 'wrap' }}>
                                 <button 
                                     type="button"
                                     onClick={handleManualSync} 
                                     disabled={syncing} 
-                                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold border-2 border-slate-200 hover:border-[#1B4965] hover:text-[#1B4965] bg-white text-slate-600 text-sm transition-all duration-300 cursor-pointer disabled:opacity-50"
-                                    style={{ height: '42px' }}
+                                    className="btn btn-primary"
+                                    style={{
+                                        height: '42px',
+                                        flex: 1,
+                                        minWidth: '140px',
+                                        background: '#d17d39',
+                                        color: '#ffffff',
+                                        fontWeight: '700',
+                                        border: 'none',
+                                        borderRadius: '10px',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '6px',
+                                        opacity: syncing ? 0.7 : 1
+                                    }}
                                 >
-                                    <span className={`material-symbols-outlined text-lg ${syncing ? 'animate-spin' : ''}`}>sync</span>
+                                    <span className={`material-symbols-outlined ${syncing ? 'animate-spin' : ''}`} style={{ fontSize: '18px', display: 'block' }}>sync</span>
                                     {syncing ? 'Synkroniserer...' : 'Synkroniser nå'}
                                 </button>
                                 <button 
                                     type="button"
                                     onClick={handleGoogleTasksAuth} 
-                                    className="text-xs font-bold text-slate-400 hover:text-red-500 transition-colors duration-200 border-none bg-none cursor-pointer px-3 py-2"
+                                    className="btn btn-secondary"
+                                    style={{
+                                        height: '42px',
+                                        padding: '0 14px',
+                                        borderRadius: '10px',
+                                        fontWeight: '600',
+                                        cursor: 'pointer'
+                                    }}
                                 >
                                     Koble fra
                                 </button>
@@ -220,10 +252,25 @@ export default function GoogleTasksIntegration() {
                             <button 
                                 type="button"
                                 onClick={handleGoogleTasksAuth} 
-                                className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold bg-gradient-to-r from-[#d17d39] to-[#bd4f2a] hover:from-[#e28e4a] hover:to-[#ce5d37] text-white text-sm hover:-translate-y-0.5 active:translate-y-0.5 active:scale-95 shadow-md shadow-orange-500/15 transition-all duration-300 cursor-pointer border-none ml-auto"
-                                style={{ height: '42px' }}
+                                className="btn btn-primary"
+                                style={{
+                                    height: '42px',
+                                    flex: 1,
+                                    minWidth: '160px',
+                                    background: '#d17d39',
+                                    color: '#ffffff',
+                                    fontWeight: '700',
+                                    border: 'none',
+                                    borderRadius: '10px',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '6px',
+                                    fontSize: '14px'
+                                }}
                             >
-                                <span className="material-symbols-outlined text-lg">link</span>
+                                <span className="material-symbols-outlined" style={{ fontSize: '18px', display: 'block' }}>link</span>
                                 Koble til Google Tasks
                             </button>
                         )}
