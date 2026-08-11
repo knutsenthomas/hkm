@@ -3550,18 +3550,28 @@ class CRMManager {
                 return;
             }
 
-            listEl.innerHTML = groups.map(g => `
-                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">
-                    <div>
-                        <div style="font-weight: 700; font-size: 14px; color: #0f172a;">${g.name}</div>
-                        <div style="font-size: 12px; color: #64748b; margin-top: 2px;">
-                            ${g.schedule ? `🕒 ${g.schedule}` : ''} ${g.location?.name ? `📍 ${g.location.name}` : ''}
+            listEl.innerHTML = groups.map(g => {
+                const membersStr = Array.isArray(g.members) && g.members.length > 0
+                    ? g.members.map(m => `${m.name}${m.role === 'Leder' ? ' (Leder)' : ''}`).join(', ')
+                    : '';
+                const statusText = g.enrollmentOpen 
+                    ? '• Åpen for påmelding' 
+                    : '• Stengt for påmelding / Privat';
+
+                return `
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; font-size: 14px; color: #0f172a;">${g.name}</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 2px;">
+                                ${g.schedule ? `🕒 ${g.schedule}` : ''} ${g.location?.name ? `📍 ${g.location.name}` : ''}
+                            </div>
+                            <div style="font-size: 11.5px; color: #d17d39; font-weight: 600; margin-top: 4px;">👥 ${g.membersCount} medlemmer ${statusText}</div>
+                            ${membersStr ? `<div style="font-size: 11.5px; color: #475569; margin-top: 6px; background: #f8fafc; padding: 6px 10px; border-radius: 6px; border: 1px solid #f1f5f9;"><strong>Deltakere:</strong> ${membersStr}</div>` : ''}
                         </div>
-                        <div style="font-size: 11px; color: #d17d39; font-weight: 600; margin-top: 4px;">👥 ${g.membersCount} medlemmer ${g.enrollmentOpen ? '• Åpen for påmelding' : ''}</div>
+                        ${g.churchCenterUrl ? `<a href="${g.churchCenterUrl}" target="_blank" class="btn btn-outline" style="font-size: 12px; height: 32px; padding: 0 12px; border-radius: 6px; text-decoration: none; flex-shrink: 0;">Vis i Church Center</a>` : ''}
                     </div>
-                    ${g.churchCenterUrl ? `<a href="${g.churchCenterUrl}" target="_blank" class="btn btn-outline" style="font-size: 12px; height: 32px; padding: 0 12px; border-radius: 6px; text-decoration: none;">Vis i Church Center</a>` : ''}
-                </div>
-            `).join('');
+                `;
+            }).join('');
 
         } catch (err) {
             console.error('loadPcoGroups error:', err);

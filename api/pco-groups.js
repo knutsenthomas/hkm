@@ -50,16 +50,58 @@ export default async function handler(req, res) {
         });
       }
 
-      const groups = (data.data || []).map(g => {
+      const rawGroups = data.data || [];
+      const groups = await Promise.all(rawGroups.map(async g => {
         const locRel = g.relationships?.location?.data;
         const typeRel = g.relationships?.group_type?.data;
+
+        let membersCount = g.attributes?.members_count || 0;
+        let membersList = [];
+        try {
+          const memRes = await fetch(`https://api.planningcenteronline.com/groups/v2/groups/${g.id}/memberships?include=person&per_page=100`, {
+            headers: { Authorization: authHeader }
+          });
+          const memData = await memRes.json();
+          if (memRes.ok && memData.data) {
+            membersCount = memData.meta?.total_count || memData.data.length;
+            const personMap = {};
+            if (Array.isArray(memData.included)) {
+              memData.included.forEach(inc => {
+                if (inc.type === 'Person') {
+                  personMap[inc.id] = inc.attributes;
+                }
+              });
+            }
+            membersList = memData.data.map(m => {
+              const pRel = m.relationships?.person?.data;
+              const personAttrs = pRel && personMap[pRel.id] ? personMap[pRel.id] : {};
+              const role = m.attributes?.role || 'member';
+              const firstName = personAttrs.first_name || '';
+              const lastName = personAttrs.last_name || '';
+              return {
+                id: m.id,
+                personId: pRel?.id || null,
+                name: `${firstName} ${lastName}`.trim() || 'Medlem',
+                role: role === 'leader' ? 'Leder' : 'Medlem',
+                email: personAttrs.primary_email_address || null
+              };
+            });
+          }
+        } catch (memErr) {
+          console.warn(`Kunne ikke hente medlemmer for gruppe ${g.id}:`, memErr);
+        }
+
+        const isEnrollmentOpen = g.attributes?.enrollment_open === true && g.attributes?.enrollment_display_strategy !== 'closed';
+
         return {
           id: g.id,
           name: g.attributes?.name || 'Husgruppe',
           description: g.attributes?.description || '',
           schedule: g.attributes?.schedule || '',
-          enrollmentOpen: g.attributes?.enrollment_open ?? true,
-          membersCount: g.attributes?.members_count || 0,
+          enrollmentOpen: isEnrollmentOpen,
+          enrollmentStrategy: g.attributes?.enrollment_display_strategy || (isEnrollmentOpen ? 'open' : 'closed'),
+          membersCount,
+          members: membersList,
           headerImageUrl: g.attributes?.header_image?.medium || g.attributes?.header_image?.thumbnail || null,
           churchCenterUrl: g.attributes?.public_church_center_web_url || null,
           createdAt: g.attributes?.created_at,
@@ -69,7 +111,7 @@ export default async function handler(req, res) {
           } : null,
           groupType: typeRel && groupTypesMap[typeRel.id] ? groupTypesMap[typeRel.id].name : null
         };
-      });
+      }));
 
       return res.status(200).json({
         success: true,
