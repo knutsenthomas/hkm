@@ -3644,17 +3644,7 @@ class CRMManager {
             const db = window.firebaseService.db;
             const syncedPeople = [];
 
-            // 1. Gather matching HKM Firestore groups
-            const groupsSnap = await db.collection('groups').get();
-            let hkmGroupDocs = [];
-            groupsSnap.forEach(doc => {
-                const data = doc.data();
-                if (data.pcoGroupId === pcoGroupId || doc.id === 'tQwjAxNHl7Ihk6jwcW2' || (data.name || '').toLowerCase().includes('bønn') || (data.name || '').toLowerCase().includes('prayer')) {
-                    hkmGroupDocs.push({ id: doc.id, ...data });
-                }
-            });
-
-            // Extract members from Firestore 'groupMembers' main collection
+            // 1. Gather all group members from Firestore 'groupMembers'
             try {
                 const gmSnap = await db.collection('groupMembers').get();
                 gmSnap.forEach(doc => {
@@ -3675,7 +3665,16 @@ class CRMManager {
                 console.warn('Feil ved oppslag i groupMembers:', e);
             }
 
-            // Extract all memberNames, leaderNames, and members from Firestore group documents
+            // 2. Gather from 'groups' collection
+            const groupsSnap = await db.collection('groups').get();
+            let hkmGroupDocs = [];
+            groupsSnap.forEach(doc => {
+                const data = doc.data();
+                if (data.pcoGroupId === pcoGroupId || doc.id === 'tQwjAxNHl7Ihk6jwcW2' || (data.name || '').toLowerCase().includes('bønn') || (data.name || '').toLowerCase().includes('prayer')) {
+                    hkmGroupDocs.push({ id: doc.id, ...data });
+                }
+            });
+
             hkmGroupDocs.forEach(g => {
                 const rawNames = [...(g.leaderNames || []), ...(g.memberNames || []), ...(g.members || [])];
                 rawNames.forEach(n => {
@@ -3702,7 +3701,7 @@ class CRMManager {
                 });
             });
 
-            // Gather all user UIDs from memberUids & leaderUids & fetch profiles from 'users' collection
+            // 3. Gather from 'users' collection (registered user accounts)
             const uidsToSync = new Set();
             hkmGroupDocs.forEach(g => {
                 (g.memberUids || []).forEach(uid => uidsToSync.add(uid));
@@ -3731,8 +3730,7 @@ class CRMManager {
                 }
             }
 
-            // 2. Also gather contacts from CRM contacts collection matching group tags/name
-            const groupNameLower = groupName.toLowerCase();
+            // 4. Merge all contacts from CRM 'contacts' collection
             const contactsSnap = await db.collection('contacts').get();
             contactsSnap.forEach(doc => {
                 const c = doc.data();
@@ -3741,12 +3739,8 @@ class CRMManager {
                 const lastName = nameParts.slice(1).join(' ') || '';
                 const email = c.email || '';
                 const phone = c.phone || c.phoneNumber || '';
-                const labelsArr = Array.isArray(c.labels) ? c.labels : (c.label ? [c.label] : []);
-                const labelsStr = labelsArr.join(' ').toLowerCase();
-
-                const isMatch = labelsStr.includes('bønn') || labelsStr.includes('prayer') || labelsStr.includes('bønneteam') || labelsStr.includes('bønnegruppe') || labelsStr.includes(groupNameLower) || c.groupId === pcoGroupId || c.group === groupName;
-
-                if (isMatch) {
+                
+                if (firstName || email) {
                     if (!syncedPeople.some(p => (p.email && email && p.email.toLowerCase() === email.toLowerCase()) || (p.firstName.toLowerCase() === firstName.toLowerCase() && p.lastName.toLowerCase() === lastName.toLowerCase()))) {
                         syncedPeople.push({ firstName, lastName, fullName: `${firstName} ${lastName}`.trim(), email, phone });
                     }
