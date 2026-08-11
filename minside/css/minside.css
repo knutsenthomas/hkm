@@ -4133,20 +4133,21 @@ html[data-theme="dark"] .profile-tab-btn.active {
 
 .ms-profile-avatar-upload-btn {
     position: absolute;
-    bottom: -4px;
-    right: -4px;
-    width: 32px;
-    height: 32px;
-    border-radius: 10px;
+    bottom: -2px;
+    right: -2px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
     background: var(--card-bg, #ffffff);
     color: var(--text-main, #0f172a);
-    border: 2px solid var(--border-solid, #e2e8f0);
+    border: 2px solid var(--card-bg, #ffffff);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     transition: all 0.2s ease;
+    z-index: 10;
 }
 
 .ms-profile-avatar-upload-btn:hover {
@@ -4157,7 +4158,14 @@ html[data-theme="dark"] .profile-tab-btn.active {
 }
 
 .ms-profile-avatar-upload-btn .material-symbols-outlined {
-    font-size: 17px;
+    font-size: 16px;
+}
+
+html[data-theme="dark"] .ms-profile-avatar-upload-btn {
+    background: #1e293b;
+    color: #f8fafc;
+    border-color: #1e293b;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .ms-profile-hero-info {
