@@ -379,7 +379,8 @@ async function ensureHkmTagGroup(authHeader) {
       headers: { Authorization: authHeader }
     });
     const data = await res.json();
-    const existingGroup = (data.data || []).find(g => (g.attributes?.name || '').toLowerCase() === 'hkm crm');
+    const groups = data.data || [];
+    const existingGroup = groups.find(g => (g.attributes?.name || '').toLowerCase() === 'hkm crm');
     if (existingGroup) return existingGroup.id;
 
     const createRes = await fetchPCO('https://api.planningcenteronline.com/people/v2/tag_groups', {
@@ -393,7 +394,15 @@ async function ensureHkmTagGroup(authHeader) {
       })
     });
     const createData = await createRes.json();
-    return createData.data?.id;
+    if (createRes.ok && createData.data?.id) {
+      return createData.data.id;
+    }
+
+    if (groups.length > 0) {
+      return groups[0].id;
+    }
+
+    return null;
   } catch (e) {
     console.warn('ensureHkmTagGroup error:', e);
     return null;
