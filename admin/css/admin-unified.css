@@ -11871,7 +11871,12 @@ html[data-theme="dark"] .status-pill.status-completed {
         display: none !important;
     }
     .contacts-grid .table-header #contacts-tools {
-        display: none !important;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        gap: 8px !important;
+        width: 100% !important;
     }
 
     /* Stack flex grids and grid-rows vertically in a single column */
