@@ -3709,7 +3709,8 @@ class CRMManager {
                 } catch (e) {}
             }
 
-            // 3. Also gather contacts from CRM contacts collection matching group name or tags
+            // 3. Only add contacts from CRM contacts collection if their label/tag explicitly matches the group name/tag
+            const groupNameLower = groupName.toLowerCase();
             const contactsSnap = await db.collection('contacts').get();
             contactsSnap.forEach(doc => {
                 const c = doc.data();
@@ -3718,9 +3719,15 @@ class CRMManager {
                 const lastName = nameParts.slice(1).join(' ') || '';
                 const email = c.email || '';
                 const phone = c.phone || c.phoneNumber || '';
+                const labelsArr = Array.isArray(c.labels) ? c.labels : (c.label ? [c.label] : []);
+                const labelsStr = labelsArr.join(' ').toLowerCase();
 
-                if (!syncedPeople.some(p => (p.email && email && p.email.toLowerCase() === email.toLowerCase()) || (p.firstName.toLowerCase() === firstName.toLowerCase() && p.lastName.toLowerCase() === lastName.toLowerCase()))) {
-                    syncedPeople.push({ firstName, lastName, email, phone });
+                const isMatch = labelsStr.includes('bønn') || labelsStr.includes('prayer') || labelsStr.includes(groupNameLower) || c.groupId === pcoGroupId || c.group === groupName;
+
+                if (isMatch) {
+                    if (!syncedPeople.some(p => (p.email && email && p.email.toLowerCase() === email.toLowerCase()) || (p.firstName.toLowerCase() === firstName.toLowerCase() && p.lastName.toLowerCase() === lastName.toLowerCase()))) {
+                        syncedPeople.push({ firstName, lastName, email, phone });
+                    }
                 }
             });
 
