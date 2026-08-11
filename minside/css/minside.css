@@ -6735,4 +6735,121 @@ html body [id="admin-avatar"] img {
     padding: 0 !important;
 }
 
+/* ==========================================================================
+   GLOBAL DARK THEME READABILITY & CONTRAST PROTECTION
+   ========================================================================== */
+html[data-theme="dark"] body.minside-body,
+html[data-theme="dark"] body.admin-body,
+html[data-theme="dark"] .main-content,
+html[data-theme="dark"] #content-area {
+    color: #f8fafc !important;
+    background-color: #0f172a !important;
+}
+
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] h3,
+html[data-theme="dark"] h4,
+html[data-theme="dark"] h5,
+html[data-theme="dark"] h6,
+html[data-theme="dark"] .section-title,
+html[data-theme="dark"] .section-header-title,
+html[data-theme="dark"] .card-title,
+html[data-theme="dark"] .panel-title,
+html[data-theme="dark"] #dashboard-main-header-title {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .section-subtitle,
+html[data-theme="dark"] .text-muted,
+html[data-theme="dark"] .subtext,
+html[data-theme="dark"] label {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] [style*="color: #0f172a"],
+html[data-theme="dark"] [style*="color:#0f172a"],
+html[data-theme="dark"] [style*="color: #1e293b"],
+html[data-theme="dark"] [style*="color:#1e293b"],
+html[data-theme="dark"] [style*="color: #334155"],
+html[data-theme="dark"] [style*="color:#334155"],
+html[data-theme="dark"] [style*="color: #111827"],
+html[data-theme="dark"] [style*="color:#111827"],
+html[data-theme="dark"] [style*="color: #000000"],
+html[data-theme="dark"] [style*="color:#000000"],
+html[data-theme="dark"] [style*="color: #000"],
+html[data-theme="dark"] [style*="color:#000"],
+html[data-theme="dark"] [style*="color: #333333"],
+html[data-theme="dark"] [style*="color:#333333"],
+html[data-theme="dark"] [style*="color: #333"],
+html[data-theme="dark"] [style*="color:#333"] {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] [style*="color: #64748b"],
+html[data-theme="dark"] [style*="color:#64748b"],
+html[data-theme="dark"] [style*="color: #6c757d"],
+html[data-theme="dark"] [style*="color:#6c757d"] {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] body.minside-body [style*="background: #ffffff"]:not(.btn):not(.btn-primary),
+html[data-theme="dark"] body.minside-body [style*="background:#ffffff"]:not(.btn):not(.btn-primary),
+html[data-theme="dark"] body.minside-body [style*="background: #fff"]:not(.btn):not(.btn-primary),
+html[data-theme="dark"] body.minside-body [style*="background:#fff"]:not(.btn):not(.btn-primary),
+html[data-theme="dark"] body.minside-body [style*="background-color: #ffffff"]:not(.btn):not(.btn-primary),
+html[data-theme="dark"] body.minside-body [style*="background-color: #fff"]:not(.btn):not(.btn-primary),
+html[data-theme="dark"] body.admin-body [style*="background: #ffffff"]:not(.btn):not(.btn-primary),
+html[data-theme="dark"] body.admin-body [style*="background:#ffffff"]:not(.btn):not(.btn-primary),
+html[data-theme="dark"] body.admin-body [style*="background-color: #ffffff"]:not(.btn):not(.btn-primary) {
+    background: #1e293b !important;
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .bento-card,
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .panel,
+html[data-theme="dark"] .design-ui-panel,
+html[data-theme="dark"] .modal-content,
+html[data-theme="dark"] .info-card,
+html[data-theme="dark"] .detail-card {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] table,
+html[data-theme="dark"] .data-table,
+html[data-theme="dark"] th,
+html[data-theme="dark"] td {
+    border-color: #334155 !important;
+    color: #e2e8f0 !important;
+}
+
+html[data-theme="dark"] th {
+    background-color: #0f172a !important;
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] tr:hover td {
+    background-color: #334155 !important;
+}
+
+html[data-theme="dark"] .form-control,
+html[data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]),
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+    color: #64748b !important;
+}
+
+
 
