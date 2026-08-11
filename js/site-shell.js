@@ -181,7 +181,7 @@ const COPY = {
             tax: 'Skattefradrag'
         },
         footer: {
-            description: 'His Kingdom Ministry er en non-profit organisasjon dedikert til åndelig vekst gjennom undervisning, podcast og reisevirksomhet.',
+            description: 'His Kingdom Ministry er en non-profit organisasjon dedikert til åndelig vekst gjennom undervisning, podcaster, arrangementer og digitale verktøy (HKM Studio) for kalender- og oppgavesynkronisering.',
             aboutTitle: 'Om oss',
             resourcesTitle: 'Ressurser',
             mediaTitle: 'Media',
@@ -268,7 +268,7 @@ const COPY = {
             tax: 'Tax Deduction'
         },
         footer: {
-            description: 'His Kingdom Ministry is a non-profit organization dedicated to spiritual growth through teaching, podcasts, and outreach.',
+            description: 'His Kingdom Ministry is a non-profit organization dedicated to spiritual growth through teaching, podcasts, events, and digital application tools (HKM Studio) for calendar and task synchronization.',
             aboutTitle: 'About',
             resourcesTitle: 'Resources',
             mediaTitle: 'Media',
@@ -355,7 +355,7 @@ const COPY = {
             tax: 'Deducción fiscal'
         },
         footer: {
-            description: 'His Kingdom Ministry es una organización sin ánimo de lucro dedicada al crecimiento espiritual mediante enseñanza, pódcast y actividades.',
+            description: 'His Kingdom Ministry es una organización sin fines de lucro dedicada al crecimiento espiritual a través de la enseñanza, pódcast, eventos y herramientas digitales (HKM Studio) para sincronización de calendario y tareas.',
             aboutTitle: 'Nosotros',
             resourcesTitle: 'Recursos',
             mediaTitle: 'Media',
