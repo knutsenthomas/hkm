@@ -3644,7 +3644,7 @@ class CRMManager {
             const db = window.firebaseService.db;
             const syncedPeople = [];
 
-            // 1. Gather exact group document from Firestore
+            // 1. Gather matching HKM Firestore groups
             const groupsSnap = await db.collection('groups').get();
             let hkmGroupDocs = [];
             groupsSnap.forEach(doc => {
@@ -3653,6 +3653,29 @@ class CRMManager {
                     hkmGroupDocs.push({ id: doc.id, ...data });
                 }
             });
+
+            // Extract members from Firestore 'groupMembers' sub-collection / main collection
+            for (const gDoc of hkmGroupDocs) {
+                try {
+                    const gmSnap = await db.collection('groupMembers').where('groupId', '==', gDoc.id).get();
+                    gmSnap.forEach(doc => {
+                        const gm = doc.data();
+                        const gmName = gm.name || `${gm.firstName || ''} ${gm.lastName || ''}`.trim();
+                        if (gmName) {
+                            const nameParts = gmName.split(' ');
+                            const firstName = nameParts[0] || 'Medlem';
+                            const lastName = nameParts.slice(1).join(' ') || '';
+                            const email = gm.email || '';
+                            const phone = gm.phone || gm.phoneNumber || '';
+                            if (!syncedPeople.some(p => (p.email && email && p.email.toLowerCase() === email.toLowerCase()) || (p.firstName.toLowerCase() === firstName.toLowerCase() && p.lastName.toLowerCase() === lastName.toLowerCase()))) {
+                                syncedPeople.push({ firstName, lastName, fullName: `${firstName} ${lastName}`.trim(), email, phone });
+                            }
+                        }
+                    });
+                } catch (e) {
+                    console.warn(`Feil ved oppslag i groupMembers for ${gDoc.id}:`, e);
+                }
+            }
 
             // Extract all memberNames, leaderNames, and members from Firestore group documents
             hkmGroupDocs.forEach(g => {
