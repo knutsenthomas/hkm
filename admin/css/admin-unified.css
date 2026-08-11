@@ -11664,17 +11664,17 @@ html[data-theme="dark"] .status-pill.status-completed {
         background: rgba(224, 108, 85, 0.15) !important;
     }
 
-    /* Horizontal scroll for Min Side where there are many items */
+    /* Center and fill mobile bottom nav evenly across 100% width */
     body.minside-body .mobile-bottom-nav,
     body.minside-body.admin-body .mobile-bottom-nav {
-        justify-content: flex-start !important;
-        overflow-x: auto !important;
-        overflow-y: hidden !important;
-        -webkit-overflow-scrolling: touch !important;
-        scrollbar-width: none !important;
-        padding-left: 16px !important;
-        padding-right: 16px !important;
-        gap: 8px !important;
+        display: flex !important;
+        justify-content: space-around !important;
+        align-items: center !important;
+        padding-left: 4px !important;
+        padding-right: 4px !important;
+        gap: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
     
     body.minside-body .mobile-bottom-nav::-webkit-scrollbar,
@@ -11684,9 +11684,11 @@ html[data-theme="dark"] .status-pill.status-completed {
 
     body.minside-body .mobile-bottom-nav .mobile-nav-item,
     body.minside-body.admin-body .mobile-bottom-nav .mobile-nav-item {
-        flex: 0 0 auto !important;
-        min-width: 76px !important;
-        max-width: 80px !important;
+        flex: 1 1 0px !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        text-align: center !important;
     }
 }
 
