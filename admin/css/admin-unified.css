@@ -3579,6 +3579,40 @@ body.crm-body .promo-card:hover {
   box-shadow: var(--admin-page-shadow-hover);
 }
 
+/* AI Inspiration Banner Showpiece (Dark brand gradient banner override) */
+.ai-inspirasjon-hero,
+div.card.ai-inspirasjon-hero,
+body.admin-body div.card.ai-inspirasjon-hero,
+body.crm-body div.card.ai-inspirasjon-hero {
+  background: linear-gradient(135deg, #0b1a24 0%, #15384d 50%, #1B4965 100%) !important;
+  border: 1px solid rgba(209, 125, 57, 0.4) !important;
+  box-shadow: 0 12px 32px rgba(11, 26, 36, 0.25) !important;
+  color: #ffffff !important;
+}
+
+.ai-inspirasjon-hero h3,
+body.admin-body .ai-inspirasjon-hero h3,
+body.crm-body .ai-inspirasjon-hero h3 {
+  color: #ffffff !important;
+  font-size: 26px !important;
+  font-weight: 800 !important;
+}
+
+.ai-inspirasjon-hero p,
+body.admin-body .ai-inspirasjon-hero p,
+body.crm-body .ai-inspirasjon-hero p {
+  color: #cbd5e1 !important;
+  font-size: 14.5px !important;
+  line-height: 1.6 !important;
+}
+
+.ai-inspirasjon-hero .ai-badge,
+.ai-inspirasjon-hero div[style*="border-radius: 99px"] {
+  background: rgba(209, 125, 57, 0.2) !important;
+  border: 1px solid rgba(209, 125, 57, 0.5) !important;
+  color: #ffedd5 !important;
+}
+
 body.admin-body .card-header,
 body.crm-body .table-header,
 body.admin-body .logs-header,
