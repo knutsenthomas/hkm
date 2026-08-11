@@ -3417,7 +3417,8 @@ class CRMManager {
         const btn = document.getElementById('sync-pco-btn');
         if (btn) {
             btn.disabled = true;
-            btn.innerHTML = `<span class="material-symbols-outlined spin" style="font-size: 18px;">sync</span> Synkroniserer...`;
+            btn.innerHTML = `<span class="material-symbols-outlined spin" style="font-size: 18px; color: #2563eb;">sync</span>`;
+            btn.title = 'Synkroniserer med Planning Center...';
         }
 
         try {
@@ -3444,7 +3445,7 @@ class CRMManager {
             for (let i = 0; i < contactsToSync.length; i += batchSize) {
                 const batch = contactsToSync.slice(i, i + batchSize);
                 if (btn) {
-                    btn.innerHTML = `<span class="material-symbols-outlined spin" style="font-size: 18px;">sync</span> Synk (${Math.min(i + batchSize, contactsToSync.length)}/${contactsToSync.length})...`;
+                    btn.title = `Synkroniserer (${Math.min(i + batchSize, contactsToSync.length)}/${contactsToSync.length})...`;
                 }
 
                 try {
@@ -3481,7 +3482,8 @@ class CRMManager {
         } finally {
             if (btn) {
                 btn.disabled = false;
-                btn.innerHTML = `<img src="/img/pco-logo.png" alt="Planning Center" style="width: 20px; height: 20px; object-fit: contain; border-radius: 4px; display: inline-block; vertical-align: middle;"> <span>Synk</span>`;
+                btn.title = 'Synkroniser med Planning Center People';
+                btn.innerHTML = `<img src="/img/pco-logo.png" alt="Planning Center Synk" style="width: 20px; height: 20px; object-fit: contain; border-radius: 4px; display: block;">`;
             }
         }
     }
