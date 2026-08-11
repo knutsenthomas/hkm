@@ -111,7 +111,7 @@ class CRMManager {
         if (filterContactsBtn) filterContactsBtn.onclick = () => this.openFilterDialog();
 
         const syncPcoBtn = document.getElementById('sync-pco-btn');
-        if (syncPcoBtn) syncPcoBtn.onclick = () => this.syncAllContactsWithPlanningCenter();
+        if (syncPcoBtn) syncPcoBtn.onclick = () => this.openPcoHubModal();
 
         const contactTagFilter = document.getElementById('contact-tag-filter');
         if (contactTagFilter) {
@@ -3413,6 +3413,199 @@ class CRMManager {
         }
     }
 
+    openPcoHubModal() {
+        const modal = document.getElementById('pco-sync-modal');
+        if (!modal) return;
+        modal.style.display = 'flex';
+        
+        const hkmCountEl = document.getElementById('pco-hkm-contact-count');
+        if (hkmCountEl) hkmCountEl.textContent = (this.contacts || []).length;
+
+        this.loadPcoPeopleCount();
+    }
+
+    switchPcoTab(tabName) {
+        const tabs = document.querySelectorAll('.pco-tab');
+        tabs.forEach(t => {
+            if (t.dataset.pcoTab === tabName) {
+                t.classList.add('active');
+                t.style.color = '#d17d39';
+                t.style.borderBottom = '2px solid #d17d39';
+            } else {
+                t.classList.remove('active');
+                t.style.color = '#64748b';
+                t.style.borderBottom = '2px solid transparent';
+            }
+        });
+
+        const contentPeople = document.getElementById('pco-tab-content-people');
+        const contentGroups = document.getElementById('pco-tab-content-groups');
+        const contentCalendar = document.getElementById('pco-tab-content-calendar');
+
+        if (contentPeople) contentPeople.style.display = tabName === 'people' ? 'block' : 'none';
+        if (contentGroups) contentGroups.style.display = tabName === 'groups' ? 'block' : 'none';
+        if (contentCalendar) contentCalendar.style.display = tabName === 'calendar' ? 'block' : 'none';
+
+        if (tabName === 'groups') this.loadPcoGroups();
+        if (tabName === 'calendar') this.loadPcoCalendar();
+    }
+
+    async loadPcoPeopleCount() {
+        const pcoCountEl = document.getElementById('pco-people-count');
+        if (!pcoCountEl) return;
+        pcoCountEl.textContent = '...';
+
+        try {
+            const res = await fetch('/api/pco-people', { method: 'GET' });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                pcoCountEl.textContent = data.count || (data.data ? data.data.length : 0);
+            } else {
+                pcoCountEl.textContent = 'Feil';
+            }
+        } catch (e) {
+            console.warn('loadPcoPeopleCount error:', e);
+            pcoCountEl.textContent = 'Ikke tilkoblet';
+        }
+    }
+
+    async importPlanningCenterPeople() {
+        if (!confirm('Vil du importere kontakter fra Planning Center People inn i HKM CRM?')) return;
+        try {
+            const res = await fetch('/api/pco-people', { method: 'GET' });
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+                alert(`⚠️ Kunne ikke hente personer fra Planning Center: ${data.error || 'Ukjent feil'}`);
+                return;
+            }
+
+            const pcoPeople = data.data || [];
+            const included = data.included || [];
+            
+            // Build map of emails & phones from included data
+            const emailsMap = {};
+            const phonesMap = {};
+            included.forEach(inc => {
+                if (inc.type === 'Email') {
+                    const personRel = inc.relationships?.person?.data;
+                    if (personRel) emailsMap[personRel.id] = inc.attributes?.address;
+                } else if (inc.type === 'PhoneNumber') {
+                    const personRel = inc.relationships?.person?.data;
+                    if (personRel) phonesMap[personRel.id] = inc.attributes?.number;
+                }
+            });
+
+            let importedCount = 0;
+
+            for (const p of pcoPeople) {
+                const attrs = p.attributes || {};
+                const name = `${attrs.first_name || ''} ${attrs.last_name || ''}`.trim() || 'Medlem';
+                const email = attrs.primary_email_address || emailsMap[p.id] || '';
+                const phone = phonesMap[p.id] || '';
+
+                const exists = (this.contacts || []).some(c => (email && c.email && c.email.toLowerCase() === email.toLowerCase()) || (c.name && c.name.toLowerCase() === name.toLowerCase()));
+                if (!exists) {
+                    await this.addContact({
+                        name,
+                        email,
+                        phone,
+                        status: 'KUNDE',
+                        tags: ['Planning Center']
+                    }, true);
+                    importedCount++;
+                }
+            }
+
+            alert(`✅ Import fullført! ${importedCount} nye kontakter importert til HKM CRM fra Planning Center People.`);
+            await this.loadContacts();
+            this.openPcoHubModal();
+        } catch (err) {
+            console.error('Import PCO People error:', err);
+            alert(`⚠️ Import feilet: ${err.message}`);
+        }
+    }
+
+    async loadPcoGroups() {
+        const listEl = document.getElementById('pco-groups-list');
+        if (!listEl) return;
+        listEl.innerHTML = '<div style="text-align: center; padding: 20px; color: #64748b;"><span class="material-symbols-outlined spin">sync</span> Laster husgrupper...</div>';
+
+        try {
+            const res = await fetch('/api/pco-groups', { method: 'GET' });
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+                listEl.innerHTML = `<div style="color: #ef4444; padding: 16px; text-align: center;">Kunne ikke laste husgrupper: ${data.error || 'Feil ved tilkobling'}</div>`;
+                return;
+            }
+
+            const groups = data.groups || [];
+            if (groups.length === 0) {
+                listEl.innerHTML = '<div style="text-align: center; padding: 20px; color: #94a3b8;">Ingen aktive husgrupper funnet i Planning Center Groups.</div>';
+                return;
+            }
+
+            listEl.innerHTML = groups.map(g => `
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">
+                    <div>
+                        <div style="font-weight: 700; font-size: 14px; color: #0f172a;">${g.name}</div>
+                        <div style="font-size: 12px; color: #64748b; margin-top: 2px;">
+                            ${g.schedule ? `🕒 ${g.schedule}` : ''} ${g.location?.name ? `📍 ${g.location.name}` : ''}
+                        </div>
+                        <div style="font-size: 11px; color: #d17d39; font-weight: 600; margin-top: 4px;">👥 ${g.membersCount} medlemmer ${g.enrollmentOpen ? '• Åpen for påmelding' : ''}</div>
+                    </div>
+                    ${g.churchCenterUrl ? `<a href="${g.churchCenterUrl}" target="_blank" class="btn btn-outline" style="font-size: 12px; height: 32px; padding: 0 12px; border-radius: 6px; text-decoration: none;">Vis i Church Center</a>` : ''}
+                </div>
+            `).join('');
+
+        } catch (err) {
+            console.error('loadPcoGroups error:', err);
+            listEl.innerHTML = `<div style="color: #ef4444; padding: 16px; text-align: center;">Feil ved henting av husgrupper: ${err.message}</div>`;
+        }
+    }
+
+    async loadPcoCalendar() {
+        const listEl = document.getElementById('pco-calendar-list');
+        if (!listEl) return;
+        listEl.innerHTML = '<div style="text-align: center; padding: 20px; color: #64748b;"><span class="material-symbols-outlined spin">sync</span> Laster kalender...</div>';
+
+        try {
+            const res = await fetch('/api/pco-calendar', { method: 'GET' });
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+                listEl.innerHTML = `<div style="color: #ef4444; padding: 16px; text-align: center;">Kunne ikke laste kalender: ${data.error || 'Feil ved tilkobling'}</div>`;
+                return;
+            }
+
+            const events = data.events || [];
+            if (events.length === 0) {
+                listEl.innerHTML = '<div style="text-align: center; padding: 20px; color: #94a3b8;">Ingen arrangementer funnet i Planning Center Calendar.</div>';
+                return;
+            }
+
+            listEl.innerHTML = events.map(e => {
+                const dateStr = e.startAt ? new Date(e.startAt).toLocaleDateString('no-NO', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Uten dato';
+                return `
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">
+                        <div>
+                            <div style="font-weight: 700; font-size: 14px; color: #0f172a;">${e.name}</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 2px;">
+                                📅 ${dateStr} ${e.locationName ? `📍 ${e.locationName}` : ''}
+                            </div>
+                        </div>
+                        ${e.registrationUrl ? `<a href="${e.registrationUrl}" target="_blank" class="btn btn-outline" style="font-size: 12px; height: 32px; padding: 0 12px; border-radius: 6px; text-decoration: none;">Påmelding</a>` : ''}
+                    </div>
+                `;
+            }).join('');
+
+        } catch (err) {
+            console.error('loadPcoCalendar error:', err);
+            listEl.innerHTML = `<div style="color: #ef4444; padding: 16px; text-align: center;">Feil ved henting av kalender: ${err.message}</div>`;
+        }
+    }
+
     async syncAllContactsWithPlanningCenter() {
         const btn = document.getElementById('sync-pco-btn');
         if (btn) {
@@ -3444,9 +3637,6 @@ class CRMManager {
 
             for (let i = 0; i < contactsToSync.length; i += batchSize) {
                 const batch = contactsToSync.slice(i, i + batchSize);
-                if (btn) {
-                    btn.title = `Synkroniserer (${Math.min(i + batchSize, contactsToSync.length)}/${contactsToSync.length})...`;
-                }
 
                 try {
                     const syncRes = await fetch('/api/pco-people', {
@@ -3463,18 +3653,13 @@ class CRMManager {
                     console.warn('PCO batch sync warning:', e);
                 }
 
-                // Pause 1.2s between batches to stay well under Planning Center's 100 req / 20s rate limit
                 if (i + batchSize < contactsToSync.length) {
                     await new Promise(resolve => setTimeout(resolve, 1200));
                 }
             }
 
-            // 2. Fetch total count of people in Planning Center People
-            const getRes = await fetch('/api/pco-people', { method: 'GET' });
-            const getData = await getRes.json();
-            const pcoPeopleCount = getData.count || (getData.data ? getData.data.length : 0);
-
-            alert(`✅ Synkronisering fullført!\n- ${totalSynced} av ${contactsToSync.length} HKM-kontakter ble overført/oppdatert i Planning Center People.\n- Det finnes totalt ${pcoPeopleCount} personer i din Planning Center-konto.`);
+            alert(`✅ Synkronisering fullført!\n- ${totalSynced} av ${contactsToSync.length} HKM-kontakter ble overført/oppdatert i Planning Center People.`);
+            this.loadPcoPeopleCount();
 
         } catch (err) {
             console.error('Planning Center sync error:', err);
@@ -3482,7 +3667,7 @@ class CRMManager {
         } finally {
             if (btn) {
                 btn.disabled = false;
-                btn.title = 'Synkroniser med Planning Center People';
+                btn.title = 'Synkroniser med Planning Center';
                 btn.innerHTML = `<img src="/img/pco-logo.png" alt="Planning Center Synk" style="width: 20px; height: 20px; object-fit: contain; border-radius: 4px; display: block;">`;
             }
         }
@@ -3491,3 +3676,4 @@ class CRMManager {
 
 // Initialize on load
 window.crm = new CRMManager();
+
