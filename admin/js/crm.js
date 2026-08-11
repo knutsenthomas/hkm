@@ -3716,6 +3716,57 @@ class CRMManager {
             }
         }
     }
+
+    async loadPcoListsAndTags() {
+        const container = document.getElementById('pco-lists-container');
+        if (!container) return;
+        container.innerHTML = '<div style="text-align: center; padding: 12px; color: #64748b; font-size: 12px;"><span class="material-symbols-outlined spin">sync</span> Laster lister og etiketter...</div>';
+
+        try {
+            const [listsRes, tagsRes] = await Promise.all([
+                fetch('/api/pco-people?resource=lists'),
+                fetch('/api/pco-people?resource=tags')
+            ]);
+            const listsData = await listsRes.json();
+            const tagsData = await tagsRes.json();
+
+            const lists = listsData.lists || [];
+            const tags = tagsData.tags || [];
+
+            if (lists.length === 0 && tags.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 12px; color: #94a3b8; font-size: 12px;">Ingen definerte lister eller etiketter funnet i Planning Center People.</div>';
+                return;
+            }
+
+            let html = '';
+
+            if (lists.length > 0) {
+                html += '<div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Planning Center Lister:</div>';
+                html += lists.map(l => `
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; font-size: 12.5px;">
+                        <div>
+                            <strong style="color: #0f172a;">${l.name}</strong>
+                            <span style="font-size: 11px; color: #64748b; margin-left: 6px;">(${l.totalResults} personer)</span>
+                        </div>
+                        <span class="badge" style="background: #eff6ff; color: #2563eb; font-size: 11px; padding: 2px 8px; border-radius: 99px;">PCO Liste</span>
+                    </div>
+                `).join('');
+            }
+
+            if (tags.length > 0) {
+                html += '<div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-top: 8px; margin-bottom: 4px;">Planning Center Etiketter:</div>';
+                html += '<div style="display: flex; flex-wrap: wrap; gap: 6px;">' + tags.map(t => `
+                    <span class="badge" style="background: #fff7ed; color: #ea580c; border: 1px solid #ffedd5; font-size: 11.5px; padding: 4px 10px; border-radius: 99px; font-weight: 600;">🏷️ ${t.name}</span>
+                `).join('') + '</div>';
+            }
+
+            container.innerHTML = html;
+
+        } catch (err) {
+            console.error('loadPcoListsAndTags error:', err);
+            container.innerHTML = `<div style="color: #ef4444; font-size: 12px; padding: 12px;">Feil ved henting av lister/etiketter: ${err.message}</div>`;
+        }
+    }
 }
 
 // Initialize on load

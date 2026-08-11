@@ -753,6 +753,21 @@
                             </button>
                         </div>
                     </div>
+
+                    <!-- PCO Lists & Tags Section -->
+                    <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #e2e8f0;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                            <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 6px;">
+                                <span class="material-symbols-outlined" style="font-size: 18px; color: #d17d39;">label</span> Planning Center Lister &amp; Etiketter
+                            </h4>
+                            <button type="button" onclick="if(window.crm) window.crm.loadPcoListsAndTags();" style="font-size: 12px; padding: 4px 10px; border-radius: 6px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">
+                                Hent lister
+                            </button>
+                        </div>
+                        <div id="pco-lists-container" style="display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto;">
+                            <div style="font-size: 12px; color: #64748b; text-align: center; padding: 12px;">Klikk «Hent lister» for å se lister og etiketter i Planning Center.</div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Tab 2: Groups -->

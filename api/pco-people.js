@@ -25,6 +25,41 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === 'GET') {
+      const resource = req.query?.resource;
+
+      if (resource === 'lists') {
+        const listsRes = await fetchPCO('https://api.planningcenteronline.com/people/v2/lists?per_page=100', {
+          headers: { Authorization: authHeader }
+        });
+        const listsData = await listsRes.json();
+        if (!listsRes.ok) {
+          return res.status(listsRes.status).json({ error: listsData.errors?.[0]?.detail || 'Kunne ikke hente lister fra Planning Center' });
+        }
+        const lists = (listsData.data || []).map(l => ({
+          id: l.id,
+          name: l.attributes?.name || 'Liste',
+          description: l.attributes?.description || '',
+          totalResults: l.attributes?.total_results || 0,
+          category: l.attributes?.category || 'Allmenn'
+        }));
+        return res.status(200).json({ success: true, count: lists.length, lists });
+      }
+
+      if (resource === 'tags') {
+        const tagsRes = await fetchPCO('https://api.planningcenteronline.com/people/v2/tags?per_page=100', {
+          headers: { Authorization: authHeader }
+        });
+        const tagsData = await tagsRes.json();
+        if (!tagsRes.ok) {
+          return res.status(tagsRes.status).json({ error: tagsData.errors?.[0]?.detail || 'Kunne ikke hente etiketter fra Planning Center' });
+        }
+        const tags = (tagsData.data || []).map(t => ({
+          id: t.id,
+          name: t.attributes?.name || 'Etikett'
+        }));
+        return res.status(200).json({ success: true, count: tags.length, tags });
+      }
+
       const pcoRes = await fetchPCO('https://api.planningcenteronline.com/people/v2/people?per_page=100&include=emails,phone_numbers', {
         headers: { Authorization: authHeader }
       });
