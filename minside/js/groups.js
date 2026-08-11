@@ -3802,12 +3802,71 @@ export class HkmGroupsManager {
         }
     }
 
+    extractGoogleDriveFolderId(url) {
+        if (!url) return null;
+        const match = url.match(/\/folders\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+        return match ? match[1] : null;
+    }
+
     async renderHubResources(tabContainer) {
         const uid = firebase.auth().currentUser?.uid;
         const isLeader = this.checkIsLeader(this.activeGroup);
         const isAdmin = this.isAdmin;
+        const driveUrl = this.activeGroup?.googleDriveUrl || '';
+        const driveFolderId = this.extractGoogleDriveFolderId(driveUrl);
+
+        let driveHtml = '';
+        if (driveUrl) {
+            if (driveFolderId) {
+                driveHtml = `
+                    <div style="background: var(--card-bg, #fff); padding: 24px; border-radius: 16px; border: 1px solid rgba(66,133,244,0.25); box-shadow: 0 4px 20px rgba(66,133,244,0.05); margin-bottom: 24px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(66,133,244,0.1); color: #4285f4; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <span class="material-symbols-outlined" style="font-size: 26px;">folder_shared</span>
+                                </div>
+                                <div>
+                                    <h3 style="margin: 0; font-size: 17.5px; font-weight: 800; color: var(--text-color, #0f172a); display: flex; align-items: center; gap: 8px;">
+                                        <span>Google Disk-område</span>
+                                        <span style="font-size: 11px; background: rgba(66,133,244,0.12); color: #1a73e8; padding: 2px 8px; border-radius: 12px; font-weight: 700;">Synkronisert</span>
+                                    </h3>
+                                    <p style="margin: 2px 0 0 0; font-size: 13px; color: var(--text-muted, #64748b);">Automatisk synkroniserte filer fra gruppens Google Disk-mappe</p>
+                                </div>
+                            </div>
+                            <a href="${this.escapeHtml(driveUrl)}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: 10px; background: #4285f4; color: white; text-decoration: none; font-size: 13px; font-weight: 700; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(66,133,244,0.2);" onmouseover="this.style.transform='scale(1.02)';" onmouseout="this.style.transform='none';">
+                                <span>Åpne i Google Disk</span>
+                                <span class="material-symbols-outlined" style="font-size: 16px;">open_in_new</span>
+                            </a>
+                        </div>
+                        
+                        <div style="width: 100%; height: 500px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color, #e2e8f0); background: #f8fafc; position: relative;">
+                            <iframe src="https://drive.google.com/embeddedfolderview?id=${driveFolderId}#list" style="width: 100%; height: 100%; border: none;" title="Google Disk Mappe"></iframe>
+                        </div>
+                    </div>
+                `;
+            } else {
+                driveHtml = `
+                    <div style="background: linear-gradient(135deg, rgba(66,133,244,0.08) 0%, rgba(66,133,244,0.02) 100%); border: 1px solid rgba(66,133,244,0.2); border-radius: 16px; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="background: #4285f4; color: white; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <span class="material-symbols-outlined" style="font-size: 24px;">folder_shared</span>
+                            </div>
+                            <div>
+                                <h4 style="margin: 0; font-size: 16px; font-weight: 700; color: #1a73e8;">Google Disk-område</h4>
+                                <p style="margin: 2px 0 0 0; font-size: 13px; color: #174ea6;">Delt område for gruppens dokumenter og filer</p>
+                            </div>
+                        </div>
+                        <a href="${this.escapeHtml(driveUrl)}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; border-radius: 10px; background: #4285f4; color: white; font-weight: 700; font-size: 13px; text-decoration: none;">
+                            <span>Åpne Google Disk</span>
+                            <span class="material-symbols-outlined" style="font-size: 16px;">open_in_new</span>
+                        </a>
+                    </div>
+                `;
+            }
+        }
 
         tabContainer.innerHTML = `
+            ${driveHtml}
             <div style="background: var(--card-bg, #fff); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color, #e2e8f0);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                     <h3 style="margin: 0; font-size: 18px; font-weight: 700;">${this.t('groups.resourcesTitle')}</h3>
