@@ -5473,16 +5473,16 @@ class MinSideManager {
         container.innerHTML = `
         <div>
             <!-- Recurring Donation / Fast Giveravtale Promo Banner -->
-            <div style="background: linear-gradient(135deg, #fffcf9 0%, #ffffff 100%); border: 1px solid rgba(209, 125, 57, 0.25); border-radius: 20px; padding: 20px 24px; margin-bottom: 20px; box-shadow: 0 4px 16px -4px rgba(209, 125, 57, 0.08); display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+            <div class="giving-promo-banner" style="background: var(--card-bg, #ffffff); border: 1px solid var(--border-color, rgba(209, 125, 57, 0.25)); border-radius: 20px; padding: 20px 24px; margin-bottom: 20px; box-shadow: 0 4px 16px -4px rgba(209, 125, 57, 0.08); display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
                 <div style="display: flex; align-items: center; gap: 16px;">
                     <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(209, 125, 57, 0.1); color: var(--accent-color, #d17d39); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                         <span class="material-symbols-outlined" style="font-size: 22px;">sync</span>
                     </div>
                     <div>
-                        <h4 style="font-size: 1rem; font-weight: 700; color: var(--text-main, #0f172a); margin: 0 0 2px 0;">
+                        <h4 style="font-size: 1rem; font-weight: 700; color: var(--text-color, #0f172a); margin: 0 0 2px 0;">
                             ${isNo ? 'Fast månedlig giveravtale' : (isEs ? 'Donación mensual recurrente' : 'Monthly recurring donation')}
                         </h4>
-                        <p style="font-size: 0.84rem; color: var(--text-muted, #475569); margin: 0; line-height: 1.4;">
+                        <p style="font-size: 0.84rem; color: var(--text-muted, #64748b); margin: 0; line-height: 1.4;">
                             ${isNo ? 'Støtt His Kingdom Ministry fast hver måned via Vipps eller kort.' : 'Support His Kingdom Ministry monthly via Vipps or card.'}
                         </p>
                     </div>
