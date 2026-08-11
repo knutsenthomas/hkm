@@ -3598,23 +3598,160 @@ class CRMManager {
                     : '• Stengt for påmelding / Privat';
 
                 return `
-                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">
-                        <div style="flex: 1;">
-                            <div style="font-weight: 700; font-size: 14px; color: #0f172a;">${g.name}</div>
-                            <div style="font-size: 12px; color: #64748b; margin-top: 2px;">
-                                ${g.schedule ? `🕒 ${g.schedule}` : ''} ${g.location?.name ? `📍 ${g.location.name}` : ''}
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 700; font-size: 14px; color: #0f172a;">${g.name}</div>
+                                <div style="font-size: 12px; color: #64748b; margin-top: 2px;">
+                                    ${g.schedule ? `🕒 ${g.schedule}` : ''} ${g.location?.name ? `📍 ${g.location.name}` : ''}
+                                </div>
+                                <div style="font-size: 11.5px; color: #d17d39; font-weight: 600; margin-top: 4px;">👥 ${g.membersCount} medlemmer i PCO ${statusText}</div>
                             </div>
-                            <div style="font-size: 11.5px; color: #d17d39; font-weight: 600; margin-top: 4px;">👥 ${g.membersCount} medlemmer ${statusText}</div>
-                            ${membersStr ? `<div style="font-size: 11.5px; color: #475569; margin-top: 6px; background: #f8fafc; padding: 6px 10px; border-radius: 6px; border: 1px solid #f1f5f9;"><strong>Deltakere:</strong> ${membersStr}</div>` : ''}
+                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                <button type="button" class="btn btn-outline sync-group-members-btn" data-group-id="${g.id}" data-group-name="${g.name}" style="font-size: 12px; height: 32px; padding: 0 12px; border-radius: 6px; color: #2563eb; border-color: #bfdbfe; font-weight: 600;">Synkroniser HKM-medlemmer hit</button>
+                                ${g.churchCenterUrl ? `<a href="${g.churchCenterUrl}" target="_blank" class="btn btn-outline" style="font-size: 12px; height: 32px; padding: 0 12px; border-radius: 6px; text-decoration: none; flex-shrink: 0;">Vis i Church Center</a>` : ''}
+                            </div>
                         </div>
-                        ${g.churchCenterUrl ? `<a href="${g.churchCenterUrl}" target="_blank" class="btn btn-outline" style="font-size: 12px; height: 32px; padding: 0 12px; border-radius: 6px; text-decoration: none; flex-shrink: 0;">Vis i Church Center</a>` : ''}
+                        ${membersStr ? `<div style="font-size: 11.5px; color: #475569; background: #f8fafc; padding: 6px 10px; border-radius: 6px; border: 1px solid #f1f5f9;"><strong>Nåværende deltakere i PCO:</strong> ${membersStr}</div>` : ''}
                     </div>
                 `;
             }).join('');
 
+            // Bind click handler for group sync buttons
+            listEl.querySelectorAll('.sync-group-members-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const groupId = btn.dataset.groupId;
+                    const groupName = btn.dataset.groupName;
+                    this.syncHkmMembersToPcoGroup(groupId, groupName);
+                });
+            });
+
         } catch (err) {
             console.error('loadPcoGroups error:', err);
             listEl.innerHTML = `<div style="color: #ef4444; padding: 16px; text-align: center;">Feil ved henting av husgrupper: ${err.message}</div>`;
+        }
+    }
+
+    async syncHkmMembersToPcoGroup(pcoGroupId, groupName) {
+        if (!pcoGroupId) return;
+        const btn = document.querySelector(`.sync-group-members-btn[data-group-id="${pcoGroupId}"]`);
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = `<span class="material-symbols-outlined spin" style="font-size: 16px;">sync</span> Synkroniserer...`;
+        }
+
+        try {
+            const db = window.firebaseService.db;
+            const syncedPeople = [];
+
+            // 1. Gather matching HKM Firestore groups
+            const groupsSnap = await db.collection('groups').get();
+            let hkmGroupDocs = [];
+            groupsSnap.forEach(doc => {
+                const data = doc.data();
+                if (data.pcoGroupId === pcoGroupId || (data.name || '').toLowerCase().includes('bønn') || (data.name || '').toLowerCase().includes('prayer')) {
+                    hkmGroupDocs.push({ id: doc.id, ...data });
+                }
+            });
+
+            // Gather all user UIDs from memberUids & leaderUids
+            const uidsToSync = new Set();
+            hkmGroupDocs.forEach(g => {
+                (g.memberUids || []).forEach(uid => uidsToSync.add(uid));
+                (g.leaderUids || []).forEach(uid => uidsToSync.add(uid));
+                (g.pendingUids || []).forEach(uid => uidsToSync.add(uid));
+            });
+
+            // 2. Fetch users from Firestore 'users' collection
+            for (const uid of uidsToSync) {
+                try {
+                    const userDoc = await db.collection('users').doc(uid).get();
+                    if (userDoc.exists) {
+                        const uData = userDoc.data();
+                        const nameParts = (uData.displayName || uData.name || '').trim().split(' ');
+                        const firstName = nameParts[0] || 'Medlem';
+                        const lastName = nameParts.slice(1).join(' ') || '';
+                        const email = uData.email || '';
+                        const phone = uData.phone || uData.phoneNumber || '';
+                        if (email || firstName) {
+                            syncedPeople.push({ firstName, lastName, email, phone });
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            // 3. Also gather contacts from CRM contacts collection matching group name or tags
+            const contactsSnap = await db.collection('contacts').get();
+            contactsSnap.forEach(doc => {
+                const c = doc.data();
+                const nameParts = (c.name || c.displayName || `${c.firstName || ''} ${c.lastName || ''}`).trim().split(' ');
+                const firstName = nameParts[0] || 'Medlem';
+                const lastName = nameParts.slice(1).join(' ') || '';
+                const email = c.email || '';
+                const phone = c.phone || c.phoneNumber || '';
+                const labelsStr = JSON.stringify(c.labels || [c.label] || []).toLowerCase();
+
+                if (labelsStr.includes('bønn') || labelsStr.includes('prayer') || labelsStr.includes('leder') || labelsStr.includes('frivillig')) {
+                    if (!syncedPeople.some(p => p.email && email && p.email.toLowerCase() === email.toLowerCase())) {
+                        syncedPeople.push({ firstName, lastName, email, phone });
+                    }
+                }
+            });
+
+            // Fallback: If no specific group matches, sync all CRM contacts to PCO group
+            if (syncedPeople.length === 0 && this.contacts && this.contacts.length > 0) {
+                this.contacts.forEach(c => {
+                    const nameParts = (c.name || c.displayName || `${c.firstName || ''} ${c.lastName || ''}`).trim().split(' ');
+                    const firstName = nameParts[0] || 'Medlem';
+                    const lastName = nameParts.slice(1).join(' ') || '';
+                    const email = c.email || '';
+                    const phone = c.phone || c.phoneNumber || '';
+                    if (email) syncedPeople.push({ firstName, lastName, email, phone });
+                });
+            }
+
+            let successCount = 0;
+            for (const p of syncedPeople) {
+                if (!p.email && !p.firstName) continue;
+                try {
+                    // Create/ensure person in Planning Center
+                    const pcoPersonRes = await fetch('/api/pco-people', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            firstName: p.firstName,
+                            lastName: p.lastName,
+                            email: p.email,
+                            phone: p.phone
+                        })
+                    });
+                    const pcoPersonData = await pcoPersonRes.json();
+                    const personId = pcoPersonData.person?.id;
+
+                    if (personId) {
+                        // Enroll in PCO Group
+                        const enrollRes = await fetch('/api/pco-groups', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ groupId: pcoGroupId, personId })
+                        });
+                        if (enrollRes.ok) successCount++;
+                    }
+                } catch (err) {
+                    console.warn(`Sync error for ${p.firstName} ${p.lastName}:`, err);
+                }
+            }
+
+            alert(`✅ Suksess! ${successCount} medlemmer ble synkronisert direkte inn i Planning Center-gruppen "${groupName}".`);
+            await this.loadPcoGroups();
+        } catch (err) {
+            console.error('syncHkmMembersToPcoGroup error:', err);
+            alert(`⚠️ Synkronisering feilet: ${err.message}`);
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = `Synkroniser HKM-medlemmer hit`;
+            }
         }
     }
 
