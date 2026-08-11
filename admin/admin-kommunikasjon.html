@@ -741,12 +741,17 @@
                         </div>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <button type="button" class="btn btn-primary" onclick="if(window.crm) window.crm.syncAllContactsWithPlanningCenter();" style="height: 44px; justify-content: center; font-weight: 600; border-radius: 10px; background: #d17d39; border: none; color: white;">
-                            <span class="material-symbols-outlined">upload</span> Eksporter HKM kontakter -> Planning Center People
+                        <button type="button" class="btn btn-primary" id="pco-two-way-btn" onclick="if(window.crm) window.crm.syncTwoWayPlanningCenter();" style="height: 48px; justify-content: center; font-weight: 700; border-radius: 12px; background: linear-gradient(135deg, #1B4965 0%, #0b1a24 100%); border: none; color: white; box-shadow: 0 4px 12px rgba(27, 73, 101, 0.25); cursor: pointer;">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">sync</span> Full 2-veis synkronisering (Begge veier)
                         </button>
-                        <button type="button" class="btn btn-outline" onclick="if(window.crm) window.crm.importPlanningCenterPeople();" style="height: 44px; justify-content: center; font-weight: 600; border-radius: 10px; border: 1px solid #cbd5e1; color: #334155;">
-                            <span class="material-symbols-outlined">download</span> Importer kontakter fra Planning Center People -> HKM CRM
-                        </button>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 2px;">
+                            <button type="button" class="btn btn-outline" onclick="if(window.crm) window.crm.syncAllContactsWithPlanningCenter();" style="height: 42px; justify-content: center; font-weight: 600; border-radius: 10px; border: 1px solid #cbd5e1; color: #334155; font-size: 12.5px;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">upload</span> Bare eksporter -> PCO
+                            </button>
+                            <button type="button" class="btn btn-outline" onclick="if(window.crm) window.crm.importPlanningCenterPeople();" style="height: 42px; justify-content: center; font-weight: 600; border-radius: 10px; border: 1px solid #cbd5e1; color: #334155; font-size: 12.5px;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">download</span> Bare importer -> HKM
+                            </button>
+                        </div>
                     </div>
                 </div>
 

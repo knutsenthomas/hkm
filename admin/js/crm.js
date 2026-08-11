@@ -1928,6 +1928,10 @@ class CRMManager {
                 });
                 this.notify("Kontakt lagret!");
             }
+
+            // Live Background Sync to Planning Center People
+            this.syncSingleContactToPlanningCenter(firstName, lastName, email, phone);
+
             if (status === 'NETTSTEDSMEDLEM') {
                 await this.syncContactToUserCollection(email, `${firstName} ${lastName}`.trim(), phone, address, zip, city, country);
             }
@@ -3672,8 +3676,47 @@ class CRMManager {
             }
         }
     }
+
+    async syncSingleContactToPlanningCenter(firstName, lastName, email, phone) {
+        if (!firstName && !lastName && !email) return;
+        try {
+            await fetch('/api/pco-people', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ firstName, lastName, email, phone })
+            });
+            console.log(`PCO live-synk fullført for ${firstName} ${lastName}`);
+        } catch (e) {
+            console.warn('PCO live-synk advarsel:', e);
+        }
+    }
+
+    async syncTwoWayPlanningCenter() {
+        const btn = document.getElementById('pco-two-way-btn');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = `<span class="material-symbols-outlined spin" style="font-size: 20px;">sync</span> Synkroniserer begge veier...`;
+        }
+
+        try {
+            // Step 1: Export local contacts to Planning Center
+            await this.syncAllContactsWithPlanningCenter();
+
+            // Step 2: Import missing contacts from Planning Center to HKM CRM
+            await this.importPlanningCenterPeople();
+
+            alert('🎉 Full 2-veis synkronisering med Planning Center er fullført!');
+        } catch (err) {
+            console.error('2-way sync error:', err);
+            alert(`⚠️ Feil under 2-veis synkronisering: ${err.message}`);
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 20px;">sync</span> Full 2-veis synkronisering (Begge veier)`;
+            }
+        }
+    }
 }
 
 // Initialize on load
 window.crm = new CRMManager();
-
