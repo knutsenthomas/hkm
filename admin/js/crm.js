@@ -3798,6 +3798,8 @@ class CRMManager {
 
             // 3. Enroll exact members with rate-limiting & fallback
             let successCount = 0;
+            let alreadyInGroupCount = 0;
+            const failedPeople = [];
             let i = 0;
             for (const p of syncedPeople) {
                 i++;
@@ -3805,7 +3807,11 @@ class CRMManager {
                     btn.innerHTML = `<span class="material-symbols-outlined spin" style="font-size: 16px;">sync</span> Synkroniserer (${i}/${syncedPeople.length})...`;
                 }
 
-                if (!p.email && !p.firstName) continue;
+                if (!p.email && !p.firstName) {
+                    failedPeople.push(`Ukjent (Mangler navn/epost)`);
+                    continue;
+                }
+                
                 try {
                     const pcoPersonRes = await fetch('/api/pco-people', {
                         method: 'POST',
@@ -3827,12 +3833,24 @@ class CRMManager {
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ groupId: pcoGroupId, personId })
                         });
-                        if (enrollRes.ok) successCount++;
+                        const enrollData = await enrollRes.json();
+                        
+                        if (enrollRes.ok) {
+                            successCount++;
+                        } else {
+                            // If they are already in the group, it's technically a success
+                            if (enrollData.error && (enrollData.error.toLowerCase().includes('already been taken') || enrollData.error.toLowerCase().includes('already exists'))) {
+                                alreadyInGroupCount++;
+                                successCount++;
+                            } else {
+                                failedPeople.push(`${p.fullName} (Innmelding: ${enrollData.error || 'Ukjent feil'})`);
+                            }
+                        }
                     } else {
-                        console.warn(`Kunne ikke finne/opprette PCO personId for ${p.firstName} ${p.lastName}:`, pcoPersonData);
+                        failedPeople.push(`${p.fullName} (Opprettelse PCO: ${pcoPersonData.error || 'Ukjent feil'})`);
                     }
                 } catch (err) {
-                    console.warn(`Sync error for ${p.firstName} ${p.lastName}:`, err);
+                    failedPeople.push(`${p.fullName} (Nettverksfeil)`);
                 }
 
                 // Throttle requests to stay well within Planning Center API rate limits
@@ -3840,7 +3858,9 @@ class CRMManager {
             }
 
             const pruneMsg = prunedCount > 0 ? ` (${prunedCount} overflødige medlemmer ble fjernet).` : '.';
-            alert(`✅ Suksess! Gruppen "${groupName}" er nå oppdatert med ${successCount} medlemmer${pruneMsg}`);
+            const failMsg = failedPeople.length > 0 ? `\n\n⚠️ ${failedPeople.length} medlemmer feilet:\n- ${failedPeople.join('\n- ')}` : '';
+            
+            alert(`✅ Suksess! Gruppen "${groupName}" er sjekket.\n\nTotalt i PCO nå: ${successCount} (hvorav ${alreadyInGroupCount} var der fra før).${pruneMsg}${failMsg}`);
             await this.loadPcoGroups();
         } catch (err) {
             console.error('syncHkmMembersToPcoGroup error:', err);
