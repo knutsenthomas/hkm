@@ -11671,8 +11671,8 @@ html[data-theme="dark"] .status-pill.status-completed {
     .mobile-bottom-nav .mobile-nav-item .material-symbols-outlined {
         font-size: 22px !important;
         margin-bottom: 4px !important;
-        width: 50px !important;
-        height: 50px !important;
+        width: 40px !important;
+        height: 40px !important;
         display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
