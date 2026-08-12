@@ -186,7 +186,7 @@ async function createOrSyncPerson(authHeader, { firstName, lastName, email, phon
           type: 'Person',
           attributes: {
             first_name: firstName || 'Medlem',
-            last_name: lastName || ''
+            ...(lastName ? { last_name: lastName } : {})
           }
         }
       })

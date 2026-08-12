@@ -3839,7 +3839,8 @@ class CRMManager {
                             successCount++;
                         } else {
                             // If they are already in the group, it's technically a success
-                            if (enrollData.error && (enrollData.error.toLowerCase().includes('already been taken') || enrollData.error.toLowerCase().includes('already exists'))) {
+                            const errStr = (enrollData.error || '').toLowerCase();
+                            if (errStr.includes('already been taken') || errStr.includes('already exists') || errStr.includes('already a member')) {
                                 alreadyInGroupCount++;
                                 successCount++;
                             } else {
