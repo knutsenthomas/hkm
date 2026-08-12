@@ -3756,6 +3756,18 @@ class CRMManager {
                 }
             });
 
+            console.log('Funnede medlemmer i CRM:', syncedPeople);
+            
+            // Wait for user confirmation to proceed and show them how many members were found
+            const confirmSync = confirm(`Fant ${syncedPeople.length} medlemmer for denne gruppen i CRM.\n\nVil du fortsette synkroniseringen til Planning Center?`);
+            if (!confirmSync) {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = `Synkroniser HKM-medlemmer hit`;
+                }
+                return;
+            }
+
             // 2. Fetch current PCO memberships to prune extra members
             const pcoGroupsRes = await fetch('/api/pco-groups', { method: 'GET' });
             const pcoGroupsData = await pcoGroupsRes.json();
