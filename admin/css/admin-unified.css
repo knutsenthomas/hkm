@@ -11646,27 +11646,33 @@ html[data-theme="dark"] .status-pill.status-completed {
 
     body.admin-body .mobile-bottom-nav .mobile-nav-item:hover,
     .mobile-bottom-nav .mobile-nav-item:active {
-        background: rgba(15, 23, 42, 0.03) !important;
         color: #0f172a !important;
+        background: transparent !important;
+    }
+
+    body.admin-body .mobile-bottom-nav .mobile-nav-item:hover .material-symbols-outlined,
+    .mobile-bottom-nav .mobile-nav-item:active .material-symbols-outlined {
+        background: rgba(15, 23, 42, 0.04) !important;
     }
 
     body.admin-body .mobile-bottom-nav .mobile-nav-item.active,
     .mobile-bottom-nav .mobile-nav-item.active {
         color: var(--admin-accent-color, #d17d39) !important;
-        background: rgba(209, 125, 57, 0.08) !important;
-        transform: translateY(-1px) !important;
+        background: transparent !important;
     }
 
     body.admin-body .mobile-bottom-nav .mobile-nav-item.active .material-symbols-outlined,
     .mobile-bottom-nav .mobile-nav-item.active .material-symbols-outlined {
         font-variation-settings: 'FILL' 1 !important;
-        transform: none !important;
+        background: rgba(209, 125, 57, 0.12) !important;
     }
 
     body.admin-body .mobile-bottom-nav .mobile-nav-item .material-symbols-outlined,
     .mobile-bottom-nav .mobile-nav-item .material-symbols-outlined {
-        font-size: 20px !important;
-        margin-bottom: 2px !important;
+        font-size: 22px !important;
+        margin-bottom: 3px !important;
+        padding: 4px 18px !important;
+        border-radius: 16px !important;
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
 
@@ -11692,18 +11698,29 @@ html[data-theme="dark"] .status-pill.status-completed {
     html[data-theme="dark"] body.admin-body .mobile-bottom-nav .mobile-nav-item,
     html[data-theme="dark"] .mobile-bottom-nav .mobile-nav-item {
         color: #94a3b8 !important;
+        background: transparent !important;
     }
 
     html[data-theme="dark"] body.admin-body .mobile-bottom-nav .mobile-nav-item:hover,
     html[data-theme="dark"] .mobile-bottom-nav .mobile-nav-item:hover {
-        background: rgba(255, 255, 255, 0.05) !important;
         color: #f8fafc !important;
+        background: transparent !important;
+    }
+
+    html[data-theme="dark"] body.admin-body .mobile-bottom-nav .mobile-nav-item:hover .material-symbols-outlined,
+    html[data-theme="dark"] .mobile-bottom-nav .mobile-nav-item:active .material-symbols-outlined {
+        background: rgba(255, 255, 255, 0.08) !important;
     }
 
     html[data-theme="dark"] body.admin-body .mobile-bottom-nav .mobile-nav-item.active,
     html[data-theme="dark"] .mobile-bottom-nav .mobile-nav-item.active {
         color: var(--admin-accent-color, #e06c55) !important;
-        background: rgba(224, 108, 85, 0.15) !important;
+        background: transparent !important;
+    }
+
+    html[data-theme="dark"] body.admin-body .mobile-bottom-nav .mobile-nav-item.active .material-symbols-outlined,
+    html[data-theme="dark"] .mobile-bottom-nav .mobile-nav-item.active .material-symbols-outlined {
+        background: rgba(224, 108, 85, 0.2) !important;
     }
 
     /* Center and fill mobile bottom nav evenly across 100% width */
