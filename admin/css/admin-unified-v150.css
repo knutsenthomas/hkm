@@ -11671,12 +11671,12 @@ html[data-theme="dark"] .status-pill.status-completed {
     .mobile-bottom-nav .mobile-nav-item .material-symbols-outlined {
         font-size: 22px !important;
         margin-bottom: 4px !important;
-        width: 40px !important;
-        height: 40px !important;
+        width: 50px !important;
+        height: 50px !important;
         display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
-        border-radius: 12px !important;
+        border-radius: 10px !important;
         box-sizing: border-box !important;
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
