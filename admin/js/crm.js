@@ -3481,13 +3481,33 @@ class CRMManager {
     }
 
     async importPlanningCenterPeople() {
-        if (!confirm('Vil du importere kontakter fra Planning Center People inn i HKM CRM?')) return;
+        const confirmSync = await new Promise(resolve => {
+            this.openCrmToolDialog({
+                mode: 'custom-html',
+                title: 'Importer kontakter fra PCO',
+                html: `<div style="padding: 16px; font-size: 14px; color: #334155;">Vil du importere kontakter fra Planning Center People inn i HKM CRM?</div>`,
+                confirmLabel: 'Start import',
+                cancelLabel: 'Avbryt',
+                onConfirm: () => { resolve(true); return true; },
+                onCancel: () => { resolve(false); return true; }
+            });
+        });
+        
+        if (!confirmSync) return;
+
         try {
             const res = await fetch('/api/pco-people', { method: 'GET' });
             const data = await res.json();
 
             if (!res.ok || !data.success) {
-                alert(`⚠️ Kunne ikke hente personer fra Planning Center: ${data.error || 'Ukjent feil'}`);
+                this.openCrmToolDialog({
+                    mode: 'custom-html',
+                    title: 'Import feilet',
+                    html: `<div style="padding: 16px; font-size: 14px; color: #991b1b;"><div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-weight: 500;"><span class="material-symbols-outlined" style="display:block;">warning</span> Kunne ikke hente personer fra Planning Center:</div>${this.escapeHtml(data.error || 'Ukjent feil')}</div>`,
+                    confirmLabel: 'Lukk',
+                    showCancel: false,
+                    onConfirm: () => true
+                });
                 return;
             }
 
@@ -3543,12 +3563,26 @@ class CRMManager {
                 }
             }
 
-            alert(`✅ Import fullført! ${importedCount} nye kontakter importert til HKM CRM fra Planning Center People.`);
+            this.openCrmToolDialog({
+                mode: 'custom-html',
+                title: 'Import fullført',
+                html: `<div style="padding: 16px; font-size: 14px; color: #334155;"><div style="display: flex; align-items: center; gap: 8px; color: #166534; margin-bottom: 12px; font-weight: 500;"><span class="material-symbols-outlined" style="display:block;">check_circle</span> Suksess! Import fullført!</div>${importedCount} nye kontakter importert til HKM CRM fra Planning Center People.</div>`,
+                confirmLabel: 'Lukk',
+                showCancel: false,
+                onConfirm: () => true
+            });
             await this.loadContacts();
             this.openPcoHubModal();
         } catch (err) {
             console.error('Import PCO People error:', err);
-            alert(`⚠️ Import feilet: ${err.message}`);
+            this.openCrmToolDialog({
+                mode: 'custom-html',
+                title: 'Import feilet',
+                html: `<div style="padding: 16px; font-size: 14px; color: #991b1b;"><div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-weight: 500;"><span class="material-symbols-outlined" style="display:block;">warning</span> Feil under import:</div>${this.escapeHtml(err.message)}</div>`,
+                confirmLabel: 'Lukk',
+                showCancel: false,
+                onConfirm: () => true
+            });
         }
     }
 
@@ -3990,7 +4024,14 @@ class CRMManager {
             }).filter(c => c.firstName || c.email);
 
             if (contactsToSync.length === 0) {
-                alert('Ingen kontakter funnet i HKM for synkronisering.');
+                this.openCrmToolDialog({
+                    mode: 'custom-html',
+                    title: 'Synkronisering avbrutt',
+                    html: '<div style="padding: 16px; font-size: 14px; color: #334155;">Ingen kontakter funnet i HKM for synkronisering.</div>',
+                    confirmLabel: 'Lukk',
+                    showCancel: false,
+                    onConfirm: () => true
+                });
                 return;
             }
 
@@ -4020,12 +4061,26 @@ class CRMManager {
                 }
             }
 
-            alert(`✅ Synkronisering fullført!\n- ${totalSynced} av ${contactsToSync.length} HKM-kontakter ble overført/oppdatert i Planning Center People.`);
+            this.openCrmToolDialog({
+                mode: 'custom-html',
+                title: 'Synkronisering fullført',
+                html: `<div style="padding: 16px; font-size: 14px; color: #334155;"><div style="display: flex; align-items: center; gap: 8px; color: #166534; margin-bottom: 12px; font-weight: 500;"><span class="material-symbols-outlined" style="display:block;">check_circle</span> Synkronisering fullført!</div>- ${totalSynced} av ${contactsToSync.length} HKM-kontakter ble overført/oppdatert i Planning Center People.</div>`,
+                confirmLabel: 'Lukk',
+                showCancel: false,
+                onConfirm: () => true
+            });
             this.loadPcoPeopleCount();
 
         } catch (err) {
             console.error('Planning Center sync error:', err);
-            alert(`⚠️ Synkronisering feilet: ${err.message}`);
+            this.openCrmToolDialog({
+                mode: 'custom-html',
+                title: 'Synkronisering feilet',
+                html: `<div style="padding: 16px; font-size: 14px; color: #991b1b;"><div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-weight: 500;"><span class="material-symbols-outlined" style="display:block;">warning</span> Feil under synkronisering:</div>${this.escapeHtml(err.message)}</div>`,
+                confirmLabel: 'Lukk',
+                showCancel: false,
+                onConfirm: () => true
+            });
         } finally {
             if (btn) {
                 btn.disabled = false;
@@ -4063,10 +4118,24 @@ class CRMManager {
             // Step 2: Import missing contacts from Planning Center to HKM CRM
             await this.importPlanningCenterPeople();
 
-            alert('🎉 Full 2-veis synkronisering med Planning Center er fullført!');
+            this.openCrmToolDialog({
+                mode: 'custom-html',
+                title: '2-veis synkronisering fullført',
+                html: '<div style="padding: 16px; font-size: 14px; color: #334155;"><div style="display: flex; align-items: center; gap: 8px; color: #166534; margin-bottom: 12px; font-weight: 500;"><span class="material-symbols-outlined" style="display:block;">celebration</span> Full 2-veis synkronisering med Planning Center er fullført!</div></div>',
+                confirmLabel: 'Lukk',
+                showCancel: false,
+                onConfirm: () => true
+            });
         } catch (err) {
             console.error('2-way sync error:', err);
-            alert(`⚠️ Feil under 2-veis synkronisering: ${err.message}`);
+            this.openCrmToolDialog({
+                mode: 'custom-html',
+                title: 'Feil',
+                html: `<div style="padding: 16px; font-size: 14px; color: #991b1b;"><div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-weight: 500;"><span class="material-symbols-outlined" style="display:block;">warning</span> Feil under 2-veis synkronisering:</div>${this.escapeHtml(err.message)}</div>`,
+                confirmLabel: 'Lukk',
+                showCancel: false,
+                onConfirm: () => true
+            });
         } finally {
             if (btn) {
                 btn.disabled = false;
