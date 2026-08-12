@@ -1724,7 +1724,14 @@ class CRMManager {
 
     toggleModal(show) {
         const modal = document.getElementById('contact-modal');
-        if (modal) modal.style.display = show ? 'flex' : 'none';
+        if (modal) {
+            modal.style.display = show ? 'flex' : 'none';
+            if (show) {
+                modal.scrollTop = 0;
+                const content = modal.querySelector('.modal-content');
+                if (content) content.scrollTop = 0;
+            }
+        }
         this.isModalOpen = show;
         if (!show) {
             this.resetContactModalState();
