@@ -207,6 +207,34 @@ async function createOrSyncPerson(authHeader, { firstName, lastName, email, phon
     }
   }
 
+  // If the person exists, we should ensure their name in PCO is updated to match the CRM
+  if (personId && existingPerson) {
+    const pcoFirstName = existingPerson.attributes?.first_name || '';
+    const pcoLastName = existingPerson.attributes?.last_name || '';
+    const newFirstName = firstName || 'Medlem';
+    const newLastName = lastName || '-';
+
+    // Only update if the names actually differ to save unnecessary API calls
+    if (newFirstName !== pcoFirstName || (newLastName !== '-' && newLastName !== pcoLastName)) {
+      await fetchPCO(`https://api.planningcenteronline.com/people/v2/people/${personId}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: authHeader,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          data: {
+            type: 'Person',
+            attributes: {
+              first_name: newFirstName,
+              last_name: newLastName
+            }
+          }
+        })
+      }).catch(err => console.warn('Kunne ikke oppdatere eksisterende person i PCO:', err));
+    }
+  }
+
   // Add email if provided and not already associated
   if (email && personId && !existingPerson) {
     await fetchPCO(`https://api.planningcenteronline.com/people/v2/people/${personId}/emails`, {
