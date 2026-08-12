@@ -3758,8 +3758,26 @@ class CRMManager {
 
             console.log('Funnede medlemmer i CRM:', syncedPeople);
             
-            // Wait for user confirmation to proceed and show them how many members were found
-            const confirmSync = confirm(`Fant ${syncedPeople.length} medlemmer for denne gruppen i CRM.\n\nVil du fortsette synkroniseringen til Planning Center?`);
+            // Wait for user confirmation using custom modal
+            const confirmSync = await new Promise(resolve => {
+                this.openCrmToolDialog({
+                    mode: 'custom-html',
+                    title: 'Synkroniser medlemmer',
+                    subtitle: groupName,
+                    html: `<div style="padding: 16px; font-size: 14px; color: #334155;">Fant <strong>${syncedPeople.length} medlemmer</strong> for denne gruppen i CRM.<br><br>Vil du fortsette synkroniseringen til Planning Center?</div>`,
+                    confirmLabel: 'Start synkronisering',
+                    cancelLabel: 'Avbryt',
+                    onConfirm: () => {
+                        resolve(true);
+                        return true;
+                    },
+                    onCancel: () => {
+                        resolve(false);
+                        return true;
+                    }
+                });
+            });
+
             if (!confirmSync) {
                 if (btn) {
                     btn.disabled = false;
@@ -3858,14 +3876,40 @@ class CRMManager {
                 await new Promise(resolve => setTimeout(resolve, 200));
             }
 
-            const pruneMsg = prunedCount > 0 ? ` (${prunedCount} overflødige medlemmer ble fjernet).` : '.';
-            const failMsg = failedPeople.length > 0 ? `\n\n⚠️ ${failedPeople.length} medlemmer feilet:\n- ${failedPeople.join('\n- ')}` : '';
+            const pruneMsg = prunedCount > 0 ? ` (${prunedCount} overflødige medlemmer ble fjernet).` : '';
+            const failMsg = failedPeople.length > 0 ? `<div style="margin-top: 16px; padding: 12px; background: #fee2e2; border-radius: 8px; color: #991b1b; font-size: 13px;"><strong>${failedPeople.length} medlemmer feilet:</strong><ul style="margin-top: 8px; padding-left: 20px; margin-bottom: 0;"><li>${failedPeople.join('</li><li>')}</li></ul></div>` : '';
             
-            alert(`✅ Suksess! Gruppen "${groupName}" er sjekket.\n\nTotalt i PCO nå: ${successCount} (hvorav ${alreadyInGroupCount} var der fra før).${pruneMsg}${failMsg}`);
+            this.openCrmToolDialog({
+                mode: 'custom-html',
+                title: 'Synkronisering fullført',
+                subtitle: groupName,
+                html: `<div style="padding: 16px; font-size: 14px; color: #334155;">
+                          <div style="display: flex; align-items: center; gap: 8px; color: #166534; margin-bottom: 12px; font-weight: 500;">
+                             <span class="material-symbols-outlined" style="display:block;">check_circle</span> Suksess! Gruppen er sjekket.
+                          </div>
+                          Totalt i PCO nå: <strong>${successCount}</strong> (hvorav ${alreadyInGroupCount} var der fra før).${pruneMsg}
+                          ${failMsg}
+                       </div>`,
+                confirmLabel: 'Lukk',
+                showCancel: false,
+                onConfirm: () => true
+            });
             await this.loadPcoGroups();
         } catch (err) {
             console.error('syncHkmMembersToPcoGroup error:', err);
-            alert(`⚠️ Synkronisering feilet: ${err.message}`);
+            this.openCrmToolDialog({
+                mode: 'custom-html',
+                title: 'Feil ved synkronisering',
+                html: `<div style="padding: 16px; font-size: 14px; color: #991b1b;">
+                          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-weight: 500;">
+                             <span class="material-symbols-outlined" style="display:block;">warning</span> Synkronisering feilet
+                          </div>
+                          ${this.escapeHtml(err.message)}
+                       </div>`,
+                confirmLabel: 'Lukk',
+                showCancel: false,
+                onConfirm: () => true
+            });
         } finally {
             if (btn) {
                 btn.disabled = false;
