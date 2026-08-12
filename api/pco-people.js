@@ -225,6 +225,7 @@ async function createOrSyncPerson(authHeader, { firstName, lastName, email, phon
         body: JSON.stringify({
           data: {
             type: 'Person',
+            id: personId,
             attributes: {
               first_name: newFirstName,
               last_name: newLastName
