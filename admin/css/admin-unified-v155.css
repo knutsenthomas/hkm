@@ -8478,19 +8478,65 @@ html[data-theme="dark"] .btn-icon {
    Force modern, premium, cohesive look on all Admin and Min Side headers
    ========================================================================== */
 
-/* Main Header Container */
-#dashboard-main-header.main-header {
+/* Main Header Container - 100% Full Width Edge-to-Edge */
+body.admin-body #dashboard-main-header.main-header,
+body.minside-body #dashboard-main-header.main-header,
+body.crm-body #dashboard-main-header.main-header,
+#dashboard-main-header,
+#dashboard-main-header.main-header,
+.main-header {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
   padding: 16px 24px !important; /* 8px multiples */
-  background: rgba(255, 255, 255, 0.85) !important;
+  background: rgba(255, 255, 255, 0.92) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
   border-bottom: 1px solid rgba(27, 73, 101, 0.08) !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+  box-sizing: border-box !important;
+}
+
+/* Eliminate outer main-content padding so topbar stretches edge-to-edge */
+body.admin-body .main-content,
+body.minside-body .main-content,
+body.crm-body .main-content,
+.main-content {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-top: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Content below topbar retains clean padding */
+body.admin-body .main-content > div:not(#dashboard-main-header):not(.main-header),
+body.minside-body .main-content > div:not(#dashboard-main-header):not(.main-header),
+body.crm-body .main-content > div:not(#dashboard-main-header):not(.main-header),
+.main-content > .section-content,
+.main-content > .container-fluid,
+.main-content > .admin-page-container {
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 768px) {
+  body.admin-body .main-content > div:not(#dashboard-main-header):not(.main-header),
+  body.minside-body .main-content > div:not(#dashboard-main-header):not(.main-header),
+  body.crm-body .main-content > div:not(#dashboard-main-header):not(.main-header),
+  .main-content > .section-content,
+  .main-content > .container-fluid,
+  .main-content > .admin-page-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
 }
 
 /* Dark mode support */
-html[data-theme="dark"] #dashboard-main-header.main-header {
-  background: rgba(15, 23, 42, 0.85) !important;
+html[data-theme="dark"] #dashboard-main-header.main-header,
+html[data-theme="dark"] .main-header {
+  background: rgba(15, 23, 42, 0.92) !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
 }
 
