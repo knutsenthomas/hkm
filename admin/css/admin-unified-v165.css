@@ -5654,13 +5654,10 @@ body.minside-body .main-content {
   transition: margin-left 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-@media (min-width: 1025px) {
-  body.sidebar-collapsed .sidebar {
-    transform: translateX(-100%) !important;
-  }
-  body.sidebar-collapsed .main-content {
-    margin-left: 0 !important;
-  }
+/* Mini sidebar transition alignment */
+body.sidebar-mini .sidebar,
+body.sidebar-collapsed .sidebar {
+  transform: none !important;
 }
 
 body.admin-body .user-profile-link,
