@@ -2585,40 +2585,7 @@ html[data-theme="dark"] .data-table tbody tr:hover {
     transform: scale(1.1);
 }
 
-/* Collapsed sidebar state (Desktop / Laptop) */
-body.sidebar-collapsed {
-    --sidebar-w: 72px !important;
-}
-
-body.sidebar-collapsed .sidebar {
-    width: 72px !important;
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-}
-
-body.sidebar-collapsed .sidebar-logo-text,
-body.sidebar-collapsed .sidebar-group-title,
-body.sidebar-collapsed .nav-link span:not(.material-symbols-outlined),
-body.sidebar-collapsed .sidebar-footer,
-body.sidebar-collapsed .nav-badge {
-    display: none !important;
-}
-
-body.sidebar-collapsed .sidebar-logo {
-    justify-content: center;
-    padding-left: 0;
-    padding-right: 0;
-}
-
-body.sidebar-collapsed .nav-link {
-    justify-content: center;
-    padding: 10px 0;
-}
-
-body.sidebar-collapsed .nav-link .material-symbols-outlined {
-    margin-right: 0;
-    font-size: 22px;
-}
+/* Collapsed sidebar state handled by admin-unified.css (.sidebar-mini / .sidebar-collapsed) */
 
 /* Laptop & Tablet Landscape: sleek, visible sidebar */
 @media (max-width: 1200px) {

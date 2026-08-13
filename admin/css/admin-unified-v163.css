@@ -11007,11 +11007,14 @@ html[data-theme="dark"] .sidebar-expand-overlay {
 @media (min-width: 1025px) {
   /* Mini Sidebar Outer Container */
   body.sidebar-mini .sidebar,
-  body.sidebar-mini .sidebar * {
+  body.sidebar-collapsed .sidebar,
+  body.sidebar-mini .sidebar *,
+  body.sidebar-collapsed .sidebar * {
     box-sizing: border-box !important;
   }
 
-  body.sidebar-mini .sidebar {
+  body.sidebar-mini .sidebar,
+  body.sidebar-collapsed .sidebar {
     width: 72px !important;
     min-width: 72px !important;
     max-width: 72px !important;
@@ -11025,9 +11028,13 @@ html[data-theme="dark"] .sidebar-expand-overlay {
   }
 
   body.sidebar-mini .main-content,
+  body.sidebar-collapsed .main-content,
   body.sidebar-mini .crm-main,
+  body.sidebar-collapsed .crm-main,
   body.sidebar-mini .main-header,
-  body.sidebar-mini .admin-container {
+  body.sidebar-collapsed .main-header,
+  body.sidebar-mini .admin-container,
+  body.sidebar-collapsed .admin-container {
     margin-left: 72px !important;
     width: calc(100% - 72px) !important;
     max-width: calc(100% - 72px) !important;
@@ -11035,7 +11042,8 @@ html[data-theme="dark"] .sidebar-expand-overlay {
   }
 
   /* Sidebar Header & Brand Logo in Mini Mode */
-  body.sidebar-mini .sidebar-header {
+  body.sidebar-mini .sidebar-header,
+  body.sidebar-collapsed .sidebar-header {
     width: 100% !important;
     padding: 8px 0 14px 0 !important;
     margin-bottom: 12px !important;
@@ -11047,7 +11055,8 @@ html[data-theme="dark"] .sidebar-expand-overlay {
     box-sizing: border-box !important;
   }
 
-  body.sidebar-mini .sidebar-header .logo {
+  body.sidebar-mini .sidebar-header .logo,
+  body.sidebar-collapsed .sidebar-header .logo {
     justify-content: center !important;
     align-items: center !important;
     margin: 0 auto !important;
@@ -11057,11 +11066,14 @@ html[data-theme="dark"] .sidebar-expand-overlay {
   }
 
   body.sidebar-mini .sidebar-header .logo-text,
-  body.sidebar-mini .sidebar-header .logo h1 {
+  body.sidebar-collapsed .sidebar-header .logo-text,
+  body.sidebar-mini .sidebar-header .logo h1,
+  body.sidebar-collapsed .sidebar-header .logo h1 {
     display: none !important;
   }
 
-  body.sidebar-mini .sidebar-header .logo img {
+  body.sidebar-mini .sidebar-header .logo img,
+  body.sidebar-collapsed .sidebar-header .logo img {
     width: 34px !important;
     height: 34px !important;
     min-width: 34px !important;
@@ -11071,34 +11083,45 @@ html[data-theme="dark"] .sidebar-expand-overlay {
     display: block !important;
   }
 
-  body.sidebar-mini .desktop-sidebar-toggle-btn {
+  body.sidebar-mini .desktop-sidebar-toggle-btn,
+  body.sidebar-collapsed .desktop-sidebar-toggle-btn {
     display: none !important;
   }
 
   /* Completely hide category header text & arrows to prevent double lines */
-  body.sidebar-mini .sidebar .nav-category-header {
+  body.sidebar-mini .sidebar .nav-category-header,
+  body.sidebar-collapsed .sidebar .nav-category-header {
     display: none !important;
   }
 
   /* Clean single divider lines between logical navigation sections */
   body.sidebar-mini .sidebar .nav-group + .nav-group,
+  body.sidebar-collapsed .sidebar .nav-group + .nav-group,
   body.sidebar-mini .sidebar .nav-list > li.nav-item[data-nav-category="administrasjon"]:first-of-type,
-  body.sidebar-mini .sidebar .nav-list > li.nav-item[data-nav-category="kommunikasjon"]:first-of-type {
+  body.sidebar-collapsed .sidebar .nav-list > li.nav-item[data-nav-category="administrasjon"]:first-of-type,
+  body.sidebar-mini .sidebar .nav-list > li.nav-item[data-nav-category="kommunikasjon"]:first-of-type,
+  body.sidebar-collapsed .sidebar .nav-list > li.nav-item[data-nav-category="kommunikasjon"]:first-of-type {
     margin-top: 10px !important;
     padding-top: 10px !important;
     border-top: 1px solid var(--border-color, #e2e8f0) !important;
   }
 
   html[data-theme="dark"] body.sidebar-mini .sidebar .nav-group + .nav-group,
+  html[data-theme="dark"] body.sidebar-collapsed .sidebar .nav-group + .nav-group,
   html[data-theme="dark"] body.sidebar-mini .sidebar .nav-list > li.nav-item[data-nav-category="administrasjon"]:first-of-type,
-  html[data-theme="dark"] body.sidebar-mini .sidebar .nav-list > li.nav-item[data-nav-category="kommunikasjon"]:first-of-type {
+  html[data-theme="dark"] body.sidebar-collapsed .sidebar .nav-list > li.nav-item[data-nav-category="administrasjon"]:first-of-type,
+  html[data-theme="dark"] body.sidebar-mini .sidebar .nav-list > li.nav-item[data-nav-category="kommunikasjon"]:first-of-type,
+  html[data-theme="dark"] body.sidebar-collapsed .sidebar .nav-list > li.nav-item[data-nav-category="kommunikasjon"]:first-of-type {
     border-top-color: #334155 !important;
   }
 
   /* Nav Items & Links in Mini Mode with High Specificity */
   body.sidebar-mini .sidebar .sidebar-nav,
+  body.sidebar-collapsed .sidebar .sidebar-nav,
   body.sidebar-mini .sidebar .nav-group,
-  body.sidebar-mini .sidebar .nav-list {
+  body.sidebar-collapsed .sidebar .nav-group,
+  body.sidebar-mini .sidebar .nav-list,
+  body.sidebar-collapsed .sidebar .nav-list {
     width: 100% !important;
     min-width: 100% !important;
     max-width: 100% !important;
@@ -11109,7 +11132,8 @@ html[data-theme="dark"] .sidebar-expand-overlay {
     align-items: center !important;
   }
 
-  body.sidebar-mini .sidebar .nav-item {
+  body.sidebar-mini .sidebar .nav-item,
+  body.sidebar-collapsed .sidebar .nav-item {
     width: 100% !important;
     min-width: 100% !important;
     max-width: 100% !important;
@@ -11122,7 +11146,8 @@ html[data-theme="dark"] .sidebar-expand-overlay {
     align-items: center !important;
   }
 
-  body.sidebar-mini .sidebar .nav-link-wrap {
+  body.sidebar-mini .sidebar .nav-link-wrap,
+  body.sidebar-collapsed .sidebar .nav-link-wrap {
     width: 100% !important;
     min-width: 100% !important;
     max-width: 100% !important;
@@ -11134,11 +11159,13 @@ html[data-theme="dark"] .sidebar-expand-overlay {
   }
 
   body.admin-body.sidebar-mini .sidebar .nav-link,
+  body.admin-body.sidebar-collapsed .sidebar .nav-link,
   body.crm-body.sidebar-mini .sidebar .nav-link,
+  body.crm-body.sidebar-collapsed .sidebar .nav-link,
   body.minside-body.sidebar-mini .sidebar .nav-link,
+  body.minside-body.sidebar-collapsed .sidebar .nav-link,
   body.sidebar-mini .sidebar .nav-link,
-  body.admin-body.sidebar-mini .sidebar .nav-item:not([data-nav-category="all"]) > .nav-link,
-  body.crm-body.sidebar-mini .sidebar .nav-item:not([data-nav-category="all"]) > .nav-link {
+  body.sidebar-collapsed .sidebar .nav-link {
     width: 44px !important;
     height: 44px !important;
     min-width: 44px !important;
@@ -11162,44 +11189,52 @@ html[data-theme="dark"] .sidebar-expand-overlay {
   }
 
   /* Active Pill State */
-  body.sidebar-mini .sidebar .nav-link.active {
+  body.sidebar-mini .sidebar .nav-link.active,
+  body.sidebar-collapsed .sidebar .nav-link.active {
     background: #e0f2fe !important;
     color: #0369a1 !important;
     box-shadow: none !important;
   }
 
-  html[data-theme="dark"] body.sidebar-mini .sidebar .nav-link.active {
+  html[data-theme="dark"] body.sidebar-mini .sidebar .nav-link.active,
+  html[data-theme="dark"] body.sidebar-collapsed .sidebar .nav-link.active {
     background: rgba(56, 189, 248, 0.15) !important;
     color: #38bdf8 !important;
   }
 
   /* Hover State */
-  body.sidebar-mini .sidebar .nav-link:hover {
+  body.sidebar-mini .sidebar .nav-link:hover,
+  body.sidebar-collapsed .sidebar .nav-link:hover {
     background: #f1f5f9 !important;
     color: var(--admin-accent-color, #d17d39) !important;
   }
 
-  html[data-theme="dark"] body.sidebar-mini .sidebar .nav-link:hover {
+  html[data-theme="dark"] body.sidebar-mini .sidebar .nav-link:hover,
+  html[data-theme="dark"] body.sidebar-collapsed .sidebar .nav-link:hover {
     background: #1e293b !important;
     color: var(--admin-accent-color, #d17d39) !important;
   }
 
   /* Hide text label & star button */
-  body.sidebar-mini .sidebar .nav-link > span:not(.material-symbols-outlined) {
+  body.sidebar-mini .sidebar .nav-link > span:not(.material-symbols-outlined),
+  body.sidebar-collapsed .sidebar .nav-link > span:not(.material-symbols-outlined) {
     display: none !important;
   }
 
-  body.sidebar-mini .sidebar .nav-fav-toggle-btn {
+  body.sidebar-mini .sidebar .nav-fav-toggle-btn,
+  body.sidebar-collapsed .sidebar .nav-fav-toggle-btn {
     display: none !important;
   }
 
   /* Icon inside link - High Specificity Centering */
   body.admin-body.sidebar-mini .sidebar .nav-link .material-symbols-outlined,
+  body.admin-body.sidebar-collapsed .sidebar .nav-link .material-symbols-outlined,
   body.crm-body.sidebar-mini .sidebar .nav-link .material-symbols-outlined,
+  body.crm-body.sidebar-collapsed .sidebar .nav-link .material-symbols-outlined,
   body.minside-body.sidebar-mini .sidebar .nav-link .material-symbols-outlined,
+  body.minside-body.sidebar-collapsed .sidebar .nav-link .material-symbols-outlined,
   body.sidebar-mini .sidebar .nav-link .material-symbols-outlined,
-  body.admin-body.sidebar-mini .sidebar .nav-link span:first-child,
-  body.crm-body.sidebar-mini .sidebar .nav-link span:first-child {
+  body.sidebar-collapsed .sidebar .nav-link .material-symbols-outlined {
     font-size: 22px !important;
     width: 22px !important;
     height: 22px !important;
@@ -11217,7 +11252,8 @@ html[data-theme="dark"] .sidebar-expand-overlay {
   }
 
   /* Badge indicator in mini mode */
-  body.sidebar-mini .sidebar .nav-badge {
+  body.sidebar-mini .sidebar .nav-badge,
+  body.sidebar-collapsed .sidebar .nav-badge {
     position: absolute !important;
     top: 4px !important;
     right: 4px !important;
