@@ -10838,34 +10838,34 @@ html[data-theme="dark"] .design-ui-callout p {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    width: 32px !important;
-    height: 32px !important;
-    min-width: 32px !important;
-    max-width: 32px !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
     padding: 0 !important;
-    background: rgba(241, 245, 249, 0.8) !important;
+    background: rgba(241, 245, 249, 0.85) !important;
     border: 1px solid rgba(226, 232, 240, 0.9) !important;
-    border-radius: 9px !important;
-    color: #64748b !important;
+    border-radius: 10px !important;
+    color: #475569 !important;
     cursor: pointer !important;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
     flex-shrink: 0 !important;
     margin: 0 !important;
     backdrop-filter: blur(4px) !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
   }
   .desktop-sidebar-toggle-btn:hover {
     background: #ffffff !important;
     color: #d17d39 !important;
     border-color: rgba(209, 125, 57, 0.35) !important;
-    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.12) !important;
+    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.14) !important;
     transform: scale(1.05) !important;
   }
   .desktop-sidebar-toggle-btn:active {
     transform: scale(0.95) !important;
   }
   .desktop-sidebar-toggle-btn span {
-    font-size: 18px !important;
+    font-size: 20px !important;
     line-height: 1 !important;
     display: block !important;
   }
@@ -10878,10 +10878,63 @@ html[data-theme="dark"] .design-ui-callout p {
   html[data-theme="dark"] .desktop-sidebar-toggle-btn:hover {
     background: #1e293b !important;
     color: #f97316 !important;
-    border-color: rgba(249, 115, 22, 0.4) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
   }
+}
 
+/* --- Collapsed / Mini Sidebar Logo Hover Overlay --- */
+.sidebar-header .logo {
+  position: relative !important;
+}
+
+.sidebar-expand-overlay {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) scale(0.85) !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(209, 125, 57, 0.3) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #d17d39 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  z-index: 20 !important;
+}
+
+.sidebar-expand-overlay span {
+  font-size: 20px !important;
+  line-height: 1 !important;
+}
+
+body.sidebar-mini .sidebar-header:hover .sidebar-expand-overlay,
+body.sidebar-mini .sidebar-header .logo:hover .sidebar-expand-overlay,
+body.sidebar-collapsed .sidebar-header:hover .sidebar-expand-overlay,
+body.sidebar-collapsed .sidebar-header .logo:hover .sidebar-expand-overlay {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: translate(-50%, -50%) scale(1) !important;
+}
+
+body.sidebar-mini .sidebar-header:hover .logo img,
+body.sidebar-collapsed .sidebar-header:hover .logo img {
+  opacity: 0.2 !important;
+  transition: opacity 0.2s ease !important;
+}
+
+html[data-theme="dark"] .sidebar-expand-overlay {
+  background: #1e293b !important;
+  border-color: rgba(249, 115, 22, 0.4) !important;
+  color: #f97316 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+}
+
+@media (min-width: 1025px) {
   /* Mini Sidebar Outer Container */
   body.sidebar-mini .sidebar,
   body.sidebar-mini .sidebar * {

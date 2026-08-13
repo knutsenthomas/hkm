@@ -29,9 +29,9 @@ const initAdminHeader = () => {
         if (toggleBtn) {
             const icon = toggleBtn.querySelector('.material-symbols-outlined');
             if (icon) {
-                icon.textContent = isMini ? 'menu' : 'menu_open';
+                icon.textContent = isMini ? 'left_panel_open' : 'left_panel_close';
             }
-            const title = isMini ? 'Vis full meny (tekst og ikoner)' : 'Smal meny (kun ikoner)';
+            const title = isMini ? 'Vis full meny' : 'Skjul meny';
             toggleBtn.setAttribute('title', title);
             toggleBtn.setAttribute('aria-label', title);
         }
@@ -42,24 +42,46 @@ const initAdminHeader = () => {
         applySidebarMiniState(isMiniStored);
 
         const sidebarHeader = document.querySelector('.sidebar-header');
-        if (sidebarHeader && !document.getElementById('desktop-sidebar-toggle')) {
-            const toggleBtn = document.createElement('button');
-            toggleBtn.id = 'desktop-sidebar-toggle';
-            toggleBtn.type = 'button';
-            toggleBtn.className = 'desktop-sidebar-toggle-btn';
-            toggleBtn.innerHTML = `<span class="material-symbols-outlined">${isMiniStored ? 'menu' : 'menu_open'}</span>`;
-            const title = isMiniStored ? 'Vis full meny (tekst og ikoner)' : 'Smal meny (kun ikoner)';
-            toggleBtn.setAttribute('title', title);
-            toggleBtn.setAttribute('aria-label', title);
-            
-            toggleBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const nowMini = !document.body.classList.contains('sidebar-mini');
-                localStorage.setItem(SIDEBAR_MINI_KEY, nowMini ? 'true' : 'false');
-                applySidebarMiniState(nowMini);
-            });
+        if (sidebarHeader) {
+            // Attach overlay to logo if not present
+            const logoEl = sidebarHeader.querySelector('.logo') || sidebarHeader;
+            if (logoEl && !sidebarHeader.querySelector('.sidebar-expand-overlay')) {
+                const overlay = document.createElement('div');
+                overlay.className = 'sidebar-expand-overlay';
+                overlay.innerHTML = `<span class="material-symbols-outlined">left_panel_open</span>`;
+                overlay.setAttribute('title', 'Vis full meny');
+                logoEl.appendChild(overlay);
 
-            sidebarHeader.appendChild(toggleBtn);
+                logoEl.addEventListener('click', (e) => {
+                    if (document.body.classList.contains('sidebar-mini') || document.body.classList.contains('sidebar-collapsed')) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        localStorage.setItem(SIDEBAR_MINI_KEY, 'false');
+                        document.body.classList.remove('sidebar-collapsed');
+                        applySidebarMiniState(false);
+                    }
+                });
+            }
+
+            if (!document.getElementById('desktop-sidebar-toggle')) {
+                const toggleBtn = document.createElement('button');
+                toggleBtn.id = 'desktop-sidebar-toggle';
+                toggleBtn.type = 'button';
+                toggleBtn.className = 'desktop-sidebar-toggle-btn';
+                toggleBtn.innerHTML = `<span class="material-symbols-outlined">${isMiniStored ? 'left_panel_open' : 'left_panel_close'}</span>`;
+                const title = isMiniStored ? 'Vis full meny' : 'Skjul meny';
+                toggleBtn.setAttribute('title', title);
+                toggleBtn.setAttribute('aria-label', title);
+                
+                toggleBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const nowMini = !document.body.classList.contains('sidebar-mini');
+                    localStorage.setItem(SIDEBAR_MINI_KEY, nowMini ? 'true' : 'false');
+                    applySidebarMiniState(nowMini);
+                });
+
+                sidebarHeader.appendChild(toggleBtn);
+            }
         }
     };
 

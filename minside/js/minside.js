@@ -1256,10 +1256,37 @@ class MinSideManager {
             });
         });
 
+        // Setup logo hover overlay to restore full sidebar
+        const sidebarHeader = document.querySelector('.sidebar-header');
+        if (sidebarHeader) {
+            const logoEl = sidebarHeader.querySelector('.logo') || sidebarHeader;
+            if (logoEl && !sidebarHeader.querySelector('.sidebar-expand-overlay')) {
+                const overlay = document.createElement('div');
+                overlay.className = 'sidebar-expand-overlay';
+                overlay.innerHTML = `<span class="material-symbols-outlined">left_panel_open</span>`;
+                overlay.setAttribute('title', 'Vis full meny');
+                logoEl.appendChild(overlay);
+
+                logoEl.addEventListener('click', (e) => {
+                    if (document.body.classList.contains('sidebar-collapsed') || document.body.classList.contains('sidebar-mini')) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        document.body.classList.remove('sidebar-collapsed', 'sidebar-mini');
+                        const mobileToggleIcon = document.querySelector('#mobile-toggle .material-symbols-outlined');
+                        if (mobileToggleIcon) mobileToggleIcon.textContent = 'left_panel_close';
+                    }
+                });
+            }
+        }
+
         document.getElementById('mobile-toggle')?.addEventListener('click', (e) => {
             e.stopPropagation();
             if (window.innerWidth > 768) {
                 document.body.classList.toggle('sidebar-collapsed');
+                const icon = e.currentTarget.querySelector('.material-symbols-outlined');
+                if (icon) {
+                    icon.textContent = document.body.classList.contains('sidebar-collapsed') ? 'left_panel_open' : 'left_panel_close';
+                }
             } else {
                 this.toggleSidebar(true);
             }
