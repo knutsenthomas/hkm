@@ -8491,14 +8491,20 @@ body.crm-body #dashboard-main-header.main-header,
   margin-right: 0 !important;
   margin-top: 0 !important;
   margin-bottom: 0 !important;
-  padding: 14px 12px !important;
-  background: rgba(255, 255, 255, 0.92) !important;
+  height: 68px !important;
+  min-height: 68px !important;
+  padding: 0 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  background: rgba(255, 255, 255, 0.96) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
   border-bottom: 1px solid rgba(27, 73, 101, 0.08) !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
   box-sizing: border-box !important;
   border-radius: 0 !important;
+  overflow: visible !important;
 }
 
 /* Eliminate outer main-content padding so topbar stretches edge-to-edge */
@@ -12225,13 +12231,19 @@ body.crm-body #dashboard-main-header.main-header,
     margin-right: 0 !important;
     margin-top: 0 !important;
     margin-bottom: 0 !important;
+    height: 68px !important;
+    min-height: 68px !important;
     width: 100% !important;
     max-width: 100% !important;
     border-radius: 0 !important;
     border: none !important;
     border-bottom: 1px solid rgba(27, 73, 101, 0.08) !important;
-    padding: 14px 12px !important;
+    padding: 0 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
     box-sizing: border-box !important;
+    overflow: visible !important;
 }
 
 /* --- 6. Dark Theme Color Alignments --- */
