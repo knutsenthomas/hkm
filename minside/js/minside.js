@@ -1256,7 +1256,25 @@ class MinSideManager {
             });
         });
 
-        // Setup logo hover overlay to restore full sidebar
+        // Setup sidebar toggle and logo hover overlay to restore full sidebar (identical to admin)
+        const updateSidebarIcons = (isCollapsed) => {
+            const mobileIcon = document.querySelector('#mobile-toggle .material-symbols-outlined');
+            if (mobileIcon) mobileIcon.textContent = isCollapsed ? 'left_panel_open' : 'left_panel_close';
+            const desktopBtn = document.getElementById('desktop-sidebar-toggle');
+            if (desktopBtn) {
+                const desktopIcon = desktopBtn.querySelector('.material-symbols-outlined');
+                if (desktopIcon) desktopIcon.textContent = isCollapsed ? 'left_panel_open' : 'left_panel_close';
+            }
+        };
+
+        const toggleSidebarState = (forceState) => {
+            const isCurrentlyCollapsed = document.body.classList.contains('sidebar-collapsed') || document.body.classList.contains('sidebar-mini');
+            const targetState = (typeof forceState === 'boolean') ? forceState : !isCurrentlyCollapsed;
+            document.body.classList.toggle('sidebar-collapsed', targetState);
+            document.body.classList.toggle('sidebar-mini', targetState);
+            updateSidebarIcons(targetState);
+        };
+
         const sidebarHeader = document.querySelector('.sidebar-header');
         if (sidebarHeader) {
             const logoEl = sidebarHeader.querySelector('.logo') || sidebarHeader;
@@ -1271,26 +1289,23 @@ class MinSideManager {
                     if (document.body.classList.contains('sidebar-collapsed') || document.body.classList.contains('sidebar-mini')) {
                         e.preventDefault();
                         e.stopPropagation();
-                        document.body.classList.remove('sidebar-collapsed', 'sidebar-mini');
-                        const mobileToggleIcon = document.querySelector('#mobile-toggle .material-symbols-outlined');
-                        if (mobileToggleIcon) mobileToggleIcon.textContent = 'left_panel_close';
+                        toggleSidebarState(false);
                     }
                 });
             }
         }
 
-        document.getElementById('mobile-toggle')?.addEventListener('click', (e) => {
+        const handleToggleClick = (e) => {
             e.stopPropagation();
             if (window.innerWidth > 768) {
-                document.body.classList.toggle('sidebar-collapsed');
-                const icon = e.currentTarget.querySelector('.material-symbols-outlined');
-                if (icon) {
-                    icon.textContent = document.body.classList.contains('sidebar-collapsed') ? 'left_panel_open' : 'left_panel_close';
-                }
+                toggleSidebarState();
             } else {
                 this.toggleSidebar(true);
             }
-        });
+        };
+
+        document.getElementById('mobile-toggle')?.addEventListener('click', handleToggleClick);
+        document.getElementById('desktop-sidebar-toggle')?.addEventListener('click', handleToggleClick);
         document.getElementById('sidebar-overlay')?.addEventListener('click', () => this.toggleSidebar(false));
 
         document.getElementById('logout-btn')?.addEventListener('click', () => {

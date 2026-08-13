@@ -56,7 +56,7 @@
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" as="style" onload="this.onload=null;this.rel='stylesheet';if(document.fonts){document.fonts.load('24px &quot;Material Symbols Outlined&quot;').then(function(){document.documentElement.classList.add('fonts-loaded')}).catch(function(){document.documentElement.classList.add('fonts-loaded')})}else{document.documentElement.classList.add('fonts-loaded')}">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"></noscript>
     <link rel="stylesheet" href="/admin/css/dashboard.css?v=20260808_V21">
-    <link rel="stylesheet" href="/admin/css/admin-unified-v161.css">
+    <link rel="stylesheet" href="/admin/css/admin-unified-v162.css">
     <link rel="stylesheet" href="/minside/css/minside.css?v=20260808_V21">
     <link rel="stylesheet" href="/css/notifications.css?v=20260628_V1">
     
@@ -585,6 +585,9 @@
                         <img src="/img/logo-hkm.png" alt="HKM Logo">
                         <h1 class="logo-text" data-i18n="sidebar.title">Min side</h1>
                     </a>
+                    <button type="button" id="desktop-sidebar-toggle" class="desktop-sidebar-toggle-btn" title="Kollaps meny">
+                        <span class="material-symbols-outlined">left_panel_close</span>
+                    </button>
                 </div>
 
                 <nav class="sidebar-nav">
@@ -641,9 +644,9 @@
                 <div id="dashboard-main-header" class="main-header">
                     <div class="section-header design-ui-header in-topbar" style="margin-bottom: 0;">
 
-                        <!-- ← Hamburger on the LEFT -->
-                        <button id="mobile-toggle" class="mobile-nav-toggle">
-                            <span class="material-symbols-outlined">menu</span>
+                        <!-- ← Sidebar toggle on the LEFT -->
+                        <button id="mobile-toggle" class="mobile-nav-toggle" title="Kollaps/vis meny">
+                            <span class="material-symbols-outlined">left_panel_close</span>
                         </button>
 
                         <div class="section-header-icon">
