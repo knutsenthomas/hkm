@@ -11406,37 +11406,49 @@ html[data-theme="dark"] .hkm-task-card.completed {
 }
 
 .dashboard-course-signups-header .header-left-info {
-    display: flex;
-    align-items: center;
-    gap: 14px;
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
 }
 
 .dashboard-course-signups-header .header-icon-badge {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background: rgba(209, 125, 57, 0.08);
-    color: #d17d39;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(209, 125, 57, 0.18);
-    flex-shrink: 0;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 12px !important;
+    background: rgba(209, 125, 57, 0.08) !important;
+    color: #d17d39 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 1px solid rgba(209, 125, 57, 0.18) !important;
+    flex-shrink: 0 !important;
+}
+
+.dashboard-course-signups-header .header-icon-badge .material-symbols-outlined {
+    font-size: 22px !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .dashboard-course-signups-header h3 {
-    margin: 0;
-    font-size: 17px;
-    font-weight: 800;
-    color: #0f172a;
-    letter-spacing: -0.01em;
+    margin: 0 !important;
+    font-size: 17px !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    letter-spacing: -0.01em !important;
+    line-height: 1.2 !important;
 }
 
 .dashboard-course-signups-header p {
-    margin: 3px 0 0 0;
-    font-size: 13px;
-    color: #64748b;
-    font-weight: 500;
+    margin: 3px 0 0 0 !important;
+    font-size: 13px !important;
+    color: #64748b !important;
+    font-weight: 500 !important;
+    line-height: 1.3 !important;
 }
 
 .dashboard-see-all-link {
