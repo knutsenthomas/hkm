@@ -1312,6 +1312,7 @@ class MinSideManager {
 
         document.getElementById('mobile-toggle')?.addEventListener('click', handleToggleClick);
         document.getElementById('desktop-sidebar-toggle')?.addEventListener('click', handleToggleClick);
+        document.getElementById('mobile-sidebar-close')?.addEventListener('click', () => this.toggleSidebar(false));
         document.getElementById('sidebar-overlay')?.addEventListener('click', () => this.toggleSidebar(false));
 
         document.getElementById('logout-btn')?.addEventListener('click', () => {

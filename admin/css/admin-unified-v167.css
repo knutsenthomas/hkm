@@ -11267,6 +11267,25 @@ html[data-theme="dark"] .sidebar-expand-overlay {
   .desktop-sidebar-toggle-btn {
     display: none !important;
   }
+
+  .mobile-sidebar-close-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: transparent !important;
+    border: none !important;
+    color: #64748b !important;
+    font-size: 24px !important;
+    cursor: pointer !important;
+    padding: 6px !important;
+    border-radius: 8px !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-sidebar-close-btn {
+    display: none !important;
+  }
 }
 
 /* ==========================================================================
