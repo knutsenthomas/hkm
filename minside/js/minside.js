@@ -1259,7 +1259,13 @@ class MinSideManager {
         // Setup sidebar toggle and logo hover overlay to restore full sidebar (identical to admin)
         const updateSidebarIcons = (isCollapsed) => {
             const mobileIcon = document.querySelector('#mobile-toggle .material-symbols-outlined');
-            if (mobileIcon) mobileIcon.textContent = isCollapsed ? 'left_panel_open' : 'left_panel_close';
+            if (mobileIcon) {
+                if (window.innerWidth <= 768) {
+                    mobileIcon.textContent = 'menu';
+                } else {
+                    mobileIcon.textContent = isCollapsed ? 'left_panel_open' : 'left_panel_close';
+                }
+            }
             const desktopBtn = document.getElementById('desktop-sidebar-toggle');
             if (desktopBtn) {
                 const desktopIcon = desktopBtn.querySelector('.material-symbols-outlined');
