@@ -11002,14 +11002,7 @@ html[data-theme="dark"] .sidebar-expand-overlay {
   }
 
   body.sidebar-mini .desktop-sidebar-toggle-btn {
-    width: 34px !important;
-    height: 34px !important;
-    min-width: 34px !important;
-    max-width: 34px !important;
-    margin: 0 auto !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    display: none !important;
   }
 
   /* Completely hide category header text & arrows to prevent double lines */
