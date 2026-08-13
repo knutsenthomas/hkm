@@ -12200,51 +12200,35 @@ html[data-theme="dark"] .status-pill.status-completed {
     }
 }
 
-/* Force the main-header to span edge-to-edge on Tablet (769px - 1024px) */
-@media (min-width: 769px) and (max-width: 1024px) {
-    body.admin-body .main-content,
-    body.minside-body .main-content,
-    .main-content {
-        padding: 20px !important;
-        padding-top: 0 !important;
-    }
-
-    body.admin-body #dashboard-main-header.main-header,
-    body.minside-body #dashboard-main-header.main-header,
-    body.admin-body .main-header,
-    body.minside-body .main-header {
-        margin-left: -20px !important;
-        margin-right: -20px !important;
-        margin-top: 0 !important;
-        width: calc(100% + 40px) !important;
-        max-width: none !important;
-        border-radius: 0 !important;
-        border: none !important;
-        border-bottom: 1px solid rgba(27, 73, 101, 0.08) !important;
-        padding: 14px 20px !important;
-        margin-bottom: 0 !important;
-        box-sizing: border-box !important;
-    }
+/* Force the main-header to span 100% edge-to-edge across ALL screen sizes (Mobile, Tablet, Desktop) */
+body.admin-body .main-content,
+body.minside-body .main-content,
+body.crm-body .main-content,
+.main-content {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    box-sizing: border-box !important;
 }
 
-/* Force the main-header to span edge-to-edge on Desktop (1025px and up) */
-@media (min-width: 1025px) {
-    body.admin-body #dashboard-main-header.main-header,
-    body.minside-body #dashboard-main-header.main-header,
-    body.admin-body .main-header,
-    body.minside-body .main-header {
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        margin-top: 0 !important;
-        width: 100% !important;
-        max-width: none !important;
-        border-radius: 0 !important;
-        border: none !important;
-        border-bottom: 1px solid rgba(27, 73, 101, 0.08) !important;
-        padding: 16px 20px !important;
-        margin-bottom: 0 !important;
-        box-sizing: border-box !important;
-    }
+body.admin-body #dashboard-main-header.main-header,
+body.minside-body #dashboard-main-header.main-header,
+body.crm-body #dashboard-main-header.main-header,
+#dashboard-main-header,
+#dashboard-main-header.main-header,
+.main-header {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    margin-top: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 0 !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(27, 73, 101, 0.08) !important;
+    padding: 14px 24px !important;
+    margin-bottom: 0 !important;
+    box-sizing: border-box !important;
 }
 
 /* --- 6. Dark Theme Color Alignments --- */
