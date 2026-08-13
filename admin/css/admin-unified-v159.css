@@ -11383,7 +11383,7 @@ html[data-theme="dark"] .hkm-task-card.completed {
     }
 }
 
-/* Recent Course Signups Card Styles */
+/* Recent Course Signups Card Styles - Modernized Color Palette */
 .dashboard-course-signups-card {
     background: #ffffff;
     border: 1px solid #e2e8f0;
@@ -11412,21 +11412,21 @@ html[data-theme="dark"] .hkm-task-card.completed {
 }
 
 .dashboard-course-signups-header .header-icon-badge {
-    width: 46px;
-    height: 46px;
-    border-radius: 14px;
-    background: #fff7ed;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(209, 125, 57, 0.08);
     color: #d17d39;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid #ffedd5;
+    border: 1px solid rgba(209, 125, 57, 0.18);
     flex-shrink: 0;
 }
 
 .dashboard-course-signups-header h3 {
     margin: 0;
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 800;
     color: #0f172a;
     letter-spacing: -0.01em;
@@ -11443,20 +11443,23 @@ html[data-theme="dark"] .hkm-task-card.completed {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 13px;
-    font-weight: 700;
-    color: #d17d39;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #334155;
     text-decoration: none;
-    background: #fff7ed;
-    padding: 8px 16px;
-    border-radius: 999px;
-    border: 1px solid #ffedd5;
-    transition: all 0.2s ease;
+    background: #f8fafc;
+    padding: 7px 14px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .dashboard-see-all-link:hover {
-    background: #ffedd5;
-    border-color: #fed7aa;
+    background: #ffffff;
+    color: #d17d39;
+    border-color: rgba(209, 125, 57, 0.35);
+    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.12);
     transform: translateY(-1px);
 }
 
@@ -11474,7 +11477,7 @@ html[data-theme="dark"] .hkm-task-card.completed {
     gap: 16px;
     padding: 14px 18px;
     background: #ffffff;
-    border: 1.5px solid #f1f5f9;
+    border: 1px solid #f1f5f9;
     border-radius: 16px;
     transition: all 0.2s ease;
     width: 100%;
@@ -11497,18 +11500,18 @@ html[data-theme="dark"] .hkm-task-card.completed {
 }
 
 .recent-signup-avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #d17d39, #b95d20);
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #334155, #1e293b);
     color: #ffffff;
-    font-weight: 800;
-    font-size: 14px;
+    font-weight: 700;
+    font-size: 13.5px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12);
 }
 
 .recent-signup-info {
@@ -11550,13 +11553,13 @@ html[data-theme="dark"] .hkm-task-card.completed {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    color: #d17d39;
+    color: #475569;
     font-weight: 600;
-    background: #fff7ed;
+    background: #f1f5f9;
     padding: 3px 10px;
     border-radius: 8px;
     font-size: 12px;
-    border: 1px solid #ffedd5;
+    border: 1px solid #e2e8f0;
 }
 
 .recent-signup-right {
@@ -11577,29 +11580,28 @@ html[data-theme="dark"] .hkm-task-card.completed {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 5px 12px;
-    border-radius: 999px;
-    font-size: 11.5px;
-    font-weight: 700;
-    /* text-transform: uppercase; removed by request */
-    letter-spacing: 0.03em;
+    padding: 4px 11px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
 }
 
 .status-pill.status-approved {
-    background: #dcfce7;
-    color: #16a34a;
-    border: 1px solid #bbf7d0;
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
 }
 
 .status-pill.status-pending {
     background: #fff7ed;
-    color: #d17d39;
+    color: #c2410c;
     border: 1px solid #ffedd5;
 }
 
 .status-pill.status-completed {
-    background: #e0f2fe;
-    color: #0284c7;
+    background: #f0f9ff;
+    color: #0369a1;
     border: 1px solid #bae6fd;
 }
 
@@ -11622,6 +11624,48 @@ html[data-theme="dark"] .dashboard-course-signups-header .header-icon-badge {
     background: rgba(209, 125, 57, 0.2) !important;
     color: #f97316 !important;
     border-color: rgba(209, 125, 57, 0.4) !important;
+}
+
+html[data-theme="dark"] .recent-signup-item {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .recent-signup-item:hover {
+    background: #0f172a !important;
+    border-color: #475569 !important;
+}
+
+html[data-theme="dark"] .recent-signup-name {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .recent-signup-email {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .recent-signup-course-tag {
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: #cbd5e1 !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .dashboard-see-all-link {
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: #f8fafc !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .status-pill.status-approved {
+    background: rgba(16, 185, 129, 0.15) !important;
+    color: #34d399 !important;
+    border-color: rgba(52, 211, 153, 0.3) !important;
+}
+
+html[data-theme="dark"] .status-pill.status-pending {
+    background: rgba(245, 158, 11, 0.15) !important;
+    color: #fbbf24 !important;
+    border-color: rgba(251, 191, 36, 0.3) !important;
 }
 
 html[data-theme="dark"] .dashboard-see-all-link {
