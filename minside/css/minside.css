@@ -2923,8 +2923,8 @@ html[data-theme="dark"] .data-table tbody tr:hover {
     }
 }
 
-/* Mobile: sidebar hidden off-screen, full-width content */
-@media (max-width: 1024px) {
+/* Mobile: sidebar hidden off-screen, full-width content (only on screens 768px and smaller) */
+@media (max-width: 768px) {
     :root {
         --sidebar-w: 0px !important;
         --sidebar-width: 0px !important;

@@ -11004,7 +11004,7 @@ html[data-theme="dark"] .sidebar-expand-overlay {
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
 }
 
-@media (min-width: 1025px) {
+@media (min-width: 769px) {
   /* Mini Sidebar Outer Container */
   body.sidebar-mini .sidebar,
   body.sidebar-collapsed .sidebar,
@@ -11266,7 +11266,7 @@ html[data-theme="dark"] .sidebar-expand-overlay {
   }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .desktop-sidebar-toggle-btn {
     display: none !important;
   }
