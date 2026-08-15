@@ -2157,10 +2157,10 @@
                 const desc = (lesson.description || '').trim();
                 const titleStr = (lesson.title || '').trim();
                 if (desc && desc.toLowerCase() !== titleStr.toLowerCase()) {
-                    overviewText.textContent = desc;
+                    overviewText.innerHTML = desc;
                     overviewText.style.display = 'block';
                 } else {
-                    overviewText.textContent = '';
+                    overviewText.innerHTML = '';
                     overviewText.style.display = 'none';
                 }
             }
