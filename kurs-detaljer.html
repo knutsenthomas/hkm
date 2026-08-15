@@ -2262,7 +2262,15 @@
                     const percent = Math.min(100, Math.round((completedList.length / totalLessons) * 100));
                     const label = progressWrapper.querySelector('.progress-label');
                     const fill = progressWrapper.querySelector('.progress-bar-fill');
-                    if (label) label.textContent = `${percent}% Fullført`;
+                    if (label) {
+                        if (completedList.length === 0) {
+                            label.textContent = `Kursprogresjon: 0%`;
+                        } else if (completedList.length >= totalLessons) {
+                            label.textContent = `Kursprogresjon: 100% (Fullført)`;
+                        } else {
+                            label.textContent = `Kursprogresjon: ${percent}% (${completedList.length} av ${totalLessons} leksjoner)`;
+                        }
+                    }
                     if (fill) fill.style.width = `${percent}%`;
                 } else {
                     progressWrapper.style.display = 'none';
