@@ -1529,7 +1529,12 @@
                 <button type="button" class="lesson-nav-btn" id="prev-lesson-btn" onclick="window.selectPrevLesson()">
                     <i class="fas fa-chevron-left"></i> Forrige leksjon
                 </button>
-                <span id="lesson-step-indicator" style="font-size: 0.88rem; font-weight: 700; color: #64748b;">Leksjon 1 av 1</span>
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center;">
+                    <span id="lesson-step-indicator" style="font-size: 0.88rem; font-weight: 700; color: #64748b;">Leksjon 1 av 1</span>
+                    <button type="button" class="lesson-nav-btn" id="toggle-complete-btn" onclick="window.toggleCurrentLessonComplete()" style="padding: 6px 14px; font-size: 0.82rem; border-radius: 8px; border: 1.5px solid #cbd5e1; background: transparent; color: #64748b; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-check-circle"></i> <span id="complete-btn-text">Markér som fullført</span>
+                    </button>
+                </div>
                 <button type="button" class="lesson-nav-btn" id="next-lesson-btn" onclick="window.selectNextLesson()">
                     Neste leksjon <i class="fas fa-chevron-right"></i>
                 </button>
@@ -2114,6 +2119,27 @@
             } catch (e) {}
         }
 
+        function toggleLessonCompleted(courseId, lessonIndex) {
+            if (!courseId && courseId !== 0) return;
+            try {
+                let completed = getCompletedLessons(courseId);
+                if (completed.includes(lessonIndex)) {
+                    completed = completed.filter(idx => idx !== lessonIndex);
+                } else {
+                    completed.push(lessonIndex);
+                }
+                localStorage.setItem(`hkm_completed_lessons_${courseId}`, JSON.stringify(completed));
+            } catch (e) {}
+        }
+
+        window.toggleCurrentLessonComplete = function() {
+            if (!currentCourse) return;
+            const cId = currentCourse.id || currentCourse.slug;
+            const currentIdx = (typeof window.currentLessonIndex === 'number' ? window.currentLessonIndex : currentLessonIndex);
+            toggleLessonCompleted(cId, currentIdx);
+            window.selectLesson(currentIdx);
+        };
+
         window.selectNextLesson = function() {
             const currentIdx = (typeof window.currentLessonIndex === 'number' ? window.currentLessonIndex : currentLessonIndex);
             if (currentCourse) {
@@ -2274,6 +2300,26 @@
                     if (fill) fill.style.width = `${percent}%`;
                 } else {
                     progressWrapper.style.display = 'none';
+                }
+            }
+
+            // Update 'Markér som fullført' button state
+            const completeBtn = document.getElementById('toggle-complete-btn');
+            const completeBtnText = document.getElementById('complete-btn-text');
+            const cId = currentCourse?.id || currentCourse?.slug || 'default';
+            const isCompleted = getCompletedLessons(cId).includes(index);
+
+            if (completeBtn) {
+                if (isCompleted) {
+                    completeBtn.style.background = 'rgba(22, 163, 74, 0.12)';
+                    completeBtn.style.color = '#16a34a';
+                    completeBtn.style.borderColor = 'rgba(22, 163, 74, 0.35)';
+                    if (completeBtnText) completeBtnText.textContent = 'Fullført';
+                } else {
+                    completeBtn.style.background = 'transparent';
+                    completeBtn.style.color = '#64748b';
+                    completeBtn.style.borderColor = '#cbd5e1';
+                    if (completeBtnText) completeBtnText.textContent = 'Markér som fullført';
                 }
             }
 
