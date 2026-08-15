@@ -25571,8 +25571,9 @@ class AdminManager {
     }
 
     async _saveCourse() {
+        const saveBtn = document.getElementById('save-course-btn');
         const status = document.getElementById('course-save-status');
-        const editCourseKey = document.getElementById('course-id').value;
+        const editCourseKey = document.getElementById('course-id')?.value || '';
 
         const lessons = [];
         document.querySelectorAll('#lessons-container > .lesson-row-item').forEach(row => {
@@ -25604,14 +25605,15 @@ class AdminManager {
                     price: p,
                     date: d,
                     zoomUrl: z,
-                    resource: r,
-                    resourceUrl: ru,
+                    resources: resourcesList,
+                    resource: firstRes.title || '',
+                    resourceUrl: firstRes.url || '',
                     description: desc
                 });
             }
         });
 
-        let category = document.getElementById('course-category').value;
+        let category = document.getElementById('course-category')?.value || '';
         if (category === '__NEW__') {
             category = document.getElementById('course-new-category')?.value?.trim() || '';
             if (!category) {
@@ -25625,19 +25627,19 @@ class AdminManager {
 
         const rawCourse = {
             id: editCourseKey && !editCourseKey.startsWith('idx:') ? editCourseKey : `course_${Date.now()}`,
-            title: document.getElementById('course-title').value.trim(),
-            description: document.getElementById('course-description').value.trim(),
+            title: document.getElementById('course-title')?.value?.trim() || '',
+            description: document.getElementById('course-description')?.value?.trim() || '',
             category: category,
-            price: parseInt(document.getElementById('course-price').value) || 0,
+            price: parseInt(document.getElementById('course-price')?.value) || 0,
             priceSuffix: document.getElementById('course-price-suffix')?.value?.trim() || '',
-            imageUrl: document.getElementById('course-image').value.trim(),
+            imageUrl: document.getElementById('course-image')?.value?.trim() || '',
             lessons,
             updatedAt: new Date().toISOString()
         };
 
         const validated = typeof adminUtils.sanitizeCoursePayload === 'function'
             ? adminUtils.sanitizeCoursePayload(rawCourse)
-            : { ok: !!rawCourse.title, errors: rawCourse.title ? [] : ['Kurstitel er påkrevd.'], value: rawCourse };
+            : { ok: !!rawCourse.title, errors: rawCourse.title ? [] : ['Kurstittel er påkrevd.'], value: rawCourse };
 
         if (!validated.ok) {
             if (status) { status.style.color = '#ef4444'; status.textContent = validated.errors.join(' '); }
@@ -25645,7 +25647,7 @@ class AdminManager {
         }
 
         await this._runWriteLocked('course-save', async () => {
-            await this._withButtonLoading(btn, async () => {
+            await this._withButtonLoading(saveBtn, async () => {
                 try {
                     const data = typeof firebaseService.getSiteContent === 'function'
                         ? await firebaseService.getSiteContent('collection_courses')
