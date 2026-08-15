@@ -2094,9 +2094,33 @@
             container.innerHTML = html;
         }
 
+        function getCompletedLessons(courseId) {
+            if (!courseId) return [];
+            try {
+                const stored = localStorage.getItem(`hkm_completed_lessons_${courseId}`);
+                if (stored) return JSON.parse(stored);
+            } catch (e) {}
+            return [];
+        }
+
+        function markLessonCompleted(courseId, lessonIndex) {
+            if (!courseId && courseId !== 0) return;
+            try {
+                const completed = getCompletedLessons(courseId);
+                if (!completed.includes(lessonIndex)) {
+                    completed.push(lessonIndex);
+                    localStorage.setItem(`hkm_completed_lessons_${courseId}`, JSON.stringify(completed));
+                }
+            } catch (e) {}
+        }
+
         window.selectNextLesson = function() {
-            const nextIdx = (typeof window.currentLessonIndex === 'number' ? window.currentLessonIndex : currentLessonIndex) + 1;
-            window.selectLesson(nextIdx);
+            const currentIdx = (typeof window.currentLessonIndex === 'number' ? window.currentLessonIndex : currentLessonIndex);
+            if (currentCourse) {
+                const cId = currentCourse.id || currentCourse.slug;
+                markLessonCompleted(cId, currentIdx);
+            }
+            window.selectLesson(currentIdx + 1);
         };
 
         window.selectPrevLesson = function() {
@@ -2225,15 +2249,17 @@
                 }
             }
 
-            // Progress bar is only visible if watching a recorded lesson (videoUrl present)
+            // Progress bar calculation based on actual completed lessons count
             const progressWrapper = document.querySelector('.progress-wrapper');
             const hasRecordedVideo = Boolean(lesson && lesson.videoUrl && String(lesson.videoUrl).trim().length > 0);
 
             if (progressWrapper) {
                 if (hasRecordedVideo) {
                     progressWrapper.style.display = 'flex';
-                    const totalLessons = (currentCourse && currentCourse.lessons) ? currentCourse.lessons.length : 1;
-                    const percent = Math.min(100, Math.round(((index + 1) / totalLessons) * 100));
+                    const totalLessons = lessons.length || 1;
+                    const cId = currentCourse?.id || currentCourse?.slug || 'default';
+                    const completedList = getCompletedLessons(cId);
+                    const percent = Math.min(100, Math.round((completedList.length / totalLessons) * 100));
                     const label = progressWrapper.querySelector('.progress-label');
                     const fill = progressWrapper.querySelector('.progress-bar-fill');
                     if (label) label.textContent = `${percent}% Fullført`;
