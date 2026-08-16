@@ -478,7 +478,7 @@
             <div class="inbox-container">
                 <div class="unified-inbox-container" id="unified-inbox">
                     <!-- 1. Folders Sidebar -->
-                    <aside class="inbox-folders" style="padding: 12px 12px 10px 12px;">
+                    <aside class="inbox-folders" style="padding: 0 12px 10px 12px !important;">
                         <!-- Mobile Drawer Header -->
                         <div class="inbox-folders-header">
                             <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 16px; color: #0f172a;">
@@ -490,7 +490,7 @@
                             </button>
                         </div>
 
-                        <button id="btn-compose-email" onclick="if(window.messagesManager && window.messagesManager.openComposeModal){ window.messagesManager.openComposeModal(); } else { alert('Vennligst velg en e-post fra listen for å besvare.'); }" style="margin: 0 0 12px 0; width: 100%; height: 42px; padding: 0 16px; border-radius: 12px; background: linear-gradient(135deg, #d17d39, #bd4f2a); color: #ffffff; border: none; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: none; transition: all 0.2s ease;">
+                        <button id="btn-compose-email" onclick="if(window.messagesManager && window.messagesManager.openComposeModal){ window.messagesManager.openComposeModal(); } else { alert('Vennligst velg en e-post fra listen for å besvare.'); }" style="margin: 0 0 10px 0; width: 100%; height: 42px; padding: 0 16px; border-radius: 12px; background: linear-gradient(135deg, #d17d39, #bd4f2a); color: #ffffff; border: none; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: none; transition: all 0.2s ease;">
                             <span class="material-symbols-outlined" style="font-size: 18px;">edit</span> Skriv ny
                         </button>
                         <div class="folder-item active" data-filter="all">
@@ -522,7 +522,7 @@
 
                     <!-- 2. Thread List -->
                     <section class="inbox-threads">
-                        <div class="threads-header" style="padding: 12px 16px !important;">
+                        <div class="threads-header" style="padding: 0 16px 10px 16px !important; margin-top: 0 !important;">
                             <div class="threads-search-row">
                                 <button class="mobile-menu-btn" onclick="document.getElementById('unified-inbox').classList.toggle('mobile-menu-open')" title="Meny">
                                     <span class="material-symbols-outlined">menu</span>
