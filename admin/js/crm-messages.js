@@ -422,7 +422,10 @@ class MessagesManager {
                 </div>
                 <div class="thread-info">
                     <div class="thread-top">
-                        <span class="thread-name">${this.escapeHtml(name)}</span>
+                        <div style="display: flex; align-items: center; gap: 6px; min-width: 0;">
+                            <span class="thread-name">${this.escapeHtml(name)}</span>
+                            <span class="thread-channel-badge ${avatarClass}">${channelTag}</span>
+                        </div>
                         <span class="thread-time">${timeLabel}</span>
                     </div>
                     ${showSubject ? `<div class="thread-subject">${this.escapeHtml(subjectText)}</div>` : ''}
