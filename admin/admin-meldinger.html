@@ -522,9 +522,17 @@
 
                     <!-- 2. Thread List -->
                     <section class="inbox-threads">
-                        <div class="threads-header">
-                            <div style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between;">
+                        <div class="threads-header" style="padding: 20px 20px 16px 20px;">
+                            <div style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; height: 28px;">
                                 <span>Meldinger</span>
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <button class="btn-icon-square" id="mark-all-read-btn" onclick="window.messagesManager.markAllAsRead()" title="Marker alle meldinger som lest" style="width: 34px; height: 34px; border-radius: 10px;">
+                                        <span class="material-symbols-outlined" style="color: #10b981; font-size: 18px;">done_all</span>
+                                    </button>
+                                    <button class="btn-icon-square" id="toggle-bulk-mode-btn" onclick="window.messagesManager.toggleBulkSelectionMode()" title="Massesletting (velg flere meldinger)" style="width: 34px; height: 34px; border-radius: 10px;">
+                                        <span class="material-symbols-outlined" style="color: #ef4444; font-size: 18px;">delete_sweep</span>
+                                    </button>
+                                </div>
                             </div>
                             <div class="threads-search-row">
                                 <button class="mobile-menu-btn" onclick="document.getElementById('unified-inbox').classList.toggle('mobile-menu-open')" title="Meny">
@@ -534,12 +542,6 @@
                                     <span class="material-symbols-outlined">search</span>
                                     <input type="text" id="inbox-search" placeholder="Søk i meldinger...">
                                 </div>
-                                <button class="btn-icon-square" id="mark-all-read-btn" onclick="window.messagesManager.markAllAsRead()" title="Marker alle meldinger som lest">
-                                    <span class="material-symbols-outlined" style="color: #10b981;">done_all</span>
-                                </button>
-                                <button class="btn-icon-square" id="toggle-bulk-mode-btn" onclick="window.messagesManager.toggleBulkSelectionMode()" title="Massesletting (velg flere meldinger)">
-                                    <span class="material-symbols-outlined" style="color: #ef4444;">delete_sweep</span>
-                                </button>
                             </div>
                             <div class="bulk-actions" id="bulk-actions" style="display: none;">
                                 <div class="bulk-actions-left">
