@@ -24811,7 +24811,7 @@ class AdminManager {
             <!-- Sub-tab Bar -->
             <div style="display: flex; gap: 8px; border-bottom: 1px solid #e2e8f0; margin-bottom: 24px; padding-bottom: 0;">
                 <button class="sub-tab-btn active" id="courses-list-tab-btn">Kursliste</button>
-                <button class="sub-tab-btn" id="courses-enrollments-tab-btn">Påmeldinger & Tilganger</button>
+                <button class="sub-tab-btn" id="courses-enrollments-tab-btn">Påmeldinger</button>
                 <button class="sub-tab-btn" id="courses-finance-tab-btn">Økonomi</button>
             </div>
 
