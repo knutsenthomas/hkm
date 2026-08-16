@@ -12014,7 +12014,8 @@ html[data-theme="dark"] .status-pill.status-completed {
     background: var(--card-bg, #ffffff) !important;
 }
 
-.card:not(.contacts-grid):not(.table-container):not(.crm-card):hover,
+.card:hover,
+.design-ui-panel:hover,
 .bento-card:hover,
 .stat-card-premium:hover,
 .chart-card-premium:hover,
@@ -12023,8 +12024,8 @@ html[data-theme="dark"] .status-pill.status-completed {
 .recent-signups-card:hover,
 .course-card:hover,
 .newsletter-card:hover {
-    transform: translateY(-3px) scale(1.01) !important;
-    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06), 0 4px 10px rgba(15, 23, 42, 0.02) !important;
+    transform: none !important;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04) !important;
     border-color: rgba(15, 23, 42, 0.12) !important;
 }
 
@@ -14151,5 +14152,23 @@ body.admin-body .main-header,
 .main-header {
     position: static !important;
     top: auto !important;
+}
+
+/* Strictly disable all zoom, scale and move animations on all cards and containers when hovered */
+.card:hover,
+.design-ui-panel:hover,
+.bento-card:hover,
+.stat-card:hover,
+.stat-card-premium:hover,
+.chart-card-premium:hover,
+.teaching-card:hover,
+.event-card:hover,
+.recent-signups-card:hover,
+.course-card:hover,
+.newsletter-card:hover,
+.table-container:hover,
+.crm-card:hover,
+.crm-table:hover {
+    transform: none !important;
 }
 
