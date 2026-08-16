@@ -24986,9 +24986,9 @@ class AdminManager {
 
                     <!-- Revenue breakdown per course -->
                     <div style="display: grid; grid-template-columns: 1fr; gap: 24px; margin-top: 24px;">
-                        <div class="design-ui-panel" style="padding: 24px; border-radius: 16px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
-                            <h3 style="font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-top: 0; margin-bottom: 16px;">Omsetning per kurs</h3>
-                            <div id="finance-courses-breakdown">
+                        <div class="design-ui-panel" style="padding: 20px 0 0 0; border-radius: 16px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.02); overflow: hidden;">
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-top: 0; margin-bottom: 16px; padding: 0 20px;">Omsetning per kurs</h3>
+                            <div id="finance-courses-breakdown" style="width: 100%;">
                                 <div class="loader" style="text-align:center;padding:20px;color:#94a3b8;">Beregner...</div>
                             </div>
                         </div>
@@ -31542,25 +31542,25 @@ class AdminManager {
 
                 return `
                     <tr>
-                        <td style="font-weight: 600; color: #1e293b;">${title}</td>
+                        <td style="font-weight: 600; color: #1e293b; padding-left: 20px;">${title}</td>
                         <td style="text-align: center; color: #475569;">${total}</td>
                         <td style="text-align: center; color: #16a34a; font-weight: 600;">${paid}</td>
                         <td style="font-weight: 600; color: #1B4965;">kr ${rev.toLocaleString('no-NO')}</td>
-                        <td style="color: #ef4444; font-weight: 500;">kr ${ref.toLocaleString('no-NO')}</td>
+                        <td style="color: #ef4444; font-weight: 500; padding-right: 20px;">kr ${ref.toLocaleString('no-NO')}</td>
                     </tr>
                 `;
             }).join('');
 
             breakdownContainer.innerHTML = `
-                <div class="table-container full-bleed">
-                    <table class="crm-table">
+                <div class="table-container full-bleed" style="margin: 0; width: 100%; border: none; border-top: 1px solid #e2e8f0; border-radius: 0; box-shadow: none;">
+                    <table class="crm-table" style="width: 100%; min-width: 100%; border-radius: 0;">
                         <thead>
                             <tr>
-                                <th>Kursnavn</th>
+                                <th style="padding-left: 20px;">Kursnavn</th>
                                 <th style="text-align: center;">Meldt på totalt</th>
                                 <th style="text-align: center;">Betalte deltakere</th>
                                 <th>Omsetning</th>
-                                <th>Refundert</th>
+                                <th style="padding-right: 20px;">Refundert</th>
                             </tr>
                         </thead>
                         <tbody>${rows}</tbody>
