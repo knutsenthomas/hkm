@@ -3801,8 +3801,8 @@ class AdminManager {
                                 }
                             </div>
                         </td>
-                        <td style="min-width: 240px; max-width: 400px;">
-                            <div style="font-weight: 700; color: #1e293b; font-size: 15px; margin-bottom: 4px; line-height: 1.3;">${this.escapeHtml(title)}</div>
+                        <td style="min-width: 220px; max-width: 380px; padding-right: 16px; word-break: break-word;">
+                            <div style="font-weight: 700; color: #1e293b; font-size: 15px; margin-bottom: 4px; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; word-break: break-word;">${this.escapeHtml(title)}</div>
                             <div style="font-size: 13px; color: #64748b; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.4;">
                                 ${(() => { 
                                     const raw = summary || ep.description || '';
