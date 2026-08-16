@@ -895,7 +895,7 @@ class MessagesManager {
         }
 
         viewEl.innerHTML = `
-            <div class="view-header" style="padding: 20px 28px 16px 28px; display: flex; justify-content: space-between; align-items: center;">
+            <div class="view-header" style="padding: 20px 28px 16px 28px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; border-bottom: 1px solid #f1f5f9;">
                 <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; margin-right: 12px;">
                     <button class="mobile-back-btn" onclick="window.messagesManager.closeMobileThread()" title="Tilbake til meldinger">
                         <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
@@ -909,8 +909,8 @@ class MessagesManager {
                 </div>
             </div>
             
-            <div class="threads-scroll" style="flex: 1; padding: 28px; overflow-y: auto; display: flex; flex-direction: column;">
-                <div class="email-view-container" style="width: 100%; max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; flex: 1;">
+            <div class="threads-scroll" style="flex: 1; min-height: 0; padding: 28px; overflow-y: auto; display: flex; flex-direction: column;">
+                <div class="email-view-container" style="width: 100%; max-width: 820px; margin: 0 auto; display: flex; flex-direction: column;">
                     
                     <!-- Sender Row -->
                     <div class="email-sender-row" style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px;">
@@ -949,6 +949,12 @@ class MessagesManager {
                 </div>
             </div>
         `;
+
+        setTimeout(() => {
+            if (viewEl) viewEl.scrollTop = 0;
+            const scrollArea = viewEl.querySelector('.threads-scroll');
+            if (scrollArea) scrollArea.scrollTop = 0;
+        }, 0);
     }
 
     openReplyComposer(msgId, mode = 'reply') {

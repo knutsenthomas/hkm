@@ -242,6 +242,11 @@
 }
 
 .threads-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
 .threads-list {
     flex: 1;
     overflow-y: auto;
