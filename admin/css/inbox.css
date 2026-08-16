@@ -245,38 +245,34 @@
 .threads-list {
     flex: 1;
     overflow-y: auto;
-    padding: 12px;
+    padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 8px;
 }
 
 .thread-item {
     padding: 14px 16px;
-    border: 1px solid #e2e8f0;
+    border: none;
+    border-bottom: 1px solid #f1f5f9;
     background: #ffffff;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: background 0.15s ease;
     display: flex;
-    gap: 14px;
+    gap: 12px;
     align-items: flex-start;
-    border-radius: 14px;
+    border-radius: 0;
     margin-bottom: 0;
     width: 100%;
     box-sizing: border-box;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.02);
 }
 
 .thread-item:hover {
     background: #f8fafc;
-    border-color: #cbd5e1;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
 }
 
 .thread-item.active {
-    background: #ffffff;
-    border-color: var(--accent-color, #1B4965);
-    box-shadow: 0 4px 16px rgba(27, 73, 101, 0.12);
+    background: #f1f5f9;
+    border-left: 3px solid var(--accent-color, #1B4965);
 }
 
 .thread-item-checkbox {
@@ -415,39 +411,43 @@
 }
 
 .thread-avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #1B4965 0%, #3b82f6 100%);
-    color: #ffffff;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    color: #1e293b;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
     position: relative;
     font-weight: 700;
-    font-size: 14px;
-    box-shadow: 0 2px 8px rgba(27, 73, 101, 0.18);
+    font-size: 13.5px;
+}
+
+.thread-avatar.chat {
+    background: #dcfce7 !important;
+    color: #15803d !important;
+}
+
+.thread-avatar.push {
+    background: #fff7ed !important;
+    color: #c2410c !important;
 }
 
 .thread-avatar > .material-symbols-outlined {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    width: 24px !important;
-    height: 24px !important;
-    font-size: 24px !important;
+    width: 22px !important;
+    height: 22px !important;
+    font-size: 22px !important;
     line-height: 1 !important;
 }
 
 .thread-channel-icon {
-    position: absolute;
-    bottom: -2px;
-    right: -2px;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #fff;
+    display: none !important;
+}
     border: 1.5px solid var(--inbox-border);
     display: flex;
     align-items: center;

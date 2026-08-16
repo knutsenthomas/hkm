@@ -416,9 +416,6 @@ class MessagesManager {
                 </div>
                 <div class="thread-avatar ${avatarClass}">
                     ${avatarContent}
-                    <div class="thread-channel-icon">
-                        <span class="material-symbols-outlined">${channelIcon}</span>
-                    </div>
                 </div>
                 <div class="thread-info">
                     <div class="thread-top">
