@@ -627,149 +627,33 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const sidebar = document.querySelector('.sidebar');
-            const mobileToggle = document.getElementById('mobile-nav-toggle');
             const topbarTitle = document.getElementById('dashboard-main-header-title');
             const topbarIcon = document.getElementById('dashboard-main-header-icon');
             const topbarSubtitle = document.getElementById('dashboard-main-header-subtitle');
-            const ADMIN_LAST_DASHBOARD_SECTION_KEY = 'hkm_admin_last_dashboard_section';
 
-            const topbarSectionOverrides = {
-                overview: { icon: 'grid_view', title: 'Oversikt' },
-                todo: { icon: 'playlist_add_check', title: 'Huskeliste' }
-            };
+            // Set fixed topbar metadata for Systemlogger page
+            if (topbarTitle) topbarTitle.textContent = 'Systemlogger';
+            if (topbarIcon) topbarIcon.textContent = 'assignment';
+            if (topbarSubtitle) topbarSubtitle.textContent = 'Systemfeil og hendelseslogger.';
 
-            function getNavLabelFromLink(link) {
-                if (!link) return '';
-                const spans = link.querySelectorAll('span');
-                if (!spans || spans.length === 0) return '';
-                const textSpan = Array.from(spans)
-                    .find(span => span && span.classList && !span.classList.contains('material-symbols-outlined') && !span.classList.contains('nav-badge'));
-                return (textSpan?.textContent || '').trim();
+            // Remove any leftover section hash from URL if present
+            if (window.location.hash) {
+                try {
+                    history.replaceState(null, '', window.location.pathname);
+                } catch (_) {}
             }
 
-            function getSectionMeta(sectionId, sourceLink) {
-                const sectionEl = sectionId ? document.getElementById(`${sectionId}-section`) : null;
-                const sectionHeaderTitle = sectionEl?.querySelector('.section-header .section-title, .design-ui-header .section-title, .section-header h2, .section-header h3');
-                const sectionHeaderSubtitle = sectionEl?.querySelector('.section-header .section-subtitle, .design-ui-header .section-subtitle');
-                const sectionHeaderIcon = sectionEl?.querySelector('.section-header-icon .material-symbols-outlined');
-                const navIcon = sourceLink?.querySelector('.material-symbols-outlined');
-                const navTitle = getNavLabelFromLink(sourceLink);
-                const override = topbarSectionOverrides[sectionId] || {};
-
-                return {
-                    title: override.title || navTitle || sectionHeaderTitle?.textContent?.trim() || 'Oversikt',
-                    icon: override.icon || navIcon?.textContent?.trim() || sectionHeaderIcon?.textContent?.trim() || 'grid_view',
-                    subtitle: sectionHeaderSubtitle?.textContent?.trim() || 'HKM Studio administrasjonspanel'
-                };
-            }
-
-            function syncTopbarForSection(sectionId, sourceLink) {
-                if (!topbarTitle || !topbarIcon) return;
-                const meta = getSectionMeta(sectionId, sourceLink);
-                topbarTitle.textContent = meta.title;
-                topbarIcon.textContent = meta.icon;
-                if (topbarSubtitle) {
-                    topbarSubtitle.textContent = meta.subtitle;
-                }
-            }
-
-            // All hamburger/overlay logic is now handled by admin-header.js
-
-            const mobileSidebarClose = document.getElementById('mobile-sidebar-close');
-            if (mobileSidebarClose) {
-                mobileSidebarClose.addEventListener('click', () => {
-                    sidebar?.classList.remove('active');
-                    const overlay = document.querySelector('.sidebar-overlay');
-                    if (overlay && overlay.classList) {
-                        overlay.classList.remove('active');
-                        overlay.style.removeProperty('display');
-                        overlay.style.removeProperty('opacity');
-                        overlay.style.removeProperty('pointer-events');
-                    }
-                });
-            }
-
-            // Navigation logic with event delegation to handle dynamic sidebar replacement
-            function handleSectionSwitch(targetSectionId, sourceLink = null) {
-                if (!targetSectionId) return;
-
-                console.log(`[Navigation] Navigating to section: ${targetSectionId}`);
-                sessionStorage.setItem(ADMIN_LAST_DASHBOARD_SECTION_KEY, targetSectionId);
-                
-                // Update URL hash if needed (without triggering a second switch)
-                if (window.location.hash !== `#${targetSectionId}`) {
-                    try {
-                        history.pushState(null, '', `#${targetSectionId}`);
-                    } catch (_) {
-                        window.location.hash = targetSectionId;
-                    }
-                }
-
-                // Update Visible Section
-                const sections = document.querySelectorAll('.section-content');
-                console.log(`[Navigation] Found ${sections.length} sections. Hiding all, showing ${targetSectionId}-section.`);
-                sections.forEach(section => {
-                    if (section && section.classList) {
-                        section.classList.remove('active');
-                        if (section.id === `${targetSectionId}-section`) {
-                            section.classList.add('active');
-                            console.log(`[Navigation] Activated section: ${section.id}`);
-                        }
-                    }
-                });
-
-                // Trigger module-based rendering if available
-                if (window.adminManager && typeof window.adminManager.onSectionSwitch === 'function') {
-                    window.adminManager.onSectionSwitch(targetSectionId);
-                }
-
-                // Update Active Link UI
-                document.querySelectorAll('.nav-link, .mobile-nav-item').forEach(l => {
-                    if (l && l.classList) {
-                        const isMatch = l.getAttribute('data-section') === targetSectionId;
-                        l.classList.toggle('active', isMatch);
-                    }
-                });
-
-                // Sync topbar
-                const activeLink = sourceLink || document.querySelector(`.nav-link[data-section="${targetSectionId}"], .mobile-nav-item[data-section="${targetSectionId}"]`);
-                syncTopbarForSection(targetSectionId, activeLink);
-
-                // Close sidebar on mobile
-                sidebar?.classList.remove('active');
-                const overlay = document.querySelector('.sidebar-overlay');
-                if (overlay && overlay.classList) {
-                    overlay.classList.remove('active');
-                }
-            }
-
-            // Global click delegation
+            // Click delegation for section links: Navigate back to main dashboard with hash
             document.addEventListener('click', (e) => {
                 const link = e.target.closest('.nav-link[data-section], .mobile-nav-item[data-section]');
                 if (link) {
                     e.preventDefault();
                     const targetSectionId = link.getAttribute('data-section');
-                    handleSectionSwitch(targetSectionId, link);
+                    if (targetSectionId) {
+                        window.location.href = `/admin/index.html#${targetSectionId}`;
+                    }
                 }
             });
-
-            // Handle browser back/forward and direct hash changes
-            window.addEventListener('hashchange', () => {
-                const hash = window.location.hash.substring(1);
-                if (hash) {
-                    handleSectionSwitch(hash);
-                }
-            });
-
-            // Initial load
-            const hash = window.location.hash.substring(1);
-            const rememberedSection = sessionStorage.getItem(ADMIN_LAST_DASHBOARD_SECTION_KEY);
-            const initialSection = hash || rememberedSection || 'overview';
-            
-            // Wait slightly for AdminManager to be ready before initial switch
-            setTimeout(() => {
-                handleSectionSwitch(initialSection);
-            }, 200);
 
             // FAB Action Restoration
             const pendingBtnId = sessionStorage.getItem('pendingFabAction');

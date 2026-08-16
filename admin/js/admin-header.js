@@ -456,13 +456,13 @@ const initAdminHeader = () => {
 
         const path = window.location.pathname.toLowerCase().replace(/\/$/, '');
         const hash = window.location.hash.replace('#', '');
-        const isAdminHome = path.endsWith('/admin/index.html') || path.endsWith('/admin/index.html');
+        const isAdminHome = path.endsWith('/admin/index.html') || path.endsWith('/admin/') || path === '/admin';
         const currentSection = hash || (isAdminHome ? 'overview' : '');
 
         const itemHref = (section) => `/admin/index.html#${section}`;
         const isActive = (item) => {
             if (item.path && path.includes(item.path)) return true;
-            if (item.section && currentSection === item.section) return true;
+            if (isAdminHome && item.section && currentSection === item.section) return true;
             return false;
         };
 
