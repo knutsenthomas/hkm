@@ -58,11 +58,20 @@
     <link rel="stylesheet" href="css/inbox.css?v=20260816_V999">
 
     <style>
-        .threads-header {
-            padding: 4px 16px 12px 16px !important;
+        .inbox-threads {
+            padding-top: 0 !important;
             margin-top: 0 !important;
         }
+        .threads-header {
+            padding: 8px 16px 12px 16px !important;
+            margin-top: 0 !important;
+            padding-top: 8px !important;
+        }
         .threads-search-row {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+        .threads-search {
             margin-top: 0 !important;
             padding-top: 0 !important;
         }
@@ -529,8 +538,8 @@
                     <div class="inbox-drawer-backdrop" id="inbox-drawer-backdrop" onclick="document.getElementById('unified-inbox').classList.remove('mobile-menu-open')"></div>
 
                     <!-- 2. Thread List -->
-                    <section class="inbox-threads">
-                        <div class="threads-header" style="padding: 4px 16px 12px 16px !important;">
+                    <section class="inbox-threads" style="padding-top: 0 !important; margin-top: 0 !important;">
+                        <div class="threads-header" style="padding: 8px 16px 12px 16px !important; margin-top: 0 !important;">
                             <div class="threads-search-row">
                                 <button class="mobile-menu-btn" onclick="document.getElementById('unified-inbox').classList.toggle('mobile-menu-open')" title="Meny">
                                     <span class="material-symbols-outlined">menu</span>
