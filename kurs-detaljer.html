@@ -525,16 +525,14 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
         }
 
-        .lesson-nav-top-info {
+        .lesson-nav-center-info {
             display: flex;
             align-items: center;
             gap: 14px;
         }
 
-        .lesson-nav-buttons-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .nav-btn-text {
+            display: inline;
         }
 
         .lesson-nav-btn {
@@ -899,41 +897,37 @@
 
             .lesson-nav-bar {
                 display: flex !important;
-                flex-direction: column !important;
-                gap: 12px !important;
-                padding: 14px 16px !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                gap: 6px !important;
+                padding: 10px 8px !important;
                 border-radius: 14px !important;
                 margin-bottom: 24px !important;
                 width: 100% !important;
                 box-sizing: border-box !important;
             }
 
-            .lesson-nav-top-info {
+            .lesson-nav-center-info {
                 display: flex !important;
                 align-items: center !important;
-                justify-content: space-between !important;
-                width: 100% !important;
                 gap: 8px !important;
-                padding-bottom: 8px !important;
-                border-bottom: 1px solid #f1f5f9 !important;
-            }
-
-            .lesson-nav-buttons-row {
-                display: flex !important;
-                align-items: center !important;
-                justify-content: space-between !important;
-                width: 100% !important;
-                gap: 10px !important;
-            }
-
-            .lesson-nav-buttons-row .lesson-nav-btn {
-                flex: 1 !important;
                 justify-content: center !important;
-                text-align: center !important;
-                padding: 10px 8px !important;
-                font-size: 0.84rem !important;
-                white-space: nowrap !important;
-                box-sizing: border-box !important;
+                flex: 1 !important;
+            }
+
+            .nav-btn-text {
+                display: none !important;
+            }
+
+            .lesson-nav-arrow-btn {
+                padding: 8px 12px !important;
+                min-width: 40px !important;
+                height: 40px !important;
+                justify-content: center !important;
+                font-size: 0.95rem !important;
+                border-radius: 10px !important;
+                flex-shrink: 0 !important;
             }
 
             .sidebar-header {
@@ -1579,20 +1573,18 @@
 
             <!-- Next / Prev Lesson Navigation Sub-bar -->
             <div class="lesson-nav-bar" id="lesson-nav-bar">
-                <div class="lesson-nav-top-info">
-                    <span id="lesson-step-indicator" style="font-size: 0.88rem; font-weight: 700; color: #64748b;">Leksjon 1 av 1</span>
-                    <button type="button" class="lesson-nav-btn" id="toggle-complete-btn" onclick="window.toggleCurrentLessonComplete()" style="padding: 6px 14px; font-size: 0.82rem; border-radius: 8px; border: 1.5px solid #cbd5e1; background: transparent; color: #64748b; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                <button type="button" class="lesson-nav-btn lesson-nav-arrow-btn" id="prev-lesson-btn" onclick="window.selectPrevLesson()" title="Forrige leksjon">
+                    <i class="fas fa-chevron-left"></i> <span class="nav-btn-text">Forrige leksjon</span>
+                </button>
+                <div class="lesson-nav-center-info">
+                    <span id="lesson-step-indicator" style="font-size: 0.88rem; font-weight: 700; color: #64748b; white-space: nowrap;">Leksjon 1 av 1</span>
+                    <button type="button" class="lesson-nav-btn" id="toggle-complete-btn" onclick="window.toggleCurrentLessonComplete()" style="padding: 6px 14px; font-size: 0.82rem; border-radius: 8px; border: 1.5px solid #cbd5e1; background: transparent; color: #64748b; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
                         <i class="fas fa-check-circle"></i> <span id="complete-btn-text">Markér som fullført</span>
                     </button>
                 </div>
-                <div class="lesson-nav-buttons-row">
-                    <button type="button" class="lesson-nav-btn" id="prev-lesson-btn" onclick="window.selectPrevLesson()">
-                        <i class="fas fa-chevron-left"></i> Forrige leksjon
-                    </button>
-                    <button type="button" class="lesson-nav-btn" id="next-lesson-btn" onclick="window.selectNextLesson()">
-                        Neste leksjon <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
+                <button type="button" class="lesson-nav-btn lesson-nav-arrow-btn" id="next-lesson-btn" onclick="window.selectNextLesson()" title="Neste leksjon">
+                    <span class="nav-btn-text">Neste leksjon</span> <i class="fas fa-chevron-right"></i>
+                </button>
             </div>
 
             <!-- Content Tabs Header -->
