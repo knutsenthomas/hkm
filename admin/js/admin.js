@@ -24961,7 +24961,7 @@ class AdminManager {
             <div id="finance-tab-view" style="display: none;">
                 <div class="design-ui-shell">
                     <!-- Key stats cards grid -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                    <div class="finance-stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; width: 100%; box-sizing: border-box;">
                         <div class="design-ui-panel" style="padding: 20px; border-radius: 12px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 8px;">
                             <div style="font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Total Omsetning</div>
                             <div id="finance-total-revenue" style="font-size: 24px; font-weight: 800; color: #1B4965;">kr 0</div>
