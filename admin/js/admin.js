@@ -24818,7 +24818,7 @@ class AdminManager {
             <!-- VIEW 1: COURSES VIEW -->
             <div id="courses-tab-view">
                 <div style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:16px;">
-                    <button class="btn btn-secondary" style="display:inline-flex; align-items:center; gap:6px; background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px;" onclick="const shopLink = document.querySelector('.nav-link[data-section=\'shop\']'); if(shopLink){ shopLink.click(); setTimeout(() => { document.querySelector('#shop-section [data-tab=\'kurs\']')?.click(); }, 150); } else { document.getElementById('courses-finance-tab-btn')?.click(); }">
+                    <button class="btn btn-secondary" id="see-course-purchases-btn" style="display:inline-flex; align-items:center; gap:6px; background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px;">
                         <span class="material-symbols-outlined" style="font-size:18px;">payments</span> Se kurskjøp
                     </button>
                     <button class="btn btn-primary" id="create-course-btn">
@@ -25080,6 +25080,11 @@ class AdminManager {
             if (enrollmentsView) enrollmentsView.style.display = 'none';
             if (financeView) financeView.style.display = 'block';
             await this._loadFinanceData();
+        });
+
+        const seePurchasesBtn = document.getElementById('see-course-purchases-btn');
+        seePurchasesBtn?.addEventListener('click', () => {
+            financeTabBtn?.click();
         });
 
         // Search & Filter event bindings

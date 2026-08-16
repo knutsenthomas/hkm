@@ -13100,13 +13100,13 @@ html body.minside-body .design-ui-panel-header > select {
                 box-sizing: border-box !important;
             }
 
-            /* Flat top sticky navigation bar with vertical alignment */
+            /* Flat top navigation bar with vertical alignment */
             #dashboard-main-header,
             .main-header,
             body.minside-body #dashboard-main-header,
             body.admin-body #dashboard-main-header {
-                position: sticky !important;
-                top: 0 !important;
+                position: static !important;
+                top: auto !important;
                 left: 0 !important;
                 right: 0 !important;
                 z-index: 1000 !important;
@@ -14116,5 +14116,14 @@ body.builder-active .main-header > .section-header,
     padding-right: 0 !important;
     border-radius: 0 !important;
     box-sizing: border-box !important;
+}
+
+/* Ensure admin top header bar and table headers scroll away naturally instead of sticking */
+body.admin-body #dashboard-main-header,
+body.admin-body .main-header,
+#dashboard-main-header,
+.main-header {
+    position: static !important;
+    top: auto !important;
 }
 
