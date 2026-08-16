@@ -2150,9 +2150,42 @@
             if (!courseId) return [];
             try {
                 const stored = localStorage.getItem(`hkm_completed_lessons_${courseId}`);
-                if (stored) return JSON.parse(stored);
+                let list = stored ? JSON.parse(stored) : [];
+                // Merge global array entries matching courseId_idx
+                const globalStored = localStorage.getItem('hkm_completed_lessons');
+                if (globalStored) {
+                    const globalList = JSON.parse(globalStored);
+                    globalList.forEach(item => {
+                        if (typeof item === 'string' && item.startsWith(`${courseId}_`)) {
+                            const idx = parseInt(item.split('_')[1], 10);
+                            if (!isNaN(idx) && !list.includes(idx)) list.push(idx);
+                        }
+                    });
+                }
+                return list;
             } catch (e) {}
             return [];
+        }
+
+        async function syncLessonCompletionToFirestore(courseId, lessonIndex, isCompleted) {
+            try {
+                const user = (typeof firebaseService !== 'undefined' && firebaseService?.currentUser) || 
+                             (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
+                if (user && user.uid && typeof firebase !== 'undefined' && firebase.firestore) {
+                    const userRef = firebase.firestore().collection('users').doc(user.uid);
+                    const doc = await userRef.get();
+                    let completedLessons = (doc.exists && Array.isArray(doc.data().completedLessons)) ? doc.data().completedLessons : [];
+                    const key = `${courseId}_${lessonIndex}`;
+                    if (isCompleted) {
+                        if (!completedLessons.includes(key)) completedLessons.push(key);
+                    } else {
+                        completedLessons = completedLessons.filter(k => k !== key && k !== String(lessonIndex));
+                    }
+                    await userRef.set({ completedLessons }, { merge: true });
+                }
+            } catch (e) {
+                console.warn('Failed to sync completed lesson to Firestore:', e);
+            }
         }
 
         function markLessonCompleted(courseId, lessonIndex) {
@@ -2163,6 +2196,13 @@
                     completed.push(lessonIndex);
                     localStorage.setItem(`hkm_completed_lessons_${courseId}`, JSON.stringify(completed));
                 }
+                let globalList = JSON.parse(localStorage.getItem('hkm_completed_lessons') || '[]');
+                const key = `${courseId}_${lessonIndex}`;
+                if (!globalList.includes(key)) {
+                    globalList.push(key);
+                    localStorage.setItem('hkm_completed_lessons', JSON.stringify(globalList));
+                }
+                syncLessonCompletionToFirestore(courseId, lessonIndex, true);
             } catch (e) {}
         }
 
@@ -2170,12 +2210,25 @@
             if (!courseId && courseId !== 0) return;
             try {
                 let completed = getCompletedLessons(courseId);
+                let isNowCompleted = false;
                 if (completed.includes(lessonIndex)) {
                     completed = completed.filter(idx => idx !== lessonIndex);
+                    isNowCompleted = false;
                 } else {
                     completed.push(lessonIndex);
+                    isNowCompleted = true;
                 }
                 localStorage.setItem(`hkm_completed_lessons_${courseId}`, JSON.stringify(completed));
+
+                let globalList = JSON.parse(localStorage.getItem('hkm_completed_lessons') || '[]');
+                const key = `${courseId}_${lessonIndex}`;
+                if (isNowCompleted) {
+                    if (!globalList.includes(key)) globalList.push(key);
+                } else {
+                    globalList = globalList.filter(k => k !== key);
+                }
+                localStorage.setItem('hkm_completed_lessons', JSON.stringify(globalList));
+                syncLessonCompletionToFirestore(courseId, lessonIndex, isNowCompleted);
             } catch (e) {}
         }
 

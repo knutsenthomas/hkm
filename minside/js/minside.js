@@ -5974,10 +5974,25 @@ class MinSideManager {
         };
 
         const userCompletedLessons = this.profileData?.completedLessons || [];
+        const localGlobalCompleted = (() => {
+            try { return JSON.parse(localStorage.getItem('hkm_completed_lessons') || '[]'); } catch(e) { return []; }
+        })();
 
         const activeCourseInfo = courses.map(c => {
             const lessons = c.lessons || [];
-            const doneCount = lessons.filter((l, lIdx) => userCompletedLessons.includes(`${c.id}_${lIdx}`) || userCompletedLessons.includes(l.id)).length;
+            const localCourseCompleted = (() => {
+                try { return JSON.parse(localStorage.getItem(`hkm_completed_lessons_${c.id}`) || '[]'); } catch(e) { return []; }
+            })();
+
+            const doneCount = lessons.filter((l, lIdx) => 
+                userCompletedLessons.includes(`${c.id}_${lIdx}`) || 
+                userCompletedLessons.includes(l.id) ||
+                localGlobalCompleted.includes(`${c.id}_${lIdx}`) ||
+                localGlobalCompleted.includes(l.id) ||
+                localCourseCompleted.includes(lIdx) ||
+                localCourseCompleted.includes(String(lIdx)) ||
+                (l.id && localCourseCompleted.includes(l.id))
+            ).length;
             const pct = lessons.length > 0 ? Math.round((doneCount / lessons.length) * 100) : 0;
             return { course: c, total: lessons.length, done: doneCount, pct };
         });
