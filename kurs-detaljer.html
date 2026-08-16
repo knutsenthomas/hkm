@@ -481,6 +481,7 @@
             font-size: 0.82rem;
             font-weight: 700;
             color: #334155;
+            white-space: nowrap;
         }
 
         .progress-bar-bg {
@@ -1004,12 +1005,23 @@
 
             .progress-wrapper {
                 width: 100% !important;
-                justify-content: space-between !important;
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 6px !important;
+                margin-bottom: 8px !important;
+            }
+
+            .progress-label {
+                font-size: 0.82rem !important;
+                white-space: nowrap !important;
+                width: 100% !important;
             }
 
             .progress-bar-bg {
-                flex-grow: 1 !important;
-                max-width: 180px !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                flex-grow: 0 !important;
+                height: 8px !important;
             }
 
             /* Video & Overlays */
