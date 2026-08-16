@@ -1014,17 +1014,21 @@
 
             /* Video & Overlays */
             .video-card {
-                border-radius: 12px !important;
-                margin-bottom: 12px !important;
-                min-height: 260px !important;
+                border-radius: 14px !important;
+                margin-bottom: 16px !important;
+                width: 100% !important;
+                aspect-ratio: 16 / 9 !important;
                 height: auto !important;
-                aspect-ratio: auto !important;
+                min-height: unset !important;
             }
 
             .video-card iframe,
             .video-card video {
+                width: 100% !important;
+                height: 100% !important;
                 aspect-ratio: 16 / 9 !important;
-                height: 100 !important;
+                border: none !important;
+                border-radius: 0 !important;
             }
 
             .video-card-countdown-content {
@@ -2576,21 +2580,21 @@
                             videoId = vUrl.split('youtu.be/')[1]?.split('?')[0]?.split('&')[0];
                         }
                         if (videoId) {
-                            embedHtml = `<iframe src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=0&rel=0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width:100%;height:100%;border:none;border-radius:16px;"></iframe>`;
+                            embedHtml = `<iframe src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=0&rel=0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width:100%;height:100%;border:none;"></iframe>`;
                         }
                     } else if (vUrl.includes('vimeo.com')) {
                         const vimeoMatch = vUrl.match(/vimeo\.com\/(?:video\/)?(\d+)/);
                         if (vimeoMatch && vimeoMatch[1]) {
-                            embedHtml = `<iframe src="https://player.vimeo.com/video/${vimeoMatch[1]}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="width:100%;height:100%;border:none;border-radius:16px;"></iframe>`;
+                            embedHtml = `<iframe src="https://player.vimeo.com/video/${vimeoMatch[1]}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="width:100%;height:100%;border:none;"></iframe>`;
                         }
                     }
 
                     if (embedHtml) {
                         videoContainer.innerHTML = embedHtml;
                     } else if (/\.(mp4|webm|ogg|mov)($|\?)/i.test(vUrl)) {
-                        videoContainer.innerHTML = `<video src="${vUrl}" controls style="width:100%;height:100%;border-radius:16px;object-fit:contain;background:#000;"></video>`;
+                        videoContainer.innerHTML = `<video src="${vUrl}" controls style="width:100%;height:100%;object-fit:cover;background:#000;"></video>`;
                     } else {
-                        videoContainer.innerHTML = `<iframe src="${vUrl}" allowfullscreen style="width:100%;height:100%;border:none;border-radius:16px;"></iframe>`;
+                        videoContainer.innerHTML = `<iframe src="${vUrl}" allowfullscreen style="width:100%;height:100%;border:none;"></iframe>`;
                     }
                 } else if (isLiveSessionFinished) {
                     videoContainer.style.backgroundImage = `linear-gradient(rgba(15, 23, 42, 0.82), rgba(15, 23, 42, 0.92)), url('${courseImg}')`;
