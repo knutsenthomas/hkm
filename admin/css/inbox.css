@@ -981,10 +981,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    padding-top: 64px;
+    padding-left: 24px;
+    padding-right: 24px;
     color: #94a3b8;
     text-align: center;
-    padding: 48px 24px;
     background: #ffffff;
 }
 
