@@ -495,7 +495,7 @@ class MessagesManager {
         const chatData = this.visitorChats.find(c => c.id === chatId) || {};
 
         viewEl.innerHTML = `
-            <div class="view-header" style="display: flex; align-items: center;">
+            <div class="view-header" style="padding: 20px 24px 16px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9;">
                 <button class="mobile-back-btn" onclick="window.messagesManager.closeMobileThread()" title="Tilbake til meldinger">
                     <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
                 </button>
@@ -895,7 +895,7 @@ class MessagesManager {
         }
 
         viewEl.innerHTML = `
-            <div class="view-header" style="padding: 18px 28px; display: flex; justify-content: space-between; align-items: center;">
+            <div class="view-header" style="padding: 20px 28px 16px 28px; display: flex; justify-content: space-between; align-items: center;">
                 <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; margin-right: 12px;">
                     <button class="mobile-back-btn" onclick="window.messagesManager.closeMobileThread()" title="Tilbake til meldinger">
                         <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
