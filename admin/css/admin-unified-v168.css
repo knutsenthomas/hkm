@@ -13558,8 +13558,7 @@ html body.minside-body .design-ui-panel-header > select {
             .note-card,
             .course-card,
             .reading-plan-card,
-            .history-card,
-            .table-container {
+            .history-card {
                 border-radius: 16px !important;
                 border: 1px solid var(--admin-border, #e2e8f0) !important;
                 margin-left: 0 !important;
@@ -13569,6 +13568,18 @@ html body.minside-body .design-ui-panel-header > select {
                 box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03) !important;
                 width: 100% !important;
                 max-width: 100% !important;
+                box-sizing: border-box !important;
+                overflow: hidden !important;
+            }
+
+            .table-container {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
                 box-sizing: border-box !important;
                 overflow-x: auto !important;
                 overflow-y: hidden !important;
