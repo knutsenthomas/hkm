@@ -364,12 +364,16 @@ class MessagesManager {
         
         let preview = '';
         if (isEmail) {
-            preview = t.subject || t.message || '';
+            preview = t.message || t.body || '';
         } else if (isChat) {
             preview = t.lastMessage?.text || 'Ingen meldinger enda';
         } else if (isPush) {
-            preview = t.title || t.body || '';
+            preview = t.body || t.message || '';
         }
+
+        const subjectText = (isEmail || isPush) ? (t.title || t.subject || '') : '';
+        const showSubject = subjectText && subjectText.trim().length > 0;
+        const showPreview = preview && preview.trim().length > 0 && preview.trim().toLowerCase() !== subjectText.trim().toLowerCase();
 
         const isUnread = isEmail ? t.status !== 'lest' : (isChat && t.lastMessage && t.lastMessage.sender === 'visitor');
         const isActive = this.activeThreadId === t.id;
@@ -421,8 +425,8 @@ class MessagesManager {
                         <span class="thread-name">${this.escapeHtml(name)}</span>
                         <span class="thread-time">${timeLabel}</span>
                     </div>
-                    ${(isEmail || isPush) && (t.title || t.subject) ? `<div class="thread-subject">${this.escapeHtml(t.title || t.subject)}</div>` : ''}
-                    <div class="thread-preview">${this.escapeHtml(preview)}</div>
+                    ${showSubject ? `<div class="thread-subject">${this.escapeHtml(subjectText)}</div>` : ''}
+                    ${showPreview ? `<div class="thread-preview">${this.escapeHtml(preview)}</div>` : ''}
                 </div>
             </div>
         `;
