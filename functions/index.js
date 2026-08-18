@@ -10103,7 +10103,7 @@ exports.notifyCourseParticipants = onRequest({ cors: true, secrets: [emailUserPa
 
   await verifyAdmin(req, res, async () => {
     try {
-      const { courseId, courseTitle, subject, message, actionUrl } = req.body;
+      const { courseId, courseTitle, subject, message, actionUrl, extraEmails } = req.body;
       if (!courseId || !subject || !message) {
         res.status(400).json({ error: "Mangler kurs-ID, emne eller melding." });
         return;
@@ -10133,8 +10133,21 @@ exports.notifyCourseParticipants = onRequest({ cors: true, secrets: [emailUserPa
         }
       });
 
+      // Add extra email recipients if specified
+      if (Array.isArray(extraEmails)) {
+        extraEmails.forEach(em => {
+          if (typeof em === 'string' && em.trim() && em.includes('@') && em.includes('.')) {
+            const emailClean = em.trim().toLowerCase();
+            if (!seenEmails.has(emailClean)) {
+              seenEmails.add(emailClean);
+              recipients.push({ email: emailClean, name: '' });
+            }
+          }
+        });
+      }
+
       if (recipients.length === 0) {
-        res.status(404).json({ error: "Ingen påmeldte deltakere med godkjent tilgang funnet for dette kurset." });
+        res.status(404).json({ error: "Ingen påmeldte deltakere eller ekstra mottakere funnet for dette kurset." });
         return;
       }
 

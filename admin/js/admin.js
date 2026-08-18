@@ -24946,6 +24946,12 @@ class AdminManager {
                             </div>
 
                             <div style="margin-bottom:16px;">
+                                <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Ekstra mottakere (valgfritt)</label>
+                                <input id="notify-course-extra-emails" type="text" placeholder="epost1@eksempel.no, epost2@eksempel.no" oninput="window.adminManager.updateNotifyCourseRecipientCount()" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;box-sizing:border-box;">
+                                <span style="font-size:0.8rem;color:#94a3b8;margin-top:4px;display:block;">Skriv inn e-postadresser separert med komma (,) for å varsle personer som ikke ligger i påmeldingslisten.</span>
+                            </div>
+
+                            <div style="margin-bottom:16px;">
                                 <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Emnefelt *</label>
                                 <input id="notify-course-subject" type="text" required placeholder="🎉 Nytt opptak er lagt ut: Seerkurs med aktivering" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;box-sizing:border-box;">
                             </div>
@@ -25341,6 +25347,10 @@ class AdminManager {
         subjectInput.value = `🎉 Nytt opptak er lagt ut: ${selectedCourseTitle}`;
         messageInput.value = `Hei {{name}}!\n\nVi har gleden av å informere om at et nytt opptak nå er tilgjengelig for kurset ${selectedCourseTitle}.\n\nDu kan logge inn på Min Side når som helst for å se opptaket og følge leksjonene i ditt eget tempo.\n\nVelsignelse og god fornøyelse!\nHis Kingdom Ministry`;
 
+        // Reset extra emails field
+        const extraEmailsInput = document.getElementById('notify-course-extra-emails');
+        if (extraEmailsInput) extraEmailsInput.value = '';
+
         modal.style.display = 'block';
         await this.updateNotifyCourseRecipientCount();
     }
@@ -25356,6 +25366,7 @@ class AdminManager {
         const recipientInfo = document.getElementById('notify-recipient-info');
         const subjectInput = document.getElementById('notify-course-subject');
         const messageInput = document.getElementById('notify-course-message');
+        const extraEmailsInput = document.getElementById('notify-course-extra-emails');
 
         if (!select || !recipientText) return;
 
@@ -25369,7 +25380,12 @@ class AdminManager {
             messageInput.value = `Hei {{name}}!\n\nVi har gleden av å informere om at et nytt opptak nå er tilgjengelig for kurset ${courseTitle}.\n\nDu kan logge inn på Min Side når som helst for å se opptaket og følge leksjonene i ditt eget tempo.\n\nVelsignelse og god fornøyelse!\nHis Kingdom Ministry`;
         }
 
-        if (!courseId) {
+        const extraEmailsRaw = (extraEmailsInput?.value || '').trim();
+        const extraList = extraEmailsRaw
+            ? extraEmailsRaw.split(/[,;\s]+/).map(e => e.trim().toLowerCase()).filter(e => e.includes('@') && e.includes('.'))
+            : [];
+
+        if (!courseId && extraList.length === 0) {
             recipientText.textContent = 'Velg et kurs for å se antall godkjente deltakere.';
             if (recipientInfo) recipientInfo.style.background = '#f8fafc';
             return;
@@ -25380,33 +25396,50 @@ class AdminManager {
         try {
             const db = window.firebaseService?.db || firebase.firestore();
             const snap = await db.collection('courseEnrollments').get();
-            const recipients = new Set();
+            const enrolledRecipients = new Set();
+            const allRecipients = new Set();
             const strCourseId = String(courseId).toLowerCase().trim();
 
-            snap.forEach(doc => {
-                const d = doc.data();
-                const isApproved = d.status === 'paid' || d.status === 'success' || !d.status;
-                const dCourseId = String(d.courseId || '').toLowerCase().trim();
-                const dCourseTitle = String(d.courseTitle || '').toLowerCase().trim();
-                const matchesCourse = dCourseId === strCourseId || dCourseId === 'all' || 
-                                      dCourseTitle === String(courseTitle || '').toLowerCase().trim() ||
-                                      (strCourseId.includes('seerkurs') && (dCourseId.includes('seer') || dCourseTitle.includes('seer')));
+            if (courseId) {
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    const isApproved = d.status === 'paid' || d.status === 'success' || !d.status;
+                    const dCourseId = String(d.courseId || '').toLowerCase().trim();
+                    const dCourseTitle = String(d.courseTitle || '').toLowerCase().trim();
+                    const matchesCourse = dCourseId === strCourseId || dCourseId === 'all' || 
+                                          dCourseTitle === String(courseTitle || '').toLowerCase().trim() ||
+                                          (strCourseId.includes('seerkurs') && (dCourseId.includes('seer') || dCourseTitle.includes('seer')));
 
-                if (isApproved && matchesCourse && d.email) {
-                    recipients.add(d.email.trim().toLowerCase());
+                    if (isApproved && matchesCourse && d.email) {
+                        const emailClean = d.email.trim().toLowerCase();
+                        enrolledRecipients.add(emailClean);
+                        allRecipients.add(emailClean);
+                    }
+                });
+            }
+
+            extraList.forEach(e => allRecipients.add(e));
+
+            const totalCount = allRecipients.size;
+            const enrolledCount = enrolledRecipients.size;
+            const extraCount = extraList.length;
+
+            if (totalCount > 0) {
+                if (extraCount > 0 && enrolledCount > 0) {
+                    recipientText.textContent = `Klar til utsendelse: ${enrolledCount} påmeldte + ${extraCount} ekstra (${totalCount} unike mottakere totalt).`;
+                } else if (extraCount > 0) {
+                    recipientText.textContent = `Klar til utsendelse: ${extraCount} ekstra ${extraCount === 1 ? 'mottaker' : 'mottakere'}.`;
+                } else {
+                    recipientText.textContent = `Klar til utsendelse: ${totalCount} ${totalCount === 1 ? 'deltaker' : 'deltakere'} med godkjent tilgang.`;
                 }
-            });
 
-            const count = recipients.size;
-            if (count > 0) {
-                recipientText.textContent = `Klar til utsendelse: ${count} ${count === 1 ? 'deltaker' : 'deltakere'} med godkjent tilgang vil motta e-posten.`;
                 if (recipientInfo) {
                     recipientInfo.style.background = '#f0fdf4';
                     recipientInfo.style.borderColor = '#bbf7d0';
                     recipientInfo.style.color = '#15803d';
                 }
             } else {
-                recipientText.textContent = 'Ingen godkjente deltakere funnet for dette kurset ennå.';
+                recipientText.textContent = 'Ingen godkjente deltakere eller ekstra e-poster funnet ennå.';
                 if (recipientInfo) {
                     recipientInfo.style.background = '#fff7ed';
                     recipientInfo.style.borderColor = '#fed7aa';
@@ -25425,6 +25458,7 @@ class AdminManager {
         const select = document.getElementById('notify-course-select');
         const subjectInput = document.getElementById('notify-course-subject');
         const messageInput = document.getElementById('notify-course-message');
+        const extraEmailsInput = document.getElementById('notify-course-extra-emails');
         const submitBtn = document.getElementById('notify-course-submit-btn');
 
         if (!select || !subjectInput || !messageInput) return;
@@ -25434,14 +25468,19 @@ class AdminManager {
         const subject = subjectInput.value.trim();
         const message = messageInput.value.trim();
 
+        const extraEmailsRaw = (extraEmailsInput?.value || '').trim();
+        const extraEmails = extraEmailsRaw
+            ? extraEmailsRaw.split(/[,;\s]+/).map(e => e.trim().toLowerCase()).filter(e => e.includes('@') && e.includes('.'))
+            : [];
+
         if (!courseId || !subject || !message) {
-            this.showToast('Vennligst fyll ut alle feltene.', 'warning');
+            this.showToast('Vennligst fyll ut alle påkrevde felt.', 'warning');
             return;
         }
 
         const confirmed = await this.showConfirm(
             'Bekreft sending av opptaksvarsel',
-            `Vil du sende dette e-postvarslet til alle påmeldte for kurset "${courseTitle}"?`,
+            `Vil du sende dette e-postvarslet til alle påmeldte for kurset "${courseTitle}"${extraEmails.length > 0 ? ` og ${extraEmails.length} ekstra mottakere` : ''}?`,
             'Send e-post nå'
         );
         if (!confirmed) return;
@@ -25464,6 +25503,7 @@ class AdminManager {
                     courseTitle,
                     subject,
                     message,
+                    extraEmails,
                     actionUrl: `https://www.hiskingdomministry.no/kurs-detaljer?id=${courseId}`
                 })
             });
