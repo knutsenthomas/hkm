@@ -92,6 +92,43 @@
             box-shadow: 2px 0 12px rgba(0, 0, 0, 0.4) !important;
         }
 
+        html[data-theme="dark"] .sidebar-back-wrap {
+            background: #0f172a !important;
+            border-bottom-color: #1e293b !important;
+        }
+
+        html[data-theme="dark"] .btn-sidebar-back {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            color: #e2e8f0 !important;
+        }
+
+        html[data-theme="dark"] .btn-sidebar-back:hover {
+            background: rgba(209, 125, 57, 0.2) !important;
+            border-color: rgba(209, 125, 57, 0.4) !important;
+            color: #fdba74 !important;
+        }
+
+        html[data-theme="dark"] .btn-panel-back {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            color: #e2e8f0 !important;
+        }
+
+        html[data-theme="dark"] .btn-panel-back .material-symbols-outlined {
+            color: #94a3b8 !important;
+        }
+
+        html[data-theme="dark"] .btn-panel-back:hover {
+            background: #273549 !important;
+            border-color: rgba(209, 125, 57, 0.4) !important;
+            color: #fdba74 !important;
+        }
+
+        html[data-theme="dark"] .btn-panel-back:hover .material-symbols-outlined {
+            color: #fdba74 !important;
+        }
+
         html[data-theme="dark"] .sidebar-header {
             background: #0f172a !important;
             border-bottom-color: #1e293b !important;
@@ -336,6 +373,88 @@
             .sidebar-nav {
                 width: 100%;
             }
+        }
+
+        .sidebar-back-wrap {
+            padding: 16px 20px 12px;
+            background: #ffffff;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .btn-sidebar-back {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 10px 16px;
+            background: rgba(27, 73, 101, 0.05);
+            border: 1px solid rgba(27, 73, 101, 0.12);
+            border-radius: 12px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--hkm-navy, #1b4965);
+            text-decoration: none;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            box-sizing: border-box;
+        }
+
+        .btn-sidebar-back:hover {
+            background: rgba(209, 125, 57, 0.1);
+            border-color: rgba(209, 125, 57, 0.3);
+            color: var(--hkm-terracotta, #d17d39);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(209, 125, 57, 0.1);
+        }
+
+        .btn-sidebar-back:active {
+            transform: scale(0.98);
+        }
+
+        .panel-heading-wrap {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn-panel-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #475569;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            flex-shrink: 0;
+        }
+
+        .btn-panel-back .material-symbols-outlined {
+            font-size: 18px;
+            color: var(--hkm-navy, #1b4965);
+            transition: transform 0.2s ease;
+        }
+
+        .btn-panel-back:hover {
+            background: #ffffff;
+            border-color: rgba(209, 125, 57, 0.3);
+            color: var(--hkm-terracotta, #d17d39);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transform: translateY(-1px);
+        }
+
+        .btn-panel-back:hover .material-symbols-outlined {
+            color: var(--hkm-terracotta, #d17d39);
+            transform: translateX(-2px);
+        }
+
+        .btn-panel-back:active {
+            transform: scale(0.98);
         }
 
         .sidebar-header {
@@ -1538,6 +1657,13 @@
     <div id="platform-container" class="platform-container">
         <!-- Left Sidebar: Course Modules & Lessons Navigation -->
         <aside class="sidebar-nav" id="sidebar-nav">
+            <div class="sidebar-back-wrap">
+                <a href="/minside/" class="btn-sidebar-back">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
+                    <span>Tilbake til Min side</span>
+                </a>
+            </div>
+
             <div class="sidebar-header" onclick="window.toggleMobileSidebar()">
                 <span class="sidebar-title" id="sidebar-course-title">Seerkurs med aktivering</span>
                 <span class="mobile-sidebar-toggle-btn"><i class="fas fa-chevron-down" id="mobile-sidebar-chevron"></i></span>
@@ -1582,7 +1708,13 @@
         <main class="main-panel">
             <!-- Top Breadcrumb & Progress Bar -->
             <div class="panel-top-bar">
-                <h1 id="course-lesson-heading" style="font-size: 1.25rem; margin: 0; letter-spacing: -0.01em;"><strong>Seerkurs med aktivering – Leksjon 1:</strong> <span>Hvordan se i ånden</span></h2>
+                <div class="panel-heading-wrap">
+                    <a href="/minside/" class="btn-panel-back" title="Tilbake til Min side">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                        <span>Min side</span>
+                    </a>
+                    <h1 id="course-lesson-heading" style="font-size: 1.25rem; margin: 0; letter-spacing: -0.01em;"><strong>Seerkurs med aktivering – Leksjon 1:</strong> <span>Hvordan se i ånden</span></h1>
+                </div>
 
                 <div class="progress-wrapper">
                     <span class="progress-label">70% Fullført</span>
