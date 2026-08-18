@@ -24918,6 +24918,54 @@ class AdminManager {
                         </form>
                     </div>
                 </div>
+
+                <!-- Notify Course Modal -->
+                <div id="notify-course-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1050;overflow-y:auto;padding:20px;">
+                    <div style="background:white;border-radius:16px;max-width:680px;margin:30px auto;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid #f1f5f9;padding-bottom:16px;">
+                            <div style="display:flex;align-items:center;gap:10px;">
+                                <span class="material-symbols-outlined" style="font-size:28px;color:#d17d39;">campaign</span>
+                                <div>
+                                    <h3 style="font-size:1.3rem;font-weight:800;color:#1e293b;margin:0;">Varsle påmeldte om nytt opptak</h3>
+                                    <p style="font-size:0.85rem;color:#64748b;margin:2px 0 0 0;">Send e-postvarsel til alle deltakere med godkjent tilgang</p>
+                                </div>
+                            </div>
+                            <button type="button" onclick="window.adminManager.closeNotifyCourseModal()" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:1.8rem;line-height:1;">&times;</button>
+                        </div>
+
+                        <form id="notify-course-form" onsubmit="window.adminManager.submitNotifyCourse(event)">
+                            <div style="margin-bottom:16px;">
+                                <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Velg kurs *</label>
+                                <select id="notify-course-select" required onchange="window.adminManager.updateNotifyCourseRecipientCount()" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;background:#ffffff;color:#1e293b;font-family:inherit;">
+                                </select>
+                            </div>
+
+                            <div id="notify-recipient-info" style="margin-bottom:16px;padding:12px 16px;border-radius:10px;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;display:flex;align-items:center;gap:8px;font-size:0.88rem;font-weight:600;">
+                                <span class="material-symbols-outlined" style="font-size:20px;">group</span>
+                                <span id="notify-recipient-text">Finner mottakere...</span>
+                            </div>
+
+                            <div style="margin-bottom:16px;">
+                                <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Emnefelt *</label>
+                                <input id="notify-course-subject" type="text" required placeholder="🎉 Nytt opptak er lagt ut: Seerkurs med aktivering" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;box-sizing:border-box;">
+                            </div>
+
+                            <div style="margin-bottom:20px;">
+                                <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Melding *</label>
+                                <textarea id="notify-course-message" rows="6" required style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;resize:vertical;line-height:1.5;box-sizing:border-box;"></textarea>
+                                <span style="font-size:0.8rem;color:#94a3b8;margin-top:4px;display:block;">Tips: Du kan bruke {{name}} for deltakerens navn. En stor «Se opptaket på Min side»-knapp legges til automatisk i e-posten.</span>
+                            </div>
+
+                            <div style="display:flex;justify-content:flex-end;gap:10px;border-top:1px solid #f1f5f9;padding-top:16px;">
+                                <button type="button" class="btn btn-secondary" onclick="window.adminManager.closeNotifyCourseModal()" style="padding:10px 18px;border-radius:10px;font-size:0.95rem;">Avbryt</button>
+                                <button type="submit" id="notify-course-submit-btn" class="btn btn-primary" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);color:#ffffff;border:none;padding:10px 24px;border-radius:10px;font-weight:700;font-size:0.95rem;cursor:pointer;box-shadow:0 4px 12px rgba(209,125,57,0.3);">
+                                    <span class="material-symbols-outlined" style="font-size:18px;">send</span>
+                                    <span>Send varsel til deltakere</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
 
             <!-- VIEW 2: ENROLLMENTS VIEW -->
@@ -24944,6 +24992,11 @@ class AdminManager {
                                 <option value="success">Godkjent (Success)</option>
                                 <option value="refunded">Refundert</option>
                             </select>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-primary" onclick="window.adminManager.openNotifyCourseModal()" style="display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color:#ffffff; border:none; padding:10px 18px; border-radius:8px; font-weight:700; font-size:0.95rem; cursor:pointer; box-shadow:0 2px 8px rgba(209,125,57,0.25); white-space:nowrap;">
+                                <span class="material-symbols-outlined" style="font-size:18px;">campaign</span> Varsle påmeldte
+                            </button>
                         </div>
                     </div>
 
@@ -25151,6 +25204,9 @@ class AdminManager {
                                 <button type="button" class="btn-secondary" onclick="window.adminManager._openCourseModal(${i})" style="padding:8px 12px;border-radius:8px;font-size:12px;">
                                     Rediger
                                 </button>
+                                <button type="button" class="btn-secondary" onclick="window.adminManager.openNotifyCourseModal(${i})" style="padding:8px 12px;border-radius:8px;font-size:12px;background:#fff7ed;border-color:#fed7aa;color:#c2410c;display:inline-flex;align-items:center;gap:4px;" title="Varsle påmeldte om nytt opptak">
+                                    <span class="material-symbols-outlined" style="font-size:16px;">campaign</span> Varsle opptak
+                                </button>
                                 <button type="button" class="btn-secondary" onclick="window.adminManager.createEventFromCourse(${i})" style="padding:8px 12px;border-radius:8px;font-size:12px;background:#f0fdf4;border-color:#bbf7d0;color:#15803d;display:inline-flex;align-items:center;gap:4px;" title="Opprett kalenderarrangement">
                                     <span class="material-symbols-outlined" style="font-size:16px;">calendar_add_on</span> Kalender
                                 </button>
@@ -25246,6 +25302,188 @@ class AdminManager {
         } catch (error) {
             console.error('Failed to create event from course:', error);
             this.showToast('Kunne ikke opprette kalenderarrangement.', 'error');
+        }
+    }
+
+    async openNotifyCourseModal(courseIndex = null) {
+        const modal = document.getElementById('notify-course-modal');
+        const select = document.getElementById('notify-course-select');
+        const subjectInput = document.getElementById('notify-course-subject');
+        const messageInput = document.getElementById('notify-course-message');
+
+        if (!modal || !select || !subjectInput || !messageInput) {
+            this.showToast('Kunne ikke åpne varslingsmodal.', 'error');
+            return;
+        }
+
+        // Populate course dropdown
+        select.innerHTML = '<option value="">-- Velg et kurs --</option>';
+        if (Array.isArray(this.coursesItems) && this.coursesItems.length > 0) {
+            this.coursesItems.forEach((c, idx) => {
+                const opt = document.createElement('option');
+                opt.value = c.id || `course_${idx}`;
+                opt.textContent = c.title || 'Uten tittel';
+                opt.dataset.index = idx;
+                select.appendChild(opt);
+            });
+        }
+
+        // Set selected course if index passed
+        if (courseIndex !== null && this.coursesItems && this.coursesItems[courseIndex]) {
+            const course = this.coursesItems[courseIndex];
+            select.value = course.id || `course_${courseIndex}`;
+        } else if (select.options.length > 1) {
+            select.selectedIndex = 1;
+        }
+
+        // Set prefilled template
+        const selectedCourseTitle = select.options[select.selectedIndex]?.text || 'Kurset';
+        subjectInput.value = `🎉 Nytt opptak er lagt ut: ${selectedCourseTitle}`;
+        messageInput.value = `Hei {{name}}!\n\nVi har gleden av å informere om at et nytt opptak nå er tilgjengelig for kurset ${selectedCourseTitle}.\n\nDu kan logge inn på Min Side når som helst for å se opptaket og følge leksjonene i ditt eget tempo.\n\nVelsignelse og god fornøyelse!\nHis Kingdom Ministry`;
+
+        modal.style.display = 'block';
+        await this.updateNotifyCourseRecipientCount();
+    }
+
+    closeNotifyCourseModal() {
+        const modal = document.getElementById('notify-course-modal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    async updateNotifyCourseRecipientCount() {
+        const select = document.getElementById('notify-course-select');
+        const recipientText = document.getElementById('notify-recipient-text');
+        const recipientInfo = document.getElementById('notify-recipient-info');
+        const subjectInput = document.getElementById('notify-course-subject');
+        const messageInput = document.getElementById('notify-course-message');
+
+        if (!select || !recipientText) return;
+
+        const courseId = select.value;
+        const courseTitle = select.options[select.selectedIndex]?.text || '';
+
+        if (subjectInput && courseTitle) {
+            subjectInput.value = `🎉 Nytt opptak er lagt ut: ${courseTitle}`;
+        }
+        if (messageInput && courseTitle && messageInput.value.includes('Nytt opptak er')) {
+            messageInput.value = `Hei {{name}}!\n\nVi har gleden av å informere om at et nytt opptak nå er tilgjengelig for kurset ${courseTitle}.\n\nDu kan logge inn på Min Side når som helst for å se opptaket og følge leksjonene i ditt eget tempo.\n\nVelsignelse og god fornøyelse!\nHis Kingdom Ministry`;
+        }
+
+        if (!courseId) {
+            recipientText.textContent = 'Velg et kurs for å se antall godkjente deltakere.';
+            if (recipientInfo) recipientInfo.style.background = '#f8fafc';
+            return;
+        }
+
+        recipientText.textContent = 'Beregner antall mottakere...';
+
+        try {
+            const db = window.firebaseService?.db || firebase.firestore();
+            const snap = await db.collection('courseEnrollments').get();
+            const recipients = new Set();
+            const strCourseId = String(courseId).toLowerCase().trim();
+
+            snap.forEach(doc => {
+                const d = doc.data();
+                const isApproved = d.status === 'paid' || d.status === 'success' || !d.status;
+                const dCourseId = String(d.courseId || '').toLowerCase().trim();
+                const dCourseTitle = String(d.courseTitle || '').toLowerCase().trim();
+                const matchesCourse = dCourseId === strCourseId || dCourseId === 'all' || 
+                                      dCourseTitle === String(courseTitle || '').toLowerCase().trim() ||
+                                      (strCourseId.includes('seerkurs') && (dCourseId.includes('seer') || dCourseTitle.includes('seer')));
+
+                if (isApproved && matchesCourse && d.email) {
+                    recipients.add(d.email.trim().toLowerCase());
+                }
+            });
+
+            const count = recipients.size;
+            if (count > 0) {
+                recipientText.textContent = `Klar til utsendelse: ${count} ${count === 1 ? 'deltaker' : 'deltakere'} med godkjent tilgang vil motta e-posten.`;
+                if (recipientInfo) {
+                    recipientInfo.style.background = '#f0fdf4';
+                    recipientInfo.style.borderColor = '#bbf7d0';
+                    recipientInfo.style.color = '#15803d';
+                }
+            } else {
+                recipientText.textContent = 'Ingen godkjente deltakere funnet for dette kurset ennå.';
+                if (recipientInfo) {
+                    recipientInfo.style.background = '#fff7ed';
+                    recipientInfo.style.borderColor = '#fed7aa';
+                    recipientInfo.style.color = '#c2410c';
+                }
+            }
+        } catch (err) {
+            console.error('Error fetching recipient count:', err);
+            recipientText.textContent = 'Kunne ikke hente deltakerantall automatisk.';
+        }
+    }
+
+    async submitNotifyCourse(event) {
+        if (event) event.preventDefault();
+
+        const select = document.getElementById('notify-course-select');
+        const subjectInput = document.getElementById('notify-course-subject');
+        const messageInput = document.getElementById('notify-course-message');
+        const submitBtn = document.getElementById('notify-course-submit-btn');
+
+        if (!select || !subjectInput || !messageInput) return;
+
+        const courseId = select.value;
+        const courseTitle = select.options[select.selectedIndex]?.text || 'Kurset';
+        const subject = subjectInput.value.trim();
+        const message = messageInput.value.trim();
+
+        if (!courseId || !subject || !message) {
+            this.showToast('Vennligst fyll ut alle feltene.', 'warning');
+            return;
+        }
+
+        const confirmed = await this.showConfirm(
+            'Bekreft sending av opptaksvarsel',
+            `Vil du sende dette e-postvarslet til alle påmeldte for kurset "${courseTitle}"?`,
+            'Send e-post nå'
+        );
+        if (!confirmed) return;
+
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="material-symbols-outlined fa-spin" style="font-size:18px;">sync</span> Sender e-post...';
+        }
+
+        try {
+            const token = await firebase.auth().currentUser?.getIdToken();
+            const response = await fetch('https://us-central1-his-kingdom-ministry-prod.cloudfunctions.net/notifyCourseParticipants', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    courseId,
+                    courseTitle,
+                    subject,
+                    message,
+                    actionUrl: `https://www.hiskingdomministry.no/kurs-detaljer?id=${courseId}`
+                })
+            });
+
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.error || `Serverfeil: ${response.status}`);
+            }
+
+            const data = await response.json();
+            this.showToast(`Varsel sendt! ${data.sentCount || 0} deltakere ble varslet på e-post.`, 'success', 6000);
+            this.closeNotifyCourseModal();
+        } catch (err) {
+            console.error('submitNotifyCourse error:', err);
+            this.showToast('Kunne ikke sende varsel: ' + err.message, 'error');
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">send</span> <span>Send varsel til deltakere</span>';
+            }
         }
     }
 
