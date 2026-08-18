@@ -24999,10 +24999,101 @@ class AdminManager {
                                 <option value="refunded">Refundert</option>
                             </select>
                         </div>
-                        <div>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <button type="button" class="btn btn-primary" onclick="window.adminManager.openManualEnrollmentModal()" style="display:inline-flex; align-items:center; gap:6px; background:#1B4965; color:#ffffff; border:none; padding:10px 18px; border-radius:8px; font-weight:700; font-size:0.95rem; cursor:pointer; box-shadow:0 2px 8px rgba(27,73,101,0.25); white-space:nowrap;">
+                                <span class="material-symbols-outlined" style="font-size:18px;">person_add</span> Legg til deltaker
+                            </button>
                             <button type="button" class="btn btn-primary" onclick="window.adminManager.openNotifyCourseModal()" style="display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color:#ffffff; border:none; padding:10px 18px; border-radius:8px; font-weight:700; font-size:0.95rem; cursor:pointer; box-shadow:0 2px 8px rgba(209,125,57,0.25); white-space:nowrap;">
                                 <span class="material-symbols-outlined" style="font-size:18px;">campaign</span> Varsle påmeldte
                             </button>
+                        </div>
+                    </div>
+
+                    <!-- Manual Enrollment Modal -->
+                    <div id="manual-enrollment-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1050;overflow-y:auto;padding:20px;">
+                        <div style="background:white;border-radius:16px;max-width:640px;margin:30px auto;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid #f1f5f9;padding-bottom:16px;">
+                                <div style="display:flex;align-items:center;gap:10px;">
+                                    <span class="material-symbols-outlined" style="font-size:28px;color:#1B4965;">person_add</span>
+                                    <div>
+                                        <h3 style="font-size:1.3rem;font-weight:800;color:#1e293b;margin:0;">Legg til deltaker manuelt</h3>
+                                        <p style="font-size:0.85rem;color:#64748b;margin:2px 0 0 0;">Meld på en deltaker og tildel kurstilgang direkte</p>
+                                    </div>
+                                </div>
+                                <button type="button" onclick="window.adminManager.closeManualEnrollmentModal()" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:1.8rem;line-height:1;">&times;</button>
+                            </div>
+
+                            <form id="manual-enrollment-form" onsubmit="window.adminManager.submitManualEnrollment(event)">
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+                                    <div style="grid-column:span 2;">
+                                        <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Fullt navn *</label>
+                                        <input id="manual-enrollment-name" type="text" required placeholder="F.eks. Kari Nordmann" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;box-sizing:border-box;">
+                                    </div>
+                                    <div>
+                                        <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">E-postadresse *</label>
+                                        <input id="manual-enrollment-email" type="email" required placeholder="kari@eksempel.no" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;box-sizing:border-box;">
+                                    </div>
+                                    <div>
+                                        <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Telefonnummer</label>
+                                        <input id="manual-enrollment-phone" type="tel" placeholder="F.eks. 90000000" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;box-sizing:border-box;">
+                                    </div>
+                                    <div style="grid-column:span 2;">
+                                        <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Velg kurs *</label>
+                                        <select id="manual-enrollment-course" required onchange="window.adminManager.onManualCourseChange()" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;background:#ffffff;box-sizing:border-box;font-family:inherit;">
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Status</label>
+                                        <select id="manual-enrollment-status" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;background:#ffffff;box-sizing:border-box;font-family:inherit;">
+                                            <option value="paid" selected>Godkjent (Gir direkte tilgang)</option>
+                                            <option value="pending">Venter på betaling/godkjenning</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Betalingsmetode</label>
+                                        <select id="manual-enrollment-method" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;background:#ffffff;box-sizing:border-box;font-family:inherit;">
+                                            <option value="Manuell">Manuell registrering</option>
+                                            <option value="Vipps">Vipps</option>
+                                            <option value="Gave">Gave / Stipend</option>
+                                            <option value="Faktura">Faktura</option>
+                                            <option value="Bankoverføring">Bankoverføring</option>
+                                            <option value="Gratis">Gratis</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Beløp (kr)</label>
+                                        <input id="manual-enrollment-amount" type="number" min="0" value="0" placeholder="0" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;box-sizing:border-box;">
+                                    </div>
+                                    <div>
+                                        <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Tilgangsomfang</label>
+                                        <select id="manual-enrollment-access-type" onchange="window.adminManager.onManualAccessTypeChange()" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;background:#ffffff;box-sizing:border-box;font-family:inherit;">
+                                            <option value="full" selected>Full tilgang til hele kurset</option>
+                                            <option value="custom">Velg spesifikke leksjoner...</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Lessons selection (hidden by default) -->
+                                <div id="manual-enrollment-lessons-container" style="display:none;margin-bottom:16px;padding:16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;">
+                                    <label style="display:block;font-weight:700;font-size:0.88rem;color:#334155;margin-bottom:8px;">Velg leksjoner deltakeren skal ha tilgang til:</label>
+                                    <div id="manual-enrollment-lessons-list" style="display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto;"></div>
+                                </div>
+
+                                <div style="margin-bottom:20px;padding:12px 16px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;display:flex;align-items:center;gap:10px;">
+                                    <input id="manual-enrollment-send-email" type="checkbox" checked style="width:18px;height:18px;cursor:pointer;accent-color:#1B4965;">
+                                    <label for="manual-enrollment-send-email" style="font-size:0.9rem;font-weight:600;color:#15803d;cursor:pointer;">
+                                        Send godkjennelses-e-post til deltakeren med innloggingslenke
+                                    </label>
+                                </div>
+
+                                <div style="display:flex;justify-content:flex-end;gap:10px;border-top:1px solid #f1f5f9;padding-top:16px;">
+                                    <button type="button" class="btn btn-secondary" onclick="window.adminManager.closeManualEnrollmentModal()" style="padding:10px 18px;border-radius:10px;font-size:0.95rem;">Avbryt</button>
+                                    <button type="submit" id="manual-enrollment-submit-btn" class="btn btn-primary" style="display:inline-flex;align-items:center;gap:6px;background:#1B4965;color:#ffffff;border:none;padding:10px 24px;border-radius:10px;font-weight:700;font-size:0.95rem;cursor:pointer;box-shadow:0 4px 12px rgba(27,73,101,0.25);">
+                                        <span class="material-symbols-outlined" style="font-size:18px;">person_add</span>
+                                        <span>Opprett påmelding</span>
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
 
@@ -25523,6 +25614,180 @@ class AdminManager {
             if (submitBtn) {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">send</span> <span>Send varsel til deltakere</span>';
+            }
+        }
+    }
+
+    openManualEnrollmentModal() {
+        const modal = document.getElementById('manual-enrollment-modal');
+        const courseSelect = document.getElementById('manual-enrollment-course');
+        const form = document.getElementById('manual-enrollment-form');
+        if (!modal || !courseSelect) return;
+
+        if (form) form.reset();
+
+        // Populate courses
+        courseSelect.innerHTML = '<option value="">-- Velg et kurs --</option>';
+        if (Array.isArray(this.coursesItems) && this.coursesItems.length > 0) {
+            this.coursesItems.forEach((c, idx) => {
+                const opt = document.createElement('option');
+                opt.value = c.id || `course_${idx}`;
+                opt.textContent = c.title || 'Uten tittel';
+                opt.dataset.index = idx;
+                opt.dataset.price = c.price || 0;
+                courseSelect.appendChild(opt);
+            });
+            if (courseSelect.options.length > 1) {
+                courseSelect.selectedIndex = 1;
+                this.onManualCourseChange();
+            }
+        }
+
+        const accessType = document.getElementById('manual-enrollment-access-type');
+        if (accessType) accessType.value = 'full';
+        const lessonsContainer = document.getElementById('manual-enrollment-lessons-container');
+        if (lessonsContainer) lessonsContainer.style.display = 'none';
+
+        const sendEmailCheck = document.getElementById('manual-enrollment-send-email');
+        if (sendEmailCheck) sendEmailCheck.checked = true;
+
+        modal.style.display = 'block';
+    }
+
+    closeManualEnrollmentModal() {
+        const modal = document.getElementById('manual-enrollment-modal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    onManualCourseChange() {
+        const courseSelect = document.getElementById('manual-enrollment-course');
+        const amountInput = document.getElementById('manual-enrollment-amount');
+        if (!courseSelect) return;
+
+        const selectedOpt = courseSelect.options[courseSelect.selectedIndex];
+        if (selectedOpt && selectedOpt.dataset.price && amountInput) {
+            amountInput.value = selectedOpt.dataset.price;
+        }
+
+        this.onManualAccessTypeChange();
+    }
+
+    onManualAccessTypeChange() {
+        const accessType = document.getElementById('manual-enrollment-access-type')?.value;
+        const container = document.getElementById('manual-enrollment-lessons-container');
+        const list = document.getElementById('manual-enrollment-lessons-list');
+        const courseSelect = document.getElementById('manual-enrollment-course');
+
+        if (!container || !list || !courseSelect) return;
+
+        if (accessType !== 'custom') {
+            container.style.display = 'none';
+            return;
+        }
+
+        const selectedOpt = courseSelect.options[courseSelect.selectedIndex];
+        const courseIdx = selectedOpt?.dataset?.index;
+        const course = courseIdx !== undefined && this.coursesItems ? this.coursesItems[courseIdx] : null;
+
+        if (!course || !Array.isArray(course.lessons) || course.lessons.length === 0) {
+            list.innerHTML = '<p style="color:#64748b;font-size:0.85rem;margin:0;">Kurset har ingen registrerte leksjoner ennå.</p>';
+        } else {
+            list.innerHTML = course.lessons.map((lesson, lIdx) => {
+                const lessonTitle = this.escapeHtml(lesson.title || `Leksjon ${lIdx + 1}`);
+                const lessonId = lesson.id || lIdx;
+                return `
+                    <label style="display:flex;align-items:center;gap:8px;font-size:0.88rem;color:#334155;cursor:pointer;">
+                        <input type="checkbox" class="manual-lesson-checkbox" value="${lessonId}" checked style="accent-color:#1B4965;">
+                        <span>${lIdx + 1}. ${lessonTitle}</span>
+                    </label>
+                `;
+            }).join('');
+        }
+
+        container.style.display = 'block';
+    }
+
+    async submitManualEnrollment(event) {
+        if (event) event.preventDefault();
+
+        const nameInput = document.getElementById('manual-enrollment-name');
+        const emailInput = document.getElementById('manual-enrollment-email');
+        const phoneInput = document.getElementById('manual-enrollment-phone');
+        const courseSelect = document.getElementById('manual-enrollment-course');
+        const statusSelect = document.getElementById('manual-enrollment-status');
+        const methodSelect = document.getElementById('manual-enrollment-method');
+        const amountInput = document.getElementById('manual-enrollment-amount');
+        const accessTypeSelect = document.getElementById('manual-enrollment-access-type');
+        const sendEmailCheck = document.getElementById('manual-enrollment-send-email');
+        const submitBtn = document.getElementById('manual-enrollment-submit-btn');
+
+        if (!nameInput || !emailInput || !courseSelect) return;
+
+        const name = nameInput.value.trim();
+        const email = emailInput.value.trim().toLowerCase();
+        const phone = (phoneInput?.value || '').trim();
+        const courseId = courseSelect.value;
+        const courseTitle = courseSelect.options[courseSelect.selectedIndex]?.text || '';
+        const status = statusSelect?.value || 'paid';
+        const paymentMethod = methodSelect?.value || 'Manuell';
+        const amount = Number(amountInput?.value || 0);
+        const accessType = accessTypeSelect?.value || 'full';
+        const shouldSendEmail = sendEmailCheck?.checked === true;
+
+        if (!name || !email || !courseId) {
+            this.showToast('Vennligst fyll ut navn, e-post og velg kurs.', 'warning');
+            return;
+        }
+
+        let paidLessons = null;
+        if (accessType === 'custom') {
+            const checkedBoxes = document.querySelectorAll('.manual-lesson-checkbox:checked');
+            paidLessons = Array.from(checkedBoxes).map(cb => {
+                const val = cb.value;
+                return isNaN(val) ? val : Number(val);
+            });
+        }
+
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="material-symbols-outlined fa-spin" style="font-size:18px;">sync</span> Oppretter...';
+        }
+
+        try {
+            const db = window.firebaseService?.db || firebase.firestore();
+            const enrollmentData = {
+                name,
+                email,
+                phone: phone || null,
+                courseId,
+                courseTitle,
+                status,
+                paymentMethod,
+                amount,
+                enrolledAt: firebase.firestore.FieldValue.serverTimestamp(),
+                createdAt: new Date().toISOString(),
+                manual: true
+            };
+
+            if (status === 'paid') {
+                enrollmentData.approvedAt = firebase.firestore.FieldValue.serverTimestamp();
+            }
+            if (paidLessons !== null) {
+                enrollmentData.paidLessons = paidLessons;
+            }
+
+            await db.collection('courseEnrollments').add(enrollmentData);
+
+            this.showToast(`Deltaker "${name}" er nå lagt til i ${courseTitle}!`, 'success', 5000);
+            this.closeManualEnrollmentModal();
+            await this._loadEnrollmentsList();
+        } catch (err) {
+            console.error('submitManualEnrollment error:', err);
+            this.showToast('Kunne ikke opprette påmelding: ' + err.message, 'error');
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">person_add</span> <span>Opprett påmelding</span>';
             }
         }
     }
