@@ -25492,7 +25492,7 @@ class AdminManager {
 
         try {
             const token = await firebase.auth().currentUser?.getIdToken();
-            const response = await fetch('https://us-central1-his-kingdom-ministry-prod.cloudfunctions.net/notifyCourseParticipants', {
+            const response = await fetch('https://us-central1-his-kingdom-ministry.cloudfunctions.net/notifyCourseParticipants', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
