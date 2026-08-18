@@ -25024,6 +25024,18 @@ class AdminManager {
                             </div>
 
                             <form id="manual-enrollment-form" onsubmit="window.adminManager.submitManualEnrollment(event)">
+                                <!-- Fast contact search -->
+                                <div style="margin-bottom:20px;position:relative;">
+                                    <label style="display:block;font-weight:700;font-size:0.9rem;color:#1B4965;margin-bottom:6px;">
+                                        <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-2px;">person_search</span> Hent fra eksisterende kontakter / brukere (valgfritt)
+                                    </label>
+                                    <div style="position:relative;">
+                                        <input id="manual-contact-search" type="text" placeholder="Søk på navn, e-post eller telefon for å hente..." oninput="window.adminManager.searchContactsForEnrollment(this.value)" autocomplete="off" style="width:100%;padding:11px 16px 11px 40px;border:1.5px solid #cbd5e1;border-radius:10px;font-size:0.95rem;box-sizing:border-box;background:#f8fafc;">
+                                        <span class="material-symbols-outlined" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:20px;color:#94a3b8;">contacts</span>
+                                    </div>
+                                    <div id="manual-contact-results" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1.5px solid #cbd5e1;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,0.15);max-height:220px;overflow-y:auto;z-index:1100;margin-top:4px;"></div>
+                                </div>
+
                                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
                                     <div style="grid-column:span 2;">
                                         <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Fullt navn *</label>
@@ -25618,13 +25630,187 @@ class AdminManager {
         }
     }
 
+    async _fetchSystemContacts() {
+        if (this._cachedSystemContacts && this._cachedSystemContacts.length > 0) {
+            return this._cachedSystemContacts;
+        }
+
+        try {
+            const db = window.firebaseService?.db || firebase.firestore();
+            const contactsMap = new Map();
+
+            // 1. Fetch from 'users'
+            try {
+                const usersSnap = await db.collection('users').get();
+                usersSnap.forEach(doc => {
+                    const d = doc.data();
+                    const email = (d.email || '').trim().toLowerCase();
+                    const name = (d.name || d.displayName || d.fullName || '').trim();
+                    const phone = (d.phone || d.phoneNumber || '').trim();
+                    if (email) {
+                        contactsMap.set(email, {
+                            id: doc.id,
+                            name: name || email.split('@')[0],
+                            email,
+                            phone,
+                            type: 'Bruker'
+                        });
+                    }
+                });
+            } catch (err) {
+                console.warn('Could not fetch users for contact picker:', err);
+            }
+
+            // 2. Fetch from 'courseEnrollments' (to include previous students)
+            try {
+                const enrollSnap = await db.collection('courseEnrollments').get();
+                enrollSnap.forEach(doc => {
+                    const d = doc.data();
+                    const email = (d.email || '').trim().toLowerCase();
+                    const name = (d.name || '').trim();
+                    const phone = (d.phone || '').trim();
+                    if (email && !contactsMap.has(email)) {
+                        contactsMap.set(email, {
+                            id: doc.id,
+                            name: name || email.split('@')[0],
+                            email,
+                            phone,
+                            type: 'Deltaker'
+                        });
+                    } else if (email && contactsMap.has(email)) {
+                        const existing = contactsMap.get(email);
+                        if (!existing.phone && phone) existing.phone = phone;
+                    }
+                });
+            } catch (err) {
+                console.warn('Could not fetch enrollments for contact picker:', err);
+            }
+
+            // 3. Fetch from 'donations' (to include donors)
+            try {
+                const donSnap = await db.collection('donations').limit(100).get();
+                donSnap.forEach(doc => {
+                    const d = doc.data();
+                    const email = (d.email || d.donorEmail || '').trim().toLowerCase();
+                    const name = (d.donorName || d.name || '').trim();
+                    const phone = (d.phone || d.donorPhone || '').trim();
+                    if (email && !contactsMap.has(email)) {
+                        contactsMap.set(email, {
+                            id: doc.id,
+                            name: name || email.split('@')[0],
+                            email,
+                            phone,
+                            type: 'Giver'
+                        });
+                    }
+                });
+            } catch (err) {
+                console.warn('Could not fetch donations for contact picker:', err);
+            }
+
+            this._cachedSystemContacts = Array.from(contactsMap.values()).sort((a, b) => a.name.localeCompare(b.name, 'no'));
+            return this._cachedSystemContacts;
+        } catch (err) {
+            console.error('Failed to fetch system contacts:', err);
+            return [];
+        }
+    }
+
+    async searchContactsForEnrollment(query) {
+        const resultsEl = document.getElementById('manual-contact-results');
+        if (!resultsEl) return;
+
+        const q = (query || '').trim().toLowerCase();
+        if (!q || q.length < 1) {
+            resultsEl.style.display = 'none';
+            resultsEl.innerHTML = '';
+            return;
+        }
+
+        const contacts = await this._fetchSystemContacts();
+        const matches = contacts.filter(c => 
+            c.name.toLowerCase().includes(q) || 
+            c.email.toLowerCase().includes(q) || 
+            (c.phone && c.phone.includes(q))
+        ).slice(0, 8);
+
+        if (matches.length === 0) {
+            resultsEl.innerHTML = `
+                <div style="padding:12px 16px;color:#94a3b8;font-size:0.85rem;text-align:center;">
+                    Ingen kontakter funnet for «${this.escapeHtml(query)}»
+                </div>
+            `;
+            resultsEl.style.display = 'block';
+            return;
+        }
+
+        resultsEl.innerHTML = matches.map((c) => {
+            const initials = c.name ? c.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '👤';
+            return `
+                <div class="manual-contact-item" onclick="window.adminManager.selectContactForEnrollment('${this.escapeHtml(c.email)}')" style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid #f1f5f9;cursor:pointer;transition:background 0.15s ease;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                    <div style="width:34px;height:34px;border-radius:50%;background:#e2e8f0;color:#1B4965;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        ${initials}
+                    </div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-weight:700;font-size:0.88rem;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                            ${this.escapeHtml(c.name)}
+                        </div>
+                        <div style="font-size:0.8rem;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                            ${this.escapeHtml(c.email)} ${c.phone ? `• ${this.escapeHtml(c.phone)}` : ''}
+                        </div>
+                    </div>
+                    <span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;background:#f1f5f9;color:#475569;white-space:nowrap;">
+                        ${c.type}
+                    </span>
+                </div>
+            `;
+        }).join('');
+
+        resultsEl.style.display = 'block';
+    }
+
+    selectContactForEnrollment(email) {
+        const resultsEl = document.getElementById('manual-contact-results');
+        const searchInput = document.getElementById('manual-contact-search');
+        const nameInput = document.getElementById('manual-enrollment-name');
+        const emailInput = document.getElementById('manual-enrollment-email');
+        const phoneInput = document.getElementById('manual-enrollment-phone');
+
+        if (!this._cachedSystemContacts) return;
+        const contact = this._cachedSystemContacts.find(c => c.email.toLowerCase() === email.toLowerCase());
+        if (!contact) return;
+
+        if (nameInput) nameInput.value = contact.name || '';
+        if (emailInput) emailInput.value = contact.email || '';
+        if (phoneInput) phoneInput.value = contact.phone || '';
+        if (searchInput) searchInput.value = contact.name ? `${contact.name} (${contact.email})` : contact.email;
+
+        if (resultsEl) {
+            resultsEl.style.display = 'none';
+            resultsEl.innerHTML = '';
+        }
+
+        this.showToast(`Hentet ${contact.name}!`, 'info', 2500);
+    }
+
     openManualEnrollmentModal() {
         const modal = document.getElementById('manual-enrollment-modal');
         const courseSelect = document.getElementById('manual-enrollment-course');
         const form = document.getElementById('manual-enrollment-form');
+        const searchInput = document.getElementById('manual-contact-search');
+        const resultsEl = document.getElementById('manual-contact-results');
+
         if (!modal || !courseSelect) return;
 
         if (form) form.reset();
+        if (searchInput) searchInput.value = '';
+        if (resultsEl) {
+            resultsEl.style.display = 'none';
+            resultsEl.innerHTML = '';
+        }
+
+        // Prefetch contacts in background
+        this._fetchSystemContacts();
 
         // Populate courses
         courseSelect.innerHTML = '<option value="">-- Velg et kurs --</option>';
