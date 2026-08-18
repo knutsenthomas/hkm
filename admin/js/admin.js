@@ -25029,9 +25029,9 @@ class AdminManager {
                                     <label style="display:block;font-weight:700;font-size:0.9rem;color:#1B4965;margin-bottom:6px;">
                                         <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-2px;">person_search</span> Hent fra eksisterende kontakter / brukere (valgfritt)
                                     </label>
-                                    <div style="position:relative;">
-                                        <input id="manual-contact-search" type="text" placeholder="Søk på navn, e-post eller telefon for å hente..." oninput="window.adminManager.searchContactsForEnrollment(this.value)" autocomplete="off" style="width:100%;padding:11px 16px 11px 40px;border:1.5px solid #cbd5e1;border-radius:10px;font-size:0.95rem;box-sizing:border-box;background:#f8fafc;">
-                                        <span class="material-symbols-outlined" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:20px;color:#94a3b8;">contacts</span>
+                                    <div style="display:flex;align-items:center;background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:10px;padding:0 14px;transition:border-color 0.2s ease, box-shadow 0.2s ease;" onfocuswithin="this.style.borderColor='#1B4965';this.style.background='#ffffff';">
+                                        <span class="material-symbols-outlined" style="font-size:20px;color:#94a3b8;margin-right:10px;flex-shrink:0;user-select:none;pointer-events:none;">contacts</span>
+                                        <input id="manual-contact-search" type="text" placeholder="Søk på navn, e-post eller telefon for å hente..." oninput="window.adminManager.searchContactsForEnrollment(this.value)" autocomplete="off" style="width:100%;padding:11px 0;border:none;background:transparent;font-size:0.95rem;outline:none;font-family:inherit;color:#1e293b;box-sizing:border-box;">
                                     </div>
                                     <div id="manual-contact-results" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1.5px solid #cbd5e1;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,0.15);max-height:220px;overflow-y:auto;z-index:1100;margin-top:4px;"></div>
                                 </div>
