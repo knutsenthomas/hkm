@@ -10141,49 +10141,62 @@ exports.notifyCourseParticipants = onRequest({ cors: true, secrets: [emailUserPa
       const link = actionUrl || `https://www.hiskingdomministry.no/kurs-detaljer?id=${courseId}`;
       const title = courseTitle || 'Kurset';
 
+      const fallbackRecording = {
+        subject: subject || `🎉 Nytt opptak er lagt ut: ${title}`,
+        body: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
+  <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
+
+  <header style="padding: 32px 20px 24px 20px; box-sizing: border-box; max-width: 100%; text-align: center; background-color: #FCF9F5;">
+    <div style="margin-bottom: 16px;">
+      <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 48px; width: auto; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
+    </div>
+    <h1 style="margin: 0; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: rgba(18, 28, 44, 0.6); text-transform: uppercase; letter-spacing: 0.25em; line-height: 1.5;">His Kingdom Ministry</h1>
+    <div style="width: 32px; height: 1px; background-color: rgba(137, 114, 105, 0.4); margin: 20px auto 0 auto;"></div>
+  </header>
+
+  <div style="padding: 0 24px 36px 24px; box-sizing: border-box; background-color: #FCF9F5;">
+    <section style="margin-bottom: 24px; text-align: center;">
+      <div style="display: inline-block; padding: 4px 12px; background-color: rgba(209, 125, 57, 0.1); color: #d17d39; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; border-radius: 6px; margin-bottom: 12px;">
+        NYTT OPPTAK TILGJENGELIG
+      </div>
+      <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 24px; line-height: 32px; font-weight: 700; color: #121c2c; margin: 0 0 8px 0;">{{courseTitle}}</h2>
+    </section>
+
+    <section style="margin-bottom: 32px; background-color: #ffffff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(27, 73, 101, 0.04); border: 1px solid rgba(27, 73, 101, 0.08); font-size: 15px; line-height: 1.65; color: #334155;">
+      {{message}}
+    </section>
+
+    <div style="text-align: center; margin-bottom: 36px;">
+      <a href="{{actionUrl}}" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 14px 36px; border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.12em; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.25);">
+        Se opptaket på Min side →
+      </a>
+    </div>
+
+    <section style="border-top: 1px solid rgba(221, 193, 182, 0.2); padding-top: 24px; font-size: 13px; color: #64748b;">
+      <p style="margin: 0;">Vennlig hilsen,<br><strong style="color: #1b4965;">His Kingdom Ministry</strong></p>
+    </section>
+  </div>
+</div>`
+      };
+
+      const templateRecording = await getEmailTemplate("course_recording_notification", fallbackRecording);
+
       const emailPromises = recipients.map(async (r) => {
-        const customMsg = message.replace(/{{name}}/g, r.name || 'kursdeltaker')
-                                 .replace(/{{courseTitle}}/g, title);
+        const customMsgFormatted = message.replace(/{{name}}/g, r.name || 'kursdeltaker')
+                                           .replace(/{{courseTitle}}/g, title);
 
-        const html = `
-          <div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
-            <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
+        const emailSubject = (subject || templateRecording.subject)
+          .replace(/{{name}}/g, r.name || 'kursdeltaker')
+          .replace(/{{courseTitle}}/g, title);
 
-            <header style="padding: 32px 20px 24px 20px; box-sizing: border-box; max-width: 100%; text-align: center; background-color: #FCF9F5;">
-              <div style="margin-bottom: 16px;">
-                <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 48px; width: auto; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
-              </div>
-              <h1 style="margin: 0; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: rgba(18, 28, 44, 0.6); text-transform: uppercase; letter-spacing: 0.25em; line-height: 1.5;">His Kingdom Ministry</h1>
-              <div style="width: 32px; height: 1px; background-color: rgba(137, 114, 105, 0.4); margin: 20px auto 0 auto;"></div>
-            </header>
-
-            <div style="padding: 0 24px 36px 24px; box-sizing: border-box; background-color: #FCF9F5;">
-              <section style="margin-bottom: 24px; text-align: center;">
-                <div style="display: inline-block; padding: 4px 12px; background-color: rgba(209, 125, 57, 0.1); color: #d17d39; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; border-radius: 6px; margin-bottom: 12px;">
-                  NYTT OPPTAK TILGJENGELIG
-                </div>
-                <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 24px; line-height: 32px; font-weight: 700; color: #121c2c; margin: 0 0 8px 0;">${title}</h2>
-              </section>
-
-              <section style="margin-bottom: 32px; background-color: #ffffff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(27, 73, 101, 0.04); border: 1px solid rgba(27, 73, 101, 0.08); font-size: 15px; line-height: 1.65; color: #334155;">
-                ${customMsg.replace(/\n/g, '<br>')}
-              </section>
-
-              <div style="text-align: center; margin-bottom: 36px;">
-                <a href="${link}" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 14px 36px; border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.12em; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.25);">
-                  Se opptaket på Min side →
-                </a>
-              </div>
-
-              <section style="border-top: 1px solid rgba(221, 193, 182, 0.2); padding-top: 24px; font-size: 13px; color: #64748b;">
-                <p style="margin: 0;">Vennlig hilsen,<br><strong style="color: #1b4965;">His Kingdom Ministry</strong></p>
-              </section>
-            </div>
-          </div>
-        `;
+        const html = templateRecording.body
+          .replace(/{{name}}/g, r.name || 'kursdeltaker')
+          .replace(/{{courseTitle}}/g, title)
+          .replace(/{{message}}/g, customMsgFormatted.replace(/\n/g, '<br>'))
+          .replace(/{{actionUrl}}/g, link);
 
         try {
-          await sendEmail({ to: r.email, subject, html, text: customMsg });
+          await sendEmail({ to: r.email, subject: emailSubject, html, text: customMsgFormatted });
           return { email: r.email, success: true };
         } catch (err) {
           console.error(`[notifyCourseParticipants] Feil ved sending til ${r.email}:`, err);
