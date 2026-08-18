@@ -25639,29 +25639,86 @@ class AdminManager {
             const db = window.firebaseService?.db || firebase.firestore();
             const contactsMap = new Map();
 
-            // 1. Fetch from 'users'
+            // 1. Primary CRM contacts: collection('contacts')
             try {
-                const usersSnap = await db.collection('users').get();
-                usersSnap.forEach(doc => {
+                const contactsSnap = await db.collection('contacts').get();
+                contactsSnap.forEach(doc => {
                     const d = doc.data();
                     const email = (d.email || '').trim().toLowerCase();
-                    const name = (d.name || d.displayName || d.fullName || '').trim();
-                    const phone = (d.phone || d.phoneNumber || '').trim();
+                    const name = (d.name || (d.firstName ? `${d.firstName} ${d.lastName || ''}`.trim() : '')).trim();
+                    const phone = (d.phone || d.mobile || d.tlf || '').trim();
+                    const segments = Array.isArray(d.segments) ? d.segments : (typeof d.segments === 'string' && d.segments ? d.segments.split(',').map(s => s.trim()) : (d.segment ? [d.segment] : []));
+                    const tags = Array.isArray(d.tags) ? d.tags : (typeof d.tags === 'string' && d.tags ? d.tags.split(',').map(t => t.trim()) : []);
+                    const subLabel = segments.length ? segments[0] : (tags.length ? tags[0] : 'Kontakt (CRM)');
+
                     if (email) {
                         contactsMap.set(email, {
                             id: doc.id,
                             name: name || email.split('@')[0],
                             email,
                             phone,
-                            type: 'Bruker'
+                            type: subLabel || 'CRM',
+                            tags: [...segments, ...tags]
                         });
+                    }
+                });
+            } catch (err) {
+                console.warn('Could not fetch contacts collection:', err);
+            }
+
+            // 2. Newsletter subscriptions: collection('newsletter_subscriptions')
+            try {
+                const subSnap = await db.collection('newsletter_subscriptions').get();
+                subSnap.forEach(doc => {
+                    const d = doc.data();
+                    const email = (d.email || '').trim().toLowerCase();
+                    const name = (d.name || d.displayName || '').trim();
+                    const phone = (d.phone || d.mobile || '').trim();
+                    if (email && !contactsMap.has(email)) {
+                        contactsMap.set(email, {
+                            id: doc.id,
+                            name: name || email.split('@')[0],
+                            email,
+                            phone,
+                            type: 'Nyhetsbrev',
+                            tags: ['Nyhetsbrev']
+                        });
+                    }
+                });
+            } catch (err) {
+                console.warn('Could not fetch newsletter_subscriptions:', err);
+            }
+
+            // 3. Registered users: collection('users')
+            try {
+                const usersSnap = await db.collection('users').get();
+                usersSnap.forEach(doc => {
+                    const d = doc.data();
+                    const email = (d.email || '').trim().toLowerCase();
+                    const name = (d.name || d.displayName || d.fullName || (d.firstName ? `${d.firstName} ${d.lastName || ''}`.trim() : '')).trim();
+                    const phone = (d.phone || d.phoneNumber || d.mobile || '').trim();
+                    if (email) {
+                        if (!contactsMap.has(email)) {
+                            contactsMap.set(email, {
+                                id: doc.id,
+                                name: name || email.split('@')[0],
+                                email,
+                                phone,
+                                type: 'Bruker',
+                                tags: ['Bruker']
+                            });
+                        } else {
+                            const existing = contactsMap.get(email);
+                            if (!existing.phone && phone) existing.phone = phone;
+                            if (name && existing.name === email.split('@')[0]) existing.name = name;
+                        }
                     }
                 });
             } catch (err) {
                 console.warn('Could not fetch users for contact picker:', err);
             }
 
-            // 2. Fetch from 'courseEnrollments' (to include previous students)
+            // 4. Course enrollments: collection('courseEnrollments')
             try {
                 const enrollSnap = await db.collection('courseEnrollments').get();
                 enrollSnap.forEach(doc => {
@@ -25675,20 +25732,22 @@ class AdminManager {
                             name: name || email.split('@')[0],
                             email,
                             phone,
-                            type: 'Deltaker'
+                            type: 'Deltaker',
+                            tags: ['Deltaker']
                         });
                     } else if (email && contactsMap.has(email)) {
                         const existing = contactsMap.get(email);
                         if (!existing.phone && phone) existing.phone = phone;
+                        if (name && existing.name === email.split('@')[0]) existing.name = name;
                     }
                 });
             } catch (err) {
                 console.warn('Could not fetch enrollments for contact picker:', err);
             }
 
-            // 3. Fetch from 'donations' (to include donors)
+            // 5. Donations: collection('donations')
             try {
-                const donSnap = await db.collection('donations').limit(100).get();
+                const donSnap = await db.collection('donations').limit(200).get();
                 donSnap.forEach(doc => {
                     const d = doc.data();
                     const email = (d.email || d.donorEmail || '').trim().toLowerCase();
@@ -25700,7 +25759,8 @@ class AdminManager {
                             name: name || email.split('@')[0],
                             email,
                             phone,
-                            type: 'Giver'
+                            type: 'Giver',
+                            tags: ['Giver']
                         });
                     }
                 });
@@ -25727,12 +25787,23 @@ class AdminManager {
             return;
         }
 
+        const norm = (str) => String(str || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/ü/g, 'u');
+        const qNorm = norm(q);
+
         const contacts = await this._fetchSystemContacts();
-        const matches = contacts.filter(c => 
-            c.name.toLowerCase().includes(q) || 
-            c.email.toLowerCase().includes(q) || 
-            (c.phone && c.phone.includes(q))
-        ).slice(0, 8);
+        const matches = contacts.filter(c => {
+            const nameNorm = norm(c.name);
+            const emailNorm = norm(c.email);
+            const phoneNorm = (c.phone || '').replace(/[\s\-\+]/g, '');
+            const tagsNorm = norm((c.tags || []).join(' '));
+            const typeNorm = norm(c.type || '');
+
+            return nameNorm.includes(qNorm) || 
+                   emailNorm.includes(qNorm) || 
+                   phoneNorm.includes(q.replace(/[\s\-\+]/g, '')) ||
+                   tagsNorm.includes(qNorm) ||
+                   typeNorm.includes(qNorm);
+        }).slice(0, 10);
 
         if (matches.length === 0) {
             resultsEl.innerHTML = `
@@ -25760,7 +25831,7 @@ class AdminManager {
                         </div>
                     </div>
                     <span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;background:#f1f5f9;color:#475569;white-space:nowrap;">
-                        ${c.type}
+                        ${this.escapeHtml(c.type)}
                     </span>
                 </div>
             `;
