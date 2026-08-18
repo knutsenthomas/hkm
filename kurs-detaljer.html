@@ -2605,7 +2605,7 @@
                             videoId = vUrl.split('youtu.be/')[1]?.split('?')[0]?.split('&')[0];
                         }
                         if (videoId) {
-                            embedHtml = `<iframe src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=0&rel=0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width:100%;height:100%;border:none;"></iframe>`;
+                            embedHtml = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0&enablejsapi=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width:100%;height:100%;border:none;"></iframe>`;
                         }
                     } else if (vUrl.includes('vimeo.com')) {
                         const vimeoMatch = vUrl.match(/vimeo\.com\/(?:video\/)?(\d+)/);
