@@ -96,25 +96,6 @@
             background: #334155;
         }
 
-        html[data-theme="dark"] .lang-btn {
-            background: #1e293b;
-            border-color: #334155;
-            color: #f8fafc;
-        }
-
-        html[data-theme="dark"] .lang-dropdown {
-            background: #1e293b;
-            border-color: #334155;
-        }
-
-        html[data-theme="dark"] .lang-switch-btn {
-            color: #cbd5e1;
-        }
-
-        html[data-theme="dark"] .lang-switch-btn:hover {
-            background-color: #334155;
-        }
-
 
         * {
             margin: 0;
@@ -341,23 +322,23 @@
             z-index: 10;
         }
         .lang-btn {
-            background: white;
-            border: 1px solid var(--border-color);
+            background: var(--card-bg, #ffffff);
+            border: 1px solid var(--border-color, #cbd5e1);
             padding: 8px 16px;
             border-radius: 20px;
             font-weight: 600;
             font-size: 14px;
-            color: var(--text-main);
+            color: var(--text-main, #0f172a);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             cursor: pointer;
             transition: all 0.2s;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
         .lang-btn:hover {
-            border-color: var(--primary-orange);
-            color: var(--primary-orange);
+            border-color: var(--primary-orange, #d17d39);
+            color: var(--primary-orange, #d17d39);
         }
         .lang-dropdown {
             position: absolute;
@@ -365,30 +346,67 @@
             top: 100%;
             margin-top: 8px;
             width: 140px;
-            background: white;
-            border: 1px solid var(--border-color);
+            background: var(--card-bg, #ffffff);
+            border: 1px solid var(--border-color, #cbd5e1);
             border-radius: 12px;
             box-shadow: var(--shadow);
             display: none;
             overflow: hidden;
-            padding: 4px 0;
+            padding: 4px;
+            z-index: 100;
         }
         .lang-switcher.active .lang-dropdown {
             display: block !important;
         }
         .lang-switch-btn {
-            display: block;
-            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
             text-decoration: none;
-            color: var(--text-main);
+            color: var(--text-main, #1e293b);
             font-weight: 500;
             font-size: 14px;
-            transition: background 0.2s;
+            border-radius: 8px;
+            transition: background 0.15s ease, color 0.15s ease;
             text-align: left;
             cursor: pointer;
+            background-color: transparent;
         }
-        .lang-switch-btn:hover {
-            background-color: #f8f9fa;
+        .lang-switch-btn:hover,
+        .lang-switch-btn:focus {
+            background-color: rgba(209, 125, 57, 0.15) !important;
+            color: var(--text-main, #0f172a) !important;
+        }
+        .lang-switch-btn.font-bold {
+            font-weight: 700;
+            color: #d17d39 !important;
+            background-color: rgba(209, 125, 57, 0.12) !important;
+        }
+
+        /* Dark Mode Language Switcher Overrides */
+        html[data-theme="dark"] .lang-btn {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+        html[data-theme="dark"] .lang-dropdown {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+        }
+        html[data-theme="dark"] .lang-switch-btn {
+            color: #e2e8f0 !important;
+            background-color: transparent !important;
+        }
+        html[data-theme="dark"] .lang-switch-btn:hover,
+        html[data-theme="dark"] .lang-switch-btn:focus {
+            background-color: #334155 !important;
+            color: #ffffff !important;
+        }
+        html[data-theme="dark"] .lang-switch-btn.font-bold {
+            color: #f59e0b !important;
+            background-color: rgba(245, 158, 11, 0.18) !important;
         }
     </style>
     <!-- Tailwind CSS Play CDN -->
