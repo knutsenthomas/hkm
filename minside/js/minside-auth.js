@@ -1,8 +1,10 @@
 // Translations Dictionary for Min Side Authentication
 const authTranslations = {
     no: {
+        'page.title': 'Logg inn | Min Side',
         'login.title': 'Min Side',
         'login.subtitle': 'Velkommen til ditt åndelige fellesskap',
+        'login.google': 'Google',
         'login.modeLogin': 'Logg inn',
         'login.modeRegister': 'Ny bruker',
         'login.modeMagic': 'Magisk Link',
@@ -55,8 +57,10 @@ const authTranslations = {
         'error.unknown': 'En ukjent feil oppstod.'
     },
     en: {
+        'page.title': 'Login | My Page',
         'login.title': 'My Page',
         'login.subtitle': 'Welcome to your spiritual community',
+        'login.google': 'Google',
         'login.modeLogin': 'Login',
         'login.modeRegister': 'Register',
         'login.modeMagic': 'Magic Link',
@@ -109,8 +113,10 @@ const authTranslations = {
         'error.unknown': 'An unknown error occurred.'
     },
     es: {
+        'page.title': 'Iniciar sesión | Mi página',
         'login.title': 'Mi página',
         'login.subtitle': 'Bienvenido a tu comunidad espiritual',
+        'login.google': 'Google',
         'login.modeLogin': 'Iniciar sesión',
         'login.modeRegister': 'Registrarse',
         'login.modeMagic': 'Enlace mágico',
@@ -164,17 +170,47 @@ const authTranslations = {
     }
 };
 
-// Translation Helper
+// Global state for active feedback (enables instant dynamic re-translation on language switch)
+let currentFeedbackState = null;
+
+// Translation Helpers
+function getCurrentLanguage() {
+    try {
+        const stored = localStorage.getItem('hkm_preferred_lang');
+        if (stored && ['no', 'en', 'es'].includes(stored)) return stored;
+    } catch(e) {}
+    const docLang = (document.documentElement.lang || '').toLowerCase();
+    if (docLang && ['no', 'en', 'es'].includes(docLang)) return docLang;
+    return 'no';
+}
+
 function t(key) {
-    const lang = document.documentElement.lang || 'no';
+    const lang = getCurrentLanguage();
     return authTranslations[lang]?.[key] || authTranslations['no']?.[key] || key;
 }
 
 // Static HTML Translation Utility
 function translateStaticHTML() {
-    const lang = document.documentElement.lang || 'no';
+    const lang = getCurrentLanguage();
+    document.documentElement.lang = lang;
     
-    // Translate elements with data-i18n
+    // 1. Update Document Title
+    if (authTranslations[lang]?.['page.title']) {
+        document.title = authTranslations[lang]['page.title'];
+    }
+
+    // 2. Update Language Button Badge (NO / EN / ES)
+    document.querySelectorAll('.lang-btn span:not(.material-symbols-outlined)').forEach(el => {
+        el.textContent = lang.toUpperCase();
+    });
+
+    // 3. Highlight Active Language in Dropdown
+    document.querySelectorAll('.lang-switch-btn').forEach(btn => {
+        const btnLang = btn.getAttribute('data-lang');
+        btn.classList.toggle('font-bold', btnLang === lang);
+    });
+
+    // 4. Translate elements with data-i18n
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         const translated = authTranslations[lang]?.[key] || authTranslations['no']?.[key];
@@ -183,7 +219,7 @@ function translateStaticHTML() {
         }
     });
 
-    // Translate input placeholders with data-i18n-placeholder
+    // 5. Translate input placeholders with data-i18n-placeholder
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
         const key = el.getAttribute('data-i18n-placeholder');
         const translated = authTranslations[lang]?.[key] || authTranslations['no']?.[key];
@@ -191,11 +227,30 @@ function translateStaticHTML() {
             el.setAttribute('placeholder', translated);
         }
     });
+
+    // 6. Update Back Link Href
+    const backLink = document.querySelector('.back-link');
+    if (backLink) {
+        backLink.setAttribute('href', lang === 'no' ? '/index' : `/${lang}/index`);
+    }
+
+    // 7. Dynamically re-render active feedback message in new language
+    if (currentFeedbackState) {
+        if (currentFeedbackState.type === 'duplicate') {
+            showDuplicateEmailNotice(currentFeedbackState.email);
+        } else if (currentFeedbackState.type === 'standard') {
+            const msg = currentFeedbackState.error ? getErrorMessage(currentFeedbackState.error) : (authTranslations[lang]?.[currentFeedbackState.key] || currentFeedbackState.rawMsg);
+            if (msg) showMessage(msg, currentFeedbackState.msgType, currentFeedbackState.isHtml);
+        }
+    }
 }
 
 // Register global language callback early for i18nManager
 window.minsideAuthLanguageChange = function(lang) {
-    document.documentElement.lang = lang;
+    if (lang && ['no', 'en', 'es'].includes(lang)) {
+        try { localStorage.setItem('hkm_preferred_lang', lang); } catch(e) {}
+        document.documentElement.lang = lang;
+    }
     translateStaticHTML();
 };
 
@@ -229,6 +284,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform initial static translation immediately
     translateStaticHTML();
+
+    // Bind language switcher clicks for instant translation
+    document.querySelectorAll('.lang-switch-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const chosenLang = btn.getAttribute('data-lang');
+            if (chosenLang) {
+                window.minsideAuthLanguageChange(chosenLang);
+                const wrapper = btn.closest('.lang-switcher');
+                if (wrapper) wrapper.classList.remove('active');
+            }
+        });
+    });
 
     // --- Mode Switching ---
     const buttons = document.querySelectorAll('.btn-mode');
@@ -286,8 +354,58 @@ document.addEventListener('DOMContentLoaded', async () => {
         feedbackBox.className = `feedback-message ${type}`;
         feedbackBox.style.display = 'block';
     }
+
     function hideMessage() {
+        currentFeedbackState = null;
         if (feedbackBox) feedbackBox.style.display = 'none';
+    }
+
+    function showDuplicateEmailNotice(email) {
+        currentFeedbackState = { type: 'duplicate', email };
+        const escapedEmail = escapeHtml(email);
+        const html = `
+            <div style="text-align: left; padding: 2px 0;">
+                <div style="font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; font-size: 0.98rem;">
+                    <span class="material-symbols-outlined" style="font-size: 22px; color: #38bdf8;">account_circle</span>
+                    <span>${t('auth.existingAccountNotice')}</span>
+                </div>
+                <div style="font-size: 0.88rem; margin-bottom: 14px; line-height: 1.5; opacity: 0.95;">
+                    ${t('auth.existingAccountDesc')} (<strong>${escapedEmail}</strong>)
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+                    <button type="button" id="btn-goto-login-prefill" class="btn btn-sm" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff !important; border: none; padding: 9px 16px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(209,125,57,0.35);">
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: #ffffff !important;">login</span> ${t('auth.gotoLoginBtn')}
+                    </button>
+                    <button type="button" id="btn-goto-forgot-prefill" class="btn btn-sm" style="background: rgba(255,255,255,0.1); color: inherit; border: 1px solid rgba(148,163,184,0.4); padding: 9px 16px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">lock_reset</span> ${t('auth.gotoForgotBtn')}
+                    </button>
+                </div>
+            </div>
+        `;
+        showMessage(html, 'info', true);
+
+        setTimeout(() => {
+            const toLogin = document.getElementById('btn-goto-login-prefill');
+            if (toLogin) {
+                toLogin.onclick = () => {
+                    const loginEmail = document.getElementById('login-email');
+                    if (loginEmail) loginEmail.value = email;
+                    setMode('login');
+                    const pwd = document.getElementById('login-password');
+                    if (pwd) pwd.focus();
+                    hideMessage();
+                };
+            }
+            const toForgot = document.getElementById('btn-goto-forgot-prefill');
+            if (toForgot) {
+                toForgot.onclick = () => {
+                    const forgotEmail = document.getElementById('forgot-email');
+                    if (forgotEmail) forgotEmail.value = email;
+                    setMode('forgot');
+                    hideMessage();
+                };
+            }
+        }, 50);
     }
 
     async function waitForFirebaseReady(timeoutMs = 5000) {
@@ -429,53 +547,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             btn.textContent = t('login.submitRegister');
 
             if (error.code === 'auth/email-already-in-use') {
-                const escapedEmail = escapeHtml(email);
-                const html = `
-                    <div style="text-align: left; padding: 2px 0;">
-                        <div style="font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; font-size: 0.98rem;">
-                            <span class="material-symbols-outlined" style="font-size: 22px; color: #38bdf8;">account_circle</span>
-                            <span>${t('auth.existingAccountNotice')}</span>
-                        </div>
-                        <div style="font-size: 0.88rem; margin-bottom: 14px; line-height: 1.5; opacity: 0.95;">
-                            ${t('auth.existingAccountDesc')} (<strong>${escapedEmail}</strong>)
-                        </div>
-                        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
-                            <button type="button" id="btn-goto-login-prefill" class="btn btn-sm" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff !important; border: none; padding: 9px 16px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(209,125,57,0.35);">
-                                <span class="material-symbols-outlined" style="font-size: 18px; color: #ffffff !important;">login</span> ${t('auth.gotoLoginBtn')}
-                            </button>
-                            <button type="button" id="btn-goto-forgot-prefill" class="btn btn-sm" style="background: rgba(255,255,255,0.1); color: inherit; border: 1px solid rgba(148,163,184,0.4); padding: 9px 16px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
-                                <span class="material-symbols-outlined" style="font-size: 18px;">lock_reset</span> ${t('auth.gotoForgotBtn')}
-                            </button>
-                        </div>
-                    </div>
-                `;
-                showMessage(html, 'info', true);
-
-                setTimeout(() => {
-                    const toLogin = document.getElementById('btn-goto-login-prefill');
-                    if (toLogin) {
-                        toLogin.onclick = () => {
-                            const loginEmail = document.getElementById('login-email');
-                            if (loginEmail) loginEmail.value = email;
-                            setMode('login');
-                            const pwd = document.getElementById('login-password');
-                            if (pwd) pwd.focus();
-                            hideMessage();
-                        };
-                    }
-                    const toForgot = document.getElementById('btn-goto-forgot-prefill');
-                    if (toForgot) {
-                        toForgot.onclick = () => {
-                            const forgotEmail = document.getElementById('forgot-email');
-                            if (forgotEmail) forgotEmail.value = email;
-                            setMode('forgot');
-                            hideMessage();
-                        };
-                    }
-                }, 50);
+                showDuplicateEmailNotice(email);
                 return;
             }
 
+            currentFeedbackState = { type: 'standard', error, msgType: 'error', isHtml: false };
             showMessage(getErrorMessage(error), 'error');
         }
     });
