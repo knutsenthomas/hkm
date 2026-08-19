@@ -432,19 +432,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const escapedEmail = escapeHtml(email);
                 const html = `
                     <div style="text-align: left; padding: 2px 0;">
-                        <div style="font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; font-size: 0.95rem;">
-                            <span class="material-symbols-outlined" style="font-size: 20px;">account_circle</span>
-                            ${t('auth.existingAccountNotice')}
+                        <div style="font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; font-size: 0.98rem;">
+                            <span class="material-symbols-outlined" style="font-size: 22px; color: #38bdf8;">account_circle</span>
+                            <span>${t('auth.existingAccountNotice')}</span>
                         </div>
-                        <div style="font-size: 0.85rem; margin-bottom: 12px; line-height: 1.45; opacity: 0.95;">
+                        <div style="font-size: 0.88rem; margin-bottom: 14px; line-height: 1.5; opacity: 0.95;">
                             ${t('auth.existingAccountDesc')} (<strong>${escapedEmail}</strong>)
                         </div>
-                        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
-                            <button type="button" id="btn-goto-login-prefill" class="btn btn-sm" style="background: #1B4965; color: #ffffff; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(27,73,101,0.25);">
-                                <span class="material-symbols-outlined" style="font-size: 16px;">login</span> ${t('auth.gotoLoginBtn')}
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+                            <button type="button" id="btn-goto-login-prefill" class="btn btn-sm" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff !important; border: none; padding: 9px 16px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(209,125,57,0.35);">
+                                <span class="material-symbols-outlined" style="font-size: 18px; color: #ffffff !important;">login</span> ${t('auth.gotoLoginBtn')}
                             </button>
-                            <button type="button" id="btn-goto-forgot-prefill" class="btn btn-sm" style="background: rgba(209,125,57,0.15); color: #d17d39; border: 1px solid rgba(209,125,57,0.35); padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
-                                <span class="material-symbols-outlined" style="font-size: 16px;">lock_reset</span> ${t('auth.gotoForgotBtn')}
+                            <button type="button" id="btn-goto-forgot-prefill" class="btn btn-sm" style="background: rgba(255,255,255,0.1); color: inherit; border: 1px solid rgba(148,163,184,0.4); padding: 9px 16px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">lock_reset</span> ${t('auth.gotoForgotBtn')}
                             </button>
                         </div>
                     </div>
