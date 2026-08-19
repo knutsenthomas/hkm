@@ -189,6 +189,129 @@ function t(key) {
     return authTranslations[lang]?.[key] || authTranslations['no']?.[key] || key;
 }
 
+function escapeHtml(str) {
+    return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function showMessage(msg, type, isHtml = false) {
+    const feedbackBox = document.getElementById('feedback-box');
+    if (!msg || !feedbackBox) {
+        hideMessage();
+        return;
+    }
+    if (isHtml) {
+        feedbackBox.innerHTML = msg;
+    } else {
+        feedbackBox.textContent = msg;
+    }
+    feedbackBox.className = `feedback-message ${type}`;
+    feedbackBox.style.display = 'block';
+}
+
+function hideMessage() {
+    currentFeedbackState = null;
+    const feedbackBox = document.getElementById('feedback-box');
+    if (feedbackBox) feedbackBox.style.display = 'none';
+}
+
+function setMode(mode) {
+    const buttons = document.querySelectorAll('.btn-mode');
+    const sections = document.querySelectorAll('.auth-mode-section');
+
+    buttons.forEach(b => {
+        if (b.id === `mode-${mode}`) {
+            b.style.borderColor = 'var(--primary-orange)';
+            b.style.color = 'var(--primary-orange)';
+        } else {
+            b.style.borderColor = 'var(--border-color)';
+            b.style.color = 'var(--text-main)';
+        }
+    });
+
+    sections.forEach(s => {
+        if (s.id === `section-${mode}`) {
+            s.classList.add('active');
+        } else {
+            s.classList.remove('active');
+        }
+    });
+    hideMessage();
+}
+
+function showDuplicateEmailNotice(email) {
+    currentFeedbackState = { type: 'duplicate', email };
+    const escapedEmail = escapeHtml(email);
+    const html = `
+        <div style="text-align: left; padding: 2px 0;">
+            <div style="font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; font-size: 0.98rem;">
+                <span class="material-symbols-outlined" style="font-size: 22px; color: #38bdf8;">account_circle</span>
+                <span>${t('auth.existingAccountNotice')}</span>
+            </div>
+            <div style="font-size: 0.88rem; margin-bottom: 14px; line-height: 1.5; opacity: 0.95;">
+                ${t('auth.existingAccountDesc')} (<strong>${escapedEmail}</strong>)
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+                <button type="button" id="btn-goto-login-prefill" class="btn btn-sm" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff !important; border: none; padding: 9px 16px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(209,125,57,0.35);">
+                    <span class="material-symbols-outlined" style="font-size: 18px; color: #ffffff !important;">login</span> ${t('auth.gotoLoginBtn')}
+                </button>
+                <button type="button" id="btn-goto-forgot-prefill" class="btn btn-sm" style="background: rgba(255,255,255,0.1); color: inherit; border: 1px solid rgba(148,163,184,0.4); padding: 9px 16px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">lock_reset</span> ${t('auth.gotoForgotBtn')}
+                </button>
+            </div>
+        </div>
+    `;
+    showMessage(html, 'info', true);
+
+    setTimeout(() => {
+        const toLogin = document.getElementById('btn-goto-login-prefill');
+        if (toLogin) {
+            toLogin.onclick = () => {
+                const loginEmail = document.getElementById('login-email');
+                if (loginEmail) loginEmail.value = email;
+                setMode('login');
+                const pwd = document.getElementById('login-password');
+                if (pwd) pwd.focus();
+                hideMessage();
+            };
+        }
+        const toForgot = document.getElementById('btn-goto-forgot-prefill');
+        if (toForgot) {
+            toForgot.onclick = () => {
+                const forgotEmail = document.getElementById('forgot-email');
+                if (forgotEmail) forgotEmail.value = email;
+                setMode('forgot');
+                hideMessage();
+            };
+        }
+    }, 50);
+}
+
+function getErrorMessage(error) {
+    if (!error) return t('error.unknown');
+    const code = error.code || '';
+    const msg = String(error.message || '');
+    if (code === 'permission-denied' || msg.toLowerCase().includes('permission')) {
+        return '';
+    }
+    switch (code) {
+        case 'auth/user-not-found': return t('error.userNotFound');
+        case 'auth/wrong-password': return t('error.wrongPassword');
+        case 'auth/email-already-in-use': return t('error.emailInUse');
+        case 'auth/weak-password': return t('error.weakPassword');
+        case 'auth/invalid-email': return t('error.invalidEmail');
+        case 'auth/missing-email': return t('error.invalidEmail');
+        case 'auth/popup-blocked': return t('auth.googlePopupBlocked');
+        case 'auth/popup-closed-by-user': return t('auth.googlePopupClosed');
+        case 'auth/unauthorized-domain': return t('auth.googleUnauthorizedDomain');
+        default: return msg || t('error.unknown');
+    }
+}
+
 // Static HTML Translation Utility
 function translateStaticHTML() {
     const lang = getCurrentLanguage();
@@ -254,30 +377,30 @@ window.minsideAuthLanguageChange = function(lang) {
     translateStaticHTML();
 };
 
-    function safeLocalStorageSet(key, val) {
-        try {
-            window.localStorage.setItem(key, val);
-        } catch (e) {
-            console.warn('localStorage set failed:', e);
-        }
+function safeLocalStorageSet(key, val) {
+    try {
+        window.localStorage.setItem(key, val);
+    } catch (e) {
+        console.warn('localStorage set failed:', e);
     }
+}
 
-    function safeLocalStorageGet(key) {
-        try {
-            return window.localStorage.getItem(key);
-        } catch (e) {
-            console.warn('localStorage get failed:', e);
-            return null;
-        }
+function safeLocalStorageGet(key) {
+    try {
+        return window.localStorage.getItem(key);
+    } catch (e) {
+        console.warn('localStorage get failed:', e);
+        return null;
     }
+}
 
-    function safeLocalStorageRemove(key) {
-        try {
-            window.localStorage.removeItem(key);
-        } catch (e) {
-            console.warn('localStorage remove failed:', e);
-        }
+function safeLocalStorageRemove(key) {
+    try {
+        window.localStorage.removeItem(key);
+    } catch (e) {
+        console.warn('localStorage remove failed:', e);
     }
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("[HKM] MinSide Auth Script loaded");
@@ -300,113 +423,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- Mode Switching ---
     const buttons = document.querySelectorAll('.btn-mode');
-    const sections = document.querySelectorAll('.auth-mode-section');
-
     buttons.forEach(btn => {
         btn.addEventListener('click', () => {
             const mode = btn.id.split('-')[1];
             setMode(mode);
         });
     });
-
-    function setMode(mode) {
-        buttons.forEach(b => {
-            if (b.id === `mode-${mode}`) {
-                b.style.borderColor = 'var(--primary-orange)';
-                b.style.color = 'var(--primary-orange)';
-            } else {
-                b.style.borderColor = 'var(--border-color)';
-                b.style.color = 'var(--text-main)';
-            }
-        });
-
-        sections.forEach(s => {
-            if (s.id === `section-${mode}`) {
-                s.classList.add('active');
-            } else {
-                s.classList.remove('active');
-            }
-        });
-        hideMessage();
-    }
-
-    function escapeHtml(str) {
-        return String(str || '')
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-    }
-
-    // --- Feedback UI ---
-    const feedbackBox = document.getElementById('feedback-box');
-    function showMessage(msg, type, isHtml = false) {
-        if (!msg || !feedbackBox) {
-            hideMessage();
-            return;
-        }
-        if (isHtml) {
-            feedbackBox.innerHTML = msg;
-        } else {
-            feedbackBox.textContent = msg;
-        }
-        feedbackBox.className = `feedback-message ${type}`;
-        feedbackBox.style.display = 'block';
-    }
-
-    function hideMessage() {
-        currentFeedbackState = null;
-        if (feedbackBox) feedbackBox.style.display = 'none';
-    }
-
-    function showDuplicateEmailNotice(email) {
-        currentFeedbackState = { type: 'duplicate', email };
-        const escapedEmail = escapeHtml(email);
-        const html = `
-            <div style="text-align: left; padding: 2px 0;">
-                <div style="font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; font-size: 0.98rem;">
-                    <span class="material-symbols-outlined" style="font-size: 22px; color: #38bdf8;">account_circle</span>
-                    <span>${t('auth.existingAccountNotice')}</span>
-                </div>
-                <div style="font-size: 0.88rem; margin-bottom: 14px; line-height: 1.5; opacity: 0.95;">
-                    ${t('auth.existingAccountDesc')} (<strong>${escapedEmail}</strong>)
-                </div>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
-                    <button type="button" id="btn-goto-login-prefill" class="btn btn-sm" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff !important; border: none; padding: 9px 16px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(209,125,57,0.35);">
-                        <span class="material-symbols-outlined" style="font-size: 18px; color: #ffffff !important;">login</span> ${t('auth.gotoLoginBtn')}
-                    </button>
-                    <button type="button" id="btn-goto-forgot-prefill" class="btn btn-sm" style="background: rgba(255,255,255,0.1); color: inherit; border: 1px solid rgba(148,163,184,0.4); padding: 9px 16px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">lock_reset</span> ${t('auth.gotoForgotBtn')}
-                    </button>
-                </div>
-            </div>
-        `;
-        showMessage(html, 'info', true);
-
-        setTimeout(() => {
-            const toLogin = document.getElementById('btn-goto-login-prefill');
-            if (toLogin) {
-                toLogin.onclick = () => {
-                    const loginEmail = document.getElementById('login-email');
-                    if (loginEmail) loginEmail.value = email;
-                    setMode('login');
-                    const pwd = document.getElementById('login-password');
-                    if (pwd) pwd.focus();
-                    hideMessage();
-                };
-            }
-            const toForgot = document.getElementById('btn-goto-forgot-prefill');
-            if (toForgot) {
-                toForgot.onclick = () => {
-                    const forgotEmail = document.getElementById('forgot-email');
-                    if (forgotEmail) forgotEmail.value = email;
-                    setMode('forgot');
-                    hideMessage();
-                };
-            }
-        }, 50);
-    }
 
     async function waitForFirebaseReady(timeoutMs = 5000) {
         const startedAt = Date.now();
@@ -748,26 +770,5 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
         window.location.href = '/minside/index.html';
-    }
-
-    function getErrorMessage(error) {
-        if (!error) return t('error.unknown');
-        const code = error.code || '';
-        const msg = String(error.message || '');
-        if (code === 'permission-denied' || msg.toLowerCase().includes('permission')) {
-            return ''; // Suppress internal permission error messages from UI feedback box
-        }
-        switch (code) {
-            case 'auth/user-not-found': return t('error.userNotFound');
-            case 'auth/wrong-password': return t('error.wrongPassword');
-            case 'auth/email-already-in-use': return t('error.emailInUse');
-            case 'auth/weak-password': return t('error.weakPassword');
-            case 'auth/invalid-email': return t('error.invalidEmail');
-            case 'auth/missing-email': return t('error.invalidEmail');
-            case 'auth/popup-blocked': return t('auth.googlePopupBlocked');
-            case 'auth/popup-closed-by-user': return t('auth.googlePopupClosed');
-            case 'auth/unauthorized-domain': return t('auth.googleUnauthorizedDomain');
-            default: return msg || t('error.unknown');
-        }
     }
 });
