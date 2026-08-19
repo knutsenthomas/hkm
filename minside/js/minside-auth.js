@@ -484,18 +484,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        if (userDoc && !userDoc.exists) {
-            try {
-                await firebase.firestore().collection('users').doc(user.uid).set({
-                    email: (user.email || '').toLowerCase().trim(),
-                    displayName: user.displayName || '',
-                    photoURL: user.photoURL || '',
-                    role: 'medlem',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
-            } catch (setErr) {
-                console.warn("[HKM] ensureMemberProfile set profile warning:", setErr);
+        try {
+            const updatePayload = {
+                email: (user.email || '').toLowerCase().trim(),
+                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            if (user.displayName) updatePayload.displayName = user.displayName;
+            if (user.photoURL) updatePayload.photoURL = user.photoURL;
+            if (!userDoc || !userDoc.exists) {
+                updatePayload.role = 'medlem';
+                updatePayload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
             }
+            await firebase.firestore().collection('users').doc(user.uid).set(updatePayload, { merge: true });
+        } catch (setErr) {
+            console.warn("[HKM] ensureMemberProfile set profile warning:", setErr);
         }
     }
 

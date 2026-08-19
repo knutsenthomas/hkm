@@ -29412,6 +29412,29 @@ class AdminManager {
                 ? createdAt.toLocaleDateString('no-NO')
                 : '—';
 
+            const lastLogin = user.lastLogin?.toDate?.()
+                ? user.lastLogin.toDate()
+                : (user.lastLogin ? new Date(user.lastLogin) : (user.lastLoginAt?.toDate?.() ? user.lastLoginAt.toDate() : (user.lastActive?.toDate?.() ? user.lastActive.toDate() : null)));
+            
+            let lastLoginText = '<span style="color:#94a3b8;font-size:12px;">Aldri</span>';
+            if (lastLogin && !Number.isNaN(lastLogin.getTime())) {
+                const now = new Date();
+                const diffHours = (now.getTime() - lastLogin.getTime()) / (1000 * 60 * 60);
+                const diffDays = Math.floor(diffHours / 24);
+                
+                const timeStr = lastLogin.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
+                const dateStr = lastLogin.toLocaleDateString('no-NO');
+                
+                let relativeBadge = '';
+                if (diffHours < 24 && lastLogin.getDate() === now.getDate() && lastLogin.getMonth() === now.getMonth() && lastLogin.getFullYear() === now.getFullYear()) {
+                    relativeBadge = `<span style="display:inline-block;padding:2px 6px;border-radius:6px;background:#dcfce7;color:#15803d;font-size:11px;font-weight:700;margin-left:4px;">I dag</span>`;
+                } else if (diffDays <= 7 && diffDays >= 0) {
+                    relativeBadge = `<span style="display:inline-block;padding:2px 6px;border-radius:6px;background:#f1f5f9;color:#475569;font-size:11px;font-weight:600;margin-left:4px;">${diffDays === 0 ? '1' : diffDays}d siden</span>`;
+                }
+
+                lastLoginText = `<div style="display:flex;align-items:center;gap:4px;white-space:nowrap;"><span style="font-weight:600;color:#1e293b;">${dateStr}</span> <span style="font-size:11.5px;color:#64748b;">${timeStr}</span> ${relativeBadge}</div>`;
+            }
+
             return `
                 <tr data-user-id="${user.id}">
                     <td style="white-space: nowrap; min-width: 180px;">
@@ -29430,6 +29453,7 @@ class AdminManager {
                     <td style="white-space: nowrap;"><span class="badge status-automated" style="white-space: nowrap;">${this.escapeHtml(roleLabel)}</span></td>
                     <td style="white-space: nowrap;">${phoneText ? this.escapeHtml(phoneText) : '<span class="text-muted">—</span>'}</td>
                     <td style="white-space: nowrap;">${createdText}</td>
+                    <td style="white-space: nowrap;">${lastLoginText}</td>
                     <td class="col-actions" style="white-space: nowrap; text-align: right;">
                         <button class="btn btn-outline edit-user-btn" type="button" data-id="${user.id}" style="white-space: nowrap;">Rediger</button>
                         ${canDelete ? `
@@ -29444,13 +29468,14 @@ class AdminManager {
 
         container.innerHTML = `
             <div class="table-container" style="overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch;">
-                <table class="crm-table" style="min-width: 620px; width: 100%;">
+                <table class="crm-table" style="min-width: 720px; width: 100%;">
                     <thead>
                         <tr>
                             <th style="white-space: nowrap;">Bruker</th>
                             <th style="white-space: nowrap;">Rolle</th>
                             <th style="white-space: nowrap;">Telefon</th>
                             <th style="white-space: nowrap;">Opprettet</th>
+                            <th style="white-space: nowrap;">Sist innlogget</th>
                             <th class="col-actions" style="white-space: nowrap; text-align: right;">Handlinger</th>
                         </tr>
                     </thead>

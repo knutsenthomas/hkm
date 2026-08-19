@@ -358,9 +358,11 @@
                         ? adminUtils.isElevatedAdminRole(role)
                         : ['admin', 'superadmin'].includes(String(role || '').toLowerCase());
 
-                    if (!canAccessAdmin && typeof adminUtils.pushFlashNotice === 'function') {
-                        adminUtils.pushFlashNotice('Access Denied: Du har ikke administratorrettigheter til adminpanelet.', 'error', 6000);
-                    }
+                    try {
+                        await firebase.firestore().collection('users').doc(user.uid).set({
+                            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                        }, { merge: true });
+                    } catch (e) {}
 
                     window.location.href = canAccessAdmin ? '/admin/index.html' : '/minside/index.html';
                 }
