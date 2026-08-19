@@ -30105,6 +30105,26 @@ class AdminManager {
                 }, { merge: true });
                 this.showToast('Bruker oppdatert.', 'success');
             } else {
+                // Prevent duplicates: Check if user with this email already exists in Firestore
+                const emailClean = (cleanData.email || '').toLowerCase().trim();
+                if (emailClean) {
+                    const existingSnap = await firebaseService.db.collection('users')
+                        .where('email', '==', emailClean)
+                        .limit(1)
+                        .get();
+                    
+                    if (!existingSnap.empty) {
+                        const existingDoc = existingSnap.docs[0];
+                        await existingDoc.ref.set({
+                            ...cleanData,
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        }, { merge: true });
+                        this.showToast(`En bruker med ${emailClean} finnes allerede. Profilen ble oppdatert.`, 'info');
+                        await this.loadUsersList();
+                        return;
+                    }
+                }
+
                 // Create (Placeholder for Firestore metadata - User still needs Auth account)
                 const newDoc = await firebaseService.db.collection('users').add({
                     ...cleanData,
