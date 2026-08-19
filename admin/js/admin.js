@@ -29397,6 +29397,11 @@ class AdminManager {
         };
 
         const canDelete = this.userRole === (window.HKM_ROLES?.SUPERADMIN || 'superadmin');
+        const formatAdminDate = (dateObj) => {
+            if (!dateObj || Number.isNaN(dateObj.getTime())) return null;
+            return dateObj.toLocaleDateString('no-NO', { day: 'numeric', month: 'short', year: 'numeric' });
+        };
+
         const rowsHtml = users.map((user) => {
             const name = user.displayName || user.fullName || 'Ukjent Navn';
             const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
@@ -29408,31 +29413,60 @@ class AdminManager {
             const createdAt = user.createdAt?.toDate?.()
                 ? user.createdAt.toDate()
                 : (user.createdAt ? new Date(user.createdAt) : null);
-            const createdText = createdAt && !Number.isNaN(createdAt.getTime())
-                ? createdAt.toLocaleDateString('no-NO')
-                : '—';
+            const createdText = formatAdminDate(createdAt) || '—';
 
             const lastLogin = user.lastLogin?.toDate?.()
                 ? user.lastLogin.toDate()
                 : (user.lastLogin ? new Date(user.lastLogin) : (user.lastLoginAt?.toDate?.() ? user.lastLoginAt.toDate() : (user.lastActive?.toDate?.() ? user.lastActive.toDate() : null)));
             
-            let lastLoginText = '<span style="color:#94a3b8;font-size:12px;">Aldri</span>';
+            let lastLoginHtml = `
+                <div style="display:inline-flex;align-items:center;gap:6px;color:#94a3b8;font-size:12.5px;">
+                    <span style="width:6px;height:6px;border-radius:50%;background:#cbd5e1;display:inline-block;"></span>
+                    <span>Aldri</span>
+                </div>
+            `;
+
             if (lastLogin && !Number.isNaN(lastLogin.getTime())) {
                 const now = new Date();
-                const diffHours = (now.getTime() - lastLogin.getTime()) / (1000 * 60 * 60);
+                const diffMs = now.getTime() - lastLogin.getTime();
+                const diffHours = diffMs / (1000 * 60 * 60);
                 const diffDays = Math.floor(diffHours / 24);
                 
                 const timeStr = lastLogin.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
-                const dateStr = lastLogin.toLocaleDateString('no-NO');
+                const dateStr = formatAdminDate(lastLogin);
                 
-                let relativeBadge = '';
-                if (diffHours < 24 && lastLogin.getDate() === now.getDate() && lastLogin.getMonth() === now.getMonth() && lastLogin.getFullYear() === now.getFullYear()) {
-                    relativeBadge = `<span style="display:inline-block;padding:2px 6px;border-radius:6px;background:#dcfce7;color:#15803d;font-size:11px;font-weight:700;margin-left:4px;">I dag</span>`;
-                } else if (diffDays <= 7 && diffDays >= 0) {
-                    relativeBadge = `<span style="display:inline-block;padding:2px 6px;border-radius:6px;background:#f1f5f9;color:#475569;font-size:11px;font-weight:600;margin-left:4px;">${diffDays === 0 ? '1' : diffDays}d siden</span>`;
-                }
+                const isToday = diffHours < 24 && lastLogin.getDate() === now.getDate() && lastLogin.getMonth() === now.getMonth() && lastLogin.getFullYear() === now.getFullYear();
 
-                lastLoginText = `<div style="display:flex;align-items:center;gap:4px;white-space:nowrap;"><span style="font-weight:600;color:#1e293b;">${dateStr}</span> <span style="font-size:11.5px;color:#64748b;">${timeStr}</span> ${relativeBadge}</div>`;
+                if (isToday) {
+                    lastLoginHtml = `
+                        <div style="display:flex;flex-direction:column;gap:2px;line-height:1.3;">
+                            <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#15803d;">
+                                <span style="width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 2px rgba(34,197,94,0.25);flex-shrink:0;"></span>
+                                <span>I dag, ${timeStr}</span>
+                            </div>
+                            <span style="font-size:11.5px;color:#94a3b8;padding-left:13px;">${dateStr}</span>
+                        </div>
+                    `;
+                } else if (diffDays <= 7 && diffDays >= 0) {
+                    const daysLabel = diffDays === 1 ? '1 dag siden' : `${diffDays} dager siden`;
+                    lastLoginHtml = `
+                        <div style="display:flex;flex-direction:column;gap:2px;line-height:1.3;">
+                            <div style="font-size:13px;font-weight:600;color:#1e293b;">${dateStr}</div>
+                            <div style="font-size:11.5px;color:#64748b;display:flex;align-items:center;gap:4px;">
+                                <span>kl. ${timeStr}</span>
+                                <span style="color:#cbd5e1;">•</span>
+                                <span style="color:#94a3b8;font-weight:500;">${daysLabel}</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    lastLoginHtml = `
+                        <div style="display:flex;flex-direction:column;gap:2px;line-height:1.3;">
+                            <div style="font-size:13px;font-weight:500;color:#334155;">${dateStr}</div>
+                            <div style="font-size:11.5px;color:#94a3b8;">kl. ${timeStr}</div>
+                        </div>
+                    `;
+                }
             }
 
             return `
@@ -29452,8 +29486,8 @@ class AdminManager {
                     </td>
                     <td style="white-space: nowrap;"><span class="badge status-automated" style="white-space: nowrap;">${this.escapeHtml(roleLabel)}</span></td>
                     <td style="white-space: nowrap;">${phoneText ? this.escapeHtml(phoneText) : '<span class="text-muted">—</span>'}</td>
-                    <td style="white-space: nowrap;">${createdText}</td>
-                    <td style="white-space: nowrap;">${lastLoginText}</td>
+                    <td style="white-space: nowrap; font-size: 13px; color: #475569; font-weight: 500;">${createdText}</td>
+                    <td style="white-space: nowrap;">${lastLoginHtml}</td>
                     <td class="col-actions" style="white-space: nowrap; text-align: right;">
                         <button class="btn btn-outline edit-user-btn" type="button" data-id="${user.id}" style="white-space: nowrap;">Rediger</button>
                         ${canDelete ? `
