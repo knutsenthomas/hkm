@@ -1653,37 +1653,7 @@
             </div>
 
             <div id="modules-accordion-container">
-                <!-- Module 1 -->
-                <div class="module-group">
-                    <div class="module-header" onclick="window.toggleModule('mod-1')">
-                        <span>Modul 1: Introduksjon</span>
-                        <i class="fas fa-chevron-down" id="mod-1-icon"></i>
-                    </div>
-                    <ul class="lesson-list" id="mod-1-list">
-                        <a href="javascript:void(0)" class="lesson-item active" onclick="window.selectLesson(0)" style="cursor: pointer;">
-                            <span class="lesson-dot"></span>
-                            <span>Leksjon 1.1: Hvordan se i ånden</span>
-                        </a>
-                        <a href="javascript:void(0)" class="lesson-item" onclick="window.selectLesson(1)" style="cursor: pointer;">
-                            <span class="lesson-dot"></span>
-                            <span>Leksjon 1.2: Høre Guds røst</span>
-                        </a>
-                    </ul>
-                </div>
-
-                <!-- Module 2 -->
-                <div class="module-group">
-                    <div class="module-header" onclick="window.toggleModule('mod-2')">
-                        <span>Modul 2: Praktisk Aktivering</span>
-                        <i class="fas fa-chevron-down" id="mod-2-icon"></i>
-                    </div>
-                    <ul class="lesson-list" id="mod-2-list">
-                        <a href="javascript:void(0)" class="lesson-item" onclick="window.selectLesson(2)" style="cursor: pointer;">
-                            <span class="lesson-dot"></span>
-                            <span>Leksjon 2.1: Møte med Jesus</span>
-                        </a>
-                    </ul>
-                </div>
+                <div style="padding: 20px; text-align: center; color: #94a3b8; font-size: 0.9rem;">Laster leksjoner...</div>
             </div>
         </aside>
 
@@ -1749,7 +1719,7 @@
 
                 <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--hkm-navy); margin-bottom: 12px;">Læreren din</h3>
                 <div class="instructor-card">
-                    <img src="/assets/Hilde Karin Knutsen-cVkzTBaQ.jpg" alt="Hilde Karin Knutsen" class="instructor-avatar">
+                    <img src="/img/Hilde%20Karin%20Knutsen.jpg" alt="Hilde Karin Knutsen" class="instructor-avatar">
                     <div>
                         <h4 class="instructor-name">Hilde Karin Knutsen</h4>
                         <p class="instructor-bio">
@@ -1779,17 +1749,7 @@
                 <p class="overview-text">
                     Del dine tanker eller still spørsmål til lærerne og meddeltakerne for denne leksjonen.
                 </p>
-                <div id="discussion-form-container">
-                    <div style="background: white; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 14px rgba(0,0,0,0.03); margin-bottom: 24px;">
-                        <textarea id="discussion-comment-input" placeholder="Skriv din refleksjon eller ditt spørsmål her..." style="width: 100%; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 14px; font-family: inherit; margin-bottom: 14px; min-height: 90px; font-size: 0.95rem; outline: none; transition: border 0.2s;"></textarea>
-                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                            <span style="font-size: 0.85rem; color: #64748b;" id="comment-author-info">Innlogget som kursdeltaker</span>
-                            <button type="button" class="btn-terracotta" id="post-comment-btn" onclick="window.handlePostComment()" style="padding: 10px 24px; font-size: 0.9rem; cursor: pointer; border: none; border-radius: 8px;">
-                                <i class="fas fa-paper-plane"></i> Send refleksjon
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <div id="discussion-form-container"></div>
 
                 <div id="discussion-comments-list" style="display: flex; flex-direction: column; gap: 14px;">
                 </div>
@@ -3037,7 +2997,7 @@
                 comments = [
                     {
                         author: 'Hilde Karin Knutsen',
-                        avatar: '/assets/Hilde Karin Knutsen-cVkzTBaQ.jpg',
+                        avatar: '/img/Hilde%20Karin%20Knutsen.jpg',
                         role: 'Hovedlærer',
                         date: 'I dag',
                         text: 'Velkommen til denne leksjonen! Legg gjerne igjen dine tanker eller spørsmål her.'
