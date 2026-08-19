@@ -24912,63 +24912,8 @@ class AdminManager {
                                 </button>
                                 <button type="button" id="delete-course-btn" style="display:none;padding:12px 20px;border-radius:10px;background:white;color:#ef4444;border:1.5px solid #fee2e2;font-weight:600;cursor:pointer;">
                                     Slett kurs
-                                </button>
                             </div>
                             <p id="course-save-status" style="margin-top:12px;font-size:0.85rem;"></p>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Notify Course Modal -->
-                <div id="notify-course-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1050;overflow-y:auto;padding:20px;">
-                    <div style="background:white;border-radius:16px;max-width:680px;margin:30px auto;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid #f1f5f9;padding-bottom:16px;">
-                            <div style="display:flex;align-items:center;gap:10px;">
-                                <span class="material-symbols-outlined" style="font-size:28px;color:#d17d39;">campaign</span>
-                                <div>
-                                    <h3 style="font-size:1.3rem;font-weight:800;color:#1e293b;margin:0;">Varsle påmeldte om nytt opptak</h3>
-                                    <p style="font-size:0.85rem;color:#64748b;margin:2px 0 0 0;">Send e-postvarsel til alle deltakere med godkjent tilgang</p>
-                                </div>
-                            </div>
-                            <button type="button" onclick="window.adminManager.closeNotifyCourseModal()" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:1.8rem;line-height:1;">&times;</button>
-                        </div>
-
-                        <form id="notify-course-form" onsubmit="window.adminManager.submitNotifyCourse(event)">
-                            <div style="margin-bottom:16px;">
-                                <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Velg kurs *</label>
-                                <select id="notify-course-select" required onchange="window.adminManager.updateNotifyCourseRecipientCount()" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;background:#ffffff;color:#1e293b;font-family:inherit;">
-                                </select>
-                            </div>
-
-                            <div id="notify-recipient-info" style="margin-bottom:16px;padding:12px 16px;border-radius:10px;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;display:flex;align-items:center;gap:8px;font-size:0.88rem;font-weight:600;">
-                                <span class="material-symbols-outlined" style="font-size:20px;">group</span>
-                                <span id="notify-recipient-text">Finner mottakere...</span>
-                            </div>
-
-                            <div style="margin-bottom:16px;">
-                                <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Ekstra mottakere (valgfritt)</label>
-                                <input id="notify-course-extra-emails" type="text" placeholder="epost1@eksempel.no, epost2@eksempel.no" oninput="window.adminManager.updateNotifyCourseRecipientCount()" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;box-sizing:border-box;">
-                                <span style="font-size:0.8rem;color:#94a3b8;margin-top:4px;display:block;">Skriv inn e-postadresser separert med komma (,) for å varsle personer som ikke ligger i påmeldingslisten.</span>
-                            </div>
-
-                            <div style="margin-bottom:16px;">
-                                <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Emnefelt *</label>
-                                <input id="notify-course-subject" type="text" required placeholder="🎉 Nytt opptak er lagt ut: Seerkurs med aktivering" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;box-sizing:border-box;">
-                            </div>
-
-                            <div style="margin-bottom:20px;">
-                                <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Melding *</label>
-                                <textarea id="notify-course-message" rows="6" required style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;resize:vertical;line-height:1.5;box-sizing:border-box;"></textarea>
-                                <span style="font-size:0.8rem;color:#94a3b8;margin-top:4px;display:block;">Tips: Du kan bruke {{name}} for deltakerens navn. En stor «Se opptaket på Min side»-knapp legges til automatisk i e-posten.</span>
-                            </div>
-
-                            <div style="display:flex;justify-content:flex-end;gap:10px;border-top:1px solid #f1f5f9;padding-top:16px;">
-                                <button type="button" class="btn btn-secondary" onclick="window.adminManager.closeNotifyCourseModal()" style="padding:10px 18px;border-radius:10px;font-size:0.95rem;">Avbryt</button>
-                                <button type="submit" id="notify-course-submit-btn" class="btn btn-primary" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);color:#ffffff;border:none;padding:10px 24px;border-radius:10px;font-weight:700;font-size:0.95rem;cursor:pointer;box-shadow:0 4px 12px rgba(209,125,57,0.3);">
-                                    <span class="material-symbols-outlined" style="font-size:18px;">send</span>
-                                    <span>Send varsel til deltakere</span>
-                                </button>
-                            </div>
                         </form>
                     </div>
                 </div>
@@ -25006,106 +24951,6 @@ class AdminManager {
                             <button type="button" class="btn btn-primary" onclick="window.adminManager.openNotifyCourseModal()" style="display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color:#ffffff; border:none; padding:10px 18px; border-radius:8px; font-weight:700; font-size:0.95rem; cursor:pointer; box-shadow:0 2px 8px rgba(209,125,57,0.25); white-space:nowrap;">
                                 <span class="material-symbols-outlined" style="font-size:18px;">campaign</span> Varsle påmeldte
                             </button>
-                        </div>
-                    </div>
-
-                    <!-- Manual Enrollment Modal -->
-                    <div id="manual-enrollment-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1050;overflow-y:auto;padding:20px;">
-                        <div style="background:white;border-radius:16px;max-width:640px;margin:30px auto;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
-                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid #f1f5f9;padding-bottom:16px;">
-                                <div style="display:flex;align-items:center;gap:10px;">
-                                    <span class="material-symbols-outlined" style="font-size:28px;color:#1B4965;">person_add</span>
-                                    <div>
-                                        <h3 style="font-size:1.3rem;font-weight:800;color:#1e293b;margin:0;">Legg til deltaker manuelt</h3>
-                                        <p style="font-size:0.85rem;color:#64748b;margin:2px 0 0 0;">Meld på en deltaker og tildel kurstilgang direkte</p>
-                                    </div>
-                                </div>
-                                <button type="button" onclick="window.adminManager.closeManualEnrollmentModal()" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:1.8rem;line-height:1;">&times;</button>
-                            </div>
-
-                            <form id="manual-enrollment-form" onsubmit="window.adminManager.submitManualEnrollment(event)">
-                                <!-- Fast contact search -->
-                                <div style="margin-bottom:20px;position:relative;">
-                                    <label style="display:block;font-weight:700;font-size:0.9rem;color:#1B4965;margin-bottom:6px;">
-                                        <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-2px;">person_search</span> Hent fra eksisterende kontakter / brukere (valgfritt)
-                                    </label>
-                                    <div style="display:flex;align-items:center;background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:10px;padding:0 14px;transition:border-color 0.2s ease, box-shadow 0.2s ease;" onfocuswithin="this.style.borderColor='#1B4965';this.style.background='#ffffff';">
-                                        <span class="material-symbols-outlined" style="font-size:20px;color:#94a3b8;margin-right:10px;flex-shrink:0;user-select:none;pointer-events:none;">contacts</span>
-                                        <input id="manual-contact-search" type="text" placeholder="Søk på navn, e-post eller telefon for å hente..." oninput="window.adminManager.searchContactsForEnrollment(this.value)" autocomplete="off" style="width:100%;padding:11px 0;border:none;background:transparent;font-size:0.95rem;outline:none;font-family:inherit;color:#1e293b;box-sizing:border-box;">
-                                    </div>
-                                    <div id="manual-contact-results" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1.5px solid #cbd5e1;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,0.15);max-height:220px;overflow-y:auto;z-index:1100;margin-top:4px;"></div>
-                                </div>
-
-                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
-                                    <div style="grid-column:span 2;">
-                                        <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Fullt navn *</label>
-                                        <input id="manual-enrollment-name" type="text" required placeholder="F.eks. Kari Nordmann" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;box-sizing:border-box;">
-                                    </div>
-                                    <div>
-                                        <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">E-postadresse *</label>
-                                        <input id="manual-enrollment-email" type="email" required placeholder="kari@eksempel.no" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;box-sizing:border-box;">
-                                    </div>
-                                    <div>
-                                        <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Telefonnummer</label>
-                                        <input id="manual-enrollment-phone" type="tel" placeholder="F.eks. 90000000" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;box-sizing:border-box;">
-                                    </div>
-                                    <div style="grid-column:span 2;">
-                                        <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Velg kurs *</label>
-                                        <select id="manual-enrollment-course" required onchange="window.adminManager.onManualCourseChange()" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;background:#ffffff;box-sizing:border-box;font-family:inherit;">
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Status</label>
-                                        <select id="manual-enrollment-status" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;background:#ffffff;box-sizing:border-box;font-family:inherit;">
-                                            <option value="paid" selected>Godkjent (Gir direkte tilgang)</option>
-                                            <option value="pending">Venter på betaling/godkjenning</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Betalingsmetode</label>
-                                        <select id="manual-enrollment-method" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;background:#ffffff;box-sizing:border-box;font-family:inherit;">
-                                            <option value="Manuell">Manuell registrering</option>
-                                            <option value="Vipps">Vipps</option>
-                                            <option value="Gave">Gave / Stipend</option>
-                                            <option value="Faktura">Faktura</option>
-                                            <option value="Bankoverføring">Bankoverføring</option>
-                                            <option value="Gratis">Gratis</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Beløp (kr)</label>
-                                        <input id="manual-enrollment-amount" type="number" min="0" value="0" placeholder="0" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;box-sizing:border-box;">
-                                    </div>
-                                    <div>
-                                        <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Tilgangsomfang</label>
-                                        <select id="manual-enrollment-access-type" onchange="window.adminManager.onManualAccessTypeChange()" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;background:#ffffff;box-sizing:border-box;font-family:inherit;">
-                                            <option value="full" selected>Full tilgang til hele kurset</option>
-                                            <option value="custom">Velg spesifikke leksjoner...</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <!-- Lessons selection (hidden by default) -->
-                                <div id="manual-enrollment-lessons-container" style="display:none;margin-bottom:16px;padding:16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;">
-                                    <label style="display:block;font-weight:700;font-size:0.88rem;color:#334155;margin-bottom:8px;">Velg leksjoner deltakeren skal ha tilgang til:</label>
-                                    <div id="manual-enrollment-lessons-list" style="display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto;"></div>
-                                </div>
-
-                                <div style="margin-bottom:20px;padding:12px 16px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;display:flex;align-items:center;gap:10px;">
-                                    <input id="manual-enrollment-send-email" type="checkbox" checked style="width:18px;height:18px;cursor:pointer;accent-color:#1B4965;">
-                                    <label for="manual-enrollment-send-email" style="font-size:0.9rem;font-weight:600;color:#15803d;cursor:pointer;">
-                                        Send godkjennelses-e-post til deltakeren med innloggingslenke
-                                    </label>
-                                </div>
-
-                                <div style="display:flex;justify-content:flex-end;gap:10px;border-top:1px solid #f1f5f9;padding-top:16px;">
-                                    <button type="button" class="btn btn-secondary" onclick="window.adminManager.closeManualEnrollmentModal()" style="padding:10px 18px;border-radius:10px;font-size:0.95rem;">Avbryt</button>
-                                    <button type="submit" id="manual-enrollment-submit-btn" class="btn btn-primary" style="display:inline-flex;align-items:center;gap:6px;background:#1B4965;color:#ffffff;border:none;padding:10px 24px;border-radius:10px;font-weight:700;font-size:0.95rem;cursor:pointer;box-shadow:0 4px 12px rgba(27,73,101,0.25);">
-                                        <span class="material-symbols-outlined" style="font-size:18px;">person_add</span>
-                                        <span>Opprett påmelding</span>
-                                    </button>
-                                </div>
-                            </form>
                         </div>
                     </div>
 
@@ -25155,6 +25000,162 @@ class AdminManager {
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- SHARED ROOT MODALS (Accessible from all tabs) -->
+
+            <!-- Notify Course Modal -->
+            <div id="notify-course-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1050;overflow-y:auto;padding:20px;">
+                <div style="background:white;border-radius:16px;max-width:680px;margin:30px auto;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid #f1f5f9;padding-bottom:16px;">
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <span class="material-symbols-outlined" style="font-size:28px;color:#d17d39;">campaign</span>
+                            <div>
+                                <h3 style="font-size:1.3rem;font-weight:800;color:#1e293b;margin:0;">Varsle påmeldte om nytt opptak</h3>
+                                <p style="font-size:0.85rem;color:#64748b;margin:2px 0 0 0;">Send e-postvarsel til alle deltakere med godkjent tilgang</p>
+                            </div>
+                        </div>
+                        <button type="button" onclick="window.adminManager.closeNotifyCourseModal()" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:1.8rem;line-height:1;">&times;</button>
+                    </div>
+
+                    <form id="notify-course-form" onsubmit="window.adminManager.submitNotifyCourse(event)">
+                        <div style="margin-bottom:16px;">
+                            <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Velg kurs *</label>
+                            <select id="notify-course-select" required onchange="window.adminManager.updateNotifyCourseRecipientCount()" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;background:#ffffff;color:#1e293b;font-family:inherit;">
+                            </select>
+                        </div>
+
+                        <div id="notify-recipient-info" style="margin-bottom:16px;padding:12px 16px;border-radius:10px;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;display:flex;align-items:center;gap:8px;font-size:0.88rem;font-weight:600;">
+                            <span class="material-symbols-outlined" style="font-size:20px;">group</span>
+                            <span id="notify-recipient-text">Finner mottakere...</span>
+                        </div>
+
+                        <div style="margin-bottom:16px;">
+                            <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Ekstra mottakere (valgfritt)</label>
+                            <input id="notify-course-extra-emails" type="text" placeholder="epost1@eksempel.no, epost2@eksempel.no" oninput="window.adminManager.updateNotifyCourseRecipientCount()" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;box-sizing:border-box;">
+                            <span style="font-size:0.8rem;color:#94a3b8;margin-top:4px;display:block;">Skriv inn e-postadresser separert med komma (,) for å varsle personer som ikke ligger i påmeldingslisten.</span>
+                        </div>
+
+                        <div style="margin-bottom:16px;">
+                            <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Emnefelt *</label>
+                            <input id="notify-course-subject" type="text" required placeholder="🎉 Nytt opptak er lagt ut: Seerkurs med aktivering" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;box-sizing:border-box;">
+                        </div>
+
+                        <div style="margin-bottom:20px;">
+                            <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Melding *</label>
+                            <textarea id="notify-course-message" rows="6" required style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;font-family:inherit;resize:vertical;line-height:1.5;box-sizing:border-box;"></textarea>
+                            <span style="font-size:0.8rem;color:#94a3b8;margin-top:4px;display:block;">Tips: Du kan bruke {{name}} for deltakerens navn. En stor «Se opptaket på Min side»-knapp legges til automatisk i e-posten.</span>
+                        </div>
+
+                        <div style="display:flex;justify-content:flex-end;gap:10px;border-top:1px solid #f1f5f9;padding-top:16px;">
+                            <button type="button" class="btn btn-secondary" onclick="window.adminManager.closeNotifyCourseModal()" style="padding:10px 18px;border-radius:10px;font-size:0.95rem;">Avbryt</button>
+                            <button type="submit" id="notify-course-submit-btn" class="btn btn-primary" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);color:#ffffff;border:none;padding:10px 24px;border-radius:10px;font-weight:700;font-size:0.95rem;cursor:pointer;box-shadow:0 4px 12px rgba(209,125,57,0.3);">
+                                <span class="material-symbols-outlined" style="font-size:18px;">send</span>
+                                <span>Send varsel til deltakere</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Manual Enrollment Modal -->
+            <div id="manual-enrollment-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1050;overflow-y:auto;padding:20px;">
+                <div style="background:white;border-radius:16px;max-width:640px;margin:30px auto;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid #f1f5f9;padding-bottom:16px;">
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <span class="material-symbols-outlined" style="font-size:28px;color:#1B4965;">person_add</span>
+                            <div>
+                                <h3 style="font-size:1.3rem;font-weight:800;color:#1e293b;margin:0;">Legg til deltaker manuelt</h3>
+                                <p style="font-size:0.85rem;color:#64748b;margin:2px 0 0 0;">Meld på en deltaker og tildel kurstilgang direkte</p>
+                            </div>
+                        </div>
+                        <button type="button" onclick="window.adminManager.closeManualEnrollmentModal()" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:1.8rem;line-height:1;">&times;</button>
+                    </div>
+
+                    <form id="manual-enrollment-form" onsubmit="window.adminManager.submitManualEnrollment(event)">
+                        <!-- Fast contact search -->
+                        <div style="margin-bottom:20px;position:relative;">
+                            <label style="display:block;font-weight:700;font-size:0.9rem;color:#1B4965;margin-bottom:6px;">
+                                <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-2px;">person_search</span> Hent fra eksisterende kontakter / brukere (valgfritt)
+                            </label>
+                            <div style="display:flex;align-items:center;background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:10px;padding:0 14px;transition:border-color 0.2s ease, box-shadow 0.2s ease;" onfocuswithin="this.style.borderColor='#1B4965';this.style.background='#ffffff';">
+                                <span class="material-symbols-outlined" style="font-size:20px;color:#94a3b8;margin-right:10px;flex-shrink:0;user-select:none;pointer-events:none;">contacts</span>
+                                <input id="manual-contact-search" type="text" placeholder="Søk på navn, e-post eller telefon for å hente..." oninput="window.adminManager.searchContactsForEnrollment(this.value)" autocomplete="off" style="width:100%;padding:11px 0;border:none;background:transparent;font-size:0.95rem;outline:none;font-family:inherit;color:#1e293b;box-sizing:border-box;">
+                            </div>
+                            <div id="manual-contact-results" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1.5px solid #cbd5e1;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,0.15);max-height:220px;overflow-y:auto;z-index:1100;margin-top:4px;"></div>
+                        </div>
+
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+                            <div style="grid-column:span 2;">
+                                <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Fullt navn *</label>
+                                <input id="manual-enrollment-name" type="text" required placeholder="F.eks. Kari Nordmann" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;box-sizing:border-box;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">E-postadresse *</label>
+                                <input id="manual-enrollment-email" type="email" required placeholder="kari@eksempel.no" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;box-sizing:border-box;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Telefonnummer</label>
+                                <input id="manual-enrollment-phone" type="tel" placeholder="F.eks. 90000000" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;box-sizing:border-box;">
+                            </div>
+                            <div style="grid-column:span 2;">
+                                <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Velg kurs *</label>
+                                <select id="manual-enrollment-course" required onchange="window.adminManager.onManualCourseChange()" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;background:#ffffff;box-sizing:border-box;font-family:inherit;">
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Status</label>
+                                <select id="manual-enrollment-status" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;background:#ffffff;box-sizing:border-box;font-family:inherit;">
+                                    <option value="paid" selected>Godkjent (Gir direkte tilgang)</option>
+                                    <option value="pending">Venter på betaling/godkjenning</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Betalingsmetode</label>
+                                <select id="manual-enrollment-method" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;background:#ffffff;box-sizing:border-box;font-family:inherit;">
+                                    <option value="Manuell">Manuell registrering</option>
+                                    <option value="Vipps">Vipps</option>
+                                    <option value="Gave">Gave / Stipend</option>
+                                    <option value="Faktura">Faktura</option>
+                                    <option value="Bankoverføring">Bankoverføring</option>
+                                    <option value="Gratis">Gratis</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Beløp (kr)</label>
+                                <input id="manual-enrollment-amount" type="number" min="0" value="0" placeholder="0" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;box-sizing:border-box;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:6px;">Tilgangsomfang</label>
+                                <select id="manual-enrollment-access-type" onchange="window.adminManager.onManualAccessTypeChange()" style="width:100%;padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;background:#ffffff;box-sizing:border-box;font-family:inherit;">
+                                    <option value="full" selected>Full tilgang til hele kurset</option>
+                                    <option value="custom">Velg spesifikke leksjoner...</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Lessons selection (hidden by default) -->
+                        <div id="manual-enrollment-lessons-container" style="display:none;margin-bottom:16px;padding:16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;">
+                            <label style="display:block;font-weight:700;font-size:0.88rem;color:#334155;margin-bottom:8px;">Velg leksjoner deltakeren skal ha tilgang til:</label>
+                            <div id="manual-enrollment-lessons-list" style="display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto;"></div>
+                        </div>
+
+                        <div style="margin-bottom:20px;padding:12px 16px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;display:flex;align-items:center;gap:10px;">
+                            <input id="manual-enrollment-send-email" type="checkbox" checked style="width:18px;height:18px;cursor:pointer;accent-color:#1B4965;">
+                            <label for="manual-enrollment-send-email" style="font-size:0.9rem;font-weight:600;color:#15803d;cursor:pointer;">
+                                Send godkjennelses-e-post til deltakeren med innloggingslenke
+                            </label>
+                        </div>
+
+                        <div style="display:flex;justify-content:flex-end;gap:10px;border-top:1px solid #f1f5f9;padding-top:16px;">
+                            <button type="button" class="btn btn-secondary" onclick="window.adminManager.closeManualEnrollmentModal()" style="padding:10px 18px;border-radius:10px;font-size:0.95rem;">Avbryt</button>
+                            <button type="submit" id="manual-enrollment-submit-btn" class="btn btn-primary" style="display:inline-flex;align-items:center;gap:6px;background:#1B4965;color:#ffffff;border:none;padding:10px 24px;border-radius:10px;font-weight:700;font-size:0.95rem;cursor:pointer;box-shadow:0 4px 12px rgba(27,73,101,0.25);">
+                                <span class="material-symbols-outlined" style="font-size:18px;">person_add</span>
+                                <span>Opprett påmelding</span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
@@ -25425,6 +25426,19 @@ class AdminManager {
             return;
         }
 
+        // Ensure courses are loaded
+        if (!Array.isArray(this.coursesItems) || this.coursesItems.length === 0) {
+            try {
+                const db = window.firebaseService?.db || firebase.firestore();
+                const snap = await db.collection('courses').get();
+                const fetched = [];
+                snap.forEach(doc => fetched.push({ id: doc.id, ...doc.data() }));
+                if (fetched.length > 0) this.coursesItems = fetched;
+            } catch (err) {
+                console.warn('Could not fetch courses for modal:', err);
+            }
+        }
+
         // Populate course dropdown
         select.innerHTML = '<option value="">-- Velg et kurs --</option>';
         if (Array.isArray(this.coursesItems) && this.coursesItems.length > 0) {
@@ -25455,6 +25469,9 @@ class AdminManager {
         if (extraEmailsInput) extraEmailsInput.value = '';
 
         modal.style.display = 'block';
+        modal.onclick = (e) => {
+            if (e.target === modal) this.closeNotifyCourseModal();
+        };
         await this.updateNotifyCourseRecipientCount();
     }
 
@@ -25909,6 +25926,9 @@ class AdminManager {
         if (sendEmailCheck) sendEmailCheck.checked = true;
 
         modal.style.display = 'block';
+        modal.onclick = (e) => {
+            if (e.target === modal) this.closeManualEnrollmentModal();
+        };
     }
 
     closeManualEnrollmentModal() {
