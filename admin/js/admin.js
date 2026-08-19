@@ -27593,8 +27593,8 @@ class AdminManager {
                         email: "post@hiskingdomministry.no",
                         phone_label: "Telefon",
                         phone: "+47 930 94 615",
-                        address_label: "Lokasjon",
-                        address: "Norge"
+                        address_label: "Adresse",
+                        address: "Augerødlia 48, 1591 Sperrebotn"
                     }
                 }
             },
