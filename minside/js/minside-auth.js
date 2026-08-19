@@ -41,6 +41,10 @@ const authTranslations = {
         'auth.googlePopupBlocked': 'Google-vinduet ble blokkert. Prøver redirect-innlogging.',
         'auth.googlePopupClosed': 'Google-innlogging ble lukket før den var ferdig.',
         'auth.googleUnauthorizedDomain': 'Domenet er ikke godkjent for Google-innlogging i Firebase.',
+        'auth.existingAccountNotice': 'Du har allerede en konto!',
+        'auth.existingAccountDesc': 'Det finnes allerede en registrert brukerkonto med denne e-postadressen. Vennligst logg inn, eller tilbakestill passordet ditt hvis du har glemt det.',
+        'auth.gotoLoginBtn': 'Logg inn med denne e-posten',
+        'auth.gotoForgotBtn': 'Glemt passord?',
         
         // Errors
         'error.userNotFound': 'Ingen bruker funnet med denne e-posten.',
@@ -91,6 +95,10 @@ const authTranslations = {
         'auth.googlePopupBlocked': 'Google popup blocked. Retrying with redirect.',
         'auth.googlePopupClosed': 'Google login was closed before completion.',
         'auth.googleUnauthorizedDomain': 'The domain is not authorized for Google login in Firebase.',
+        'auth.existingAccountNotice': 'You already have an account!',
+        'auth.existingAccountDesc': 'An account is already registered with this email address. Please log in or reset your password if you have forgotten it.',
+        'auth.gotoLoginBtn': 'Log in with this email',
+        'auth.gotoForgotBtn': 'Forgot password?',
         
         // Errors
         'error.userNotFound': 'No user found with this email.',
@@ -141,6 +149,10 @@ const authTranslations = {
         'auth.googlePopupBlocked': 'Ventana emergente de Google bloqueada. Reintentando con redirección.',
         'auth.googlePopupClosed': 'El inicio de sesión de Google se cerró antes de completarse.',
         'auth.googleUnauthorizedDomain': 'El dominio no está autorizado para el inicio de sesión de Google en Firebase.',
+        'auth.existingAccountNotice': '¡Ya tienes una cuenta!',
+        'auth.existingAccountDesc': 'Ya existe una cuenta registrada con esta dirección de correo electrónico. Por favor, inicia sesión o restablece tu contraseña.',
+        'auth.gotoLoginBtn': 'Iniciar sesión con este correo',
+        'auth.gotoForgotBtn': '¿Olvidaste tu contraseña?',
         
         // Errors
         'error.userNotFound': 'No se encontró ningún usuario con este correo.',
@@ -250,14 +262,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         hideMessage();
     }
 
+    function escapeHtml(str) {
+        return String(str || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
     // --- Feedback UI ---
     const feedbackBox = document.getElementById('feedback-box');
-    function showMessage(msg, type) {
+    function showMessage(msg, type, isHtml = false) {
         if (!msg || !feedbackBox) {
             hideMessage();
             return;
         }
-        feedbackBox.textContent = msg;
+        if (isHtml) {
+            feedbackBox.innerHTML = msg;
+        } else {
+            feedbackBox.textContent = msg;
+        }
         feedbackBox.className = `feedback-message ${type}`;
         feedbackBox.style.display = 'block';
     }
@@ -400,9 +425,58 @@ document.addEventListener('DOMContentLoaded', async () => {
             await routeByRole();
         } catch (error) {
             console.error(error);
-            showMessage(getErrorMessage(error), 'error');
             btn.disabled = false;
             btn.textContent = t('login.submitRegister');
+
+            if (error.code === 'auth/email-already-in-use') {
+                const escapedEmail = escapeHtml(email);
+                const html = `
+                    <div style="text-align: left; padding: 2px 0;">
+                        <div style="font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; font-size: 0.95rem;">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">account_circle</span>
+                            ${t('auth.existingAccountNotice')}
+                        </div>
+                        <div style="font-size: 0.85rem; margin-bottom: 12px; line-height: 1.45; opacity: 0.95;">
+                            ${t('auth.existingAccountDesc')} (<strong>${escapedEmail}</strong>)
+                        </div>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
+                            <button type="button" id="btn-goto-login-prefill" class="btn btn-sm" style="background: #1B4965; color: #ffffff; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(27,73,101,0.25);">
+                                <span class="material-symbols-outlined" style="font-size: 16px;">login</span> ${t('auth.gotoLoginBtn')}
+                            </button>
+                            <button type="button" id="btn-goto-forgot-prefill" class="btn btn-sm" style="background: rgba(209,125,57,0.15); color: #d17d39; border: 1px solid rgba(209,125,57,0.35); padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                                <span class="material-symbols-outlined" style="font-size: 16px;">lock_reset</span> ${t('auth.gotoForgotBtn')}
+                            </button>
+                        </div>
+                    </div>
+                `;
+                showMessage(html, 'info', true);
+
+                setTimeout(() => {
+                    const toLogin = document.getElementById('btn-goto-login-prefill');
+                    if (toLogin) {
+                        toLogin.onclick = () => {
+                            const loginEmail = document.getElementById('login-email');
+                            if (loginEmail) loginEmail.value = email;
+                            setMode('login');
+                            const pwd = document.getElementById('login-password');
+                            if (pwd) pwd.focus();
+                            hideMessage();
+                        };
+                    }
+                    const toForgot = document.getElementById('btn-goto-forgot-prefill');
+                    if (toForgot) {
+                        toForgot.onclick = () => {
+                            const forgotEmail = document.getElementById('forgot-email');
+                            if (forgotEmail) forgotEmail.value = email;
+                            setMode('forgot');
+                            hideMessage();
+                        };
+                    }
+                }, 50);
+                return;
+            }
+
+            showMessage(getErrorMessage(error), 'error');
         }
     });
 
