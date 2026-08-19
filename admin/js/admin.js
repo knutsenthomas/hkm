@@ -32107,6 +32107,9 @@ class AdminManager {
                     <td class="col-actions" style="width: 250px; min-width: 250px; text-align: right; white-space: nowrap; padding-right: 24px;">
                         <div style="display:flex; gap:3px; justify-content:flex-end; align-items:center;">
                             ${approveBtn}
+                            <button class="btn-secondary" onclick="window.adminManager.openEnrollmentCertificateModal('${item.id}')" style="padding:5px 8px;border-radius:6px;font-size:11px;color:#d97706;border-color:#fde68a;background:#fffbeb;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:3px;white-space:nowrap;" title="Generer / Skriv ut diplom for deltaker">
+                                <span class="material-symbols-outlined" style="font-size:13px;">workspace_premium</span> Diplom
+                            </button>
                             <button class="btn-secondary" onclick="window.adminManager._openLessonAccessModal('${item.id}')" style="padding:5px 8px;border-radius:6px;font-size:11px;display:inline-flex;align-items:center;gap:3px;cursor:pointer;font-weight:600;white-space:nowrap;">
                                 <span class="material-symbols-outlined" style="font-size:13px;">rule</span> Leksjoner
                             </button>
@@ -32188,6 +32191,27 @@ class AdminManager {
             console.error('Delete enrollment error:', err);
             this.showToast('Kunne ikke slette påmelding: ' + err.message, 'error');
         }
+    }
+
+    openEnrollmentCertificateModal(enrollmentId) {
+        if (!window.CourseCertificate) {
+            this.showToast('Fullføringsbevis-modulen er ikke lastet.', 'warning');
+            return;
+        }
+
+        const enrollment = (this.enrollmentItems || []).find(e => e.id === enrollmentId);
+        if (!enrollment) {
+            this.showToast('Fant ikke påmeldingsinformasjon.', 'warning');
+            return;
+        }
+
+        window.CourseCertificate.showModal({
+            courseId: enrollment.courseId,
+            studentName: enrollment.name || 'Kursdeltaker',
+            studentEmail: enrollment.email || '',
+            courseTitle: enrollment.courseTitle || 'Fullført kurs',
+            date: enrollment.approvedAt || enrollment.enrolledAt || new Date()
+        });
     }
 
     async _openLessonAccessModal(enrollmentId) {

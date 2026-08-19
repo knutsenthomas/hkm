@@ -6040,9 +6040,16 @@ class MinSideManager {
                                     <span class="course-category-tag">${c.category || 'Generelt'}</span>
                                     <h3 style="font-size:1.25rem; font-weight:800; color:var(--text-main); margin:4px 0 6px;">${c.title || t('courses.untitled')}</h3>
                                 </div>
-                                <a href="/kurs-detaljer.html?id=${encodeURIComponent(c.id)}" onclick="event.stopPropagation();" class="btn btn-outline-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; border-radius:10px; font-weight:700; padding:6px 16px; text-decoration:none; background: rgba(209, 125, 57, 0.08); color: #d17d39; border: 1px solid rgba(209, 125, 57, 0.3);">
-                                    <span class="material-symbols-outlined" style="font-size:18px;">open_in_new</span> Åpne kurset
-                                </a>
+                                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                    ${ci.pct >= 100 && ci.total > 0 ? `
+                                        <button type="button" onclick="event.stopPropagation(); window.minSide.openCourseCertificate('${this._escapeHtml(c.id)}', '${this._escapeHtml(c.title || '')}', ${ci.total})" class="btn btn-sm" style="display:inline-flex; align-items:center; gap:6px; border-radius:10px; font-weight:700; padding:6px 14px; background:linear-gradient(135deg, #1B4965 0%, #0b2536 100%); color:#ffffff; border:1px solid #d17d39; box-shadow:0 2px 8px rgba(27,73,101,0.3); cursor:pointer;">
+                                            <span class="material-symbols-outlined" style="font-size:18px; color:#d17d39;">workspace_premium</span> Se fullføringsbevis
+                                        </button>
+                                    ` : ''}
+                                    <a href="/kurs-detaljer.html?id=${encodeURIComponent(c.id)}" onclick="event.stopPropagation();" class="btn btn-outline-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; border-radius:10px; font-weight:700; padding:6px 16px; text-decoration:none; background: rgba(209, 125, 57, 0.08); color: #d17d39; border: 1px solid rgba(209, 125, 57, 0.3);">
+                                        <span class="material-symbols-outlined" style="font-size:18px;">open_in_new</span> Åpne kurset
+                                    </a>
+                                </div>
                             </div>
                             <p style="font-size:0.88rem; color:var(--text-muted); margin:6px 0 0; line-height:1.5;">${c.excerpt || c.intro || ''}</p>
                             
@@ -6120,6 +6127,26 @@ class MinSideManager {
                 </div>`;
             }).join('')}
         </div>`;
+    }
+
+    openCourseCertificate(courseId, courseTitle, totalLessons) {
+        if (!window.CourseCertificate) {
+            console.warn('CourseCertificate module not loaded');
+            return;
+        }
+
+        const studentName = this.profileData?.name || 
+                            this.profileData?.displayName || 
+                            this.currentUser?.displayName || 
+                            (this.profileData?.email ? this.profileData.email.split('@')[0] : 'Kursdeltaker');
+
+        window.CourseCertificate.showModal({
+            courseId,
+            studentName,
+            studentEmail: this.currentUser?.email || '',
+            courseTitle: courseTitle || 'Fullført kurs',
+            date: new Date()
+        });
     }
 
     async renderCoursePlayer(container, args) {

@@ -57,6 +57,7 @@
     <!-- Firebase Config & Service -->
     <script type="module" src="js/firebase-config.js"></script>
     <script type="module" src="js/firebase-service.js"></script>
+    <script src="js/course-certificate.js"></script>
 
     <style>
         :root {
@@ -1720,6 +1721,9 @@
                     <button type="button" class="lesson-nav-btn" id="toggle-complete-btn" onclick="window.toggleCurrentLessonComplete()" style="padding: 6px 14px; font-size: 0.82rem; border-radius: 8px; border: 1.5px solid #cbd5e1; background: transparent; color: #64748b; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
                         <i class="fas fa-check-circle"></i> <span id="complete-btn-text">Markér som fullført</span>
                     </button>
+                    <button type="button" class="lesson-nav-btn" id="course-cert-btn" onclick="window.openCurrentCourseCertificate()" style="display:none; padding: 6px 14px; font-size: 0.82rem; border-radius: 8px; border: 1.5px solid #d17d39; background: linear-gradient(135deg, #1B4965 0%, #0b2536 100%); color: #ffffff; font-weight: 700; cursor: pointer; align-items: center; gap: 6px; white-space: nowrap; box-shadow: 0 2px 8px rgba(27,73,101,0.25);">
+                        <span class="material-symbols-outlined" style="font-size: 16px; color: #d17d39;">workspace_premium</span> <span>Fullføringsbevis</span>
+                    </button>
                 </div>
                 <button type="button" class="lesson-nav-btn lesson-nav-arrow-btn" id="next-lesson-btn" onclick="window.selectNextLesson()" title="Neste leksjon">
                     <span class="nav-btn-text">Neste leksjon</span> <i class="fas fa-chevron-right"></i>
@@ -2393,6 +2397,20 @@
             window.selectLesson(prevIdx);
         };
 
+        window.openCurrentCourseCertificate = function() {
+            if (!window.CourseCertificate || !currentCourse) return;
+            const user = (typeof firebaseService !== 'undefined' && firebaseService?.currentUser) || 
+                         (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
+            const studentName = user?.displayName || user?.name || (user?.email ? user.email.split('@')[0] : 'Kursdeltaker');
+            window.CourseCertificate.showModal({
+                courseId: currentCourse.id || currentCourse.slug,
+                studentName,
+                studentEmail: user?.email || '',
+                courseTitle: currentCourse.title || 'Fullført kurs',
+                date: new Date()
+            });
+        };
+
         window.selectLesson = function(index) {
             if (!currentCourse) return;
             let parsedIdx = parseInt(index, 10);
@@ -2542,11 +2560,23 @@
                 }
             }
 
+            // Update Certificate button visibility if all lessons complete
+            const certBtn = document.getElementById('course-cert-btn');
+            const cId = currentCourse?.id || currentCourse?.slug || 'default';
+            const totalLessons = lessons.length || 1;
+            const completedList = getCompletedLessons(cId);
+            if (certBtn) {
+                if (completedList.length >= totalLessons && totalLessons > 0) {
+                    certBtn.style.display = 'inline-flex';
+                } else {
+                    certBtn.style.display = 'none';
+                }
+            }
+
             // Update 'Markér som fullført' button state
             const completeBtn = document.getElementById('toggle-complete-btn');
             const completeBtnText = document.getElementById('complete-btn-text');
-            const cId = currentCourse?.id || currentCourse?.slug || 'default';
-            const isCompleted = getCompletedLessons(cId).includes(index);
+            const isCompleted = completedList.includes(index);
 
             if (completeBtn) {
                 if (isCompleted) {
