@@ -2861,13 +2861,17 @@ class MinSideManager {
             const snap = await notifsRef.where('userId', '==', uid).where('type', '==', 'welcome').limit(1).get();
             if (snap.empty) {
                 const displayName = userName || 'kjære venn';
+                const welcomeMsg = `Hei ${displayName}! Vi er så takknemlige for å ha deg med. Utforsk gjerne våre bibelleseplaner, nettkurs og podkaster for åndelig vekst i hverdagen.`;
                 await notifsRef.add({
                     userId: uid,
                     title: 'Velkommen til His Kingdom Ministry! 🕊️',
-                    body: `Hei ${displayName}! Vi er så takknemlige for å ha deg med. Utforsk gjerne våre bibelleseplaner, nettkurs og podkaster for åndelig vekst i hverdagen.`,
+                    body: welcomeMsg,
+                    message: welcomeMsg,
                     type: 'welcome',
                     icon: 'volunteer_activism',
                     read: false,
+                    silent: true,
+                    skipDelivery: true,
                     link: '/bibel.html',
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });

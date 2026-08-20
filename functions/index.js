@@ -9550,8 +9550,9 @@ exports.onNotificationCreated = onDocumentCreated({
 
   const userId = notifData.userId;
   const title = notifData.title || "Nytt varsel";
-  const message = notifData.message || "";
+  const message = notifData.message || notifData.body || "";
   const type = notifData.type || "";
+  const linkUrl = notifData.link ? (notifData.link.startsWith('http') ? notifData.link : `https://www.hiskingdomministry.no${notifData.link.startsWith('/') ? '' : '/'}${notifData.link}`) : 'https://www.hiskingdomministry.no/minside';
 
   if (!userId) return;
 
@@ -9582,7 +9583,7 @@ exports.onNotificationCreated = onDocumentCreated({
               body: message
             },
             data: {
-              click_action: `https://www.hiskingdomministry.no/minside/`,
+              click_action: linkUrl,
               type: type
             }
           };
@@ -9600,39 +9601,78 @@ exports.onNotificationCreated = onDocumentCreated({
       
       const subject = `Nytt varsel: ${title}`;
       
-      // En kjempefin HTML-mal i stil med HKM
+      // Offisiell HKM Editorial E-postmal
       const html = `
-        <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #ffffff; padding: 24px 12px; margin: 0 auto; max-width: 600px; box-sizing: border-box;">
-          <div style="text-align: center; margin-bottom: 24px;">
-            <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" alt="His Kingdom Ministry" style="height: 60px; width: auto;">
-          </div>
-          
-          <div style="background-color: #ffffff; padding: 24px; margin-bottom: 24px;">
-            <h2 style="color: #1B4965; font-size: 20px; font-weight: 700; margin: 0 0 16px 0; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px;">
-              ${title}
-            </h2>
-            
-            <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 20px 0;">
-              Hei ${name},
-            </p>
-            
-            <div style="background-color: #f8fafc; border-left: 4px solid #d17d39; padding: 16px; border-radius: 8px; margin-bottom: 24px;">
-              <p style="margin: 0; color: #334155; font-size: 15.5px; line-height: 1.6; font-weight: 500;">
-                ${message}
-              </p>
+        <div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: 100%; max-width: 600px; box-sizing: border-box; margin: 0 auto; background-color: #FCF9F5; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EAE4DC; text-align: left;">
+          <!-- Minimal Top Accent -->
+          <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
+
+          <!-- Editorial Header -->
+          <header style="padding: 32px 20px 24px 20px; box-sizing: border-box; max-width: 100%; text-align: center; background-color: #FCF9F5;">
+            <div style="margin-bottom: 16px;">
+              <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 48px; width: auto; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
             </div>
-            
-            <div style="text-align: center; margin-top: 24px;">
-              <a href="https://www.hiskingdomministry.no/minside/" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 12px 28px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 12px rgba(200, 104, 42, 0.2);">
-                Gå til Min Side
+            <h1 style="margin: 0; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: rgba(18, 28, 44, 0.6); text-transform: uppercase; letter-spacing: 0.25em; line-height: 1.5;">His Kingdom Ministry</h1>
+            <div style="width: 32px; height: 1px; background-color: rgba(137, 114, 105, 0.4); margin: 20px auto 0 auto;"></div>
+          </header>
+
+          <!-- Main Content Wrapper -->
+          <div style="padding: 0 20px 32px 20px; box-sizing: border-box; max-width: 100%; background-color: #FCF9F5;">
+            <!-- Personal Greeting -->
+            <section style="margin-bottom: 28px; text-align: center; max-width: 440px; margin-left: auto; margin-right: auto;">
+              <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 26px; line-height: 34px; font-weight: 700; color: #121c2c; margin: 0 0 8px 0; font-style: italic;">
+                ${title}
+              </h2>
+              <p style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 24px; font-weight: 400; color: #56423b; margin: 0; font-style: italic; opacity: 0.85;">
+                Hei ${name}, her er en oppdatering fra din konto.
+              </p>
+            </section>
+
+            <!-- Message Card -->
+            <section style="margin-bottom: 36px; background-color: #ffffff; border-left: 4px solid #d17d39; border-radius: 0 12px 12px 0; padding: 22px 24px; box-shadow: 0 2px 8px rgba(209, 125, 57, 0.04); border-top: 1px solid rgba(209, 125, 57, 0.08); border-right: 1px solid rgba(209, 125, 57, 0.08); border-bottom: 1px solid rgba(209, 125, 57, 0.08);">
+              <div style="display: inline-block; padding: 2px 6px; background-color: rgba(209, 125, 57, 0.08); color: #d17d39; font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; border-radius: 4px; margin-bottom: 12px;">
+                MELDING
+              </div>
+              <p style="margin: 0; font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.7; color: rgba(18, 28, 44, 0.9); white-space: pre-line;">
+                ${message || "Du har mottatt en ny oppdatering på Min Side."}
+              </p>
+            </section>
+
+            <!-- CTA Button -->
+            <div style="text-align: center; margin-bottom: 40px;">
+              <a href="${linkUrl}" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 14px 44px; border-radius: 24px 8px 24px 8px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.2em; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.25);">
+                ÅPNE PÅ MIN SIDE
               </a>
             </div>
+
+            <!-- Closing -->
+            <section style="border-top: 1px solid rgba(221, 193, 182, 0.1); padding-top: 32px; margin-bottom: 16px; text-align: left;">
+              <p style="font-family: 'Inter', sans-serif; font-size: 14px; color: #56423b; font-style: italic; margin: 0 0 16px 0;">Vennlig hilsen,</p>
+              <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse; display: inline-table; vertical-align: middle;">
+                <tr>
+                  <td style="vertical-align: middle; padding-right: 12px;">
+                    <div style="width: 32px; height: 1px; background-color: rgba(27, 73, 101, 0.3); font-size: 1px; line-height: 1px; overflow: hidden;"></div>
+                  </td>
+                  <td style="vertical-align: middle; line-height: 1;">
+                    <span style="font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: #1B4965; text-transform: uppercase; letter-spacing: 0.3em; margin: 0; display: inline-block; line-height: 1; vertical-align: middle;">HIS KINGDOM MINISTRY</span>
+                  </td>
+                </tr>
+              </table>
+            </section>
           </div>
-          
-          <div style="text-align: center; font-size: 12px; color: #64748b; line-height: 1.5; padding: 0 16px;">
-            <p style="margin: 0 0 8px 0;">Dette er et automatisk varsel sendt til deg fra His Kingdom Ministry.</p>
-            <p style="margin: 0;">Du kan endre dine varslingsinnstillinger under Profil på Min Side.</p>
-          </div>
+
+          <!-- Footer -->
+          <footer style="padding: 24px 20px 32px 20px; box-sizing: border-box; max-width: 100%; background-color: rgba(252, 249, 245, 0.5); text-align: center; border-top: 1px solid rgba(221, 193, 182, 0.1);">
+            <div style="margin-bottom: 20px;">
+              <a href="https://www.hiskingdomministry.no/" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 14px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Hjem</a>
+              <a href="https://www.hiskingdomministry.no/minside" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 14px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Min Side</a>
+              <a href="mailto:post@hiskingdomministry.no" style="color: rgba(18, 28, 44, 0.3); text-decoration: none; margin: 0 14px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;">Kontakt</a>
+            </div>
+            <p style="font-family: 'Inter', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(18, 28, 44, 0.4); margin: 0 0 10px 0;">© 2026 His Kingdom Ministry</p>
+            <a href="https://www.hiskingdomministry.no/minside" style="font-family: 'Inter', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: #1B4965; text-decoration: underline; text-underline-offset: 4px; font-weight: 600;">
+              Endre dine varslingsinnstillinger
+            </a>
+          </footer>
         </div>
       `;
 
