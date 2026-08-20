@@ -27,58 +27,94 @@
     <meta name="description"
         content="Utforsk kurs fra His Kingdom Ministry. Lær om bibelstudium, bønn, lederskap og mer.">
 
-    <!-- Structured Data (JSON-LD) for GEO & SEO -->
+    <!-- Structured Data (JSON-LD) for GEO & SEO (Google AI, ChatGPT, Perplexity) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@graph": [
         {
-          "@type": "ItemList",
-          "name": "Kurs - His Kingdom Ministry",
-          "description": "Utvalgte kurs og undervisningsrekker fra His Kingdom Ministry",
-          "url": "https://www.hiskingdomministry.no/kurs",
-          "itemListElement": [
-            {
-              "@type": "Course",
-              "position": 1,
-              "name": "Bibelens Grunnlandskap",
-              "description": "En dyptgående gjennomgang av Bibelens struktur, historiske kontekst og hovedtemaer.",
-              "provider": {
-                "@type": "Organization",
-                "name": "His Kingdom Ministry",
-                "sameAs": "https://www.hiskingdomministry.no"
-              }
-            },
-            {
-              "@type": "Course",
-              "position": 2,
-              "name": "Bønneliv og Åndelig Vekst",
-              "description": "Praktisk og teologisk undervisning om bønn, stilletid og personlig trosutvikling.",
-              "provider": {
-                "@type": "Organization",
-                "name": "His Kingdom Ministry",
-                "sameAs": "https://www.hiskingdomministry.no"
-              }
+          "@type": "Course",
+          "@id": "https://www.hiskingdomministry.no/kurs#seer-kurs",
+          "name": "Seerkurs med aktivering",
+          "description": "Et dyptgående bibelsk kurs med Hilde Karin Knutsen om hvordan du i praksis kan aktivere dine åndelige sanser og vokse i din relasjon til Jesus.",
+          "inLanguage": "no",
+          "isAccessibleForFree": true,
+          "educationalLevel": "Alle nivåer",
+          "teaches": "Bibelsk teologi, åndelige gaver, bønn, profetisk innsikt",
+          "provider": {
+            "@type": "Organization",
+            "name": "His Kingdom Ministry",
+            "url": "https://www.hiskingdomministry.no",
+            "logo": "https://www.hiskingdomministry.no/img/logo-hkm.png",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "Augerødlia 48",
+              "postalCode": "1591",
+              "addressLocality": "Sperrebotn",
+              "addressCountry": "NO"
             }
-          ]
+          },
+          "instructor": {
+            "@type": "Person",
+            "name": "Hilde Karin Knutsen",
+            "jobTitle": "Hovedlærer & Misjonær",
+            "worksFor": {
+              "@type": "Organization",
+              "name": "His Kingdom Ministry"
+            }
+          },
+          "hasCourseInstance": {
+            "@type": "CourseInstance",
+            "courseMode": "Online",
+            "courseWorkload": "PT3H",
+            "url": "https://www.hiskingdomministry.no/kurs"
+          }
+        },
+        {
+          "@type": "Course",
+          "@id": "https://www.hiskingdomministry.no/kurs#bibelens-grunnlandskap",
+          "name": "Bibelens Grunnlandskap",
+          "description": "En systematisk og engasjerende gjennomgang av Bibelens 66 bøker, historiske sammenhenger og frelseshistorie.",
+          "inLanguage": "no",
+          "isAccessibleForFree": true,
+          "educationalLevel": "Grunnleggende til viderekomne",
+          "provider": {
+            "@type": "Organization",
+            "name": "His Kingdom Ministry",
+            "url": "https://www.hiskingdomministry.no"
+          },
+          "hasCourseInstance": {
+            "@type": "CourseInstance",
+            "courseMode": "Online",
+            "url": "https://www.hiskingdomministry.no/kurs"
+          }
         },
         {
           "@type": "FAQPage",
+          "@id": "https://www.hiskingdomministry.no/kurs#faq",
           "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Hvilke kurs tilbyr His Kingdom Ministry?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "His Kingdom Ministry tilbyr nettbaserte kurs og bibelundervisning innen åndelig vekst, seerkurs med aktivering, bønn, bibelstudier og disippelskap."
+              }
+            },
             {
               "@type": "Question",
               "name": "Koster det noe å ta kursene hos His Kingdom Ministry?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Våre nettbaserte undervisningskurs og bibelstudier er gratis tilgjengelige for alle som ønsker å vokse i troen."
+                "text": "De fleste undervisningskurs, leksjoner og ressurser er gratis tilgjengelige for alle. Visse intensive live-seminarer har enkel påmelding via Min Side."
               }
             },
             {
               "@type": "Question",
-              "name": "Kan jeg lagre fremgangen min på kursene?",
+              "name": "Kan jeg ta kursene i mitt eget tempo?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Ja, ved å opprette en bruker på Min Side blir kursprogresjonen din automatisk lagret slik at du kan fortsette der du slapp."
+                "text": "Ja, video- og lydleksjonene kan spilles av når det passer deg, og systemet husker automatisk hvor du slapp samt lagrer dine personlige refleksjonsnotater."
               }
             }
           ]

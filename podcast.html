@@ -82,6 +82,63 @@
     <meta property="twitter:title" content="Podcast | His Kingdom Ministry">
     <meta property="twitter:description" content="Lytt til His Kingdom Ministry podcast for oppmuntring, bibelsk undervisning og trosstyrkende budskap.">
     <meta property="twitter:image" content="https://images.unsplash.com/photo-1478737270239-2f02b77ac6d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80">
+
+    <!-- Structured Data (JSON-LD) for GEO & SEO (Google AI, ChatGPT, Apple Podcasts, Spotify) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "PodcastSeries",
+          "@id": "https://www.hiskingdomministry.no/podcast#series",
+          "name": "His Kingdom Ministry Podcast",
+          "description": "Ukentlige andakter, oppmuntrende budskap og bibelsk undervisning fra Hilde Karin Knutsen og His Kingdom Ministry.",
+          "url": "https://www.hiskingdomministry.no/podcast",
+          "inLanguage": "no",
+          "author": {
+            "@type": "Person",
+            "name": "Hilde Karin Knutsen"
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "His Kingdom Ministry",
+            "url": "https://www.hiskingdomministry.no",
+            "logo": "https://www.hiskingdomministry.no/img/logo-hkm.png",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "Augerødlia 48",
+              "postalCode": "1591",
+              "addressLocality": "Sperrebotn",
+              "addressCountry": "NO"
+            }
+          },
+          "webFeed": "https://anchor.fm/s/hiskingdomministry/podcast/rss"
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://www.hiskingdomministry.no/podcast#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Hvor kan jeg lytte til His Kingdom Ministry podcast?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Du kan lytte direkte på vår nettside (www.hiskingdomministry.no/podcast), samt på Spotify, Apple Podcasts og YouTube."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Hvor ofte publiseres nye episoder?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Det publiseres nye andakter og oppmuntrende undervisningsepisoder ukentlig."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
 </head>
 
 <body class="cms-loading">
