@@ -2479,6 +2479,9 @@ class MinSideManager {
             const notifEl = document.getElementById('ov-notif-count');
             if (notifEl) notifEl.textContent = notifSnap.size || '0';
 
+            // Ensure welcome notification for new members
+            this._ensureWelcomeNotification(uid, this.profileData?.fullName || this.currentUser?.displayName);
+
             // Year total giving
             let yearTotal = 0;
             donations.forEach(donation => {
@@ -2845,6 +2848,33 @@ class MinSideManager {
             })();
         } catch (e) {
             console.warn('Overview fetch error:', e);
+        }
+    }
+
+    async _ensureWelcomeNotification(uid, userName) {
+        if (!uid || !window.firebase || !firebase.firestore) return;
+        try {
+            const welcomeKey = `hkm_welcome_notif_sent_${uid}`;
+            if (localStorage.getItem(welcomeKey)) return;
+
+            const notifsRef = firebase.firestore().collection('user_notifications');
+            const snap = await notifsRef.where('userId', '==', uid).where('type', '==', 'welcome').limit(1).get();
+            if (snap.empty) {
+                const displayName = userName || 'kjære venn';
+                await notifsRef.add({
+                    userId: uid,
+                    title: 'Velkommen til His Kingdom Ministry! 🕊️',
+                    body: `Hei ${displayName}! Vi er så takknemlige for å ha deg med. Utforsk gjerne våre bibelleseplaner, nettkurs og podkaster for åndelig vekst i hverdagen.`,
+                    type: 'welcome',
+                    icon: 'volunteer_activism',
+                    read: false,
+                    link: '/bibel.html',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }
+            localStorage.setItem(welcomeKey, 'true');
+        } catch (e) {
+            console.warn('[MinSide] Kunne ikke opprette velkomstvarsel:', e);
         }
     }
 
@@ -5682,40 +5712,31 @@ class MinSideManager {
 
         const isNo = document.documentElement.lang === 'no' || !document.documentElement.lang;
         const isEs = document.documentElement.lang === 'es';
-        const title = isNo ? 'Gaveoversikt' : (isEs ? 'Resumen de Ofrendas' : 'Donation Overview');
-        const subtitle = isNo ? 'Min gaveoversikt' : (isEs ? 'Mi historial de ofrendas' : 'My giving overview');
+        const title = isNo ? 'Årsoppgave over gaver' : (isEs ? 'Resumen Anual de Ofrendas' : 'Annual Giving Statement');
+        const subtitle = isNo ? `Offisiell gavebekreftelse for ${selectedYear === 'all' ? 'alle år' : selectedYear}` : (isEs ? `Confirmación de ofrendas para ${selectedYear === 'all' ? 'todos los años' : selectedYear}` : `Official donation statement for ${selectedYear === 'all' ? 'all years' : selectedYear}`);
         const dateLabel = isNo ? 'Dato' : (isEs ? 'Fecha' : 'Date');
         const typeLabelStr = isNo ? 'Type' : (isEs ? 'Tipo' : 'Type');
-        const methodLabelStr = isNo ? 'Metode' : (isEs ? 'Método' : 'Method');
+        const methodLabelStr = isNo ? 'Betalingsmetode' : (isEs ? 'Método de pago' : 'Payment Method');
         const amountLabelStr = isNo ? 'Beløp' : (isEs ? 'Monto' : 'Amount');
-        const totalLabelStr = isNo ? 'Total sum' : (isEs ? 'Suma total' : 'Total sum');
-        const periodLabelStr = isNo ? 'Periode' : (isEs ? 'Periodo' : 'Period');
-        const filterLabelStr = isNo ? 'Filter' : (isEs ? 'Filtro' : 'Filter');
-        const countLabelStr = isNo ? 'Antall poster' : (isEs ? 'Registros' : 'Record count');
-        const noTransLabel = isNo ? 'Ingen transaksjoner funnet.' : (isEs ? 'No se encontraron transacciones.' : 'No transactions found.');
-        const docLabel = isNo ? 'Dette dokumentet viser dine registrerte gaver og betalinger hos His Kingdom Ministry.' : (isEs ? 'Este documento muestra sus ofrendas y pagos registrados en His Kingdom Ministry.' : 'This document shows your registered donations and payments with His Kingdom Ministry.');
-        const previewLabel = isNo ? 'Dette er en forhåndsvisning av din gaveoversikt. Bruk utskriftsknappen eller Ctrl+P/Cmd+P for å lagre som PDF / skrive ut.' : (isEs ? 'Esta es una vista previa de su historial de ofrendas. Use el botón de impresión o Ctrl+P/Cmd+P para guardar como PDF / imprimir.' : 'This is a preview of your donation overview. Use the print button or Ctrl+P/Cmd+P to save as PDF / print.');
-        const printBtnLabel = isNo ? 'Skriv ut / PDF' : (isEs ? 'Imprimir / PDF' : 'Print / PDF');
+        const totalLabelStr = isNo ? 'Total sum mottatt' : (isEs ? 'Suma total recibida' : 'Total amount received');
+        const periodLabelStr = isNo ? 'Gaveperiode' : (isEs ? 'Periodo' : 'Period');
+        const filterLabelStr = isNo ? 'Gavekategori' : (isEs ? 'Categoría' : 'Category');
+        const countLabelStr = isNo ? 'Antall gaver' : (isEs ? 'Registros' : 'Record count');
+        const noTransLabel = isNo ? 'Ingen registrerte gaver for den valgte perioden.' : (isEs ? 'No se encontraron ofrendas para este periodo.' : 'No registered donations found for this period.');
+        const docLabel = isNo ? 'Dette dokumentet bekrefter dine registrerte gaver til His Kingdom Ministry. Som frivillig organisasjon er gaver ikke innberettet med automatisk skattefradrag; dette dokumentet fungerer som din offisielle bekreftelse og årsoppgave for personlig regnskapsføring og dokumentasjon.' : (isEs ? 'Este documento confirma sus ofrendas registradas en His Kingdom Ministry para su contabilidad personal.' : 'This document confirms your registered donations to His Kingdom Ministry for personal record keeping.');
+        const previewLabel = isNo ? 'Forhåndsvisning av årsoppgave. Bruk utskriftsknappen eller Ctrl+P/Cmd+P for å lagre som PDF eller skrive ut.' : (isEs ? 'Vista previa. Use el botón de impresión para guardar como PDF o imprimir.' : 'Statement preview. Use print button or Ctrl+P/Cmd+P to save as PDF or print.');
+        const printBtnLabel = isNo ? 'Skriv ut / Lagre som PDF' : (isEs ? 'Imprimir / PDF' : 'Print / Save as PDF');
 
         const periodText = selectedYear === 'all' ? (isNo ? 'Alle år' : (isEs ? 'Todos los años' : 'All years')) : `${selectedYear}`;
-        const typeText = selectedType === 'all' ? (isNo ? 'Alle transaksjoner' : (isEs ? 'Todas las transacciones' : 'All transactions')) : (selectedType === 'gave' ? (isNo ? 'Kun gaver' : (isEs ? 'Solo ofrendas' : 'Donations only')) : (isNo ? 'Kun butikkjøp' : (isEs ? 'Solo tienda' : 'Shop purchases only')));
+        const typeText = selectedType === 'all' ? (isNo ? 'Alle gaver og bidrag' : (isEs ? 'Todas las ofrendas' : 'All donations')) : (selectedType === 'gave' ? (isNo ? 'Gaver og misjonsstøtte' : (isEs ? 'Solo ofrendas' : 'Donations only')) : (isNo ? 'Kjøp i nettbutikk' : (isEs ? 'Solo tienda' : 'Shop purchases only')));
 
-        const userName = this.profileData?.fullName || this.currentUser?.displayName || (isNo ? 'Medlem' : (isEs ? 'Miembro' : 'Member'));
-        const userSsn = this.profileData?.ssn || this.profileData?.nationalIdNumber || '';
-        let userBirthday = this.profileData?.birthday || this.profileData?.birthdate || this.profileData?.fødselsdato || '';
-        if (!userBirthday && userSsn && userSsn.length >= 6) {
-            const dd = userSsn.substring(0, 2);
-            const mm = userSsn.substring(2, 4);
-            const yy = userSsn.substring(4, 6);
-            const yearPrefix = parseInt(yy, 10) > 30 ? '19' : '20';
-            userBirthday = `${dd}.${mm}.${yearPrefix}${yy}`;
-        }
+        const userName = this.profileData?.fullName || this.currentUser?.displayName || (isNo ? 'Giver' : (isEs ? 'Miembro' : 'Donor'));
         const userEmail = this.currentUser?.email || '';
         const userAddress = [
             this.profileData?.adresse,
             [this.profileData?.postnummer, this.profileData?.poststed].filter(Boolean).join(' '),
             this.profileData?.land
-        ].filter(Boolean).join(', ') || (isNo ? 'Ingen registrert adresse' : (isEs ? 'Sin dirección registrada' : 'No registered address'));
+        ].filter(Boolean).join(', ') || '';
 
         const printWindow = window.open('', '_blank');
         if (!printWindow) {
@@ -5732,33 +5753,51 @@ class MinSideManager {
             
             return `
                 <tr style="border-bottom:1px solid #e2e8f0;">
-                    <td style="padding:8px; font-size:11px; color:#334155;">${date.toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric' })}</td>
-                    <td style="padding:8px; font-size:11px; color:#0f172a; font-weight:600;">${typeLabel}</td>
-                    <td style="padding:8px; font-size:11px; color:#475569;">${methodLabel}</td>
-                    <td style="padding:8px; font-size:11px; color:#0f172a; font-weight:700; text-align:right;">kr ${amountNok.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</td>
+                    <td style="padding:10px 8px; font-size:12px; color:#334155;">${date.toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric' })}</td>
+                    <td style="padding:10px 8px; font-size:12px; color:#0f172a; font-weight:600;">${typeLabel}</td>
+                    <td style="padding:10px 8px; font-size:12px; color:#475569;">${methodLabel}</td>
+                    <td style="padding:10px 8px; font-size:12px; color:#0f172a; font-weight:700; text-align:right;">kr ${amountNok.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</td>
                 </tr>
             `;
         }).join('');
 
         printWindow.document.write(`
-            <html>
+            <!DOCTYPE html>
+            <html lang="${isNo ? 'no' : (isEs ? 'es' : 'en')}">
             <head>
-                <title>${title} - His Kingdom Ministry</title>
+                <meta charset="UTF-8">
+                <title>${title} (${selectedYear}) - His Kingdom Ministry</title>
                 <style>
                     @page {
-                        margin: 12mm;
-                        size: auto;
+                        margin: 15mm;
+                        size: A4 portrait;
                     }
                     body {
-                        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
                         color: #1e293b;
-                        background: white;
+                        background: #f8fafc;
                         margin: 0;
-                        padding: 20px;
+                        padding: 24px;
+                    }
+                    .document-card {
+                        background: white;
+                        max-width: 820px;
+                        margin: 0 auto;
+                        padding: 40px;
+                        border-radius: 12px;
+                        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+                        border: 1px solid #e2e8f0;
                     }
                     @media print {
                         body {
+                            background: white;
                             padding: 0;
+                        }
+                        .document-card {
+                            box-shadow: none;
+                            border: none;
+                            padding: 0;
+                            max-width: 100%;
                         }
                         .no-print {
                             display: none !important;
@@ -5767,40 +5806,39 @@ class MinSideManager {
                 </style>
             </head>
             <body>
-                <div class="no-print" style="margin-bottom:20px; padding:12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                <div class="no-print" style="max-width:820px; margin:0 auto 20px auto; padding:14px 20px; background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; display:flex; justify-content:space-between; align-items:center; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
                     <span style="font-size:13px; color:#475569; font-weight:500;">${previewLabel}</span>
-                    <button onclick="window.print()" style="background:#d17d39; color:white; border:none; padding:8px 16px; border-radius:6px; font-weight:600; cursor:pointer; font-size:13px;">
+                    <button onclick="window.print()" style="background:#d17d39; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:700; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:8px;">
                         ${printBtnLabel}
                     </button>
                 </div>
 
-                <div style="padding: 20px; max-width: 800px; margin: 0 auto;">
-                    <!-- Logo & Header -->
-                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #d17d39; padding-bottom:16px; margin-bottom:24px;">
+                <div class="document-card">
+                    <!-- Header -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2.5px solid #d17d39; padding-bottom:20px; margin-bottom:28px;">
                         <div style="display:flex; align-items:center; gap:16px;">
-                            <img src="/img/logo-hkm.png" alt="Logo" style="height:55px; width:auto; object-fit:contain; border-radius:4px;">
+                            <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" style="height:60px; width:auto; object-fit:contain;">
                             <div>
-                                <h1 style="margin:0; font-size:24px; font-weight:800; color:#d17d39; letter-spacing:-0.02em;">HIS KINGDOM MINISTRY</h1>
-                                <p style="margin:4px 0 0; font-size:11px; color:#64748b; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">${subtitle}</p>
+                                <h1 style="margin:0; font-size:22px; font-weight:850; color:#1b4965; letter-spacing:-0.02em;">HIS KINGDOM MINISTRY</h1>
+                                <p style="margin:4px 0 0; font-size:12px; color:#d17d39; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;">${title}</p>
                             </div>
                         </div>
                         <div style="text-align:right;">
-                            <p style="margin:0; font-size:11px; color:#64748b;">Dato: ${new Date().toLocaleDateString('no-NO')}</p>
+                            <p style="margin:0; font-size:12px; font-weight:600; color:#64748b;">Utskriftsdato: ${new Date().toLocaleDateString('no-NO')}</p>
+                            <p style="margin:4px 0 0; font-size:11px; color:#94a3b8;">${subtitle}</p>
                         </div>
                     </div>
 
-                    <!-- Member Info & Meta -->
-                    <div style="display:flex; justify-content:space-between; margin-bottom:24px; gap:20px;">
-                        <div style="flex:1; background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:8px;">
-                            <h3 style="margin:0 0 8px 0; font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Giver</h3>
-                            <p style="margin:0; font-size:14px; font-weight:700; color:#0f172a;">${this._escapeHtml(userName)}</p>
-                            ${userSsn ? `<p style="margin:4px 0 0; font-size:12px; color:#475569;"><strong>F.nr:</strong> ${this._escapeHtml(userSsn)}</p>` : ''}
-                            ${userBirthday ? `<p style="margin:4px 0 0; font-size:12px; color:#475569;"><strong>Fødselsdato:</strong> ${this._escapeHtml(userBirthday)}</p>` : ''}
+                    <!-- Donor & Summary Info -->
+                    <div style="display:flex; justify-content:space-between; margin-bottom:28px; gap:20px;">
+                        <div style="flex:1; background:#f8fafc; border:1px solid #e2e8f0; padding:18px; border-radius:10px;">
+                            <h3 style="margin:0 0 10px 0; font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Giverinformasjon</h3>
+                            <p style="margin:0; font-size:15px; font-weight:800; color:#0f172a;">${this._escapeHtml(userName)}</p>
                             ${userEmail ? `<p style="margin:4px 0 0; font-size:12px; color:#475569;">${this._escapeHtml(userEmail)}</p>` : ''}
-                            ${userAddress && userAddress !== 'Ingen registrert adresse' && userAddress !== 'Sin dirección registrada' && userAddress !== 'No registered address' ? `<p style="margin:4px 0 0; font-size:12px; color:#475569;">${this._escapeHtml(userAddress)}</p>` : ''}
+                            ${userAddress ? `<p style="margin:4px 0 0; font-size:12px; color:#475569;">${this._escapeHtml(userAddress)}</p>` : ''}
                         </div>
-                        <div style="flex:1; background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:8px;">
-                            <h3 style="margin:0 0 8px 0; font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Rapportinfo</h3>
+                        <div style="flex:1; background:#f8fafc; border:1px solid #e2e8f0; padding:18px; border-radius:10px;">
+                            <h3 style="margin:0 0 10px 0; font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Oversikt</h3>
                             <p style="margin:0; font-size:13px; color:#334155;"><strong style="color:#0f172a;">${periodLabelStr}:</strong> ${periodText}</p>
                             <p style="margin:4px 0 0; font-size:13px; color:#334155;"><strong style="color:#0f172a;">${filterLabelStr}:</strong> ${typeText}</p>
                             <p style="margin:4px 0 0; font-size:13px; color:#334155;"><strong style="color:#0f172a;">${countLabelStr}:</strong> ${filtered.length}</p>
@@ -5808,33 +5846,33 @@ class MinSideManager {
                     </div>
 
                     <!-- Main Table -->
-                    <table style="width:100%; border-collapse:collapse; margin-bottom:32px;">
+                    <table style="width:100%; border-collapse:collapse; margin-bottom:28px;">
                         <thead>
-                            <tr style="border-bottom:2px solid #d17d39; text-align:left;">
-                                <th style="padding:10px 8px; font-size:11px; font-weight:700; color:#d17d39; text-transform:uppercase;">${dateLabel}</th>
-                                <th style="padding:10px 8px; font-size:11px; font-weight:700; color:#d17d39; text-transform:uppercase;">${typeLabelStr}</th>
-                                <th style="padding:10px 8px; font-size:11px; font-weight:700; color:#d17d39; text-transform:uppercase;">${methodLabelStr}</th>
-                                <th style="padding:10px 8px; font-size:11px; font-weight:700; color:#d17d39; text-transform:uppercase; text-align:right;">${amountLabelStr}</th>
+                            <tr style="border-bottom:2px solid #e2e8f0; text-align:left; background:#f1f5f9;">
+                                <th style="padding:10px 8px; font-size:11px; font-weight:800; color:#1b4965; text-transform:uppercase;">${dateLabel}</th>
+                                <th style="padding:10px 8px; font-size:11px; font-weight:800; color:#1b4965; text-transform:uppercase;">${typeLabelStr}</th>
+                                <th style="padding:10px 8px; font-size:11px; font-weight:800; color:#1b4965; text-transform:uppercase;">${methodLabelStr}</th>
+                                <th style="padding:10px 8px; font-size:11px; font-weight:800; color:#1b4965; text-transform:uppercase; text-align:right;">${amountLabelStr}</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${rowsHtml || `<tr><td colspan="4" style="padding:24px; text-align:center; color:#64748b;">${noTransLabel}</td></tr>`}
+                            ${rowsHtml || `<tr><td colspan="4" style="padding:28px; text-align:center; color:#64748b;">${noTransLabel}</td></tr>`}
                         </tbody>
                     </table>
 
                     <!-- Total Block -->
-                    <div style="display:flex; justify-content:flex-end; margin-bottom:40px;">
-                        <div style="background:#d17d39; color:white; padding:12px 24px; border-radius:8px; text-align:right; min-width:200px;">
-                            <span style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; opacity:0.85;">${totalLabelStr}</span>
-                            <div style="font-size:22px; font-weight:800; margin-top:2px;">kr ${totalSum.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</div>
+                    <div style="display:flex; justify-content:flex-end; margin-bottom:36px;">
+                        <div style="background: linear-gradient(135deg, #1b4965 0%, #112d42 100%); color:white; padding:14px 28px; border-radius:10px; text-align:right; min-width:240px; box-shadow: 0 4px 12px rgba(27, 73, 101, 0.2);">
+                            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; opacity:0.85;">${totalLabelStr}</span>
+                            <div style="font-size:24px; font-weight:850; margin-top:2px;">kr ${totalSum.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</div>
                         </div>
                     </div>
 
-                    <!-- Footer Details -->
-                    <div style="border-top:1px dashed #cbd5e1; padding-top:20px; text-align:center; color:#64748b; font-size:11px; line-height:1.5;">
-                        <p style="margin:0; font-weight:600; color:#475569;">His Kingdom Ministry</p>
-                        <p style="margin:2px 0 0;">Org.nr: 928 290 839 | E-post: post@hkm.no | Web: www.hkm.no</p>
-                        <p style="margin:4px 0 0; font-style:italic;">${docLabel}</p>
+                    <!-- Footer Declaration & Organization Details -->
+                    <div style="border-top:1px dashed #cbd5e1; padding-top:20px; text-align:center; color:#64748b; font-size:11px; line-height:1.6;">
+                        <p style="margin:0; font-weight:750; color:#1e293b; font-size:12px;">His Kingdom Ministry</p>
+                        <p style="margin:2px 0 0;">Org.nr: 928 290 839 | Adresse: Augerødlia 48, 1591 Sperrebotn | E-post: post@hiskingdomministry.no | www.hiskingdomministry.no</p>
+                        <p style="margin:6px auto 0 auto; max-width:640px; font-style:italic; color:#64748b;">${docLabel}</p>
                     </div>
                 </div>
             </body>

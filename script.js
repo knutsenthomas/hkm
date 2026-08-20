@@ -4,6 +4,7 @@
 // ===================================
 
 import { mountSiteShell } from './js/site-shell.js';
+import './js/pwa-install-prompt.js';
 
 mountSiteShell();
 

@@ -1704,6 +1704,7 @@
             <div class="content-tabs">
                 <button class="tab-btn active" onclick="window.switchTab('oversikt')">Oversikt</button>
                 <button class="tab-btn" onclick="window.switchTab('ressurser')">Ressurser</button>
+                <button class="tab-btn" onclick="window.switchTab('refleksjon')">Refleksjon & Notater</button>
                 <button class="tab-btn" onclick="window.switchTab('diskusjon')">Diskusjon</button>
             </div>
 
@@ -1743,7 +1744,12 @@
                 </div>
             </div>
 
-            <!-- Tab 3: Diskusjon -->
+            <!-- Tab 3: Refleksjon & Notater -->
+            <div class="tab-content-panel" id="tab-refleksjon">
+                <div id="lesson-reflection-container"></div>
+            </div>
+
+            <!-- Tab 4: Diskusjon -->
             <div class="tab-content-panel" id="tab-diskusjon">
                 <h2 class="overview-title">Spørsmål & Refleksjoner</h2>
                 <p class="overview-text">
@@ -2593,6 +2599,11 @@
                 window.renderDiscussionComments(currentCourse?.id, index);
             }
 
+            // Render Reflection, Quiz & Personal Notes for active lesson
+            if (typeof window.renderLessonReflectionAndNotes === 'function') {
+                window.renderLessonReflectionAndNotes(currentCourse, lesson, index);
+            }
+
             const videoContainer = document.getElementById('video-card-container');
             const courseImg = (currentCourse && (currentCourse.imageUrl || currentCourse.image || currentCourse.thumbnail)) || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=1200&q=80';
             const lockedOverlay = document.getElementById('locked-overlay');
@@ -2692,6 +2703,8 @@
                 } else if (lesson.videoUrl && String(lesson.videoUrl).trim().length > 0) {
                     videoContainer.style.backgroundImage = 'none';
                     const vUrl = String(lesson.videoUrl).trim();
+                    const courseKey = (currentCourse?.id || currentCourse?.slug || 'c') + '_' + index;
+                    const savedTime = parseFloat(localStorage.getItem(`hkm_playback_${courseKey}`) || '0');
                     let embedHtml = '';
 
                     if (vUrl.includes('youtube.com') || vUrl.includes('youtu.be')) {
@@ -2705,19 +2718,38 @@
                             videoId = vUrl.split('youtu.be/')[1]?.split('?')[0]?.split('&')[0];
                         }
                         if (videoId) {
-                            embedHtml = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0&enablejsapi=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width:100%;height:100%;border:none;"></iframe>`;
+                            const startParam = (savedTime > 5) ? `&start=${Math.floor(savedTime)}` : '';
+                            embedHtml = `<iframe id="current-course-video-iframe" src="https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0&enablejsapi=1${startParam}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width:100%;height:100%;border:none;"></iframe>`;
                         }
                     } else if (vUrl.includes('vimeo.com')) {
                         const vimeoMatch = vUrl.match(/vimeo\.com\/(?:video\/)?(\d+)/);
                         if (vimeoMatch && vimeoMatch[1]) {
-                            embedHtml = `<iframe src="https://player.vimeo.com/video/${vimeoMatch[1]}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="width:100%;height:100%;border:none;"></iframe>`;
+                            embedHtml = `<iframe id="current-course-video-iframe" src="https://player.vimeo.com/video/${vimeoMatch[1]}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="width:100%;height:100%;border:none;"></iframe>`;
                         }
                     }
 
                     if (embedHtml) {
                         videoContainer.innerHTML = embedHtml;
                     } else if (/\.(mp4|webm|ogg|mov)($|\?)/i.test(vUrl)) {
-                        videoContainer.innerHTML = `<video src="${vUrl}" controls style="width:100%;height:100%;object-fit:cover;background:#000;"></video>`;
+                        videoContainer.innerHTML = `<video id="current-course-video-native" src="${vUrl}" controls style="width:100%;height:100%;object-fit:cover;background:#000;"></video>`;
+                        const vidEl = document.getElementById('current-course-video-native');
+                        if (vidEl) {
+                            if (savedTime > 5) {
+                                vidEl.addEventListener('loadedmetadata', () => {
+                                    if (savedTime < vidEl.duration - 10) {
+                                        vidEl.currentTime = savedTime;
+                                    }
+                                }, { once: true });
+                            }
+                            let lastSave = 0;
+                            vidEl.addEventListener('timeupdate', () => {
+                                const now = Date.now();
+                                if (now - lastSave > 2500 && vidEl.currentTime > 2) {
+                                    lastSave = now;
+                                    localStorage.setItem(`hkm_playback_${courseKey}`, vidEl.currentTime);
+                                }
+                            });
+                        }
                     } else {
                         videoContainer.innerHTML = `<iframe src="${vUrl}" allowfullscreen style="width:100%;height:100%;border:none;"></iframe>`;
                     }
@@ -3021,6 +3053,240 @@
                 </div>
             `).join('');
         };
+
+        // Render Reflection, Quiz & Personal Notes for active lesson
+        window.renderLessonReflectionAndNotes = async function(course, lesson, lessonIdx) {
+            const container = document.getElementById('lesson-reflection-container');
+            if (!container || !course) return;
+
+            const courseId = course.id || course.slug || 'c';
+            const noteKey = `hkm_course_note_${courseId}_${lessonIdx}`;
+            const cleanTitle = (lesson?.title || `Leksjon ${lessonIdx + 1}`).replace(/^leksjon\s+\d+:\s*/i, '');
+            
+            // 1. Fetch saved note from LocalStorage or Firestore
+            let savedNote = localStorage.getItem(noteKey) || '';
+            const user = (typeof firebaseService !== 'undefined' && firebaseService?.currentUser) || 
+                         (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
+
+            if (user && user.uid && typeof firebaseService !== 'undefined' && firebaseService?.db) {
+                try {
+                    const snap = await firebaseService.db.collection('users').doc(user.uid)
+                        .collection('course_notes').doc(`${courseId}_${lessonIdx}`).get();
+                    if (snap.exists && snap.data()?.note) {
+                        savedNote = snap.data().note;
+                        localStorage.setItem(noteKey, savedNote);
+                    }
+                } catch (e) {}
+            }
+
+            // 2. Check for quiz items
+            const quizList = lesson?.quiz || lesson?.questions || [
+                {
+                    question: `Hva opplevde du som det viktigste kjernebudskapet i «${cleanTitle}»?`,
+                    isReflection: true,
+                    prompt: "Tenk over et ord, en bibeltekst eller en åpenbaring som traff deg spesielt under undervisningen."
+                },
+                {
+                    question: "Hvordan kan du omsette denne læren til praktisk handling eller bønn i din hverdag?",
+                    isReflection: true,
+                    prompt: "Notér gjerne et konkret bønnefokus eller et steg i tro du vil ta denne uken."
+                }
+            ];
+
+            const quizHtml = quizList.map((q, qIdx) => {
+                if (q.isReflection) {
+                    return `
+                        <div class="reflection-card" style="background: #ffffff; border: 1px solid rgba(226, 232, 240, 0.9); border-radius: 16px; padding: 24px; margin-bottom: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.03);">
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(209, 125, 57, 0.1); color: var(--hkm-terracotta); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; flex-shrink: 0;">
+                                    ${qIdx + 1}
+                                </div>
+                                <div style="flex: 1;">
+                                    <h4 style="font-size: 1.05rem; font-weight: 750; color: var(--hkm-navy); margin-bottom: 6px;">${q.question}</h4>
+                                    <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 12px; line-height: 1.5;">${q.prompt}</p>
+                                    <button type="button" onclick="window.appendReflectionPromptToNotes('${qIdx + 1}. ${q.question.replace(/'/g, "\\'")}')" style="background: transparent; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 6px 14px; font-size: 0.82rem; color: #64748b; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
+                                        <i class="fas fa-plus-circle" style="color: var(--hkm-terracotta);"></i> Sett inn i mine notater
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Interactive Multiple Choice Quiz
+                const opts = q.options || [];
+                const correctIdx = q.correctIndex ?? 0;
+                return `
+                    <div class="quiz-card" id="quiz-card-${qIdx}" style="background: #ffffff; border: 1px solid rgba(226, 232, 240, 0.9); border-radius: 16px; padding: 24px; margin-bottom: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.03);">
+                        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(27, 73, 101, 0.1); color: var(--hkm-navy); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; flex-shrink: 0;">
+                                ${qIdx + 1}
+                            </div>
+                            <h4 style="font-size: 1.05rem; font-weight: 750; color: var(--hkm-navy); margin: 4px 0 0;">${q.question}</h4>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            ${opts.map((opt, oIdx) => `
+                                <button type="button" class="quiz-option-btn" onclick="window.handleQuizAnswer(${qIdx}, ${oIdx}, ${correctIdx}, '${(q.explanation || 'Riktig forstått!').replace(/'/g, "\\'")}')" style="text-align: left; padding: 12px 18px; border-radius: 12px; border: 1.5px solid #e2e8f0; background: #f8fafc; font-size: 0.92rem; color: #334155; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: space-between;">
+                                    <span>${opt}</span>
+                                    <span class="quiz-status-icon"></span>
+                                </button>
+                            `).join('')}
+                        </div>
+                        <div id="quiz-feedback-${qIdx}" style="display: none; margin-top: 14px; padding: 12px 16px; border-radius: 10px; font-size: 0.88rem; line-height: 1.45;"></div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                <div style="margin-bottom: 32px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h2 class="overview-title" style="margin-bottom: 4px;">Refleksjonsspørsmål & Innsikt</h2>
+                            <p class="overview-text" style="margin-bottom: 0;">Fest undervisningen i hjertet gjennom personlig ettertanke og refleksjon.</p>
+                        </div>
+                    </div>
+                    ${quizHtml}
+                </div>
+
+                <div class="personal-notes-wrapper" style="background: #ffffff; border: 1px solid rgba(226, 232, 240, 0.9); border-radius: 20px; padding: 28px; box-shadow: 0 6px 20px rgba(0,0,0,0.03);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(209, 125, 57, 0.1); color: var(--hkm-terracotta); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+                                <i class="fas fa-feather-alt"></i>
+                            </div>
+                            <div>
+                                <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--hkm-navy); margin: 0;">Mine Personlige Leksjonsnotater</h3>
+                                <div id="notes-save-status" style="font-size: 0.78rem; color: #16a34a; display: flex; align-items: center; gap: 5px; margin-top: 2px;">
+                                    <i class="fas fa-check-circle"></i> Alt er lagret
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button type="button" onclick="window.copyLessonNotes()" style="background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 14px; font-size: 0.82rem; font-weight: 600; color: #475569; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
+                                <i class="fas fa-copy"></i> Kopier
+                            </button>
+                            <button type="button" onclick="window.downloadLessonNotes('${cleanTitle.replace(/'/g, "\\'")}')" style="background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 14px; font-size: 0.82rem; font-weight: 600; color: #475569; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
+                                <i class="fas fa-download"></i> Last ned
+                            </button>
+                        </div>
+                    </div>
+
+                    <textarea id="lesson-notes-textarea" rows="7" placeholder="Skriv ned dine personlige notater, åndelige åpenbaringer og bønneemner her... (Lagres automatisk)" style="width: 100%; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 16px; font-size: 0.95rem; font-family: inherit; line-height: 1.6; resize: vertical; box-sizing: border-box; outline: none; transition: border-color 0.2s ease, box-shadow 0.2s ease;">${savedNote}</textarea>
+                </div>
+            `;
+
+            // Setup real-time auto-save debouncing for notes
+            const textarea = document.getElementById('lesson-notes-textarea');
+            const statusEl = document.getElementById('notes-save-status');
+            let debounceTimer = null;
+
+            if (textarea) {
+                textarea.addEventListener('input', () => {
+                    if (statusEl) {
+                        statusEl.style.color = '#d97706';
+                        statusEl.innerHTML = '<i class="fas fa-sync fa-spin"></i> Lagrer endringer...';
+                    }
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(async () => {
+                        const noteText = textarea.value;
+                        localStorage.setItem(noteKey, noteText);
+
+                        if (user && user.uid && typeof firebaseService !== 'undefined' && firebaseService?.db) {
+                            try {
+                                await firebaseService.db.collection('users').doc(user.uid)
+                                    .collection('course_notes').doc(`${courseId}_${lessonIdx}`).set({
+                                        note: noteText,
+                                        courseId: courseId,
+                                        courseTitle: course.title || '',
+                                        lessonIndex: lessonIdx,
+                                        lessonTitle: cleanTitle,
+                                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                                    }, { merge: true });
+                            } catch (e) {}
+                        }
+
+                        if (statusEl) {
+                            statusEl.style.color = '#16a34a';
+                            statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Lagret i profilen din';
+                        }
+                    }, 1200);
+                });
+            }
+        };
+
+        window.handleQuizAnswer = function(qIdx, selectedIdx, correctIdx, explanation) {
+            const card = document.getElementById(`quiz-card-${qIdx}`);
+            const feedback = document.getElementById(`quiz-feedback-${qIdx}`);
+            if (!card || !feedback) return;
+
+            const btns = card.querySelectorAll('.quiz-option-btn');
+            btns.forEach((btn, idx) => {
+                btn.disabled = true;
+                btn.style.cursor = 'default';
+                if (idx === correctIdx) {
+                    btn.style.background = 'rgba(22, 163, 74, 0.12)';
+                    btn.style.borderColor = '#16a34a';
+                    btn.style.color = '#16a34a';
+                    btn.querySelector('.quiz-status-icon').innerHTML = '<i class="fas fa-check-circle" style="color: #16a34a;"></i>';
+                } else if (idx === selectedIdx && selectedIdx !== correctIdx) {
+                    btn.style.background = 'rgba(239, 68, 68, 0.12)';
+                    btn.style.borderColor = '#ef4444';
+                    btn.style.color = '#ef4444';
+                    btn.querySelector('.quiz-status-icon').innerHTML = '<i class="fas fa-times-circle" style="color: #ef4444;"></i>';
+                }
+            });
+
+            feedback.style.display = 'block';
+            if (selectedIdx === correctIdx) {
+                feedback.style.background = 'rgba(22, 163, 74, 0.1)';
+                feedback.style.color = '#15803d';
+                feedback.style.border = '1px solid rgba(22, 163, 74, 0.3)';
+                feedback.innerHTML = `<strong>✨ Riktig!</strong> ${explanation}`;
+            } else {
+                feedback.style.background = 'rgba(239, 68, 68, 0.08)';
+                feedback.style.color = '#b91c1c';
+                feedback.style.border = '1px solid rgba(239, 68, 68, 0.25)';
+                feedback.innerHTML = `<strong>💡 Ikke helt:</strong> Det riktige svaret var markert i grønt. ${explanation}`;
+            }
+        };
+
+        window.appendReflectionPromptToNotes = function(promptText) {
+            const textarea = document.getElementById('lesson-notes-textarea');
+            if (!textarea) return;
+            const currentVal = textarea.value.trim();
+            const addition = `\n\n📌 ${promptText}\nSvar: `;
+            textarea.value = currentVal ? (currentVal + addition) : `📌 ${promptText}\nSvar: `;
+            textarea.focus();
+            textarea.dispatchEvent(new Event('input'));
+        };
+
+        window.copyLessonNotes = function() {
+            const textarea = document.getElementById('lesson-notes-textarea');
+            if (!textarea || !textarea.value.trim()) {
+                alert('Du har ikke skrevet noen notater ennå.');
+                return;
+            }
+            navigator.clipboard.writeText(textarea.value);
+            alert('Notatene ble kopiert til utklippstavlen!');
+        };
+
+        window.downloadLessonNotes = function(lessonTitle) {
+            const textarea = document.getElementById('lesson-notes-textarea');
+            if (!textarea || !textarea.value.trim()) {
+                alert('Du har ikke skrevet noen notater ennå.');
+                return;
+            }
+            const blob = new Blob([textarea.value], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Notater - ${lessonTitle || 'Leksjon'}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
     </script>
 </body>
 
