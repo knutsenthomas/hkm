@@ -883,16 +883,16 @@
             opacity: 1;
         }
 
-        /* Floating Chapter Popover */
+        /* Floating Chapter Popover (Minimalist Accordion Style) */
         .floating-chapter-popover {
             position: absolute;
             bottom: calc(100% + 16px);
             left: 50%;
             transform: translateX(-50%) scale(0.95);
             transform-origin: bottom center;
-            width: 440px;
+            width: 390px;
             max-width: 94vw;
-            max-height: calc(85vh - 70px);
+            max-height: calc(85vh - 60px);
             background: var(--bg-card) !important;
             border: 1px solid var(--border-color) !important;
             border-radius: 24px;
@@ -907,228 +907,183 @@
             overflow: hidden;
         }
 
-        .floating-chapter-popover #floating-books-container,
-        .floating-chapter-popover #floating-chapter-grid {
-            max-height: calc(85vh - 150px) !important;
-            overflow-y: auto !important;
-            overscroll-behavior: contain !important;
-            -webkit-overflow-scrolling: touch !important;
-        }
-
         .floating-chapter-popover.active {
             display: flex;
             transform: translateX(-50%) scale(1);
             opacity: 1;
         }
 
-        /* Segmented Tabs Header */
-        .popover-tabs-header {
+        .popover-accordion-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 12px;
             padding-bottom: 10px;
             border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.08));
             flex-shrink: 0;
         }
 
-        .popover-segmented-tabs {
-            display: flex;
-            background: var(--bg-surface, rgba(0, 0, 0, 0.05));
-            padding: 3px;
-            border-radius: 14px;
-            gap: 4px;
-            flex: 1;
-        }
-
-        html[data-theme="dark"] .popover-segmented-tabs {
-            background: rgba(255, 255, 255, 0.06);
-        }
-
-        .popover-tab-btn {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 8px 12px;
-            font-size: 13px;
-            font-weight: 700;
-            border-radius: 11px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            background: transparent;
-            color: var(--text-muted);
-        }
-
-        .popover-tab-btn:hover:not(.active) {
+        .popover-accordion-title {
+            font-size: 18px;
+            font-weight: 800;
             color: var(--text-base);
-            background: rgba(0, 0, 0, 0.03);
+            letter-spacing: -0.01em;
         }
 
-        html[data-theme="dark"] .popover-tab-btn:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.04);
+        .popover-search-wrap {
+            position: relative;
+            margin-bottom: 10px;
+            flex-shrink: 0;
         }
 
-        .popover-tab-btn.active {
-            background: var(--bg-card, #ffffff) !important;
-            color: var(--bible-primary, #d17d39) !important;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+        .popover-search-input {
+            width: 100%;
+            padding: 9px 34px 9px 36px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 12px;
+            border: 1px solid var(--border-color, rgba(0,0,0,0.12));
+            background: var(--bg-surface, rgba(0,0,0,0.03));
+            color: var(--text-base);
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease;
         }
 
-        html[data-theme="dark"] .popover-tab-btn.active {
-            background: rgba(255, 255, 255, 0.12) !important;
-            color: #ffffff !important;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
+        html[data-theme="dark"] .popover-search-input {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
         }
 
-        .floating-nav-part-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 4px 8px;
-            border-radius: 99px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            user-select: none;
-            min-width: 0;
+        .popover-search-input:focus {
+            border-color: var(--bible-primary, #d17d39);
         }
 
-        .floating-nav-part-btn:hover {
-            background: rgba(209, 125, 57, 0.14);
-            color: var(--bible-primary, #d17d39);
+        .bible-accordion-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow-y: auto;
+            max-height: calc(85vh - 160px);
+            padding-right: 4px;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
         }
 
-        .floating-chapter-popover .chapter-item {
-            background: rgba(255, 255, 255, 0.03) !important;
-            border: 1px solid rgba(255, 255, 255, 0.08) !important;
-            color: var(--text-base) !important;
-            border-radius: 12px !important;
-            font-size: 14px !important;
-            font-weight: 600 !important;
-            aspect-ratio: 1 !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            cursor: pointer;
+        .bible-accordion-list::-webkit-scrollbar {
+            width: 5px;
         }
 
-        .floating-chapter-popover .chapter-item:hover {
-            background: rgba(209, 125, 57, 0.12) !important;
-            border-color: var(--bible-primary) !important;
-            transform: scale(1.06) !important;
+        .bible-accordion-list::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.15);
+            border-radius: 4px;
         }
 
-        .floating-chapter-popover .chapter-item.active {
-            background: var(--bible-primary) !important;
-            color: #ffffff !important;
-            border-color: var(--bible-primary) !important;
-            box-shadow: 0 4px 12px rgba(209, 125, 57, 0.4) !important;
+        html[data-theme="dark"] .bible-accordion-list::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.15);
         }
 
-        /* Light Mode Adjustment */
-        html[data-theme="light"] .floating-chapter-popover .chapter-item:not(.active) {
-            background: rgba(0, 0, 0, 0.02) !important;
-            border: 1px solid rgba(0, 0, 0, 0.06) !important;
-            color: var(--text-base) !important;
-        }
-        
-        html[data-theme="light"] .floating-chapter-popover .chapter-item:not(.active):hover {
-            background: rgba(209, 125, 57, 0.1) !important;
+        .bible-book-row {
+            border-radius: 14px;
+            transition: background 0.15s ease;
         }
 
-        /* Books Items Grid */
-        #floating-books-items-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            gap: 6px;
-            padding-bottom: 8px;
-        }
-
-        /* Floating Book Item */
-        .floating-book-item {
+        .bible-book-row-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 9px 12px !important;
+            padding: 12px 14px;
             border-radius: 12px;
-            font-size: 13px !important;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-base);
+        }
+
+        .bible-book-row-header:hover {
+            background: rgba(209, 125, 57, 0.08);
+            color: var(--bible-primary, #d17d39);
+        }
+
+        .bible-book-row-header.expanded {
+            font-weight: 700;
+            color: var(--bible-primary, #d17d39);
+            background: rgba(209, 125, 57, 0.06);
+        }
+
+        .bible-book-row-title {
+            font-size: 16px;
             font-weight: 600;
-            color: var(--text-base) !important;
+            line-height: 1.3;
+        }
+
+        .bible-book-row-header.expanded .bible-book-row-title {
+            font-weight: 700;
+        }
+
+        .bible-book-row-header .arrow-icon {
+            font-size: 20px;
+            color: var(--text-muted, #94a3b8);
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .bible-book-row-header.expanded .arrow-icon {
+            transform: rotate(180deg);
+            color: var(--bible-primary, #d17d39);
+        }
+
+        .bible-book-row-chapters {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            padding: 8px 4px 14px 4px;
+        }
+
+        .bible-accordion-chapter-tile {
+            background: rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            border-radius: 12px;
+            height: 44px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-base);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
             transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-            background: rgba(255, 255, 255, 0.02) !important;
-            border: 1px solid rgba(255, 255, 255, 0.06) !important;
-            box-sizing: border-box !important;
-            min-height: 42px;
+            user-select: none;
         }
 
-        .floating-book-item:hover:not(.active) {
-            background: rgba(209, 125, 57, 0.08) !important;
+        html[data-theme="dark"] .bible-accordion-chapter-tile {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.08);
+            color: #f8fafc;
+        }
+
+        .bible-accordion-chapter-tile:hover {
+            background: rgba(209, 125, 57, 0.15) !important;
             border-color: var(--bible-primary, #d17d39) !important;
-            transform: translateY(-1px);
+            color: var(--bible-primary, #d17d39) !important;
+            transform: scale(1.05);
         }
 
-        .floating-book-item.active,
-        html[data-theme="light"] .floating-book-item.active {
+        .bible-accordion-chapter-tile.active {
             background: var(--bible-primary, #d17d39) !important;
             color: #ffffff !important;
             border-color: var(--bible-primary, #d17d39) !important;
-            font-weight: 700 !important;
-            box-shadow: 0 4px 14px rgba(209, 125, 57, 0.35) !important;
+            box-shadow: 0 4px 12px rgba(209, 125, 57, 0.35) !important;
         }
 
-        .floating-book-item.active *,
-        html[data-theme="light"] .floating-book-item.active * {
-            color: #ffffff !important;
-        }
-
-        html[data-theme="light"] .floating-book-item:not(.active) {
-            background: rgba(0, 0, 0, 0.02) !important;
-            border: 1px solid rgba(0, 0, 0, 0.06) !important;
-            color: var(--text-base) !important;
-        }
-        
-        html[data-theme="light"] .floating-book-item:not(.active):hover {
-            background: rgba(209, 125, 57, 0.08) !important;
-            border-color: rgba(209, 125, 57, 0.3) !important;
-        }
-
-        .testament-header-pill {
-            grid-column: 1 / -1;
-            padding: 7px 12px;
-            margin: 8px 0 4px 0;
+        .testament-divider-label {
+            padding: 10px 14px 6px 14px;
             font-size: 11px;
             font-weight: 800;
             letter-spacing: 0.06em;
             text-transform: uppercase;
             color: var(--bible-primary, #d17d39);
-            background: rgba(209, 125, 57, 0.08);
-            border-radius: 8px;
-            border-left: 3px solid var(--bible-primary, #d17d39);
-        }
-
-        .quick-book-chip {
-            padding: 5px 12px;
-            font-size: 11px;
-            font-weight: 700;
-            border-radius: 99px;
-            white-space: nowrap;
-            cursor: pointer;
-            border: 1px solid var(--border-color, rgba(0,0,0,0.12));
-            background: var(--bg-surface, rgba(0,0,0,0.04));
-            color: var(--text-base, #334155);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .quick-book-chip:hover {
-            background: rgba(209, 125, 57, 0.12);
-            color: var(--bible-primary, #d17d39);
-            border-color: var(--bible-primary, #d17d39);
-            transform: scale(1.04);
+            margin-top: 6px;
         }
 
         .sheet-overlay-backdrop {
@@ -4338,30 +4293,20 @@
                 <!-- Floating Chapter Popover -->
                 <div class="floating-chapter-popover" id="floating-chapter-popover">
                     <div class="sheet-handle-bar"></div>
-                    <!-- Segmented Tabs Header -->
-                    <div class="popover-tabs-header">
-                        <div class="popover-segmented-tabs">
-                            <button type="button" id="tab-btn-books" class="popover-tab-btn" title="Velg bok">
-                                <span class="material-symbols-outlined" style="font-size: 16px;">menu_book</span>
-                                <span>Bøker</span>
-                            </button>
-                            <button type="button" id="tab-btn-chapters" class="popover-tab-btn active" title="Velg kapittel">
-                                <span class="material-symbols-outlined" style="font-size: 16px;">tag</span>
-                                <span id="tab-chapters-label">Kapitler</span>
-                            </button>
-                        </div>
+                    <div class="popover-accordion-header">
+                        <span class="popover-accordion-title">Bøker</span>
                         <button type="button" class="sheet-close-btn" title="Lukk" onclick="document.getElementById('floating-chapter-popover').classList.remove('active'); const b=document.getElementById('hkm-sheet-backdrop-overlay'); if(b) b.classList.remove('active');">
                             <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
                         </button>
                     </div>
-
-                    <!-- Chapters Container (default view) -->
-                    <div class="chapter-grid" id="floating-chapter-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; max-height: 280px; overflow-y: auto;">
-                        <!-- Loaded dynamically -->
+                    <div class="popover-search-wrap">
+                        <input type="text" id="floating-book-search-input" class="popover-search-input" placeholder="Søk i bøker...">
+                        <span class="material-symbols-outlined" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 18px; color: var(--text-muted); pointer-events: none;">search</span>
+                        <button type="button" id="floating-book-search-clear" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; padding: 0; cursor: pointer; color: var(--text-muted); display: none;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
+                        </button>
                     </div>
-
-                    <!-- Books Container -->
-                    <div id="floating-books-container" style="display: none; flex-direction: column; gap: 4px; max-height: 340px; overflow-y: auto; padding-right: 4px;">
+                    <div class="bible-accordion-list" id="floating-books-container">
                         <!-- Loaded dynamically -->
                     </div>
                 </div>
