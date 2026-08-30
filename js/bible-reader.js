@@ -2873,7 +2873,8 @@ class BibleReader {
             // Update floating pill book label immediately
             const floatBookSpan = document.getElementById('floating-nav-book');
             if (floatBookSpan && currentBook) {
-                floatBookSpan.innerText = currentBook.name.toUpperCase();
+                floatBookSpan.innerText = currentBook.name;
+                floatBookSpan.title = currentBook.name;
             }
 
             // If book has only 1 chapter, navigate to chapter 1 and close popover immediately
@@ -3720,6 +3721,7 @@ class BibleReader {
         const currentBook = this.books.find(b => b.id === this.selectedBookId);
         if (floatBookSpan && currentBook) {
             floatBookSpan.innerText = currentBook.name;
+            floatBookSpan.title = currentBook.name;
         }
         if (floatChapSpan) floatChapSpan.innerText = chapterNum;
     }
