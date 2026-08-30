@@ -387,7 +387,16 @@ class BibleReader {
                 'extended_btn': 'Vis dypere teologisk analyse',
                 'extended_loading': 'Analyserer dypere...',
                 'extended_header': 'Dypere analyse',
-                'cross_references': 'Kryssreferanser'
+                'cross_references': 'Kryssreferanser',
+                'select_book': 'Velg bok',
+                'select_chapter': 'Velg kapittel',
+                'books': 'Bøker',
+                'chapters': 'Kapitler',
+                'quick_access': 'Hurtigvalg',
+                'all_filter': 'Alle',
+                'ot_filter': 'Gamle Testamente',
+                'nt_filter': 'Nye Testamente',
+                'search_books': 'Søk bok eller sjanger...'
             },
             'en': {
                 'empty_bookmarks': 'No saved verses yet. Click on a verse in the text to save it.',
@@ -406,7 +415,16 @@ class BibleReader {
                 'extended_btn': 'Show deeper theological analysis',
                 'extended_loading': 'Analyzing deeper...',
                 'extended_header': 'Deeper analysis',
-                'cross_references': 'Cross references'
+                'cross_references': 'Cross references',
+                'select_book': 'Select book',
+                'select_chapter': 'Select chapter',
+                'books': 'Books',
+                'chapters': 'Chapters',
+                'quick_access': 'Quick jump',
+                'all_filter': 'All',
+                'ot_filter': 'Old Testament',
+                'nt_filter': 'New Testament',
+                'search_books': 'Search books or genres...'
             },
             'es': {
                 'empty_bookmarks': 'Aún no hay versículos guardados. Haz clic en un versículo en el texto para guardarlo.',
@@ -425,7 +443,16 @@ class BibleReader {
                 'extended_btn': 'Ver análisis teológico profundo',
                 'extended_loading': 'Analizando en detalle...',
                 'extended_header': 'Análisis profundo',
-                'cross_references': 'Referencias cruzadas'
+                'cross_references': 'Referencias cruzadas',
+                'select_book': 'Seleccionar libro',
+                'select_chapter': 'Seleccionar capítulo',
+                'books': 'Libros',
+                'chapters': 'Capítulos',
+                'quick_access': 'Acceso rápido',
+                'all_filter': 'Todos',
+                'ot_filter': 'Antiguo Testamento',
+                'nt_filter': 'Nuevo Testamento',
+                'search_books': 'Buscar libros o géneros...'
             }
         };
         return (translations[lang] || translations['no'])[key] || key;
@@ -830,32 +857,47 @@ class BibleReader {
                 });
             }
             
-            // 5. Set up click listener for the book/chapter pill
+            // 5. Set up click listener for the book/chapter pill & separate target parts
             const pill = document.getElementById('floating-nav-info-pill');
+            const navBookBtn = document.getElementById('floating-nav-book');
+            const navChapBtn = document.getElementById('floating-nav-chapter');
+
+            if (navBookBtn) {
+                navBookBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const chapPopover = document.getElementById('floating-chapter-popover');
+                    if (chapPopover && chapPopover.classList.contains('active') && document.getElementById('tab-btn-books')?.classList.contains('active')) {
+                        chapPopover.classList.remove('active');
+                        toggleBackdrop(false);
+                    } else {
+                        this.openBooksPopover();
+                    }
+                });
+            }
+
+            if (navChapBtn) {
+                navChapBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const chapPopover = document.getElementById('floating-chapter-popover');
+                    if (chapPopover && chapPopover.classList.contains('active') && document.getElementById('tab-btn-chapters')?.classList.contains('active')) {
+                        chapPopover.classList.remove('active');
+                        toggleBackdrop(false);
+                    } else {
+                        this.openChaptersPopover();
+                    }
+                });
+            }
+
             if (pill) {
                 pill.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    popover.classList.remove('active');
-                    const chapPopover = document.getElementById('floating-chapter-popover');
-                    if (chapPopover) {
-                        // Reset view to chapters on open
-                        if (!chapPopover.classList.contains('active')) {
-                            const headerChapters = document.getElementById('floating-popover-header-chapters');
-                            const headerBooks = document.getElementById('floating-popover-header-books');
-                            const chapGrid = document.getElementById('floating-chapter-grid');
-                            const booksCont = document.getElementById('floating-books-container');
-
-                            if (headerChapters) headerChapters.style.display = 'flex';
-                            if (headerBooks) headerBooks.style.display = 'none';
-                            if (chapGrid) chapGrid.style.display = 'grid';
-                            if (booksCont) booksCont.style.display = 'none';
-                        }
-                        const isActive = chapPopover.classList.toggle('active');
-                        toggleBackdrop(isActive);
-                        if (isActive) {
-                            this.pushModalHistoryState('floating-chapter-popover');
-                        } else if (window.history.state && window.history.state.hkmModalActive) {
-                            window.history.back();
+                    if (e.target !== navBookBtn && e.target !== navChapBtn) {
+                        e.stopPropagation();
+                        const chapPopover = document.getElementById('floating-chapter-popover');
+                        if (chapPopover && chapPopover.classList.contains('active')) {
+                            chapPopover.classList.remove('active');
+                            toggleBackdrop(false);
+                        } else {
+                            this.openChaptersPopover();
                         }
                     }
                 });
@@ -868,40 +910,39 @@ class BibleReader {
                 }
             }
 
-            // Set up show books view trigger inside popover
-            const btnShowBooks = document.getElementById('btn-show-books-view');
-            if (btnShowBooks) {
-                btnShowBooks.addEventListener('click', async (e) => {
+            // Click on Book Badge in main reading header opens Book selector popover directly
+            if (this.dom.currentBookBadge) {
+                this.dom.currentBookBadge.style.cursor = 'pointer';
+                this.dom.currentBookBadge.title = this.t('select_book') || 'Velg bok';
+                this.dom.currentBookBadge.addEventListener('click', async (e) => {
                     e.stopPropagation();
-                    const headerChapters = document.getElementById('floating-popover-header-chapters');
-                    const headerBooks = document.getElementById('floating-popover-header-books');
-                    const chapGrid = document.getElementById('floating-chapter-grid');
-                    const booksCont = document.getElementById('floating-books-container');
-
-                    if (headerChapters) headerChapters.style.display = 'none';
-                    if (headerBooks) headerBooks.style.display = 'flex';
-                    if (chapGrid) chapGrid.style.display = 'none';
-                    if (booksCont) {
-                        booksCont.style.display = 'flex';
-                        await this.renderFloatingBooks();
-                    }
+                    this.openBooksPopover();
                 });
             }
 
-            // Set up back to chapters view trigger inside popover
-            const btnShowChapters = document.getElementById('btn-show-chapters-view');
-            if (btnShowChapters) {
-                btnShowChapters.addEventListener('click', (e) => {
+            // Click on Chapter Number in main reading header opens Chapter selector popover directly
+            if (this.dom.currentChapterNumber) {
+                this.dom.currentChapterNumber.style.cursor = 'pointer';
+                this.dom.currentChapterNumber.title = this.t('select_chapter') || 'Velg kapittel';
+                this.dom.currentChapterNumber.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const headerChapters = document.getElementById('floating-popover-header-chapters');
-                    const headerBooks = document.getElementById('floating-popover-header-books');
-                    const chapGrid = document.getElementById('floating-chapter-grid');
-                    const booksCont = document.getElementById('floating-books-container');
+                    this.openChaptersPopover();
+                });
+            }
 
-                    if (headerChapters) headerChapters.style.display = 'flex';
-                    if (headerBooks) headerBooks.style.display = 'none';
-                    if (chapGrid) chapGrid.style.display = 'grid';
-                    if (booksCont) booksCont.style.display = 'none';
+            // Set up Segmented Tabs triggers inside popover
+            const tabBtnBooks = document.getElementById('tab-btn-books');
+            const tabBtnChapters = document.getElementById('tab-btn-chapters');
+            if (tabBtnBooks) {
+                tabBtnBooks.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.openBooksPopover();
+                });
+            }
+            if (tabBtnChapters) {
+                tabBtnChapters.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.openChaptersPopover();
                 });
             }
 
@@ -912,6 +953,62 @@ class BibleReader {
                 toggleBackdrop(false);
             });
         }
+    }
+
+    openBooksPopover() {
+        const popover = document.getElementById('floating-settings-popover');
+        if (popover) popover.classList.remove('active');
+        const chapPopover = document.getElementById('floating-chapter-popover');
+        if (!chapPopover) return;
+
+        const tabBooks = document.getElementById('tab-btn-books');
+        const tabChapters = document.getElementById('tab-btn-chapters');
+        const chapGrid = document.getElementById('floating-chapter-grid');
+        const booksCont = document.getElementById('floating-books-container');
+
+        if (tabBooks) tabBooks.classList.add('active');
+        if (tabChapters) tabChapters.classList.remove('active');
+        if (chapGrid) chapGrid.style.display = 'none';
+        if (booksCont) {
+            booksCont.style.display = 'flex';
+            this.renderFloatingBooks();
+        }
+
+        chapPopover.classList.add('active');
+        const backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
+        if (backdrop) backdrop.classList.add('active');
+        this.pushModalHistoryState('floating-chapter-popover');
+
+        setTimeout(() => {
+            const input = document.getElementById('floating-book-search-input');
+            if (input && window.innerWidth > 768) {
+                input.focus();
+            }
+        }, 100);
+    }
+
+    openChaptersPopover() {
+        const popover = document.getElementById('floating-settings-popover');
+        if (popover) popover.classList.remove('active');
+        const chapPopover = document.getElementById('floating-chapter-popover');
+        if (!chapPopover) return;
+
+        const tabBooks = document.getElementById('tab-btn-books');
+        const tabChapters = document.getElementById('tab-btn-chapters');
+        const chapGrid = document.getElementById('floating-chapter-grid');
+        const booksCont = document.getElementById('floating-books-container');
+
+        if (tabBooks) tabBooks.classList.remove('active');
+        if (tabChapters) tabChapters.classList.add('active');
+        if (chapGrid) chapGrid.style.display = 'grid';
+        if (booksCont) booksCont.style.display = 'none';
+
+        this.renderChapters();
+
+        chapPopover.classList.add('active');
+        const backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
+        if (backdrop) backdrop.classList.add('active');
+        this.pushModalHistoryState('floating-chapter-popover');
     }
 
     bindEvents() {
@@ -1245,16 +1342,29 @@ class BibleReader {
             } else if (e.key === 'ArrowRight') {
                 this.navigateChapter(1);
             } else if (e.key.toLowerCase() === 'b') {
-                // Toggle bookmark if verses are selected
                 if (this.selectedVerses && this.selectedVerses.length > 0 && this.dom.toolbarBtnBookmark) {
                     e.preventDefault();
                     this.dom.toolbarBtnBookmark.click();
+                } else {
+                    e.preventDefault();
+                    this.openBooksPopover();
                 }
+            } else if (e.key.toLowerCase() === 'k' || e.key.toLowerCase() === 'c') {
+                e.preventDefault();
+                this.openChaptersPopover();
             } else if (e.key === 'Escape') {
-                // Clear selection if active
                 if (this.selectedVerses && this.selectedVerses.length > 0) {
                     e.preventDefault();
                     this.clearSelection();
+                } else {
+                    const chapPopover = document.getElementById('floating-chapter-popover');
+                    const setPopover = document.getElementById('floating-settings-popover');
+                    if (chapPopover?.classList.contains('active') || setPopover?.classList.contains('active')) {
+                        chapPopover?.classList.remove('active');
+                        setPopover?.classList.remove('active');
+                        const backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
+                        if (backdrop) backdrop.classList.remove('active');
+                    }
                 }
             }
         });
@@ -2444,13 +2554,18 @@ class BibleReader {
         this.dom.booksListNt.innerHTML = ntBooks.join('');
 
         // Bind clicks on book items
+        // Bind clicks on book items
         const bindBookClicks = (container) => {
             container.querySelectorAll('.book-item').forEach(item => {
                 item.addEventListener('click', async () => {
-                    container.querySelectorAll('.book-item').forEach(el => el.classList.remove('active'));
+                    document.querySelectorAll('.book-item').forEach(el => el.classList.remove('active'));
                     item.classList.add('active');
-                    await this.selectBook(item.dataset.id);
-                    await this.selectChapter(`${item.dataset.id}_intro`);
+                    const bookId = item.dataset.id;
+                    await this.selectBook(bookId);
+                    await this.selectChapter(`${bookId}_1`);
+                    if (this.dom.sidebar && this.dom.sidebar.classList.contains('active')) {
+                        this.dom.sidebar.classList.remove('active');
+                    }
                 });
             });
         };
@@ -2460,13 +2575,14 @@ class BibleReader {
     }
 
     filterBooks(query) {
-        const cleanQuery = query.toLowerCase().trim();
+        const cleanQuery = (query || '').toLowerCase().replace(/[\.\,\-]/g, ' ').replace(/\s+/g, ' ').trim();
         const bookItems = document.querySelectorAll('.book-item');
         
         bookItems.forEach(item => {
-            const bookName = (item.dataset.name || item.querySelector('.book-name').innerText).toLowerCase();
+            const rawName = (item.dataset.name || item.querySelector('.book-name').innerText).toLowerCase();
+            const normName = rawName.replace(/[\.\,\-]/g, ' ').replace(/\s+/g, ' ').trim();
             const bookGenre = (item.dataset.genre || '').toLowerCase();
-            if (bookName.includes(cleanQuery) || bookGenre.includes(cleanQuery)) {
+            if (normName.includes(cleanQuery) || rawName.includes(cleanQuery) || bookGenre.includes(cleanQuery)) {
                 item.style.display = 'flex';
             } else {
                 item.style.display = 'none';
@@ -2477,8 +2593,8 @@ class BibleReader {
         const gtHeader = document.getElementById('header-gt');
         const ntHeader = document.getElementById('header-nt');
         
-        const hasVisibleGt = Array.from(this.dom.booksListGt.children).some(child => child.style.display !== 'none');
-        const hasVisibleNt = Array.from(this.dom.booksListNt.children).some(child => child.style.display !== 'none');
+        const hasVisibleGt = Array.from(this.dom.booksListGt ? this.dom.booksListGt.children : []).some(child => child.style.display !== 'none');
+        const hasVisibleNt = Array.from(this.dom.booksListNt ? this.dom.booksListNt.children : []).some(child => child.style.display !== 'none');
 
         if (gtHeader) gtHeader.style.display = hasVisibleGt ? 'block' : 'none';
         if (ntHeader) ntHeader.style.display = hasVisibleNt ? 'block' : 'none';
@@ -2514,16 +2630,30 @@ class BibleReader {
 
     renderChapters() {
         const isIntroActive = this.selectedChapterId === `${this.selectedBookId}_intro` ? 'active' : '';
-        const introItemHtml = `<div class="chapter-item ${isIntroActive}" data-id="${this.selectedBookId}_intro" style="font-weight: 700; background: rgba(27,73,101,0.08); color: #1B4965;">Intro</div>`;
+        const currentBook = (this.books || []).find(b => b.id === this.selectedBookId);
+        const bookName = currentBook ? currentBook.name : '';
+        const lang = document.documentElement.lang || 'no';
+        const labelSelectChapter = lang === 'en' ? 'Chapters' : (lang === 'es' ? 'Capítulos' : 'Kapitler');
 
-        const gridHtml = introItemHtml + this.chapters.map(c => {
+        const tabChaptersLabel = document.getElementById('tab-chapters-label');
+        if (tabChaptersLabel) {
+            tabChaptersLabel.innerText = bookName ? bookName : labelSelectChapter;
+        }
+
+        const chapHeaderTitle = document.querySelector('#floating-popover-header-chapters > span');
+        if (chapHeaderTitle) {
+            chapHeaderTitle.innerText = bookName ? `${bookName} — ${labelSelectChapter}` : labelSelectChapter;
+        }
+
+        const introItemHtml = `<div class="chapter-item ${isIntroActive}" data-id="${this.selectedBookId}_intro" style="font-weight: 700; background: rgba(209, 125, 57, 0.12); color: var(--bible-primary, #d17d39);">Intro</div>`;
+
+        const gridHtml = introItemHtml + (this.chapters || []).map(c => {
             const isActive = c.id === this.selectedChapterId ? 'active' : '';
             return `<div class="chapter-item ${isActive}" data-id="${c.id}">${c.number}</div>`;
         }).join('');
 
         const onChapterClick = async (item) => {
-            document.querySelectorAll('.chapter-grid .chapter-item').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('#floating-chapter-grid .chapter-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.chapter-grid .chapter-item, #floating-chapter-grid .chapter-item').forEach(el => el.classList.remove('active'));
             
             // Highlight this chapter in all grids
             const targetChapterId = item.dataset.id;
@@ -2537,8 +2667,12 @@ class BibleReader {
                 overlay.classList.remove('active');
             }
             
-            // Hide floating chapter popover
-            document.getElementById('floating-chapter-popover')?.classList.remove('active');
+            // Hide floating chapter popover & backdrop
+            const chapPopover = document.getElementById('floating-chapter-popover');
+            if (chapPopover) chapPopover.classList.remove('active');
+
+            const backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
+            if (backdrop) backdrop.classList.remove('active');
             
             // Hide mobile/reading-mode sidebar if active
             if (this.dom.sidebar && this.dom.sidebar.classList.contains('active')) {
@@ -2639,7 +2773,8 @@ class BibleReader {
         
         const otTitle = isEn ? 'Old Testament' : (isEs ? 'Antiguo Testamento' : 'Det Gamle Testamente');
         const ntTitle = isEn ? 'New Testament' : (isEs ? 'Nuevo Testamento' : 'Det Nye Testamente');
-        const searchPlaceholder = isEn ? 'Search books or genres...' : (isEs ? 'Buscar libros o géneros...' : 'Søk bok eller sjanger...');
+        const searchPlaceholder = this.t('search_books') || 'Søk bok eller sjanger...';
+        const quickAccessLabel = this.t('quick_access') || 'Hurtigvalg';
 
         const genres = this.getGenreLabels();
         const genreMap = {};
@@ -2651,22 +2786,49 @@ class BibleReader {
             return bookIdNum >= 40 || ['MAT', 'MRK', 'LUK', 'JHN', 'ACT', 'ROM', '1CO', '2CO', 'GAL', 'EPH', 'PHP', 'COL', '1TH', '2TH', '1TI', '2TI', 'TIT', 'PHM', 'HEB', 'JAS', '1PE', '2PE', '1JO', '2JO', '3JO', 'JUD', 'REV'].includes(bookId);
         };
 
+        // Popular books for 1-tap quick jump
+        const popularBookIds = ['1', '19', '40', '43', '45', '66'];
+        const quickPillsHtml = popularBookIds.map(pid => {
+            const b = this.books.find(x => x.id === pid);
+            if (!b) return '';
+            const isActive = b.id === this.selectedBookId ? 'active' : '';
+            return `<button type="button" class="quick-book-chip ${isActive}" data-id="${b.id}">${b.name}</button>`;
+        }).join('');
+
+        // Testament quick filter pills
+        const testamentPillsHtml = `
+            <button type="button" class="testament-filter-btn active" data-testament="all" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 99px; white-space: nowrap; cursor: pointer; border: 1px solid var(--bible-primary, #d17d39); background: var(--bible-primary, #d17d39); color: #ffffff; transition: all 0.2s ease;">
+                ${this.t('all_filter') || 'Alle'} (${this.books.length})
+            </button>
+            <button type="button" class="testament-filter-btn" data-testament="ot" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 99px; white-space: nowrap; cursor: pointer; border: 1px solid var(--border-color, rgba(0,0,0,0.12)); background: var(--bg-surface, rgba(0,0,0,0.04)); color: var(--text-base, #334155); transition: all 0.2s ease;">
+                ${this.t('ot_filter') || 'Gamle Testamente'} (39)
+            </button>
+            <button type="button" class="testament-filter-btn" data-testament="nt" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 99px; white-space: nowrap; cursor: pointer; border: 1px solid var(--border-color, rgba(0,0,0,0.12)); background: var(--bg-surface, rgba(0,0,0,0.04)); color: var(--text-base, #334155); transition: all 0.2s ease;">
+                ${this.t('nt_filter') || 'Nye Testamente'} (27)
+            </button>
+        `;
+
         // Render Sticky Genre Filter & Search Controls
         let html = `
-            <div class="book-genre-filter-container" style="position: sticky; top: 0; background: var(--bg-card, #ffffff); z-index: 20; padding: 4px 0 12px 0; margin-bottom: 12px; border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.08));">
-                <div style="position: relative; margin-bottom: 10px;">
-                    <input type="text" id="floating-book-search-input" placeholder="${searchPlaceholder}" style="width: 100%; padding: 9px 14px 9px 36px; font-size: 13px; font-weight: 500; border-radius: 12px; border: 1px solid var(--border-color, rgba(0,0,0,0.15)); background: var(--bg-body, #faf9f6); color: var(--text-base, #1e293b); outline: none;">
-                    <span class="material-symbols-outlined" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 18px; color: var(--text-muted, #94a3b8); pointer-events: none;">search</span>
+            <div class="book-genre-filter-container" style="position: sticky; top: 0; background: var(--bg-card, #ffffff); z-index: 20; padding: 2px 0 10px 0; margin-bottom: 10px; border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.08));">
+                <div style="position: relative; margin-bottom: 8px;">
+                    <input type="text" id="floating-book-search-input" placeholder="${searchPlaceholder}" style="width: 100%; padding: 8px 32px 8px 34px; font-size: 13px; font-weight: 500; border-radius: 12px; border: 1px solid var(--border-color, rgba(0,0,0,0.15)); background: var(--bg-surface, #faf9f6); color: var(--text-base, #1e293b); outline: none;">
+                    <span class="material-symbols-outlined" style="position: absolute; left: 9px; top: 50%; transform: translateY(-50%); font-size: 18px; color: var(--text-muted, #94a3b8); pointer-events: none;">search</span>
+                    <button type="button" id="floating-book-search-clear" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; padding: 0; cursor: pointer; color: var(--text-muted); display: none;">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
+                    </button>
                 </div>
-                <div class="genre-pills-bar" style="display: flex; gap: 8px; overflow-x: auto; padding: 6px 2px 8px 2px; scrollbar-width: none; -webkit-overflow-scrolling: touch;">
-                    ${genres.map(g => `
-                        <button type="button" class="genre-pill-btn ${g.key === 'all' ? 'active' : ''}" data-genre="${g.key}" style="padding: 7px 16px; font-size: 12px; font-weight: 700; border-radius: 99px; white-space: nowrap; cursor: pointer; border: 1px solid ${g.key === 'all' ? 'var(--bible-primary, #d17d39)' : 'var(--border-color, rgba(0,0,0,0.12))'}; background: ${g.key === 'all' ? 'var(--bible-primary, #d17d39)' : 'rgba(0,0,0,0.04)'}; color: ${g.key === 'all' ? '#ffffff' : 'var(--text-base, #334155)'}; transition: all 0.2s ease;">
-                            ${g.label}
-                        </button>
-                    `).join('')}
+                <!-- Quick Access Chips -->
+                <div class="quick-access-chips-bar" style="display: flex; align-items: center; gap: 6px; overflow-x: auto; padding: 2px 2px 6px 2px; scrollbar-width: none; -webkit-overflow-scrolling: touch; margin-bottom: 6px;">
+                    <span style="font-size: 11px; font-weight: 800; color: var(--bible-primary, #d17d39); white-space: nowrap; margin-right: 2px; text-transform: uppercase; letter-spacing: 0.05em;">${quickAccessLabel}:</span>
+                    ${quickPillsHtml}
+                </div>
+                <!-- Testament Tabs -->
+                <div class="testament-filter-bar" style="display: flex; gap: 6px; overflow-x: auto; padding: 2px 2px 4px 2px; scrollbar-width: none; -webkit-overflow-scrolling: touch;">
+                    ${testamentPillsHtml}
                 </div>
             </div>
-            <div id="floating-books-items-list" style="display: flex; flex-direction: column; gap: 4px;">
+            <div id="floating-books-items-list">
         `;
 
         let hasAddedOT = false;
@@ -2675,25 +2837,23 @@ class BibleReader {
         this.books.forEach((b, index) => {
             const isNT = isNewTestament(b.id, index);
             const genreKey = this.getBookGenreKey(b, index);
-            const genreLabel = genreMap[genreKey] || '';
 
             if (!isNT && !hasAddedOT) {
-                html += `<div class="testament-header-pill ot-header-pill" style="padding: 6px 12px; margin: 4px 0 8px 0; font-size: 11px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--bible-primary, #d17d39); background: rgba(209, 125, 57, 0.08); border-radius: 8px; border-left: 3px solid var(--bible-primary, #d17d39);">${otTitle}</div>`;
+                html += `<div class="testament-header-pill ot-header-pill">${otTitle}</div>`;
                 hasAddedOT = true;
             } else if (isNT && !hasAddedNT) {
-                html += `<div class="testament-header-pill nt-header-pill" style="padding: 6px 12px; margin: 16px 0 8px 0; font-size: 11px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--bible-primary, #d17d39); background: rgba(209, 125, 57, 0.08); border-radius: 8px; border-left: 3px solid var(--bible-primary, #d17d39);">${ntTitle}</div>`;
+                html += `<div class="testament-header-pill nt-header-pill">${ntTitle}</div>`;
                 hasAddedNT = true;
             }
 
             const isActive = b.id === this.selectedBookId ? 'active' : '';
             html += `
                 <div class="floating-book-item ${isActive}" data-id="${b.id}" data-genre="${genreKey}" data-name="${b.name.toLowerCase()}" data-testament="${isNT ? 'nt' : 'ot'}">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        ${isActive ? '<span class="material-symbols-outlined" style="font-size: 18px; color: #ffffff;">check_circle</span>' : ''}
-                        <span>${b.name}</span>
-                        ${genreLabel ? `<span class="genre-badge" style="font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: rgba(0,0,0,0.06); opacity: 0.75; margin-left: 4px;">${genreLabel}</span>` : ''}
+                    <span style="display: flex; align-items: center; gap: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        ${isActive ? '<span class="material-symbols-outlined" style="font-size: 16px; color: #ffffff; flex-shrink: 0;">check_circle</span>' : ''}
+                        <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${b.name}</span>
                     </span>
-                    <span class="material-symbols-outlined" style="font-size: 16px; opacity: ${isActive ? '1' : '0.5'};">${isActive ? 'check' : 'chevron_right'}</span>
+                    <span class="material-symbols-outlined" style="font-size: 14px; opacity: ${isActive ? '1' : '0.4'}; flex-shrink: 0;">${isActive ? 'check' : 'chevron_right'}</span>
                 </div>
             `;
         });
@@ -2701,44 +2861,70 @@ class BibleReader {
         html += `</div>`;
         container.innerHTML = html;
 
+        // Book selection logic (Grid items & Quick Chips)
+        const onSelectBook = async (bookId) => {
+            container.querySelectorAll('.floating-book-item, .quick-book-chip').forEach(el => el.classList.remove('active'));
+            container.querySelectorAll(`[data-id="${bookId}"]`).forEach(el => el.classList.add('active'));
+
+            await this.selectBook(bookId);
+
+            const currentBook = (this.books || []).find(b => b.id === bookId);
+            
+            // Update floating pill book label immediately
+            const floatBookSpan = document.getElementById('floating-nav-book');
+            if (floatBookSpan && currentBook) {
+                floatBookSpan.innerText = currentBook.name.toUpperCase();
+            }
+
+            // If book has only 1 chapter, navigate to chapter 1 and close popover immediately
+            if (this.chapters && this.chapters.length === 1) {
+                await this.selectChapter(`${bookId}_1`);
+                const chapPopover = document.getElementById('floating-chapter-popover');
+                if (chapPopover) chapPopover.classList.remove('active');
+                const backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
+                if (backdrop) backdrop.classList.remove('active');
+                return;
+            }
+
+            // Switch to chapters view smoothly
+            this.openChaptersPopover();
+        };
+
         // Bind clicks on book items
         container.querySelectorAll('.floating-book-item').forEach(item => {
-            item.addEventListener('click', async () => {
-                const bookId = item.dataset.id;
-                
-                container.querySelectorAll('.floating-book-item').forEach(el => el.classList.remove('active'));
-                item.classList.add('active');
+            item.addEventListener('click', () => onSelectBook(item.dataset.id));
+        });
 
-                await this.selectBook(bookId);
-
-                const headerChapters = document.getElementById('floating-popover-header-chapters');
-                const headerBooks = document.getElementById('floating-popover-header-books');
-                const chapGrid = document.getElementById('floating-chapter-grid');
-                const booksCont = document.getElementById('floating-books-container');
-                if (headerChapters) headerChapters.style.display = 'flex';
-                if (headerBooks) headerBooks.style.display = 'none';
-                if (chapGrid) chapGrid.style.display = 'grid';
-                if (booksCont) booksCont.style.display = 'none';
+        // Bind clicks on quick jump chips
+        container.querySelectorAll('.quick-book-chip').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                onSelectBook(btn.dataset.id);
             });
         });
 
-        // Filter Logic for Genre Pills & Search Input
-        const filterBookList = (selectedGenre, searchVal) => {
-            const cleanSearch = (searchVal || '').toLowerCase().trim();
+        // Filter Logic for Testament / Search Input
+        let currentTestament = 'all';
+        const searchInput = container.querySelector('#floating-book-search-input');
+        const clearBtn = container.querySelector('#floating-book-search-clear');
+
+        const filterBookList = (testament, searchVal) => {
+            const cleanSearch = (searchVal || '').toLowerCase().replace(/[\.\,\-]/g, ' ').replace(/\s+/g, ' ').trim();
             const items = container.querySelectorAll('.floating-book-item');
             
             let visibleOTCount = 0;
             let visibleNTCount = 0;
 
             items.forEach(item => {
-                const itemGenre = item.dataset.genre;
-                const itemName = item.dataset.name;
+                const rawName = (item.dataset.name || '').toLowerCase();
+                const normName = rawName.replace(/[\.\,\-]/g, ' ').replace(/\s+/g, ' ').trim();
                 const itemTestament = item.dataset.testament;
+                const itemGenre = item.dataset.genre || '';
 
-                const matchesGenre = (selectedGenre === 'all' || itemGenre === selectedGenre);
-                const matchesSearch = (!cleanSearch || itemName.includes(cleanSearch) || itemGenre.includes(cleanSearch));
+                const matchesTestament = (testament === 'all' || itemTestament === testament);
+                const matchesSearch = (!cleanSearch || normName.includes(cleanSearch) || rawName.includes(cleanSearch) || itemGenre.includes(cleanSearch));
 
-                if (matchesGenre && matchesSearch) {
+                if (matchesTestament && matchesSearch) {
                     item.style.display = 'flex';
                     if (itemTestament === 'ot') visibleOTCount++;
                     if (itemTestament === 'nt') visibleNTCount++;
@@ -2750,20 +2936,21 @@ class BibleReader {
             // Toggle testament headers based on visible books
             const otHeader = container.querySelector('.ot-header-pill');
             const ntHeader = container.querySelector('.nt-header-pill');
-            if (otHeader) otHeader.style.display = visibleOTCount > 0 ? 'block' : 'none';
-            if (ntHeader) ntHeader.style.display = visibleNTCount > 0 ? 'block' : 'none';
+            if (otHeader) otHeader.style.display = (testament === 'all' || testament === 'ot') && visibleOTCount > 0 ? 'block' : 'none';
+            if (ntHeader) ntHeader.style.display = (testament === 'all' || testament === 'nt') && visibleNTCount > 0 ? 'block' : 'none';
+
+            if (clearBtn) {
+                clearBtn.style.display = searchVal ? 'block' : 'none';
+            }
         };
 
-        // Bind Genre Pills
-        let currentSelectedGenre = 'all';
-        const searchInput = container.querySelector('#floating-book-search-input');
-
-        container.querySelectorAll('.genre-pill-btn').forEach(btn => {
+        // Bind Testament Filter Pills
+        container.querySelectorAll('.testament-filter-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                container.querySelectorAll('.genre-pill-btn').forEach(b => {
+                container.querySelectorAll('.testament-filter-btn').forEach(b => {
                     b.classList.remove('active');
-                    b.style.background = 'rgba(0,0,0,0.04)';
+                    b.style.background = 'var(--bg-surface, rgba(0,0,0,0.04))';
                     b.style.color = 'var(--text-base, #334155)';
                     b.style.borderColor = 'var(--border-color, rgba(0,0,0,0.12))';
                 });
@@ -2772,15 +2959,25 @@ class BibleReader {
                 btn.style.color = '#ffffff';
                 btn.style.borderColor = 'var(--bible-primary, #d17d39)';
 
-                currentSelectedGenre = btn.dataset.genre;
-                filterBookList(currentSelectedGenre, searchInput ? searchInput.value : '');
+                currentTestament = btn.dataset.testament;
+                filterBookList(currentTestament, searchInput ? searchInput.value : '');
             });
         });
 
-        // Bind Search Input
+        // Bind Search Input & Clear Button
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
-                filterBookList(currentSelectedGenre, e.target.value);
+                filterBookList(currentTestament, e.target.value);
+            });
+        }
+        if (clearBtn) {
+            clearBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (searchInput) {
+                    searchInput.value = '';
+                    searchInput.focus();
+                    filterBookList(currentTestament, '');
+                }
             });
         }
 
@@ -2789,7 +2986,7 @@ class BibleReader {
         if (activeItem) {
             setTimeout(() => {
                 activeItem.scrollIntoView({ block: 'center', behavior: 'smooth' });
-            }, 50);
+            }, 60);
         }
     }
 

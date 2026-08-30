@@ -558,7 +558,15 @@
             letter-spacing: 0.15em;
             line-height: 1;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
-            transition: background 0.3s, color 0.3s;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .book-badge:hover {
+            background: rgba(209, 125, 57, 0.12);
+            color: var(--bible-primary, #d17d39);
+            transform: scale(1.04);
         }
 
         .chapter-number {
@@ -569,7 +577,14 @@
             line-height: 1;
             font-family: Georgia, Cambria, "Times New Roman", Times, serif;
             text-align: center;
-            transition: color 0.3s;
+            transition: color 0.3s, transform 0.2s ease;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .chapter-number:hover {
+            color: var(--bible-primary, #d17d39);
+            transform: scale(1.03);
         }
 
         @media (min-width: 768px) {
@@ -808,14 +823,14 @@
             left: 50%;
             transform: translateX(-50%) scale(0.95);
             transform-origin: bottom center;
-            width: 380px;
-            max-width: 90vw;
-            max-height: calc(80vh - 80px);
+            width: 440px;
+            max-width: 94vw;
+            max-height: calc(85vh - 70px);
             background: var(--bg-card) !important;
             border: 1px solid var(--border-color) !important;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            padding: 16px;
+            border-radius: 24px;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.22);
+            padding: 16px 18px 18px;
             display: none;
             flex-direction: column;
             z-index: 20001 !important;
@@ -827,7 +842,7 @@
 
         .floating-chapter-popover #floating-books-container,
         .floating-chapter-popover #floating-chapter-grid {
-            max-height: calc(80vh - 140px) !important;
+            max-height: calc(85vh - 150px) !important;
             overflow-y: auto !important;
             overscroll-behavior: contain !important;
             -webkit-overflow-scrolling: touch !important;
@@ -837,6 +852,85 @@
             display: flex;
             transform: translateX(-50%) scale(1);
             opacity: 1;
+        }
+
+        /* Segmented Tabs Header */
+        .popover-tabs-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.08));
+            flex-shrink: 0;
+        }
+
+        .popover-segmented-tabs {
+            display: flex;
+            background: var(--bg-surface, rgba(0, 0, 0, 0.05));
+            padding: 3px;
+            border-radius: 14px;
+            gap: 4px;
+            flex: 1;
+        }
+
+        html[data-theme="dark"] .popover-segmented-tabs {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .popover-tab-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 11px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            background: transparent;
+            color: var(--text-muted);
+        }
+
+        .popover-tab-btn:hover:not(.active) {
+            color: var(--text-base);
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        html[data-theme="dark"] .popover-tab-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .popover-tab-btn.active {
+            background: var(--bg-card, #ffffff) !important;
+            color: var(--bible-primary, #d17d39) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        html[data-theme="dark"] .popover-tab-btn.active {
+            background: rgba(255, 255, 255, 0.12) !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        .floating-nav-part-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 99px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .floating-nav-part-btn:hover {
+            background: rgba(209, 125, 57, 0.18);
+            color: var(--bible-primary, #d17d39);
+            transform: scale(1.05);
         }
 
         .floating-chapter-popover .chapter-item {
@@ -851,12 +945,13 @@
             align-items: center !important;
             justify-content: center !important;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            cursor: pointer;
         }
 
         .floating-chapter-popover .chapter-item:hover {
-            background: rgba(255, 255, 255, 0.08) !important;
+            background: rgba(209, 125, 57, 0.12) !important;
             border-color: var(--bible-primary) !important;
-            transform: scale(1.05) !important;
+            transform: scale(1.06) !important;
         }
 
         .floating-chapter-popover .chapter-item.active {
@@ -874,7 +969,15 @@
         }
         
         html[data-theme="light"] .floating-chapter-popover .chapter-item:not(.active):hover {
-            background: rgba(0, 0, 0, 0.05) !important;
+            background: rgba(209, 125, 57, 0.1) !important;
+        }
+
+        /* Books Items Grid */
+        #floating-books-items-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 6px;
+            padding-bottom: 8px;
         }
 
         /* Floating Book Item */
@@ -882,7 +985,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px 14px !important;
+            padding: 9px 12px !important;
             border-radius: 12px;
             font-size: 13px !important;
             font-weight: 600;
@@ -891,14 +994,14 @@
             transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
             background: rgba(255, 255, 255, 0.02) !important;
             border: 1px solid rgba(255, 255, 255, 0.06) !important;
-            margin-bottom: 6px;
             box-sizing: border-box !important;
+            min-height: 42px;
         }
 
         .floating-book-item:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.08) !important;
-            border-color: var(--bible-primary) !important;
-            padding-left: 18px !important;
+            background: rgba(209, 125, 57, 0.08) !important;
+            border-color: var(--bible-primary, #d17d39) !important;
+            transform: translateY(-1px);
         }
 
         .floating-book-item.active,
@@ -922,7 +1025,42 @@
         }
         
         html[data-theme="light"] .floating-book-item:not(.active):hover {
-            background: rgba(0, 0, 0, 0.05) !important;
+            background: rgba(209, 125, 57, 0.08) !important;
+            border-color: rgba(209, 125, 57, 0.3) !important;
+        }
+
+        .testament-header-pill {
+            grid-column: 1 / -1;
+            padding: 7px 12px;
+            margin: 8px 0 4px 0;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--bible-primary, #d17d39);
+            background: rgba(209, 125, 57, 0.08);
+            border-radius: 8px;
+            border-left: 3px solid var(--bible-primary, #d17d39);
+        }
+
+        .quick-book-chip {
+            padding: 5px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 99px;
+            white-space: nowrap;
+            cursor: pointer;
+            border: 1px solid var(--border-color, rgba(0,0,0,0.12));
+            background: var(--bg-surface, rgba(0,0,0,0.04));
+            color: var(--text-base, #334155);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .quick-book-chip:hover {
+            background: rgba(209, 125, 57, 0.12);
+            color: var(--bible-primary, #d17d39);
+            border-color: var(--bible-primary, #d17d39);
+            transform: scale(1.04);
         }
 
         .sheet-overlay-backdrop {
@@ -4082,8 +4220,8 @@
                     <span class="material-symbols-outlined">chevron_left</span>
                 </button>
                 <div class="floating-nav-info" id="floating-nav-info-pill" title="Choose book and chapter">
-                    <span id="floating-nav-book">JOHN</span>
-                    <span id="floating-nav-chapter">1</span>
+                    <span id="floating-nav-book" class="floating-nav-part-btn" title="Select book">JOHN</span>
+                    <span id="floating-nav-chapter" class="floating-nav-part-btn" title="Select chapter">1</span>
                 </div>
                 <button class="floating-nav-btn" id="floating-next-btn" title="Next chapter">
                     <span class="material-symbols-outlined">chevron_right</span>
@@ -4110,41 +4248,30 @@
                 <!-- Floating Chapter Popover -->
                 <div class="floating-chapter-popover" id="floating-chapter-popover">
                     <div class="sheet-handle-bar"></div>
-                    <!-- Header for Chapters (default view) -->
-                    <div id="floating-popover-header-chapters" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px;">
-                        <span style="font-weight: 700; font-size: 15px; color: var(--text-base);">Select chapter</span>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <button id="btn-show-books-view" onclick="const hc=document.getElementById('floating-popover-header-chapters'), hb=document.getElementById('floating-popover-header-books'), cg=document.getElementById('floating-chapter-grid'), bc=document.getElementById('floating-books-container'); if(hc)hc.style.display='none'; if(hb)hb.style.display='flex'; if(cg)cg.style.display='none'; if(bc){bc.style.display='flex'; if(window.bibleReader) window.bibleReader.renderFloatingBooks();}" style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px !important; font-weight: 700 !important; color: var(--bible-primary, #d17d39) !important; background: rgba(209, 125, 57, 0.1) !important; border: 1px solid rgba(209, 125, 57, 0.25) !important; border-radius: 20px !important; padding: 6px 14px !important; cursor: pointer; text-decoration: none; transition: all 0.2s ease;">
+                    <!-- Segmented Tabs Header -->
+                    <div class="popover-tabs-header">
+                        <div class="popover-segmented-tabs">
+                            <button type="button" id="tab-btn-books" class="popover-tab-btn" title="Select book">
                                 <span class="material-symbols-outlined" style="font-size: 16px;">menu_book</span>
-                                <span>Select book</span>
+                                <span>Books</span>
                             </button>
-                            <button type="button" class="sheet-close-btn" title="Close" onclick="document.getElementById('floating-chapter-popover').classList.remove('active'); const b=document.getElementById('hkm-sheet-backdrop-overlay'); if(b) b.classList.remove('active');">
-                                <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Header for Books (books view) -->
-                    <div id="floating-popover-header-books" style="display: none; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px;">
-                        <span style="font-weight: 700; font-size: 15px; color: var(--text-base);">Select book</span>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <button id="btn-show-chapters-view" style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px !important; font-weight: 700 !important; color: var(--bible-primary, #d17d39) !important; background: rgba(209, 125, 57, 0.1) !important; border: 1px solid rgba(209, 125, 57, 0.25) !important; border-radius: 20px !important; padding: 6px 14px !important; cursor: pointer; text-decoration: none; transition: all 0.2s ease;">
-                                <span class="material-symbols-outlined" style="font-size: 16px;">arrow_back</span>
-                                <span>Back</span>
-                            </button>
-                            <button type="button" class="sheet-close-btn" title="Close" onclick="document.getElementById('floating-chapter-popover').classList.remove('active'); const b=document.getElementById('hkm-sheet-backdrop-overlay'); if(b) b.classList.remove('active');">
-                                <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                            <button type="button" id="tab-btn-chapters" class="popover-tab-btn active" title="Select chapter">
+                                <span class="material-symbols-outlined" style="font-size: 16px;">tag</span>
+                                <span id="tab-chapters-label">Chapters</span>
                             </button>
                         </div>
+                        <button type="button" class="sheet-close-btn" title="Close" onclick="document.getElementById('floating-chapter-popover').classList.remove('active'); const b=document.getElementById('hkm-sheet-backdrop-overlay'); if(b) b.classList.remove('active');">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                        </button>
                     </div>
 
-                    <!-- Chapters Container -->
-                    <div class="chapter-grid" id="floating-chapter-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; max-height: 250px; overflow-y: auto;">
+                    <!-- Chapters Container (default view) -->
+                    <div class="chapter-grid" id="floating-chapter-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; max-height: 280px; overflow-y: auto;">
                         <!-- Loaded dynamically -->
                     </div>
 
                     <!-- Books Container -->
-                    <div id="floating-books-container" style="display: none; flex-direction: column; gap: 4px; max-height: 250px; overflow-y: auto; padding-right: 4px;">
+                    <div id="floating-books-container" style="display: none; flex-direction: column; gap: 4px; max-height: 340px; overflow-y: auto; padding-right: 4px;">
                         <!-- Loaded dynamically -->
                     </div>
                 </div>
