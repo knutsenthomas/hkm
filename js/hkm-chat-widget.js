@@ -113,12 +113,12 @@ function generateHkmAiResponse(text, lang = 'no') {
 
   if (lower.includes('bønn') || lower.includes('be for') || lower.includes('pray') || lower.includes('oraci') || lower.includes('orar')) {
     if (lang === 'en') {
-      return '🙏 **We would love to pray for you!**\n\nJesus hears every prayer and cares deeply for your heart. Your prayer request has also been forwarded directly to our team in the Wix app so Thomas and our intercessors can lift you up.\n\n*"Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God."* – Philippians 4:6 ✨';
+      return '🙏 **We would love to pray for you!**\n\nJesus hears every prayer and cares deeply for your heart. Your prayer request has been forwarded directly to our team so Thomas and our intercessors can lift you up in prayer.\n\n*"Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God."* – Philippians 4:6 ✨';
     }
     if (lang === 'es') {
-      return '🙏 **¡Nos encantaría orar por ti!**\n\nJesús escucha cada oración y se preocupa profundamente por tu vida. Tu petición ha sido enviada directamente a nuestro equipo en la aplicación Wix para que Thomas y nuestros intercesores oren por ti.\n\n*"Por nada estéis afanosos, sino sean conocidas vuestras peticiones delante de Dios en toda oración y ruego, con acción de gracias."* – Filipenses 4:6 ✨';
+      return '🙏 **¡Nos encantaría orar por ti!**\n\nJesús escucha cada oración y se preocupa profundamente por tu vida. Tu petición ha sido enviada directamente a nuestro equipo para que Thomas y nuestros intercesores oren por ti.\n\n*"Por nada estéis afanosos, sino sean conocidas vuestras peticiones delante de Dios en toda oración y ruego, con acción de gracias."* – Filipenses 4:6 ✨';
     }
-    return '🙏 **Vi vil mer enn gjerne be for deg!**\n\nJesus hører enhver bønn og bryr seg om deg og din situasjon. Bønnebegjæret ditt er også sendt rett inn til teamet vårt i Wix-appen slik at Thomas og bønnelederne våre kan løfte deg opp i bønn.\n\n*"Vær ikke bekymret for noe, men legg i alle ting deres bønner fram for Gud i påkallelse og bønn med takk."* – Filipperne 4:6 ✨';
+    return '🙏 **Vi vil mer enn gjerne be for deg!**\n\nJesus hører enhver bønn og bryr seg om deg og din situasjon. Bønnebegjæret ditt er overlevert direkte til teamet vårt slik at Thomas og bønnelederne våre kan løfte deg opp i bønn.\n\n*"Vær ikke bekymret for noe, men legg i alle ting deres bønner fram for Gud i påkallelse og bønn med takk."* – Filipperne 4:6 ✨';
   }
 
   if (lower.includes('bibel') || lower.includes('studie') || lower.includes('undervisning') || lower.includes('reading plan') || lower.includes('leseplan')) {
@@ -163,22 +163,22 @@ function generateHkmAiResponse(text, lang = 'no') {
 
   if (lower.includes('kontakt') || lower.includes('hvem er') || lower.includes('thomas') || lower.includes('e-post') || lower.includes('telefon') || lower.includes('adresse') || lower.includes('contact')) {
     if (lang === 'en') {
-      return '✉️ **Contact Us**\n\nHis Kingdom Ministry is led by Thomas and Hilde Karin Knutsen. You can reach us here in the chat, or by email at **post@hiskingdomministry.no**. Your message has been sent to our phone in the Wix app, and we will reply as soon as possible!';
+      return '✉️ **Contact Us**\n\nHis Kingdom Ministry is led by Thomas and Hilde Karin Knutsen. You can reach us directly here in the chat, or by email at **post@hiskingdomministry.no**. We will reply as soon as possible!';
     }
     if (lang === 'es') {
-      return '✉️ **Contacto**\n\nHis Kingdom Ministry es dirigido por Thomas y Hilde Karin Knutsen. Puedes escribirnos aquí en el chat o por correo a **post@hiskingdomministry.no**. ¡Tu mensaje ya fue enviado a nuestro teléfono y responderemos pronto!';
+      return '✉️ **Contacto**\n\nHis Kingdom Ministry es dirigido por Thomas y Hilde Karin Knutsen. Puedes escribirnos directamente aquí en el chat o por correo a **post@hiskingdomministry.no**. ¡Te responderemos pronto!';
     }
-    return '✉️ **Kontakt His Kingdom Ministry**\n\nHis Kingdom Ministry ledes av Thomas og Hilde Karin Knutsen. Du kan nå oss direkte her i chatten, eller på e-post til **post@hiskingdomministry.no**.\n\nMeldingen din er allerede overført til telefonen vår via Wix-appen, og vi svarer deg så fort vi har anledning!';
+    return '✉️ **Kontakt His Kingdom Ministry**\n\nHis Kingdom Ministry ledes av Thomas og Hilde Karin Knutsen. Du kan nå oss direkte her i chatten, eller på e-post til **post@hiskingdomministry.no**.\n\nVi svarer deg så fort vi har anledning!';
   }
 
   // General helpful faith-filled response
   if (lang === 'en') {
-    return '✨ **Thank you for reaching out!**\n\nWe have received your message and sent a push notification directly to our team in the Wix app. We will get back to you shortly.\n\n*"The Lord bless you and keep you; the Lord make his face shine on you and be gracious to you."* – Numbers 6:24-25 🙏';
+    return '✨ **Thank you for reaching out!**\n\nWe have received your message and notified our team. We will get back to you here shortly.\n\n*"The Lord bless you and keep you; the Lord make his face shine on you and be gracious to you."* – Numbers 6:24-25 🙏';
   }
   if (lang === 'es') {
-    return '✨ **¡Gracias por contactarnos!**\n\nHemos recibido tu mensaje y enviado una notificación a nuestro equipo en la aplicación Wix. Te responderemos a la brevedad.\n\n*"Jehová te bendiga, y te guarde; Jehová haga resplandecer su rostro sobre ti, y tenga de ti misericordia."* – Números 6:24-25 🙏';
+    return '✨ **¡Gracias por contactarnos!**\n\nHemos recibido tu mensaje y notificado a nuestro equipo. Te responderemos por aquí a la brevedad.\n\n*"Jehová te bendiga, y te guarde; Jehová haga resplandecer su rostro sobre ti, y tenga de ti misericordia."* – Números 6:24-25 🙏';
   }
-  return '✨ **Takk for henvendelsen!**\n\nMeldingen din er mottatt og sendt som et direkte push-varsel til teamet vårt i Wix-appen. Vi svarer deg her så snart vi kan.\n\n*"Herren velsigne deg og bevare deg! Herren la sitt ansikt lyse over deg og være deg nådig!"* – 4. Mosebok 6:24-25 🙏';
+  return '✨ **Takk for henvendelsen!**\n\nMeldingen din er mottatt og sendt direkte til teamet vårt. Vi svarer deg her så snart vi kan.\n\n*"Herren velsigne deg og bevare deg! Herren la sitt ansikt lyse over deg og være deg nådig!"* – 4. Mosebok 6:24-25 🙏';
 }
 
 function formatMarkdown(text) {
