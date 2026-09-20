@@ -79,22 +79,6 @@ export default async function handler(req, res) {
     console.log('[HKM Chat] Sending message to Wix Inbox conversation:', conversationId);
     const result = await wixClient.inboxMessages.sendMessage(conversationId, formattedMessage, options);
 
-    // Optional Slack notification if webhook is configured
-    const slackWebhookUrl = process.env.SLACK_CHAT_WEBHOOK_URL || process.env.SLACK_WEBHOOK_URL;
-    if (slackWebhookUrl) {
-      try {
-        await fetch(slackWebhookUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            text: `💬 *HKM Assistent: Ny henvendelse!*\n*Fra:* ${senderName || 'Besøkende'} ${senderEmail ? `(<mailto:${senderEmail}|${senderEmail}>)` : ''}\n*Melding:* ${rawText}\n*Kanal:* His Kingdom Ministry (Wix App Push)`
-          })
-        });
-      } catch (slackErr) {
-        console.warn('[HKM Chat] Slack notification failed (non-blocking):', slackErr);
-      }
-    }
-
     res.status(200).json(result);
   } catch (error) {
     console.error('[HKM Chat] Error in send-message serverless function:', error);
