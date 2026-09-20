@@ -9643,10 +9643,17 @@ html[data-theme="dark"] .skeleton-text::after {
 #site-search-input-v2:focus,
 #site-search-input-v2:focus-visible,
 #floating-book-search-input:focus,
-#floating-book-search-input:focus-visible {
+#floating-book-search-input:focus-visible,
+.hkm-chat-input:focus,
+.hkm-chat-input:focus-visible,
+.hkm-chat-input:active,
+#hkm-chat-form:focus-within,
+#hkm-chat-widget-root button:focus,
+#hkm-chat-widget-root button:focus-visible {
     outline: none !important;
     outline-style: none !important;
     outline-width: 0 !important;
+    outline-offset: 0 !important;
     box-shadow: none !important;
     -webkit-tap-highlight-color: transparent !important;
 }

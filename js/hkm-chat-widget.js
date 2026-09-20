@@ -583,9 +583,25 @@ export function initHkmChatWidget() {
       border-color: rgba(255, 255, 255, 0.12);
       color: #f1f5f9;
     }
-    .hkm-chat-input:focus {
-      border-color: #d17d39;
-      box-shadow: 0 0 0 1px #d17d39;
+    .hkm-chat-input:focus,
+    .hkm-chat-input:focus-visible {
+      outline: none !important;
+      outline-offset: 0 !important;
+      box-shadow: none !important;
+      border-color: #d17d39 !important;
+    }
+
+    .hkm-chat-send-btn:focus,
+    .hkm-chat-send-btn:focus-visible,
+    .hkm-chip-btn:focus,
+    .hkm-chip-btn:focus-visible,
+    .hkm-chat-launcher:focus,
+    .hkm-chat-launcher:focus-visible,
+    .hkm-chat-close-btn:focus,
+    .hkm-chat-close-btn:focus-visible {
+      outline: none !important;
+      outline-offset: 0 !important;
+      box-shadow: none !important;
     }
 
     .hkm-chat-send-btn {
