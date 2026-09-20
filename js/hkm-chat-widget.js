@@ -20,12 +20,12 @@ const TRANSLATIONS = {
     offlineTitle: 'Vi er ikke tilstede nå',
     offlineDesc: 'Våre åpningstider for kundeservice er mandag–fredag 08:00–16:00. Du kan fortsatt sende oss meldinger, så svarer vi deg her eller på e-post så fort vi er tilbake! 😊',
     quick: [
-      { text: 'Kan dere be for meg? 🙏', label: '🙏 Bønnebegjær' },
-      { text: 'Hvor finner jeg bibelstudiene? 📖', label: '📖 Bibelstudier' },
-      { text: 'Hvilke arrangementer kommer snart? 🗓️', label: '🗓️ Arrangementer' },
-      { text: 'Hvor kan jeg lytte til podcasten? 🎙️', label: '🎙️ Podkast' },
-      { text: 'Hvordan kan jeg bli fast giver? 💛', label: '💛 Bli fast giver' },
-      { text: 'Hvordan kommer jeg i kontakt med dere? ✉️', label: '✉️ Kontakt oss' }
+      { text: 'Kan dere be for meg? 🙏', label: '🙏 Bønnebegjær', actionRequired: true },
+      { text: 'Hvor finner jeg bibelstudiene? 📖', label: '📖 Bibelstudier', actionRequired: false },
+      { text: 'Hvilke arrangementer kommer snart? 🗓️', label: '🗓️ Arrangementer', actionRequired: false },
+      { text: 'Hvor kan jeg lytte til podcasten? 🎙️', label: '🎙️ Podkast', actionRequired: false },
+      { text: 'Hvordan kan jeg bli fast giver? 💛', label: '💛 Bli fast giver', actionRequired: false },
+      { text: 'Hvordan kommer jeg i kontakt med dere? ✉️', label: '✉️ Kontakt oss', actionRequired: false }
     ]
   },
   en: {
@@ -43,12 +43,12 @@ const TRANSLATIONS = {
     offlineTitle: 'We are currently offline',
     offlineDesc: 'Our support hours are Mon–Fri 08:00–16:00. You can still send a message, and we will reply as soon as we are back! 😊',
     quick: [
-      { text: 'Can you pray for me? 🙏', label: '🙏 Prayer request' },
-      { text: 'Where can I find Bible studies? 📖', label: '📖 Bible studies' },
-      { text: 'What events are coming up? 🗓️', label: '🗓️ Events' },
-      { text: 'Where can I listen to the podcast? 🎙️', label: '🎙️ Podcast' },
-      { text: 'How can I support your ministry? 💛', label: '💛 Support ministry' },
-      { text: 'How can I get in touch? ✉️', label: '✉️ Contact us' }
+      { text: 'Can you pray for me? 🙏', label: '🙏 Prayer request', actionRequired: true },
+      { text: 'Where can I find Bible studies? 📖', label: '📖 Bible studies', actionRequired: false },
+      { text: 'What events are coming up? 🗓️', label: '🗓️ Events', actionRequired: false },
+      { text: 'Where can I listen to the podcast? 🎙️', label: '🎙️ Podcast', actionRequired: false },
+      { text: 'How can I support your ministry? 💛', label: '💛 Support ministry', actionRequired: false },
+      { text: 'How can I get in touch? ✉️', label: '✉️ Contact us', actionRequired: false }
     ]
   },
   es: {
@@ -66,12 +66,12 @@ const TRANSLATIONS = {
     offlineTitle: 'Estamos fuera de horario',
     offlineDesc: 'Nuestro horario de atención es de lunes a viernes de 08:00 a 16:00. ¡Aún puedes dejarnos un mensaje y te responderemos pronto! 😊',
     quick: [
-      { text: '¿Pueden orar por mí? 🙏', label: '🙏 Petición de oración' },
-      { text: '¿Dónde encuentro estudios bíblicos? 📖', label: '📖 Estudios bíblicos' },
-      { text: '¿Cuáles son los próximos eventos? 🗓️', label: '🗓️ Eventos' },
-      { text: '¿Dónde puedo escuchar el podcast? 🎙️', label: '🎙️ Pódcast' },
-      { text: '¿Cómo puedo apoyar al ministerio? 💛', label: '💛 Donaciones' },
-      { text: '¿Cómo puedo contactarlos? ✉️', label: '✉️ Contáctanos' }
+      { text: '¿Pueden orar por mí? 🙏', label: '🙏 Petición de oración', actionRequired: true },
+      { text: '¿Dónde encuentro estudios bíblicos? 📖', label: '📖 Estudios bíblicos', actionRequired: false },
+      { text: '¿Cuáles son los próximos eventos? 🗓️', label: '🗓️ Eventos', actionRequired: false },
+      { text: '¿Dónde puedo escuchar el podcast? 🎙️', label: '🎙️ Pódcast', actionRequired: false },
+      { text: '¿Cómo puedo apoyar al ministerio? 💛', label: '💛 Donaciones', actionRequired: false },
+      { text: '¿Cómo puedo contactarlos? ✉️', label: '✉️ Contáctanos', actionRequired: false }
     ]
   }
 };
@@ -671,7 +671,7 @@ export function initHkmChatWidget() {
       </div>
 
       <div class="hkm-chips-bar" id="hkm-chips-bar">
-        ${t.quick.map(q => `<button type="button" class="hkm-chip-btn" data-text="${q.text}">${q.label}</button>`).join('')}
+        ${t.quick.map(q => `<button type="button" class="hkm-chip-btn" data-text="${q.text}" data-action="${q.actionRequired ? 'true' : 'false'}">${q.label}</button>`).join('')}
       </div>
 
       <div class="hkm-chat-footer">
@@ -720,62 +720,67 @@ export function initHkmChatWidget() {
     }
   }
 
-  launcher.addEventListener('click', () => toggleChat(!isOpen));
+  launcher.addEventListener('click', () => toggleChat());
   closeBtn.addEventListener('click', () => toggleChat(false));
 
-  function appendMessage(text, isUser = false, ownerName = '') {
-    const row = document.createElement('div');
-    row.className = `hkm-msg-row ${isUser ? 'hkm-msg-row-user' : 'hkm-msg-row-bot'}`;
+  chatForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    handleSendMessage();
+  });
 
-    const timeStr = new Date().toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
-
-    if (isUser) {
-      row.innerHTML = `
-        <div>
-          <div class="hkm-msg-bubble hkm-msg-bubble-user">${formatMarkdown(text)}</div>
-          <div class="hkm-msg-time">${timeStr}</div>
-        </div>
-      `;
-    } else if (ownerName) {
-      row.innerHTML = `
-        <span class="material-symbols-outlined hkm-msg-avatar">account_circle</span>
-        <div>
-          <div style="font-size: 10px; font-weight: 700; color: #bd4f2a; margin-bottom: 2px; padding: 0 4px;">${ownerName}</div>
-          <div class="hkm-msg-bubble hkm-msg-bubble-owner">${formatMarkdown(text)}</div>
-          <div class="hkm-msg-time">${timeStr}</div>
-        </div>
-      `;
-    } else {
-      row.innerHTML = `
-        <span class="material-symbols-outlined hkm-msg-avatar">support_agent</span>
-        <div>
-          <div class="hkm-msg-bubble hkm-msg-bubble-bot">${formatMarkdown(text)}</div>
-          <div class="hkm-msg-time">${timeStr}</div>
-        </div>
-      `;
+  inputEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
     }
+  });
 
-    messagesContainer.appendChild(row);
+  function appendMessage(text, isUser, senderLabel) {
+    const msgEl = document.createElement('div');
+    msgEl.className = `hkm-msg-row ${isUser ? 'user' : 'bot'}`;
+    
+    const timeStr = new Date().toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
+    const isOwner = !!senderLabel;
+
+    msgEl.innerHTML = `
+      ${!isUser ? `
+        <div class="hkm-avatar ${isOwner ? 'hkm-avatar-owner' : ''}">
+          <span class="material-symbols-outlined">${isOwner ? 'person' : 'support_agent'}</span>
+        </div>
+      ` : ''}
+      <div class="hkm-msg-content">
+        ${isOwner ? `<div class="hkm-owner-tag">👤 ${senderLabel}</div>` : ''}
+        <div class="hkm-msg-bubble ${isUser ? 'hkm-msg-bubble-user' : (isOwner ? 'hkm-msg-bubble-owner' : 'hkm-msg-bubble-bot')}">
+          ${formatMarkdown(text)}
+        </div>
+        <div class="hkm-msg-time">${timeStr}</div>
+      </div>
+    `;
+
+    messagesContainer.appendChild(msgEl);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    return row;
   }
 
   function showTypingIndicator() {
-    const row = document.createElement('div');
-    row.className = 'hkm-msg-row hkm-msg-row-bot';
-    row.id = 'hkm-active-typing';
-    row.innerHTML = `
-      <span class="material-symbols-outlined hkm-msg-avatar">support_agent</span>
-      <div class="hkm-typing-indicator">
-        <span>${t.typing}</span>
-        <span class="hkm-typing-dot"></span>
-        <span class="hkm-typing-dot"></span>
-        <span class="hkm-typing-dot"></span>
+    removeTypingIndicator();
+    const ind = document.createElement('div');
+    ind.id = 'hkm-active-typing';
+    ind.className = 'hkm-msg-row bot';
+    ind.innerHTML = `
+      <div class="hkm-avatar">
+        <span class="material-symbols-outlined">support_agent</span>
+      </div>
+      <div class="hkm-msg-content">
+        <div class="hkm-typing-indicator">
+          <span class="hkm-typing-text">${t.typing}</span>
+          <div class="hkm-typing-dot"></div>
+          <div class="hkm-typing-dot"></div>
+          <div class="hkm-typing-dot"></div>
+        </div>
       </div>
     `;
-    messagesContainer.appendChild(row);
+    messagesContainer.appendChild(ind);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    return row;
   }
 
   function removeTypingIndicator() {
@@ -783,17 +788,20 @@ export function initHkmChatWidget() {
     if (el) el.remove();
   }
 
-  // Quick reply chips click
+  // Quick reply chips click: only push to phone if action is required (like prayer requests)
   chipsBar.addEventListener('click', (e) => {
     const chip = e.target.closest('.hkm-chip-btn');
     if (chip && chip.dataset.text) {
-      handleSendMessage(chip.dataset.text);
+      const isActionRequired = chip.dataset.action === 'true';
+      handleSendMessage(chip.dataset.text, { skipWixPush: !isActionRequired });
     }
   });
 
-  async function handleSendMessage(customText) {
+  async function handleSendMessage(customText, options = {}) {
     const text = (typeof customText === 'string' ? customText : inputEl.value).trim();
     if (!text || isSending) return;
+
+    const skipWixPush = options.skipWixPush === true;
 
     // 1. Render user message immediately
     appendMessage(text, true);
@@ -805,44 +813,46 @@ export function initHkmChatWidget() {
     showTypingIndicator();
 
     try {
-      // 2. Get or create Wix conversation if needed
-      if (!conversationId) {
-        const convRes = await fetch('/api/get-or-create-conversation', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            anonymousVisitorId: anonVisitorId
-          })
-        });
+      // 2 & 3. Forward to Wix Inbox ONLY IF action is required (like Prayer request) or user-typed text
+      if (!skipWixPush) {
+        if (!conversationId) {
+          const convRes = await fetch('/api/get-or-create-conversation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              anonymousVisitorId: anonVisitorId
+            })
+          });
 
-        if (convRes.ok) {
-          const convData = await convRes.json();
-          conversationId = convData.conversation?._id || convData.conversation?.id;
-          if (conversationId) {
-            sessionStorage.setItem('hkm_wix_conv_id', conversationId);
+          if (convRes.ok) {
+            const convData = await convRes.json();
+            conversationId = convData.conversation?._id || convData.conversation?.id;
+            if (conversationId) {
+              sessionStorage.setItem('hkm_wix_conv_id', conversationId);
+            }
           }
         }
-      }
 
-      // 3. Send message to Wix Inbox API in background (triggers phone push notification)
-      if (conversationId) {
-        fetch('/api/send-message', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            conversationId,
-            senderName: 'Besøkende',
-            message: {
-              direction: 'PARTICIPANT_TO_BUSINESS',
-              visibility: 'BUSINESS_AND_PARTICIPANT',
-              content: {
-                basic: {
-                  items: [{ text }]
+        // Send message to Wix Inbox API in background (triggers phone push notification)
+        if (conversationId) {
+          fetch('/api/send-message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              conversationId,
+              senderName: 'Besøkende',
+              message: {
+                direction: 'PARTICIPANT_TO_BUSINESS',
+                visibility: 'BUSINESS_AND_PARTICIPANT',
+                content: {
+                  basic: {
+                    items: [{ text }]
+                  }
                 }
               }
-            }
-          })
-        }).catch(err => console.warn('[HKM Chat] Wix dispatch warning:', err));
+            })
+          }).catch(err => console.warn('[HKM Chat] Wix dispatch warning:', err));
+        }
       }
 
       // 4. Generate AI response with natural delay
