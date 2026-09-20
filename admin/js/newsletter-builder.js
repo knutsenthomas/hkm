@@ -401,8 +401,17 @@ class NewsletterBuilder {
 
     startAuthListener() {
         window.firebaseService.onAuthChange(async (user) => {
+            if (this._pendingAuthRedirectTimer) {
+                clearTimeout(this._pendingAuthRedirectTimer);
+                this._pendingAuthRedirectTimer = null;
+            }
+
             if (!user) {
-                window.location.href = '/admin/login.html';
+                this._pendingAuthRedirectTimer = setTimeout(() => {
+                    if (!window.firebaseService?.auth?.currentUser) {
+                        window.location.href = '/admin/login.html';
+                    }
+                }, 2500);
             } else {
                 console.log("[newsletter-builder] User is authenticated. Loading data...");
                 await this.loadTemplates();
@@ -12014,11 +12023,11 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                 : `<span class="card-badge" style="margin-bottom: 12px;">Nyhetsbrev</span>`;
 
             const buttonHtml = `
-                <div class="card-action-footer" style="display: flex; gap: 8px; width: 100%; box-sizing: border-box; margin-top: auto;">
-                    <button class="btn" id="regenerate-newsletter-suggestion-btn" style="flex: 0 0 46px; width: 46px; height: 44px; padding: 0; background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: none;" onmouseover="this.style.background='#e2e8f0';" onmouseout="this.style.background='#f1f5f9';" title="Generer nytt forslag">
+                <div class="card-action-footer">
+                    <button class="btn ai-regenerate-btn" id="regenerate-newsletter-suggestion-btn" title="Generer nytt forslag">
                         <span class="material-symbols-outlined" style="font-size: 20px;">cached</span>
                     </button>
-                    <button class="btn" id="use-newsletter-suggestion-btn" style="flex: 1; height: 44px; margin: 0;">
+                    <button class="btn btn-primary ai-use-btn" id="use-newsletter-suggestion-btn">
                         <span class="material-symbols-outlined">mark_email_unread</span> Opprett og åpne kladd
                     </button>
                 </div>
@@ -12070,11 +12079,11 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                 : `<span class="card-badge" style="margin-bottom: 12px;">Blogginnlegg</span>`;
 
             const buttonHtml = `
-                <div class="card-action-footer" style="display: flex; gap: 8px; width: 100%; box-sizing: border-box; margin-top: auto;">
-                    <button class="btn" id="regenerate-blog-suggestion-btn" style="flex: 0 0 46px; width: 46px; height: 44px; padding: 0; background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: none;" onmouseover="this.style.background='#e2e8f0';" onmouseout="this.style.background='#f1f5f9';" title="Generer nytt forslag">
+                <div class="card-action-footer">
+                    <button class="btn ai-regenerate-btn" id="regenerate-blog-suggestion-btn" title="Generer nytt forslag">
                         <span class="material-symbols-outlined" style="font-size: 20px;">cached</span>
                     </button>
-                    <button class="btn" id="use-blog-suggestion-btn" style="flex: 1; height: 44px; margin: 0;">
+                    <button class="btn btn-primary ai-use-btn" id="use-blog-suggestion-btn">
                         <span class="material-symbols-outlined">edit_document</span> Opprett bloggutkast
                     </button>
                 </div>
@@ -12128,11 +12137,11 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                 : `<span class="card-badge" style="margin-bottom: 12px;">Undervisning</span>`;
 
             const buttonHtml = `
-                <div class="card-action-footer" style="display: flex; gap: 8px; width: 100%; box-sizing: border-box; margin-top: auto;">
-                    <button class="btn" id="regenerate-teaching-suggestion-btn" style="flex: 0 0 46px; width: 46px; height: 44px; padding: 0; background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: none;" onmouseover="this.style.background='#e2e8f0';" onmouseout="this.style.background='#f1f5f9';" title="Generer nytt forslag">
+                <div class="card-action-footer">
+                    <button class="btn ai-regenerate-btn" id="regenerate-teaching-suggestion-btn" title="Generer nytt forslag">
                         <span class="material-symbols-outlined" style="font-size: 20px;">cached</span>
                     </button>
-                    <button class="btn" id="use-teaching-suggestion-btn" style="flex: 1; height: 44px; margin: 0;">
+                    <button class="btn btn-primary ai-use-btn" id="use-teaching-suggestion-btn">
                         <span class="material-symbols-outlined">school</span> Opprett undervisning
                     </button>
                 </div>

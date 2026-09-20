@@ -658,7 +658,7 @@ const initAdminHeader = () => {
 
             let role = 'medlem';
             try {
-                role = await firebaseService.getUserRole(user.uid, { timeoutMs: 2500 });
+                role = await firebaseService.getUserRole(user.uid, { timeoutMs: 6000 });
             } catch (e) {
                 console.warn('[admin-header] Could not fetch user role:', e);
             }

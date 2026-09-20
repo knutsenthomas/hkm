@@ -38,13 +38,22 @@ class MessagesManager {
 
     startAuthListener() {
         window.firebaseService.onAuthChange((user) => {
+            if (this._pendingAuthRedirectTimer) {
+                clearTimeout(this._pendingAuthRedirectTimer);
+                this._pendingAuthRedirectTimer = null;
+            }
+
             if (user) {
                 this.currentAdminEmail = user.email || '';
                 this.startAdminBellListeners(user.uid);
                 this.loadUnifiedInbox();
             } else {
                 this.stopAdminBellListeners();
-                window.location.href = '/admin/login.html';
+                this._pendingAuthRedirectTimer = setTimeout(() => {
+                    if (!window.firebaseService?.auth?.currentUser) {
+                        window.location.href = '/admin/login.html';
+                    }
+                }, 2500);
             }
         });
     }

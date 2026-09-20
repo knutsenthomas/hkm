@@ -19,7 +19,7 @@ class FirebaseService {
         this._contentMemoTtlMs = 2 * 60 * 1000;
         this._collectionCacheTtlMs = 60 * 1000; // 1 min for collections
         this._fetchErrorNoticeTimestamps = new Map();
-        this._userRoleCacheTtlMs = 10 * 60 * 1000; // 10 min fallback cache for auth/routing stability
+        this._userRoleCacheTtlMs = 24 * 60 * 60 * 1000; // 24 hours fallback cache for auth/routing stability
         this._userRoleCacheKeyPrefix = 'hkm_user_role_cache:';
         this._retryRegistered = false;
         this.isLazy = true; // Indicates Firebase is deferred to user interaction
@@ -491,28 +491,13 @@ class FirebaseService {
         if (this._authPersistencePromise) return this._authPersistencePromise;
 
         const localPersistence = firebase?.auth?.Auth?.Persistence?.LOCAL;
-        const sessionPersistence = firebase?.auth?.Auth?.Persistence?.SESSION;
         if (!localPersistence) return false;
 
-        const persistencePromise = this.auth.setPersistence(localPersistence);
-        const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error("Persistence timeout")), 800)
-        );
-
-        this._authPersistencePromise = Promise.race([persistencePromise, timeoutPromise])
+        this._authPersistencePromise = this.auth.setPersistence(localPersistence)
             .then(() => true)
             .catch((err) => {
-                console.warn("[FirebaseService] LOCAL auth persistence failed or timed out, trying SESSION:", err);
-                if (sessionPersistence) {
-                    const sessionPromise = this.auth.setPersistence(sessionPersistence);
-                    const sessionTimeout = new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error("Session persistence timeout")), 800)
-                    );
-                    return Promise.race([sessionPromise, sessionTimeout])
-                        .then(() => true)
-                        .catch(() => false);
-                }
-                return false;
+                console.warn("[FirebaseService] LOCAL auth persistence notice:", err);
+                return true;
             });
 
         return this._authPersistencePromise;
@@ -1092,7 +1077,7 @@ class FirebaseService {
         if (!safeUid) return 'medlem';
         const timeoutMs = Number.isFinite(options?.timeoutMs) && options.timeoutMs > 0
             ? Math.round(options.timeoutMs)
-            : 2500;
+            : 6000;
         const cachedRole = this._getCachedUserRole(safeUid);
         const fallbackSuperadmins = ['thomas@hiskingdomministry.no', 'knutsenthomas@gmail.com'];
         const currentUser = this.auth && this.auth.currentUser ? this.auth.currentUser : null;

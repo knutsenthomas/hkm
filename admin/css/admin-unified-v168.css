@@ -10057,15 +10057,44 @@ html[data-theme="dark"] .ai-suggestion-card .section-divider {
 html[data-theme="dark"] .ai-suggestion-card .suggestion-bullets {
   color: var(--admin-text-muted, #94a3b8) !important;
 }
+html[data-theme="dark"] .ai-suggestion-card .ai-regenerate-btn,
 html[data-theme="dark"] .ai-suggestion-card button[style*="background: #f1f5f9"],
 html[data-theme="dark"] .ai-suggestion-card button[style*="background:#f1f5f9"] {
   background: var(--admin-surface-muted, #0f172a) !important;
   border-color: var(--admin-border, #334155) !important;
   color: var(--admin-text, #f8fafc) !important;
 }
+html[data-theme="dark"] .ai-suggestion-card .ai-regenerate-btn:hover,
 html[data-theme="dark"] .ai-suggestion-card button[style*="background: #f1f5f9"]:hover,
 html[data-theme="dark"] .ai-suggestion-card button[style*="background:#f1f5f9"]:hover {
   background: var(--admin-surface, #1e293b) !important;
+}
+html[data-theme="dark"] .ai-suggestion-card.newsletter-type .ai-regenerate-btn {
+  background: rgba(209, 125, 57, 0.15) !important;
+  border-color: rgba(209, 125, 57, 0.4) !important;
+  color: #ff8854 !important;
+}
+html[data-theme="dark"] .ai-suggestion-card.newsletter-type .ai-regenerate-btn:hover {
+  background: rgba(209, 125, 57, 0.25) !important;
+  color: #ffaa80 !important;
+}
+html[data-theme="dark"] .ai-suggestion-card.blog-type .ai-regenerate-btn {
+  background: rgba(56, 189, 248, 0.15) !important;
+  border-color: rgba(56, 189, 248, 0.4) !important;
+  color: #38bdf8 !important;
+}
+html[data-theme="dark"] .ai-suggestion-card.blog-type .ai-regenerate-btn:hover {
+  background: rgba(56, 189, 248, 0.25) !important;
+  color: #7dd3fc !important;
+}
+html[data-theme="dark"] .ai-suggestion-card.teaching-type .ai-regenerate-btn {
+  background: rgba(52, 211, 153, 0.15) !important;
+  border-color: rgba(52, 211, 153, 0.4) !important;
+  color: #34d399 !important;
+}
+html[data-theme="dark"] .ai-suggestion-card.teaching-type .ai-regenerate-btn:hover {
+  background: rgba(52, 211, 153, 0.25) !important;
+  color: #6ee7b7 !important;
 }
 html[data-theme="dark"] .ai-suggestion-card .card-badge[style*="background:#e2e8f0"],
 html[data-theme="dark"] .ai-suggestion-card .card-badge[style*="background: #e2e8f0"] {

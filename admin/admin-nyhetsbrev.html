@@ -296,48 +296,125 @@
             margin-bottom: 8px;
         }
         .ai-suggestion-card .card-action-footer {
-            margin-top: auto;
-            width: 100%;
+            margin-top: auto !important;
+            width: 100% !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            box-sizing: border-box !important;
         }
-        .ai-suggestion-card .card-action-footer button {
-            width: 100%;
-            padding: 12px 16px;
-            font-size: 13.5px;
-            font-weight: 700;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
+        .ai-suggestion-card .card-action-footer .ai-regenerate-btn {
+            flex: 0 0 44px !important;
+            width: 44px !important;
+            height: 44px !important;
+            min-height: 44px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            border-radius: 10px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            box-shadow: none !important;
         }
-        .ai-suggestion-card.newsletter-type .card-action-footer button {
-            background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
-            color: white;
-            border: none;
+        .ai-suggestion-card .card-action-footer .ai-regenerate-btn:active {
+            transform: scale(0.96) !important;
         }
-        .ai-suggestion-card.newsletter-type .card-action-footer button:hover {
-            background: linear-gradient(135deg, #bd4f2a 0%, #a23c1e 100%);
-            box-shadow: 0 4px 12px rgba(209,125,57,0.35);
+        .ai-suggestion-card .card-action-footer .ai-use-btn {
+            flex: 1 1 auto !important;
+            height: 44px !important;
+            min-height: 44px !important;
+            width: auto !important;
+            padding: 10px 16px !important;
+            margin: 0 !important;
+            font-size: 13.5px !important;
+            font-weight: 700 !important;
+            border-radius: 10px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 8px !important;
+            cursor: pointer !important;
+            border: none !important;
+            color: #ffffff !important;
+            text-decoration: none !important;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
-        .ai-suggestion-card.blog-type .card-action-footer button {
-            background: #1b4965;
-            color: white;
-            border: none;
+        .ai-suggestion-card .card-action-footer .ai-use-btn:active {
+            transform: scale(0.98) !important;
         }
-        .ai-suggestion-card.blog-type .card-action-footer button:hover {
-            background: #123144;
-            box-shadow: 0 4px 12px rgba(27,73,101,0.35);
+
+        /* 1. Newsletter Card Buttons (Brand Orange) */
+        .ai-suggestion-card.newsletter-type .ai-regenerate-btn {
+            background: #fff7ed !important;
+            border: 1.5px solid rgba(209, 125, 57, 0.35) !important;
+            color: #d17d39 !important;
         }
-        .ai-suggestion-card.teaching-type .card-action-footer button {
-            background: #059669;
-            color: white;
-            border: none;
+        .ai-suggestion-card.newsletter-type .ai-regenerate-btn:hover {
+            background: #ffedd5 !important;
+            color: #bd4f2a !important;
+            border-color: rgba(209, 125, 57, 0.6) !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 2px 8px rgba(209, 125, 57, 0.2) !important;
         }
-        .ai-suggestion-card.teaching-type .card-action-footer button:hover {
-            background: #047857;
-            box-shadow: 0 4px 12px rgba(5,150,105,0.35);
+        .ai-suggestion-card.newsletter-type .ai-use-btn {
+            background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(209, 125, 57, 0.28) !important;
+        }
+        .ai-suggestion-card.newsletter-type .ai-use-btn:hover {
+            background: linear-gradient(135deg, #bd4f2a 0%, #a23c1e 100%) !important;
+            box-shadow: 0 6px 16px rgba(209, 125, 57, 0.38) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        /* 2. Blog Card Buttons (Brand Dark Blue) */
+        .ai-suggestion-card.blog-type .ai-regenerate-btn {
+            background: #f0f9ff !important;
+            border: 1.5px solid rgba(27, 73, 101, 0.35) !important;
+            color: #1B4965 !important;
+        }
+        .ai-suggestion-card.blog-type .ai-regenerate-btn:hover {
+            background: #e0f2fe !important;
+            color: #123144 !important;
+            border-color: rgba(27, 73, 101, 0.6) !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 2px 8px rgba(27, 73, 101, 0.2) !important;
+        }
+        .ai-suggestion-card.blog-type .ai-use-btn {
+            background: linear-gradient(135deg, #1B4965 0%, #0f172a 100%) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(27, 73, 101, 0.28) !important;
+        }
+        .ai-suggestion-card.blog-type .ai-use-btn:hover {
+            background: linear-gradient(135deg, #123144 0%, #081119 100%) !important;
+            box-shadow: 0 6px 16px rgba(27, 73, 101, 0.38) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        /* 3. Teaching Card Buttons (Emerald Green) */
+        .ai-suggestion-card.teaching-type .ai-regenerate-btn {
+            background: #ecfdf5 !important;
+            border: 1.5px solid rgba(5, 150, 105, 0.35) !important;
+            color: #059669 !important;
+        }
+        .ai-suggestion-card.teaching-type .ai-regenerate-btn:hover {
+            background: #d1fae5 !important;
+            color: #047857 !important;
+            border-color: rgba(5, 150, 105, 0.6) !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 2px 8px rgba(5, 150, 105, 0.2) !important;
+        }
+        .ai-suggestion-card.teaching-type .ai-use-btn {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.28) !important;
+        }
+        .ai-suggestion-card.teaching-type .ai-use-btn:hover {
+            background: linear-gradient(135deg, #047857 0%, #064e3b 100%) !important;
+            box-shadow: 0 6px 16px rgba(5, 150, 105, 0.38) !important;
+            transform: translateY(-1px) !important;
         }
 
         /* Adjustments for builder elements when builder is inactive */
@@ -2115,7 +2192,7 @@
     <script type="module" src="js/todo-drawer.js?v=20260602_V3"></script>
     <script type="module" src="js/unsplash.js?v=20260511_G1"></script>
     <script type="module" src="js/version-history.js?v=20260728_V1"></script>
-    <script type="module" src="js/newsletter-builder.js?v=20260808_V2"></script>
+    <script type="module" src="js/newsletter-builder.js?v=20260907_BTN_FIX"></script>
 </body>
 
 </html>

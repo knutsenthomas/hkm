@@ -1152,7 +1152,16 @@ class MinSideManager {
             count++;
         }
 
+        if (this._pendingAuthRedirectTimer) {
+            clearTimeout(this._pendingAuthRedirectTimer);
+            this._pendingAuthRedirectTimer = null;
+        }
+
         firebase.auth().onAuthStateChanged(async (user) => {
+            if (this._pendingAuthRedirectTimer) {
+                clearTimeout(this._pendingAuthRedirectTimer);
+                this._pendingAuthRedirectTimer = null;
+            }
             try {
                 if (user) {
                     this.currentUser = user;
@@ -1232,7 +1241,12 @@ class MinSideManager {
                         }
                     })();
                 } else {
-                    window.location.href = '/minside/login.html';
+                    // Delay redirect slightly to avoid false logouts during transient token refreshes or tab restores
+                    this._pendingAuthRedirectTimer = setTimeout(() => {
+                        if (!firebase.auth().currentUser) {
+                            window.location.href = '/minside/login.html';
+                        }
+                    }, 2500);
                 }
             } catch (error) {
                 console.error('Init Error:', error);

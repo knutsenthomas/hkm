@@ -2065,7 +2065,7 @@ class AdminManager {
 
             try {
                 // Fetch user role
-                const role = await firebaseService.getUserRole(user.uid, { timeoutMs: 2500 });
+                const role = await firebaseService.getUserRole(user.uid, { timeoutMs: 6000 });
                 this.userRole = role;
 
                 const hasAdminAccess = typeof adminUtils.isElevatedAdminRole === 'function'
