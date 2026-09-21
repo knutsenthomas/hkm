@@ -3,21 +3,20 @@ import path from 'path';
 
 /**
  * His Kingdom Ministry - Multilingual Sitemap Generator
- * Generates an SEO & GEO-optimized sitemap.xml with complete hreflang mappings,
- * change frequencies, priority weights, and accurate lastmod timestamps.
+ * Generates an SEO & GEO-optimized sitemap.xml with strictly 1-to-1 reciprocal hreflang mappings,
+ * change frequencies, priority weights, accurate lastmod timestamps, and zero redirect/404 URLs.
  */
 
 const BASE_URL = 'https://www.hiskingdomministry.no';
 const TODAY = new Date().toISOString().split('T')[0];
 
-// Multilingual Route Clusters
-// Each item maps the path for Norwegian, English, Spanish, priority, changefreq, and custom lastmod if needed
+// Multilingual Route Clusters - strictly 1-to-1 or single-language pages
 const routes = [
     // Core Pages
     {
         no: '/',
-        en: '/en/',
-        es: '/es/',
+        en: '/en',
+        es: '/es',
         priority: '1.0',
         changefreq: 'daily'
     },
@@ -79,8 +78,6 @@ const routes = [
     },
     {
         no: '/kurs-detaljer',
-        en: '/en/courses',
-        es: '/es/cursos',
         priority: '0.8',
         changefreq: 'weekly'
     },
@@ -95,6 +92,39 @@ const routes = [
         no: '/arrangement-detaljer',
         en: '/en/event-details',
         es: '/es/detalles-evento',
+        priority: '0.7',
+        changefreq: 'weekly'
+    },
+    {
+        no: '/kalender',
+        en: '/en/calendar',
+        es: '/es/calendario',
+        priority: '0.8',
+        changefreq: 'weekly'
+    },
+    {
+        no: '/undervisning',
+        en: '/en/teaching',
+        es: '/es/ensenanza',
+        priority: '0.8',
+        changefreq: 'weekly'
+    },
+    {
+        no: '/undervisningsserier',
+        priority: '0.8',
+        changefreq: 'weekly'
+    },
+    {
+        no: '/media',
+        en: '/en/media',
+        es: '/es/media',
+        priority: '0.8',
+        changefreq: 'weekly'
+    },
+    {
+        no: '/youtube',
+        en: '/en/youtube',
+        es: '/es/youtube',
         priority: '0.7',
         changefreq: 'weekly'
     },
@@ -156,15 +186,13 @@ const routes = [
     },
     {
         no: '/bibelstudier',
-        en: '/en/bibel',
-        es: '/es/bibel',
         priority: '0.8',
         changefreq: 'weekly'
     },
     {
         no: '/leseplaner',
-        en: '/en/reading-plans',
-        es: '/es/planes-lectura',
+        en: '/en/leseplaner',
+        es: '/es/leseplaner',
         priority: '0.9',
         changefreq: 'weekly'
     },
@@ -204,32 +232,21 @@ const routes = [
         changefreq: 'weekly'
     },
     {
+        no: '/ressurser/tidslinje-imperier',
+        en: '/en/ressurser/tidslinje-imperier',
+        es: '/es/ressurser/tidslinje-imperier',
+        priority: '0.7',
+        changefreq: 'monthly'
+    },
+    {
         no: '/reisevirksomhet',
-        en: '/en/about',
-        es: '/es/sobre-nosotros',
         priority: '0.7',
         changefreq: 'monthly'
     },
     {
         no: '/seminarer',
-        en: '/en/events',
-        es: '/es/eventos',
         priority: '0.7',
         changefreq: 'monthly'
-    },
-    {
-        no: '/undervisningsserier',
-        en: '/en/courses',
-        es: '/es/cursos',
-        priority: '0.8',
-        changefreq: 'weekly'
-    },
-    {
-        no: '/butikk',
-        en: '/en/shop',
-        es: '/es/tienda',
-        priority: '0.8',
-        changefreq: 'weekly'
     },
     {
         no: '/personvern',
@@ -240,8 +257,6 @@ const routes = [
     },
     {
         no: '/betingelser',
-        en: '/en/privacy',
-        es: '/es/privacidad',
         priority: '0.4',
         changefreq: 'yearly'
     },
@@ -267,25 +282,33 @@ let xml = `<?xml version="1.0" encoding="UTF-8"?>
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
 `;
 
-// Build 3 URL entries for each route (no, en, es) with reciprocal hreflang tags
+let totalUrlsCount = 0;
+
 routes.forEach(route => {
-    const langs = [
-        { lang: 'no', path: route.no },
-        { lang: 'en', path: route.en },
-        { lang: 'es', path: route.es }
-    ];
+    const langs = [];
+    if (route.no) langs.push({ lang: 'no', path: route.no });
+    if (route.en) langs.push({ lang: 'en', path: route.en });
+    if (route.es) langs.push({ lang: 'es', path: route.es });
 
     langs.forEach(current => {
+        totalUrlsCount++;
         const fullUrl = `${BASE_URL}${current.path}`;
         xml += `  <url>\n`;
         xml += `    <loc>${fullUrl}</loc>\n`;
         xml += `    <lastmod>${TODAY}</lastmod>\n`;
         xml += `    <changefreq>${route.changefreq}</changefreq>\n`;
         xml += `    <priority>${route.priority}</priority>\n`;
-        xml += `    <xhtml:link rel="alternate" hreflang="no" href="${BASE_URL}${route.no}" />\n`;
-        xml += `    <xhtml:link rel="alternate" hreflang="en" href="${BASE_URL}${route.en}" />\n`;
-        xml += `    <xhtml:link rel="alternate" hreflang="es" href="${BASE_URL}${route.es}" />\n`;
-        xml += `    <xhtml:link rel="alternate" hreflang="x-default" href="${BASE_URL}${route.no}" />\n`;
+
+        if (route.no) {
+            xml += `    <xhtml:link rel="alternate" hreflang="no" href="${BASE_URL}${route.no}" />\n`;
+        }
+        if (route.en) {
+            xml += `    <xhtml:link rel="alternate" hreflang="en" href="${BASE_URL}${route.en}" />\n`;
+        }
+        if (route.es) {
+            xml += `    <xhtml:link rel="alternate" hreflang="es" href="${BASE_URL}${route.es}" />\n`;
+        }
+        xml += `    <xhtml:link rel="alternate" hreflang="x-default" href="${BASE_URL}${route.no || route.en || current.path}" />\n`;
         xml += `  </url>\n`;
     });
 });
@@ -294,7 +317,7 @@ xml += `</urlset>\n`;
 
 // Write to public/sitemap.xml and dist/sitemap.xml (if dist exists)
 fs.writeFileSync(path.resolve('public/sitemap.xml'), xml, 'utf8');
-console.log(`✅ Generated public/sitemap.xml with ${routes.length * 3} multilingual URLs and fresh lastmod (${TODAY}).`);
+console.log(`✅ Generated public/sitemap.xml with ${totalUrlsCount} multilingual URLs and fresh lastmod (${TODAY}).`);
 
 const distDir = path.resolve('dist');
 if (fs.existsSync(distDir)) {

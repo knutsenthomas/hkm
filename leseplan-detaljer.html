@@ -1454,7 +1454,7 @@
             <div class="footer-bottom">
                 <p>&copy; <span id="copyright-year">2026</span> <span data-content-doc="settings_global"
                         data-content-key="footer.copyright">His Kingdom Ministry. Alle rettigheter reservert.</span></p>
-                <a href="/admin/login.html" class="admin-link" id="admin-link" data-content-doc="settings_global"
+                <a href="/admin/login" class="admin-link" id="admin-link" data-content-doc="settings_global"
                     data-content-key="footer.adminLink">Admin</a>
             </div>
         </div>
@@ -1948,7 +1948,7 @@
                                         </div>
                                     </div>
                                     ${versesText ? `
-                                    <a href="/bibel.html?ref=${encodeURIComponent(versesText)}&plan=${plan.id}&day=${day.dayNumber}" class="hkm-rp-start-day-link" title="${lang === 'en' ? 'Read today' : (lang === 'es' ? 'Leer hoy' : 'Les i dag')}" style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; aspect-ratio: 1 / 1; border-radius: 50%; background: rgba(209, 125, 57, 0.08); border: 1px solid rgba(209, 125, 57, 0.15); color: var(--primary-orange); transition: all 0.2s ease; cursor: pointer; text-decoration: none; flex-shrink: 0; box-sizing: border-box;">
+                                    <a href="/bibel?ref=${encodeURIComponent(versesText)}&plan=${plan.id}&day=${day.dayNumber}" class="hkm-rp-start-day-link" title="${lang === 'en' ? 'Read today' : (lang === 'es' ? 'Leer hoy' : 'Les i dag')}" style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; aspect-ratio: 1 / 1; border-radius: 50%; background: rgba(209, 125, 57, 0.08); border: 1px solid rgba(209, 125, 57, 0.15); color: var(--primary-orange); transition: all 0.2s ease; cursor: pointer; text-decoration: none; flex-shrink: 0; box-sizing: border-box;">
                                         <span class="material-symbols-outlined" style="font-size: 20px; font-weight: 700;">arrow_forward</span>
                                     </a>
                                     ` : `<span class="material-symbols-outlined prayer-icon-right">${headerIcon}</span>`}
@@ -1959,7 +1959,7 @@
                                 ${versesText ? `
                                 <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
                                     <span class="material-symbols-outlined" style="font-size: 18px; color: var(--text-muted);">menu_book</span>
-                                    <a href="/bibel.html?ref=${encodeURIComponent(versesText)}&plan=${plan.id}&day=${day.dayNumber}" style="font-size: 0.9rem; font-weight: 600; color: var(--primary-blue); text-decoration: none; transition: all 0.2s;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                                    <a href="/bibel?ref=${encodeURIComponent(versesText)}&plan=${plan.id}&day=${day.dayNumber}" style="font-size: 0.9rem; font-weight: 600; color: var(--primary-blue); text-decoration: none; transition: all 0.2s;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
                                         ${lang === 'en' ? 'Open scripture passage' : (lang === 'es' ? 'Abrir pasaje bíblico' : 'Les dagens bibelord')}
                                     </a>
                                 </div>
@@ -2059,7 +2059,7 @@
                                             startBtn.style.fontSize = '0.95rem';
                                             startBtn.innerHTML = `${btnText} (${dayLabel} ${currentDay}) <span class="material-symbols-outlined text-lg">arrow_forward</span>`;
                                             startBtn.onclick = () => {
-                                                window.location.href = `/bibel.html?plan=${plan.id}&day=${currentDay}`;
+                                                window.location.href = `/bibel?plan=${plan.id}&day=${currentDay}`;
                                             };
                                         }
 
@@ -2228,7 +2228,7 @@
 
                 // Add button click routing to Bible reader
                 document.getElementById('start-plan-btn').addEventListener('click', () => {
-                    window.location.href = `/bibel.html?plan=${plan.id}&day=1`;
+                    window.location.href = `/bibel?plan=${plan.id}&day=1`;
                 });
                 // Toggle views
                 document.getElementById('loading-state').style.display = 'none';
@@ -2257,7 +2257,7 @@
                                 </button>
                             </div>
                             <div class="qr-code-box" style="display: none; align-items: center; gap: 12px; padding: 12px; background: var(--bg-light); border: 1px solid var(--border-color); border-radius: 12px; width: fit-content; box-sizing: border-box; margin-left: 0;">
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(res.url)}" alt="QR-kode" style="width: 80px; height: 80px; border-radius: 4px; background: white; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.05);" loading="lazy" />
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(res.url)}" alt="QR Code" style="width: 80px; height: 80px; border-radius: 4px; background: white; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.05);" loading="lazy" />
                                 <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.3; text-align: left;">
                                     <strong style="display: block; margin-bottom: 2px; color: var(--text-base);">Skann med mobilen</strong>
                                     <span>Åpne ressursen på telefonen din.</span>
@@ -2286,7 +2286,7 @@
                 }
 
                 otherPlansContainer.innerHTML = otherPlans.map(plan => `
-                    <a href="/leseplan-detaljer.html?id=${plan.id}" class="other-plan-card">
+                    <a href="/leseplan-detaljer?id=${plan.id}" class="other-plan-card">
                         <div class="other-plan-image-wrapper">
                             <img src="${plan.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=600&q=80'}" alt="${escapeHtml(plan.title)}" loading="lazy">
                             <span class="other-plan-badge">${plan.durationDays} dager</span>

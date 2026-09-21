@@ -1135,7 +1135,7 @@
             <h1 class="page-hero-title" id="plan-hero-title">Reading Plan Details</h1>
             <p class="page-hero-subtitle" id="plan-hero-subtitle" style="display: none; font-size: 1.15rem; opacity: 0.9; margin-top: 8px; font-weight: 500;"></p>
             <nav class="hero-breadcrumbs">
-                <a href="/en/">Home</a>
+                <a href="/en">Home</a>
                 <span class="separator">/</span>
                 <a href="/en/leseplaner">Reading Plans</a>
                 <span class="separator">/</span>
@@ -1559,7 +1559,7 @@
                     }
 
                     // Update breadcrumbs parent folder name
-                    const breadcrumbCategory = document.querySelector('.hero-breadcrumbs a[href="/en/reading-plans.html"]') || document.querySelector('.hero-breadcrumbs a[href="/en/reading-plans"]');
+                    const breadcrumbCategory = document.querySelector('.hero-breadcrumbs a[href="/en/leseplaner"]') || document.querySelector('.hero-breadcrumbs a[href="/en/reading-plans"]');
                     if (breadcrumbCategory) {
                         breadcrumbCategory.textContent = 'Prayer Apps';
                     }
@@ -1892,7 +1892,7 @@
                                         </div>
                                     </div>
                                     ${versesText ? `
-                                    <a href="/en/bibel.html?ref=${encodeURIComponent(versesText)}&plan=${plan.id}&day=${day.dayNumber}" class="hkm-rp-start-day-link" title="${lang === 'en' ? 'Read today' : (lang === 'es' ? 'Leer hoy' : 'Les i dag')}" style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; aspect-ratio: 1 / 1; border-radius: 50%; background: rgba(209, 125, 57, 0.08); border: 1px solid rgba(209, 125, 57, 0.15); color: var(--primary-orange); transition: all 0.2s ease; cursor: pointer; text-decoration: none; flex-shrink: 0; box-sizing: border-box;">
+                                    <a href="/en/bibel?ref=${encodeURIComponent(versesText)}&plan=${plan.id}&day=${day.dayNumber}" class="hkm-rp-start-day-link" title="${lang === 'en' ? 'Read today' : (lang === 'es' ? 'Leer hoy' : 'Les i dag')}" style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; aspect-ratio: 1 / 1; border-radius: 50%; background: rgba(209, 125, 57, 0.08); border: 1px solid rgba(209, 125, 57, 0.15); color: var(--primary-orange); transition: all 0.2s ease; cursor: pointer; text-decoration: none; flex-shrink: 0; box-sizing: border-box;">
                                         <span class="material-symbols-outlined" style="font-size: 20px; font-weight: 700;">arrow_forward</span>
                                     </a>
                                     ` : `<span class="material-symbols-outlined prayer-icon-right">${headerIcon}</span>`}
@@ -1903,7 +1903,7 @@
                                 ${versesText ? `
                                 <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
                                     <span class="material-symbols-outlined" style="font-size: 18px; color: var(--text-muted);">menu_book</span>
-                                    <a href="/en/bibel.html?ref=${encodeURIComponent(versesText)}&plan=${plan.id}&day=${day.dayNumber}" style="font-size: 0.9rem; font-weight: 600; color: var(--primary-blue); text-decoration: none; transition: all 0.2s;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                                    <a href="/en/bibel?ref=${encodeURIComponent(versesText)}&plan=${plan.id}&day=${day.dayNumber}" style="font-size: 0.9rem; font-weight: 600; color: var(--primary-blue); text-decoration: none; transition: all 0.2s;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
                                         ${lang === 'en' ? 'Open scripture passage' : (lang === 'es' ? 'Abrir pasaje bíblico' : 'Les dagens bibelord')}
                                     </a>
                                 </div>
@@ -2003,7 +2003,7 @@
                                             startBtn.style.fontSize = '0.95rem';
                                             startBtn.innerHTML = `${btnText} (${dayLabel} ${currentDay}) <span class="material-symbols-outlined text-lg">arrow_forward</span>`;
                                             startBtn.onclick = () => {
-                                                window.location.href = `/bibel.html?plan=${plan.id}&day=${currentDay}`;
+                                                window.location.href = `/en/bibel?plan=${plan.id}&day=${currentDay}`;
                                             };
                                         }
 
@@ -2172,7 +2172,7 @@
 
                 // Add button click routing to Bible reader
                 document.getElementById('start-plan-btn').addEventListener('click', () => {
-                    window.location.href = `/en/bibel.html?plan=${plan.id}&day=1`;
+                    window.location.href = `/en/bibel?plan=${plan.id}&day=1`;
                 });
                 // Toggle views
                 document.getElementById('loading-state').style.display = 'none';
@@ -2230,7 +2230,7 @@
                 }
 
                 otherPlansContainer.innerHTML = otherPlans.map(plan => `
-                    <a href="/en/reading-plan-details.html?id=${plan.id}" class="other-plan-card">
+                    <a href="/en/reading-plan-details?id=${plan.id}" class="other-plan-card">
                         <div class="other-plan-image-wrapper">
                             <img src="${plan.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=600&q=80'}" alt="${escapeHtml(plan.title)}" loading="lazy">
                             <span class="other-plan-badge">${plan.durationDays} days</span>

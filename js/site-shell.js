@@ -87,7 +87,7 @@ const ROUTES = {
         accessibility: '/tilgjengelighet'
     },
     en: {
-        home: '/en/',
+        home: '/en',
         donate: '/en/donations',
         regularDonor: '/en/regular-donors',
         churches: '/en/for-churches',
@@ -107,7 +107,7 @@ const ROUTES = {
         accessibility: '/en/accessibility'
     },
     es: {
-        home: '/es/',
+        home: '/es',
         donate: '/es/donaciones',
         regularDonor: '/es/donantes-regulares',
         churches: '/es/para-iglesias',
@@ -406,7 +406,7 @@ function contentAttributes(key, attr = '') {
 
 function resolveHref(routeKey, routes) {
     if (routeKey === 'store') return STORE_URL;
-    if (routeKey === 'profile') return '/minside/index.html';
+    if (routeKey === 'profile') return '/minside';
     return routes[routeKey] || routes.home;
 }
 
@@ -438,7 +438,7 @@ function menuColumnMarkup(section, sectionKey, routes) {
 }
 
 function getTranslatedPath(targetLang) {
-    if (typeof window === 'undefined') return targetLang === 'no' ? '/' : `/${targetLang}/`;
+    if (typeof window === 'undefined') return targetLang === 'no' ? '/' : `/${targetLang}`;
     const path = window.location.pathname.replace(/\/$/, '').toLowerCase();
     if (path.includes('/register') || path.includes('/registro') || path.includes('/registrer')) {
         if (targetLang === 'no') return '/registrer';
@@ -461,8 +461,8 @@ function getTranslatedPath(targetLang) {
         if (targetLang === 'es') return '/es/donaciones';
     }
     if (targetLang === 'no') return '/';
-    if (targetLang === 'en') return '/en/';
-    if (targetLang === 'es') return '/es/';
+    if (targetLang === 'en') return '/en';
+    if (targetLang === 'es') return '/es';
     return '/';
 }
 
@@ -723,7 +723,7 @@ export function renderSiteFooter(language = getLanguage()) {
                     <p>&copy; <span id="copyright-year">${new Date().getFullYear()}</span>
                         <span ${contentAttributes('footer.copyright')}>${footer.copyright}</span>
                     </p>
-                    <a href="/admin/login.html" class="admin-link" id="admin-link"
+                    <a href="/admin/login" class="admin-link" id="admin-link"
                         ${contentAttributes('footer.adminLink')}>${footer.admin}</a>
                 </div>
             </div>

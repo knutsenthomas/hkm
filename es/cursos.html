@@ -24,7 +24,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cursos | His Kingdom Ministry</title>
-    <meta name="description" content="Explore cursos de His Kingdom Ministry. Aprenda sobre estudio bíblico, oración, liderazgo y más.">
+    <meta name="description" content="Explore cursos bíblicos en línea de His Kingdom Ministry. Fortalezca su fe con enseñanzas sobre activación espiritual, oración y discipulado.">
 
     <!-- Structured Data (JSON-LD) for GEO & SEO (Google AI, ChatGPT, Perplexity) -->
     <script type="application/ld+json">
@@ -53,15 +53,15 @@
               "addressCountry": "NO"
             }
           },
-          "instructor": {
-            "@type": "Person",
-            "name": "Hilde Karin Knutsen",
-            "jobTitle": "Instructora Principal y Misionera"
-          },
           "hasCourseInstance": {
             "@type": "CourseInstance",
             "courseMode": "Online",
-            "url": "https://www.hiskingdomministry.no/es/cursos"
+            "url": "https://www.hiskingdomministry.no/es/cursos",
+            "instructor": {
+              "@type": "Person",
+              "name": "Hilde Karin Knutsen",
+              "jobTitle": "Instructora Principal y Misionera"
+            }
           }
         },
         {
@@ -2412,7 +2412,7 @@
                         const safeTitle = (course.title || '').replace(/'/g, "\\'");
 
                         const cardAction = hasAccess 
-                            ? `window.location.href='/minside/index.html#course-player?courseId=${course.id}'` 
+                            ? `window.location.href='/minside#course-player?courseId=${course.id}'` 
                             : `openEnrollModal(${JSON.stringify(course).replace(/"/g, '&quot;')})`;
 
                         return `
