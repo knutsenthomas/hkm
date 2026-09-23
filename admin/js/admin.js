@@ -24164,7 +24164,10 @@ class AdminManager {
 
     async editHeroSlide(index = -1) {
         const isNew = index === -1;
-        const slide = isNew ? { title: '', subtitle: '', imageUrl: '', youtubeId: '', btnText: '', btnLink: '', duration: 8 } : this.heroSlides[index];
+        if (!Array.isArray(this.heroSlides)) {
+            this.heroSlides = [];
+        }
+        const slide = isNew ? { title: '', subtitle: '', imageUrl: '', youtubeId: '', btnText: '', btnLink: '', duration: 8 } : (this.heroSlides[index] || {});
         const safeSlideImage = this.escapeHtml(slide.imageUrl || '');
         const safeSlideYoutubeId = this.escapeHtml(slide.youtubeId || '');
         const safeSlideTitle = this.escapeHtml(slide.title || '');
@@ -24173,138 +24176,197 @@ class AdminManager {
         const safeSlideBtnLink = this.escapeHtml(slide.btnLink || '');
         const slideDuration = slide.duration || 8;
 
+        // Clean up any existing hero slide modals
+        const existingModal = document.getElementById('hero-slide-modal-root');
+        if (existingModal) existingModal.remove();
+
         const modal = document.createElement('div');
-        modal.className = 'dashboard-modal';
+        modal.id = 'hero-slide-modal-root';
+        modal.style.cssText = 'position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(8px); z-index: 12000; display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box;';
+
         modal.innerHTML = `
-            <div class="modal-backdrop" style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px;">
-                <div class="card" style="width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
-                    <div class="card-header flex-between">
-                        <h3 class="card-title">${isNew ? 'Legg til ny slide' : 'Rediger slide'}</h3>
-                        <button class="icon-btn" id="hero-close-modal"><span class="material-symbols-outlined">close</span></button>
+            <div class="hero-modal-dialog" style="width: 100%; max-width: 620px !important; max-height: 90vh !important; background: #ffffff; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); display: flex !important; flex-direction: column !important; overflow: hidden !important; border: 1px solid rgba(226, 232, 240, 0.9); animation: modalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
+                <!-- Modal Header -->
+                <div style="padding: 18px 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #ffffff; flex-shrink: 0;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="material-symbols-outlined" style="font-size: 24px; color: #d17d39;">view_carousel</span>
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #0f172a;">${isNew ? 'Legg til ny slide' : 'Rediger slide'}</h3>
                     </div>
-                    <div class="card-body">
-                        <div class="form-group">
-                            <label>Slide-bilde (Anbefalt: 1920x1080px)</label>
-                            <div id="hero-img-trigger" style="margin-bottom: 12px; position: relative; cursor: pointer; border: 2px dashed #e2e8f0; border-radius: 12px; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; background: #f8fafc; overflow: hidden;">
-                                ${safeSlideImage ? `<img src="${safeSlideImage}" style="width: 100%; height: 100%; object-fit: cover;">` : '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>'}
-                                <div class="upload-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.78); color: #fff; font-size: 11px; padding: 8px; text-align: center; opacity: 1; transition: opacity 0.2s;">Klikk på bildet eller velg fil</div>
-                            </div>
-                            <input type="file" id="hero-file-input" style="display: none;" accept="image/*">
-                            <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
-                                <button type="button" class="btn-secondary" id="hero-choose-image-btn" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; white-space:nowrap;">
-                                    <span class="material-symbols-outlined">upload</span>
-                                    Velg bilde
-                                </button>
-                                <span id="hero-upload-status" style="font-size:13px; color:#64748b;">JPG, PNG eller WebP</span>
-                            </div>
-                            <input type="text" id="hero-img-url" class="form-control" value="${safeSlideImage}" placeholder="Eller lim inn bilde-URL her">
-                        </div>
+                    <button type="button" id="hero-close-modal" aria-label="Lukk modal" style="background: #f1f5f9; border: none; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #64748b; transition: all 0.2s;">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                    </button>
+                </div>
 
-                        <div class="form-group">
-                            <label>Overskrift</label>
-                            <input type="text" id="hero-title" class="form-control" value="${safeSlideTitle}">
+                <!-- Modal Body (Scrollable) -->
+                <div class="hero-modal-body" style="padding: 24px; overflow-y: auto !important; flex: 1 1 auto; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; gap: 20px;">
+                    <!-- Image section -->
+                    <div>
+                        <label style="font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; display: block;">Slide-bilde (Anbefalt: 1920x1080px)</label>
+                        <div id="hero-img-trigger" style="margin-bottom: 12px; position: relative; cursor: pointer; border: 2px dashed #cbd5e1; border-radius: 14px; height: 200px; width: 100%; display: flex; align-items: center; justify-content: center; background: #f8fafc; overflow: hidden; transition: border-color 0.2s;">
+                            ${safeSlideImage ? `<img src="${safeSlideImage}" style="width: 100%; height: 100%; object-fit: cover;">` : '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>'}
+                            <div class="upload-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.78); color: #fff; font-size: 12px; font-weight: 500; padding: 8px; text-align: center; opacity: 1; transition: opacity 0.2s;">Klikk på bildet eller velg fil</div>
                         </div>
-                        <div class="form-group">
-                            <label>Undertekst</label>
-                            <textarea id="hero-subtitle" class="form-control" style="height: 80px;">${safeSlideSubtitle}</textarea>
+                        <input type="file" id="hero-file-input" style="display: none;" accept="image/*">
+                        <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:10px;">
+                            <button type="button" class="btn-secondary" id="hero-choose-image-btn" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; white-space:nowrap; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid #cbd5e1; background: #ffffff;">
+                                <span class="material-symbols-outlined" style="font-size:18px;">upload</span>
+                                Velg bilde
+                            </button>
+                            <button type="button" class="btn-secondary" id="hero-unsplash-btn" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; white-space:nowrap; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid #cbd5e1; background: #ffffff;">
+                                <span class="material-symbols-outlined" style="font-size:18px; color: #d17d39;">photo_library</span>
+                                Unsplash
+                            </button>
+                            <span id="hero-upload-status" style="font-size:12px; color:#64748b;">JPG, PNG eller WebP (maks 10 MB)</span>
                         </div>
-                        <div class="form-group">
-                            <label>Bakgrunnsvideo (Valgfritt YouTube eller opplastet MP4)</label>
-                            <div style="display:flex; gap:10px; align-items:center;">
-                                <span class="material-symbols-outlined" style="color:#d17d39;">video_library</span>
-                                <input type="text" id="hero-video-url" class="form-control" value="${slide.videoUrl || slide.youtubeId || ''}" placeholder="Lim inn lenke (YouTube eller MP4)">
-                            </div>
-                            <input type="file" id="hero-video-file" style="display: none;" accept="video/mp4,video/webm">
-                            <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
-                                <button type="button" class="btn-secondary" id="hero-upload-video-btn" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; white-space:nowrap; font-size:12px; padding:6px 12px;">
-                                    <span class="material-symbols-outlined" style="font-size:16px;">upload</span>
-                                    Last opp MP4
-                                </button>
-                                <span id="hero-video-upload-status" style="font-size:11px; color:#64748b;">(Maks 50 MB, MP4 anbefales)</span>
-                            </div>
-                            <p style="font-size:11px; color:#64748b; margin-top:4px;">Støtter YouTube-ID, YouTube-lenke eller opplastet MP4-fil.</p>
-                        </div>
-                        <div class="form-group">
-                            <label>Visningstid i sekunder</label>
-                            <input type="number" id="hero-duration" class="form-control" value="${slideDuration}" min="1" step="1">
-                            <p style="font-size:11px; color:#64748b; margin-top:4px;">Hvor lenge denne sliden skal vises før den bytter automatisk (Standard er 8 sekunder). Hvis det er en video, kan du sette den høyere (f.eks. 15 eller 30).</p>
-                        </div>
-                        <div class="form-group">
-                            <label>Knapptekst</label>
-                            <input type="text" id="hero-btn-text" class="form-control" value="${safeSlideBtnText}">
-                        </div>
-                        <div class="form-group">
-                            <label>Knapp-lenke</label>
-                            <input type="text" id="hero-btn-link" class="form-control" value="${safeSlideBtnLink}">
-                        </div>
+                        <input type="text" id="hero-img-url" class="form-control" value="${safeSlideImage}" placeholder="Eller lim inn bilde-URL her" style="border-radius: 10px; padding: 10px 14px; border: 1.5px solid #e2e8f0; font-size: 14px; width: 100%; box-sizing: border-box;">
+                    </div>
 
-                        <div style="display:flex; justify-content:flex-end; margin-top:15px; margin-bottom:-5px;">
-                            <button type="button" class="btn-secondary" id="hero-auto-translate-btn" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; white-space:nowrap; font-size:12px; padding:6px 12px;">
+                    <!-- Title -->
+                    <div>
+                        <label style="font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 6px; display: block;">Overskrift</label>
+                        <input type="text" id="hero-title" class="form-control" value="${safeSlideTitle}" placeholder="F.eks. Velkommen til His Kingdom Ministry" style="border-radius: 10px; padding: 10px 14px; border: 1.5px solid #e2e8f0; font-size: 14px; width: 100%; box-sizing: border-box;">
+                    </div>
+
+                    <!-- Subtitle -->
+                    <div>
+                        <label style="font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 6px; display: block;">Undertekst</label>
+                        <textarea id="hero-subtitle" class="form-control" style="border-radius: 10px; padding: 10px 14px; border: 1.5px solid #e2e8f0; font-size: 14px; width: 100%; height: 75px; box-sizing: border-box; resize: vertical;" placeholder="Kort ingress eller beskrivelse">${safeSlideSubtitle}</textarea>
+                    </div>
+
+                    <!-- Video Background -->
+                    <div>
+                        <label style="font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 6px; display: block;">Bakgrunnsvideo (Valgfritt YouTube eller opplastet MP4)</label>
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <span class="material-symbols-outlined" style="color:#d17d39;">video_library</span>
+                            <input type="text" id="hero-video-url" class="form-control" value="${slide.videoUrl || slide.youtubeId || ''}" placeholder="Lim inn lenke (YouTube eller MP4)" style="border-radius: 10px; padding: 10px 14px; border: 1.5px solid #e2e8f0; font-size: 14px; flex: 1; box-sizing: border-box;">
+                        </div>
+                        <input type="file" id="hero-video-file" style="display: none;" accept="video/mp4,video/webm">
+                        <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
+                            <button type="button" class="btn-secondary" id="hero-upload-video-btn" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; white-space:nowrap; font-size:12px; padding:6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff;">
+                                <span class="material-symbols-outlined" style="font-size:16px;">upload</span>
+                                Last opp MP4
+                            </button>
+                            <span id="hero-video-upload-status" style="font-size:11px; color:#64748b;">(Maks 50 MB, MP4 anbefales)</span>
+                        </div>
+                        <p style="font-size:11px; color:#64748b; margin-top:4px; margin-bottom:0;">Støtter YouTube-ID, YouTube-lenke eller opplastet MP4-fil.</p>
+                    </div>
+
+                    <!-- Duration -->
+                    <div>
+                        <label style="font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 6px; display: block;">Visningstid i sekunder</label>
+                        <input type="number" id="hero-duration" class="form-control" value="${slideDuration}" min="1" step="1" style="border-radius: 10px; padding: 10px 14px; border: 1.5px solid #e2e8f0; font-size: 14px; width: 100%; box-sizing: border-box;">
+                        <p style="font-size:11px; color:#64748b; margin-top:4px; margin-bottom:0;">Hvor lenge denne sliden skal vises før den bytter automatisk (Standard: 8 sekunder).</p>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div>
+                            <label style="font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 6px; display: block;">Knapptekst</label>
+                            <input type="text" id="hero-btn-text" class="form-control" value="${safeSlideBtnText}" placeholder="F.eks. Les mer" style="border-radius: 10px; padding: 10px 14px; border: 1.5px solid #e2e8f0; font-size: 14px; width: 100%; box-sizing: border-box;">
+                        </div>
+                        <div>
+                            <label style="font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 6px; display: block;">Knapp-lenke</label>
+                            <input type="text" id="hero-btn-link" class="form-control" value="${safeSlideBtnLink}" placeholder="F.eks. /om-oss" style="border-radius: 10px; padding: 10px 14px; border: 1.5px solid #e2e8f0; font-size: 14px; width: 100%; box-sizing: border-box;">
+                        </div>
+                    </div>
+
+                    <!-- Translations -->
+                    <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+                            <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                                <span class="material-symbols-outlined" style="font-size: 18px; color: #d17d39;">translate</span>
+                                Flerspråklige oversettelser
+                            </h4>
+                            <button type="button" class="btn-secondary" id="hero-auto-translate-btn" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; font-size:12px; padding:6px 12px; border-radius: 8px; cursor: pointer; border: 1px solid #cbd5e1; background: #ffffff;">
                                 <span class="material-symbols-outlined" style="font-size:16px;">g_translate</span>
                                 Oversett automatisk nå
                             </button>
                         </div>
 
-                        <!-- English Translation Section -->
-                        <div class="form-group" style="border-top: 1px dashed #cbd5e1; padding-top: 15px; margin-top: 15px;">
-                            <h4 style="color:#d17d39; margin-bottom: 12px; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px;">
-                                <span class="material-symbols-outlined" style="font-size:18px;">translate</span>
-                                Engelsk oversettelse (Valgfritt)
-                            </h4>
-                            <div class="form-group">
-                                <label>Overskrift (EN)</label>
-                                <input type="text" id="hero-title-en" class="form-control" value="${this.escapeHtml(slide.translations?.en?.title || '')}" placeholder="Leave blank to use Norwegian">
+                        <!-- English -->
+                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; margin-bottom: 14px;">
+                            <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                                <span>🇬🇧</span> Engelsk oversettelse (Valgfritt)
                             </div>
-                            <div class="form-group">
-                                <label>Undertekst (EN)</label>
-                                <textarea id="hero-subtitle-en" class="form-control" style="height: 60px;" placeholder="Leave blank to use Norwegian">${this.escapeHtml(slide.translations?.en?.subtitle || '')}</textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>Knapptekst (EN)</label>
-                                <input type="text" id="hero-btn-text-en" class="form-control" value="${this.escapeHtml(slide.translations?.en?.btnText || '')}" placeholder="Leave blank to use Norwegian">
-                            </div>
-                        </div>
-
-                        <!-- Spanish Translation Section -->
-                        <div class="form-group" style="border-top: 1px dashed #cbd5e1; padding-top: 15px; margin-top: 15px;">
-                            <h4 style="color:#bd4f2a; margin-bottom: 12px; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px;">
-                                <span class="material-symbols-outlined" style="font-size:18px;">translate</span>
-                                Spansk oversettelse (Valgfritt)
-                            </h4>
-                            <div class="form-group">
-                                <label>Overskrift (ES)</label>
-                                <input type="text" id="hero-title-es" class="form-control" value="${this.escapeHtml(slide.translations?.es?.title || '')}" placeholder="Leave blank to use Norwegian">
-                            </div>
-                            <div class="form-group">
-                                <label>Undertekst (ES)</label>
-                                <textarea id="hero-subtitle-es" class="form-control" style="height: 60px;" placeholder="Leave blank to use Norwegian">${this.escapeHtml(slide.translations?.es?.subtitle || '')}</textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>Knapptekst (ES)</label>
-                                <input type="text" id="hero-btn-text-es" class="form-control" value="${this.escapeHtml(slide.translations?.es?.btnText || '')}" placeholder="Leave blank to use Norwegian">
+                            <div style="display: flex; flex-direction: column; gap: 10px;">
+                                <div>
+                                    <label style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 4px; display: block;">Overskrift (EN)</label>
+                                    <input type="text" id="hero-title-en" class="form-control" value="${this.escapeHtml(slide.translations?.en?.title || '')}" placeholder="Leave blank to use Norwegian" style="border-radius: 8px; padding: 8px 12px; border: 1px solid #cbd5e1; font-size: 13px; width: 100%; box-sizing: border-box;">
+                                </div>
+                                <div>
+                                    <label style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 4px; display: block;">Undertekst (EN)</label>
+                                    <textarea id="hero-subtitle-en" class="form-control" style="border-radius: 8px; padding: 8px 12px; border: 1px solid #cbd5e1; font-size: 13px; width: 100%; height: 50px; box-sizing: border-box; resize: vertical;" placeholder="Leave blank to use Norwegian">${this.escapeHtml(slide.translations?.en?.subtitle || '')}</textarea>
+                                </div>
+                                <div>
+                                    <label style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 4px; display: block;">Knapptekst (EN)</label>
+                                    <input type="text" id="hero-btn-text-en" class="form-control" value="${this.escapeHtml(slide.translations?.en?.btnText || '')}" placeholder="Leave blank to use Norwegian" style="border-radius: 8px; padding: 8px 12px; border: 1px solid #cbd5e1; font-size: 13px; width: 100%; box-sizing: border-box;">
+                                </div>
                             </div>
                         </div>
 
-                        <div style="margin-top: 24px;">
-                            <button class="btn-primary" style="width: 100%;" id="hero-save-btn">Lagre slide</button>
+                        <!-- Spanish -->
+                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px;">
+                            <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                                <span>🇪🇸</span> Spansk oversettelse (Valgfritt)
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 10px;">
+                                <div>
+                                    <label style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 4px; display: block;">Overskrift (ES)</label>
+                                    <input type="text" id="hero-title-es" class="form-control" value="${this.escapeHtml(slide.translations?.es?.title || '')}" placeholder="Leave blank to use Norwegian" style="border-radius: 8px; padding: 8px 12px; border: 1px solid #cbd5e1; font-size: 13px; width: 100%; box-sizing: border-box;">
+                                </div>
+                                <div>
+                                    <label style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 4px; display: block;">Undertekst (ES)</label>
+                                    <textarea id="hero-subtitle-es" class="form-control" style="border-radius: 8px; padding: 8px 12px; border: 1px solid #cbd5e1; font-size: 13px; width: 100%; height: 50px; box-sizing: border-box; resize: vertical;" placeholder="Leave blank to use Norwegian">${this.escapeHtml(slide.translations?.es?.subtitle || '')}</textarea>
+                                </div>
+                                <div>
+                                    <label style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 4px; display: block;">Knapptekst (ES)</label>
+                                    <input type="text" id="hero-btn-text-es" class="form-control" value="${this.escapeHtml(slide.translations?.es?.btnText || '')}" placeholder="Leave blank to use Norwegian" style="border-radius: 8px; padding: 8px 12px; border: 1px solid #cbd5e1; font-size: 13px; width: 100%; box-sizing: border-box;">
+                                </div>
+                            </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Modal Footer (Sticky) -->
+                <div style="padding: 16px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; align-items: center; gap: 12px; flex-shrink: 0;">
+                    <button type="button" class="btn-secondary" id="hero-cancel-modal" style="padding: 10px 20px; border-radius: 12px; font-weight: 600; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; cursor: pointer; transition: all 0.2s;">Avbryt</button>
+                    <button type="button" class="btn-primary" id="hero-save-btn" style="padding: 10px 24px; border-radius: 12px; font-weight: 700; background: #d17d39; color: #ffffff; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(209, 125, 57, 0.25); transition: all 0.2s;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">save</span>
+                        ${isNew ? 'Opprett slide' : 'Lagre endringer'}
+                    </button>
                 </div>
             </div>
         `;
         document.body.appendChild(modal);
 
-        // Scoped selection within the modal to avoid any ID conflicts
+        // Modal closing handlers
+        const closeModal = () => {
+            document.removeEventListener('keydown', onEsc);
+            modal.remove();
+        };
+        const onEsc = (e) => {
+            if (e.key === 'Escape') closeModal();
+        };
+        document.addEventListener('keydown', onEsc);
+
+        modal.onclick = (e) => {
+            if (e.target === modal) closeModal();
+        };
+
+        const closeBtn = modal.querySelector('#hero-close-modal');
+        const cancelBtn = modal.querySelector('#hero-cancel-modal');
+        if (closeBtn) closeBtn.onclick = closeModal;
+        if (cancelBtn) cancelBtn.onclick = closeModal;
+
+        // Scoped selection within the modal
         const imgInput = modal.querySelector('#hero-img-url');
         const fileInput = modal.querySelector('#hero-file-input');
         const imgTrigger = modal.querySelector('#hero-img-trigger');
         const chooseImageBtn = modal.querySelector('#hero-choose-image-btn');
+        const unsplashBtn = modal.querySelector('#hero-unsplash-btn');
         const uploadStatus = modal.querySelector('#hero-upload-status');
         const saveBtn = modal.querySelector('#hero-save-btn');
-        const closeBtn = modal.querySelector('#hero-close-modal');
         const autoTranslateBtn = modal.querySelector('#hero-auto-translate-btn');
-
-        closeBtn.onclick = () => modal.remove();
 
         if (autoTranslateBtn) {
             autoTranslateBtn.onclick = async () => {
@@ -24313,32 +24375,32 @@ class AdminManager {
                 autoTranslateBtn.innerHTML = '<span class="material-symbols-outlined spin">sync</span> Oversetter...';
                 
                 const slideToTranslate = {
-                    title: modal.querySelector('#hero-title').value,
-                    subtitle: modal.querySelector('#hero-subtitle').value,
-                    btnText: modal.querySelector('#hero-btn-text').value,
+                    title: modal.querySelector('#hero-title')?.value || '',
+                    subtitle: modal.querySelector('#hero-subtitle')?.value || '',
+                    btnText: modal.querySelector('#hero-btn-text')?.value || '',
                     translations: {
                         en: {
-                            title: modal.querySelector('#hero-title-en').value.trim(),
-                            subtitle: modal.querySelector('#hero-subtitle-en').value.trim(),
-                            btnText: modal.querySelector('#hero-btn-text-en').value.trim()
+                            title: modal.querySelector('#hero-title-en')?.value.trim() || '',
+                            subtitle: modal.querySelector('#hero-subtitle-en')?.value.trim() || '',
+                            btnText: modal.querySelector('#hero-btn-text-en')?.value.trim() || ''
                         },
                         es: {
-                            title: modal.querySelector('#hero-title-es').value.trim(),
-                            subtitle: modal.querySelector('#hero-subtitle-es').value.trim(),
-                            btnText: modal.querySelector('#hero-btn-text-es').value.trim()
+                            title: modal.querySelector('#hero-title-es')?.value.trim() || '',
+                            subtitle: modal.querySelector('#hero-subtitle-es')?.value.trim() || '',
+                            btnText: modal.querySelector('#hero-btn-text-es')?.value.trim() || ''
                         }
                     }
                 };
 
                 try {
                     const finalTranslations = await this._translateSlide(slideToTranslate);
-                    modal.querySelector('#hero-title-en').value = finalTranslations.en.title || '';
-                    modal.querySelector('#hero-subtitle-en').value = finalTranslations.en.subtitle || '';
-                    modal.querySelector('#hero-btn-text-en').value = finalTranslations.en.btnText || '';
+                    if (modal.querySelector('#hero-title-en')) modal.querySelector('#hero-title-en').value = finalTranslations.en.title || '';
+                    if (modal.querySelector('#hero-subtitle-en')) modal.querySelector('#hero-subtitle-en').value = finalTranslations.en.subtitle || '';
+                    if (modal.querySelector('#hero-btn-text-en')) modal.querySelector('#hero-btn-text-en').value = finalTranslations.en.btnText || '';
                     
-                    modal.querySelector('#hero-title-es').value = finalTranslations.es.title || '';
-                    modal.querySelector('#hero-subtitle-es').value = finalTranslations.es.subtitle || '';
-                    modal.querySelector('#hero-btn-text-es').value = finalTranslations.es.btnText || '';
+                    if (modal.querySelector('#hero-title-es')) modal.querySelector('#hero-title-es').value = finalTranslations.es.title || '';
+                    if (modal.querySelector('#hero-subtitle-es')) modal.querySelector('#hero-subtitle-es').value = finalTranslations.es.subtitle || '';
+                    if (modal.querySelector('#hero-btn-text-es')) modal.querySelector('#hero-btn-text-es').value = finalTranslations.es.btnText || '';
                     
                     this.showToast('Oversettelse fullført!', 'success');
                 } catch (err) {
@@ -24351,84 +24413,116 @@ class AdminManager {
             };
         }
 
-        // Image Trigger Logic
-        imgTrigger.onclick = () => fileInput.click();
-        chooseImageBtn.onclick = () => fileInput.click();
-
-        imgTrigger.onmouseenter = () => {
-            const overlay = imgTrigger.querySelector('.upload-overlay');
-            if (overlay) overlay.style.opacity = '1';
-        };
-        imgTrigger.onmouseleave = () => {
-            const overlay = imgTrigger.querySelector('.upload-overlay');
-            if (overlay) overlay.style.opacity = '0';
-        };
-
-        // Live Preview
+        // Live Preview Helper
         const renderImagePreview = (url) => {
             const safeUrl = this.escapeHtml(url || '');
-            imgTrigger.innerHTML = safeUrl && safeUrl.length > 10
-                ? `<img src="${safeUrl}" style="width: 100%; height: 100%; object-fit: cover;"><div class="upload-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.78); color: #fff; font-size: 11px; padding: 8px; text-align: center; opacity: 1; transition: opacity 0.2s;">Klikk på bildet eller velg ny fil</div>`
-                : '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span><div class="upload-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.78); color: #fff; font-size: 11px; padding: 8px; text-align: center; opacity: 1; transition: opacity 0.2s;">Klikk på bildet eller velg fil</div>';
-        };
-
-        imgInput.oninput = (e) => {
-            renderImagePreview(e.target.value);
-        };
-
-        // File Upload Handling (Blog-style)
-        fileInput.onchange = async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            if (!file.type || !file.type.startsWith('image/')) {
-                this.showToast('Velg en bildefil.', 'error', 4000);
-                fileInput.value = '';
-                return;
-            }
-            if (file.size > 10 * 1024 * 1024) {
-                this.showToast('Bildet er for stort. Maks størrelse er 10 MB.', 'error', 6000);
-                fileInput.value = '';
-                return;
-            }
-
-            imgTrigger.style.opacity = '0.5';
-            imgTrigger.style.pointerEvents = 'none';
-            chooseImageBtn.disabled = true;
-            chooseImageBtn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span> Laster opp...';
-            uploadStatus.textContent = `${file.name} - starter...`;
-            const originalHTML = imgTrigger.innerHTML;
-            imgTrigger.innerHTML = '<span class="loader-sm"></span>';
-
-            try {
-                const safeFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-                const path = `hero/${Date.now()}_${safeFileName}`;
-                const url = await firebaseService.uploadImage(
-                    file,
-                    path,
-                    (progress) => {
-                        uploadStatus.textContent = `${file.name} - ${progress}%`;
-                    },
-                    { timeoutMs: 90000, maxSizeBytes: 10 * 1024 * 1024 }
-                );
-                
-                imgInput.value = url;
-                imgInput.dispatchEvent(new Event('input')); 
-                this.showToast('Bilde lastet opp!', 'success');
-                uploadStatus.textContent = 'Opplasting fullført';
-            } catch (err) {
-                console.error("Upload error:", err);
-                this.showToast('Kunne ikke laste opp bilde: ' + (err.message || 'Ukjent feil'), 'error', 6000);
-                uploadStatus.textContent = 'Opplasting feilet';
-                imgTrigger.innerHTML = originalHTML;
-            } finally {
-                imgTrigger.style.opacity = '1';
-                imgTrigger.style.pointerEvents = 'auto';
-                chooseImageBtn.disabled = false;
-                chooseImageBtn.innerHTML = '<span class="material-symbols-outlined">upload</span> Velg bilde';
-                fileInput.value = '';
+            if (safeUrl && safeUrl.length > 5) {
+                imgTrigger.innerHTML = `<img src="${safeUrl}" style="width: 100%; height: 100%; object-fit: cover;"><div class="upload-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.78); color: #fff; font-size: 12px; font-weight: 500; padding: 8px; text-align: center; opacity: 1; transition: opacity 0.2s;">Klikk på bildet eller velg ny fil</div>`;
+            } else {
+                imgTrigger.innerHTML = '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span><div class="upload-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.78); color: #fff; font-size: 12px; font-weight: 500; padding: 8px; text-align: center; opacity: 1; transition: opacity 0.2s;">Klikk på bildet eller velg fil</div>';
             }
         };
+
+        // Image Trigger Logic
+        if (imgTrigger && fileInput) {
+            imgTrigger.onclick = () => fileInput.click();
+        }
+        if (chooseImageBtn && fileInput) {
+            chooseImageBtn.onclick = () => fileInput.click();
+        }
+
+        // Unsplash integration
+        if (unsplashBtn) {
+            unsplashBtn.onclick = () => {
+                if (window.unsplashManager) {
+                    window.unsplashManager.open((selection) => {
+                        if (selection && selection.url) {
+                            if (imgInput) imgInput.value = selection.url;
+                            renderImagePreview(selection.url);
+                        }
+                    });
+                } else {
+                    this.showToast('Unsplash er ikke tilgjengelig.', 'info');
+                }
+            };
+        }
+
+        if (imgTrigger) {
+            imgTrigger.onmouseenter = () => {
+                const overlay = imgTrigger.querySelector('.upload-overlay');
+                if (overlay) overlay.style.opacity = '1';
+            };
+            imgTrigger.onmouseleave = () => {
+                const overlay = imgTrigger.querySelector('.upload-overlay');
+                if (overlay) overlay.style.opacity = '0.7';
+            };
+        }
+
+        if (imgInput) {
+            imgInput.oninput = (e) => {
+                renderImagePreview(e.target.value);
+            };
+        }
+
+        // File Upload Handling
+        if (fileInput) {
+            fileInput.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                if (!file.type || !file.type.startsWith('image/')) {
+                    this.showToast('Velg en bildefil.', 'error', 4000);
+                    fileInput.value = '';
+                    return;
+                }
+                if (file.size > 10 * 1024 * 1024) {
+                    this.showToast('Bildet er for stort. Maks størrelse er 10 MB.', 'error', 6000);
+                    fileInput.value = '';
+                    return;
+                }
+
+                imgTrigger.style.opacity = '0.5';
+                imgTrigger.style.pointerEvents = 'none';
+                if (chooseImageBtn) {
+                    chooseImageBtn.disabled = true;
+                    chooseImageBtn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span> Laster opp...';
+                }
+                if (uploadStatus) uploadStatus.textContent = `${file.name} - starter...`;
+                const originalHTML = imgTrigger.innerHTML;
+                imgTrigger.innerHTML = '<span class="loader-sm"></span>';
+
+                try {
+                    const safeFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+                    const path = `hero/${Date.now()}_${safeFileName}`;
+                    const url = await firebaseService.uploadImage(
+                        file,
+                        path,
+                        (progress) => {
+                            if (uploadStatus) uploadStatus.textContent = `${file.name} - ${progress}%`;
+                        },
+                        { timeoutMs: 90000, maxSizeBytes: 10 * 1024 * 1024 }
+                    );
+                    
+                    if (imgInput) imgInput.value = url;
+                    renderImagePreview(url);
+                    this.showToast('Bilde lastet opp!', 'success');
+                    if (uploadStatus) uploadStatus.textContent = 'Opplasting fullført';
+                } catch (err) {
+                    console.error("Upload error:", err);
+                    this.showToast('Kunne ikke laste opp bilde: ' + (err.message || 'Ukjent feil'), 'error', 6000);
+                    if (uploadStatus) uploadStatus.textContent = 'Opplasting feilet';
+                    imgTrigger.innerHTML = originalHTML;
+                } finally {
+                    imgTrigger.style.opacity = '1';
+                    imgTrigger.style.pointerEvents = 'auto';
+                    if (chooseImageBtn) {
+                        chooseImageBtn.disabled = false;
+                        chooseImageBtn.innerHTML = '<span class="material-symbols-outlined">upload</span> Velg bilde';
+                    }
+                    fileInput.value = '';
+                }
+            };
+        }
 
         // Video Upload Logic
         const videoInput = modal.querySelector('#hero-video-url');
@@ -24443,7 +24537,7 @@ class AdminManager {
                 const file = e.target.files[0];
                 if (!file) return;
 
-                uploadVideoStatus.textContent = 'Laster opp...';
+                if (uploadVideoStatus) uploadVideoStatus.textContent = 'Laster opp...';
                 uploadVideoBtn.disabled = true;
                 uploadVideoBtn.innerHTML = '<span class="material-symbols-outlined spin">sync</span> Laster opp...';
 
@@ -24454,19 +24548,18 @@ class AdminManager {
                         ['video/'], 
                         50, // 50MB max
                         (progress) => {
-                            uploadVideoStatus.textContent = `Laster opp: ${progress}%`;
+                            if (uploadVideoStatus) uploadVideoStatus.textContent = `Laster opp: ${progress}%`;
                         },
                         { timeoutMs: 300000 } // 5 min timeout
                     );
                     
-                    videoInput.value = url;
-                    videoInput.dispatchEvent(new Event('input')); 
+                    if (videoInput) videoInput.value = url;
                     this.showToast('Video lastet opp!', 'success');
-                    uploadVideoStatus.textContent = 'Video opplastet';
+                    if (uploadVideoStatus) uploadVideoStatus.textContent = 'Video opplastet';
                 } catch (err) {
                     console.error("Upload error:", err);
                     this.showToast('Kunne ikke laste opp video: ' + (err.message || 'Ukjent feil'), 'error', 6000);
-                    uploadVideoStatus.textContent = 'Opplasting feilet';
+                    if (uploadVideoStatus) uploadVideoStatus.textContent = 'Opplasting feilet';
                 } finally {
                     uploadVideoBtn.disabled = false;
                     uploadVideoBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">upload</span> Last opp MP4';
@@ -24476,85 +24569,88 @@ class AdminManager {
         }
 
         // Save Logic
-        saveBtn.onclick = async () => {
-            saveBtn.disabled = true;
-            saveBtn.textContent = 'Lagrer...';
+        if (saveBtn) {
+            saveBtn.onclick = async () => {
+                saveBtn.disabled = true;
+                const originalBtnText = saveBtn.innerHTML;
+                saveBtn.innerHTML = '<span class="material-symbols-outlined spin">sync</span> Lagrer...';
 
-            const rawVideo = modal.querySelector('#hero-video-url').value;
-            const ytId = this.extractYoutubeId(rawVideo);
-            
-            const slideTitle = modal.querySelector('#hero-title').value;
-            const slideSubtitle = modal.querySelector('#hero-subtitle').value;
-            const slideBtnText = modal.querySelector('#hero-btn-text').value;
-            const slideBtnLink = modal.querySelector('#hero-btn-link').value;
+                const rawVideo = modal.querySelector('#hero-video-url')?.value || '';
+                const ytId = this.extractYoutubeId(rawVideo);
+                
+                const slideTitle = modal.querySelector('#hero-title')?.value || '';
+                const slideSubtitle = modal.querySelector('#hero-subtitle')?.value || '';
+                const slideBtnText = modal.querySelector('#hero-btn-text')?.value || '';
+                const slideBtnLink = modal.querySelector('#hero-btn-link')?.value || '';
 
-            const translations = {
-                en: {
-                    title: modal.querySelector('#hero-title-en').value.trim(),
-                    subtitle: modal.querySelector('#hero-subtitle-en').value.trim(),
-                    btnText: modal.querySelector('#hero-btn-text-en').value.trim()
-                },
-                es: {
-                    title: modal.querySelector('#hero-title-es').value.trim(),
-                    subtitle: modal.querySelector('#hero-subtitle-es').value.trim(),
-                    btnText: modal.querySelector('#hero-btn-text-es').value.trim()
+                const translations = {
+                    en: {
+                        title: modal.querySelector('#hero-title-en')?.value.trim() || '',
+                        subtitle: modal.querySelector('#hero-subtitle-en')?.value.trim() || '',
+                        btnText: modal.querySelector('#hero-btn-text-en')?.value.trim() || ''
+                    },
+                    es: {
+                        title: modal.querySelector('#hero-title-es')?.value.trim() || '',
+                        subtitle: modal.querySelector('#hero-subtitle-es')?.value.trim() || '',
+                        btnText: modal.querySelector('#hero-btn-text-es')?.value.trim() || ''
+                    }
+                };
+
+                const slideToTranslate = {
+                    title: slideTitle,
+                    subtitle: slideSubtitle,
+                    btnText: slideBtnText,
+                    translations: translations
+                };
+
+                let finalTranslations = translations;
+                const needsTranslation = (!translations.en.title && slideTitle) || 
+                                         (!translations.en.subtitle && slideSubtitle) || 
+                                         (!translations.en.btnText && slideBtnText) ||
+                                         (!translations.es.title && slideTitle) || 
+                                         (!translations.es.subtitle && slideSubtitle) || 
+                                         (!translations.es.btnText && slideBtnText);
+
+                if (needsTranslation) {
+                    this.showToast('Oversetter slide til engelsk og spansk...', 'info', 3000);
+                    try {
+                        finalTranslations = await this._translateSlide(slideToTranslate);
+                    } catch (err) {
+                        console.error("Slide translation error on save:", err);
+                    }
                 }
-            };
 
-            const slideToTranslate = {
-                title: slideTitle,
-                subtitle: slideSubtitle,
-                btnText: slideBtnText,
-                translations: translations
-            };
+                const updatedSlide = {
+                    imageUrl: imgInput ? imgInput.value : '',
+                    youtubeId: ytId || '',
+                    videoUrl: !ytId ? rawVideo : '', // Store as generic video if not YT
+                    title: slideTitle,
+                    subtitle: slideSubtitle,
+                    btnText: slideBtnText,
+                    btnLink: slideBtnLink,
+                    duration: parseFloat(modal.querySelector('#hero-duration')?.value) || 8,
+                    translations: finalTranslations
+                };
 
-            let finalTranslations = translations;
-            const needsTranslation = (!translations.en.title && slideTitle) || 
-                                     (!translations.en.subtitle && slideSubtitle) || 
-                                     (!translations.en.btnText && slideBtnText) ||
-                                     (!translations.es.title && slideTitle) || 
-                                     (!translations.es.subtitle && slideSubtitle) || 
-                                     (!translations.es.btnText && slideBtnText);
+                if (isNew) {
+                    this.heroSlides.push(updatedSlide);
+                } else {
+                    this.heroSlides[index] = updatedSlide;
+                }
 
-            if (needsTranslation) {
-                this.showToast('Oversetter slide til engelsk og spansk...', 'info', 3000);
                 try {
-                    finalTranslations = await this._translateSlide(slideToTranslate);
+                    await firebaseService.savePageContent('hero_slides', { slides: this.heroSlides });
+                    this.showToast('Slide lagret!', 'success');
+                    closeModal();
+                    this.renderHeroSlides(this.heroSlides);
                 } catch (err) {
-                    console.error("Slide translation error on save:", err);
+                    console.error("Save error:", err);
+                    this.showToast('Kunne ikke lagre sliden: ' + (err.message || 'Ukjent feil'), 'error', 6000);
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = originalBtnText;
                 }
-            }
-
-            const updatedSlide = {
-                imageUrl: imgInput.value,
-                youtubeId: ytId || '',
-                videoUrl: !ytId ? rawVideo : '', // Store as generic video if not YT
-                title: slideTitle,
-                subtitle: slideSubtitle,
-                btnText: slideBtnText,
-                btnLink: slideBtnLink,
-                duration: parseFloat(modal.querySelector('#hero-duration').value) || 8,
-                translations: finalTranslations
             };
-
-            if (isNew) {
-                this.heroSlides.push(updatedSlide);
-            } else {
-                this.heroSlides[index] = updatedSlide;
-            }
-
-            try {
-                await firebaseService.savePageContent('hero_slides', { slides: this.heroSlides });
-                this.showToast('Slide lagret!', 'success');
-                modal.remove();
-                this.renderHeroSlides(this.heroSlides);
-            } catch (err) {
-                console.error("Save error:", err);
-                this.showToast('Kunne ikke lagre sliden.', 'error');
-                saveBtn.disabled = false;
-                saveBtn.textContent = 'Lagre slide';
-            }
-        };
+        }
     }
 
     async _translateSlide(slide) {
