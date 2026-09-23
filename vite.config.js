@@ -85,8 +85,47 @@ function getHtmlEntries(dir, entries = {}) {
     return entries;
 }
 
+const vercelAnalyticsPlugin = {
+    name: 'hkm-vercel-analytics',
+    transformIndexHtml: {
+        order: 'post',
+        handler(html) {
+            if (html.includes('/_vercel/insights/script.js')) return [];
+
+            return [
+                {
+                    tag: 'script',
+                    children: 'window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };',
+                    injectTo: 'head'
+                },
+                {
+                    tag: 'script',
+                    attrs: {
+                        defer: true,
+                        src: '/_vercel/insights/script.js'
+                    },
+                    injectTo: 'head'
+                },
+                {
+                    tag: 'script',
+                    children: 'window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };',
+                    injectTo: 'head'
+                },
+                {
+                    tag: 'script',
+                    attrs: {
+                        defer: true,
+                        src: '/_vercel/speed-insights/script.js'
+                    },
+                    injectTo: 'head'
+                }
+            ];
+        }
+    }
+};
+
 export default defineConfig({
-    plugins: [sharedSiteShellPlugin, react()],
+    plugins: [sharedSiteShellPlugin, vercelAnalyticsPlugin, react()],
     resolve: {
         alias: {
             '@': resolve(__dirname, 'admin/js')

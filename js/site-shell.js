@@ -11,6 +11,31 @@ if (typeof document !== 'undefined' && document.head) {
     }
 }
 
+// Vercel Web Analytics & Speed Insights
+if (typeof window !== 'undefined') {
+    window.va = window.va || function () {
+        (window.vaq = window.vaq || []).push(arguments);
+    };
+    window.si = window.si || function () {
+        (window.siq = window.siq || []).push(arguments);
+    };
+
+    if (typeof document !== 'undefined' && document.head) {
+        if (!document.querySelector('script[src*="/_vercel/insights/script.js"]')) {
+            const vaScript = document.createElement('script');
+            vaScript.defer = true;
+            vaScript.src = '/_vercel/insights/script.js';
+            document.head.appendChild(vaScript);
+        }
+        if (!document.querySelector('script[src*="/_vercel/speed-insights/script.js"]')) {
+            const siScript = document.createElement('script');
+            siScript.defer = true;
+            siScript.src = '/_vercel/speed-insights/script.js';
+            document.head.appendChild(siScript);
+        }
+    }
+}
+
 const STORE_URL = 'https://www.hiskingdomdesigns.no/';
 const FACEBOOK_URL = 'https://www.facebook.com/hiskingdomministry777?locale=nb_NO';
 const INSTAGRAM_URL = 'https://www.instagram.com/freedomisathand/';
