@@ -4,11 +4,17 @@
 // Hybrid AI-svar + Wix Inbox Push Notifications
 // =========================================================================
 
+const DESIGNS_GREETINGS = {
+  no: 'Velkommen til His Kingdom Designs. Hvordan kan vi hjelpe deg i dag?',
+  en: 'Welcome to His Kingdom Designs. How can we help you today?',
+  es: '¡Bienvenido a His Kingdom Designs! ¿Cómo podemos ayudarte hoy?'
+};
+
 const TRANSLATIONS = {
   no: {
     title: 'His Kingdom Ministry',
     subtitle: 'Aktiv nå',
-    greeting: 'Hei! Velsignet dag og velkommen til His Kingdom Ministry. 🙏 Hvordan kan vi be for deg eller hjelpe deg i dag?',
+    greeting: 'Hei! Velkommen til His Kingdom Ministry. Hvordan kan vi hjelpe deg i dag?',
     placeholder: 'Skriv din melding her...',
     send: 'Send',
     sending: 'Sender...',
@@ -31,7 +37,7 @@ const TRANSLATIONS = {
   en: {
     title: 'His Kingdom Ministry',
     subtitle: 'Active now',
-    greeting: 'Hello! Blessed day and welcome to His Kingdom Ministry. 🙏 How can we pray for you or assist you today?',
+    greeting: 'Hello! Welcome to His Kingdom Ministry. How can we help you today?',
     placeholder: 'Type your message here...',
     send: 'Send',
     sending: 'Sending...',
@@ -54,7 +60,7 @@ const TRANSLATIONS = {
   es: {
     title: 'His Kingdom Ministry',
     subtitle: 'En línea',
-    greeting: '¡Hola! Bendecido día y bienvenido a His Kingdom Ministry. 🙏 ¿Cómo podemos orar por ti o ayudarte hoy?',
+    greeting: '¡Hola! Bienvenido a His Kingdom Ministry. ¿Cómo podemos ayudarte hoy?',
     placeholder: 'Escribe tu mensaje aquí...',
     send: 'Enviar',
     sending: 'Enviando...',
@@ -195,7 +201,16 @@ export function initHkmChatWidget() {
   if (document.getElementById('hkm-chat-widget-root')) return;
 
   const lang = getSiteLanguage();
-  const t = TRANSLATIONS[lang] || TRANSLATIONS.no;
+  const host = typeof window !== 'undefined' ? (window.location.hostname || '').toLowerCase() : '';
+  const path = typeof window !== 'undefined' ? (window.location.pathname || '').toLowerCase() : '';
+  const isDesigns = host.includes('hiskingdomdesigns') || host.includes('designs') || path.includes('/butikk') || path.includes('/shop');
+
+  const baseT = TRANSLATIONS[lang] || TRANSLATIONS.no;
+  const t = {
+    ...baseT,
+    title: isDesigns ? 'His Kingdom Designs' : baseT.title,
+    greeting: isDesigns ? (DESIGNS_GREETINGS[lang] || DESIGNS_GREETINGS.no) : baseT.greeting
+  };
 
   // Sørg for at Material Symbols bruker &display=block for å forhindre råtekst-flash
   if (!document.querySelector('link[href*="fonts.googleapis.com/css2?family=Material+Symbols+Outlined"]')) {
