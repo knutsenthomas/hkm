@@ -1,3 +1,5 @@
+import { initHkmChatWidget } from './hkm-chat-widget.js';
+
 if (typeof document !== 'undefined' && document.head) {
     if (!document.querySelector('link[rel="preload"][href="/img/logo-hkm.png"]')) {
         const logoPreload = document.createElement('link');
@@ -854,6 +856,11 @@ export function mountSiteShell() {
     initCookieSettingsLink();
     bindSiteShellMenu(header, megaMenu);
     if (typeof window.hkmApplyTheme === 'function') window.hkmApplyTheme();
+    try {
+        initHkmChatWidget();
+    } catch (e) {
+        console.warn('Could not initialize HKM Chat Widget:', e);
+    }
     document.dispatchEvent(new CustomEvent('hkm:site-shell-mounted', { detail: { language } }));
     return true;
 }
