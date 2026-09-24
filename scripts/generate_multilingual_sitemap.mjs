@@ -7,7 +7,7 @@ import path from 'path';
  * change frequencies, priority weights, accurate lastmod timestamps, and zero redirect/404 URLs.
  */
 
-const BASE_URL = 'https://www.hiskingdomministry.no';
+const BASE_URL = 'https://hiskingdomministry.no';
 const TODAY = new Date().toISOString().split('T')[0];
 
 // Multilingual Route Clusters - strictly 1-to-1 or single-language pages

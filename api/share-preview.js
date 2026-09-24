@@ -159,7 +159,7 @@ export default async function handler(req, res) {
   try {
     let title = 'His Kingdom Ministry';
     let description = 'Deling fra His Kingdom Ministry';
-    let imageUrl = 'https://www.hiskingdomministry.no/img/logo-hkm.png';
+    let imageUrl = 'https://hiskingdomministry.no/img/logo-hkm.png';
 
     if (type === 'plan') {
       // Fetch plan details from Firestore via REST API
@@ -294,7 +294,7 @@ export default async function handler(req, res) {
         if (course) {
           title = course.title || 'Kurs';
           description = course.description || 'Nettkurs fra His Kingdom Ministry';
-          imageUrl = course.imageUrl || 'https://www.hiskingdomministry.no/img/logo-hkm.png';
+          imageUrl = course.imageUrl || 'https://hiskingdomministry.no/img/logo-hkm.png';
         }
       }
     }

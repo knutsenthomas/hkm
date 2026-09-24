@@ -16,11 +16,11 @@
             }
         })();
     </script>
-    <link rel="canonical" href="https://www.hiskingdomministry.no/om-oss">
-    <link rel="alternate" hreflang="no" href="https://www.hiskingdomministry.no/om-oss">
-    <link rel="alternate" hreflang="en" href="https://www.hiskingdomministry.no/en/about">
-    <link rel="alternate" hreflang="es" href="https://www.hiskingdomministry.no/es/sobre-nosotros">
-    <link rel="alternate" hreflang="x-default" href="https://www.hiskingdomministry.no/om-oss">
+    <link rel="canonical" href="https://hiskingdomministry.no/om-oss">
+    <link rel="alternate" hreflang="no" href="https://hiskingdomministry.no/om-oss">
+    <link rel="alternate" hreflang="en" href="https://hiskingdomministry.no/en/about">
+    <link rel="alternate" hreflang="es" href="https://hiskingdomministry.no/es/sobre-nosotros">
+    <link rel="alternate" hreflang="x-default" href="https://hiskingdomministry.no/om-oss">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Om Oss | Visjon & Team | His Kingdom Ministry</title>
@@ -32,46 +32,70 @@
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="profile">
-    <meta property="og:url" content="https://www.hiskingdomministry.no/om-oss">
+    <meta property="og:url" content="https://hiskingdomministry.no/om-oss">
     <meta property="og:title" content="Om Oss | Visjon & Team | His Kingdom Ministry">
     <meta property="og:description" content="Lær mer om His Kingdom Ministry, vår visjon og teamet bak tjenesten.">
-    <meta property="og:image" content="https://www.hiskingdomministry.no/img/om-oss-og.jpg">
+    <meta property="og:image" content="https://hiskingdomministry.no/img/om-oss-og.jpg">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://www.hiskingdomministry.no/om-oss">
+    <meta property="twitter:url" content="https://hiskingdomministry.no/om-oss">
     <meta property="twitter:title" content="Om Oss | Visjon & Team | His Kingdom Ministry">
     <meta property="twitter:description" content="Lær mer om His Kingdom Ministry, vår visjon og teamet bak tjenesten.">
-    <meta property="twitter:image" content="https://www.hiskingdomministry.no/img/om-oss-og.jpg">
+    <meta property="twitter:image" content="https://hiskingdomministry.no/img/om-oss-og.jpg">
     <!-- Structured Data (JSON-LD) for SEO & GEO -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "NGO",
-      "name": "His Kingdom Ministry",
-      "url": "https://www.hiskingdomministry.no/om-oss",
-      "logo": "https://www.hiskingdomministry.no/img/logo-hkm.png",
-      "description": "His Kingdom Ministry er en kristen organisasjon dedikert til åndelig vekst, bibelundervisning, podcast og reisevirksomhet.",
-      "founder": [
+      "@graph": [
         {
-          "@type": "Person",
-          "name": "Hilde Karin Knutsen"
+          "@type": "NGO",
+          "@id": "https://hiskingdomministry.no/#organization",
+          "name": "His Kingdom Ministry",
+          "url": "https://hiskingdomministry.no/om-oss",
+          "logo": "https://hiskingdomministry.no/img/logo-hkm.png",
+          "description": "His Kingdom Ministry er en kristen organisasjon dedikert til åndelig vekst, bibelundervisning, podcast og reisevirksomhet.",
+          "founder": [
+            {
+              "@type": "Person",
+              "name": "Hilde Karin Knutsen"
+            },
+            {
+              "@type": "Person",
+              "name": "Thomas Knutsen"
+            }
+          ],
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Augerødlia 48",
+            "postalCode": "1591",
+            "addressLocality": "Sperrebotn",
+            "addressCountry": "NO"
+          },
+          "sameAs": [
+            "https://www.facebook.com/hiskingdomministry777",
+            "https://www.instagram.com/freedomisathand/",
+            "https://www.youtube.com/@HisKingdomMinistry"
+          ]
         },
         {
-          "@type": "Person",
-          "name": "Thomas Knutsen"
+          "@type": "BreadcrumbList",
+          "@id": "https://hiskingdomministry.no/om-oss#breadcrumb",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Hjem",
+              "item": "https://hiskingdomministry.no/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Om oss",
+              "item": "https://hiskingdomministry.no/om-oss"
+            }
+          ]
         }
-      ],
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "Augerødlia 48",
-        "postalCode": "1591",
-        "addressLocality": "Sperrebotn",
-        "addressCountry": "NO"
-      },
-      "sameAs": [
-        "https://www.facebook.com/hiskingdomministry777",
-        "https://www.instagram.com/hiskingdomministry"
       ]
     }
     </script>
@@ -770,9 +794,9 @@
                         <span class="section-label" data-content-key="intro.label">Velkommen til fellesskapet</span>
                     </div>
                     <h2 class="section-title" data-content-key="intro.title">Vi er en Non-profit organisasjon</h2>
-                    <p class="section-text" data-content-key="intro.text">His Kingdom Ministry driver med åndelig
-                        samlinger som bønnemøter, undervisningseminarer, og forkynnende reisevirksomhet. Vi ønsker å
-                        være et felleskap der mennesker kan vokse i sin tro og relasjon til Jesus.</p>
+                    <p class="section-text" data-content-key="intro.text">His Kingdom Ministry driver med åndelige
+                        samlinger som bønnemøter, undervisningsseminarer og forkynnende reisevirksomhet. Vi ønsker å
+                        være et fellesskap der mennesker kan vokse i sin tro og relasjon til Jesus.</p>
 
                     <div class="about-features">
                         <div class="about-feature-item">
@@ -795,7 +819,7 @@
                                 <h3 data-content-key="about.features.story.title">Vår historie</h3>
                                 <p data-content-key="about.features.story.text">Startet med en visjon om å samle
                                     mennesker i åndelig vekst, har vi vokst til et
-                                    levende felleskap som driver med bønnemøter, undervisning og reisevirksomhet.</p>
+                                    levende fellesskap som driver med bønnemøter, undervisning og reisevirksomhet.</p>
                             </div>
                         </div>
                     </div>

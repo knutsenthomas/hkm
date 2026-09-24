@@ -33,4 +33,4 @@ Allow: /
 Disallow: /admin/
 Disallow: /minside/
 
-Sitemap: https://www.hiskingdomministry.no/sitemap.xml
+Sitemap: https://hiskingdomministry.no/sitemap.xml

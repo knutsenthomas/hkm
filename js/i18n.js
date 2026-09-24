@@ -388,8 +388,8 @@ const i18nManager = {
         const alternateEl = document.querySelector(`link[rel="alternate"][hreflang="${lang}"]`);
         if (alternateEl) {
             let targetUrl = alternateEl.getAttribute('href');
-            if (targetUrl.startsWith('https://www.hiskingdomministry.no')) {
-                targetUrl = targetUrl.replace('https://www.hiskingdomministry.no', window.location.origin);
+            if (targetUrl.startsWith('https://www.hiskingdomministry.no') || targetUrl.startsWith('https://hiskingdomministry.no')) {
+                targetUrl = targetUrl.replace(/^https:\/\/(www\.)?hiskingdomministry\.no/, window.location.origin);
             }
             window.location.href = targetUrl + window.location.search;
             return;

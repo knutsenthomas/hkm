@@ -27284,7 +27284,7 @@ class AdminManager {
                     imageAlt: 'Fellesskap',
                     label: 'Velkommen til fellesskapet',
                     title: 'Vi er en Non-profit organisasjon',
-                    text: 'His Kingdom Ministry driver med åndelig samlinger som bønnemøter, undervisningseminarer, og forkynnende reisevirksomhet. Vi ønsker å være et felleskap der mennesker kan vokse i sin tro og relasjon til Jesus.'
+                    text: 'His Kingdom Ministry driver med åndelige samlinger som bønnemøter, undervisningsseminarer og forkynnende reisevirksomhet. Vi ønsker å være et fellesskap der mennesker kan vokse i sin tro og relasjon til Jesus.'
                 },
                 shopPromo: {
                     badge: 'His Kingdom Designs',
@@ -27338,18 +27338,18 @@ class AdminManager {
                         },
                         story: {
                             title: 'Vår historie',
-                            text: 'Startet med en visjon om å samle mennesker i åndelig vekst, har vi vokst til et levende felleskap som driver med bønnemøter, undervisning og reisevirksomhet.'
+                            text: 'Startet med en visjon om å samle mennesker i åndelig vekst, har vi vokst til et levende fellesskap som driver med bønnemøter, undervisning og reisevirksomhet.'
                         }
                     }
                 },
                 stats: {
-                    youtube_videos: 0,
+                    youtube_videos: 455,
                     youtube_videos_label: 'YouTube-videoer',
-                    youtube_views: 0,
+                    youtube_views: 58925,
                     youtube_views_label: 'YouTube-visninger',
-                    podcast_episodes: 0,
+                    podcast_episodes: 48,
                     podcast_episodes_label: 'Podcast-episoder',
-                    countries_visited: 0,
+                    countries_visited: 9,
                     countries_visited_label: 'Land besøkt'
                 },
                 impact: {
@@ -27556,7 +27556,7 @@ class AdminManager {
                 intro: {
                     label: 'Velkommen til fellesskapet',
                     title: 'Vi er en Non-profit organisasjon',
-                    text: 'His Kingdom Ministry driver med åndelig samlinger som bønnemøter, undervisningseminarer, og forkynnende reisevirksomhet. Vi ønsker å være et felleskap der mennesker kan vokse i sin tro og relasjon til Jesus.',
+                    text: 'His Kingdom Ministry driver med åndelige samlinger som bønnemøter, undervisningsseminarer og forkynnende reisevirksomhet. Vi ønsker å være et fellesskap der mennesker kan vokse i sin tro og relasjon til Jesus.',
                     btnText: 'Kontakt oss',
                     image: 'https://static.wixstatic.com/media/db4f96_2b25900fd882417e8fc88a62002ba11a~mv2.jpg/v1/fill/w_865,h_675,al_c,q_85,enc_avif,quality_auto/FullSizeRender_edited_edited_edited_edited%20(1).jpg',
                     videoUrl: 'https://www.youtube.com/watch?v=Z3jXbw0yC5E'
@@ -27569,7 +27569,7 @@ class AdminManager {
                         },
                         story: {
                             title: 'Vår historie',
-                            text: 'Startet med en visjon om å samle mennesker in åndelig vekst, har vi vokst til et levende felleskap som driver med bønnemøter, undervisning og reisevirksomhet.'
+                            text: 'Startet med en visjon om å samle mennesker i åndelig vekst, har vi vokst til et levende fellesskap som driver med bønnemøter, undervisning og reisevirksomhet.'
                         }
                     }
                 },

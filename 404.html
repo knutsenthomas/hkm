@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="no">
+
+<head>
+    <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('hkm_theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else {
+                const hour = new Date().getHours();
+                const isNight = hour >= 22 || hour < 6;
+                const systemTheme = isNight || window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', systemTheme);
+            }
+        })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Siden ble ikke funnet | His Kingdom Ministry</title>
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"></noscript>
+    
+    <!-- Font Awesome -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
+    <!-- Material Symbols Outlined -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block"></noscript>
+
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="preload" href="/css/cookie-consent.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="/css/cookie-consent.css"></noscript>
+    <link rel="preload" href="/css/search-v2.css?v=1.0.3" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="/css/search-v2.css?v=1.0.3"></noscript>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+
+    <style>
+        .error-404-container {
+            min-height: calc(100vh - 120px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 140px 24px 80px 24px;
+            background: linear-gradient(180deg, rgba(248, 249, 250, 0.8) 0%, rgba(255, 255, 255, 1) 100%);
+        }
+
+        html[data-theme="dark"] .error-404-container {
+            background: linear-gradient(180deg, #0b1329 0%, #0f172a 100%) !important;
+        }
+
+        .error-404-card {
+            max-width: 680px;
+            width: 100%;
+            text-align: center;
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 48px 32px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        html[data-theme="dark"] .error-404-card {
+            background: #1e293b !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        .error-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 9999px;
+            background: rgba(209, 125, 57, 0.12);
+            color: var(--hkm-terracotta, #d17d39);
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+        }
+
+        .error-title {
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 1.2;
+            color: #1a202c;
+            margin-bottom: 16px;
+        }
+
+        html[data-theme="dark"] .error-title {
+            color: #f8fafc !important;
+        }
+
+        .error-description {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #64748b;
+            margin-bottom: 32px;
+            max-width: 520px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        html[data-theme="dark"] .error-description {
+            color: #94a3b8 !important;
+        }
+
+        .error-quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            margin-top: 32px;
+            text-align: left;
+        }
+
+        .quick-link-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 16px;
+            border-radius: 16px;
+            background: #f8fafc;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            color: #1e293b;
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+
+        html[data-theme="dark"] .quick-link-item {
+            background: #0f172a !important;
+            border-color: rgba(255, 255, 255, 0.06) !important;
+            color: #f1f5f9 !important;
+        }
+
+        .quick-link-item:hover {
+            transform: translateY(-2px);
+            border-color: var(--hkm-terracotta, #d17d39);
+            box-shadow: 0 8px 20px rgba(209, 125, 57, 0.12);
+        }
+
+        .quick-link-item .material-symbols-outlined {
+            color: var(--hkm-terracotta, #d17d39);
+            margin-bottom: 8px;
+            font-size: 24px;
+        }
+
+        .quick-link-item span.title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .btn-primary-home {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 28px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
+            color: #ffffff !important;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 14px rgba(209, 125, 57, 0.25);
+        }
+
+        .btn-primary-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(209, 125, 57, 0.35);
+        }
+
+        @media (orientation: landscape) and (max-height: 500px) {
+            .error-404-container {
+                padding-top: 100px;
+                padding-bottom: 40px;
+            }
+        }
+    </style>
+</head>
+
+<body class="cms-loading">
+    <main class="error-404-container">
+        <div class="error-404-card">
+            <div class="error-badge">
+                <span class="material-symbols-outlined text-sm">warning</span>
+                Status 404
+            </div>
+            <h1 class="error-title">Siden ble ikke funnet</h1>
+            <p class="error-description">
+                Beklager, siden du leter etter eksisterer ikke, har blitt flyttet, eller adressen er skrevet feil.
+            </p>
+
+            <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+                <a href="/" class="btn-primary-home">
+                    <span class="material-symbols-outlined">home</span>
+                    Gå til forsiden
+                </a>
+            </div>
+
+            <div class="error-quick-links">
+                <a href="/bibel" class="quick-link-item">
+                    <span class="material-symbols-outlined">menu_book</span>
+                    <span class="title">Nettbibel</span>
+                </a>
+                <a href="/leseplaner" class="quick-link-item">
+                    <span class="material-symbols-outlined">calendar_today</span>
+                    <span class="title">Leseplaner</span>
+                </a>
+                <a href="/undervisning" class="quick-link-item">
+                    <span class="material-symbols-outlined">school</span>
+                    <span class="title">Undervisning</span>
+                </a>
+                <a href="/podcast" class="quick-link-item">
+                    <span class="material-symbols-outlined">podcasts</span>
+                    <span class="title">Podcast</span>
+                </a>
+                <a href="/arrangementer" class="quick-link-item">
+                    <span class="material-symbols-outlined">event</span>
+                    <span class="title">Arrangementer</span>
+                </a>
+                <a href="/kontakt" class="quick-link-item">
+                    <span class="material-symbols-outlined">mail</span>
+                    <span class="title">Kontakt oss</span>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="/script.js"></script>
+    <script type="module" src="/js/cookie-consent.js"></script>
+    <script type="module" src="/js/i18n.js"></script>
+</body>
+
+</html>
