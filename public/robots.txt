@@ -12,25 +12,30 @@ User-agent: Google-Extended
 Allow: /
 Disallow: /admin/
 Disallow: /minside/
+Disallow: /api/
 
 User-agent: GPTBot
 Allow: /
 Disallow: /admin/
 Disallow: /minside/
+Disallow: /api/
 
 User-agent: ClaudeBot
 Allow: /
 Disallow: /admin/
 Disallow: /minside/
+Disallow: /api/
 
 User-agent: PerplexityBot
 Allow: /
 Disallow: /admin/
 Disallow: /minside/
+Disallow: /api/
 
 User-agent: Applebot-Extended
 Allow: /
 Disallow: /admin/
 Disallow: /minside/
+Disallow: /api/
 
 Sitemap: https://hiskingdomministry.no/sitemap.xml
