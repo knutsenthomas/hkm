@@ -304,10 +304,12 @@
                     
                     <div class="flex items-center gap-3 pl-4 border-l border-outline-variant/50">
                         <div class="text-right">
-                            <p class="font-body-sm font-bold leading-none">Thomas Knutsen</p>
-                            <p class="text-[10px] text-primary-container font-black uppercase tracking-tighter">Medlem</p>
+                            <p id="user-display-name" class="font-body-sm font-bold leading-none">Min Side</p>
+                            <p id="user-membership-label" class="text-[10px] text-primary-container font-black uppercase tracking-tighter">Medlem</p>
                         </div>
-                        <img class="w-10 h-10 rounded-full object-cover ring-2 ring-primary/10 hover:ring-primary transition-all duration-300" alt="Thomas Knutsen portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYWCOOzX9Sd7bTB8TUQx4LrPF2IgXqnaLiVWDnLIrb0LEoyX_dwaFhQDVNxWEL00A9_FTx_awYoE8WH8KNWONeZRo4VEpWgHZ_87_yXV_R4OdgNWYEZtM8722-DzthgnlbnMZ0QqBQg1F48ZE9V1MNlT9zsi_qat1P3CUMwts-1QL99NgYB8zpMOfeuNqP2rFlTuzIJT-fPX07sFwZmLKyOegexztbLN2utcnjhoR79ShAFkYccO56iz-o4Gnr0bjCT2C0D0ycShjR"/>
+                        <div id="user-avatar-container" class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center ring-2 ring-primary/10 transition-all duration-300 overflow-hidden text-primary font-bold text-sm">
+                            <span class="material-symbols-outlined text-[20px]">person</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -320,7 +322,7 @@
                 <!-- Video Player / Simulated Meeting Component -->
                 <div id="video-player-viewport" class="relative aspect-video rounded-xl overflow-hidden bg-black group shadow-lg ring-1 ring-on-surface/5 transition-all duration-300">
                     <!-- Background image placeholder -->
-                    <div id="player-bg" class="absolute inset-0 bg-cover bg-center opacity-60 transition-opacity duration-500" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAKBzTxnpnsVp9DA8OzoYOBHUKZ7Eo4Yaniy1jXm87-3qYzjc5QZMaBThReDrLlUmPdj5e4EK3Ojq3Gow4zVe4WbzXhwJKqrDp5fwiaCg3R5Vzk16bx_PQf7hEFYI2MQ1QnFqoktutVv2jHa10dWMkOojdUdyLds5giToHcYqO-viwsrfh4DUXolKEj_f0DSBBuqOHuJZPQ4c8dErZoUhgLSMJAiYQwWH5HPiRG4x_gcHUUyQLuay_oXled8aukGPlchcNhUsENnT59')"></div>
+                    <div id="player-bg" class="absolute inset-0 bg-cover bg-center opacity-60 transition-opacity duration-500" style="background-image: url('/img/verse_bg_sunset_ocean.jpg')"></div>
                     
                     <!-- Inner Active Simulated Player (Initially hidden) -->
                     <div id="active-player" class="absolute inset-0 hidden bg-[#1a1a1a] flex-col items-center justify-center p-6 text-white">
@@ -354,8 +356,8 @@
                             
                             <div class="space-y-4 text-left">
                                 <div>
-                                    <label class="font-label-caps text-label-caps text-on-surface-variant block mb-2">Your Name</label>
-                                    <input id="student-name-input" class="w-full border-outline-variant bg-surface-container rounded-xl focus:border-primary focus:ring-primary p-3 text-body-md" type="text" value="Thomas Knutsen"/>
+                                    <label class="font-label-caps text-label-caps text-on-surface-variant block mb-2">Ditt navn</label>
+                                    <input id="student-name-input" class="w-full border-outline-variant bg-surface-container rounded-xl focus:border-primary focus:ring-primary p-3 text-body-md" type="text" placeholder="Ditt navn" value=""/>
                                 </div>
                                 <label class="flex items-center gap-3 cursor-pointer group">
                                     <input class="rounded text-primary focus:ring-primary border-outline-variant cursor-pointer" type="checkbox" checked/>
@@ -643,7 +645,7 @@
                 desc: "I denne første leksjonen går vi gjennom det fundamentale grunnlaget for åndelig klarsyn. Vi utforsker hvordan vi kan skille mellom egne tanker og Den Hellige Ånds ledelse.",
                 duration: "45 minutter",
                 resource: "PDF Arbeidsbok",
-                bgUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuAKBzTxnpnsVp9DA8OzoYOBHUKZ7Eo4Yaniy1jXm87-3qYzjc5QZMaBThReDrLlUmPdj5e4EK3Ojq3Gow4zVe4WbzXhwJKqrDp5fwiaCg3R5Vzk16bx_PQf7hEFYI2MQ1QnFqoktutVv2jHa10dWMkOojdUdyLds5giToHcYqO-viwsrfh4DUXolKEj_f0DSBBuqOHuJZPQ4c8dErZoUhgLSMJAiYQwWH5HPiRG4x_gcHUUyQLuay_oXled8aukGPlchcNhUsENnT59",
+                bgUrl: "/img/verse_bg_sunset_ocean.jpg",
                 verse: "\"Men den som drikker av det vannet jeg vil gi ham, skal aldri i evighet tørste. Det vannet jeg vil gi ham, skal bli en kilde i ham med vann som veller fram til evig liv.\"",
                 verseRef: "Johannes 4:14"
             },
@@ -654,7 +656,7 @@
                 desc: "Her lærer vi å tre frimodig inn i Guds nærhet. Vi ser på henvendelser i bønn og hvordan troen gir oss en direkte linje til himmelens tronsal.",
                 duration: "52 minutter",
                 resource: "Kompendium & Bønneguide",
-                bgUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuAKBzTxnpnsVp9DA8OzoYOBHUKZ7Eo4Yaniy1jXm87-3qYzjc5QZMaBThReDrLlUmPdj5e4EK3Ojq3Gow4zVe4WbzXhwJKqrDp5fwiaCg3R5Vzk16bx_PQf7hEFYI2MQ1QnFqoktutVv2jHa10dWMkOojdUdyLds5giToHcYqO-viwsrfh4DUXolKEj_f0DSBBuqOHuJZPQ4c8dErZoUhgLSMJAiYQwWH5HPiRG4x_gcHUUyQLuay_oXled8aukGPlchcNhUsENnT59",
+                bgUrl: "/img/verse_bg_sunset_ocean.jpg",
                 verse: "\"La oss derfor tre fram for nådens trone med frimodighet, så vi kan få barmhjertighet og finne nåde som gir hjelp i rette tid.\"",
                 verseRef: "Hebreerne 4:16"
             },
@@ -665,7 +667,7 @@
                 desc: "En dypdykk-leksjon fokusert på det personlige og intime forholdet til Jesus Kristus, og hvordan vi kan oppleve Hans nærvær i hverdagen.",
                 duration: "60 minutter",
                 resource: "Refleksjonshefte",
-                bgUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuAKBzTxnpnsVp9DA8OzoYOBHUKZ7Eo4Yaniy1jXm87-3qYzjc5QZMaBThReDrLlUmPdj5e4EK3Ojq3Gow4zVe4WbzXhwJKqrDp5fwiaCg3R5Vzk16bx_PQf7hEFYI2MQ1QnFqoktutVv2jHa10dWMkOojdUdyLds5giToHcYqO-viwsrfh4DUXolKEj_f0DSBBuqOHuJZPQ4c8dErZoUhgLSMJAiYQwWH5HPiRG4x_gcHUUyQLuay_oXled8aukGPlchcNhUsENnT59",
+                bgUrl: "/img/verse_bg_sunset_ocean.jpg",
                 verse: "\"Se, jeg står for døren og banker. Om noen hører min røst og åpner døren, vil jeg gå inn til ham og holde måltid med ham, og han med meg.\"",
                 verseRef: "Åpenbaringen 3:20"
             }
@@ -740,7 +742,7 @@
 
         // Simulating the Zoom Meeting Entrance Flow
         joinBtn.addEventListener('click', () => {
-            const name = studentNameInput.value.trim() || 'Thomas Knutsen';
+            const name = studentNameInput.value.trim() || 'Deltaker';
             
             // Step 1: Show Connecting State
             entranceOverlay.classList.add('opacity-0');
@@ -1052,6 +1054,69 @@
                 alert('Språk satt til norsk.');
             }
         });
+    </script>
+
+    <!-- Firebase SDKs & Auth for Dynamic User Data -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="/js/firebase-config.js"></script>
+    <script>
+        (function initSpillerUser() {
+            if (typeof firebase === 'undefined') return;
+            try {
+                if (!firebase.apps.length && window.firebaseConfig) {
+                    firebase.initializeApp(window.firebaseConfig);
+                }
+                firebase.auth().onAuthStateChanged(async (user) => {
+                    const nameEl = document.getElementById('user-display-name');
+                    const roleEl = document.getElementById('user-membership-label');
+                    const avatarContainer = document.getElementById('user-avatar-container');
+                    const studentInput = document.getElementById('student-name-input');
+
+                    if (user) {
+                        const fallbackName = user.displayName || (user.email ? user.email.split('@')[0] : 'Medlem');
+                        if (nameEl) nameEl.textContent = fallbackName;
+                        if (studentInput && !studentInput.value) studentInput.value = fallbackName;
+
+                        try {
+                            const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+                            if (userDoc.exists) {
+                                const data = userDoc.data();
+                                const activeName = data.displayName || fallbackName;
+                                if (nameEl) nameEl.textContent = activeName;
+                                if (studentInput) studentInput.value = activeName;
+                                if (roleEl && data.role) {
+                                    const roleLabels = { admin: 'Admin', team: 'Team', member: 'Medlem', user: 'Bruker' };
+                                    roleEl.textContent = roleLabels[data.role] || 'Medlem';
+                                }
+                                if (data.photoURL && avatarContainer) {
+                                    avatarContainer.innerHTML = `<img class="w-full h-full object-cover" alt="${activeName}" src="${data.photoURL}"/>`;
+                                }
+                            }
+                        } catch (err) {
+                            console.warn('[HKM Spiller] Kunne ikke laste brukerdetaljer:', err);
+                        }
+
+                        if (user.photoURL && avatarContainer && !avatarContainer.querySelector('img')) {
+                            avatarContainer.innerHTML = `<img class="w-full h-full object-cover" alt="${fallbackName}" src="${user.photoURL}"/>`;
+                        } else if (avatarContainer && !avatarContainer.querySelector('img')) {
+                            const initials = (nameEl.textContent || 'M').substring(0, 2).toUpperCase();
+                            avatarContainer.innerHTML = `<span>${initials}</span>`;
+                        }
+                    } else {
+                        if (nameEl) nameEl.textContent = 'Gjest';
+                        if (roleEl) roleEl.textContent = 'Ikke innlogget';
+                        if (studentInput) studentInput.value = '';
+                        if (avatarContainer) {
+                            avatarContainer.innerHTML = '<span class="material-symbols-outlined text-[20px]">person</span>';
+                        }
+                    }
+                });
+            } catch (e) {
+                console.warn('[HKM Spiller] Auth init:', e);
+            }
+        })();
     </script>
 </body>
 </html>
