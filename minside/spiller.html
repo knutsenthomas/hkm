@@ -660,42 +660,17 @@
                 course = courses[0];
             }
 
-            // Fallback default course structure if no courses exist in database
+            // If no course is found in the database or via URL parameter, render neutral empty state
             if (!course) {
-                course = {
-                    id: 'course_seerkurs',
-                    title: 'Seerkurs med aktivering',
-                    description: 'Et kurs om åndelig klarsyn, bønn og åndelig modenhet forankret i Guds Ord.',
-                    lessons: [
-                        {
-                            id: '1',
-                            title: 'Hvordan se i ånden',
-                            desc: 'Grunnleggende undervisning om åndelig syn og dømmekraft, forankret i Guds Ord.',
-                            duration: '45 min',
-                            resource: 'PDF Studiehefte',
-                            verse: 'For så høyt har Gud elsket verden, at han ga sin Sønn, den enbårne, for at hver den som tror på ham, ikke skal gå fortapt, men ha evig liv.',
-                            verseRef: 'Johannes 3:16'
-                        },
-                        {
-                            id: '2',
-                            title: 'Hvordan tre foran nådens trone',
-                            desc: 'Å tre frem for Gud med frimodighet i bønn og tilbedelse.',
-                            duration: '52 min',
-                            resource: 'Bønneguide',
-                            verse: 'La oss derfor tre fram for nådens trone med frimodighet, så vi kan få barmhjertighet og finne nåde som gir hjelp i rette tid.',
-                            verseRef: 'Hebreerne 4:16'
-                        },
-                        {
-                            id: '3',
-                            title: 'Møte med Jesus',
-                            desc: 'Personlig relasjon til Jesus Kristus og Hans nærvær i hverdagen.',
-                            duration: '60 min',
-                            resource: 'Refleksjonshefte',
-                            verse: 'Se, jeg står for døren og banker. Om noen hører min røst og åpner døren, vil jeg gå inn til ham og holde måltid med ham, og han med meg.',
-                            verseRef: 'Åpenbaringen 3:20'
-                        }
-                    ]
-                };
+                if (headerCourseTitle) {
+                    headerCourseTitle.textContent = 'Ingen kurs valgt';
+                }
+                if (allLessonsLabel) {
+                    allLessonsLabel.textContent = '0 leksjoner';
+                }
+                renderLessonsList([]);
+                renderEmptyLessonState();
+                return;
             }
 
             currentCourse = course;
