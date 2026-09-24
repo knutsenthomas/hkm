@@ -1760,14 +1760,14 @@ class ContentManager {
                     "name": "His Kingdom Ministry",
                     "logo": {
                         "@type": "ImageObject",
-                        "url": "https://www.hiskingdomministry.no/img/logo-hkm.png"
+                        "url": "https://hiskingdomministry.no/img/logo-hkm.png"
                     }
                 }
             };
 
             const imageUrl = item.imageUrl || item.image || (item.authorPhoto ? item.authorPhoto : null);
             if (imageUrl) {
-                schema.image = imageUrl.startsWith('http') ? imageUrl : `https://www.hiskingdomministry.no/${imageUrl.replace(/^\//, '')}`;
+                schema.image = imageUrl.startsWith('http') ? imageUrl : `https://hiskingdomministry.no/${imageUrl.replace(/^\//, '')}`;
             }
 
             if (item.content) {
@@ -4962,12 +4962,12 @@ class ContentManager {
                 "organizer": {
                     "@type": "Organization",
                     "name": "His Kingdom Ministry",
-                    "url": "https://www.hiskingdomministry.no"
+                    "url": "https://hiskingdomministry.no"
                 }
             };
 
             if (imageUrl) {
-                schema.image = imageUrl.startsWith('http') ? imageUrl : `https://www.hiskingdomministry.no/${imageUrl.replace(/^\//, '')}`;
+                schema.image = imageUrl.startsWith('http') ? imageUrl : `https://hiskingdomministry.no/${imageUrl.replace(/^\//, '')}`;
             }
 
             if (event.end) {
