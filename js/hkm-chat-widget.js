@@ -363,6 +363,12 @@ export function initHkmChatWidget() {
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.5; transform: scale(0.85); }
     }
+    .hkm-chat-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .hkm-chat-refresh-btn,
     .hkm-chat-close-btn {
       background: transparent;
       border: none;
@@ -376,8 +382,139 @@ export function initHkmChatWidget() {
       border-radius: 50%;
       transition: background 150ms ease;
     }
+    .hkm-chat-refresh-btn:hover,
     .hkm-chat-close-btn:hover {
       background: rgba(255, 255, 255, 0.18);
+    }
+    .hkm-chat-refresh-btn .material-symbols-outlined,
+    .hkm-chat-close-btn .material-symbols-outlined {
+      font-size: 19px;
+      line-height: 1;
+    }
+
+    /* Pre-chat Form */
+    .hkm-prechat-box {
+      margin-bottom: 10px;
+      padding: 10px 12px;
+      background: linear-gradient(135deg, rgba(255, 247, 237, 0.95) 0%, rgba(254, 243, 199, 0.9) 100%);
+      border: 1px solid rgba(209, 125, 57, 0.25);
+      border-radius: 14px;
+      text-align: left;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+    .dark .hkm-prechat-box {
+      background: rgba(30, 41, 59, 0.85);
+      border-color: rgba(209, 125, 57, 0.35);
+    }
+    .hkm-prechat-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #bd4f2a;
+      margin-bottom: 3px;
+    }
+    .hkm-prechat-header .material-symbols-outlined {
+      font-size: 15px;
+    }
+    .hkm-prechat-desc {
+      font-size: 11px;
+      color: #475569;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+    .dark .hkm-prechat-desc {
+      color: #cbd5e1;
+    }
+    .hkm-prechat-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    @media (min-width: 480px) {
+      .hkm-prechat-fields {
+        flex-direction: row;
+      }
+    }
+    .hkm-prechat-input {
+      flex: 1;
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-radius: 10px;
+      padding: 7px 10px;
+      font-size: 12px;
+      color: #1e293b;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+    .dark .hkm-prechat-input {
+      background: #0f172a;
+      border-color: rgba(255, 255, 255, 0.15);
+      color: #f1f5f9;
+    }
+    .hkm-prechat-input:focus {
+      border-color: #d17d39 !important;
+    }
+    .hkm-prechat-input.error {
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 0 1px #ef4444 !important;
+    }
+    .hkm-prechat-error {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #dc2626;
+      margin-top: 6px;
+    }
+    .hkm-prechat-error .material-symbols-outlined {
+      font-size: 13px;
+    }
+
+    /* Verified Contact Status */
+    .hkm-verified-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2px 8px 2px;
+      font-size: 11px;
+      color: #64748b;
+      user-select: none;
+    }
+    .dark .hkm-verified-bar {
+      color: #94a3b8;
+    }
+    .hkm-verified-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .hkm-verified-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      flex-shrink: 0;
+    }
+    .hkm-change-email-btn {
+      background: transparent;
+      border: none;
+      color: #d17d39;
+      font-size: 10px;
+      font-weight: 600;
+      text-decoration: underline;
+      cursor: pointer;
+      padding: 0 4px;
+      flex-shrink: 0;
+    }
+    .hkm-change-email-btn:hover {
+      color: #bd4f2a;
     }
 
     .hkm-chat-body {
@@ -674,9 +811,14 @@ export function initHkmChatWidget() {
             </div>
           </div>
         </div>
-        <button class="hkm-chat-close-btn" id="hkm-chat-close-btn" aria-label="${t.closeChat}">
-          <span class="material-symbols-outlined">close</span>
-        </button>
+        <div class="hkm-chat-header-actions">
+          <button class="hkm-chat-refresh-btn" id="hkm-chat-refresh-btn" aria-label="Start ny samtale" title="Start ny samtale">
+            <span class="material-symbols-outlined">refresh</span>
+          </button>
+          <button class="hkm-chat-close-btn" id="hkm-chat-close-btn" aria-label="${t.closeChat}">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
       </div>
 
       <div class="hkm-chat-body" id="hkm-chat-messages">
@@ -706,6 +848,7 @@ export function initHkmChatWidget() {
       </div>
 
       <div class="hkm-chat-footer">
+        <div id="hkm-prechat-container"></div>
         <form id="hkm-chat-form" class="hkm-chat-input-wrap">
           <input type="text" class="hkm-chat-input" id="hkm-chat-input" placeholder="${t.placeholder}" autocomplete="off">
           <button type="submit" class="hkm-chat-send-btn" id="hkm-chat-send-btn" aria-label="${t.send}">
@@ -721,6 +864,7 @@ export function initHkmChatWidget() {
   const launcher = document.getElementById('hkm-chat-launcher');
   const box = document.getElementById('hkm-chat-box');
   const closeBtn = document.getElementById('hkm-chat-close-btn');
+  const refreshBtn = document.getElementById('hkm-chat-refresh-btn');
   const messagesContainer = document.getElementById('hkm-chat-messages');
   const chatForm = document.getElementById('hkm-chat-form');
   const inputEl = document.getElementById('hkm-chat-input');
@@ -736,6 +880,82 @@ export function initHkmChatWidget() {
   let conversationId = sessionStorage.getItem('hkm_wix_conv_id') || null;
   let anonVisitorId = localStorage.getItem('hkm_chat_anon_id') || generateUUID();
   localStorage.setItem('hkm_chat_anon_id', anonVisitorId);
+
+  let userEmail = localStorage.getItem('hkm_chat_user_email') || '';
+  let userName = localStorage.getItem('hkm_chat_user_name') || '';
+
+  // Purge stale anonymous conversations that locked the Wix Owner App
+  const isContactConv = localStorage.getItem('hkm_chat_is_contact_conv') === 'true';
+  if (!isContactConv && !userEmail) {
+    sessionStorage.removeItem('hkm_wix_conv_id');
+    conversationId = null;
+  }
+
+  function renderPrechatUI() {
+    const container = document.getElementById('hkm-prechat-container');
+    if (!container) return;
+
+    if (!userEmail) {
+      container.innerHTML = `
+        <div class="hkm-prechat-box" id="hkm-prechat-box">
+          <div class="hkm-prechat-header">
+            <span class="material-symbols-outlined">mail</span>
+            <span>Hvor skal vi svare deg?</span>
+          </div>
+          <div class="hkm-prechat-desc">
+            Oppgi din e-post slik at Thomas kan svare deg i Wix-appen:
+          </div>
+          <div class="hkm-prechat-fields">
+            <input type="text" id="hkm-name-input" class="hkm-prechat-input" placeholder="Ditt navn (valgfritt)" value="${userName || ''}">
+            <input type="email" id="hkm-email-input" class="hkm-prechat-input" placeholder="din@epost.no (påkrevd for svar) *">
+          </div>
+          <div id="hkm-email-error" class="hkm-prechat-error" style="display: none;"></div>
+        </div>
+      `;
+      const emailIn = document.getElementById('hkm-email-input');
+      if (emailIn) {
+        emailIn.addEventListener('input', () => {
+          emailIn.classList.remove('error');
+          const err = document.getElementById('hkm-email-error');
+          if (err) err.style.display = 'none';
+        });
+        emailIn.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            if (inputEl.value.trim()) {
+              handleSendMessage();
+            } else {
+              inputEl.focus();
+            }
+          }
+        });
+      }
+    } else {
+      container.innerHTML = `
+        <div class="hkm-verified-bar">
+          <div class="hkm-verified-left">
+            <span class="hkm-verified-dot"></span>
+            <span>Svar sendes til: <strong>${userEmail}</strong></span>
+          </div>
+          <button type="button" id="hkm-change-email-btn" class="hkm-change-email-btn">Endre</button>
+        </div>
+      `;
+
+      const changeBtn = document.getElementById('hkm-change-email-btn');
+      if (changeBtn) {
+        changeBtn.addEventListener('click', () => {
+          userEmail = '';
+          localStorage.removeItem('hkm_chat_user_email');
+          localStorage.removeItem('hkm_chat_is_contact_conv');
+          renderPrechatUI();
+          const emailIn = document.getElementById('hkm-email-input');
+          if (emailIn) emailIn.focus();
+        });
+      }
+    }
+  }
+
+  renderPrechatUI();
 
   function toggleChat(open) {
     isOpen = typeof open === 'boolean' ? open : !isOpen;
@@ -753,6 +973,26 @@ export function initHkmChatWidget() {
 
   launcher.addEventListener('click', () => toggleChat());
   closeBtn.addEventListener('click', () => toggleChat(false));
+
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', () => {
+      sessionStorage.removeItem('hkm_wix_conv_id');
+      localStorage.removeItem('hkm_chat_is_contact_conv');
+      conversationId = null;
+      renderedMessageIds.clear();
+      messagesContainer.innerHTML = `
+        <div class="hkm-msg-row hkm-msg-row-bot">
+          <span class="material-symbols-outlined hkm-msg-avatar">support_agent</span>
+          <div>
+            <div class="hkm-msg-bubble hkm-msg-bubble-bot">
+              ${formatMarkdown(t.greeting)}
+            </div>
+            <div class="hkm-msg-time">${new Date().toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}</div>
+          </div>
+        </div>
+      `;
+    });
+  }
 
   chatForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -819,20 +1059,94 @@ export function initHkmChatWidget() {
     if (el) el.remove();
   }
 
-  // Quick reply chips click: only push to phone if action is required (like prayer requests)
+  // Quick reply chips click
   chipsBar.addEventListener('click', (e) => {
     const chip = e.target.closest('.hkm-chip-btn');
     if (chip && chip.dataset.text) {
       const isActionRequired = chip.dataset.action === 'true';
-      handleSendMessage(chip.dataset.text, { skipWixPush: !isActionRequired });
+      handleSendMessage(chip.dataset.text, { skipWixPush: !isActionRequired, isQuickReply: true });
     }
   });
+
+  async function ensureConversation(explicitEmail = null, explicitName = null) {
+    const emailToUse = explicitEmail || userEmail;
+    const nameToUse = explicitName || userName || (emailToUse ? emailToUse.split('@')[0] : null);
+
+    const hasContactConv = localStorage.getItem('hkm_chat_is_contact_conv') === 'true';
+    if (conversationId && hasContactConv && !explicitEmail) {
+      return conversationId;
+    }
+
+    try {
+      const payload = {};
+      if (emailToUse) {
+        payload.email = emailToUse;
+        if (nameToUse) payload.name = nameToUse;
+      } else {
+        payload.anonymousVisitorId = anonVisitorId;
+      }
+
+      const res = await fetch('/api/get-or-create-conversation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const convId = data.conversation?._id || data.conversation?.id;
+        if (convId) {
+          conversationId = convId;
+          sessionStorage.setItem('hkm_wix_conv_id', convId);
+          if (emailToUse) {
+            localStorage.setItem('hkm_chat_is_contact_conv', 'true');
+          }
+          return convId;
+        }
+      }
+    } catch (e) {
+      console.warn('[HKM Chat] Conversation error:', e);
+    }
+    return null;
+  }
 
   async function handleSendMessage(customText, options = {}) {
     const text = (typeof customText === 'string' ? customText : inputEl.value).trim();
     if (!text || isSending) return;
 
     const skipWixPush = options.skipWixPush === true;
+    const isQuickReply = options.isQuickReply === true;
+
+    // Check pre-chat email requirement when message is pushed to Wix
+    let senderEmail = userEmail;
+    let senderName = userName;
+
+    if (!skipWixPush && !senderEmail) {
+      const emailEl = document.getElementById('hkm-email-input');
+      const nameEl = document.getElementById('hkm-name-input');
+      const errorEl = document.getElementById('hkm-email-error');
+
+      const inputMail = emailEl ? emailEl.value.trim().toLowerCase() : '';
+      if (!inputMail || !inputMail.includes('@') || !inputMail.includes('.')) {
+        if (errorEl) {
+          errorEl.innerHTML = '<span class="material-symbols-outlined">error</span><span>Vennligst oppgi din e-postadresse ovenfor så vi kan svare deg.</span>';
+          errorEl.style.display = 'flex';
+        }
+        if (emailEl) {
+          emailEl.classList.add('error');
+          emailEl.focus();
+        }
+        return;
+      }
+
+      senderEmail = inputMail;
+      senderName = (nameEl ? nameEl.value.trim() : '') || senderEmail.split('@')[0];
+      localStorage.setItem('hkm_chat_user_email', senderEmail);
+      if (senderName) localStorage.setItem('hkm_chat_user_name', senderName);
+      userEmail = senderEmail;
+      userName = senderName;
+      renderPrechatUI();
+    }
 
     // 1. Render user message immediately
     appendMessage(text, true);
@@ -840,44 +1154,29 @@ export function initHkmChatWidget() {
     isSending = true;
     sendBtn.disabled = true;
 
-    // Show typing indicator
-    showTypingIndicator();
-
     try {
-      // 2 & 3. Forward to Wix Inbox ONLY IF action is required (like Prayer request) or user-typed text
+      // 2. Forward to Wix Inbox
       if (!skipWixPush) {
-        if (!conversationId) {
-          const convRes = await fetch('/api/get-or-create-conversation', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              anonymousVisitorId: anonVisitorId
-            })
-          });
-
-          if (convRes.ok) {
-            const convData = await convRes.json();
-            conversationId = convData.conversation?._id || convData.conversation?.id;
-            if (conversationId) {
-              sessionStorage.setItem('hkm_wix_conv_id', conversationId);
-            }
-          }
-        }
-
-        // Send message to Wix Inbox API in background (triggers phone push notification)
-        if (conversationId) {
+        const activeConvId = await ensureConversation(senderEmail, senderName);
+        if (activeConvId) {
           fetch('/api/send-message', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              conversationId,
-              senderName: 'Besøkende',
+              conversationId: activeConvId,
+              senderName: senderName || 'Besøkende',
               message: {
                 direction: 'PARTICIPANT_TO_BUSINESS',
                 visibility: 'BUSINESS_AND_PARTICIPANT',
                 content: {
                   basic: {
-                    items: [{ text }]
+                    items: [
+                      {
+                        text: senderEmail
+                          ? `${text}\n\n[Svar til kunden på e-post: ${senderEmail}]`
+                          : text
+                      }
+                    ]
                   }
                 }
               }
@@ -886,12 +1185,16 @@ export function initHkmChatWidget() {
         }
       }
 
-      // 4. Generate AI response with natural delay
-      setTimeout(() => {
-        removeTypingIndicator();
-        const aiReply = generateHkmAiResponse(text, lang);
-        appendMessage(aiReply, false);
-      }, 700);
+      // 3. ONLY provide auto-answer if user clicked a quick-reply FAQ chip!
+      // Free-text messages typed by visitors go directly to Thomas without ANY automated bot reply.
+      if (isQuickReply) {
+        showTypingIndicator();
+        setTimeout(() => {
+          removeTypingIndicator();
+          const aiReply = generateHkmAiResponse(text, lang);
+          appendMessage(aiReply, false);
+        }, 500);
+      }
 
     } catch (err) {
       console.error('[HKM Chat] Send error:', err);
@@ -921,7 +1224,15 @@ export function initHkmChatWidget() {
           renderedMessageIds.add(msg._id);
           const replyText = msg.content?.basic?.items?.map(i => i.text).join('\n') || msg.content?.minimal?.text;
           if (replyText) {
-            appendMessage(replyText, false, 'Thomas (His Kingdom Ministry)');
+            const isBotArtifact = 
+              replyText.includes('Her er produkter jeg fant') ||
+              replyText.includes('Vi ønsker å spre Guds ord') ||
+              replyText.includes('Hva kan jeg hjelpe deg med?') ||
+              replyText.startsWith('### 🛡️');
+
+            if (!isBotArtifact) {
+              appendMessage(replyText, false, 'Thomas (His Kingdom Ministry)');
+            }
           }
         }
       });
@@ -941,9 +1252,4 @@ export function initHkmChatWidget() {
       pollInterval = null;
     }
   }
-
-  chatForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    handleSendMessage();
-  });
 }

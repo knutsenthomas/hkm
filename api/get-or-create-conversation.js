@@ -36,8 +36,10 @@ export default async function handler(req, res) {
     
     let participantId = {};
 
-    if (email && name) {
-      console.log('[HKM Chat] Querying/creating CRM contact for:', email, name);
+    if (email) {
+      const cleanEmail = email.trim();
+      const resolvedName = (name || cleanEmail.split('@')[0] || 'Kunde').trim();
+      console.log('[HKM Chat] Querying/creating CRM contact for:', cleanEmail, resolvedName);
       try {
         const apiKey = process.env.WIX_CHAT_API_KEY || process.env.WIX_API_KEY;
         const siteId = process.env.WIX_SITE_ID || '7682a906-41f6-4e8d-b0b1-bfdb5ee596e7';
@@ -54,7 +56,7 @@ export default async function handler(req, res) {
             query: {
               filter: {
                 'primaryInfo.email': {
-                  '$eq': email
+                  '$eq': cleanEmail
                 }
               }
             }
@@ -70,8 +72,14 @@ export default async function handler(req, res) {
         } else {
           // 2. Create contact if not found
           console.log('[HKM Chat] Contact not found, creating new CRM contact...');
-          const firstName = name.split(' ')[0];
-          const lastName = name.split(' ').slice(1).join(' ') || '(HKM)';
+          const parts = resolvedName.split(/\s+/);
+          const firstName = parts[0] || 'Kunde';
+          const lastName = parts.slice(1).join(' ');
+
+          const nameObj = { first: firstName };
+          if (lastName) {
+            nameObj.last = lastName;
+          }
 
           const createRes = await fetch('https://www.wixapis.com/contacts/v4/contacts', {
             method: 'POST',
@@ -81,20 +89,18 @@ export default async function handler(req, res) {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              contact: {
-                info: {
-                  name: {
-                    first: firstName,
-                    last: lastName
-                  },
-                  emails: [
+              info: {
+                name: nameObj,
+                emails: {
+                  items: [
                     {
-                      email: email,
+                      email: cleanEmail,
                       tag: 'MAIN'
                     }
                   ]
                 }
-              }
+              },
+              allowDuplicates: true
             })
           });
 
@@ -102,6 +108,8 @@ export default async function handler(req, res) {
           if (createRes.ok && createData.contact) {
             resolvedContactId = createData.contact.id;
             console.log('[HKM Chat] Created new CRM contact ID:', resolvedContactId);
+          } else {
+            console.error('[HKM Chat] Failed to create contact REST response:', createData);
           }
         }
 
