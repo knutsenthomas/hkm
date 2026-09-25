@@ -214,22 +214,151 @@
         .discussion-form-box {
             background: #ffffff;
             padding: 24px;
-            border-radius: 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+            margin-bottom: 32px;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .discussion-form-box:focus-within {
+            border-color: rgba(209, 125, 57, 0.45);
+            box-shadow: 0 8px 24px -4px rgba(209, 125, 57, 0.1), 0 2px 8px -1px rgba(15, 23, 42, 0.04);
+        }
+
+        .discussion-input-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 12px;
+            letter-spacing: -0.01em;
+        }
+
+        .discussion-input-label i {
+            color: var(--hkm-terracotta, #d17d39);
+            font-size: 0.95rem;
+        }
+
+        #discussion-comment-input {
+            width: 100%;
+            min-height: 120px;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1.5px solid #cbd5e1;
+            background: #f8fafc;
+            color: #0f172a;
+            font-family: inherit;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            resize: vertical;
+            box-sizing: border-box;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: block;
+        }
+
+        #discussion-comment-input::placeholder {
+            color: #94a3b8;
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        #discussion-comment-input:focus {
+            outline: none;
+            background: #ffffff;
+            border-color: var(--hkm-terracotta, #d17d39);
+            box-shadow: 0 0 0 3px rgba(209, 125, 57, 0.16);
+        }
+
+        .discussion-form-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .discussion-user-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: #f1f5f9;
+            border-radius: 30px;
             border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.03);
-            margin-bottom: 24px;
+            font-size: 0.85rem;
+            color: #475569;
+            transition: all 0.2s ease;
+        }
+
+        .discussion-user-badge i {
+            color: var(--hkm-terracotta, #d17d39);
+            font-size: 1.1rem;
+        }
+
+        .discussion-user-badge strong {
+            color: #1e293b;
+            font-weight: 750;
+        }
+
+        .discussion-submit-btn {
+            min-height: 44px;
+            padding: 10px 24px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background-color: var(--hkm-terracotta, #d17d39);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(209, 125, 57, 0.25);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .discussion-submit-btn:hover {
+            transform: translateY(-1px) scale(1.02);
+            box-shadow: 0 6px 20px rgba(209, 125, 57, 0.38);
+        }
+
+        .discussion-submit-btn:active {
+            transform: scale(0.98);
+        }
+
+        @media (max-width: 640px) {
+            .discussion-form-footer {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .discussion-submit-btn {
+                width: 100%;
+            }
+            .discussion-user-badge {
+                justify-content: center;
+            }
         }
 
         .comment-item-card {
             background: #ffffff;
-            padding: 16px 20px;
-            border-radius: 14px;
-            border: 1px solid #e2e8f0;
+            padding: 18px 22px;
+            border-radius: 16px;
+            border: 1px solid rgba(226, 232, 240, 0.85);
             display: flex;
-            gap: 14px;
+            gap: 16px;
             align-items: flex-start;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-            margin-bottom: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.025);
+            margin-bottom: 16px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .comment-item-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
         }
 
         /* Teacher Card & Tab Contents in Dark Mode */
@@ -266,10 +395,38 @@
             color: #cbd5e1 !important;
         }
 
+        html[data-theme="dark"] .discussion-input-label {
+            color: #cbd5e1 !important;
+        }
+
+        html[data-theme="dark"] .discussion-form-box:focus-within {
+            border-color: rgba(209, 125, 57, 0.6) !important;
+        }
+
         html[data-theme="dark"] textarea#discussion-comment-input {
             background: #0f172a !important;
             border-color: #334155 !important;
             color: #f8fafc !important;
+        }
+
+        html[data-theme="dark"] textarea#discussion-comment-input::placeholder {
+            color: #64748b !important;
+        }
+
+        html[data-theme="dark"] textarea#discussion-comment-input:focus {
+            background: #0b1329 !important;
+            border-color: var(--hkm-terracotta, #d17d39) !important;
+            box-shadow: 0 0 0 3px rgba(209, 125, 57, 0.25) !important;
+        }
+
+        html[data-theme="dark"] .discussion-user-badge {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+            color: #94a3b8 !important;
+        }
+
+        html[data-theme="dark"] .discussion-user-badge strong {
+            color: #f1f5f9 !important;
         }
 
         html[data-theme="dark"] textarea,
@@ -1607,12 +1764,19 @@
                     Del dine tanker eller still spørsmål til lærerne og meddeltakerne for denne leksjonen.
                 </p>
                 <div id="discussion-form-container">
-                    <div style="background: white; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 14px rgba(0,0,0,0.03); margin-bottom: 24px;">
-                        <textarea id="discussion-comment-input" placeholder="Skriv din refleksjon eller ditt spørsmål her..." style="width: 100%; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 14px; font-family: inherit; margin-bottom: 14px; min-height: 90px; font-size: 0.95rem; outline: none; transition: border 0.2s;"></textarea>
-                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                            <span style="font-size: 0.85rem; color: #64748b;" id="comment-author-info">Innlogget som kursdeltaker</span>
-                            <button type="button" class="btn-terracotta" id="post-comment-btn" onclick="window.handlePostComment()" style="padding: 10px 24px; font-size: 0.9rem; cursor: pointer; border: none; border-radius: 8px;">
-                                <i class="fas fa-paper-plane"></i> Send refleksjon
+                    <div class="discussion-form-box">
+                        <label for="discussion-comment-input" class="discussion-input-label">
+                            <i class="fas fa-comment-dots"></i> Din refleksjon eller spørsmål
+                        </label>
+                        <textarea id="discussion-comment-input" placeholder="Hva sitter du igjen med etter denne leksjonen? Skriv et spørsmål, et vitnesbyrd eller en refleksjon her..." rows="4"></textarea>
+                        <div class="discussion-form-footer">
+                            <div class="discussion-user-badge" id="comment-author-info">
+                                <i class="fas fa-user-circle"></i>
+                                <span>Innlogget som <strong>kursdeltaker</strong></span>
+                            </div>
+                            <button type="button" class="btn-terracotta discussion-submit-btn" id="post-comment-btn" onclick="window.handlePostComment()">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>Send refleksjon</span>
                             </button>
                         </div>
                     </div>
@@ -2712,14 +2876,25 @@
                 } else {
                     const user = currentUser || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
                     const userName = (user && (user.displayName || user.email)) ? (user.displayName || user.email.split('@')[0]) : 'Kursdeltaker';
+                    const userPhoto = user && user.photoURL ? user.photoURL : null;
+                    const avatarHtml = userPhoto 
+                        ? `<img src="${userPhoto}" alt="${userName}" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">` 
+                        : `<i class="fas fa-user-circle"></i>`;
 
                     formContainer.innerHTML = `
                         <div class="discussion-form-box">
-                            <textarea id="discussion-comment-input" placeholder="Skriv din refleksjon eller ditt spørsmål her..."></textarea>
-                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                                <span style="font-size: 0.85rem;" id="comment-author-info">Innlogget som: ${userName}</span>
-                                <button type="button" class="btn-terracotta" id="post-comment-btn" onclick="window.handlePostComment()" style="padding: 10px 24px; font-size: 0.9rem; cursor: pointer; border: none; border-radius: 8px;">
-                                    <i class="fas fa-paper-plane"></i> Send refleksjon
+                            <label for="discussion-comment-input" class="discussion-input-label">
+                                <i class="fas fa-comment-dots"></i> Din refleksjon eller spørsmål
+                            </label>
+                            <textarea id="discussion-comment-input" placeholder="Hva sitter du igjen med etter denne leksjonen? Skriv et spørsmål, et vitnesbyrd eller en refleksjon her..." rows="4"></textarea>
+                            <div class="discussion-form-footer">
+                                <div class="discussion-user-badge" id="comment-author-info">
+                                    ${avatarHtml}
+                                    <span>Innlogget som <strong>${userName}</strong></span>
+                                </div>
+                                <button type="button" class="btn-terracotta discussion-submit-btn" id="post-comment-btn" onclick="window.handlePostComment()">
+                                    <i class="fas fa-paper-plane"></i>
+                                    <span>Send refleksjon</span>
                                 </button>
                             </div>
                         </div>
