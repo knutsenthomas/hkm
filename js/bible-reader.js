@@ -9040,7 +9040,7 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                         ${isEn ? 'Explore All Reading Plans' : isEs ? 'Explorar todos los planes' : 'Utforsk alle leseplaner'}
                     </a>
 
-                    <a href="/minside/index.html?tab=leseplaner" class="hkm-completion-btn-secondary">
+                    <a href="/minside/index.html#reading-plans" class="hkm-completion-btn-secondary">
                         <span class="material-symbols-outlined" style="font-size: 19px;">person</span>
                         ${isEn ? 'View My Reflections on My Page' : isEs ? 'Ver mis reflexiones en Mi Página' : 'Se mine refleksjoner på Min Side'}
                     </a>

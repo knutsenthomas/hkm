@@ -2649,6 +2649,57 @@ window.addEventListener('load', () => {
                 font-family: inherit;
                 transition: opacity 0.2s ease, transform 0.2s ease;
             `;
+
+            if (!document.getElementById('global-profile-dropdown-styles')) {
+                const styleEl = document.createElement('style');
+                styleEl.id = 'global-profile-dropdown-styles';
+                styleEl.textContent = `
+                    #global-profile-dropdown .dropdown-link-item {
+                        transition: all 0.2s ease;
+                    }
+                    #global-profile-dropdown .dropdown-link-item:hover {
+                        background: #f1f5f9 !important;
+                        color: #0f172a !important;
+                        transform: translateX(2px);
+                    }
+                    #global-profile-dropdown #dropdown-admin-link:hover {
+                        background: rgba(209, 125, 57, 0.16) !important;
+                        color: #b45309 !important;
+                    }
+                    #global-profile-dropdown #dropdown-logout-btn:hover {
+                        background: rgba(239, 68, 68, 0.16) !important;
+                        color: #b91c1c !important;
+                    }
+                    html[data-theme="dark"] #global-profile-dropdown {
+                        background: #1e293b !important;
+                        border-color: #334155 !important;
+                        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45) !important;
+                    }
+                    html[data-theme="dark"] #global-profile-dropdown #dropdown-user-name {
+                        color: #f8fafc !important;
+                    }
+                    html[data-theme="dark"] #global-profile-dropdown #dropdown-user-email {
+                        color: #94a3b8 !important;
+                    }
+                    html[data-theme="dark"] #global-profile-dropdown .dropdown-link-item {
+                        color: #cbd5e1 !important;
+                    }
+                    html[data-theme="dark"] #global-profile-dropdown .dropdown-link-item:hover {
+                        background: #334155 !important;
+                        color: #f8fafc !important;
+                    }
+                    html[data-theme="dark"] #global-profile-dropdown #dropdown-admin-link {
+                        background: rgba(209, 125, 57, 0.2) !important;
+                        color: #fb923c !important;
+                    }
+                    html[data-theme="dark"] #global-profile-dropdown div[style*="border-bottom"],
+                    html[data-theme="dark"] #global-profile-dropdown div[style*="border-top"] {
+                        border-color: #334155 !important;
+                    }
+                `;
+                document.head.appendChild(styleEl);
+            }
+
             profileDropdown.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9; margin-bottom: 10px;">
                     <img id="dropdown-user-avatar" src="" alt="Profilbilde" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--hkm-terracotta); background: #f1f5f9;">
@@ -2659,16 +2710,16 @@ window.addEventListener('load', () => {
                 </div>
 
                 <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px;">
-                    <a href="/minside/index.html" class="dropdown-link-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: #334155; font-size: 0.88rem; font-weight: 600; text-decoration: none; transition: background 0.2s;">
+                    <a href="/minside/index.html#overview" class="dropdown-link-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: #334155; font-size: 0.88rem; font-weight: 600; text-decoration: none;">
                         <i class="fas fa-user-circle" style="color: var(--hkm-terracotta); font-size: 1rem; width: 18px; text-align: center;"></i> Min Side
                     </a>
-                    <a href="/minside/index.html?tab=kurs" class="dropdown-link-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: #334155; font-size: 0.88rem; font-weight: 600; text-decoration: none; transition: background 0.2s;">
+                    <a href="/minside/index.html#courses" class="dropdown-link-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: #334155; font-size: 0.88rem; font-weight: 600; text-decoration: none;">
                         <i class="fas fa-graduation-cap" style="color: var(--hkm-terracotta); font-size: 1rem; width: 18px; text-align: center;"></i> Mine kurs
                     </a>
-                    <a href="/minside/index.html?tab=leseplaner" class="dropdown-link-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: #334155; font-size: 0.88rem; font-weight: 600; text-decoration: none; transition: background 0.2s;">
+                    <a href="/minside/index.html#reading-plans" class="dropdown-link-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: #334155; font-size: 0.88rem; font-weight: 600; text-decoration: none;">
                         <i class="fas fa-book-open" style="color: var(--hkm-terracotta); font-size: 1rem; width: 18px; text-align: center;"></i> Mine leseplaner
                     </a>
-                    <a id="dropdown-admin-link" href="/admin/index.html" class="dropdown-link-item hidden" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: #d17d39; font-size: 0.88rem; font-weight: 700; text-decoration: none; background: rgba(209, 125, 57, 0.08);">
+                    <a id="dropdown-admin-link" href="/admin/index.html#overview" class="dropdown-link-item hidden" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: #d17d39; font-size: 0.88rem; font-weight: 700; text-decoration: none; background: rgba(209, 125, 57, 0.08);">
                         <i class="fas fa-user-shield" style="font-size: 1rem; width: 18px; text-align: center;"></i> Admin Panel
                     </a>
                 </div>
@@ -2680,6 +2731,13 @@ window.addEventListener('load', () => {
                 </div>
             `;
             document.body.appendChild(profileDropdown);
+
+            // Close dropdown when any item inside is clicked
+            profileDropdown.querySelectorAll('.dropdown-link-item').forEach(link => {
+                link.addEventListener('click', () => {
+                    profileDropdown.classList.add('hidden');
+                });
+            });
 
             // Bind Logout button
             const logoutBtn = profileDropdown.querySelector('#dropdown-logout-btn');

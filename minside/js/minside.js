@@ -1037,9 +1037,11 @@ class MinSideManager {
             notifications: this.renderNotifications,
             giving: this.renderGiving,
             courses: this.renderCourses,
+            kurs: this.renderCourses,
             notes: this.renderNotes,
             tasks: this.renderTasks,
             'reading-plans': this.renderReadingPlans,
+            leseplaner: this.renderReadingPlans,
             'prayer-wall': this.renderPrayerWall,
             'course-player': this.renderCoursePlayer,
             help: this.renderHelp,
@@ -1089,7 +1091,12 @@ class MinSideManager {
                     this._recordLoginSession(user);
 
                     // Immediately trigger initial view load to eliminate initial UX waiting delay
-                    const startView = window.location.hash.replace('#', '') || 'overview';
+                    let startView = window.location.hash.replace('#', '');
+                    if (!startView) {
+                        const urlParams = new URLSearchParams(window.location.search);
+                        startView = urlParams.get('tab') || urlParams.get('view') || '';
+                    }
+                    if (!startView) startView = 'overview';
                     this.loadView(startView);
 
                     window?.addEventListener('hashchange', () => {
@@ -1298,6 +1305,18 @@ class MinSideManager {
             window.location.href = `/kurs-detaljer.html?id=${encodeURIComponent(cId)}&lesson=${encodeURIComponent(lVal)}`;
             return;
         }
+
+        // Normalize alias views to standard canonical keys
+        if (cleanViewId === 'kurs' || cleanViewId === 'mine-kurs') cleanViewId = 'courses';
+        if (cleanViewId === 'leseplaner' || cleanViewId === 'mine-leseplaner') cleanViewId = 'reading-plans';
+        if (cleanViewId === 'profil' || cleanViewId === 'min-profil') cleanViewId = 'profile';
+        if (cleanViewId === 'oversikt' || cleanViewId === 'minside') cleanViewId = 'overview';
+        if (cleanViewId === 'gaver' || cleanViewId === 'donasjoner') cleanViewId = 'giving';
+        if (cleanViewId === 'notater') cleanViewId = 'notes';
+        if (cleanViewId === 'varsler' || cleanViewId === 'meldinger') cleanViewId = 'notifications';
+        if (cleanViewId === 'aktivitet' || cleanViewId === 'historikk') cleanViewId = 'history';
+        if (cleanViewId === 'huskeliste') cleanViewId = 'tasks';
+        if (cleanViewId === 'hjelp' || cleanViewId === 'support') cleanViewId = 'help';
 
         if (cleanViewId === 'prayer-wall' && !this.prayerWallEnabled) {
             cleanViewId = 'overview';
