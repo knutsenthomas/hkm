@@ -52,9 +52,9 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" />
 
     <link rel="stylesheet" href="../styles.css">
-    <link rel="stylesheet" href="css/dashboard.css?v=20260713_V1">
+    <link rel="stylesheet" href="css/dashboard.css?v=20260925_V1">
     <link rel="stylesheet" href="../css/notifications.css">
-    <link rel="stylesheet" href="css/admin-unified.css?v=20260716_V3">
+    <link rel="stylesheet" href="css/admin-unified.css?v=20260925_V1">
     <link rel="stylesheet" href="css/todo.css?v=20260729_TODO_OVERHAUL">
     
     <!-- FORCED CSS FIX FOR ENGAGEMENT OVERFLOW (INLINE TO BEAT CACHE - GLOBAL) -->
@@ -1458,8 +1458,20 @@
             const ADMIN_LAST_DASHBOARD_SECTION_KEY = 'hkm_admin_last_dashboard_section';
 
             const topbarSectionOverrides = {
-                overview: { icon: 'grid_view', title: 'Oversikt' },
-                todo: { icon: 'playlist_add_check', title: 'Huskeliste' }
+                overview: { icon: 'grid_view', title: 'Oversikt', subtitle: 'Nøkkeltall, aktivitet og hurtighandlinger.' },
+                courses: { icon: 'school', title: 'Kursadministrasjon', subtitle: 'Administrer kurs, leksjoner og påmeldinger.' },
+                media: { icon: 'perm_media', title: 'Mediebibliotek', subtitle: 'Administrer bilder og mediefiler på tvers av plattformen.' },
+                podcast: { icon: 'podcasts', title: 'Podcast Studio', subtitle: 'Episoder, lydfiler og RSS-distribusjon.' },
+                users: { icon: 'group', title: 'Brukeradministrasjon', subtitle: 'Oversikt over alle registrerte brukere og tilganger.' },
+                comments: { icon: 'forum', title: 'Kommentarer & Moderering', subtitle: 'Behandle og godkjenn innkommende kommentarer.' },
+                causes: { icon: 'volunteer_activism', title: 'Hjertesaker', subtitle: 'Administrer innsamlinger og hjertesaker.' },
+                hero: { icon: 'view_carousel', title: 'Hero Slider', subtitle: 'Administrer forside-bannere og visuelle kampanjer.' },
+                seo: { icon: 'travel_explore', title: 'Søkemotoroptimalisering (SEO)', subtitle: 'Meta-titler, beskrivelser, Open Graph og synlighet.' },
+                app: { icon: 'phone_iphone', title: 'Mobil App Administrasjon', subtitle: 'Innstillinger, push-varsler og app-konfigurasjon.' },
+                integrations: { icon: 'hub', title: 'Integrasjoner & API', subtitle: 'Koble til eksterne tjenester, webhooks og API-er.' },
+                settings: { icon: 'settings', title: 'Innstillinger & Verktøy', subtitle: 'Administrer systeminnstillinger og datasync.' },
+                profile: { icon: 'account_circle', title: 'Min Profil', subtitle: 'Dine personlige innstillinger og sikkerhet.' },
+                todo: { icon: 'playlist_add_check', title: 'Huskeliste', subtitle: 'Oppgaver, notater og påminnelser.' }
             };
 
             function getNavLabelFromLink(link) {
@@ -1483,7 +1495,7 @@
                 return {
                     title: override.title || navTitle || sectionHeaderTitle?.textContent?.trim() || 'Oversikt',
                     icon: override.icon || navIcon?.textContent?.trim() || sectionHeaderIcon?.textContent?.trim() || 'grid_view',
-                    subtitle: sectionHeaderSubtitle?.textContent?.trim() || 'HKM Studio administrasjonspanel'
+                    subtitle: override.subtitle || sectionHeaderSubtitle?.textContent?.trim() || 'HKM Studio administrasjonspanel'
                 };
             }
 
@@ -1715,7 +1727,7 @@
     <script type="module" src="js/reading-plans-init.jsx"></script>
     <script type="module" src="js/unsplash.js?v=20260511_G1"></script>
     <script type="module" src="js/version-history.js?v=20260728_V1"></script>
-    <script type="module" src="js/admin.js?v=20260714_V1"></script>
+    <script type="module" src="js/admin.js?v=20260925_V1"></script>
     <script type="module">
         window.addEventListener('load', () => {
             if (!window.adminManager) {

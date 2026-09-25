@@ -161,15 +161,14 @@ body.builder-active {
   width: 100%;
 }
 
-/* Specific styling when section header is used as a banner card in content */
-.section-content > .section-header:not(.in-topbar),
-.design-ui-header:not(.in-topbar) {
-  background: #fff;
-  border: 1px solid var(--admin-page-panel-border);
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-  margin: 24px 0 32px;
-  width: 100%;
+/* --- HIDE DUPLICATE IN-CONTENT SECTION HEADERS & TOPBAR PANELS --- */
+html body.admin-body .design-ui-topbar,
+html body.admin-body .section-content > .section-header:not(.in-topbar),
+html body.admin-body .section-content > .design-ui-header:not(.in-topbar),
+html body.admin-body .section-content > .kinetic-header-card,
+html body.minside-body .section-content > .section-header:not(.in-topbar),
+html body.minside-body .section-content > .design-ui-header:not(.in-topbar) {
+  display: none !important;
 }
 
 /* Compact style for section-header when used inside main-header (top bar) */
@@ -3117,10 +3116,7 @@ body.crm-body .content-wrapper {
 
 /* Intro/page header card pattern (example image style) */
 body.crm-body .crm-header,
-body.builder-active .workspace-header,
-body.admin-body .section-content > .section-header,
-body.admin-body .section-content > .section-header-row,
-body.admin-body .section-content > .design-ui-header {
+body.builder-active .workspace-header {
   background: var(--admin-page-panel);
   border: 1px solid var(--admin-page-panel-border);
   border-radius: var(--admin-page-radius-xl);
@@ -7208,11 +7204,11 @@ body.admin-body .template-item:active {
   }
 }
 
-/* Center section headers vertically in between content boxes with premium symmetric margins */
-body.admin-body .section-content > .section-header,
-body.admin-body .section-content > .design-ui-header {
-  margin-top: 32px !important;
-  margin-bottom: 32px !important;
+/* Section headers inside topbar */
+body.admin-body .main-header .section-header,
+body.admin-body .main-header .design-ui-header {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 /* ==========================================================================
@@ -7409,8 +7405,8 @@ body.builder-active .btn-primary:active,
 
 /* --- Universal Mobile Responsiveness for Section Headers (Kurs, Podcast, Kommentarer, etc.) --- */
 @media (max-width: 768px) {
-    body.admin-body .section-content > .section-header,
-    body.admin-body .section-content > .design-ui-header {
+    body.admin-body .main-header .section-header,
+    body.admin-body .main-header .design-ui-header {
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
@@ -7418,22 +7414,22 @@ body.builder-active .btn-primary:active,
         text-align: left !important;
         padding: 16px 16px !important;
         gap: 12px !important;
-        margin-top: 16px !important;
-        margin-bottom: 16px !important;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
         width: 100% !important;
         box-sizing: border-box !important;
     }
     
-    body.admin-body .section-content > .section-header .section-header-icon,
-    body.admin-body .section-content > .design-ui-header .section-header-icon {
+    body.admin-body .main-header .section-header .section-header-icon,
+    body.admin-body .main-header .design-ui-header .section-header-icon {
         margin: 0 !important;
         align-self: center !important;
         display: inline-flex !important;
         flex-shrink: 0 !important;
     }
     
-    body.admin-body .section-content > .section-header > .section-header-content,
-    body.admin-body .section-content > .design-ui-header > .section-header-content {
+    body.admin-body .main-header .section-header > .section-header-content,
+    body.admin-body .main-header .design-ui-header > .section-header-content {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: wrap !important;
@@ -7446,8 +7442,8 @@ body.builder-active .btn-primary:active,
         padding: 0 !important;
     }
     
-    body.admin-body .section-content > .section-header .section-header-titles,
-    body.admin-body .section-content > .design-ui-header .section-header-titles {
+    body.admin-body .main-header .section-header .section-header-titles,
+    body.admin-body .main-header .design-ui-header .section-header-titles {
         align-items: flex-start !important;
         justify-content: center !important;
         text-align: left !important;
@@ -7455,16 +7451,16 @@ body.builder-active .btn-primary:active,
         flex: 1 !important;
     }
     
-    body.admin-body .section-content > .section-header .section-title,
-    body.admin-body .section-content > .design-ui-header .section-title {
+    body.admin-body .main-header .section-header .section-title,
+    body.admin-body .main-header .design-ui-header .section-title {
         text-align: left !important;
         align-self: flex-start !important;
         font-size: 16px !important;
         width: auto !important;
     }
     
-    body.admin-body .section-content > .section-header .section-subtitle,
-    body.admin-body .section-content > .design-ui-header .section-subtitle {
+    body.admin-body .main-header .section-header .section-subtitle,
+    body.admin-body .main-header .design-ui-header .section-subtitle {
         text-align: left !important;
         align-self: flex-start !important;
         font-size: 12px !important;
@@ -7472,8 +7468,8 @@ body.builder-active .btn-primary:active,
         width: auto !important;
     }
     
-    body.admin-body .section-content > .section-header .section-header-actions,
-    body.admin-body .section-content > .design-ui-header .section-header-actions {
+    body.admin-body .main-header .section-header .section-header-actions,
+    body.admin-body .main-header .design-ui-header .section-header-actions {
         flex-direction: row !important;
         align-items: center !important;
         justify-content: flex-start !important;
@@ -7482,10 +7478,10 @@ body.builder-active .btn-primary:active,
         gap: 8px !important;
     }
     
-    body.admin-body .section-content > .section-header .section-header-actions button,
-    body.admin-body .section-content > .section-header .section-header-actions .btn,
-    body.admin-body .section-content > .design-ui-header .section-header-actions button,
-    body.admin-body .section-content > .design-ui-header .section-header-actions .btn {
+    body.admin-body .main-header .section-header .section-header-actions button,
+    body.admin-body .main-header .section-header .section-header-actions .btn,
+    body.admin-body .main-header .design-ui-header .section-header-actions button,
+    body.admin-body .main-header .design-ui-header .section-header-actions .btn {
         width: 100% !important;
         max-width: 100% !important;
         justify-content: center !important;
@@ -7589,8 +7585,8 @@ body.minside-body .nav-item::before,
    Ensures section headers (dynamic workspace headers like "Brukeradministrasjon", "Kursadministrasjon", etc.)
    align titles and subtitles tightly to the left next to their icon on all screen widths, eliminating center gaps.
    -------------------------------------------------------------------------- */
-body.admin-body .section-content > .section-header,
-body.admin-body .section-content > .design-ui-header {
+body.admin-body .main-header .section-header,
+body.admin-body .main-header .design-ui-header {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
@@ -7598,8 +7594,8 @@ body.admin-body .section-content > .design-ui-header {
     gap: 16px !important; /* Adheres strictly to the 8px Grid Rule */
 }
 
-body.admin-body .section-content > .section-header > .section-header-content,
-body.admin-body .section-content > .design-ui-header > .section-header-content {
+body.admin-body .main-header .section-header > .section-header-content,
+body.admin-body .main-header .design-ui-header > .section-header-content {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
@@ -7612,8 +7608,8 @@ body.admin-body .section-content > .design-ui-header > .section-header-content {
     padding: 0 !important;
 }
 
-body.admin-body .section-content > .section-header .section-header-titles,
-body.admin-body .section-content > .design-ui-header .section-header-titles {
+body.admin-body .main-header .section-header .section-header-titles,
+body.admin-body .main-header .design-ui-header .section-header-titles {
     display: flex !important;
     flex-direction: column !important;
     align-items: flex-start !important;
@@ -7626,8 +7622,8 @@ body.admin-body .section-content > .design-ui-header .section-header-titles {
     gap: 4px !important;
 }
 
-body.admin-body .section-content > .section-header .section-title,
-body.admin-body .section-content > .design-ui-header .section-title {
+body.admin-body .main-header .section-header .section-title,
+body.admin-body .main-header .design-ui-header .section-title {
     text-align: left !important;
     align-self: flex-start !important;
     margin: 0 !important;
@@ -7635,8 +7631,8 @@ body.admin-body .section-content > .design-ui-header .section-title {
     width: auto !important;
 }
 
-body.admin-body .section-content > .section-header .section-subtitle,
-body.admin-body .section-content > .design-ui-header .section-subtitle {
+body.admin-body .main-header .section-header .section-subtitle,
+body.admin-body .main-header .design-ui-header .section-subtitle {
     text-align: left !important;
     align-self: flex-start !important;
     margin: 4px 0 0 !important;
@@ -11332,6 +11328,20 @@ html[data-theme="dark"] .status-pill.status-completed {
     background: rgba(2, 132, 199, 0.2) !important;
     color: #38bdf8 !important;
 }
+
+/* ==========================================================================
+   UNIVERSAL GUARANTEE: HIDE REDUNDANT IN-CONTENT SECTION HEADERS BELOW TOPBAR
+   ========================================================================== */
+html body.admin-body .design-ui-topbar,
+html body.admin-body .section-content > .section-header:not(.in-topbar),
+html body.admin-body .section-content > .section-header-row:not(.in-topbar),
+html body.admin-body .section-content > .design-ui-header:not(.in-topbar),
+html body.admin-body .section-content > .kinetic-header-card,
+html body.minside-body .section-content > .section-header:not(.in-topbar),
+html body.minside-body .section-content > .design-ui-header:not(.in-topbar) {
+    display: none !important;
+}
+
 
 
 

@@ -7937,8 +7937,14 @@ html[data-theme="dark"] body.admin-body .mobile-nav-toggle {
     color: #f1f5f9 !important;
 }
 
-
-
-
-
+/* --- HIDE DUPLICATE IN-CONTENT SECTION HEADERS & TOPBAR PANELS --- */
+html body.admin-body .design-ui-topbar,
+html body.admin-body .section-content > .section-header:not(.in-topbar),
+html body.admin-body .section-content > .section-header-row:not(.in-topbar),
+html body.admin-body .section-content > .design-ui-header:not(.in-topbar),
+html body.admin-body .section-content > .kinetic-header-card,
+html body.minside-body .section-content > .section-header:not(.in-topbar),
+html body.minside-body .section-content > .design-ui-header:not(.in-topbar) {
+    display: none !important;
+}
 
