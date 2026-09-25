@@ -769,6 +769,31 @@
             margin-bottom: 32px;
         }
 
+        .overview-text p {
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        .overview-text p:last-child {
+            margin-bottom: 0;
+        }
+
+        html[data-theme="dark"] .overview-text {
+            color: #cbd5e1 !important;
+        }
+
+        html[data-theme="dark"] .overview-text p,
+        html[data-theme="dark"] .overview-text span,
+        html[data-theme="dark"] .overview-text div,
+        html[data-theme="dark"] .overview-text li {
+            color: #cbd5e1 !important;
+        }
+
+        html[data-theme="dark"] .overview-text strong,
+        html[data-theme="dark"] .overview-text b {
+            color: #f8fafc !important;
+        }
+
         /* Instructor Section */
         .instructor-card {
             display: flex;
@@ -1542,9 +1567,9 @@
             <!-- Tab 1: Oversikt -->
             <div class="tab-content-panel active" id="tab-oversikt">
                 <h2 class="overview-title" id="lesson-overview-title">Oversikt over leksjonen: Hvordan se i ånden</h2>
-                <p class="overview-text" id="lesson-overview-text">
-                    I denne leksjonen vil Hilde Karin Knutsen gå gjennom grunnleggende bibelvers om det å se i den åndelige verden, og hvordan du i praksis kan aktivere dine åndelige sanser gjennom tro og bønn.
-                </p>
+                <div class="overview-text" id="lesson-overview-text">
+                    <p>I denne leksjonen vil Hilde Karin Knutsen gå gjennom grunnleggende bibelvers om det å se i den åndelige verden, og hvordan du i praksis kan aktivere dine åndelige sanser gjennom tro og bønn.</p>
+                </div>
 
                 <!-- Dynamic Zoom Banner Container -->
                 <div id="zoom-banner-container" style="display: none;"></div>
@@ -2013,6 +2038,104 @@
             window.location.href = `/kurs.html?enroll=${encodeURIComponent(currentCourse.id)}`;
         };
 
+        function parseVideoSource(url) {
+            if (!url || typeof url !== 'string') return null;
+            const trimmed = url.trim();
+            if (!trimmed) return null;
+
+            // YouTube parser: handles youtu.be, youtube.com/watch, embed, v, shorts
+            const ytMatch = trimmed.match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/i);
+            if (ytMatch && ytMatch[1]) {
+                return {
+                    type: 'youtube',
+                    id: ytMatch[1],
+                    embedUrl: `https://www.youtube.com/embed/${ytMatch[1]}?rel=0&autoplay=0`
+                };
+            }
+
+            // Vimeo parser: handles vimeo.com/12345, player.vimeo.com/video/12345
+            const vimMatch = trimmed.match(/(?:vimeo\.com\/(?:video\/)?|player\.vimeo\.com\/video\/)(\d+)/i);
+            if (vimMatch && vimMatch[1]) {
+                return {
+                    type: 'vimeo',
+                    id: vimMatch[1],
+                    embedUrl: `https://player.vimeo.com/video/${vimMatch[1]}?autoplay=0`
+                };
+            }
+
+            // Direct video stream / MP4 / WebM
+            return {
+                type: 'direct',
+                url: trimmed
+            };
+        }
+
+        function cleanLessonHtml(html) {
+            if (!html) return '';
+            if (!/<[a-z][\s\S]*>/i.test(html)) {
+                return html.replace(/\n/g, '<br>');
+            }
+
+            try {
+                const div = document.createElement('div');
+                div.innerHTML = html;
+
+                // Remove dangerous or non-content tags
+                div.querySelectorAll('script, iframe, object, embed').forEach(el => el.remove());
+
+                // Clean inline attributes and unwanted Google Docs / Word styles
+                div.querySelectorAll('*').forEach(el => {
+                    Array.from(el.attributes).forEach(attr => {
+                        if (attr.name.toLowerCase().startsWith('on')) {
+                            el.removeAttribute(attr.name);
+                        }
+                    });
+                    if (el.id && el.id.startsWith('docs-internal-guid')) {
+                        el.removeAttribute('id');
+                    }
+                    if (el.hasAttribute('style')) {
+                        el.style.removeProperty('color');
+                        el.style.removeProperty('background-color');
+                        el.style.removeProperty('background');
+                        el.style.removeProperty('font-family');
+                        el.style.removeProperty('font-size');
+                        el.style.removeProperty('line-height');
+                        el.style.removeProperty('font-variant');
+                        el.style.removeProperty('vertical-align');
+                        if (!el.getAttribute('style') || el.getAttribute('style').trim() === '') {
+                            el.removeAttribute('style');
+                        }
+                    }
+                });
+
+                // Remove empty paragraphs or empty wrapper divs
+                div.querySelectorAll('p, div').forEach(el => {
+                    if (!el.textContent.trim() && !el.querySelector('img, svg, audio, video')) {
+                        el.remove();
+                    }
+                });
+
+                return div.innerHTML.trim();
+            } catch (e) {
+                return String(html)
+                    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+                    .replace(/\son\w+="[^"]*"/gi, '');
+            }
+        }
+
+        function getPlainTextExcerpt(htmlOrText, maxLength = 180) {
+            if (!htmlOrText) return '';
+            try {
+                const tmp = document.createElement('div');
+                tmp.innerHTML = htmlOrText;
+                const text = (tmp.textContent || tmp.innerText || '').replace(/\s+/g, ' ').trim();
+                if (text.length <= maxLength) return text;
+                return text.substring(0, maxLength).trim() + '...';
+            } catch (e) {
+                return String(htmlOrText).replace(/<[^>]+>/g, '').substring(0, maxLength).trim();
+            }
+        }
+
         function getLessonTypeIcon(l) {
             if (l.videoUrl && String(l.videoUrl).trim().length > 0) {
                 return '<i class="fas fa-play-circle" style="font-size:0.95rem; margin-right:6px;" title="Videoopptak"></i>';
@@ -2154,21 +2277,22 @@
                 const desc = (lesson.description || '').trim();
                 const titleStr = (lesson.title || '').trim();
                 if (desc && desc.toLowerCase() !== titleStr.toLowerCase()) {
-                    overviewText.textContent = desc;
+                    overviewText.innerHTML = cleanLessonHtml(desc);
                     overviewText.style.display = 'block';
                 } else {
-                    overviewText.textContent = '';
+                    overviewText.innerHTML = '';
                     overviewText.style.display = 'none';
                 }
             }
 
             // Calculate future countdown state
+            const hasRecordedVideo = Boolean(lesson && lesson.videoUrl && String(lesson.videoUrl).trim().length > 0);
             const zoomUrl = lesson.zoomUrl || (currentCourse && currentCourse.zoomUrl);
             const targetDateVal = lesson.date || lesson.releaseDate || (currentCourse && (currentCourse.releaseDate || currentCourse.startDate || currentCourse.date || currentCourse.zoomDate));
             let isFutureCountdown = false;
             let isWithin15Mins = false;
 
-            if (targetDateVal) {
+            if (targetDateVal && !hasRecordedVideo) {
                 try {
                     const d = new Date(targetDateVal);
                     const now = Date.now();
@@ -2213,7 +2337,6 @@
 
             // Progress bar is only visible if watching a recorded lesson (videoUrl present)
             const progressWrapper = document.querySelector('.progress-wrapper');
-            const hasRecordedVideo = Boolean(lesson && lesson.videoUrl && String(lesson.videoUrl).trim().length > 0);
 
             if (progressWrapper) {
                 if (hasRecordedVideo) {
@@ -2330,7 +2453,7 @@
                             </div>
                             <h3 style="font-size:1.45rem; font-weight:750; margin-bottom:6px; letter-spacing: -0.01em;">${lesson.title}</h3>
                             <p style="color:#cbd5e1; max-width:480px; font-size:0.9rem; line-height:1.45; margin-bottom:18px; opacity: 0.9;">
-                                ${lesson.description || 'Nedtelling pågår for denne leksjonen. Zoom-møtet åpnes før start!'}
+                                ${getPlainTextExcerpt(lesson.description, 180) || 'Nedtelling pågår for denne leksjonen. Zoom-møtet åpnes før start!'}
                             </p>
 
                             <div class="countdown-grid" id="countdown-timer-grid" style="display:flex; gap:12px; margin-bottom:18px;">
@@ -2347,16 +2470,19 @@
                         </div>
                     `;
                     startCountdownTimer(targetDateVal);
-                } else if (lesson.videoUrl && (lesson.videoUrl.includes('youtube') || lesson.videoUrl.includes('vimeo'))) {
+                } else if (hasRecordedVideo) {
                     videoContainer.style.backgroundImage = 'none';
-                    let embedUrl = lesson.videoUrl;
-                    if (lesson.videoUrl.includes('youtube.com/watch?v=')) {
-                        embedUrl = lesson.videoUrl.replace('watch?v=', 'embed/');
+                    const videoSource = parseVideoSource(lesson.videoUrl);
+
+                    if (videoSource && videoSource.type === 'youtube') {
+                        videoContainer.innerHTML = `<iframe src="${videoSource.embedUrl}" title="${lesson.title || 'Leksjonsvideo'}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="width:100%;height:100%;border:none;border-radius:16px;"></iframe>`;
+                    } else if (videoSource && videoSource.type === 'vimeo') {
+                        videoContainer.innerHTML = `<iframe src="${videoSource.embedUrl}" title="${lesson.title || 'Leksjonsvideo'}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="width:100%;height:100%;border:none;border-radius:16px;"></iframe>`;
+                    } else if (videoSource && videoSource.type === 'direct') {
+                        videoContainer.innerHTML = `<video src="${videoSource.url}" controls playsinline style="width:100%;height:100%;border-radius:16px;"></video>`;
+                    } else {
+                        videoContainer.innerHTML = `<video src="${lesson.videoUrl}" controls playsinline style="width:100%;height:100%;border-radius:16px;"></video>`;
                     }
-                    videoContainer.innerHTML = `<iframe src="${embedUrl}" allowfullscreen style="width:100%;height:100%;border:none;border-radius:16px;"></iframe>`;
-                } else if (lesson.videoUrl && String(lesson.videoUrl).trim().length > 0) {
-                    videoContainer.style.backgroundImage = 'none';
-                    videoContainer.innerHTML = `<video src="${lesson.videoUrl}" controls style="width:100%;height:100%;border-radius:16px;"></video>`;
                 } else if (zoomUrl && String(zoomUrl).trim().length > 0) {
                     videoContainer.style.backgroundImage = `linear-gradient(rgba(15, 23, 42, 0.78), rgba(15, 23, 42, 0.88)), url('${courseImg}')`;
                     videoContainer.style.backgroundSize = 'cover';
@@ -2369,7 +2495,7 @@
                             </div>
                             <h3 style="font-size:1.8rem; font-weight:800; margin-bottom:10px;">${lesson.title}</h3>
                             <p style="color:#cbd5e1; max-width:520px; font-size:0.95rem; line-height:1.6; margin-bottom:24px;">
-                                ${lesson.description || 'Klikk på knappen nedenfor for å bli med i Zoom-møtet for denne leksjonen.'}
+                                ${getPlainTextExcerpt(lesson.description, 200) || 'Klikk på knappen nedenfor for å bli med i Zoom-møtet for denne leksjonen.'}
                             </p>
                             <a href="${zoomUrl}" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="font-size: 1.05rem; padding: 14px 32px; border-radius: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 10px;">
                                 <i class="fas fa-video" style="font-size: 1.15rem;"></i> Åpne i Zoom-appen
@@ -2388,7 +2514,7 @@
                             </div>
                             <h3 style="font-size:1.7rem; font-weight:800; margin-bottom:8px;">${lesson.title}</h3>
                             <p style="color:#cbd5e1; max-width:520px; font-size:0.95rem; line-height:1.6; margin-bottom: 12px;">
-                                ${lesson.description || 'Les teksten og oppgavene nedenfor for denne leksjonen.'}
+                                ${getPlainTextExcerpt(lesson.description, 200) || 'Les teksten og oppgavene nedenfor for denne leksjonen.'}
                             </p>
                             ${zoomUrl ? `
                                 <a href="${zoomUrl}" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="font-size: 0.98rem; padding: 12px 28px; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; margin-top: 12px;">
