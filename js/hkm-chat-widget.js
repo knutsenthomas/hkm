@@ -903,7 +903,7 @@ export function initHkmChatWidget() {
             <span>Hvor skal vi svare deg?</span>
           </div>
           <div class="hkm-prechat-desc">
-            Oppgi din e-post slik at Thomas kan svare deg i Wix-appen:
+            Oppgi din e-post slik at vi kan svare deg så snart vi kan.
           </div>
           <div class="hkm-prechat-fields">
             <input type="text" id="hkm-name-input" class="hkm-prechat-input" placeholder="Ditt navn (valgfritt)" value="${userName || ''}">
