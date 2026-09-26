@@ -269,7 +269,7 @@ export function initHkmChatWidget() {
       border-radius: 16px;
       border: 1px solid rgba(0, 0, 0, 0.08);
       box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.25), 0 8px 16px rgba(0, 0, 0, 0.08);
-      z-index: 9999;
+      z-index: 30000;
       display: flex;
       flex-direction: column;
       overflow: hidden;
