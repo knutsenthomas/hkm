@@ -2438,7 +2438,8 @@ class ContentManager {
                         ? cleanExcerpt.slice(0, 117) + '...' 
                         : cleanExcerpt;
 
-                    const detailsUrl = event.link || (this.getLocalizedLink('arrangement-detaljer.html') + '?id=' + encodeURIComponent(eventKey));
+                    // Cards open the site's event detail page; calendar links remain event data.
+                    const detailsUrl = this.getLocalizedLink('arrangement-detaljer.html') + '?id=' + encodeURIComponent(eventKey);
 
                     return `
                         <a href="${detailsUrl}" class="event-card">
@@ -5123,7 +5124,7 @@ class ContentManager {
                 <div class="recent-event-item">
                     <img src="${img}" alt="${event.title}" class="recent-event-img" loading="lazy" onerror="this.onerror=null; this.src='${fallbackSrc}';">
                     <div class="recent-event-info">
-                        <h4><a href="${this.getLocalizedLink('arrangement-detaljer.html')}?id=${key}">${event.title}</a></h4>
+                        <h4><a href="${this.getLocalizedLink('arrangement-detaljer.html')}?id=${encodeURIComponent(key)}">${event.title}</a></h4>
                         <span class="recent-event-date">${dateStr}</span>
                     </div>
                 </div>
