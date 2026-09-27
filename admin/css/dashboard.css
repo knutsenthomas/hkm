@@ -5759,16 +5759,46 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
 }
 
 /* --- Editor V2 Mobile Responsiveness --- */
+.editor-format-toggle {
+    display: none;
+}
+
 @media (max-width: 1024px) {
     .desktop-richtools {
-        display: flex !important;
+        display: none !important;
         position: static !important;
     }
 
     .editor-toolbar-container {
+        display: none !important;
+    }
+
+    .editor-format-toggle {
+        display: inline-flex !important;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 12px;
+        padding: 7px 10px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: #fff;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .dashboard-modal.editor-formatting-open .editor-toolbar-container {
         display: block !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 9 !important;
         max-width: 100% !important;
         padding: 8px 10px !important;
+        background: #fff;
+    }
+
+    .dashboard-modal.editor-formatting-open .desktop-richtools {
+        display: flex !important;
     }
 
     .editor-scroll-area {

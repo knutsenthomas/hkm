@@ -11081,6 +11081,9 @@ class AdminManager {
                                 <div class="docs-workspace-shell">
                                     <div class="editor-paper docs-page-paper">
                                         <textarea id="col-item-title-v2" placeholder="Skriv din tittel her..." rows="1">${item.title || ''}</textarea>
+                                        <button type="button" class="editor-format-toggle" id="editor-format-toggle" aria-expanded="false" aria-controls="desktop-richtools">
+                                            <span class="material-symbols-outlined" aria-hidden="true">format_bold</span> Formater tekst
+                                        </button>
                                         <div id="${editorHolderId}"></div>
                                         <input type="file" id="docs-image-upload-input" style="display:none;" accept="image/*">
                                     </div>
@@ -12942,6 +12945,11 @@ class AdminManager {
 
             // Title Auto-resize logic
             const titleArea = modal.querySelector('#col-item-title-v2');
+            const formatToggle = modal.querySelector('#editor-format-toggle');
+            formatToggle?.addEventListener('click', () => {
+                const isOpen = modal.classList.toggle('editor-formatting-open');
+                formatToggle.setAttribute('aria-expanded', String(isOpen));
+            });
             if (titleArea) {
                 const adjustTitleHeight = () => {
                     titleArea.style.height = 'auto';
