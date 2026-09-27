@@ -10888,6 +10888,45 @@ body.builder-active .main-content,
   box-sizing: border-box !important;
 }
 
+/* Keep the dashboard header controls inside narrow phone viewports. */
+@media (max-width: 600px) {
+  body.admin-body #dashboard-main-header > .section-header {
+    min-width: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  body.admin-body #dashboard-main-header .section-header-content,
+  body.admin-body #dashboard-main-header .section-header-titles {
+    min-width: 0 !important;
+  }
+
+  body.admin-body #dashboard-main-header .section-header-content {
+    flex-wrap: nowrap !important;
+  }
+
+  body.admin-body #dashboard-main-header .section-header-actions {
+    flex: 0 0 auto !important;
+    gap: 6px !important;
+  }
+
+  body.admin-body #dashboard-main-header .section-header-actions #admin-profile-trigger,
+  body.admin-body #dashboard-main-header .section-header-actions #todo-shortcut-btn {
+    display: none !important;
+  }
+
+  body.admin-body #dashboard-main-header .section-header-actions .notification-btn {
+    width: 38px !important;
+    min-width: 38px !important;
+    height: 38px !important;
+    padding: 0 !important;
+  }
+
+  body.admin-body #dashboard-main-header #admin-theme-toggle {
+    margin-right: 0 !important;
+  }
+}
+
 /* Responsive Podcast Table styling on mobile */
 .podcast-table {
   min-width: 720px !important;
