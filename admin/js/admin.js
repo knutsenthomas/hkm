@@ -11940,6 +11940,7 @@ class AdminManager {
             // Common editor surface utilities
             const getDocsSurface = () => getEditorHolder();
             let lastSelectionSnapshot = null;
+            let headingSelectionPending = false;
 
             const splitTextToItems = (rawText) => {
                 const text = String(rawText || '')
@@ -12243,6 +12244,12 @@ class AdminManager {
             const saveSelectionRange = () => {
                 const ctx = selectionInsideSurface();
                 if (!ctx) return;
+                // Opening a toolbar select can collapse the live selection on mobile.
+                // Keep the highlighted range until the formatting command runs.
+                const toolbar = modal.querySelector('#desktop-richtools');
+                if (ctx.range.collapsed && (headingSelectionPending || toolbar?.contains(document.activeElement))
+                    && selectionRangeStillValid(this._lastDocsSelectionRange)
+                    && !this._lastDocsSelectionRange.collapsed) return;
                 this._lastDocsSelectionRange = ctx.range.cloneRange();
                 lastSelectionSnapshot = buildSelectionSnapshot(ctx.range);
             };
@@ -12715,6 +12722,14 @@ class AdminManager {
                     desktopTools.style.pointerEvents = 'auto';
                     // Keep the selected text when a touch moves focus to the toolbar.
                     desktopTools.addEventListener('pointerdown', saveSelectionRange, true);
+                    desktopTools.addEventListener('touchstart', saveSelectionRange, { capture: true, passive: true });
+                    const headingSelect = desktopTools.querySelector('[data-tool-select="headingLevel"]');
+                    const preserveHeadingSelection = () => {
+                        saveSelectionRange();
+                        headingSelectionPending = true;
+                    };
+                    headingSelect?.addEventListener('pointerdown', preserveHeadingSelection, true);
+                    headingSelect?.addEventListener('touchstart', preserveHeadingSelection, { capture: true, passive: true });
                     
                     desktopTools.addEventListener('click', async (e) => {
                         const btn = e.target.closest('.desktop-richtools-btn');
@@ -12866,8 +12881,8 @@ class AdminManager {
                     if (headingLevelSelect) {
                         headingLevelSelect.addEventListener('change', () => {
                             const val = String(headingLevelSelect.value || 'p').trim().toLowerCase();
-                            if (!val) return;
-                            exec('formatBlock', val === 'p' ? 'p' : val);
+                            if (val) exec('formatBlock', val);
+                            headingSelectionPending = false;
                         });
                     }
 
