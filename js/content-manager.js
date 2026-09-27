@@ -2362,18 +2362,12 @@ class ContentManager {
             if (window.cmsLog) window.cmsLog('FEIL: Fant ikke .events-grid');
             return;
         }
-        const frontEventsSection = this.pageId === 'index' ? container.closest('.events') : null;
 
         try {
             // Cache events for modal usage
             this.setEventCache(events);
 
             if (!events || events.length === 0) {
-                if (frontEventsSection) {
-                    frontEventsSection.style.display = 'none';
-                    container.replaceChildren();
-                    return;
-                }
                 container.innerHTML = `
                     <div class="events-empty-state cms-events-empty-state">
                         <h3 class="cms-events-empty-title">Ingen kommende arrangementer</h3>
@@ -2394,13 +2388,6 @@ class ContentManager {
             });
 
             const displayEvents = this.pageId === 'index' ? filteredEvents.slice(0, 3) : filteredEvents;
-            if (frontEventsSection) {
-                frontEventsSection.style.display = displayEvents.length ? '' : 'none';
-                if (!displayEvents.length) {
-                    container.replaceChildren();
-                    return;
-                }
-            }
 
             if (['localhost', '127.0.0.1'].includes(String(window.location.hostname || '').toLowerCase())) {
                 console.info('[ContentManager] renderEvents debug', {
