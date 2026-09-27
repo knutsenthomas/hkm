@@ -4948,6 +4948,22 @@ class ContentManager {
             }
         }
 
+        // Use the site's existing search dialog for the compact sidebar search.
+        const sidebarSearch = document.querySelector('.search-widget .search-form');
+        if (sidebarSearch && !sidebarSearch.dataset.searchBound) {
+            sidebarSearch.dataset.searchBound = 'true';
+            sidebarSearch.addEventListener('submit', (submitEvent) => {
+                submitEvent.preventDefault();
+                const query = sidebarSearch.querySelector('input')?.value.trim() || '';
+                document.getElementById('global-search-opener')?.click();
+                const searchInput = document.getElementById('site-search-input-v2');
+                if (searchInput && query) {
+                    searchInput.value = query;
+                    searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            });
+        }
+
         // Sidebar: Recent Events
         this.populateSidebarRecentEvents();
 
