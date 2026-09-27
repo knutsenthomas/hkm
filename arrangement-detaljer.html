@@ -47,7 +47,7 @@
     <!-- Firebase Config & Service (Moved to head for early loading) -->
     <script type="module" src="js/firebase-config.js"></script>
     <script type="module" src="js/firebase-service.js?v=2026.05.10.1"></script>
-    <script type="module" src="js/content-manager.js?v=2026.05.10.8"></script>
+    <script type="module" src="js/content-manager.js?v=2026.09.27.sidebar"></script>
     <style>
         /* Charitics-inspired Event Details Styles */
         :root {
@@ -410,6 +410,11 @@
         }
 
         @media (max-width: 768px) {
+            .sidebar-left { gap: 20px; }
+            .search-widget { padding: 18px 20px; }
+            .search-widget .widget-title { font-size: 18px; margin-bottom: 12px; padding-bottom: 10px; }
+            .search-widget input { min-width: 0; padding: 12px 16px; box-sizing: border-box; }
+            .search-widget button { padding: 0 18px; }
             .event-large-image-wrap {
                 display: none !important;
             }
@@ -941,7 +946,7 @@
 
                 <!-- Recent Events -->
                 <div class="sidebar-widget recent-events-widget">
-                    <h3 class="widget-title">Nylige Arrangementer</h3>
+                    <h3 class="widget-title">Kommende arrangementer</h3>
                     <div class="recent-events-list" id="recent-events-sidebar">
                         <!-- Populated by JS -->
                         <p>Laster nylige...</p>
