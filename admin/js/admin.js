@@ -10923,6 +10923,14 @@ class AdminManager {
                              ${(collectionId === 'blog' || collectionId === 'teaching') ? `
                               <button class="btn-outline" id="save-col-item-draft"><span class="material-symbols-outlined">draft</span><span>Lagre som utkast</span></button>
                               ` : ''}
+                             <div class="editor-mobile-actions" id="editor-mobile-actions">
+                                 <button type="button" class="btn-ghost" id="editor-mobile-actions-toggle" aria-label="Flere valg" aria-expanded="false" aria-controls="editor-mobile-actions-menu" title="Flere valg"><span class="material-symbols-outlined">more_vert</span></button>
+                                 <div class="editor-mobile-actions-menu" id="editor-mobile-actions-menu" hidden>
+                                     ${(collectionId === 'blog' || collectionId === 'teaching' || collectionId === 'podcast_transcripts') ? '<button type="button" data-editor-action="translate-col-item"><span class="material-symbols-outlined">g_translate</span>Oversett</button>' : ''}
+                                     <button type="button" data-editor-action="print-col-item"><span class="material-symbols-outlined">print</span>Skriv ut</button>
+                                     ${(collectionId === 'blog' || collectionId === 'teaching') ? '<button type="button" data-editor-action="toggle-split-preview"><span class="material-symbols-outlined">visibility</span>Forhåndsvis</button>' : ''}
+                                 </div>
+                             </div>
                              <button class="btn-primary" id="save-col-item"><span class="material-symbols-outlined">publish</span><span>Lagre og publiser</span></button>
                         </div>
 </header>
@@ -11300,6 +11308,31 @@ class AdminManager {
             document.body.appendChild(modal);
 
             // Live synkronisering av tittel i header-center
+            const mobileActions = modal.querySelector('#editor-mobile-actions');
+            const mobileToggle = modal.querySelector('#editor-mobile-actions-toggle');
+            const mobileMenu = modal.querySelector('#editor-mobile-actions-menu');
+            const closeMobileActions = () => {
+                mobileMenu.hidden = true;
+                mobileToggle.setAttribute('aria-expanded', 'false');
+            };
+            mobileToggle.addEventListener('click', () => {
+                mobileMenu.hidden = !mobileMenu.hidden;
+                mobileToggle.setAttribute('aria-expanded', String(!mobileMenu.hidden));
+            });
+            mobileMenu.addEventListener('click', (event) => {
+                const option = event.target.closest('[data-editor-action]');
+                if (!option) return;
+                const action = modal.querySelector(`#${option.dataset.editorAction}`);
+                closeMobileActions();
+                action?.click();
+            });
+            modal.addEventListener('click', (event) => {
+                if (!mobileActions.contains(event.target)) closeMobileActions();
+            });
+            modal.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') closeMobileActions();
+            });
+
             const titleMainEl = document.getElementById('col-item-title-v2');
             const headerTitleEl = modal.querySelector('.editor-header-title');
             if (titleMainEl && headerTitleEl) {
