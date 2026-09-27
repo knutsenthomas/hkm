@@ -854,9 +854,12 @@ class ContentManager {
 
     async loadSpecializedContent() {
         if (this.pageId === 'index') {
-            const [heroData, events] = await Promise.all([
+            const upcomingMonths = Array.from({ length: 4 }, (_, offset) =>
+                new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + offset, 1)
+            );
+            const [heroData, monthlyEvents] = await Promise.all([
                 this.getContentDoc('hero_slides', { silent: true }),
-                this.loadEvents()
+                Promise.all(upcomingMonths.map(month => this.loadEvents(false, month)))
             ]);
 
             if (heroData && heroData.slides) {
@@ -864,7 +867,10 @@ class ContentManager {
                 this.renderHeroSlides(heroData.slides);
             }
 
-            this.renderEvents(events || []);
+            const events = Array.from(new Map(monthlyEvents.flat().map(event => [
+                event.id || `${event.title || ''}:${event.start || event.date || ''}`, event
+            ])).values());
+            this.renderEvents(events);
 
             const service = window.firebaseService;
             const isSpeedTest = service && typeof service._isSpeedTestingAgent === 'function' && service._isSpeedTestingAgent();
@@ -1788,9 +1794,9 @@ class ContentManager {
         }
     }
 
-    async loadEvents(forceRefresh = false) {
+    async loadEvents(forceRefresh = false, rangeDate = this.currentDate) {
         try {
-            const { startIso, endIso } = this.getMonthRangeIso(this.currentDate);
+            const { startIso, endIso } = this.getMonthRangeIso(rangeDate);
             const cacheKey = `hkm_events_v7_${startIso}_${endIso}`;
             const isLocalDev = ['localhost', '127.0.0.1'].includes(String(window.location.hostname || '').toLowerCase());
             const integrations = await this.getContentDoc('settings_integrations', { silent: true }) || {};
@@ -1812,7 +1818,7 @@ class ContentManager {
                 }
             }
 
-            const currentYear = this.currentDate.getFullYear();
+            const currentYear = rangeDate.getFullYear();
             const holidayEvents = this.getNorwegianHolidays(currentYear);
             const rangeStart = new Date(startIso);
             const rangeEnd = new Date(endIso);
@@ -2015,7 +2021,7 @@ class ContentManager {
             const hasEventSourcesConfigured = Boolean((apiKey && calendars.length > 0) || taggedFirebase.length > 0);
             if (!forceRefresh && hasEventSourcesConfigured && nonHolidayCount === 0) {
                 console.warn('[ContentManager] loadEvents returned only holidays/empty. Retrying once with forceRefresh...');
-                return this.loadEvents(true);
+                return this.loadEvents(true, rangeDate);
             }
 
             // Save to Cache
@@ -2385,6 +2391,10 @@ class ContentManager {
 
                 // For "boxes", we only want future events (or events currently happening)
                 return !this.isEventPast(e);
+            }).sort((a, b) => {
+                const first = this.parseEventDate(a.start || a.date)?.getTime() || 0;
+                const second = this.parseEventDate(b.start || b.date)?.getTime() || 0;
+                return first - second;
             });
 
             const displayEvents = this.pageId === 'index' ? filteredEvents.slice(0, 3) : filteredEvents;
