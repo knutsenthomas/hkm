@@ -5006,6 +5006,7 @@ class ContentManager {
     async populateSidebarCategories() {
         const categoryContainer = document.querySelector('.category-list');
         if (!categoryContainer) return;
+        const categoryWidget = categoryContainer.closest('.category-widget');
 
         const lang = this.getCurrentLanguage(); // 'no', 'en', 'es'
 
@@ -5053,10 +5054,9 @@ class ContentManager {
         });
 
         const categories = Object.keys(categoryCounts);
-        if (categories.length === 0) {
-            categoryContainer.innerHTML = `<li style="font-size: 0.95rem; color: #64748b; font-weight: 500; padding: 8px 0;">${lang === 'en' ? 'No categories' : (lang === 'es' ? 'Sin categorías' : 'Ingen kategorier')}</li>`;
-            return;
-        }
+        // A single category is not a useful navigation choice on a detail page.
+        if (categoryWidget) categoryWidget.hidden = categories.length <= 1;
+        if (categories.length <= 1) return;
 
         // Sort alphabetically
         categories.sort();
@@ -5087,13 +5087,14 @@ class ContentManager {
         const currentId = urlParams.get('id');
 
         const others = allEvents
-            .filter(e => this.getEventKey(e) !== currentId)
+            .filter(e => !e.isHoliday && !this.isEventPast(e) && this.getEventKey(e) !== currentId)
+            .sort((a, b) => (this.parseEventDate(a.start || a.date)?.getTime() || 0)
+                - (this.parseEventDate(b.start || b.date)?.getTime() || 0))
             .slice(0, 3);
 
-        if (others.length === 0) {
-            sidebarContainer.innerHTML = `<p>${this.getTranslation('no_events')}</p>`;
-            return;
-        }
+        const recentWidget = sidebarContainer.closest('.recent-events-widget');
+        if (recentWidget) recentWidget.hidden = others.length === 0;
+        if (others.length === 0) return;
 
         sidebarContainer.innerHTML = others.map(event => {
             const key = this.getEventKey(event);
