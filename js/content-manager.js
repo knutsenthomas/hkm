@@ -4797,9 +4797,15 @@ class ContentManager {
         const startDate = this.parseEventDate(startValue);
         const hasTime = this.eventHasTime(startValue);
 
-        if (heroTitleEl) heroTitleEl.textContent = event.title;
+        const detailLabels = {
+            no: { heading: 'Arrangement', breadcrumb: 'Detaljer' },
+            en: { heading: 'Event', breadcrumb: 'Details' },
+            es: { heading: 'Evento', breadcrumb: 'Detalles' }
+        };
+        const labels = detailLabels[lang] || detailLabels.no;
+        if (heroTitleEl) heroTitleEl.textContent = labels.heading;
         if (titleEl) titleEl.textContent = event.title;
-        if (breadcrumbEl) breadcrumbEl.textContent = event.title;
+        if (breadcrumbEl) breadcrumbEl.textContent = labels.breadcrumb;
 
         const imageUrl = this._getEventImage(event);
         if (imgEl && imageUrl) {
