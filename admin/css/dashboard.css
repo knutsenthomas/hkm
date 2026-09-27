@@ -5853,6 +5853,32 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
         height: 64px !important; /* Premium unified mobile height */
     }
 
+    /* Keep publishing visible in the editor header on narrow phones. */
+    .editor-header-v2 #editor-autosave-status,
+    .editor-header-v2 #blog-translation-status,
+    .editor-header-v2 #translate-col-item,
+    .editor-header-v2 #print-col-item,
+    .editor-header-v2 #toggle-split-preview {
+        display: none !important;
+    }
+
+    .editor-header-v2 .editor-header-left,
+    .editor-header-v2 .editor-header-right {
+        gap: 8px !important;
+    }
+
+    .editor-header-v2 #save-col-item {
+        width: auto !important;
+        min-width: 0 !important;
+        padding: 0 12px !important;
+        border-radius: 10px !important;
+        gap: 5px !important;
+    }
+
+    .editor-header-v2 #save-col-item span:not(.material-symbols-outlined) {
+        display: inline !important;
+    }
+
     /* Hide the separator and "Blogginnlegg" label on mobile to save space */
     .editor-header-left > span {
         display: none !important;
