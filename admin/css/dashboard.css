@@ -3141,6 +3141,10 @@ input[type="range"] {
     flex-shrink: 0 !important;
 }
 
+.editor-mobile-actions {
+    display: none;
+}
+
 /* Premium Compact Editor Buttons */
 .editor-header-v2 .btn-primary,
 .editor-header-v2 .btn-outline,
@@ -5865,6 +5869,56 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
     .editor-header-v2 .editor-header-left,
     .editor-header-v2 .editor-header-right {
         gap: 8px !important;
+    }
+
+    .editor-header-v2 {
+        gap: 8px !important;
+    }
+
+    .editor-header-v2 #close-col-modal span:not(.material-symbols-outlined) {
+        display: none !important;
+    }
+
+    .editor-mobile-actions {
+        display: block;
+        position: relative;
+    }
+
+    .editor-mobile-actions-menu {
+        position: absolute;
+        right: 0;
+        top: calc(100% + 10px);
+        z-index: 50;
+        min-width: 180px;
+        padding: 6px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
+    }
+
+    .editor-mobile-actions-menu[hidden] {
+        display: none !important;
+    }
+
+    .editor-mobile-actions-menu button {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        min-height: 44px;
+        padding: 8px 10px;
+        color: #1e293b;
+        text-align: left;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        font-size: 14px;
+    }
+
+    .editor-mobile-actions-menu button:focus-visible,
+    .editor-mobile-actions-menu button:hover {
+        background: #f1f5f9;
     }
 
     .editor-header-v2 #save-col-item {
