@@ -12286,12 +12286,13 @@ class AdminManager {
 
                 if (range) {
                     try {
-                        sel.removeAllRanges();
-                        sel.addRange(range);
                         const container = range.commonAncestorContainer;
                         const el = container.nodeType === Node.TEXT_NODE ? container.parentElement : container;
                         const focusTarget = el.closest('[contenteditable="true"]');
-                        if (focusTarget) focusTarget.focus();
+                        // On mobile, focusing after restoring a range collapses the selection.
+                        if (focusTarget) focusTarget.focus({ preventScroll: true });
+                        sel.removeAllRanges();
+                        sel.addRange(range);
                     } catch (err) {
                         console.warn('Exec: selection restore failed:', err);
                     }
@@ -12362,6 +12363,18 @@ class AdminManager {
             };
 
             const applyStyleToSelectedBlocks = (mutator) => {
+                if (shouldUseDocsLikeEditor) {
+                    const surface = getDocsSurface();
+                    const range = selectionRangeStillValid(this._lastDocsSelectionRange)
+                        ? this._lastDocsSelectionRange
+                        : selectionInsideSurface()?.range;
+                    if (!surface || !range) return;
+                    const blocks = Array.from(surface.children).filter((el) =>
+                        /^(P|DIV|H[1-6]|BLOCKQUOTE|UL|OL)$/.test(el.tagName)
+                    );
+                    blocks.filter((block) => range.intersectsNode(block)).forEach(mutator);
+                    return;
+                }
                 const selectedBlocks = getSelectedBlocks();
                 if (selectedBlocks.length) {
                     selectedBlocks.forEach(mutator);
@@ -12697,6 +12710,8 @@ class AdminManager {
                 if (!toolbarListenersAttached) {
                     toolbarListenersAttached = true;
                     desktopTools.style.pointerEvents = 'auto';
+                    // Keep the selected text when a touch moves focus to the toolbar.
+                    desktopTools.addEventListener('pointerdown', saveSelectionRange, true);
                     
                     desktopTools.addEventListener('click', async (e) => {
                         const btn = e.target.closest('.desktop-richtools-btn');

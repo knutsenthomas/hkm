@@ -5761,13 +5761,14 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
 /* --- Editor V2 Mobile Responsiveness --- */
 @media (max-width: 1024px) {
     .desktop-richtools {
-        display: none !important;
+        display: flex !important;
         position: static !important;
-        /* Ensure no sticky positioning on tablet/mobile */
     }
 
     .editor-toolbar-container {
-        display: none !important;
+        display: block !important;
+        max-width: 100% !important;
+        padding: 8px 10px !important;
     }
 
     .editor-scroll-area {
@@ -7947,4 +7948,3 @@ html body.minside-body .section-content > .section-header:not(.in-topbar),
 html body.minside-body .section-content > .design-ui-header:not(.in-topbar) {
     display: none !important;
 }
-
