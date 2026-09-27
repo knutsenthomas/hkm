@@ -3842,11 +3842,13 @@ class ContentManager {
         const pageSEO = (data.pages && data.pages[pageId]) || {};
 
         // 1. Page Title
-        let title = itemOverride?.title || pageSEO.title || data.globalTitle || document.title;
+        const defaultTitle = document.title;
+        const title = itemOverride?.title || pageSEO.title || (pageId === 'index' ? data.globalTitle : '') || defaultTitle;
         document.title = title;
 
         // 2. Meta Tags (Description, Keywords)
-        const desc = itemOverride?.description || pageSEO.description || data.globalDescription || '';
+        const defaultDescription = document.querySelector('meta[name="description"]')?.content || '';
+        const desc = itemOverride?.description || pageSEO.description || (pageId === 'index' ? data.globalDescription : '') || defaultDescription;
         this.updateMetaTag('description', desc);
         this.updateMetaTag('keywords', data.globalKeywords || '');
 
