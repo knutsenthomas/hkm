@@ -25,6 +25,14 @@ const TRANSLATIONS = {
     typing: 'Tenker...',
     offlineTitle: 'Vi er ikke tilstede nå',
     offlineDesc: 'Våre åpningstider for kundeservice er mandag–fredag 08:00–16:00. Du kan fortsatt sende oss meldinger, så svarer vi deg her eller på e-post så fort vi er tilbake! 😊',
+    newConversation: 'Start ny samtale',
+    emailHeading: 'Hvor skal vi svare deg?',
+    emailDescription: 'Oppgi din e-post slik at vi kan svare deg så snart vi kan.',
+    namePlaceholder: 'Ditt navn (valgfritt)',
+    emailPlaceholder: 'din@epost.no (påkrevd for svar) *',
+    replyTo: 'Svar sendes til:',
+    changeEmail: 'Endre',
+    emailRequired: 'Vennligst oppgi din e-postadresse ovenfor så vi kan svare deg.',
     quick: [
       { text: 'Kan dere be for meg? 🙏', label: '🙏 Bønnebegjær', actionRequired: true },
       { text: 'Hvor finner jeg bibelstudiene? 📖', label: '📖 Bibelstudier', actionRequired: false },
@@ -48,6 +56,14 @@ const TRANSLATIONS = {
     typing: 'Thinking...',
     offlineTitle: 'We are currently offline',
     offlineDesc: 'Our support hours are Mon–Fri 08:00–16:00. You can still send a message, and we will reply as soon as we are back! 😊',
+    newConversation: 'Start a new conversation',
+    emailHeading: 'Where should we reply?',
+    emailDescription: 'Enter your email address so we can reply as soon as possible.',
+    namePlaceholder: 'Your name (optional)',
+    emailPlaceholder: 'your@email.com (required for a reply) *',
+    replyTo: 'Replies will be sent to:',
+    changeEmail: 'Change',
+    emailRequired: 'Please enter your email address above so we can reply.',
     quick: [
       { text: 'Can you pray for me? 🙏', label: '🙏 Prayer request', actionRequired: true },
       { text: 'Where can I find Bible studies? 📖', label: '📖 Bible studies', actionRequired: false },
@@ -71,6 +87,14 @@ const TRANSLATIONS = {
     typing: 'Pensando...',
     offlineTitle: 'Estamos fuera de horario',
     offlineDesc: 'Nuestro horario de atención es de lunes a viernes de 08:00 a 16:00. ¡Aún puedes dejarnos un mensaje y te responderemos pronto! 😊',
+    newConversation: 'Iniciar una conversación nueva',
+    emailHeading: '¿Dónde podemos responderte?',
+    emailDescription: 'Indica tu correo electrónico para que podamos responderte lo antes posible.',
+    namePlaceholder: 'Tu nombre (opcional)',
+    emailPlaceholder: 'tu@correo.com (obligatorio para responder) *',
+    replyTo: 'Responderemos a:',
+    changeEmail: 'Cambiar',
+    emailRequired: 'Indica tu correo electrónico arriba para que podamos responderte.',
     quick: [
       { text: '¿Pueden orar por mí? 🙏', label: '🙏 Petición de oración', actionRequired: true },
       { text: '¿Dónde encuentro estudios bíblicos? 📖', label: '📖 Estudios bíblicos', actionRequired: false },
@@ -812,7 +836,7 @@ export function initHkmChatWidget() {
           </div>
         </div>
         <div class="hkm-chat-header-actions">
-          <button class="hkm-chat-refresh-btn" id="hkm-chat-refresh-btn" aria-label="Start ny samtale" title="Start ny samtale">
+          <button class="hkm-chat-refresh-btn" id="hkm-chat-refresh-btn" aria-label="${t.newConversation}" title="${t.newConversation}">
             <span class="material-symbols-outlined">refresh</span>
           </button>
           <button class="hkm-chat-close-btn" id="hkm-chat-close-btn" aria-label="${t.closeChat}">
@@ -900,14 +924,14 @@ export function initHkmChatWidget() {
         <div class="hkm-prechat-box" id="hkm-prechat-box">
           <div class="hkm-prechat-header">
             <span class="material-symbols-outlined">mail</span>
-            <span>Hvor skal vi svare deg?</span>
+            <span>${t.emailHeading}</span>
           </div>
           <div class="hkm-prechat-desc">
-            Oppgi din e-post slik at vi kan svare deg så snart vi kan.
+            ${t.emailDescription}
           </div>
           <div class="hkm-prechat-fields">
-            <input type="text" id="hkm-name-input" class="hkm-prechat-input" placeholder="Ditt navn (valgfritt)" value="${userName || ''}">
-            <input type="email" id="hkm-email-input" class="hkm-prechat-input" placeholder="din@epost.no (påkrevd for svar) *">
+            <input type="text" id="hkm-name-input" class="hkm-prechat-input" placeholder="${t.namePlaceholder}" value="${userName || ''}">
+            <input type="email" id="hkm-email-input" class="hkm-prechat-input" placeholder="${t.emailPlaceholder}">
           </div>
           <div id="hkm-email-error" class="hkm-prechat-error" style="display: none;"></div>
         </div>
@@ -935,9 +959,9 @@ export function initHkmChatWidget() {
         <div class="hkm-verified-bar">
           <div class="hkm-verified-left">
             <span class="hkm-verified-dot"></span>
-            <span>Svar sendes til: <strong>${userEmail}</strong></span>
+            <span>${t.replyTo} <strong>${userEmail}</strong></span>
           </div>
-          <button type="button" id="hkm-change-email-btn" class="hkm-change-email-btn">Endre</button>
+          <button type="button" id="hkm-change-email-btn" class="hkm-change-email-btn">${t.changeEmail}</button>
         </div>
       `;
 
@@ -1129,7 +1153,7 @@ export function initHkmChatWidget() {
       const inputMail = emailEl ? emailEl.value.trim().toLowerCase() : '';
       if (!inputMail || !inputMail.includes('@') || !inputMail.includes('.')) {
         if (errorEl) {
-          errorEl.innerHTML = '<span class="material-symbols-outlined">error</span><span>Vennligst oppgi din e-postadresse ovenfor så vi kan svare deg.</span>';
+          errorEl.innerHTML = `<span class="material-symbols-outlined">error</span><span>${t.emailRequired}</span>`;
           errorEl.style.display = 'flex';
         }
         if (emailEl) {
