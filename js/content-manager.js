@@ -2362,12 +2362,18 @@ class ContentManager {
             if (window.cmsLog) window.cmsLog('FEIL: Fant ikke .events-grid');
             return;
         }
+        const frontEventsSection = this.pageId === 'index' ? container.closest('.events') : null;
 
         try {
             // Cache events for modal usage
             this.setEventCache(events);
 
             if (!events || events.length === 0) {
+                if (frontEventsSection) {
+                    frontEventsSection.style.display = 'none';
+                    container.replaceChildren();
+                    return;
+                }
                 container.innerHTML = `
                     <div class="events-empty-state cms-events-empty-state">
                         <h3 class="cms-events-empty-title">Ingen kommende arrangementer</h3>
@@ -2388,6 +2394,13 @@ class ContentManager {
             });
 
             const displayEvents = this.pageId === 'index' ? filteredEvents.slice(0, 3) : filteredEvents;
+            if (frontEventsSection) {
+                frontEventsSection.style.display = displayEvents.length ? '' : 'none';
+                if (!displayEvents.length) {
+                    container.replaceChildren();
+                    return;
+                }
+            }
 
             if (['localhost', '127.0.0.1'].includes(String(window.location.hostname || '').toLowerCase())) {
                 console.info('[ContentManager] renderEvents debug', {
@@ -3517,6 +3530,15 @@ class ContentManager {
 
             if (value === undefined) return;
 
+            // Correct older Norwegian CMS copy while preserving the saved content.
+            if (lang === 'no' && typeof value === 'string' && !isMedia && !contentAttr) {
+                value = value.replace(/\bfelleskap\b/gi, 'fellesskap')
+                    .replace(/\båndelig samlinger\b/gi, 'åndelige samlinger');
+                if (this.pageId === 'index' && key === 'hero.btnText' && value.trim() === 'Utforsk mer') {
+                    value = 'Les om oss';
+                }
+            }
+
             if (contentAttr) {
                 const visibilityTargetSelector = el.getAttribute('data-visibility-target');
                 const visibilityTarget = visibilityTargetSelector ? el.closest(visibilityTargetSelector) : null;
@@ -3887,7 +3909,14 @@ class ContentManager {
             this.cachedHeroSlides = slides;
             // Localize slides on the fly
             const localizedSlides = slides.map(slide => {
-                if (lang === 'no') return slide;
+                if (lang === 'no') return {
+                    ...slide,
+                    title: (slide.title || '').replace(/\bfelleskap\b/gi, 'fellesskap'),
+                    subtitle: (slide.subtitle || '').replace(/\bfelleskap\b/gi, 'fellesskap')
+                        .replace(/\båndelig samlinger\b/gi, 'åndelige samlinger'),
+                    btnText: (slide.btnLink || '').includes('om-oss') && (slide.btnText || '').trim() === 'Utforsk mer'
+                        ? 'Les om oss' : slide.btnText
+                };
                 const t = slide.translations && slide.translations[lang] ? slide.translations[lang] : {};
                 return {
                     ...slide,
