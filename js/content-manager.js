@@ -5024,6 +5024,11 @@ class ContentManager {
             const sourceLabel = e.sourceLabel || (e.isHoliday ? 'Helligdager' : 'Kalender');
             let categoryName = e.category || sourceLabel;
 
+            // A calendar address is an internal identifier, not a visitor-facing category.
+            if (/@(?:group\.)?calendar\.google\.com$/i.test(String(categoryName).trim())) {
+                categoryName = lang === 'en' ? 'Events' : (lang === 'es' ? 'Eventos' : 'Arrangementer');
+            }
+
             if (categoryName === 'Interne arrangementer' || categoryName === 'manual') {
                 categoryName = lang === 'en' ? 'Meetings & Conferences' : (lang === 'es' ? 'Reuniones y Conferencias' : 'Møter & Konferanser');
             }
