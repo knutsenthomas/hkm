@@ -3527,6 +3527,17 @@ class ContentManager {
                 if (this.pageId === 'index' && key === 'hero.btnText' && value.trim() === 'Utforsk mer') {
                     value = 'Les om oss';
                 }
+                if (this.pageId === 'kontakt') {
+                    const oldContactCopy = {
+                        'hero.title': { 'Kontakt Oss': 'Kontakt oss' },
+                        'hero.subtitle': { 'Vi vil gjerne høre fra deg. Send oss en melding eller besøk oss.': 'Vi vil gjerne høre fra deg. Send oss en melding.' },
+                        'contact.info.title': { 'Ta Kontakt': 'Ta kontakt' },
+                        'contact.info.phone': { '+47 123 45 678': '+47 930 94 615' },
+                        'contact.info.address_label': { 'Besøksadresse': 'Sted' },
+                        'contact.info.address': { 'Oslo, Norge': 'Norge' }
+                    };
+                    value = oldContactCopy[key]?.[value.trim()] || value;
+                }
             }
 
             if (contentAttr) {
@@ -3843,7 +3854,8 @@ class ContentManager {
 
         // 1. Page Title
         const defaultTitle = document.title;
-        const title = itemOverride?.title || pageSEO.title || (pageId === 'index' ? data.globalTitle : '') || defaultTitle;
+        const savedTitle = pageSEO.title && pageSEO.title !== data.globalTitle ? pageSEO.title : '';
+        const title = itemOverride?.title || savedTitle || (pageId === 'index' ? data.globalTitle : '') || defaultTitle;
         document.title = title;
 
         // 2. Meta Tags (Description, Keywords)
