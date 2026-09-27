@@ -1803,7 +1803,9 @@ class ContentManager {
                     if (cached) {
                         const { timestamp, events } = JSON.parse(cached);
                         // 15 minutes TTL
-                        if (Date.now() - timestamp < 15 * 60 * 1000) {
+                        if (Date.now() - timestamp < 15 * 60 * 1000
+                            && Array.isArray(events)
+                            && events.some(event => !event.isHoliday && !this.isEventPast(event))) {
                             return events;
                         }
                     }
@@ -2019,7 +2021,7 @@ class ContentManager {
             }
 
             // Save to Cache
-            if (!isLocalDev) {
+            if (!isLocalDev && finalEvents.some(event => !event.isHoliday && !this.isEventPast(event))) {
                 try {
                     localStorage.setItem(cacheKey, JSON.stringify({
                         timestamp: Date.now(),
