@@ -20,10 +20,10 @@ window.firebaseConfig = {
     measurementId: "G-28GVKTMCZE"
 };
 
-// Clear stale event data once after the event visibility rollback.
+// Clear stale event data to force immediate calendar sync for new events.
 // This runs before content-manager.js and forces a fresh calendar fetch.
 (function invalidateEventCache() {
-    const cacheVersion = '2026-08-02-events-v4';
+    const cacheVersion = '2026-09-30-events-v8';
     const versionKey = 'hkm_events_cache_version';
 
     try {

@@ -1791,21 +1791,33 @@ class ContentManager {
     async loadEvents(forceRefresh = false) {
         try {
             const { startIso, endIso } = this.getMonthRangeIso(this.currentDate);
-            const cacheKey = `hkm_events_v7_${startIso}_${endIso}`;
+            const cacheKey = `hkm_events_v8_${startIso}_${endIso}`;
             const isLocalDev = ['localhost', '127.0.0.1'].includes(String(window.location.hostname || '').toLowerCase());
             const integrations = await this.getContentDoc('settings_integrations', { silent: true }) || {};
             let finalEvents = [];
 
-            // 1. Check Cache (Use localStorage for better persistence)
+            // 1. Check Cache (Use localStorage with Stale-While-Revalidate)
             if (!forceRefresh && !isLocalDev) {
                 try {
                     const cached = localStorage.getItem(cacheKey);
                     if (cached) {
                         const { timestamp, events } = JSON.parse(cached);
-                        // 15 minutes TTL
-                        if (Date.now() - timestamp < 15 * 60 * 1000
+                        // Fast 2-minute TTL for fresh event calendar data
+                        if (Date.now() - timestamp < 2 * 60 * 1000
                             && Array.isArray(events)
                             && events.some(event => !event.isHoliday && !this.isEventPast(event))) {
+                            // Revalidate in background if older than 30s to keep upcoming events fresh
+                            if (Date.now() - timestamp > 30 * 1000) {
+                                setTimeout(() => {
+                                    this.loadEvents(true).then(fresh => {
+                                        if (Array.isArray(fresh) && fresh.length !== (events || []).length) {
+                                            if (document.querySelector('.events-grid')) {
+                                                this.renderEvents(fresh);
+                                            }
+                                        }
+                                    }).catch(() => {});
+                                }, 300);
+                            }
                             return events;
                         }
                     }
@@ -2387,6 +2399,15 @@ class ContentManager {
 
                 // For "boxes", we only want future events (or events currently happening)
                 return !this.isEventPast(e);
+            });
+
+            // Ensure chronological order (earliest upcoming event first)
+            filteredEvents.sort((a, b) => {
+                const aDate = this.parseEventDate(a.start || a.date);
+                const bDate = this.parseEventDate(b.start || b.date);
+                const aTime = aDate ? aDate.getTime() : Number.POSITIVE_INFINITY;
+                const bTime = bDate ? bDate.getTime() : Number.POSITIVE_INFINITY;
+                return aTime - bTime;
             });
 
             const displayEvents = this.pageId === 'index' ? filteredEvents.slice(0, 3) : filteredEvents;
