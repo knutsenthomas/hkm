@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <title>Åpne Community | His Kingdom Ministry</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .community-access { max-width: 540px; margin: 140px auto 80px; padding: 32px; border: 1px solid #ddd; border-radius: 20px; }
+    .community-access h1 { font-size: 1.6rem; margin-bottom: 16px; }
+    .community-access p { margin: 16px 0; line-height: 1.6; }
+    .community-access button, .community-access a { display: inline-block; margin: 8px 8px 0 0; padding: 12px 16px; border-radius: 10px; }
+    .community-access button { background: #78350f; color: #fff; cursor: pointer; border: 0; }
+    .community-access [hidden] { display: none; }
+    @media (max-width: 600px) { .community-access { margin: 110px 16px 50px; padding: 24px; } }
+  </style>
+  <script type="module" src="/js/site-shell.js"></script>
+  <script type="module" src="/script.js"></script>
+</head>
+<body>
+  <main class="community-access">
+    <h1>Åpne HKP Community</h1>
+    <p id="community-status" role="status" aria-live="polite">Bekrefter HKM-kontoen din …</p>
+    <button id="community-retry" hidden>Prøv igjen</button>
+    <button id="community-verify" hidden>Send bekreftelseslenke</button>
+    <button id="community-switch" hidden>Bytt HKM-konto</button>
+    <a href="https://hkm-community-app.vercel.app/">Tilbake til Community</a>
+  </main>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script type="module" src="js/community-auth.js"></script>
+</body>
+</html>
