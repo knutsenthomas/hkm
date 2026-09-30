@@ -76,6 +76,70 @@
     <meta property="twitter:description" content="Privacy Policy for His Kingdom Ministry. Read how we handle your data.">
     <meta property="twitter:image" content="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80">
     <style>
+        /* Legal page typography and spacing harmonized with Admin Editor */
+        .legal-text-container {
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 1.05rem;
+            line-height: 1.65;
+            color: var(--text-dark, #2c3e50);
+        }
+
+        .legal-text-container h2 {
+            color: var(--primary-orange, #d17d39);
+            font-size: 1.65rem;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-top: 28px;
+            margin-bottom: 10px;
+        }
+
+        .legal-text-container h2:first-child {
+            margin-top: 0;
+        }
+
+        .legal-text-container h3 {
+            color: var(--primary-orange, #d17d39);
+            font-size: 1.25rem;
+            font-weight: 600;
+            line-height: 1.3;
+            margin-top: 20px;
+            margin-bottom: 8px;
+        }
+
+        .legal-text-container p {
+            margin-top: 0;
+            margin-bottom: 10px;
+            line-height: 1.65;
+        }
+
+        .legal-text-container p:has(> br:only-child) {
+            margin-bottom: 0;
+            line-height: 1.2;
+        }
+
+        .legal-text-container p:has(> br:only-child) + h2,
+        .legal-text-container p:has(> br:only-child) + h3 {
+            margin-top: 4px;
+        }
+
+        .legal-text-container ul,
+        .legal-text-container ol {
+            margin-top: 6px;
+            margin-bottom: 12px;
+            padding-left: 24px;
+            list-style-type: disc;
+        }
+
+        .legal-text-container ul + p:has(> br:only-child) {
+            display: none;
+        }
+
+        .legal-text-container li {
+            margin-bottom: 4px;
+            line-height: 1.55;
+        }
+
         /* Dark Mode Styles for Legal Pages */
         html[data-theme="dark"],
         html[data-theme="dark"] body,

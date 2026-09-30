@@ -801,8 +801,63 @@ html[data-theme="dark"] #contact-modal select {
 #content-section #editor-fields .form-group.is-privacy-editor .ql-editor {
   min-height: 600px;
   max-height: none !important;
-  font-size: 15px;
-  line-height: 1.6;
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: #1e293b;
+}
+
+#content-section #editor-fields .form-group.is-privacy-editor .ql-editor h2 {
+  color: var(--primary-orange, #d17d39) !important;
+  font-size: 1.65rem !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+  margin-top: 28px !important;
+  margin-bottom: 10px !important;
+}
+
+#content-section #editor-fields .form-group.is-privacy-editor .ql-editor h2:first-child {
+  margin-top: 0 !important;
+}
+
+#content-section #editor-fields .form-group.is-privacy-editor .ql-editor h3 {
+  color: var(--primary-orange, #d17d39) !important;
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  line-height: 1.3 !important;
+  margin-top: 20px !important;
+  margin-bottom: 8px !important;
+}
+
+#content-section #editor-fields .form-group.is-privacy-editor .ql-editor p {
+  margin-top: 0 !important;
+  margin-bottom: 10px !important;
+  line-height: 1.65 !important;
+}
+
+#content-section #editor-fields .form-group.is-privacy-editor .ql-editor p:has(> br:only-child) {
+  margin-bottom: 0 !important;
+  line-height: 1.2 !important;
+}
+
+#content-section #editor-fields .form-group.is-privacy-editor .ql-editor p:has(> br:only-child) + h2,
+#content-section #editor-fields .form-group.is-privacy-editor .ql-editor p:has(> br:only-child) + h3 {
+  margin-top: 4px !important;
+}
+
+#content-section #editor-fields .form-group.is-privacy-editor .ql-editor ul,
+#content-section #editor-fields .form-group.is-privacy-editor .ql-editor ol {
+  margin-top: 6px !important;
+  margin-bottom: 12px !important;
+  padding-left: 24px !important;
+}
+
+#content-section #editor-fields .form-group.is-privacy-editor .ql-editor ul + p:has(> br:only-child) {
+  display: none !important;
+}
+
+#content-section #editor-fields .form-group.is-privacy-editor .ql-editor li {
+  margin-bottom: 4px !important;
+  line-height: 1.55 !important;
 }
 
 #content-section #editor-fields .form-group label {
