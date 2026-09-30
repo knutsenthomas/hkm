@@ -3540,6 +3540,26 @@ class ContentManager {
             }
 
             if (value === undefined) return;
+            if (el.hasAttribute('data-legal-body')) {
+                const parsed = new DOMParser().parseFromString(String(value), 'text/html');
+                const allowed = new Set(['P','H2','H3','STRONG','B','EM','I','U','UL','OL','LI','A','BR','BLOCKQUOTE']);
+                const clean = node => {
+                    for (const child of [...node.children]) {
+                        if (['SCRIPT','STYLE','IFRAME','OBJECT','EMBED','SVG','MATH'].includes(child.tagName)) { child.remove(); continue; }
+                        clean(child);
+                        if (!allowed.has(child.tagName)) { child.replaceWith(...child.childNodes); continue; }
+                        const href = child.tagName === 'A' ? child.getAttribute('href') : null;
+                        for (const attr of [...child.attributes]) child.removeAttribute(attr.name);
+                        if (href) {
+                            try { const url = new URL(href, location.origin); if (['https:', 'http:', 'mailto:'].includes(url.protocol)) child.setAttribute('href', url.href); } catch {}
+                        }
+                    }
+                };
+                clean(parsed.body);
+                el.replaceChildren(...parsed.body.childNodes);
+                return;
+            }
+
 
             // Correct older Norwegian CMS copy while preserving the saved content.
             if (lang === 'no' && typeof value === 'string' && !isMedia && !contentAttr) {
