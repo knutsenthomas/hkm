@@ -26206,7 +26206,24 @@ class AdminManager {
                     sec7_title: "7. Kontakt oss",
                     sec7_text1: "Hvis du har spørsmål om personvern eller ønsker å utøve dine rettigheter, er du hjertelig velkommen til å kontakte oss:",
                     sec7_email: "E-post: post@hiskingdomministry.no",
-                    sec7_address: "Adresse: Norge"
+                    sec7_address: "Adresse: Norge",
+                    community_01: "8. HKP Community – undervisning og fellesskap",
+                    community_02: "HKP Community er His Kingdom Ministrys portal for undervisning og fellesskap. Denne delen beskriver hvordan opplysninger brukes i Community, i tillegg til informasjonen ellers i denne erklæringen. Sist oppdatert for Community: 30. september 2026.",
+                    community_03: "Konto, innlogging og profil",
+                    community_04: "Du logger inn med HKM-kontoen din. Community kobler kontoen til din e-postadresse, brukeridentitet og tildelte tilgang. Community mottar ikke passordet ditt fra HKM. Administratorer kan se navn, e-postadresse, rolle, tilgangsstatus, klassetilknytning og tidspunkt for siste registrerte Community-innlogging. Endringer i tilgang registreres med hvem som gjorde endringen og tidspunkt.",
+                    community_05: "Profilen kan inneholde navn, profilbilde, telefonnummer, fødselsdato, adresse, presentasjon og nødkontakt som du oppgir. Opplysningene brukes til profil og oppfølging i skolen. Del bare nødvendige opplysninger, og informer en eventuell nødkontakt før du registrerer vedkommendes kontaktinformasjon.",
+                    community_06: "Kurs, oppgaver og oppfølging",
+                    community_07: "Community behandler kurs- og klassetilknytning, registrert progresjon og oppmøte, oppgavebesvarelser, vedlegg eller vedleggslenker, innleveringstidspunkt, vurderinger og tilbakemeldinger. Dette brukes til undervisning og elevoppfølging. Du kan se egne innleveringer; lærere og administratorer har tilgang gjennom sine roller. Slike innleveringer er ikke publisert for alle deltakerne i fellesskapet.",
+                    community_08: "Meldinger og bønneemner",
+                    community_09: "Innhold du deler i fellesskapet, kan leses av brukerne som har tilgang til den aktuelle delen av appen. For bønneemner betyr «Offentlig» synlig for innloggede brukere med Community-tilgang. «Fortrolig» begrenser tilgangen til deg selv, lærere og administratorer.",
+                    community_10: "Ved «Anonymt» vises ikke navnet ditt sammen med bønneemnet i den vanlige visningen. Innlegget er likevel lagret med en kobling til brukerkontoen din og er derfor ikke fullstendig anonymisert. Registrering av at du har bedt for et bønneemne er også knyttet til kontoen.",
+                    community_11: "Bønneemner og meldinger kan avsløre personlige forhold, helse eller religiøs overbevisning. Vær varsom med hva du deler. Unngå å identifisere andre eller dele deres sensitive opplysninger. Ta kontakt dersom du trenger hjelp til å endre eller fjerne innhold.",
+                    community_12: "Zoom, opptak og eksterne lenker",
+                    community_13: "Undervisning kan være Live eller Pre-rec på Zoom. Når du åpner Zoom eller andre eksterne tjenester, gjelder også deres personverninformasjon. Et publisert opptak kan inneholde navn, bilde, stemme og bidrag fra deltakere dersom dette inngår i opptaket. Opptak som publiseres i Community, blir tilgjengelige for brukere med tilgang til biblioteket.",
+                    community_14: "Tekniske tjenester og lokal lagring",
+                    community_15: "Community bruker Google Firebase til innlogging og datalagring og Vercel til drift av nettappen. Nettleseren lagrer også opplysninger som trengs for innlogging, innstillinger og enkelte lokale utkast. Å slette nettleserdata sletter ikke automatisk opplysninger som er lagret på kontoen hos oss.",
+                    community_16: "Innsyn, retting og sletting i Community",
+                    community_17: "Du kan oppdatere profilopplysninger i appen. For innsyn, retting eller sletting av konto, innleveringer eller annet lagret innhold, kontakt <a href=\"mailto:post@hiskingdomministry.no\">post@hiskingdomministry.no</a> og oppgi at henvendelsen gjelder HKP Community. Unngå å sende sensitive opplysninger i den første e-posten. Utlogging eller deaktivering av tilgang er ikke det samme som sletting.",
                 }
             },
             'tilgjengelighet': {
@@ -26384,10 +26401,40 @@ class AdminManager {
                 return;
             }
 
+            if (pageId === 'personvern') { await this.renderPrivacyDocument(data); return; }
             this.renderFields(data);
         } catch (e) {
             container.innerHTML = '<p>Error.</p>';
         }
+    }
+
+    async renderPrivacyDocument(data) {
+        const response = await fetch('/personvern', { cache: 'no-store' });
+        if (!response.ok) throw new Error('Kunne ikke hente personvernteksten.');
+        const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
+        const body = doc.querySelector('.legal-text-container');
+        if (!body) throw new Error('Personvernteksten mangler.');
+        body.querySelectorAll('[data-content-key]').forEach(el => {
+            const value = el.dataset.contentKey.split('.').reduce((obj, key) => obj?.[key], data);
+            if (typeof value === 'string' && el.innerHTML.trim() !== value.trim()) el.textContent = value;
+            el.removeAttribute('data-content-key');
+        });
+        if (document.querySelector('.page-item.active')?.dataset.page !== 'personvern') return;
+        this.renderFields({ hero: data.hero || {} });
+        const container = document.getElementById('editor-fields');
+        const group = document.createElement('div');
+        group.className = 'form-group';
+        const label = document.createElement('h3'); label.textContent = 'Hele personvernerklæringen';
+        const hint = document.createElement('p'); hint.textContent = 'Rediger teksten samlet. Bruk verktøylinjen for overskrifter, lister og lenker. Trykk Lagre når du er ferdig.';
+        const hidden = document.createElement('textarea'); hidden.className = 'form-control'; hidden.dataset.key = 'content.bodyHtml'; hidden.hidden = true;
+        const editor = document.createElement('div'); editor.style.minHeight = '600px'; editor.style.background = '#fff';
+        group.append(label, hint, hidden, editor); container.append(group);
+        if (typeof Quill === 'undefined') throw new Error('Teksteditoren kunne ikke lastes. Last siden på nytt.');
+        const quill = new Quill(editor, { theme: 'snow', modules: { toolbar: [[{ header: [2, 3, false] }], ['bold', 'italic', 'underline'], [{ list: 'ordered' }, { list: 'bullet' }], ['link', 'clean']] } });
+        quill.clipboard.dangerouslyPasteHTML(typeof data.content?.bodyHtml === 'string' ? data.content.bodyHtml : body.innerHTML);
+        quill.root.setAttribute('aria-label', 'Hele personvernerklæringen');
+        hidden.value = quill.root.innerHTML;
+        quill.on('text-change', () => { hidden.value = quill.root.innerHTML; });
     }
 
     renderFields(data) {
