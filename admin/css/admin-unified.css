@@ -770,8 +770,39 @@ html[data-theme="dark"] #contact-modal select {
   background: #ffffff;
 }
 
-#content-section #editor-fields .form-group.is-textarea {
-  grid-column: 1 / -1;
+#content-section #editor-fields .form-group.is-textarea,
+#content-section #editor-fields .form-group.is-full-width,
+#content-section #editor-fields .form-group.is-list-field,
+#content-section #editor-fields .form-group.is-privacy-editor {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+#content-section #editor-fields .form-group.is-privacy-editor .ql-toolbar.ql-snow {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+#content-section #editor-fields .form-group.is-privacy-editor .ql-container.ql-snow {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-color: #cbd5e1;
+  font-family: inherit;
+  font-size: 15px;
+}
+
+#content-section #editor-fields .form-group.is-privacy-editor .ql-editor {
+  min-height: 600px;
+  max-height: none !important;
+  font-size: 15px;
+  line-height: 1.6;
 }
 
 #content-section #editor-fields .form-group label {
@@ -8664,6 +8695,33 @@ html[data-theme="dark"] #content-section #editor-fields .form-group label {
 html[data-theme="dark"] #content-section #editor-fields .img-preview-mini {
   border-color: var(--admin-border, #334155) !important;
   background-color: var(--admin-surface-muted, #0f172a) !important;
+}
+
+html[data-theme="dark"] #content-section #editor-fields .form-group.is-privacy-editor .ql-toolbar.ql-snow {
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] #content-section #editor-fields .form-group.is-privacy-editor .ql-container.ql-snow {
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] #content-section #editor-fields .form-group.is-privacy-editor .ql-editor {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] #content-section #editor-fields .form-group.is-privacy-editor .ql-snow .ql-stroke {
+  stroke: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] #content-section #editor-fields .form-group.is-privacy-editor .ql-snow .ql-fill {
+  fill: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] #content-section #editor-fields .form-group.is-privacy-editor .ql-snow .ql-picker {
+  color: #cbd5e1 !important;
 }
 
 /* 2. Mediebibliotek (#media-section) */
