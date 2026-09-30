@@ -26425,7 +26425,7 @@ class AdminManager {
         const group = document.createElement('div');
         group.className = 'form-group';
         const label = document.createElement('h3'); label.textContent = 'Hele personvernerklæringen';
-        const hint = document.createElement('p'); hint.textContent = 'Rediger teksten samlet. Bruk verktøylinjen for overskrifter, lister og lenker. Trykk Lagre når du er ferdig.';
+        const hint = document.createElement('p'); hint.textContent = 'Rediger teksten samlet. Bruk verktøylinjen for overskrifter, lister og lenker. Trykk Lagre når du er ferdig. Dette redigerer den norske teksten; oversettelser endres ikke automatisk.';
         const hidden = document.createElement('textarea'); hidden.className = 'form-control'; hidden.dataset.key = 'content.bodyHtml'; hidden.hidden = true;
         const editor = document.createElement('div'); editor.style.minHeight = '600px'; editor.style.background = '#fff';
         group.append(label, hint, hidden, editor); container.append(group);
@@ -27409,7 +27409,7 @@ class AdminManager {
             await this._withButtonLoading(saveBtn, async () => {
                 try {
                     // Automatically build page content translations for static pages
-                    if (pageId && !pageId.startsWith('settings_')) {
+                    if (pageId && pageId !== 'personvern' && !pageId.startsWith('settings_')) {
                         sanitized.translations = sanitized.translations || {};
                         try {
                             this.showToast('Oversetter innhold til engelsk og spansk...', 'info', 3000);
