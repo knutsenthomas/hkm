@@ -28422,7 +28422,7 @@ class AdminManager {
                                                                                                         <label>Telefon</label>
                                                                                                         ${this.userEditMode ? `
                                                                                                             <div style="display:flex; gap:8px;">
-                                                                                                                <select name="phoneCountryCode" class="form-control" style="width:120px; flex-shrink:0;">
+                                                                                                                <select name="phoneCountryCode" class="form-control" style="width:145px; flex-shrink:0;">
                                                                                                                     ${phoneCountryOptions}
                                                                                                                 </select>
                                                                                                                 <input type="tel" name="phone" class="form-control" value="${this.escapeHtml(userData.phone || '')}">
