@@ -348,6 +348,19 @@
             const resourceUrl = String(lesson?.resourceUrl || '').trim();
             const description = String(lesson?.description || '').trim();
 
+            let resourcesList = [];
+            if (Array.isArray(lesson?.resources)) {
+                resourcesList = lesson.resources
+                    .map(r => ({
+                        title: String(r?.title || r?.name || '').trim(),
+                        url: String(r?.url || r?.link || '').trim()
+                    }))
+                    .filter(r => r.title || r.url);
+            }
+            if (resourcesList.length === 0 && (resource || resourceUrl)) {
+                resourcesList = [{ title: resource || 'Dokument', url: resourceUrl }];
+            }
+
             lessons.push({
                 id: lessonId,
                 title: lessonTitle,
@@ -355,8 +368,9 @@
                 price: lessonPrice,
                 date: lessonDate,
                 zoomUrl,
-                resource,
-                resourceUrl,
+                resource: resource || (resourcesList[0]?.title || ''),
+                resourceUrl: resourceUrl || (resourcesList[0]?.url || ''),
+                resources: resourcesList,
                 description
             });
         });

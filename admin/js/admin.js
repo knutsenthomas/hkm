@@ -24700,6 +24700,7 @@ class AdminManager {
     async _saveCourse() {
         const status = document.getElementById('course-save-status');
         const editCourseKey = document.getElementById('course-id').value;
+        const saveBtn = document.getElementById('save-course-btn');
 
         const lessons = [];
         document.querySelectorAll('#lessons-container > .lesson-row-item').forEach(row => {
@@ -24731,8 +24732,9 @@ class AdminManager {
                     price: p,
                     date: d,
                     zoomUrl: z,
-                    resource: r,
-                    resourceUrl: ru,
+                    resource: firstRes.title || '',
+                    resourceUrl: firstRes.url || '',
+                    resources: resourcesList,
                     description: desc
                 });
             }
@@ -24772,7 +24774,7 @@ class AdminManager {
         }
 
         await this._runWriteLocked('course-save', async () => {
-            await this._withButtonLoading(btn, async () => {
+            await this._withButtonLoading(saveBtn, async () => {
                 try {
                     const data = typeof firebaseService.getSiteContent === 'function'
                         ? await firebaseService.getSiteContent('collection_courses')
