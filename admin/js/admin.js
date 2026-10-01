@@ -1535,6 +1535,30 @@ class AdminManager {
         return [];
     }
 
+    _getSafeCollectionListForSave(collectionId, currentData) {
+        let list = this._getCollectionItems(currentData);
+        const cachedList = this._collectionItemsCache[collectionId] || this.currentItems;
+        if ((!list || list.length === 0) && Array.isArray(cachedList) && cachedList.length > 0) {
+            console.warn(`[AdminManager] currentData was empty for collection_${collectionId}. Using memory cache fallback with ${cachedList.length} items to prevent data loss.`);
+            list = [...cachedList];
+        } else if (Array.isArray(cachedList) && cachedList.length > list.length) {
+            console.warn(`[AdminManager] currentData had only ${list.length} items while memory cache has ${cachedList.length}. Merging to prevent data loss.`);
+            const mergedList = [...list];
+            cachedList.forEach(cachedItem => {
+                if (!cachedItem) return;
+                const exists = mergedList.some(item => 
+                    (item.id && cachedItem.id && item.id === cachedItem.id) ||
+                    (item.title && cachedItem.title && item.title === cachedItem.title)
+                );
+                if (!exists) {
+                    mergedList.push(cachedItem);
+                }
+            });
+            list = mergedList;
+        }
+        return list;
+    }
+
     _getBlogTranslationTargetLanguages() {
         const fromI18n = Array.isArray(window?.i18n?.languages)
             ? window.i18n.languages
@@ -2996,7 +3020,7 @@ class AdminManager {
                 // Get the current list from Firestore, unshift, and save back immediately
                 firebaseService.invalidatePageContentCache(`collection_${sectionId}`);
                 const currentData = await firebaseService.getPageContent(`collection_${sectionId}`);
-                const list = this._getCollectionItems(currentData);
+                const list = this._getSafeCollectionListForSave(sectionId, currentData);
                 list.unshift(newItem);
                 
                 await firebaseService.savePageContent(`collection_${sectionId}`, { items: list });
@@ -13862,7 +13886,7 @@ class AdminManager {
                         // Perform the save
                         firebaseService.invalidatePageContentCache(`collection_${collectionId}`);
                         const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
-                        const list = this._getCollectionItems(currentData);
+                        const list = this._getSafeCollectionListForSave(collectionId, currentData);
 
                         // Mark as edited
                         safeItem.dashboardEdited = true;
@@ -14173,7 +14197,7 @@ class AdminManager {
                                 await firebase.firestore().collection('podcast_transcripts').doc(translatedItem.id).set(translatedItem, { merge: true });
                             } else {
                                 const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
-                                const list = this._getCollectionItems(currentData);
+                                const list = this._getSafeCollectionListForSave(collectionId, currentData);
                                 upsertItemInList(list, translatedItem);
 
                                 await firebaseService.savePageContent(`collection_${collectionId}`, { items: list });
@@ -14505,7 +14529,7 @@ class AdminManager {
                                     firebaseService.invalidatePageContentCache(`collection_${collectionId}`);
                                     
                                     const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
-                                    const list = this._getCollectionItems(currentData);
+                                    const list = this._getSafeCollectionListForSave(collectionId, currentData);
 
                                     // Mark as edited in dashboard so the public site prioritizes this version
                                     safeItem.dashboardEdited = true;
@@ -14596,7 +14620,7 @@ class AdminManager {
                                 firebaseService.invalidatePageContentCache(`collection_${collectionId}`);
                                 
                                 const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
-                                const list = this._getCollectionItems(currentData);
+                                const list = this._getSafeCollectionListForSave(collectionId, currentData);
 
                                 // Mark as edited in dashboard
                                 safeItem.dashboardEdited = true;

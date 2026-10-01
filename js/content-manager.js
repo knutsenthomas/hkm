@@ -360,8 +360,31 @@ class ContentManager {
         return Array.from(merged.values());
     }
 
+    parseBlogDate(dateVal) {
+        if (!dateVal) return 0;
+        if (dateVal instanceof Date) return isNaN(dateVal.getTime()) ? 0 : dateVal.getTime();
+        if (typeof dateVal === 'object' && typeof dateVal.toDate === 'function') {
+            try { return dateVal.toDate().getTime() || 0; } catch (e) { return 0; }
+        }
+        if (typeof dateVal === 'object' && typeof dateVal.seconds === 'number') {
+            return dateVal.seconds * 1000;
+        }
+        if (typeof dateVal === 'string') {
+            const trimmed = dateVal.trim();
+            const dmy = trimmed.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})/);
+            if (dmy) {
+                const parsed = new Date(Number(dmy[3]), Number(dmy[2]) - 1, Number(dmy[1]));
+                return isNaN(parsed.getTime()) ? 0 : parsed.getTime();
+            }
+            const t = new Date(trimmed).getTime();
+            return isNaN(t) ? 0 : t;
+        }
+        return 0;
+    }
+
     getDedupedBlogItems(data) {
-        return this.dedupeBlogItems(this.getCollectionItems(data));
+        const deduped = this.dedupeBlogItems(this.getCollectionItems(data));
+        return deduped.sort((a, b) => this.parseBlogDate(b.date) - this.parseBlogDate(a.date));
     }
 
     extractContentText(value) {
@@ -492,10 +515,11 @@ class ContentManager {
             const filtered = lang === 'no'
                 ? list
                 : list.filter((item) => this.hasUsableLocalizedTranslation(item, lang));
-            return filtered.map((item) => this.getLocalizedContentItem(item, lang));
+            const localized = filtered.map((item) => this.getLocalizedContentItem(item, lang));
+            return localized.sort((a, b) => this.parseBlogDate(b.date) - this.parseBlogDate(a.date));
         } catch (error) {
             console.warn('[ContentManager] localizeBlogItems fallback to source language', error);
-            return Array.isArray(items) ? items : [];
+            return (Array.isArray(items) ? items : []).sort((a, b) => this.parseBlogDate(b.date) - this.parseBlogDate(a.date));
         }
     }
 
