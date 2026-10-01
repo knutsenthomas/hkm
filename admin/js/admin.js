@@ -21134,10 +21134,47 @@ class AdminManager {
         document.getElementById('save-cause-btn').addEventListener('click', () => this.saveCause());
     }
 
+    async navigateToShopTab(targetTab = 'kurs') {
+        if (typeof window.handleSectionSwitch === 'function') {
+            window.handleSectionSwitch('shop');
+        } else {
+            this.onSectionSwitch('shop');
+            const sections = document.querySelectorAll('.section-content');
+            sections.forEach(s => s?.classList?.remove('active'));
+            document.getElementById('shop-section')?.classList.add('active');
+            window.location.hash = 'shop';
+        }
+
+        const section = document.getElementById('shop-section');
+        if (section && section.getAttribute('data-rendered') !== 'true') {
+            await this.renderShopManager();
+        } else if (this._shopManagerRenderingPromise) {
+            await this._shopManagerRenderingPromise;
+        }
+
+        const tabBtn = document.querySelector(`#shop-section .automation-tab[data-tab="${targetTab}"]`);
+        if (tabBtn) {
+            tabBtn.click();
+        }
+    }
+
     async renderShopManager() {
         const section = document.getElementById('shop-section');
         if (!section) return;
 
+        if (section.getAttribute('data-rendered') === 'true') return;
+        if (this._shopManagerRenderingPromise) return this._shopManagerRenderingPromise;
+
+        this._shopManagerRenderingPromise = this._renderShopManagerInternal(section);
+        try {
+            await this._shopManagerRenderingPromise;
+        } finally {
+            this._shopManagerRenderingPromise = null;
+        }
+    }
+
+    async _renderShopManagerInternal(section) {
+        if (!section) return;
         if (section.getAttribute('data-rendered') === 'true') return;
 
         if (!this.allDonationRecords || !this.adminUserMap) {
@@ -21694,8 +21731,9 @@ class AdminManager {
 
     renderKursShopViews() {
         const records = (this.allDonationRecords || []).filter(r => {
-            const recType = String(r.type || '').toLowerCase();
-            return recType === 'kurs' || recType === 'course';
+            const recType = String(r.type || r.metadata?.type || r.donationType || '').toLowerCase();
+            const courseTitle = String(r.courseTitle || r.courseName || r.itemTitle || r.metadata?.courseTitle || '').trim();
+            return recType === 'kurs' || recType === 'course' || Boolean(courseTitle) || Boolean(r.courseId);
         });
 
         const presetEl = document.getElementById('shop-date-preset');
@@ -23946,7 +23984,7 @@ class AdminManager {
             <!-- VIEW 1: COURSES VIEW -->
             <div id="courses-tab-view">
                 <div style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:16px;">
-                    <button class="btn btn-secondary" id="see-course-purchases-btn" style="display:inline-flex; align-items:center; gap:6px; background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px;" onclick="if(window.handleSectionSwitch){window.handleSectionSwitch('shop'); setTimeout(() => { document.querySelector('#shop-section [data-tab=\\'kurs\\']')?.click(); }, 150);}">
+                    <button class="btn btn-secondary" id="see-course-purchases-btn" type="button" style="display:inline-flex; align-items:center; gap:6px; background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px; cursor:pointer;" onclick="if(window.adminManager?.navigateToShopTab){window.adminManager.navigateToShopTab('kurs');}else if(typeof window.handleSectionSwitch==='function'){window.handleSectionSwitch('shop');}else{window.location.hash='shop';}">
                         <span class="material-symbols-outlined" style="font-size:18px;">payments</span> Se kurskjøp
                     </button>
                     <button class="btn btn-primary" id="create-course-btn">
@@ -24161,6 +24199,11 @@ class AdminManager {
         const deleteCourseBtn = document.getElementById('delete-course-btn');
 
         createCourseBtn?.addEventListener('click', () => this._openCourseModal());
+        const seeCoursePurchasesBtn = document.getElementById('see-course-purchases-btn');
+        seeCoursePurchasesBtn?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.navigateToShopTab('kurs');
+        });
         closeCourseModalBtn?.addEventListener('click', () => this._closeCourseModal());
         courseModal?.addEventListener('click', (e) => {
             if (e.target === courseModal) this._closeCourseModal();
