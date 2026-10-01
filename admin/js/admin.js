@@ -7750,7 +7750,7 @@ class AdminManager {
                 <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
                     <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #64748b; margin: 0;">
                         Område:
-                        <select id="media-location-select" style="height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #1e293b; font-size: 13px; font-weight: 600; cursor: pointer; outline: none; min-width: 150px; box-sizing: border-box;">
+                        <select id="media-location-select" style="height: 36px; padding: 0 38px 0 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #1e293b; font-size: 13px; font-weight: 600; cursor: pointer; outline: none; min-width: 150px; box-sizing: border-box;">
                             ${this._getMediaLocationOptionsHtml()}
                         </select>
                     </label>
@@ -7760,7 +7760,7 @@ class AdminManager {
                     </button>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span style="font-size: 13px; color: #64748b;">Sorter:</span>
-                        <select id="media-sort-select" style="height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #1e293b; font-size: 13px; font-weight: 500; cursor: pointer; outline: none; box-sizing: border-box;">
+                        <select id="media-sort-select" style="height: 36px; padding: 0 38px 0 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #1e293b; font-size: 13px; font-weight: 500; cursor: pointer; outline: none; box-sizing: border-box;">
                             <option value="date-desc">Nyeste først</option>
                             <option value="date-asc">Eldste først</option>
                             <option value="name-asc">Navn (A-Å)</option>
@@ -8702,7 +8702,7 @@ class AdminManager {
                                 <!-- Breadcrumbs -->
                             </div>
                             <div class="media-actions" style="display: flex; gap: 8px; align-items: center;">
-                                <select id="modal-media-sort" class="admin-input" style="width: auto; padding: 6px 12px; font-size: 13px; height: 38px; border-radius: 10px; border: 1px solid #cbd5e1; background: #ffffff;">
+                                <select id="modal-media-sort" class="admin-input" style="width: auto; padding: 6px 38px 6px 12px; font-size: 13px; height: 38px; border-radius: 10px; border: 1px solid #cbd5e1; background: #ffffff;">
                                     <option value="date_desc">Nyeste først</option>
                                     <option value="date_asc">Eldste først</option>
                                     <option value="name_asc">Navn A-Å</option>
@@ -24049,7 +24049,7 @@ class AdminManager {
                                 </div>
                                 <div>
                                     <label style="display:block;font-weight:600;margin-bottom:6px;">Kategori</label>
-                                    <select id="course-category" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;background:white;margin-bottom:8px;">
+                                    <select id="course-category" style="width:100%;padding:12px 42px 12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;background:white;margin-bottom:8px;">
                                         <option value="Bibelstudium">Bibelstudium</option>
                                         <option value="Bønn">Bønn</option>
                                         <option value="Lederskap">Lederskap</option>
@@ -24063,15 +24063,41 @@ class AdminManager {
                                             style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;">
                                     </div>
                                 </div>
+                                <div style="grid-column:span 2; background:#f8fafc; padding:16px; border-radius:12px; border:1px solid #e2e8f0; margin-top:4px;">
+                                    <label style="display:block;font-weight:700;margin-bottom:8px;color:#1e293b;font-size:0.95rem;">
+                                        Prismodell (Hvordan skal kurset prises?)
+                                    </label>
+                                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                                        <label id="pricing-model-course-label" style="display:flex; align-items:flex-start; gap:10px; padding:12px 14px; background:#fffbf7; border:1.5px solid #d17d39; border-radius:10px; cursor:pointer; transition:all 0.2s;">
+                                            <input type="radio" name="course-pricing-type" id="pricing-model-course" value="course" checked style="accent-color:#d17d39; margin-top:2px;">
+                                            <div>
+                                                <strong style="display:block; font-size:0.92rem; color:#1e293b;">🎓 Fast pris for hele kurset</strong>
+                                                <span style="display:block; font-size:0.8rem; color:#64748b; margin-top:2px;">Én samlet pris for hele kurset (gir automatisk tilgang til alle leksjoner).</span>
+                                            </div>
+                                        </label>
+                                        <label id="pricing-model-lesson-label" style="display:flex; align-items:flex-start; gap:10px; padding:12px 14px; background:white; border:1.5px solid #e2e8f0; border-radius:10px; cursor:pointer; transition:all 0.2s;">
+                                            <input type="radio" name="course-pricing-type" id="pricing-model-lesson" value="per_lesson" style="accent-color:#d17d39; margin-top:2px;">
+                                            <div>
+                                                <strong style="display:block; font-size:0.92rem; color:#1e293b;">📝 Pris pr. leksjon</strong>
+                                                <span style="display:block; font-size:0.8rem; color:#64748b; margin-top:2px;">Deltaker kan velge og betale for enkeltleksjoner ved påmelding.</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
                                 <div>
-                                    <label style="display:block;font-weight:600;margin-bottom:6px;">Pris (NOK) – 0 = gratis</label>
+                                    <label id="course-price-label" style="display:block;font-weight:600;margin-bottom:6px;">Pris for hele kurset (NOK) – 0 = gratis</label>
                                     <input id="course-price" type="number" min="0" placeholder="0" value="0"
                                         style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;">
                                 </div>
-                                <div style="grid-column:span 2;">
-                                    <label style="display:block;font-weight:600;margin-bottom:6px;">Pris-tekst / Suffix (f.eks. "pr. leksjon", "pr. kveld", "totalt")</label>
-                                    <input id="course-price-suffix" type="text" placeholder="Eks: pr. leksjon"
+                                <div>
+                                    <label style="display:block;font-weight:600;margin-bottom:6px;">Pris-tekst / Suffix (f.eks. "totalt", "pr. leksjon")</label>
+                                    <input id="course-price-suffix" type="text" placeholder="Eks: totalt (eller la stå tomt)"
                                         style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;">
+                                    <div style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap;" id="suffix-quick-chips">
+                                        <button type="button" class="btn-suffix-chip" data-val="totalt" style="font-size:0.75rem;padding:3px 8px;border-radius:6px;border:1px solid #cbd5e1;background:#f8fafc;cursor:pointer;color:#475569;">+ "totalt"</button>
+                                        <button type="button" class="btn-suffix-chip" data-val="for hele kurset" style="font-size:0.75rem;padding:3px 8px;border-radius:6px;border:1px solid #cbd5e1;background:#f8fafc;cursor:pointer;color:#475569;">+ "for hele kurset"</button>
+                                        <button type="button" class="btn-suffix-chip" data-val="" style="font-size:0.75rem;padding:3px 8px;border-radius:6px;border:1px solid #cbd5e1;background:#f8fafc;cursor:pointer;color:#475569;">Bare "kr" (tom)</button>
+                                    </div>
                                 </div>
                                 <div style="grid-column:span 2;">
                                     <label style="display:block;font-weight:600;margin-bottom:6px;">Forsidebilde URL</label>
@@ -24119,12 +24145,12 @@ class AdminManager {
                             <input type="text" id="enrollment-search" placeholder="Søk på navn eller e-post..." style="width: 100%; padding: 10px 16px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem;">
                         </div>
                         <div style="min-width: 180px;">
-                            <select id="enrollment-course-filter" style="width: 100%; padding: 10px 16px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; background: white; font-family: inherit;">
+                            <select id="enrollment-course-filter" style="width: 100%; padding: 10px 42px 10px 16px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; background: white; font-family: inherit;">
                                 <option value="">Alle kurs</option>
                             </select>
                         </div>
                         <div style="min-width: 180px;">
-                            <select id="enrollment-status-filter" style="width: 100%; padding: 10px 16px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; background: white; font-family: inherit;">
+                            <select id="enrollment-status-filter" style="width: 100%; padding: 10px 42px 10px 16px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; background: white; font-family: inherit;">
                                 <option value="">Alle statuser</option>
                                 <option value="pending">Venter (Standard)</option>
                                 <option value="pending_stripe">Venter (Stripe)</option>
@@ -24239,6 +24265,24 @@ class AdminManager {
         });
         deleteCourseBtn?.addEventListener('click', () => this._deleteCourse());
 
+        document.querySelectorAll('input[name="course-pricing-type"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                this._updatePricingModelUI();
+            });
+        });
+        document.getElementById('pricing-model-course-label')?.addEventListener('click', (e) => {
+            if (e.target.tagName !== 'INPUT') {
+                const radio = document.getElementById('pricing-model-course');
+                if (radio) { radio.checked = true; this._updatePricingModelUI('course'); }
+            }
+        });
+        document.getElementById('pricing-model-lesson-label')?.addEventListener('click', (e) => {
+            if (e.target.tagName !== 'INPUT') {
+                const radio = document.getElementById('pricing-model-lesson');
+                if (radio) { radio.checked = true; this._updatePricingModelUI('per_lesson'); }
+            }
+        });
+
         // Tab selection & routing
         const listTabBtn = document.getElementById('courses-list-tab-btn');
         const enrollmentsTabBtn = document.getElementById('courses-enrollments-tab-btn');
@@ -24312,7 +24356,11 @@ class AdminManager {
                 const category = course.category ? this.escapeHtml(course.category) : '—';
                 const lessonsCount = Array.isArray(course.lessons) ? course.lessons.length : 0;
                 const price = Number(course.price || 0);
-                const suffix = course.priceSuffix ? ' ' + course.priceSuffix : '';
+                const pricingModel = course.pricingModel || (course.priceSuffix && course.priceSuffix.toLowerCase().includes('leksjon') ? 'per_lesson' : 'course');
+                let suffix = course.priceSuffix ? ' ' + course.priceSuffix : '';
+                if (!course.priceSuffix && price > 0) {
+                    suffix = pricingModel === 'per_lesson' ? ' pr. leksjon' : ' totalt';
+                }
                 const priceText = price > 0
                     ? `kr ${Math.round(price).toLocaleString('no-NO')}${suffix}`
                     : 'Gratis';
@@ -24333,7 +24381,7 @@ class AdminManager {
                             </div>
                         </td>
                         <td>${category}</td>
-                        <td>${price > 0 ? `<span class="badge status-pending">${priceText}</span>` : `<span class="badge status-read">${priceText}</span>`}</td>
+                        <td>${price > 0 ? `<span class="badge status-pending" style="text-transform:none; font-weight:600;">${priceText}</span>` : `<span class="badge status-read" style="text-transform:none; font-weight:600;">${priceText}</span>`}</td>
                         <td>${lessonsCount}</td>
                         <td class="col-actions">
                             <div style="display:flex; gap:6px; justify-content: flex-end;">
@@ -24521,12 +24569,25 @@ class AdminManager {
                 if (coursePriceSuffixInput) coursePriceSuffixInput.value = course.priceSuffix || '';
                 document.getElementById('course-image').value = course.imageUrl || '';
 
+                const pricingModel = course.pricingModel || (course.priceSuffix && course.priceSuffix.toLowerCase().includes('leksjon') ? 'per_lesson' : 'course');
+                const courseRadio = document.getElementById('pricing-model-course');
+                const lessonRadio = document.getElementById('pricing-model-lesson');
+                if (pricingModel === 'per_lesson') {
+                    if (lessonRadio) lessonRadio.checked = true;
+                } else {
+                    if (courseRadio) courseRadio.checked = true;
+                }
+
                 (course.lessons || []).forEach(l => this._addLessonRow(l.title, l.videoUrl, l.price, l.date, l.zoomUrl, l.id, l.resource, l.resourceUrl, l.description, l.resources));
+                this._updatePricingModelUI(pricingModel);
             } catch (err) { console.error(err); }
         } else {
             title.textContent = 'Nytt kurs';
             deleteBtn.style.display = 'none';
+            const courseRadio = document.getElementById('pricing-model-course');
+            if (courseRadio) courseRadio.checked = true;
             this._addLessonRow(); // Start with one empty lesson
+            this._updatePricingModelUI('course');
         }
 
         modal.style.display = 'block';
@@ -24567,6 +24628,90 @@ class AdminManager {
         if (modal) modal.style.display = 'none';
     }
 
+    _updatePricingModelUI(model = null) {
+        const courseRadio = document.getElementById('pricing-model-course');
+        const lessonRadio = document.getElementById('pricing-model-lesson');
+        const currentModel = model || (lessonRadio?.checked ? 'per_lesson' : 'course');
+
+        const courseLabel = document.getElementById('pricing-model-course-label');
+        const lessonLabel = document.getElementById('pricing-model-lesson-label');
+        const priceLabel = document.getElementById('course-price-label');
+        const priceSuffixInput = document.getElementById('course-price-suffix');
+        const quickChips = document.getElementById('suffix-quick-chips');
+
+        if (currentModel === 'per_lesson') {
+            if (lessonRadio) lessonRadio.checked = true;
+            if (courseLabel) {
+                courseLabel.style.borderColor = '#e2e8f0';
+                courseLabel.style.background = 'white';
+            }
+            if (lessonLabel) {
+                lessonLabel.style.borderColor = '#d17d39';
+                lessonLabel.style.background = '#fffbf7';
+            }
+            if (priceLabel) {
+                priceLabel.textContent = 'Pris pr. leksjon (NOK) – 0 = gratis';
+            }
+            if (priceSuffixInput) {
+                priceSuffixInput.placeholder = 'Eks: pr. leksjon';
+                if (!priceSuffixInput.value || priceSuffixInput.value === 'totalt' || priceSuffixInput.value === 'for hele kurset') {
+                    priceSuffixInput.value = 'pr. leksjon';
+                }
+            }
+            if (quickChips) {
+                quickChips.innerHTML = `
+                    <button type="button" class="btn-suffix-chip" data-val="pr. leksjon" style="font-size:0.75rem;padding:3px 8px;border-radius:6px;border:1px solid #cbd5e1;background:#f8fafc;cursor:pointer;color:#475569;">+ "pr. leksjon"</button>
+                    <button type="button" class="btn-suffix-chip" data-val="pr. kveld" style="font-size:0.75rem;padding:3px 8px;border-radius:6px;border:1px solid #cbd5e1;background:#f8fafc;cursor:pointer;color:#475569;">+ "pr. kveld"</button>
+                    <button type="button" class="btn-suffix-chip" data-val="" style="font-size:0.75rem;padding:3px 8px;border-radius:6px;border:1px solid #cbd5e1;background:#f8fafc;cursor:pointer;color:#475569;">Tøm</button>
+                `;
+                quickChips.querySelectorAll('.btn-suffix-chip').forEach(btn => {
+                    btn.onclick = () => { if (priceSuffixInput) priceSuffixInput.value = btn.dataset.val; };
+                });
+            }
+            document.querySelectorAll('#lessons-container .lesson-row-item').forEach(row => {
+                const input = row.querySelector('.lesson-price');
+                const badge = row.querySelector('.lesson-price-included-badge');
+                if (input) input.style.display = 'block';
+                if (badge) badge.style.display = 'none';
+            });
+        } else {
+            if (courseRadio) courseRadio.checked = true;
+            if (courseLabel) {
+                courseLabel.style.borderColor = '#d17d39';
+                courseLabel.style.background = '#fffbf7';
+            }
+            if (lessonLabel) {
+                lessonLabel.style.borderColor = '#e2e8f0';
+                lessonLabel.style.background = 'white';
+            }
+            if (priceLabel) {
+                priceLabel.textContent = 'Pris for hele kurset (NOK) – 0 = gratis';
+            }
+            if (priceSuffixInput) {
+                priceSuffixInput.placeholder = 'Eks: totalt (eller la stå tomt for kun kr)';
+                if (priceSuffixInput.value === 'pr. leksjon' || priceSuffixInput.value === 'pr. kveld') {
+                    priceSuffixInput.value = 'totalt';
+                }
+            }
+            if (quickChips) {
+                quickChips.innerHTML = `
+                    <button type="button" class="btn-suffix-chip" data-val="totalt" style="font-size:0.75rem;padding:3px 8px;border-radius:6px;border:1px solid #cbd5e1;background:#f8fafc;cursor:pointer;color:#475569;">+ "totalt"</button>
+                    <button type="button" class="btn-suffix-chip" data-val="for hele kurset" style="font-size:0.75rem;padding:3px 8px;border-radius:6px;border:1px solid #cbd5e1;background:#f8fafc;cursor:pointer;color:#475569;">+ "for hele kurset"</button>
+                    <button type="button" class="btn-suffix-chip" data-val="" style="font-size:0.75rem;padding:3px 8px;border-radius:6px;border:1px solid #cbd5e1;background:#f8fafc;cursor:pointer;color:#475569;">Bare "kr" (tom)</button>
+                `;
+                quickChips.querySelectorAll('.btn-suffix-chip').forEach(btn => {
+                    btn.onclick = () => { if (priceSuffixInput) priceSuffixInput.value = btn.dataset.val; };
+                });
+            }
+            document.querySelectorAll('#lessons-container .lesson-row-item').forEach(row => {
+                const input = row.querySelector('.lesson-price');
+                const badge = row.querySelector('.lesson-price-included-badge');
+                if (input) input.style.display = 'none';
+                if (badge) badge.style.display = 'flex';
+            });
+        }
+    }
+
     _addLessonRow(lessonTitle = '', videoUrl = '', price = '', date = '', zoomUrl = '', lessonId = '', resource = '', resourceUrl = '', description = '', resources = null) {
         const container = document.getElementById('lessons-container');
         if (!container) return;
@@ -24588,6 +24733,8 @@ class AdminManager {
             initialResources = [{ title: '', url: '' }];
         }
 
+        const isPerLesson = document.getElementById('pricing-model-lesson')?.checked || false;
+
         row.style.cssText = 'display:flex;flex-direction:column;gap:10px;background:#f8fafc;padding:16px;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:12px;position:relative;';
         row.innerHTML = `
             <div style="display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:0.95rem;color:#1e293b;border-bottom:1px solid #e2e8f0;padding-bottom:8px;margin-bottom:4px;">
@@ -24601,8 +24748,13 @@ class AdminManager {
             <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;">
                 <input type="text" placeholder="Tittel" value="${lessonTitle}"
                     style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-title admin-input">
-                <input type="number" placeholder="Pris (NOK)" value="${price}"
-                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-price admin-input">
+                <div class="lesson-price-wrapper" style="position:relative; width:100%;">
+                    <input type="number" placeholder="Pris (NOK)" value="${price}"
+                        style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;display:${isPerLesson ? 'block' : 'none'};" class="lesson-price admin-input">
+                    <div class="lesson-price-included-badge" style="display:${isPerLesson ? 'none' : 'flex'};height:100%;min-height:38px;padding:0 10px;background:#f1f5f9;border:1.5px solid #e2e8f0;border-radius:8px;align-items:center;justify-content:center;font-size:0.82rem;color:#475569;font-weight:600;white-space:nowrap;user-select:none;">
+                        <span class="material-symbols-outlined" style="font-size:16px;margin-right:4px;color:#10b981;">check_circle</span> Inkludert
+                    </div>
+                </div>
                 <input type="datetime-local" placeholder="Dato/Tid" value="${date}"
                     style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-date admin-input">
             </div>
@@ -24819,11 +24971,14 @@ class AdminManager {
             }
         }
 
+        const pricingModel = document.querySelector('input[name="course-pricing-type"]:checked')?.value || 'course';
+
         const rawCourse = {
             id: editCourseKey && !editCourseKey.startsWith('idx:') ? editCourseKey : `course_${Date.now()}`,
             title: document.getElementById('course-title').value.trim(),
             description: document.getElementById('course-description').value.trim(),
             category: category,
+            pricingModel: pricingModel,
             price: parseInt(document.getElementById('course-price').value) || 0,
             priceSuffix: document.getElementById('course-price-suffix')?.value?.trim() || '',
             imageUrl: document.getElementById('course-image').value.trim(),

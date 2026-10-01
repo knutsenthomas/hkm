@@ -731,6 +731,29 @@ html[data-theme="dark"] .info-row-icon {
     transition: border-color 0.2s;
 }
 
+select:not([multiple]),
+.form-group select:not([multiple]),
+.info-row-edit select:not([multiple]) {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    padding-right: 42px !important;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 18px center !important;
+    background-size: 14px 14px !important;
+    cursor: pointer;
+}
+
+html[data-theme="dark"] select:not([multiple]),
+html[data-theme="dark"] .form-group select:not([multiple]),
+html[data-theme="dark"] .info-row-edit select:not([multiple]),
+body.dark-mode select:not([multiple]) {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+    background-position: right 18px center !important;
+    padding-right: 42px !important;
+}
+
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
@@ -4320,7 +4343,7 @@ html[data-theme="dark"] .hkm-switch:hover .hkm-slider {
     background-color: var(--main-bg) !important;
     border: 1.5px solid var(--border-solid) !important;
     border-radius: 14px;
-    padding: 10px 38px 10px 18px;
+    padding: 10px 42px 10px 18px;
     font-size: 14px;
     font-weight: 700;
     color: #d17d39 !important;
@@ -4331,8 +4354,8 @@ html[data-theme="dark"] .hkm-switch:hover .hkm-slider {
     min-width: 140px;
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d17d39' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
     background-repeat: no-repeat !important;
-    background-position: right 14px center !important;
-    background-size: 12px !important;
+    background-position: right 18px center !important;
+    background-size: 14px 14px !important;
     transition: all 0.2s ease !important;
 }
 

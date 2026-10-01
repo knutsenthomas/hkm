@@ -2384,6 +2384,10 @@
                         enrollFree: 'Meld på gratis',
                         total: 'Total',
                         priceSuffix: ',-',
+                        allLessonsIncluded: 'Inkludert i kurset',
+                        included: 'Inkludert',
+                        wholeCourse: 'hele kurset',
+                        perLesson: 'pr. leksjon',
                         lessonsIncluded: 'leksjoner inkludert',
                         freeCourseDesc: 'Dette kurset er helt gratis.',
                         paidCourseDesc: 'Etter betaling mottar du tilgangslenke på e-post.',
@@ -2427,6 +2431,10 @@
                         enrollFree: 'Enroll for free',
                         total: 'Total',
                         priceSuffix: ',-',
+                        allLessonsIncluded: 'Included in the course',
+                        included: 'Included',
+                        wholeCourse: 'entire course',
+                        perLesson: 'per lesson',
                         lessonsIncluded: 'lessons included',
                         freeCourseDesc: 'This course is completely free.',
                         paidCourseDesc: 'After payment, you will receive an access link by email.',
@@ -2470,6 +2478,10 @@
                         enrollFree: 'Inscribirse gratis',
                         total: 'Total',
                         priceSuffix: ',-',
+                        allLessonsIncluded: 'Incluido en el curso',
+                        included: 'Incluido',
+                        wholeCourse: 'curso completo',
+                        perLesson: 'por lección',
                         lessonsIncluded: 'lecciones incluidas',
                         freeCourseDesc: 'Este curso es completamente gratis.',
                         paidCourseDesc: 'Después del pago, recibirá un enlace de acceso por correo electrónico.',
@@ -2845,6 +2857,20 @@
                     window.location.href = '/kurs-detaljer.html?id=' + courseId;
                 };
 
+                function getCoursePriceText(c) {
+                    if (!c) return '';
+                    const isFree = !c.price || c.price === 0 || c.price === '0' || String(c.price).toLowerCase() === 'gratis';
+                    if (isFree) return t('free');
+                    const cModel = c.pricingModel || (c.priceSuffix && c.priceSuffix.toLowerCase().includes('leksjon') ? 'per_lesson' : 'course');
+                    let suffixStr = '';
+                    if (c.priceSuffix) {
+                        suffixStr = ' ' + c.priceSuffix;
+                    } else if (cModel === 'per_lesson') {
+                        suffixStr = ' ' + t('perLesson');
+                    }
+                    return 'kr ' + c.price + t('priceSuffix') + suffixStr;
+                }
+
                 function renderFeaturedSection() {
                     const container = document.getElementById('featured-courses-container');
                     if (!container) return;
@@ -2873,7 +2899,7 @@
                         const course = allCourses[0];
                         const safeTitle = (course.title || '').replace(/'/g, "\\'");
                         const isFree = !course.price || course.price === 0;
-                        const priceText = isFree ? 'Gratis' : 'kr ' + course.price + ',-';
+                        const priceText = getCoursePriceText(course);
                         
                         container.style.gridTemplateColumns = '1fr';
                         
@@ -2911,11 +2937,11 @@
                         const safeTitle2 = (course2.title || '').replace(/'/g, "\\'");
                         
                         const isFree1 = !course1.price || course1.price === 0;
-                        const priceText1 = isFree1 ? 'Gratis' : 'kr ' + course1.price + ',-';
+                        const priceText1 = getCoursePriceText(course1);
                         
                         course2.durationText = (course2.lessons || []).length + ' leksjoner';
                         const isFree2 = !course2.price || course2.price === 0;
-                        course2.priceText = isFree2 ? 'Gratis' : 'kr ' + course2.price + ',-';
+                        course2.priceText = getCoursePriceText(course2);
 
                         container.style.gridTemplateColumns = '1.2fr 1fr';
                         
@@ -2977,15 +3003,15 @@
                         const safeTitle3 = (course3.title || '').replace(/'/g, "\\'");
                         
                         const isFree1 = !course1.price || course1.price === 0;
-                        const priceText1 = isFree1 ? 'Gratis' : 'kr ' + course1.price + ',-';
+                        const priceText1 = getCoursePriceText(course1);
                         
                         course2.durationText = (course2.lessons || []).length + ' leksjoner';
                         const isFree2 = !course2.price || course2.price === 0;
-                        course2.priceText = isFree2 ? 'Gratis' : 'kr ' + course2.price + ',-';
+                        course2.priceText = getCoursePriceText(course2);
 
                         course3.durationText = (course3.lessons || []).length + ' leksjoner';
                         const isFree3 = !course3.price || course3.price === 0;
-                        course3.priceText = isFree3 ? 'Gratis' : 'kr ' + course3.price + ',-';
+                        course3.priceText = getCoursePriceText(course3);
 
                         container.style.gridTemplateColumns = '1.2fr 1fr';
                         
@@ -3109,7 +3135,7 @@
                         ${course.category ? `<span class="category-badge">${course.category}</span>` : ''}
                         ${hasAccess 
                             ? `<span class="price-badge free" style="background:#d17d39; border-color:#d17d39;"><i class="fas fa-check-circle" style="font-size:11px; margin-right:3px;"></i> ${t('unlocked')}</span>`
-                            : `<span class="price-badge ${isFree ? 'free' : 'paid'}">${isFree ? t('free') : 'kr ' + course.price + t('priceSuffix') + (course.priceSuffix ? ' ' + course.priceSuffix : '')}</span>`
+                            : `<span class="price-badge ${isFree ? 'free' : 'paid'}">${getCoursePriceText(course)}</span>`
                         }
                     </div>
                     <div class="course-body">
@@ -3204,76 +3230,135 @@
                     const lessonsList = document.getElementById('modal-lessons-list');
                     const selectAllCheckbox = document.getElementById('select-all-lessons');
                     const totalPriceLabel = document.getElementById('dynamic-total-price');
+                    const selectAllRow = selectAllCheckbox ? selectAllCheckbox.closest('div') : null;
+                    const lessonsSelectionLabel = selectionContainer ? selectionContainer.querySelector('label') : null;
+
+                    const pModel = course.pricingModel || (course.priceSuffix && course.priceSuffix.toLowerCase().includes('leksjon') ? 'per_lesson' : 'course');
 
                     if (!isFree && course.lessons && course.lessons.length > 0) {
                         selectionContainer.style.display = 'block';
-                        lessonsList.innerHTML = course.lessons.map((lesson, idx) => {
-                            const lessonPrice = lesson.price || 300;
-                            const locale = lang === 'en' ? 'en-US' : (lang === 'es' ? 'es-ES' : 'nb-NO');
-                            const formattedDate = lesson.date ? new Date(lesson.date).toLocaleDateString(locale, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
-                            const dateStr = formattedDate ? ` (${formattedDate})` : '';
-                            const rawTitle = lesson.title || t('untitled');
-                            const displayTitle = rawTitle.replace(/^(leksjon|lesson|lección)\s+\d+:\s*/i, '');
-                            const lessonPrefix = lang === 'en' ? 'Lesson' : (lang === 'es' ? 'Lección' : 'Leksjon');
-                            return `
-                                <label class="lesson-select-label">
-                                    <span style="display: flex; align-items: flex-start; gap: 10px;">
-                                        <input type="checkbox" class="lesson-select-cb" data-id="${lesson.id || 'lesson_' + idx}" data-price="${lessonPrice}" checked style="width: 16px; height: 16px; accent-color: #d17d39; margin-top: 2px; flex-shrink: 0;">
-                                        <span style="line-height: 1.4;">${lessonPrefix} ${idx + 1}: ${displayTitle}${dateStr}</span>
-                                    </span>
-                                    <strong style="color: #475569; flex-shrink: 0; text-align: right;">kr ${lessonPrice},-</strong>
-                                </label>
-                            `;
-                        }).join('');
 
-                        const updateSelection = () => {
-                            const checkboxes = document.querySelectorAll('.lesson-select-cb');
-                            let total = 0;
-                            selectedLessons = [];
-                            checkboxes.forEach(cb => {
-                                if (cb.checked) {
-                                    total += parseFloat(cb.dataset.price) || 0;
-                                    selectedLessons.push(cb.dataset.id);
-                                }
-                            });
-                            
-                            const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
-                            selectAllCheckbox.checked = checkedCount === checkboxes.length;
-                            selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
+                        if (pModel === 'course') {
+                            // Entire course pricing: All lessons included in course.price
+                            currentPrice = course.price || 0;
+                            selectedLessons = course.lessons.map((l, idx) => l.id || 'lesson_' + idx);
 
-                            currentPrice = total;
-                            totalPriceLabel.textContent = `${t('total')}: kr ${currentPrice},-`;
-                            
-                            if (currentPrice === 0) {
-                                vippsBtn.style.display = 'none';
-                                stripeBtn.style.display = 'none';
-                                submitBtn.style.display = 'flex';
-                                submitBtn.textContent = '🎓 ' + t('enrollFree');
-                            } else {
-                                vippsBtn.style.display = 'flex';
-                                stripeBtn.style.display = 'flex';
-                                submitBtn.style.display = 'none';
+                            if (lessonsSelectionLabel) {
+                                lessonsSelectionLabel.textContent = `${t('allLessonsIncluded')}:`;
                             }
-                            
+                            if (selectAllRow) {
+                                selectAllRow.style.display = 'none';
+                            }
+
+                            lessonsList.innerHTML = course.lessons.map((lesson, idx) => {
+                                const locale = lang === 'en' ? 'en-US' : (lang === 'es' ? 'es-ES' : 'nb-NO');
+                                const formattedDate = lesson.date ? new Date(lesson.date).toLocaleDateString(locale, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+                                const dateStr = formattedDate ? ` (${formattedDate})` : '';
+                                const rawTitle = lesson.title || t('untitled');
+                                const displayTitle = rawTitle.replace(/^(leksjon|lesson|lección)\s+\d+:\s*/i, '');
+                                const lessonPrefix = lang === 'en' ? 'Lesson' : (lang === 'es' ? 'Lección' : 'Leksjon');
+                                return `
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 0.88rem;">
+                                        <span style="display: flex; align-items: center; gap: 8px;">
+                                            <i class="fas fa-check-circle" style="color: #d17d39; font-size: 0.95rem;"></i>
+                                            <span style="font-weight: 500; color: #1e293b;">${lessonPrefix} ${idx + 1}: ${displayTitle}${dateStr}</span>
+                                        </span>
+                                        <span style="color: #15803d; font-size: 0.8rem; font-weight: 600; background: #f0fdf4; padding: 2px 8px; border-radius: 4px; border: 1px solid #bbf7d0;">${t('included')}</span>
+                                    </div>
+                                `;
+                            }).join('');
+
+                            const suffixText = course.priceSuffix ? ` (${course.priceSuffix})` : ` (${t('wholeCourse')})`;
+                            totalPriceLabel.textContent = `${t('total')}: kr ${currentPrice},-${suffixText}`;
+
+                            vippsBtn.style.display = 'flex';
+                            stripeBtn.style.display = 'flex';
+                            submitBtn.style.display = 'none';
+
                             const stripeAmountEl = document.getElementById("stripe-amount-text");
                             if (stripeAmountEl) stripeAmountEl.textContent = currentPrice;
-                        };
+                        } else {
+                            // Per-lesson pricing: Checkbox selection per lesson
+                            if (lessonsSelectionLabel) {
+                                lessonsSelectionLabel.textContent = lang === 'en' ? 'Select lessons you wish to attend:' : (lang === 'es' ? 'Seleccione las lecciones a las que desea asistir:' : 'Velg leksjoner du vil delta på:');
+                            }
+                            if (selectAllRow) {
+                                selectAllRow.style.display = 'flex';
+                            }
 
-                        document.querySelectorAll('.lesson-select-cb').forEach(cb => {
-                            cb.addEventListener('change', updateSelection);
-                        });
+                            lessonsList.innerHTML = course.lessons.map((lesson, idx) => {
+                                const lessonPrice = lesson.price || course.price || 300;
+                                const locale = lang === 'en' ? 'en-US' : (lang === 'es' ? 'es-ES' : 'nb-NO');
+                                const formattedDate = lesson.date ? new Date(lesson.date).toLocaleDateString(locale, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+                                const dateStr = formattedDate ? ` (${formattedDate})` : '';
+                                const rawTitle = lesson.title || t('untitled');
+                                const displayTitle = rawTitle.replace(/^(leksjon|lesson|lección)\s+\d+:\s*/i, '');
+                                const lessonPrefix = lang === 'en' ? 'Lesson' : (lang === 'es' ? 'Lección' : 'Leksjon');
+                                return `
+                                    <label class="lesson-select-label">
+                                        <span style="display: flex; align-items: flex-start; gap: 10px;">
+                                            <input type="checkbox" class="lesson-select-cb" data-id="${lesson.id || 'lesson_' + idx}" data-price="${lessonPrice}" checked style="width: 16px; height: 16px; accent-color: #d17d39; margin-top: 2px; flex-shrink: 0;">
+                                            <span style="line-height: 1.4;">${lessonPrefix} ${idx + 1}: ${displayTitle}${dateStr}</span>
+                                        </span>
+                                        <strong style="color: #475569; flex-shrink: 0; text-align: right;">kr ${lessonPrice},-</strong>
+                                    </label>
+                                `;
+                            }).join('');
 
-                        selectAllCheckbox.onclick = () => {
-                            const checkboxes = document.querySelectorAll('.lesson-select-cb');
-                            checkboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
+                            const updateSelection = () => {
+                                const checkboxes = document.querySelectorAll('.lesson-select-cb');
+                                let total = 0;
+                                selectedLessons = [];
+                                checkboxes.forEach(cb => {
+                                    if (cb.checked) {
+                                        total += parseFloat(cb.dataset.price) || 0;
+                                        selectedLessons.push(cb.dataset.id);
+                                    }
+                                });
+                                
+                                const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+                                if (selectAllCheckbox) {
+                                    selectAllCheckbox.checked = checkedCount === checkboxes.length;
+                                    selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
+                                }
+
+                                currentPrice = total;
+                                totalPriceLabel.textContent = `${t('total')}: kr ${currentPrice},-`;
+                                
+                                if (currentPrice === 0) {
+                                    vippsBtn.style.display = 'none';
+                                    stripeBtn.style.display = 'none';
+                                    submitBtn.style.display = 'flex';
+                                    submitBtn.textContent = '🎓 ' + t('enrollFree');
+                                } else {
+                                    vippsBtn.style.display = 'flex';
+                                    stripeBtn.style.display = 'flex';
+                                    submitBtn.style.display = 'none';
+                                }
+                                
+                                const stripeAmountEl = document.getElementById("stripe-amount-text");
+                                if (stripeAmountEl) stripeAmountEl.textContent = currentPrice;
+                            };
+
+                            document.querySelectorAll('.lesson-select-cb').forEach(cb => {
+                                cb.addEventListener('change', updateSelection);
+                            });
+
+                            if (selectAllCheckbox) {
+                                selectAllCheckbox.onclick = () => {
+                                    const checkboxes = document.querySelectorAll('.lesson-select-cb');
+                                    checkboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
+                                    updateSelection();
+                                };
+                            }
+
                             updateSelection();
-                        };
-
-                        updateSelection();
+                        }
                     } else {
                         selectionContainer.style.display = 'none';
                         lessonsList.innerHTML = '';
                         selectedLessons = [];
+                        currentPrice = isFree ? 0 : (course.price || 0);
                         if (!isFree) {
                             vippsBtn.style.display = 'flex';
                             stripeBtn.style.display = 'flex';
@@ -3284,6 +3369,8 @@
                             submitBtn.style.display = 'flex';
                             submitBtn.textContent = '🎓 ' + t('startFreeNow');
                         }
+                        const stripeAmountEl = document.getElementById("stripe-amount-text");
+                        if (stripeAmountEl) stripeAmountEl.textContent = currentPrice;
                     }
                     
                     document.getElementById('enroll-modal-overlay').classList.add('open');

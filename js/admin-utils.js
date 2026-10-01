@@ -297,6 +297,9 @@
         const priceNum = Number(rawCourse?.price || 0);
         const price = Number.isFinite(priceNum) && priceNum >= 0 ? Math.round(priceNum) : 0;
         const priceSuffix = String(rawCourse?.priceSuffix || '').trim();
+        const pricingModel = ['course', 'per_lesson', 'both'].includes(rawCourse?.pricingModel)
+            ? rawCourse.pricingModel
+            : (priceSuffix.toLowerCase().includes('leksjon') ? 'per_lesson' : 'course');
 
         if (!title) errors.push('Kurstitel er påkrevd.');
 
@@ -379,6 +382,7 @@
             id: String(rawCourse?.id || `course_${Date.now()}`).trim(),
             title,
             category,
+            pricingModel,
             price,
             priceSuffix,
             lessons,

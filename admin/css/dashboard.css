@@ -3744,6 +3744,7 @@ div[id^="editorjs-holder-"] {
 .docs-toolbar-select {
     border: none !important;
     background: transparent !important;
+    background-image: none !important;
     color: #3c4043 !important;
     font-size: 13px !important;
     font-weight: 500 !important;
@@ -6453,10 +6454,19 @@ body.admin-body {
     margin-bottom: 8px;
 }
 
-.side-form input,
-.side-form select {
+.side-form input {
     width: 100%;
     padding: 10px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    background: #fbfcfd;
+    transition: all 0.2s;
+}
+
+.side-form select {
+    width: 100%;
+    padding: 10px 42px 10px 14px !important;
     border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 14px;
@@ -8021,9 +8031,9 @@ html[data-theme="dark"] body.admin-body #overview-section .analytics-range-selec
     border: 1px solid #334155 !important;
     background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
     background-repeat: no-repeat !important;
-    background-position: right 10px center !important;
-    background-size: 12px !important;
-    padding-right: 28px !important;
+    background-position: right 14px center !important;
+    background-size: 10px !important;
+    padding-right: 32px !important;
 }
 
 /* ==========================================================================

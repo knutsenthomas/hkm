@@ -2437,6 +2437,7 @@ html[data-theme="dark"] .folder-drawer-close-btn {
 .composer-from-select {
     color: #d17d39 !important;
     background: transparent !important;
+    background-image: none !important;
     border: none !important;
     outline: none !important;
     box-shadow: none !important;

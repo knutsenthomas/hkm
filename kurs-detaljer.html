@@ -2698,7 +2698,16 @@
 
                 const redirectParam = encodeURIComponent(window.location.href);
                 const loggedIn = isUserLoggedIn();
-                const priceBadgeText = currentCourse?.priceDisplay || (currentCourse?.price ? `kr ${currentCourse.price},-` : 'Betalt kurs');
+                const cModel = currentCourse?.pricingModel || (currentCourse?.priceSuffix && currentCourse.priceSuffix.toLowerCase().includes('leksjon') ? 'per_lesson' : 'course');
+                let suffixStr = '';
+                if (currentCourse?.priceSuffix) {
+                    suffixStr = ' ' + currentCourse.priceSuffix;
+                } else if (cModel === 'per_lesson') {
+                    suffixStr = ' pr. leksjon';
+                } else if (cModel === 'course') {
+                    suffixStr = ' totalt';
+                }
+                const priceBadgeText = currentCourse?.priceDisplay || (currentCourse?.price ? `kr ${currentCourse.price},-${suffixStr}` : 'Betalt kurs');
 
                 if (!loggedIn) {
                     videoContainer.innerHTML = `

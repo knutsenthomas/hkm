@@ -6629,6 +6629,25 @@ a[href*="#deduccion-fiscal"],
         /* Prevents auto-zoom on iOS */
     }
 
+    select:not([multiple]):not(.audio-speed-select):not(.audio-voice-select) {
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        padding-right: 42px !important;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: right 18px center !important;
+        background-size: 14px 14px !important;
+        cursor: pointer;
+    }
+
+    html[data-theme="dark"] select:not([multiple]):not(.audio-speed-select):not(.audio-voice-select),
+    body.dark-mode select:not([multiple]):not(.audio-speed-select):not(.audio-voice-select) {
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+        background-position: right 18px center !important;
+        padding-right: 42px !important;
+    }
+
     /* Features Grid improvements */
     .features-grid {
         gap: 15px !important;
