@@ -346,13 +346,13 @@ body.crm-body {
 
 .view-selector {
     border: 1px solid var(--border-color);
-    padding: 10px 16px;
+    padding: 10px 42px 10px 16px;
     border-radius: 8px;
     font-size: 14px;
     font-weight: 600;
     outline: none;
     cursor: pointer;
-    background: #f8fafc;
+    background-color: #f8fafc;
 }
 
 .header-right-actions {
@@ -1923,15 +1923,19 @@ html[data-theme="dark"] .selected-label-pill .remove-label-x:hover {
 .crm-editor-toolbar #crm-editor-format-block,
 .crm-editor-toolbar #crm-email-merge-tag-select {
     width: auto !important;
-    min-width: 80px !important;
-    max-width: 140px !important;
+    min-width: 90px !important;
+    max-width: 170px !important;
     flex: 0 0 auto !important;
     height: 32px !important;
     min-height: 32px !important;
-    padding: 0 6px !important;
+    padding: 0 26px 0 8px !important;
     font-size: 12px !important;
     border-radius: 6px !important;
     box-sizing: border-box !important;
+    background-position: right 8px center !important;
+    background-size: 12px 12px !important;
+    background-color: #ffffff;
+    cursor: pointer !important;
 }
 
 .crm-editor-toolbar #crm-email-insert-img-btn,

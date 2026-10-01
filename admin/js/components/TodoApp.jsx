@@ -227,7 +227,8 @@ export default function TodoApp() {
                     <select 
                         value={taskPriority}
                         onChange={(e) => setTaskPriority(e.target.value)}
-                        style={{ padding: '10px 14px', borderRadius: '10px', border: '1px solid #e2e8f0', background: 'var(--bg-card, #ffffff)', fontSize: '13px', color: 'var(--text-main, #1e293b)', cursor: 'pointer', outline: 'none' }}
+                        className="todo-quick-select"
+                        style={{ padding: '10px 42px 10px 14px', borderRadius: '10px', border: '1px solid #e2e8f0', backgroundColor: 'var(--bg-card, #ffffff)', fontSize: '13px', color: 'var(--text-main, #1e293b)', cursor: 'pointer', outline: 'none' }}
                     >
                         <option value="medium">Medium prio</option>
                         <option value="high">Høy prio</option>

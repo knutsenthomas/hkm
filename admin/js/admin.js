@@ -6493,7 +6493,7 @@ class AdminManager {
                         </div>
                         <div>
                             <label style="font-size: 13px; font-weight: 700; color: #334155; display: block; margin-bottom: 6px;">Hjørner</label>
-                            <select id="g-img-select-radius" style="width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; font-weight: 600; background: white;">
+                            <select id="g-img-select-radius" style="width: 100%; padding: 8px 42px 8px 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; font-weight: 600; background-color: white;">
                                 <option value="0px" ${curRadius === '0px' ? 'selected' : ''}>Skarpe (0px)</option>
                                 <option value="8px" ${curRadius === '8px' || curRadius === '' ? 'selected' : ''}>Runde (8px)</option>
                                 <option value="16px" ${curRadius === '16px' ? 'selected' : ''}>Myke (16px)</option>
@@ -7750,7 +7750,7 @@ class AdminManager {
                 <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
                     <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #64748b; margin: 0;">
                         Område:
-                        <select id="media-location-select" style="height: 36px; padding: 0 38px 0 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #1e293b; font-size: 13px; font-weight: 600; cursor: pointer; outline: none; min-width: 150px; box-sizing: border-box;">
+                        <select id="media-location-select" style="height: 36px; padding: 0 42px 0 12px; border-radius: 8px; border: 1px solid #e2e8f0; background-color: white; color: #1e293b; font-size: 13px; font-weight: 600; cursor: pointer; outline: none; min-width: 150px; box-sizing: border-box;">
                             ${this._getMediaLocationOptionsHtml()}
                         </select>
                     </label>
@@ -7760,7 +7760,7 @@ class AdminManager {
                     </button>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span style="font-size: 13px; color: #64748b;">Sorter:</span>
-                        <select id="media-sort-select" style="height: 36px; padding: 0 38px 0 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #1e293b; font-size: 13px; font-weight: 500; cursor: pointer; outline: none; box-sizing: border-box;">
+                        <select id="media-sort-select" style="height: 36px; padding: 0 42px 0 12px; border-radius: 8px; border: 1px solid #e2e8f0; background-color: white; color: #1e293b; font-size: 13px; font-weight: 500; cursor: pointer; outline: none; box-sizing: border-box;">
                             <option value="date-desc">Nyeste først</option>
                             <option value="date-asc">Eldste først</option>
                             <option value="name-asc">Navn (A-Å)</option>
@@ -8702,7 +8702,7 @@ class AdminManager {
                                 <!-- Breadcrumbs -->
                             </div>
                             <div class="media-actions" style="display: flex; gap: 8px; align-items: center;">
-                                <select id="modal-media-sort" class="admin-input" style="width: auto; padding: 6px 38px 6px 12px; font-size: 13px; height: 38px; border-radius: 10px; border: 1px solid #cbd5e1; background: #ffffff;">
+                                <select id="modal-media-sort" class="admin-input" style="width: auto; padding: 6px 42px 6px 12px; font-size: 13px; height: 38px; border-radius: 10px; border: 1px solid #cbd5e1; background-color: #ffffff;">
                                     <option value="date_desc">Nyeste først</option>
                                     <option value="date_asc">Eldste først</option>
                                     <option value="name_asc">Navn A-Å</option>
@@ -16789,7 +16789,7 @@ class AdminManager {
                 <div class="modal-body" style="padding:20px 24px; display:flex; flex-direction:column; gap:16px;">
                     <div class="form-group">
                         <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Velg brukerprofil</label>
-                        <select id="link-profile-user-select" class="form-control" style="width:100%; padding:10px 36px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none;">
+                        <select id="link-profile-user-select" class="form-control" style="width:100%; padding:10px 42px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none;">
                             <option value="">(Ukoblet / Ingen profil)</option>
                             ${userOptions}
                         </select>
@@ -17047,7 +17047,7 @@ class AdminManager {
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                         <h4 style="margin:0; font-size:15px; font-weight:700; color:#0f172a;">Transaksjonshistorikk</h4>
                         <div style="display:flex; gap:8px; align-items:center;">
-                            <select id="donor-modal-year-filter" class="form-control" style="font-size:13px; padding:4px 28px 4px 8px !important; height:32px; border-radius:6px; font-weight:600; width:140px; margin:0;">
+                            <select id="donor-modal-year-filter" class="form-control" style="font-size:13px; padding:4px 38px 4px 8px !important; height:32px; border-radius:6px; font-weight:600; width:140px; margin:0;">
                                 ${yearOptionsHtml}
                             </select>
                             <button type="button" class="btn-primary" id="donor-modal-print-btn" style="display:inline-flex !important; align-items:center !important; justify-content:center !important; gap:6px !important; padding:6px 12px !important; border-radius:6px !important; font-size:13px !important; font-weight:600 !important; height:32px !important; min-height:32px !important; background:#1B4965 !important; color:white !important; border:none !important; cursor:pointer !important; transform-origin: center !important;">
@@ -18581,7 +18581,7 @@ class AdminManager {
                                 <td><strong>${this.escapeHtml(row.donorName)}</strong></td>
                                 <td>${this.escapeHtml(row.donorEmail || '-')}</td>
                                 <td>
-                                    <select class="form-control shop-csv-row-user" data-idx="${idx}" style="font-size:11px; padding:4px 8px; height:28px;">
+                                    <select class="form-control shop-csv-row-user" data-idx="${idx}" style="font-size:11px; padding:4px 38px 4px 8px; height:28px;">
                                         <option value="">(Ikke koblet)</option>
                                         ${Array.from(this.adminUserMap?.values() || []).map(u => {
                                             const isSelected = u.id === row.userId;
@@ -20517,7 +20517,7 @@ class AdminManager {
                         <!-- Global Period Selector -->
                         <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 8px;">
                             <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; white-space: nowrap;">Periode:</label>
-                            <select id="global-date-preset" class="form-control" style="font-weight: 600; color: #0f172a; border-radius: 8px; height: 36px; padding: 0 32px 0 8px !important; font-size: 13px; min-width: 140px; margin: 0; border: 1px solid #cbd5e1; background: #fff;">
+                            <select id="global-date-preset" class="form-control" style="font-weight: 600; color: #0f172a; border-radius: 8px; height: 36px; padding: 0 42px 0 12px !important; font-size: 13px; min-width: 140px; margin: 0; border: 1px solid #cbd5e1; background-color: #fff;">
                                 <option value="today">I dag</option>
                                 <option value="7">Siste 7 dager</option>
                                 <option value="30" selected>Siste 30 dager</option>
@@ -20933,7 +20933,7 @@ class AdminManager {
                         <div class="modal-body" style="display:grid;gap:24px; padding:24px 32px;">
                             <div class="form-group" style="margin:0;">
                                 <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Koble til eksisterende bruker</label>
-                                <select id="manual-donation-user" class="form-control" style="width:100%; padding:10px 36px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                <select id="manual-donation-user" class="form-control" style="width:100%; padding:10px 42px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                     <option value="">Ikke koble til profil</option>
                                     ${manualDonationUserOptions}
                                 </select>
@@ -20961,7 +20961,7 @@ class AdminManager {
                             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
                                 <div class="form-group" style="margin:0;">
                                     <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Metode</label>
-                                    <select id="manual-donation-method" class="form-control" style="width:100%; padding:10px 36px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                    <select id="manual-donation-method" class="form-control" style="width:100%; padding:10px 42px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                         <option value="bank">Bank</option>
                                         <option value="manual">Manuell</option>
                                         <option value="vipps_manual">Vipps manuelt</option>
@@ -20971,7 +20971,7 @@ class AdminManager {
                                 </div>
                                 <div class="form-group" style="margin:0;">
                                     <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Status</label>
-                                    <select id="manual-donation-status" class="form-control" style="width:100%; padding:10px 36px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                    <select id="manual-donation-status" class="form-control" style="width:100%; padding:10px 42px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                         <option value="completed">Fullført</option>
                                         <option value="pending">Venter</option>
                                         <option value="processing">Behandles</option>
@@ -21056,7 +21056,7 @@ class AdminManager {
                         <div class="modal-body" style="display:grid;gap:24px; padding:24px 32px;">
                             <div class="form-group" style="margin:0;">
                                 <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Koble til eksisterende bruker</label>
-                                <select id="manual-inkind-user" class="form-control" style="width:100%; padding:10px 36px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                <select id="manual-inkind-user" class="form-control" style="width:100%; padding:10px 42px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                     <option value="">Ikke koble til profil</option>
                                     ${manualDonationUserOptions}
                                 </select>
@@ -21084,7 +21084,7 @@ class AdminManager {
                             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
                                 <div class="form-group" style="margin:0;">
                                     <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Formål (Fund)</label>
-                                    <select id="manual-inkind-fund" class="form-control" style="width:100%; padding:10px 36px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                    <select id="manual-inkind-fund" class="form-control" style="width:100%; padding:10px 42px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                         <option value="general">general</option>
                                         <option value="basar">basar</option>
                                         <option value="misjon">misjon</option>
@@ -21249,7 +21249,7 @@ class AdminManager {
                     <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0;">
                         <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 8px;">
                             <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; white-space: nowrap;">Periode:</label>
-                            <select id="shop-date-preset" class="form-control" style="font-weight: 600; color: #0f172a; border-radius: 8px; height: 36px; padding: 0 32px 0 8px !important; font-size: 13px; min-width: 140px; margin: 0; border: 1px solid #cbd5e1; background: #fff;">
+                            <select id="shop-date-preset" class="form-control" style="font-weight: 600; color: #0f172a; border-radius: 8px; height: 36px; padding: 0 42px 0 12px !important; font-size: 13px; min-width: 140px; margin: 0; border: 1px solid #cbd5e1; background-color: #fff;">
                                 <option value="7">Siste 7 dager</option>
                                 <option value="30" selected>Siste 30 dager</option>
                                 <option value="90">Siste 90 dager</option>
@@ -21571,7 +21571,7 @@ class AdminManager {
                         <div class="modal-body" style="display:grid;gap:24px; padding:24px 32px;">
                             <div class="form-group" style="margin:0;">
                                 <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Koble til eksisterende bruker</label>
-                                <select id="manual-sale-user" class="form-control" style="width:100%; padding:10px 36px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                <select id="manual-sale-user" class="form-control" style="width:100%; padding:10px 42px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                     <option value="">Ikke koble til profil</option>
                                     ${manualDonationUserOptions}
                                 </select>
@@ -21618,7 +21618,7 @@ class AdminManager {
                             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
                                 <div class="form-group" style="margin:0;">
                                     <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Metode</label>
-                                    <select id="manual-sale-method" class="form-control" style="width:100%; padding:10px 36px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                    <select id="manual-sale-method" class="form-control" style="width:100%; padding:10px 42px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                         <option value="vipps_manual">Vipps manuelt</option>
                                         <option value="stripe">Stripe</option>
                                         <option value="vipps">Vipps</option>
@@ -21631,7 +21631,7 @@ class AdminManager {
                                 </div>
                                 <div class="form-group" style="margin:0;">
                                     <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Status</label>
-                                    <select id="manual-sale-status" class="form-control" style="width:100%; padding:10px 36px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                    <select id="manual-sale-status" class="form-control" style="width:100%; padding:10px 42px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                         <option value="completed">Fullført</option>
                                         <option value="pending">Venter</option>
                                         <option value="processing">Behandles</option>
@@ -22389,7 +22389,7 @@ class AdminManager {
                         <div style="display:flex; flex-wrap:wrap; gap:16px; padding: 16px 32px; border-bottom: 1px solid #f1f5f9; background: #fafafa;">
                             <div class="form-group" style="margin:0; flex:1 1 180px; min-width: 140px;">
                                 <label style="font-weight:700; color:#1B4965; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Betalingsstatus</label>
-                                <select id="wix-payment-status-filter" class="form-control" style="height:40px; font-size:13px; border-radius:8px; font-weight:600; width: 100%; padding-top:0px !important; padding-bottom:0px !important; padding-left:12px !important; padding-right:36px !important;" onchange="window.adminManager.filterWixOrders()">
+                                <select id="wix-payment-status-filter" class="form-control" style="height:40px; font-size:13px; border-radius:8px; font-weight:600; width: 100%; padding-top:0px !important; padding-bottom:0px !important; padding-left:12px !important; padding-right:42px !important;" onchange="window.adminManager.filterWixOrders()">
                                     <option value="all">Alle statuser</option>
                                     <option value="PAID">Betalt</option>
                                     <option value="PENDING">Venter</option>
@@ -22400,7 +22400,7 @@ class AdminManager {
                             </div>
                             <div class="form-group" style="margin:0; flex:1 1 180px; min-width: 140px;">
                                 <label style="font-weight:700; color:#1B4965; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Ordrestatus</label>
-                                <select id="wix-order-status-filter" class="form-control" style="height:40px; font-size:13px; border-radius:8px; font-weight:600; width: 100%; padding-top:0px !important; padding-bottom:0px !important; padding-left:12px !important; padding-right:36px !important;" onchange="window.adminManager.filterWixOrders()">
+                                <select id="wix-order-status-filter" class="form-control" style="height:40px; font-size:13px; border-radius:8px; font-weight:600; width: 100%; padding-top:0px !important; padding-bottom:0px !important; padding-left:12px !important; padding-right:42px !important;" onchange="window.adminManager.filterWixOrders()">
                                     <option value="all">Alle statuser</option>
                                     <option value="COMPLETED">Fullført</option>
                                     <option value="APPROVED">Godkjent</option>
@@ -22410,7 +22410,7 @@ class AdminManager {
                             </div>
                             <div class="form-group" style="margin:0; flex:1 1 180px; min-width: 140px;">
                                 <label style="font-weight:700; color:#1B4965; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Utsendelse</label>
-                                <select id="wix-fulfillment-status-filter" class="form-control" style="height:40px; font-size:13px; border-radius:8px; font-weight:600; width: 100%; padding-top:0px !important; padding-bottom:0px !important; padding-left:12px !important; padding-right:36px !important;" onchange="window.adminManager.filterWixOrders()">
+                                <select id="wix-fulfillment-status-filter" class="form-control" style="height:40px; font-size:13px; border-radius:8px; font-weight:600; width: 100%; padding-top:0px !important; padding-bottom:0px !important; padding-left:12px !important; padding-right:42px !important;" onchange="window.adminManager.filterWixOrders()">
                                     <option value="all">Alle statuser</option>
                                     <option value="FULFILLED">Sendt</option>
                                     <option value="NOT_FULFILLED">Ikke sendt</option>
@@ -24049,7 +24049,7 @@ class AdminManager {
                                 </div>
                                 <div>
                                     <label style="display:block;font-weight:600;margin-bottom:6px;">Kategori</label>
-                                    <select id="course-category" style="width:100%;padding:12px 42px 12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;background:white;margin-bottom:8px;">
+                                    <select id="course-category" style="width:100%;padding:12px 42px 12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;background-color:white;margin-bottom:8px;">
                                         <option value="Bibelstudium">Bibelstudium</option>
                                         <option value="Bønn">Bønn</option>
                                         <option value="Lederskap">Lederskap</option>
@@ -24145,12 +24145,12 @@ class AdminManager {
                             <input type="text" id="enrollment-search" placeholder="Søk på navn eller e-post..." style="width: 100%; padding: 10px 16px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem;">
                         </div>
                         <div style="min-width: 180px;">
-                            <select id="enrollment-course-filter" style="width: 100%; padding: 10px 42px 10px 16px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; background: white; font-family: inherit;">
+                            <select id="enrollment-course-filter" style="width: 100%; padding: 10px 42px 10px 16px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; background-color: white; font-family: inherit;">
                                 <option value="">Alle kurs</option>
                             </select>
                         </div>
                         <div style="min-width: 180px;">
-                            <select id="enrollment-status-filter" style="width: 100%; padding: 10px 42px 10px 16px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; background: white; font-family: inherit;">
+                            <select id="enrollment-status-filter" style="width: 100%; padding: 10px 42px 10px 16px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; background-color: white; font-family: inherit;">
                                 <option value="">Alle statuser</option>
                                 <option value="pending">Venter (Standard)</option>
                                 <option value="pending_stripe">Venter (Stripe)</option>
@@ -27833,7 +27833,7 @@ class AdminManager {
                         </div>
                         <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; margin: 0;">
                             <label style="font-size: 13px; font-weight: 700; color: #334155;" class="form-label-txt">Rolle / Tilgang</label>
-                            <select name="role" class="form-control add-user-input" style="padding: 10px 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 14px; outline: none; background: #ffffff;">
+                            <select name="role" class="form-control add-user-input" style="padding: 10px 42px 10px 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 14px; outline: none; background-color: #ffffff; cursor: pointer;">
                                 ${rolesOptions}
                             </select>
                         </div>
@@ -28193,7 +28193,7 @@ class AdminManager {
                                                                                         <div class="form-group">
                                                                                             <label>Telefon</label>
                                                                                             <div style="display:flex; gap:8px;">
-                                                                                                <select name="phoneCountryCode" class="form-control" style="width:120px; flex-shrink:0;">
+                                                                                                <select name="phoneCountryCode" class="form-control" style="width:145px; flex-shrink:0;">
                                                                                                     ${phoneCountryOptions}
                                                                                                 </select>
                                                                                                 <input type="tel" name="phone" class="form-control" value="${userData ? (userData.phone || '') : ''}">

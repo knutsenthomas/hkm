@@ -1390,10 +1390,10 @@
 .prop-select {
     width: 100% !important;
     height: 38px !important;
-    background: #f8fafc !important;
+    background-color: #f8fafc !important;
     border: 1px solid #cbd5e1 !important;
     border-radius: 8px !important;
-    padding: 0 12px !important;
+    padding: 0 42px 0 12px !important;
     font-size: 13px !important;
     color: #1e293b !important;
     outline: none !important;
@@ -1879,10 +1879,10 @@
 .prop-select {
     width: 100% !important;
     height: 36px !important;
-    background: #f8fafc !important;
+    background-color: #f8fafc !important;
     border: 1px solid #cbd5e1 !important;
     border-radius: 6px !important;
-    padding: 0 10px !important;
+    padding: 0 42px 0 10px !important;
     font-size: 13px !important;
     color: #1e293b !important;
     outline: none !important;
@@ -6880,7 +6880,8 @@ html[data-theme="dark"] .inspector-input {
     font-size: 14px !important;
     border: 1px solid #cbd5e1 !important;
     border-radius: 8px !important;
-    background: #ffffff !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
     color: #1e293b !important;
     appearance: none !important;
     -webkit-appearance: none !important;
@@ -6907,7 +6908,7 @@ html[data-theme="dark"] .inspector-input {
 
 html[data-theme="dark"] .inspector-select-wrapper select {
     border-color: var(--admin-border, #334155) !important;
-    background: var(--admin-surface-muted, #0f172a) !important;
+    background-color: var(--admin-surface-muted, #0f172a) !important;
     color: var(--admin-text, #f8fafc) !important;
 }
 

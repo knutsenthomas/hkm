@@ -1025,7 +1025,7 @@ class CRMManager {
                         <span class="material-symbols-outlined" style="font-size: 18px; color: #64748b;">verified_user</span>
                         Medlemsstatus
                     </label>
-                    <select id="crm-modal-status-select" class="form-control" style="width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 14px; background: #ffffff; color: #0f172a; outline: none; cursor: pointer;">
+                    <select id="crm-modal-status-select" class="form-control" style="width: 100%; padding: 10px 42px 10px 14px !important; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 14px; background-color: #ffffff; color: #0f172a; outline: none; cursor: pointer;">
                         ${statusOptions.map(opt => `
                             <option value="${opt.value}" ${opt.value === currentStatus ? 'selected' : ''}>
                                 ${opt.label}
@@ -1039,7 +1039,7 @@ class CRMManager {
                         <span class="material-symbols-outlined" style="font-size: 18px; color: #64748b;">label</span>
                         Etikett / Tag
                     </label>
-                    <select id="crm-modal-tag-select" class="form-control" style="width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 14px; background: #ffffff; color: #0f172a; outline: none; cursor: pointer;">
+                    <select id="crm-modal-tag-select" class="form-control" style="width: 100%; padding: 10px 42px 10px 14px !important; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 14px; background-color: #ffffff; color: #0f172a; outline: none; cursor: pointer;">
                         <option value="ALL" ${currentTag === 'ALL' ? 'selected' : ''}>Alle etiketter (Ingen etikettfilter)</option>
                         <option value="__NO_TAGS__" ${currentTag === '__NO_TAGS__' ? 'selected' : ''}>Uten etikett (Ingen koder/tags)</option>
                         ${availableLabels.map(tag => `
@@ -2112,7 +2112,7 @@ class CRMManager {
                             <span>Fra:</span>
                             <span class="material-symbols-outlined" style="font-size: 15px; color: #94a3b8;" title="Avsenderadresse">info</span>
                         </label>
-                        <select id="crm-email-from-mode" class="form-control" style="width: 100%; max-width: 100%; min-width: 0; height: 42px; padding: 0 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 13.5px; background: white; color: #0f172a; outline: none; cursor: pointer; font-weight: 500; box-sizing: border-box; text-overflow: ellipsis; overflow: hidden;">
+                        <select id="crm-email-from-mode" class="form-control" style="width: 100%; max-width: 100%; min-width: 0; height: 42px; padding: 0 42px 0 12px !important; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 13.5px; background-color: white; color: #0f172a; outline: none; cursor: pointer; font-weight: 500; box-sizing: border-box; text-overflow: ellipsis; overflow: hidden;">
                             <option value="post" selected>His Kingdom Ministry &lt;post@hiskingdomministry.no&gt;</option>
                             <option value="admin">${this.escapeHtml(adminName)} &lt;${this.escapeHtml(adminEmail)}&gt;</option>
                         </select>
@@ -2122,7 +2122,7 @@ class CRMManager {
                         <label style="font-weight: 700; font-size: 13px; color: #334155;">Mal:</label>
                         <div style="position: relative; width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box;">
                             <span class="material-symbols-outlined" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #94a3b8; pointer-events: none;">search</span>
-                            <select id="crm-email-template-select" class="form-control" style="width: 100%; max-width: 100%; min-width: 0; height: 42px; padding: 0 12px 0 36px !important; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 13.5px; background: white; color: #0f172a; outline: none; cursor: pointer; font-weight: 500; box-sizing: border-box; text-overflow: ellipsis; overflow: hidden;">
+                            <select id="crm-email-template-select" class="form-control" style="width: 100%; max-width: 100%; min-width: 0; height: 42px; padding: 0 42px 0 36px !important; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 13.5px; background-color: white; color: #0f172a; outline: none; cursor: pointer; font-weight: 500; box-sizing: border-box; text-overflow: ellipsis; overflow: hidden;">
                                 <option value="">Velg e-postmal...</option>
                                 <option value="summer_camp">Youth Summer Camp is coming!</option>
                                 <option value="newsletter">Månedsoppdatering & Nyheter</option>
@@ -2161,7 +2161,7 @@ class CRMManager {
                             <div class="crm-editor-divider" style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 3px; flex-shrink: 0;"></div>
 
                             <!-- Format Selector -->
-                            <select id="crm-editor-format-block" title="Tekststørrelse / Overskrift" style="height: 32px; border-radius: 6px; border: 1px solid #cbd5e1; background: white; padding: 0 8px; font-size: 12.5px; font-weight: 600; color: #334155; cursor: pointer; outline: none; flex-shrink: 0;">
+                            <select id="crm-editor-format-block" title="Tekststørrelse / Overskrift" style="height: 32px; border-radius: 6px; border: 1px solid #cbd5e1; background-color: white; padding: 0 26px 0 8px; font-size: 12.5px; font-weight: 600; color: #334155; cursor: pointer; outline: none; flex-shrink: 0;">
                                 <option value="p">Normal tekst</option>
                                 <option value="h1">Stor overskrift (H1)</option>
                                 <option value="h2">Overskrift (H2)</option>
@@ -2204,7 +2204,7 @@ class CRMManager {
                             <div class="crm-editor-divider" style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 3px; flex-shrink: 0;"></div>
 
                             <!-- Variable Tag Selector -->
-                            <select id="crm-email-merge-tag-select" title="Sett inn flettefelt ({{ tag }})" style="height: 32px; border-radius: 6px; border: 1px solid #cbd5e1; background: white; padding: 0 8px; font-size: 12.5px; font-weight: 700; color: #2563eb; cursor: pointer; outline: none; flex-shrink: 0;">
+                            <select id="crm-email-merge-tag-select" title="Sett inn flettefelt ({{ tag }})" style="height: 32px; border-radius: 6px; border: 1px solid #cbd5e1; background-color: white; padding: 0 26px 0 8px; font-size: 12.5px; font-weight: 700; color: #2563eb; cursor: pointer; outline: none; flex-shrink: 0;">
                                 <option value="">{{ }}</option>
                                 <option value="{{ to.first_name }}">Mottakers fornavn ({{ to.first_name }})</option>
                                 <option value="{{ to.full_name }}">Mottakers fullt navn ({{ to.full_name }})</option>

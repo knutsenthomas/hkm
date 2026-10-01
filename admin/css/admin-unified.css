@@ -531,38 +531,53 @@ button.btn {
   border: 1px solid var(--admin-border);
   border-radius: var(--admin-radius-sm);
   color: var(--admin-text);
-  background: #fff;
+  background-color: #fff;
 }
 
 /* Custom indented arrow for all select dropdowns */
-select:not([multiple]),
-.form-group select:not([multiple]),
-.modal select:not([multiple]),
-#contact-modal select:not([multiple]),
+select:not([multiple]):not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select),
+.form-group select:not([multiple]):not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select),
+.modal select:not([multiple]):not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select),
+#contact-modal select:not([multiple]):not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select),
+#course-modal select:not([multiple]):not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select),
 .view-selector,
 .tag-filter-select,
-select.form-control {
+select.form-control:not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select),
+.admin-input select:not([multiple]):not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select),
+.todo-quick-select,
+.todo-drawer-quick-add select:not([multiple]) {
   appearance: none !important;
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
   padding-right: 42px !important;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
   background-repeat: no-repeat !important;
-  background-position: right 18px center !important;
+  background-position: right 14px center !important;
   background-size: 14px 14px !important;
   cursor: pointer;
+  box-sizing: border-box !important;
 }
 
-html[data-theme="dark"] select:not([multiple]),
-html[data-theme="dark"] .form-group select:not([multiple]),
-html[data-theme="dark"] .modal select:not([multiple]),
-html[data-theme="dark"] #contact-modal select:not([multiple]),
+select::-ms-expand {
+  display: none !important;
+}
+
+html[data-theme="dark"] select:not([multiple]):not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select),
+html[data-theme="dark"] .form-group select:not([multiple]):not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select),
+html[data-theme="dark"] .modal select:not([multiple]):not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select),
+html[data-theme="dark"] #contact-modal select:not([multiple]):not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select),
+html[data-theme="dark"] #course-modal select:not([multiple]):not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select),
 html[data-theme="dark"] .view-selector,
 html[data-theme="dark"] .tag-filter-select,
-html[data-theme="dark"] select.form-control {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
-  background-position: right 18px center !important;
+html[data-theme="dark"] select.form-control:not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select),
+html[data-theme="dark"] .admin-input select:not([multiple]):not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select),
+html[data-theme="dark"] .todo-quick-select,
+html[data-theme="dark"] .todo-drawer-quick-add select:not([multiple]),
+body.dark-mode select:not([multiple]):not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+  background-position: right 14px center !important;
   padding-right: 42px !important;
+  box-sizing: border-box !important;
 }
 
 .form-group input:focus,
@@ -3622,7 +3637,7 @@ body.minside-body .form-group select,
 body.builder-active .subject-input {
   border: 1px solid #dfe4ea;
   border-radius: 10px;
-  background: #fff;
+  background-color: #fff;
   box-shadow: none;
 }
 
@@ -4393,7 +4408,7 @@ body.admin-body #overview-section .analytics-range-select {
   padding: 3px 22px 3px 10px;
   border: 0;
   border-radius: 999px;
-  background: #ffedd5;
+  background-color: #ffedd5;
   color: #9a3412;
   font-size: 9px !important;
   font-weight: 700 !important;
@@ -6943,7 +6958,9 @@ body.admin-body .template-item:active {
     flex: 0 0 auto !important;
     height: 32px !important;
     min-height: 32px !important;
-    padding: 0 6px !important;
+    padding: 0 24px 0 6px !important;
+    background-position: right 6px center !important;
+    background-size: 12px 12px !important;
     font-size: 12px !important;
   }
 
@@ -7770,16 +7787,19 @@ body.admin-body .profile-header-card-body {
 }
 
 /* Style all select dropdowns globally to look premium and consistent across browsers */
-body.admin-body select:not([multiple]),
-body.crm-body select:not([multiple]),
-body.minside-body select:not([multiple]) {
+select:not([multiple]):not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select),
+body.admin-body select:not([multiple]):not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select),
+body.crm-body select:not([multiple]):not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select),
+body.minside-body select:not([multiple]):not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select) {
   -webkit-appearance: none !important;
   appearance: none !important;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231B4965' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+  -moz-appearance: none !important;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
   background-repeat: no-repeat !important;
-  background-position: right 18px center !important;
+  background-position: right 14px center !important;
   background-size: 14px 14px !important;
   padding-right: 42px !important;
+  box-sizing: border-box !important;
 }
 
 /* Fix modals that are taller than viewport by applying max-height and scrolling content */
@@ -8008,17 +8028,20 @@ html[data-theme="dark"] .form-group label {
 }
 
 
-html[data-theme="dark"] select:not([multiple]),
-html[data-theme="dark"] body.admin-body select:not([multiple]),
-html[data-theme="dark"] body.crm-body select:not([multiple]),
-html[data-theme="dark"] body.minside-body select:not([multiple]) {
+html[data-theme="dark"] select:not([multiple]):not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select),
+html[data-theme="dark"] body.admin-body select:not([multiple]):not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select),
+html[data-theme="dark"] body.crm-body select:not([multiple]):not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select),
+html[data-theme="dark"] body.minside-body select:not([multiple]):not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select),
+body.dark-mode select:not([multiple]):not(.docs-toolbar-select):not(.composer-from-select):not(.inspector-select-wrapper select) {
   -webkit-appearance: none !important;
   appearance: none !important;
+  -moz-appearance: none !important;
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
   background-repeat: no-repeat !important;
-  background-position: right 18px center !important;
+  background-position: right 14px center !important;
   background-size: 14px 14px !important;
   padding-right: 42px !important;
+  box-sizing: border-box !important;
 }
 
 /* Active log filter button in dark mode */
@@ -9116,9 +9139,13 @@ html[data-theme="dark"] .modal-header {
 html[data-theme="dark"] .modal-header h2 {
   color: var(--admin-text, #f8fafc) !important;
 }
-html[data-theme="dark"] .form-group input,
-html[data-theme="dark"] .form-group select {
+html[data-theme="dark"] .form-group input {
   background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+html[data-theme="dark"] .form-group select {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
   border-color: var(--admin-border, #334155) !important;
   color: var(--admin-text, #f8fafc) !important;
 }
@@ -9294,9 +9321,13 @@ html[data-theme="dark"] .email-composer label,
 html[data-theme="dark"] .email-subject-field {
   color: var(--admin-text-muted, #94a3b8) !important;
 }
-html[data-theme="dark"] .email-composer input,
-html[data-theme="dark"] .email-composer select {
+html[data-theme="dark"] .email-composer input {
   background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+html[data-theme="dark"] .email-composer select {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
   border-color: var(--admin-border, #334155) !important;
   color: var(--admin-text, #f8fafc) !important;
 }
@@ -9607,9 +9638,13 @@ html[data-theme="dark"] .todo-drawer-quick-add {
   border-bottom-color: var(--admin-border, #334155) !important;
 }
 html[data-theme="dark"] .todo-drawer-quick-add input[type="text"],
-html[data-theme="dark"] .todo-drawer-quick-add select,
 html[data-theme="dark"] .todo-drawer-quick-add input[type="date"] {
   background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+html[data-theme="dark"] .todo-drawer-quick-add select {
+  background-color: var(--admin-surface, #1e293b) !important;
   border-color: var(--admin-border, #334155) !important;
   color: var(--admin-text, #f8fafc) !important;
 }

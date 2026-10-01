@@ -3691,7 +3691,7 @@ class NewsletterBuilder {
                     <!-- Internal Pages Dropdown Group -->
                     <div id="hkm-internal-page-group">
                         <label style="display: block; font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">Velg side på nettsiden</label>
-                        <select id="hkm-internal-page-select" style="width: 100%; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 14px; font-weight: 600; outline: none; background: white; color: #1e293b; box-sizing: border-box; cursor: pointer;">
+                        <select id="hkm-internal-page-select" style="width: 100%; padding: 11px 42px 11px 14px !important; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 14px; font-weight: 600; outline: none; background-color: white; color: #1e293b; box-sizing: border-box; cursor: pointer;">
                             ${internalPages.map(p => `<option value="${p.url}" data-default-text="${p.defaultText}">${p.name}</option>`).join('')}
                         </select>
                     </div>
@@ -9153,7 +9153,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                         </div>
                         <div>
                             <label style="font-size: 13px; font-weight: 700; color: #334155; display: block; margin-bottom: 6px;">Hjørner</label>
-                            <select id="img-select-radius" style="width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; font-weight: 600; background: white;">
+                            <select id="img-select-radius" style="width: 100%; padding: 8px 42px 8px 10px !important; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; font-weight: 600; background-color: white;">
                                 <option value="0px" ${curRadius === '0px' ? 'selected' : ''}>Skarpe (0px)</option>
                                 <option value="8px" ${curRadius === '8px' || curRadius === '' ? 'selected' : ''}>Runde (8px)</option>
                                 <option value="16px" ${curRadius === '16px' ? 'selected' : ''}>Myke (16px)</option>
@@ -10742,7 +10742,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
 
                 <div style="margin-bottom: 16px;">
                     <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Handlingsmodus</label>
-                    <select id="bulk-tags-mode" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px;">
+                    <select id="bulk-tags-mode" style="width: 100%; padding: 10px 42px 10px 14px !important; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; box-sizing: border-box;">
                         <option value="add">Legg til etiketter (behold eksisterende)</option>
                         <option value="replace">Erstatt alle etiketter med de nye</option>
                         <option value="remove">Fjern spesifiserte etiketter</option>
@@ -10848,7 +10848,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
 
                 <div style="margin-bottom: 16px;">
                     <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Handlingsmodus</label>
-                    <select id="bulk-seg-mode" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px;">
+                    <select id="bulk-seg-mode" style="width: 100%; padding: 10px 42px 10px 14px !important; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; box-sizing: border-box;">
                         <option value="add">Legg til valgte segmenter (behold eksisterende)</option>
                         <option value="replace">Erstatt alle segmenter med de valgte</option>
                         <option value="remove">Fjern de valgte segmentene</option>

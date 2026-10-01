@@ -6470,7 +6470,8 @@ body.admin-body {
     border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 14px;
-    background: #fbfcfd;
+    background-color: #fbfcfd;
+    cursor: pointer;
     transition: all 0.2s;
 }
 

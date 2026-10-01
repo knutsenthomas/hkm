@@ -52,13 +52,55 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" />
 
     <link rel="stylesheet" href="../styles.css">
-    <link rel="stylesheet" href="css/dashboard.css?v=20261001_pulse_overflow_fix">
+    <link rel="stylesheet" href="css/dashboard.css?v=20261001_select_arrows_sync">
     <link rel="stylesheet" href="../css/notifications.css">
-    <link rel="stylesheet" href="css/admin-unified.css?v=20260930_privacy_spacing_sync">
-    <link rel="stylesheet" href="css/todo.css?v=20260729_TODO_OVERHAUL">
+    <link rel="stylesheet" href="css/admin-unified.css?v=20261001_select_arrows_sync">
+    <link rel="stylesheet" href="css/todo.css?v=20261001_select_arrows_sync">
     
-    <!-- FORCED CSS FIX FOR ENGAGEMENT OVERFLOW (INLINE TO BEAT CACHE - GLOBAL) -->
+    <!-- FORCED CSS FIX FOR ENGAGEMENT OVERFLOW & SELECT ARROWS (INLINE TO BEAT CACHE - GLOBAL) -->
     <style>
+        /* Global select arrow positioning and styling (beats browser cache) */
+        select:not([multiple]),
+        .admin-body select:not([multiple]),
+        .crm-body select:not([multiple]),
+        .form-group select:not([multiple]),
+        .modal select:not([multiple]),
+        #course-modal select:not([multiple]),
+        .admin-input select:not([multiple]),
+        .view-selector,
+        .tag-filter-select,
+        select.form-control,
+        .todo-quick-select,
+        .todo-drawer-quick-add select:not([multiple]) {
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            padding-right: 42px !important;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231B4965' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 18px center !important;
+            background-size: 14px 14px !important;
+            cursor: pointer;
+            box-sizing: border-box !important;
+        }
+
+        html[data-theme="dark"] select:not([multiple]),
+        html[data-theme="dark"] .admin-body select:not([multiple]),
+        html[data-theme="dark"] .form-group select:not([multiple]),
+        html[data-theme="dark"] .modal select:not([multiple]),
+        html[data-theme="dark"] #course-modal select:not([multiple]),
+        html[data-theme="dark"] .admin-input select:not([multiple]),
+        html[data-theme="dark"] .view-selector,
+        html[data-theme="dark"] .tag-filter-select,
+        html[data-theme="dark"] select.form-control,
+        html[data-theme="dark"] .todo-quick-select,
+        html[data-theme="dark"] .todo-drawer-quick-add select:not([multiple]) {
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+            background-position: right 18px center !important;
+            padding-right: 42px !important;
+            box-sizing: border-box !important;
+        }
+
         /* Complete Horizontal Scroll protection */
         html, 
         body.admin-body {
@@ -1256,7 +1298,7 @@
                                 </div>
 
                                 <!-- Date preset selector -->
-                                <select id="email-log-date-preset" style="padding: 10px 42px 10px 14px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 14px; background: #f8fafc; color: #1e293b; cursor: pointer; font-weight: 500;">
+                                <select id="email-log-date-preset" style="padding: 10px 42px 10px 14px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 14px; background-color: #f8fafc; color: #1e293b; cursor: pointer; font-weight: 500;">
                                     <option value="all">Alle datoer</option>
                                     <option value="today">I dag</option>
                                     <option value="7days">Siste 7 dager</option>
@@ -1272,14 +1314,14 @@
                                 </div>
 
                                 <!-- Status filter -->
-                                <select id="email-log-status-filter" style="padding: 10px 42px 10px 14px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 14px; background: #f8fafc; color: #1e293b; cursor: pointer; font-weight: 500;">
+                                <select id="email-log-status-filter" style="padding: 10px 42px 10px 14px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 14px; background-color: #f8fafc; color: #1e293b; cursor: pointer; font-weight: 500;">
                                     <option value="all">Alle statuser</option>
                                     <option value="sent">Sendt</option>
                                     <option value="failed">Feilet</option>
                                 </select>
 
                                 <!-- Limit fetch selector -->
-                                <select id="email-log-limit-select" style="padding: 10px 42px 10px 14px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 14px; background: #f8fafc; color: #1e293b; cursor: pointer; font-weight: 500;" title="Velg hvor mange e-poster du vil laste inn fra databasen">
+                                <select id="email-log-limit-select" style="padding: 10px 42px 10px 14px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 14px; background-color: #f8fafc; color: #1e293b; cursor: pointer; font-weight: 500;" title="Velg hvor mange e-poster du vil laste inn fra databasen">
                                     <option value="100">Vis 100 siste</option>
                                     <option value="250">Vis 250 siste</option>
                                     <option value="500" selected>Vis 500 siste</option>
@@ -1746,7 +1788,7 @@
     <script type="module" src="js/reading-plans-init.jsx"></script>
     <script type="module" src="js/unsplash.js?v=20260511_G1"></script>
     <script type="module" src="js/version-history.js?v=20260728_V1"></script>
-    <script type="module" src="js/admin.js?v=20261001_course_purchases_fix"></script>
+    <script type="module" src="js/admin.js?v=20261001_courses_pricing_model_v2"></script>
     <script type="module">
         window.addEventListener('load', () => {
             if (!window.adminManager) {

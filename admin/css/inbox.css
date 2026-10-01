@@ -722,8 +722,13 @@
     color: #0f172a;
     font: inherit;
     font-size: 13px;
-    background: #fff;
+    background-color: #fff;
     outline: none;
+}
+
+.email-composer select {
+    padding: 9px 42px 9px 10px !important;
+    cursor: pointer;
 }
 
 .email-composer input:focus,
