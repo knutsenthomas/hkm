@@ -52,7 +52,7 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" />
 
     <link rel="stylesheet" href="../styles.css">
-    <link rel="stylesheet" href="css/dashboard.css?v=20260927_mobile_actions">
+    <link rel="stylesheet" href="css/dashboard.css?v=20261001_pulse_overflow_fix">
     <link rel="stylesheet" href="../css/notifications.css">
     <link rel="stylesheet" href="css/admin-unified.css?v=20260930_privacy_spacing_sync">
     <link rel="stylesheet" href="css/todo.css?v=20260729_TODO_OVERHAUL">
@@ -104,6 +104,21 @@
             #dashboard-stats-grid, .stats-grid {
                 grid-template-columns: 1fr !important;
             }
+        }
+
+        /* Prevent clipping of status pulse dot animation */
+        .stat-card.modern[data-id="status"] {
+            overflow: visible !important;
+        }
+        .stat-card.modern[data-id="status"] .stat-value {
+            overflow: visible !important;
+            text-overflow: clip !important;
+            gap: 10px !important;
+            padding: 4px 2px !important;
+        }
+        .status-pulse-dot {
+            margin: 4px 4px 4px 6px !important;
+            flex-shrink: 0 !important;
         }
 
         /* HIDE MOBILE MENU BUTTON ON DESKTOP */

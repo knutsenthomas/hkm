@@ -586,13 +586,16 @@ body.admin-body {
     background-color: #10b981;
     border-radius: 50%;
     display: inline-block;
-    box-shadow: 0 0 0 rgba(16, 185, 129, 0.4);
+    position: relative;
+    flex-shrink: 0;
+    margin: 4px 4px 4px 6px;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
     animation: pulse-green 2s infinite;
 }
 
 @keyframes pulse-green {
     0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
     100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 
@@ -684,14 +687,18 @@ body.admin-body {
 .stat-card.modern[data-id="status"] {
     border-left: 4px solid #10b981 !important;
     border-color: #d1fae5 !important;
+    overflow: visible !important;
 }
 
 .stat-card.modern[data-id="status"] .stat-value {
     font-size: 24px !important;
     display: flex !important;
     align-items: center !important;
-    gap: 8px !important;
+    gap: 10px !important;
     color: #1e293b !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    padding: 4px 2px !important;
 }
 
 /* Trend positioning */

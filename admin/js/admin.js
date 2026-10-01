@@ -4999,8 +4999,8 @@ class AdminManager {
                         break;
                     case 'status':
                         value = `
-                            <span class="status-pulse-dot" style="width: 10px; height: 10px;"></span>
-                            Normal
+                            <span class="status-pulse-dot" style="width: 10px; height: 10px; flex-shrink: 0;"></span>
+                            <span>Normal</span>
                         `;
                         trend = '';
                         break;
