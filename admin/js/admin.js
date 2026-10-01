@@ -24352,7 +24352,7 @@ class AdminManager {
             const rows = items.map((course, i) => {
                 const title = this.escapeHtml(course.title || 'Uten tittel');
                 const description = this.escapeHtml((course.description || '').trim());
-                const shortDesc = description.length > 90 ? `${description.slice(0, 90)}...` : description;
+                const shortDesc = description.length > 40 ? `${description.slice(0, 40).trim()}...` : description;
                 const category = course.category ? this.escapeHtml(course.category) : '—';
                 const lessonsCount = Array.isArray(course.lessons) ? course.lessons.length : 0;
                 const price = Number(course.price || 0);
@@ -24374,9 +24374,9 @@ class AdminManager {
                         ? `<img src="${this.escapeHtml(course.imageUrl)}" alt="" style="width:100%;height:100%;object-fit:cover;">`
                         : `<span class="material-symbols-outlined" style="font-size:20px;">menu_book</span>`}
                                 </div>
-                                <div style="min-width: 0; flex: 1;">
-                                    <div class="user-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${title}</div>
-                                    <div class="text-muted" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.85rem;">${shortDesc || 'Ingen beskrivelse'}</div>
+                                <div style="min-width: 0; max-width: 240px; flex: 1;">
+                                    <div class="user-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${title}">${title}</div>
+                                    ${shortDesc ? `<div class="text-muted" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.82rem; color: #64748b;" title="${description}">${shortDesc}</div>` : ''}
                                 </div>
                             </div>
                         </td>
