@@ -2,32 +2,350 @@
 <html lang="no">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex, nofollow">
   <meta name="referrer" content="no-referrer">
-  <title>Åpne Community | His Kingdom Ministry</title>
-  <link rel="stylesheet" href="/styles.css">
+  <title>Åpne HKP Community | His Kingdom Ministry</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Material Symbols Outlined -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" />
+
+  <!-- Theme Initializer -->
+  <script>
+    (function () {
+      const savedTheme = localStorage.getItem('hkm_theme');
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+      function applyTheme(theme) {
+        const active = theme || (mq.matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', active);
+      }
+      applyTheme(savedTheme);
+    })();
+  </script>
+
   <style>
-    .community-access { max-width: 540px; margin: 140px auto 80px; padding: 32px; border: 1px solid #ddd; border-radius: 20px; }
-    .community-access h1 { font-size: 1.6rem; margin-bottom: 16px; }
-    .community-access p { margin: 16px 0; line-height: 1.6; }
-    .community-access button, .community-access a { display: inline-block; margin: 8px 8px 0 0; padding: 12px 16px; border-radius: 10px; }
-    .community-access button { background: #78350f; color: #fff; cursor: pointer; border: 0; }
-    .community-access [hidden] { display: none; }
-    @media (max-width: 600px) { .community-access { margin: 110px 16px 50px; padding: 24px; } }
+    :root {
+      --primary-color: #1B4965;
+      --primary-dark: #0f2c3f;
+      --accent-gold: #D17D39;
+      --accent-dark: #B54D2B;
+      --bg-page: #f8fafc;
+      --card-bg: rgba(255, 255, 255, 0.96);
+      --card-border: rgba(226, 232, 240, 0.85);
+      --card-shadow: 0 24px 48px -12px rgba(27, 73, 101, 0.12), 0 4px 16px rgba(0, 0, 0, 0.04);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --status-bg: #f8fafc;
+      --status-border: rgba(226, 232, 240, 0.9);
+    }
+
+    html[data-theme="dark"] {
+      --primary-color: #38bdf8;
+      --primary-dark: #0284c7;
+      --accent-gold: #f59e0b;
+      --accent-dark: #d97706;
+      --bg-page: #0b1120;
+      --card-bg: rgba(30, 41, 59, 0.94);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --card-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.6), 0 4px 16px rgba(0, 0, 0, 0.3);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --status-bg: rgba(15, 23, 42, 0.6);
+      --status-border: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background-color: var(--bg-page);
+      background-image: 
+        radial-gradient(circle at 50% 15%, rgba(209, 125, 57, 0.08) 0%, rgba(27, 73, 101, 0.04) 50%, transparent 100%),
+        linear-gradient(180deg, var(--bg-page) 0%, var(--bg-page) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      padding-bottom: max(24px, env(safe-area-inset-bottom));
+      color: var(--text-main);
+      overflow-x: hidden;
+    }
+
+    .community-access {
+      max-width: 480px;
+      width: 100%;
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      box-shadow: var(--card-shadow);
+      padding: 40px 36px;
+      text-align: center;
+      transition: all 0.3s ease;
+      animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* Emblem / Crown Icon Badge */
+    .brand-emblem {
+      width: 60px;
+      height: 60px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(209, 125, 57, 0.16) 0%, rgba(209, 125, 57, 0.05) 100%);
+      border: 1.5px solid rgba(209, 125, 57, 0.28);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      box-shadow: 0 8px 20px -6px rgba(209, 125, 57, 0.2);
+    }
+
+    .brand-emblem .material-symbols-outlined {
+      font-size: 30px;
+      color: var(--accent-gold);
+      line-height: 1;
+    }
+
+    .brand-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      background: rgba(209, 125, 57, 0.08);
+      border: 1px solid rgba(209, 125, 57, 0.2);
+      color: var(--accent-gold);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .community-access h1 {
+      font-size: 1.65rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: var(--text-main);
+      margin-top: 6px;
+      margin-bottom: 8px;
+    }
+
+    .brand-tagline {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    /* Status Box & Animated Spinner */
+    .status-card {
+      background: var(--status-bg);
+      border: 1px solid var(--status-border);
+      border-radius: 16px;
+      padding: 18px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .spinner-ring {
+      width: 28px;
+      height: 28px;
+      border: 3px solid rgba(209, 125, 57, 0.18);
+      border-top-color: var(--accent-gold);
+      border-radius: 50%;
+      animation: spin 0.85s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    #community-status {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-main);
+      line-height: 1.5;
+      margin: 0;
+      text-align: center;
+    }
+
+    /* Actions */
+    .actions-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .btn {
+      min-height: 46px;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      text-decoration: none;
+      border: none;
+      outline: none;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #1B4965 0%, #0d2c3f 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(27, 73, 101, 0.2);
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.02);
+      box-shadow: 0 6px 18px rgba(27, 73, 101, 0.28);
+    }
+
+    .btn-accent {
+      background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-dark) 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(209, 125, 57, 0.25);
+    }
+
+    .btn-accent:hover {
+      transform: scale(1.02);
+      box-shadow: 0 6px 18px rgba(209, 125, 57, 0.32);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--card-border);
+      color: var(--text-muted);
+    }
+
+    .btn-outline:hover {
+      background: rgba(0, 0, 0, 0.03);
+      color: var(--text-main);
+      border-color: rgba(148, 163, 184, 0.6);
+      transform: scale(1.01);
+    }
+
+    html[data-theme="dark"] .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .community-access [hidden] {
+      display: none !important;
+    }
+
+    /* Security micro-badge */
+    .security-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 24px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      opacity: 0.85;
+    }
+
+    .security-badge .material-symbols-outlined {
+      font-size: 14px;
+    }
+
+    @media (max-width: 520px) {
+      .community-access {
+        padding: 32px 20px;
+        border-radius: 20px;
+      }
+      .community-access h1 {
+        font-size: 1.45rem;
+      }
+    }
   </style>
-  <script type="module" src="/js/site-shell.js"></script>
-  <script type="module" src="/script.js"></script>
 </head>
 <body>
   <main class="community-access">
+    <!-- Emblem -->
+    <div class="brand-emblem" aria-hidden="true">
+      <span class="material-symbols-outlined">crown</span>
+    </div>
+
+    <div class="brand-pill">
+      <span>His Kingdom Ministry</span>
+    </div>
+
     <h1>Åpne HKP Community</h1>
-    <p id="community-status" role="status" aria-live="polite">Bekrefter HKM-kontoen din …</p>
-    <button id="community-retry" hidden>Prøv igjen</button>
-    <button id="community-verify" hidden>Send bekreftelseslenke</button>
-    <button id="community-switch" hidden>Bytt HKM-konto</button>
-    <a href="https://hkm-community-app.vercel.app/">Tilbake til Community</a>
+    <p class="brand-tagline">Sømløs pålogging til studieportalen for elever og lærere</p>
+
+    <!-- Status Box -->
+    <div class="status-card">
+      <div class="spinner-ring" aria-hidden="true"></div>
+      <p id="community-status" role="status" aria-live="polite">Bekrefter HKM-kontoen din …</p>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions-group">
+      <button id="community-retry" class="btn btn-accent" hidden>
+        <span class="material-symbols-outlined" style="font-size: 18px;">refresh</span>
+        <span>Prøv igjen</span>
+      </button>
+      
+      <button id="community-verify" class="btn btn-accent" hidden>
+        <span class="material-symbols-outlined" style="font-size: 18px;">mark_email_read</span>
+        <span>Send bekreftelseslenke</span>
+      </button>
+
+      <button id="community-switch" class="btn btn-primary" hidden>
+        <span class="material-symbols-outlined" style="font-size: 18px;">switch_account</span>
+        <span>Bytt HKM-konto</span>
+      </button>
+
+      <a href="https://hkm-community-app.vercel.app/" class="btn btn-outline">
+        <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
+        <span>Tilbake til Community</span>
+      </a>
+    </div>
+
+    <!-- Security footnote -->
+    <div class="security-badge">
+      <span class="material-symbols-outlined">lock</span>
+      <span>Beskyttet med PKCE og ende-til-ende sikker autentisering</span>
+    </div>
   </main>
+
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script type="module" src="js/community-auth.js"></script>
