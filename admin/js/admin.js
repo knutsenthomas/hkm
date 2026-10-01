@@ -154,6 +154,31 @@ class AdminManager {
         }
     }
 
+    async getAdminAuthToken() {
+        try {
+            let user = (typeof firebase !== 'undefined' && firebase.auth) ? firebase.auth().currentUser : null;
+            if (!user && window.firebaseService && window.firebaseService.auth) {
+                user = window.firebaseService.auth.currentUser;
+            }
+            if (!user && typeof firebase !== 'undefined' && firebase.auth) {
+                user = await new Promise((resolve) => {
+                    const timer = setTimeout(() => resolve(null), 2500);
+                    const unsubscribe = firebase.auth().onAuthStateChanged((u) => {
+                        clearTimeout(timer);
+                        if (typeof unsubscribe === 'function') unsubscribe();
+                        resolve(u);
+                    });
+                });
+            }
+            if (user && typeof user.getIdToken === 'function') {
+                return await user.getIdToken();
+            }
+        } catch (e) {
+            console.warn('[AdminManager] Kunne ikke hente admin auth-token:', e);
+        }
+        return null;
+    }
+
     init() {
         console.log("Initializing AdminManager...");
 
@@ -18325,11 +18350,17 @@ class AdminManager {
 
             if (isCompletedStatus) {
                 try {
+                    const token = await this.getAdminAuthToken();
+                    const headers = {
+                        'Content-Type': 'application/json'
+                    };
+                    if (token) {
+                        headers['Authorization'] = `Bearer ${token}`;
+                    }
+
                     const wixRes = await fetch('https://hiskingdomdesigns.no/api/create-manual-order', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
+                        headers,
                         body: JSON.stringify({
                             productId: productId || 'custom',
                             productName: productName || note || 'Egendefinert vare',
@@ -22148,7 +22179,13 @@ class AdminManager {
         }
 
         try {
-            const res = await fetch('https://hiskingdomdesigns.no/api/get-wix-stats');
+            const token = await this.getAdminAuthToken();
+            const headers = {};
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const res = await fetch('https://hiskingdomdesigns.no/api/get-wix-stats', { headers });
             const data = await res.json();
 
             if (!data.success) {
