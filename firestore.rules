@@ -1,3 +1,74 @@
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// Collection: admission_leads
+// Document ID: auto-generated
+// Fields:
+//   - name: string (optional, <= 200 chars)
+//   - email: string (required, > 3 and <= 254 chars, valid email format with '@')
+//   - createdAt: timestamp (optional/serverTimestamp)
+//   - source: string (optional, <= 100 chars, e.g. 'admission_portal_reminder_2027')
+//
+// Collection: applications
+// Document ID: auto-generated
+// Fields:
+//   - userId: string | null (optional, <= 128 chars, matches request.auth.uid if signed in)
+//   - name: string (required, > 0 and <= 200 chars)
+//   - gender: string (optional, <= 50 chars)
+//   - birthDate: string (optional, <= 50 chars)
+//   - email: string (required, > 3 and <= 254 chars, valid email format with '@')
+//   - phone: string (optional, <= 50 chars)
+//   - address: string (optional, <= 300 chars)
+//   - maritalStatus: string (optional, <= 50 chars)
+//   - occupation: string (optional, <= 200 chars)
+//   - programId: string (required, > 0 and <= 100 chars)
+//   - programTitle: string (optional, <= 200 chars)
+//   - programCode: string (optional, <= 50 chars)
+//   - program: string (optional, <= 100 chars)
+//   - paymentPlan: string (optional, <= 50 chars)
+//   - languageAgreement: bool (optional)
+//   - confirmYear1: bool (optional)
+//   - whySeeking: string (optional, <= 20,000 chars)
+//   - expectations: string (optional, <= 20,000 chars)
+//   - howHeard: string (optional, <= 20,000 chars)
+//   - testimony: string (optional, <= 20,000 chars)
+//   - churchCommunity: string (optional, <= 20,000 chars)
+//   - currentMinistry: string (optional, <= 20,000 chars)
+//   - ministryCalling: string (optional, <= 20,000 chars)
+//   - dreamsVision: string (optional, <= 20,000 chars)
+//   - hobbies: string (optional, <= 20,000 chars)
+//   - reference: string (optional, <= 20,000 chars)
+//   - additionalNotes: string (optional, <= 20,000 chars)
+//   - status: string (required, 'pending_review' on create)
+//   - submittedAt: string (optional, <= 50 chars, ISO date string)
+//   - createdAt: timestamp (optional/serverTimestamp)
+//   - date: string (optional, <= 50 chars)
+//
+// Collection: support_emails
+// Document ID: auto-generated
+// Fields:
+//   - to: string (required, authorized internal @hiskingdomministry.no recipient)
+//   - replyTo: string (required, > 3 and <= 254 chars, valid email format)
+//   - message: map (required, keys: subject, text, html)
+//     - subject: string (required, > 0 and <= 300 chars)
+//     - text: string (required, > 0 and <= 20,000 chars)
+//     - html: string (optional, <= 50,000 chars)
+//   - createdAt: timestamp (optional)
+//
+// Collection: system_configs
+// Document ID: 'admissions' | 'permissions' | [configId]
+// Fields:
+//   - isOpen: bool
+//   - updatedAt, updatedBy: strings / timestamps
+//
+// Collection: cms_configs
+// Document ID: 'default' | [configId]
+// Fields:
+//   - [configSlug]: any
+//
+// ===============================================================
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -23,7 +94,7 @@ service cloud.firestore {
     function isBootstrapAdminEmail() {
       return signedIn() &&
         request.auth.token.email is string &&
-        (request.auth.token.email == 'thomas@hiskingdomministry.no' || request.auth.token.email == 'knutsenthomas@gmail.com');
+        (request.auth.token.email == 'thomas@hiskingdomministry.no' || request.auth.token.email == 'knutsenthomas@gmail.com' || request.auth.token.email == 'thomas@tk-design.no');
     }
 
     function isAdmin() {
@@ -166,6 +237,119 @@ service cloud.firestore {
          (request.auth.token.email is string &&
           ((hasKey(resource.data, 'donorEmail') && resource.data.donorEmail == request.auth.token.email) ||
            (hasKey(resource.data, 'email') && resource.data.email == request.auth.token.email))));
+    }
+
+    // Domain validator for admission leads / reminder signups
+    function validAdmissionLeadCreate() {
+      let d = request.resource.data;
+      return d is map &&
+        d.keys().hasOnly(['name', 'email', 'createdAt', 'source']) &&
+        hasKey(d, 'email') &&
+        d.email is string &&
+        d.email.size() > 3 &&
+        d.email.size() <= 254 &&
+        d.email.matches(".*@.*") &&
+        (!hasKey(d, 'name') || (d.name is string && d.name.size() <= 200)) &&
+        (!hasKey(d, 'createdAt') || d.createdAt is timestamp) &&
+        (!hasKey(d, 'source') || (d.source is string && d.source.size() <= 100));
+    }
+
+    // Domain validator for student applications
+    function validApplicationCreate() {
+      let d = request.resource.data;
+      return d is map &&
+        d.keys().hasOnly([
+          'userId', 'name', 'gender', 'birthDate', 'email', 'phone', 'address',
+          'maritalStatus', 'occupation', 'programId', 'programTitle', 'programCode',
+          'program', 'paymentPlan', 'languageAgreement', 'confirmYear1',
+          'whySeeking', 'expectations', 'howHeard', 'testimony', 'churchCommunity',
+          'currentMinistry', 'ministryCalling', 'dreamsVision', 'hobbies',
+          'reference', 'additionalNotes', 'status', 'submittedAt', 'createdAt', 'date'
+        ]) &&
+        // Required identity and routing fields
+        hasKey(d, 'name') && d.name is string && d.name.size() > 0 && d.name.size() <= 200 &&
+        hasKey(d, 'email') && d.email is string && d.email.size() > 3 && d.email.size() <= 254 && d.email.matches(".*@.*") &&
+        hasKey(d, 'programId') && d.programId is string && d.programId.size() > 0 && d.programId.size() <= 100 &&
+        hasKey(d, 'status') && d.status == 'pending_review' &&
+        
+        // Ownership alignment (guest or authenticated matching uid)
+        (!hasKey(d, 'userId') || d.userId == null ||
+          (d.userId is string && d.userId.size() <= 128 && (!signedIn() || d.userId == request.auth.uid))) &&
+
+        // Personal details
+        (!hasKey(d, 'gender') || (d.gender is string && d.gender.size() <= 50)) &&
+        (!hasKey(d, 'birthDate') || (d.birthDate is string && d.birthDate.size() <= 50)) &&
+        (!hasKey(d, 'phone') || (d.phone is string && d.phone.size() <= 50)) &&
+        (!hasKey(d, 'address') || (d.address is string && d.address.size() <= 300)) &&
+        (!hasKey(d, 'maritalStatus') || (d.maritalStatus is string && d.maritalStatus.size() <= 50)) &&
+        (!hasKey(d, 'occupation') || (d.occupation is string && d.occupation.size() <= 200)) &&
+
+        // Program and terms
+        (!hasKey(d, 'programTitle') || (d.programTitle is string && d.programTitle.size() <= 200)) &&
+        (!hasKey(d, 'programCode') || (d.programCode is string && d.programCode.size() <= 50)) &&
+        (!hasKey(d, 'program') || (d.program is string && d.program.size() <= 100)) &&
+        (!hasKey(d, 'paymentPlan') || (d.paymentPlan is string && d.paymentPlan.size() <= 50)) &&
+        (!hasKey(d, 'languageAgreement') || d.languageAgreement is bool) &&
+        (!hasKey(d, 'confirmYear1') || d.confirmYear1 is bool) &&
+
+        // Long answer fields (bounded to max 20,000 characters)
+        (!hasKey(d, 'whySeeking') || (d.whySeeking is string && d.whySeeking.size() <= 20000)) &&
+        (!hasKey(d, 'expectations') || (d.expectations is string && d.expectations.size() <= 20000)) &&
+        (!hasKey(d, 'howHeard') || (d.howHeard is string && d.howHeard.size() <= 20000)) &&
+        (!hasKey(d, 'testimony') || (d.testimony is string && d.testimony.size() <= 20000)) &&
+        (!hasKey(d, 'churchCommunity') || (d.churchCommunity is string && d.churchCommunity.size() <= 20000)) &&
+        (!hasKey(d, 'currentMinistry') || (d.currentMinistry is string && d.currentMinistry.size() <= 20000)) &&
+        (!hasKey(d, 'ministryCalling') || (d.ministryCalling is string && d.ministryCalling.size() <= 20000)) &&
+        (!hasKey(d, 'dreamsVision') || (d.dreamsVision is string && d.dreamsVision.size() <= 20000)) &&
+        (!hasKey(d, 'hobbies') || (d.hobbies is string && d.hobbies.size() <= 20000)) &&
+        (!hasKey(d, 'reference') || (d.reference is string && d.reference.size() <= 20000)) &&
+        (!hasKey(d, 'additionalNotes') || (d.additionalNotes is string && d.additionalNotes.size() <= 20000)) &&
+
+        // Timestamps and metadata
+        (!hasKey(d, 'submittedAt') || (d.submittedAt is string && d.submittedAt.size() <= 50)) &&
+        (!hasKey(d, 'createdAt') || d.createdAt is timestamp) &&
+        (!hasKey(d, 'date') || (d.date is string && d.date.size() <= 50));
+    }
+
+    function canReadOwnApplication() {
+      return signedIn() && (
+        (hasKey(resource.data, 'userId') && resource.data.userId != null && resource.data.userId == request.auth.uid) ||
+        (request.auth.token.email is string &&
+         hasKey(resource.data, 'email') &&
+         resource.data.email is string &&
+         resource.data.email.lower() == request.auth.token.email.lower())
+      );
+    }
+
+    // Domain validator for triggered support and notification emails
+    function validSupportEmailCreate() {
+      let d = request.resource.data;
+      return d is map &&
+        d.keys().hasOnly(['to', 'replyTo', 'message', 'createdAt']) &&
+        hasKey(d, 'to') &&
+        d.to is string &&
+        (
+          d.to in ['school@hiskingdomministry.no', 'post@hiskingdomministry.no', 'kontakt@hiskingdomministry.no', 'thomas@hiskingdomministry.no'] ||
+          d.to.matches(".*@hiskingdomministry\\.no$")
+        ) &&
+        hasKey(d, 'replyTo') &&
+        d.replyTo is string &&
+        d.replyTo.size() > 3 &&
+        d.replyTo.size() <= 254 &&
+        d.replyTo.matches(".*@.*") &&
+        hasKey(d, 'message') &&
+        d.message is map &&
+        d.message.keys().hasOnly(['subject', 'text', 'html']) &&
+        hasKey(d.message, 'subject') &&
+        d.message.subject is string &&
+        d.message.subject.size() > 0 &&
+        d.message.subject.size() <= 300 &&
+        hasKey(d.message, 'text') &&
+        d.message.text is string &&
+        d.message.text.size() > 0 &&
+        d.message.text.size() <= 20000 &&
+        (!hasKey(d.message, 'html') || (d.message.html is string && d.message.html.size() <= 50000)) &&
+        (!hasKey(d, 'createdAt') || d.createdAt is timestamp);
     }
 
     // Public CMS content (website pages + collections)
@@ -312,7 +496,6 @@ service cloud.firestore {
     }
 
     // Donations recorded client-side after successful Stripe confirmation.
-    // Note: this is create-only for public clients; consider moving fully to webhook-only writes.
     match /donations/{donationId} {
       allow create: if isAdmin() || validDonationCreate(donationId);
       allow read: if isAdmin() || canReadOwnDonation();
@@ -489,6 +672,68 @@ service cloud.firestore {
     // Bible Dictionary Cache
     match /bible_dictionary_cache/{docId} {
       allow read, write: if true;
+    }
+
+    // Admission leads / reminder registrations for school admission portal (hkpc.no)
+    match /admission_leads/{leadId} {
+      allow create: if validAdmissionLeadCreate();
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Student admission applications (hkpc.no)
+    match /applications/{applicationId} {
+      allow create: if validApplicationCreate();
+      allow read: if isAdmin() || canReadOwnApplication();
+      allow update, delete: if isAdmin();
+    }
+
+    // Automated internal notification emails (e.g. Trigger Email extension)
+    match /support_emails/{emailId} {
+      allow create: if validSupportEmailCreate();
+      allow read, update, delete: if isAdmin();
+    }
+
+    // System configurations (admissions portal status, permissions matrix)
+    match /system_configs/{docId} {
+      allow read: if isAdmin() || docId == 'admissions';
+      allow write: if isAdmin();
+    }
+
+    // Public CMS configurations (e.g. default settings, admission toggle)
+    match /cms_configs/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Support tickets logged by visitors or users
+    match /support_tickets/{ticketId} {
+      allow create: if request.resource.data is map &&
+        hasKey(request.resource.data, 'email') &&
+        request.resource.data.email is string &&
+        request.resource.data.email.size() > 3 &&
+        request.resource.data.email.size() <= 254 &&
+        (!hasKey(request.resource.data, 'name') || (request.resource.data.name is string && request.resource.data.name.size() <= 200)) &&
+        (!hasKey(request.resource.data, 'message') || (request.resource.data.message is string && request.resource.data.message.size() <= 20000));
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Bible notes saved per user
+    match /bible_notes/{noteId} {
+      allow create: if signedIn() &&
+        hasKey(request.resource.data, 'userId') &&
+        request.resource.data.userId == request.auth.uid;
+
+      allow read, delete: if isAdmin() ||
+        (signedIn() &&
+         hasKey(resource.data, 'userId') &&
+         resource.data.userId == request.auth.uid);
+
+      allow update: if isAdmin() ||
+        (signedIn() &&
+         hasKey(resource.data, 'userId') &&
+         resource.data.userId == request.auth.uid &&
+         hasKey(request.resource.data, 'userId') &&
+         request.resource.data.userId == request.auth.uid);
     }
 
     // Default deny
