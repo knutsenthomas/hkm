@@ -3162,31 +3162,7 @@ async function getVippsPayment(config, baseUrl, accessToken, reference) {
     throw new Error(`Vipps get payment error: ${errorDetail}`);
   }
 
-  // Normalize eCom v2 response to match expected state structure
-  const history = paymentPayload.transactionLogHistory || [];
-  let state = "INITIATED";
-  const successOps = history.filter(h => h.operationSuccess);
-  if (successOps.length > 0) {
-    const latestOp = successOps[successOps.length - 1].operation;
-    if (latestOp === "CAPTURE") state = "CAPTURED";
-    else if (latestOp === "RESERVE") state = "AUTHORIZED";
-    else if (latestOp === "CANCEL" || latestOp === "VOID") state = "CANCELLED";
-    else if (latestOp === "REFUND") state = "REFUNDED";
-  }
-
-  let amountVal = 0;
-  if (history.length > 0) {
-    amountVal = history[0].amount;
-  }
-
-  return {
-    ...paymentPayload,
-    state,
-    amount: {
-      value: amountVal,
-      currency: "NOK"
-    }
-  };
+  return require('./vipps-payment-state.cjs').normalizeVippsPayment(paymentPayload);
 }
 
 async function captureVippsPayment(config, baseUrl, accessToken, reference, amount) {
@@ -4173,6 +4149,8 @@ exports.finalizeVippsPayment = onRequest({
       payment = await getVippsPayment(config, baseUrl, accessToken, normalizedReference);
     }
 
+    const existing = await db.collection('donations').doc(normalizedReference).get();
+    if (existing.exists && ['CAPTURED','AUTHORIZED'].includes(payment.state)) await existing.ref.set({status:payment.state === 'CAPTURED' ? 'completed' : 'authorized',...(payment.state === 'CAPTURED' ? {completedAt:admin.firestore.FieldValue.serverTimestamp()} : {})},{merge:true});
     res.status(200).send({
       reference: normalizedReference,
       state: payment.state || null,
@@ -4532,6 +4510,7 @@ exports.stripeWebhook = onRequest({
 exports.vippsWebhook = onRequest({
   cors: true,
   invoker: "public",
+  secrets: [vippsClientIdParam,vippsClientSecretParam,vippsSubscriptionKeyParam,vippsMsnParam],
 }, async (req, res) => {
   try {
     const payload = req.body;
@@ -4654,20 +4633,15 @@ exports.vippsWebhook = onRequest({
       return;
     }
 
-    if (
-      eventType === 'payment.captured' ||
-      eventType === 'payment.authorized' ||
-      eventType === 'RESERVE' ||
-      eventType === 'CAPTURE' ||
-      !eventType
-    ) {
-      await db.collection('donations').doc(externalId).set({
-         status: 'completed',
-         completedAt: admin.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
-      
-      console.log("Vipps standard donasjon godkjent og oppdatert i db:", externalId);
-    }
+    // Callback payloads never prove settlement. Confirm directly with Vipps.
+    const existing = await db.collection('donations').doc(externalId).get();
+    if (!existing.exists) return res.status(404).send('Unknown payment');
+    const config = getVippsConfig();
+    if (!config.isValid) throw new Error('Vipps configuration missing');
+    const {accessToken,baseUrl} = await getVippsAccessToken(config);
+    const payment = await getVippsPayment(config,baseUrl,accessToken,externalId);
+    const status = payment.state === 'CAPTURED' ? 'completed' : payment.state === 'AUTHORIZED' ? 'authorized' : payment.state === 'CANCELLED' ? 'cancelled' : payment.state === 'REFUNDED' ? 'refunded' : 'pending';
+    await existing.ref.set({status,...(status === 'completed' ? {completedAt:admin.firestore.FieldValue.serverTimestamp()} : {})},{merge:true});
     
     res.status(200).send("OK");
   } catch (error) {
