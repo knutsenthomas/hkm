@@ -65,6 +65,15 @@ async function schoolAccountService({ body, db, getAgreement, timestamp }) {
     }
     accounts.push(buildAccount(data.year, rows, agreements));
   }
-  return { accounts: accounts.sort((a,b) => b.year.localeCompare(a.year)) };
+  const result = { accounts: accounts.sort((a,b) => b.year.localeCompare(a.year)) };
+  if (body.includeGifts === true) {
+    // Identity is supplied by the private, authenticated Community gateway.
+    const snapshot = await db.collection('donations').where('userId', '==', body.centralUid).get();
+    result.gifts = snapshot.docs.map(item => ({ ...item.data(), id: item.id }))
+      .filter(row => row.userId === body.centralUid && row.fund === 'hkpc' && ['Gave', 'Gift', 'Fast giver'].includes(row.type) && Number(row.amountNok ?? row.amount) > 0)
+      .map(row => ({ id: row.id, amount: Number(row.amountNok ?? row.amount), status: row.status || 'unknown', method: row.method || '', date: row.paidAt || row.completedAt?.toDate?.().toISOString() || row.timestamp?.toDate?.().toISOString() || null, reference: row.transactionId || row.id }))
+      .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  }
+  return result;
 }
 module.exports = { confirmedPayments, buildAccount, validateTarget, schoolAccountService };

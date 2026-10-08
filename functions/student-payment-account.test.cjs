@@ -34,3 +34,11 @@ test('combined monthly payments allocate only tuition to the tuition balance',()
  const result=buildAccount('2027',[{id:'combined',status:'completed',fund:'hkpc',type:'Kurs',amountNok:1100,courseId:'hkpc-monthly',registrationAmount:100}],[]);
  assert.equal(result.paid,1000);assert.equal(result.registrationPaid,100);assert.equal(result.remaining,9000);
 });
+
+test('personal gifts use immutable account ownership and never change school balances', async () => {
+ const db=database({school_payment_student_links:{},donations:{own:{...payment,type:'Gave',userId:'student1',amountNok:10},other:{...payment,type:'Gave',userId:'student2'},ministry:{...payment,type:'Gave',userId:'student1',fund:'general'},school:{...payment,userId:'student1'},recurring:{...payment,type:'Fast giver',userId:'student1',status:'pending'}}});
+ const result=await schoolAccountService({body:{mode:'read',centralUid:'student1',includeGifts:true},db});
+ assert.deepEqual(result.accounts,[]);assert.deepEqual(result.gifts.map(row=>row.id).sort(),['own','recurring']);
+ assert.equal(result.gifts.find(row=>row.id==='own').amount,10);assert.equal(result.gifts.find(row=>row.id==='recurring').status,'pending');
+ const adminRead=await schoolAccountService({body:{mode:'read',centralUid:'student1'},db});assert.equal(adminRead.gifts,undefined);
+});
