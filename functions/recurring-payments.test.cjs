@@ -62,3 +62,12 @@ test('PayPal approval is not recorded as payment; only verified completed transa
  txs[0].amount_with_breakdown.gross_amount.value = '1';
  await assert.rejects(reconcilePayPalAgreement(options), /unexpected-recurring-payment/);
 });
+
+test('both providers charge the verified combined fee and Stripe retains the ten-payment cap',async()=>{
+ const verified={...input,verifiedCentralUid:'student1',verifiedRegistrationRemaining:1000};
+ const paypal=paypalPlan(validateRecurring(verified),'product');assert.equal(paypal.billing_cycles[0].pricing_scheme.fixed_price.value,'1100.00');assert.equal(paypal.billing_cycles[0].total_cycles,10);
+ const {db,records}=fakeDb();let price;
+ const anchor=timestamp('2027-01-01T00:00:00Z');
+ const stripe={customers:{create:async()=>({id:'customer'})},prices:{create:async body=>{price=body.unit_amount;return{id:'price'};}},subscriptions:{create:async body=>({id:'sub',billing_cycle_anchor:anchor,latest_invoice:{payment_intent:{id:'pi',status:'requires_payment_method',client_secret:'test'}}}),update:async(id,body)=>assert.equal(body.cancel_at,addMonths(anchor,10))},paymentIntents:{update:async()=>{}}};
+ const result=await createSchoolPaymentPlan({input:verified,stripe,db,now:()=>anchor});assert.equal(price,110000);assert.equal(result.totalAmount,11000);assert.equal(records.get('donations/pi').registrationAmount,100);
+});

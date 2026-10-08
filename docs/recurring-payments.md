@@ -26,3 +26,11 @@ Recurring Vipps on HKPC is unavailable pending the new sales unit's activation a
 `node --test functions/recurring-payments.test.cjs` covers fixed prices/cycles, month ends, duplicate setup, renewal metadata and the distinction between approved agreements and completed payments. HKPC's `test/school-payments.test.js` covers payment payloads, failed/unverified states and duplicate agreements. No live agreement or monetary charge was created while testing.
 
 Deploy only the four entry points above. Functions runtime is Node 22.
+
+## Administrative school payment views
+
+HKM admin links to `/admin/skolebetalinger.html` from the giving area. The page shows linked student balances, school agreement references, and course transactions. Gifts are excluded. All data comes from the default HKM payment database through `schoolPaymentsAdmin`; the server verifies a current, verified HKM administrator.
+
+HKPC website admin provides a School payments tab at `/admin/portal?tab=payments`. Its `studentPayments` admin mode verifies current Community/website admin access before invoking the private HKM payment service. A managed suspended role overrides legacy website admin access. No elevated browser claims or automatic payer-to-student matching are used.
+
+Both views distinguish tuition from the separate registration fee. Only completed course payments reduce the balance. Bank transfers must be recorded as received first. No approved student link means no invented student balance. The displayed administration list is capped at 100 linked accounts, 100 agreements and 500 transactions; a visible notice identifies capped results. Transactions with no year remain visibly unassigned to a school year.

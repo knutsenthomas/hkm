@@ -3785,6 +3785,16 @@ exports.createRecurringPayment = onRequest({ cors: true, invoker: 'public', secr
   if (req.method !== 'POST') return res.status(405).send({ error: 'Method not allowed' });
   try {
     const input = req.body || {};
+    if (input.gift !== true) {
+      const quote = await require('./school-checkout.cjs').readSchoolCheckout(db, input.schoolCheckout);
+      await require('./school-checkout.cjs').confirmSchoolAllocation(db, quote);
+      // Never trust identity or fee allocations supplied by the payment form.
+      input.verifiedCentralUid = quote.centralUid;
+      input.verifiedRegistrationRemaining = quote.registrationRemaining;
+      input.schoolYear = quote.year;
+      input.studentName = quote.name;
+      input.customerDetails = {...input.customerDetails, name: quote.name, email: quote.email};
+    }
     const details = validateRecurring(input);
     const timestamp = Timestamp.now();
     let result;
@@ -3798,13 +3808,14 @@ exports.createRecurringPayment = onRequest({ cors: true, invoker: 'public', secr
         await db.runTransaction(async tx => {
           const snap = await tx.get(ref);
           if (snap.exists && (snap.data().provider !== 'paypal' || snap.data().requestId !== details.requestId)) throw Object.assign(new Error('school-plan-exists'), { status: 409 });
-          if (!snap.exists) tx.set(ref, { provider: 'paypal', requestId: details.requestId, status: 'creating', studentName: details.studentName, schoolYear: details.year, amount: 1000, total: 10000, instalments: 10, timestamp });
+          if (!snap.exists) tx.set(ref, { provider: 'paypal', requestId: details.requestId, status: 'creating', studentName: details.studentName, schoolYear: details.year, amount: details.amount, total: details.amount * 10, instalments: 10, timestamp });
         });
       }
       const { api, config, token } = await recurringPayPalApi();
       const productId = await getOrCreatePayPalProduct(token, config);
       result = await createPayPalAgreement({ details, input, db, api, productId, timestamp });
     } else return res.status(400).send({ error: 'invalid-provider' });
+    if (!details.gift && details.centralUid) await require('./student-payment-account.cjs').schoolAccountService({body:{mode:'link',centralUid:details.centralUid,year:details.year,kind:'plan',reference:details.key},db,timestamp});
     res.status(200).send(result);
   } catch (error) {
     console.error('Recurring payment setup failed:', error.message);
@@ -4497,6 +4508,7 @@ exports.stripeWebhook = onRequest({
         donorEmail: metadata.customer_email || paymentIntent.receipt_email || "Ukjent",
         message: metadata.message || "",
         type: metadata.type || "Gave",
+        registrationAmount: Number(metadata.registration_per_month || 0),
         courseId: metadata.course_id || null,
         courseTitle: metadata.course_title || null,
         fund: metadata.fund || "general"
@@ -9642,22 +9654,72 @@ exports.onCourseEnrollmentUpdatedTrigger = onDocumentUpdated({
   }
 });
 
-// Private service: only the existing Community SSO service account can invoke it.
-exports.schoolPaymentAccount = onRequest({ invoker: ['578298544771-compute@developer.gserviceaccount.com'], secrets: [stripeSecretKeyParam, paypalClientIdParam, paypalClientSecretParam] }, async (req, res) => {
+// Private service: only the Community payment gateway can invoke it.
+exports.schoolPaymentAccount = onRequest({ timeoutSeconds: 300, invoker: ['578298544771-compute@developer.gserviceaccount.com'], secrets: [stripeSecretKeyParam, paypalClientIdParam, paypalClientSecretParam] }, async (req, res) => {
   res.set('Cache-Control', 'no-store');
   if (req.method !== 'POST') return res.status(405).send({ error: 'method-not-allowed' });
   try {
     const { schoolAccountService } = require('./student-payment-account.cjs');
+    if (req.body?.mode === 'checkout') return res.status(200).send(await require('./school-checkout.cjs').schoolCheckout({body:req.body,db,timestamp:Timestamp.now()}));
     const result = await schoolAccountService({ body: req.body || {}, db, timestamp: Timestamp.now(), getAgreement: async record => {
       if (record.provider === 'stripe') {
         const stripe = require('stripe')(stripeSecretKeyParam.value(), { apiVersion: '2023-10-16' });
         const plan = await stripe.subscriptions.retrieve(record.subscriptionId);
-        return { provider: 'stripe', status: plan.status, nextDate: ['active', 'past_due'].includes(plan.status) && plan.current_period_end < plan.cancel_at ? new Date(plan.current_period_end * 1000).toISOString() : null, nextAmount: 1000 };
+        return { provider: 'stripe', status: plan.status, nextDate: ['active', 'past_due'].includes(plan.status) && plan.current_period_end < plan.cancel_at ? new Date(plan.current_period_end * 1000).toISOString() : null, nextAmount: Number(record.amount) || 1000 };
       }
       const { api } = await recurringPayPalApi();
       const plan = await api(`/v1/billing/subscriptions/${record.subscriptionId}`, 'GET');
-      return { provider: 'paypal', status: plan.status.toLowerCase(), nextDate: plan.status === 'ACTIVE' ? plan.billing_info?.next_billing_time || null : null, nextAmount: 1000 };
+      return { provider: 'paypal', status: plan.status.toLowerCase(), nextDate: plan.status === 'ACTIVE' ? plan.billing_info?.next_billing_time || null : null, nextAmount: Number(record.amount) || 1000 };
     } });
+    if (req.body?.mode === 'admin') await enrichSchoolAccounts(result);
     res.status(200).send(result);
   } catch (error) { console.error('School payment account failed:', error.message); res.status(['payment-already-linked','school-payment-not-found','invalid-student','invalid-reference','invalid-request'].includes(error.message) ? 400 : 503).send({ error: 'school-payments-unavailable' }); }
+});
+
+// Administrative overview is separate from the student's private gateway.
+exports.schoolPaymentsAdmin = onRequest({ invoker: 'public', timeoutSeconds: 300, secrets: [stripeSecretKeyParam, paypalClientIdParam, paypalClientSecretParam] }, async (req, res) => {
+  const origin = req.get('Origin');
+  const allowed = ['https://hiskingdomministry.no', 'https://www.hiskingdomministry.no', 'http://localhost:3015', 'http://localhost:3000'];
+  res.set('Cache-Control', 'no-store'); res.set('Vary', 'Origin');
+  if (!allowed.includes(origin)) return res.status(403).json({ error: 'origin-not-allowed' });
+  res.set('Access-Control-Allow-Origin', origin); res.set('Access-Control-Allow-Headers', 'Authorization, Content-Type'); res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  if (req.method === 'OPTIONS') return res.status(204).send('');
+  if (req.method !== 'POST') return res.status(405).json({ error: 'method-not-allowed' });
+  try {
+    const token = (req.get('Authorization') || '').match(/^Bearer (.+)$/)?.[1];
+    if (!token) return res.status(401).json({ error: 'invalid-session' });
+    let identity;
+    try { identity = await require('firebase-admin/auth').getAuth().verifyIdToken(token, true); } catch { return res.status(401).json({ error: 'invalid-session' }); }
+    const current = await require('firebase-admin/auth').getAuth().getUser(identity.uid);
+    const profile = await db.collection('users').doc(identity.uid).get();
+    const bootstrap = ['thomas@hiskingdomministry.no', 'knutsenthomas@gmail.com', 'thomas@tk-design.no'].includes(current.email);
+    if (current.disabled || !current.emailVerified || !(bootstrap || ['admin', 'superadmin'].includes(profile.data()?.role))) return res.status(403).json({ error: 'admin-required' });
+    const { schoolAccountService } = require('./student-payment-account.cjs');
+    const result = await schoolAccountService({ body: { mode: 'admin', year: req.body?.year }, db, timestamp: Timestamp.now(), getAgreement: readSchoolAgreement });
+    await enrichSchoolAccounts(result);
+    res.json(result);
+  } catch { res.status(503).json({ error: 'school-payments-unavailable' }); }
+});
+async function readSchoolAgreement(record) {
+  if (record.provider === 'stripe') {
+    const stripe = require('stripe')(stripeSecretKeyParam.value(), { apiVersion: '2023-10-16' });
+    const plan = await stripe.subscriptions.retrieve(record.subscriptionId);
+    return { provider: 'stripe', status: plan.status, nextDate: ['active','past_due'].includes(plan.status) && plan.current_period_end < plan.cancel_at ? new Date(plan.current_period_end * 1000).toISOString() : null, nextAmount: Number(record.amount) || 1000 };
+  }
+  const { api } = await recurringPayPalApi();
+  const plan = await api(`/v1/billing/subscriptions/${record.subscriptionId}`, 'GET');
+  return { provider: 'paypal', status: plan.status.toLowerCase(), nextDate: plan.status === 'ACTIVE' ? plan.billing_info?.next_billing_time || null : null, nextAmount: Number(record.amount) || 1000 };
+}
+async function enrichSchoolAccounts(result) {
+  for (const account of result.accounts || []) {
+    try { const user = await require('firebase-admin/auth').getAuth().getUser(account.centralUid); account.name = user.displayName || user.email; account.email = user.email || ''; }
+    catch { account.name = 'Elevkonto'; account.email = ''; }
+  }
+}
+
+exports.schoolCheckoutDetails = onRequest({cors:true,invoker:'public'}, async (req,res)=> {
+ res.set('Cache-Control','no-store');
+ if(req.method!=='POST')return res.status(405).send({error:'method-not-allowed'});
+ try {const quote=await require('./school-checkout.cjs').readSchoolCheckout(db,req.body?.quote);res.status(200).send({year:quote.year,name:quote.name,email:quote.email,registrationRemaining:quote.registrationRemaining,amount:1000+quote.registrationRemaining/10});}
+ catch(error){res.status(error.status || 503).send({error:error.message});}
 });

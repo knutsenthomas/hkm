@@ -8,7 +8,7 @@ function returnUrl(value) {
   return url;
 }
 function validateRecurring(input) {
-  if (input.gift !== true) return { ...validatePlan(input), amount: 1000, cycles: 10, gift: false };
+  if (input.gift !== true) return { ...validatePlan(input), cycles: 10, gift: false };
   const name = String(input.customerDetails?.name || '').trim();
   const email = String(input.customerDetails?.email || '').trim().toLowerCase();
   const amount = Number(input.amount);
@@ -95,7 +95,7 @@ async function reconcilePayPalAgreement({ ref, record, api, timestamp, now = new
     if (transaction.status !== 'COMPLETED') continue;
     const gross = transaction.amount_with_breakdown?.gross_amount;
     if (gross?.currency_code !== 'NOK' || Number(gross.value) !== record.amount) throw fail('unexpected-recurring-payment', 409);
-    await ref.firestore.collection('donations').doc(transaction.id).set({ transactionId: transaction.id, subscriptionId: record.subscriptionId, amount: Number(gross.value), amountNok: Number(gross.value), currency: 'NOK', status: 'completed', method: 'paypal_subscription', donorName: record.name, donorEmail: record.email, fund: record.metadata.fund, type: record.metadata.type, courseId: record.metadata.course_id || null, courseTitle: record.metadata.course_title || null, message: record.metadata.message, timestamp, completedAt: timestamp, paidAt: transaction.time }, { merge: true });
+    await ref.firestore.collection('donations').doc(transaction.id).set({ registrationAmount: Number(record.metadata?.registration_per_month || 0), transactionId: transaction.id, subscriptionId: record.subscriptionId, amount: Number(gross.value), amountNok: Number(gross.value), currency: 'NOK', status: 'completed', method: 'paypal_subscription', donorName: record.name, donorEmail: record.email, fund: record.metadata.fund, type: record.metadata.type, courseId: record.metadata.course_id || null, courseTitle: record.metadata.course_title || null, message: record.metadata.message, timestamp, completedAt: timestamp, paidAt: transaction.time }, { merge: true });
   }
   await ref.set({ lastCheckedAt: now.getTime() }, { merge: true });
   return { status: subscription.status, paid: (transactions.transactions || []).some(tx => tx.status === 'COMPLETED') };

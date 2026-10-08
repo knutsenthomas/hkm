@@ -20542,6 +20542,7 @@ class AdminManager {
                         <button class="automation-tab" data-tab="donations">Pr. gave</button>
                         <button class="automation-tab" data-tab="donors">Pr. giver</button>
                         <button class="automation-tab" data-tab="inkind">Fysiske gaver</button>
+                        <a class="automation-tab" href="/admin/skolebetalinger.html">Skolebetalinger</a>
                     </div>
                     
                     <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0; flex-wrap: wrap;">

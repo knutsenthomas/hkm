@@ -19,14 +19,18 @@ function validatePlan(input = {}) {
     throw Object.assign(new Error('invalid-school-plan'), { status: 400 });
   }
   const reference = String(input.reference || '').trim().slice(0, 120);
-  const key = crypto.createHash('sha256').update(`${year}|${email}|${studentName.toLowerCase()}`).digest('hex');
+  const key = crypto.createHash('sha256').update(input.verifiedCentralUid ? `${year}|${input.verifiedCentralUid}` : `${year}|${email}|${studentName.toLowerCase()}`).digest('hex');
+  const registrationPerMonth = input.verifiedRegistrationRemaining === undefined ? 0 : Number(input.verifiedRegistrationRemaining) / INSTALMENTS;
+  if (!Number.isFinite(registrationPerMonth) || registrationPerMonth < 0 || registrationPerMonth > 100) throw Object.assign(new Error('invalid-school-plan'), {status:400});
+  const amount = 1000 + registrationPerMonth;
+  if (Math.abs(amount * 100 - Math.round(amount * 100)) > 0.000001) throw Object.assign(new Error('registration-allocation-needs-review'), {status:409});
   const metadata = {
-    school_plan: 'hkpc_10_months', plan_key: key, instalments: String(INSTALMENTS), school_year: year,
+    registration_per_month: String(registrationPerMonth), school_plan: 'hkpc_10_months', plan_key: key, instalments: String(INSTALMENTS), school_year: year,
     student_name: studentName, customer_name: name, customer_email: email, reference,
     fund: 'hkpc', type: 'Kurs', course_id: 'hkpc-monthly', course_title: `HKPC ${year} – 10 månedlige terminer`,
     message: `Skolebetaling HKPC ${year}\nElev: ${studentName}${reference ? `\nReferanse: ${reference}` : ''}`,
   };
-  return { name, email, studentName, year, requestId, key, metadata };
+  return { name, email, studentName, year, requestId, key, metadata, amount, centralUid: input.verifiedCentralUid || null };
 }
 
 async function createSchoolPaymentPlan({ input, stripe, db, now = () => Math.floor(Date.now() / 1000) }) {
@@ -37,10 +41,10 @@ async function createSchoolPaymentPlan({ input, stripe, db, now = () => Math.flo
     if (snap.exists) {
       const current = snap.data();
       // Only the browser that started the setup can resume an unpaid attempt.
-      if (current.provider !== 'stripe' || current.requestId !== details.requestId || current.name !== details.name || current.reference !== details.metadata.reference) throw Object.assign(new Error('school-plan-exists'), { status: 409 });
+      if (current.provider !== 'stripe' || current.requestId !== details.requestId || current.name !== details.name || current.reference !== details.metadata.reference || current.amount !== details.amount) throw Object.assign(new Error('school-plan-exists'), { status: 409 });
       return current;
     }
-    const data = { provider: 'stripe', requestId: details.requestId, name: details.name, email: details.email, studentName: details.studentName, schoolYear: details.year, reference: details.metadata.reference, startedAt: now(), status: 'creating', amount: 1000, total: 10000, instalments: INSTALMENTS };
+    const data = { provider: 'stripe', requestId: details.requestId, name: details.name, email: details.email, studentName: details.studentName, schoolYear: details.year, reference: details.metadata.reference, startedAt: now(), status: 'creating', amount: details.amount, total: details.amount * INSTALMENTS, instalments: INSTALMENTS };
     tx.set(ref, data);
     return data;
   });
@@ -51,7 +55,7 @@ async function createSchoolPaymentPlan({ input, stripe, db, now = () => Math.flo
   } else {
     // A new customer cannot be charged using a card stored for an unrelated gift.
     const customer = await stripe.customers.create({ name: details.name, email: details.email }, { idempotencyKey: `hkpc-customer-${details.requestId}` });
-    const price = await stripe.prices.create({ unit_amount: MONTHLY_ORE, currency: 'nok', recurring: { interval: 'month' }, product_data: { name: 'HKPC skoleavgift – 1 000 kr per måned i 10 måneder' } }, { idempotencyKey: `hkpc-price-${details.requestId}` });
+    const price = await stripe.prices.create({ unit_amount: Math.round(details.amount * 100), currency: 'nok', recurring: { interval: 'month' }, product_data: { name: `HKPC – ${details.amount} kr per måned i 10 måneder` } }, { idempotencyKey: `hkpc-price-${details.requestId}` });
     subscription = await stripe.subscriptions.create({
       customer: customer.id, items: [{ price: price.id, quantity: 1 }],
       collection_method: 'charge_automatically', payment_behavior: 'default_incomplete',
@@ -70,12 +74,12 @@ async function createSchoolPaymentPlan({ input, stripe, db, now = () => Math.flo
   await stripe.paymentIntents.update(intent.id, { metadata: { ...details.metadata, subscription_id: subscription.id }, receipt_email: details.email });
   await ref.set({ status: 'pending', cancelAt, subscriptionId: subscription.id }, { merge: true });
   await db.collection('donations').doc(intent.id).set({
-    transactionId: intent.id, subscriptionId: subscription.id, amount: 1000, amountNok: 1000, amountOre: MONTHLY_ORE,
+    transactionId: intent.id, subscriptionId: subscription.id, amount: details.amount, amountNok: details.amount, amountOre: Math.round(details.amount * 100), registrationAmount: details.amount - 1000,
     currency: 'nok', method: 'stripe_subscription', status: 'pending',
     donorName: details.name, donorEmail: details.email, type: 'Kurs', fund: 'hkpc',
     message: details.metadata.message, courseId: 'hkpc-monthly', courseTitle: details.metadata.course_title,
   }, { merge: true });
-  return { clientSecret: intent.client_secret, subscriptionId: subscription.id, instalments: INSTALMENTS, monthlyAmount: 1000, totalAmount: 10000, cancelAt };
+  return { clientSecret: intent.client_secret, subscriptionId: subscription.id, instalments: INSTALMENTS, monthlyAmount: details.amount, totalAmount: details.amount * INSTALMENTS, cancelAt };
 }
 
 async function schoolMetadataForIntent(stripe, intent) {
