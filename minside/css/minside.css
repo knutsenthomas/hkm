@@ -6336,3 +6336,23 @@ html[data-theme="dark"] .ms-help-hero p {
     color: #94a3b8 !important;
 }
 
+
+/* School finances live in the Community app; giving stays on My page. */
+.school-payments-link-card p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0 0 16px;
+}
+.school-payments-link-card .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    max-width: 100%;
+    white-space: normal;
+    text-align: center;
+    text-decoration: none;
+}
+.school-payments-link-card .material-symbols-outlined {
+    flex-shrink: 0;
+}

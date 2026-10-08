@@ -2,7 +2,7 @@
 // TODO: User needs to replace this placeholder or configure environment variables
 const stripe = Stripe("pk_live_51Pab8rAL393JGrO9bTUitYflDKlHGpLiqZCCBp0dCzBEV3ZFxARFfK6MgWraehq7i79tJHPIEzlpMwPiT2K3HsiZ00gJ1TQ71Y");
 const STRIPE_PAYMENT_INTENT_URL = "https://createpaymentintent-42bhgdjkcq-uc.a.run.app";
-const STRIPE_CREATE_SUBSCRIPTION_URL = "https://createstripesubscription-42bhgdjkcq-uc.a.run.app";
+const STRIPE_CREATE_SUBSCRIPTION_URL = "https://us-central1-his-kingdom-ministry.cloudfunctions.net/createRecurringPayment";
 const VIPPS_CREATE_PAYMENT_URL = "https://createvippspayment-42bhgdjkcq-uc.a.run.app";
 const VIPPS_FINALIZE_PAYMENT_URL = "https://finalizevippspayment-42bhgdjkcq-uc.a.run.app";
 
@@ -45,10 +45,12 @@ async function initializeStripe(amount, customerDetails = {}, paymentMethodPrefe
     try {
         // Call your backend to create the PaymentIntent or Subscription
         const targetUrl = isRecurring ? STRIPE_CREATE_SUBSCRIPTION_URL : STRIPE_PAYMENT_INTENT_URL;
+        const requestId = isRecurring ? await window.recurringGiftRequestId(amount, customerDetails, 'stripe') : undefined;
         const response = await fetch(targetUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
+                ...(isRecurring ? { gift: true, provider: "stripe", consent: true, requestId } : {}),
                 amount: amount,
                 currency: "nok",
                 customerDetails: customerDetails,
@@ -291,6 +293,8 @@ async function checkStatus() {
 }
 
 async function recordDonation(paymentIntent) {
+    // Recurring payments are recorded only by the verified server webhook.
+    if (paymentIntent.metadata?.donor_plan || paymentIntent.metadata?.school_plan) return;
     try {
         // Only record if we are on a page where firebase is initialized
         if (typeof firebase === 'undefined') return;

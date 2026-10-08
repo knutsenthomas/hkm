@@ -1,6 +1,17 @@
 // Vipps, Stripe, and PayPal Recurring Payments integration for Bli Fast Giver page
 const VIPPS_CREATE_AGREEMENT_URL = "https://createvippsagreement-42bhgdjkcq-uc.a.run.app";
 const VIPPS_FINALIZE_AGREEMENT_URL = "https://finalizevippsagreement-42bhgdjkcq-uc.a.run.app";
+const RECURRING_PAYMENT_URL = "https://us-central1-his-kingdom-ministry.cloudfunctions.net/createRecurringPayment";
+const RECURRING_VERIFY_URL = "https://us-central1-his-kingdom-ministry.cloudfunctions.net/verifyRecurringPayment";
+
+async function recurringGiftRequestId(amount, customerDetails, provider) {
+    const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(JSON.stringify([provider, amount, customerDetails.email, customerDetails.name, customerDetails.fund])));
+    const key = "hkm-recurring-v1-" + Array.from(new Uint8Array(hash), byte => byte.toString(16).padStart(2, "0")).join("");
+    let id = sessionStorage.getItem(key);
+    if (!id) { id = crypto.randomUUID(); sessionStorage.setItem(key, id); }
+    return id;
+}
+window.recurringGiftRequestId = recurringGiftRequestId;
 const PAYPAL_CREATE_PLAN_URL = "https://createpaypalsubscriptionplan-42bhgdjkcq-uc.a.run.app";
 const PAYPAL_ACTIVATE_SUB_URL = "https://activatepaypalsubscription-42bhgdjkcq-uc.a.run.app";
 const PAYPAL_CLIENT_ID = "Adja3K8kDYk5_GUz10nBkwlYMgHNNXwiiwfGdGD7wkU354Z-qf9UJApOfD_YfV98t-SuzjXJZg2kPp-a";
@@ -495,6 +506,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Check if we are returning from Vipps
     handleVippsReturn();
+    handlePayPalRecurringReturn();
 });
 
 // Helper to open modal
@@ -582,6 +594,10 @@ function openAgreementModal(method = "vipps") {
                 <!-- Fund purpose (hidden or defaults to general) -->
                 <input type="hidden" id="hkm-donor-fund" value="general">
 
+                <label style="display:flex;gap:12px;align-items:flex-start;margin:20px 0;font-size:14px;line-height:1.6;">
+                    <input type="checkbox" required style="margin-top:5px;" aria-label="${isEnglish ? 'Authorise monthly payments' : isSpanish ? 'Autorizar pagos mensuales' : 'Godkjenn månedlige trekk'}">
+                    <span>${isEnglish ? 'I authorise the selected amount to be charged every month until I cancel. Contact post@hiskingdomministry.no to cancel; PayPal agreements can also be cancelled in PayPal.' : isSpanish ? 'Autorizo el importe seleccionado cada mes hasta que cancele. Para cancelar, contacte con post@hiskingdomministry.no o cancele el acuerdo en PayPal.' : 'Jeg godkjenner at valgt beløp trekkes hver måned til jeg avslutter avtalen. Kontakt post@hiskingdomministry.no for å avslutte; PayPal-avtaler kan også avsluttes i PayPal.'}</span>
+                </label>
                 <button type="submit" class="hkm-submit-btn" id="hkm-submit-btn">
                     ${submitBtnText}
                 </button>
@@ -757,111 +773,35 @@ function openAgreementModal(method = "vipps") {
                 setTimeout(() => modal.remove(), 300);
             }
         } else if (method === "paypal") {
-            submitBtn.innerHTML = `<span class="hkm-spinner" style="width: 20px; height: 20px; border-width: 2px; margin-right: 10px; margin-bottom: 0; display: inline-block; vertical-align: middle;"></span>${t('loading_init')}`;
-
             try {
-                const customerDetails = {
-                    name: donorName,
-                    email: donorEmail,
-                    phone: donorPhone,
-                    address: donorAddress,
-                    zip: donorZip,
-                    city: donorCity,
-                    fund: fund,
-                    userId: currentUser ? currentUser.uid : null
-                };
-
-                // 1. Call backend to create Subscription Plan
-                const planResponse = await fetch(PAYPAL_CREATE_PLAN_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ amount })
+                const customerDetails = { name: donorName, email: donorEmail, fund };
+                const requestId = await recurringGiftRequestId(amount, customerDetails, 'paypal');
+                const response = await fetch(RECURRING_PAYMENT_URL, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount, customerDetails, gift: true, provider: 'paypal', consent: true, requestId, returnUrl: window.location.href.split('?')[0] })
                 });
-
-                const planData = await parseJsonOrThrow(planResponse);
-                if (!planData.planId) {
-                    throw new Error("Failed to create PayPal subscription plan");
-                }
-
-                const planId = planData.planId;
-
-                // 2. Replace form with PayPal container
-                const payPalHeadingText = isEnglish ? "Complete with PayPal" : (isSpanish ? "Completar con PayPal" : "Fullfør med PayPal");
-                form.innerHTML = `
-                    <div id="paypal-checkout-container" style="display: block; margin: 0; padding: 0; background: transparent;">
-                        <h4 style="margin-bottom: 16px; color: #1B4965; font-weight: 700; font-size: 16px; text-align: center;">${payPalHeadingText}</h4>
-                        <div id="paypal-button-container-recurring" style="margin-bottom: 16px;"></div>
-                    </div>
-                `;
-
-                // 3. Load PayPal SDK & Render Smart buttons
-                loadPayPalSdkRecurring(() => {
-                    if (typeof paypal === "undefined") {
-                        alert("PayPal SDK could not be loaded.");
-                        return;
-                    }
-
-                    paypal.Buttons({
-                        createSubscription: function(data, actions) {
-                            return actions.subscription.create({
-                                plan_id: planId
-                            });
-                        },
-                        onApprove: async function(data, actions) {
-                            showLoadingOverlayRecurring(true);
-
-                            try {
-                                const activateResponse = await fetch(PAYPAL_ACTIVATE_SUB_URL, {
-                                    method: "POST",
-                                    headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify({
-                                        subscriptionId: data.subscriptionID,
-                                        customerDetails,
-                                        amount
-                                    })
-                                });
-
-                                const activateData = await parseJsonOrThrow(activateResponse);
-                                if (activateData.status !== "success") {
-                                    throw new Error("Failed to activate PayPal subscription");
-                                }
-
-                                showLoadingOverlayRecurring(false);
-                                modal.classList.remove("active");
-                                setTimeout(() => modal.remove(), 300);
-
-                                const successMsg = isEnglish 
-                                    ? "Thank you! Your regular donation agreement via PayPal has been successfully created." 
-                                    : (isSpanish ? "¡Gracias! Su acuerdo de donación regular a través de PayPal ha sido creado con éxito." : "Tusen takk! Din faste avtale via PayPal ble vellykket opprettet.");
-                                showResultModal(true, successMsg);
-
-                            } catch (error) {
-                                console.error("PayPal Subscription activation failed:", error);
-                                showLoadingOverlayRecurring(false);
-                                alert("Aktivering av avtalen feilet: " + error.message);
-                            }
-                        },
-                        onError: function(err) {
-                            console.error("PayPal Subscription error:", err);
-                            alert("Det oppstod en feil under opprettelsen av avtalen i PayPal-vinduet.");
-                        },
-                        style: {
-                            layout: 'vertical',
-                            color:  'gold',
-                            shape:  'rect',
-                            label:  'subscribe'
-                        }
-                    }).render('#paypal-button-container-recurring');
-                });
-
-            } catch (err) {
-                console.error("PayPal recurring initiation failed:", err);
-                alert("Kunne ikke starte avtalen: " + err.message);
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalText;
+                const data = await parseJsonOrThrow(response);
+                const target = new URL(data.redirectUrl);
+                if (target.protocol !== 'https:' || !/(^|\.)paypal\.com$/.test(target.hostname)) throw new Error('Invalid PayPal approval link');
+                window.location.assign(target.href);
+            } catch (error) {
+                alert(isEnglish ? 'We could not start the agreement. Contact us before trying again if you already approved payment.' : 'Kunne ikke starte avtalen. Kontakt oss før du prøver igjen hvis du allerede har godkjent en betaling.');
+                submitBtn.disabled = false; submitBtn.textContent = originalText;
             }
         }
     });
+}
+
+async function handlePayPalRecurringReturn() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('recurring_provider') !== 'paypal') return;
+    if (params.get('cancelled') === '1') { showResultModal(false, isEnglish ? 'PayPal setup was cancelled.' : 'PayPal-avtalen ble avbrutt.'); return; }
+    try {
+        const response = await fetch(RECURRING_VERIFY_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: params.get('agreement_key'), requestId: params.get('request_id') }) });
+        const data = await parseJsonOrThrow(response);
+        showResultModal(data.status === 'ACTIVE', data.status === 'ACTIVE' ? (isEnglish ? 'Your monthly gift agreement is active. Each payment is registered after confirmation.' : 'Din månedlige gaveavtale er aktiv. Hver betaling registreres når den er bekreftet.') : (isEnglish ? 'The agreement is not confirmed. Contact us before creating another.' : 'Avtalen er ikke bekreftet. Kontakt oss før du oppretter en ny.'));
+        window.history.replaceState({}, '', window.location.pathname);
+    } catch { showResultModal(false, isEnglish ? 'We could not verify the agreement. Contact us before trying again.' : 'Vi kunne ikke bekrefte avtalen. Kontakt oss før du prøver igjen.'); }
 }
 
 // Check URL and handle agreement validation

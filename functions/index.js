@@ -1,3 +1,5 @@
+const { validateRecurring, createStripeGift, createPayPalAgreement, reconcilePayPalAgreement } = require('./recurring-payments.cjs');
+const { createSchoolPaymentPlan, schoolMetadataForIntent } = require('./school-payment-plan.cjs');
 const { defineSecret } = require('firebase-functions/params');
 const geminiApiKeyParam = defineSecret('GEMINI_API_KEY');
 const openaiApiKeyParam = defineSecret('OPENAI_API_KEY');
@@ -3765,6 +3767,74 @@ exports.activatePayPalSubscription = onRequest({
   }
 });
 
+// HKPC and HKM share the same provider credentials, agreements and payment ledger.
+async function recurringPayPalApi() {
+  const config = getPayPalConfig();
+  const token = await getPayPalAccessToken(config);
+  const api = async (path, method, body, requestId) => {
+    const response = await fetch(`${config.apiBase}${path}`, { method, headers: {
+      Authorization: `Bearer ${token}`, 'Content-Type': 'application/json',
+      ...(requestId ? { 'PayPal-Request-Id': crypto.createHash('sha256').update(requestId).digest('hex').slice(0, 32) } : {}),
+    }, ...(body ? { body: JSON.stringify(body) } : {}) });
+    if (!response.ok) throw new Error(`PayPal request failed (${response.status})`);
+    return response.json();
+  };
+  return { api, config, token };
+}
+exports.createRecurringPayment = onRequest({ cors: true, invoker: 'public', secrets: [stripeSecretKeyParam, paypalClientIdParam, paypalClientSecretParam] }, async (req, res) => {
+  if (req.method !== 'POST') return res.status(405).send({ error: 'Method not allowed' });
+  try {
+    const input = req.body || {};
+    const details = validateRecurring(input);
+    const timestamp = Timestamp.now();
+    let result;
+    if (input.provider === 'stripe') {
+      const stripe = require('stripe')(stripeSecretKeyParam.value(), { apiVersion: '2023-10-16' });
+      result = details.gift ? await createStripeGift({ details, stripe, db, timestamp }) : await createSchoolPaymentPlan({ input, stripe, db });
+    } else if (input.provider === 'paypal') {
+      // Reserve the same school-year identity for both providers: no duplicate plan.
+      if (!details.gift) {
+        const ref = db.collection('school_payment_plans').doc(details.key);
+        await db.runTransaction(async tx => {
+          const snap = await tx.get(ref);
+          if (snap.exists && (snap.data().provider !== 'paypal' || snap.data().requestId !== details.requestId)) throw Object.assign(new Error('school-plan-exists'), { status: 409 });
+          if (!snap.exists) tx.set(ref, { provider: 'paypal', requestId: details.requestId, status: 'creating', studentName: details.studentName, schoolYear: details.year, amount: 1000, total: 10000, instalments: 10, timestamp });
+        });
+      }
+      const { api, config, token } = await recurringPayPalApi();
+      const productId = await getOrCreatePayPalProduct(token, config);
+      result = await createPayPalAgreement({ details, input, db, api, productId, timestamp });
+    } else return res.status(400).send({ error: 'invalid-provider' });
+    res.status(200).send(result);
+  } catch (error) {
+    console.error('Recurring payment setup failed:', error.message);
+    res.status(error.status || 500).send({ error: error.status ? error.message : 'recurring-payment-unavailable' });
+  }
+});
+exports.verifyRecurringPayment = onRequest({ cors: true, invoker: 'public', secrets: [paypalClientIdParam, paypalClientSecretParam] }, async (req, res) => {
+  if (req.method !== 'POST') return res.status(405).send({ error: 'Method not allowed' });
+  try {
+    const { key, requestId } = req.body || {};
+    if (!/^[a-f0-9]{64}$/.test(key || '') || !/^[a-f0-9-]{36}$/i.test(requestId || '')) return res.status(400).send({ error: 'invalid-agreement' });
+    const ref = db.collection('recurring_payment_agreements').doc(key);
+    const snap = await ref.get();
+    if (!snap.exists || snap.data().requestId !== requestId || snap.data().provider !== 'paypal') return res.status(404).send({ error: 'agreement-not-found' });
+    const { api } = await recurringPayPalApi();
+    res.status(200).send(await reconcilePayPalAgreement({ ref, record: snap.data(), api, timestamp: Timestamp.now() }));
+  } catch (error) { res.status(error.status || 500).send({ error: 'verification-unavailable' }); }
+});
+exports.reconcileRecurringPayPal = onSchedule({ schedule: 'every 24 hours', secrets: [paypalClientIdParam, paypalClientSecretParam], timeoutSeconds: 540 }, async () => {
+  const { api } = await recurringPayPalApi();
+  // No client callback is required to record subsequent monthly payments.
+  const records = await db.collection('recurring_payment_agreements').where('provider', '==', 'paypal').get();
+  for (const snap of records.docs) {
+    const record = snap.data();
+    if (!record.subscriptionId) continue;
+    try { await reconcilePayPalAgreement({ ref: snap.ref, record, api, timestamp: Timestamp.now() }); }
+    catch (error) { console.error('PayPal recurring reconciliation failed:', snap.id, error.message); }
+  }
+});
+
 exports.createStripeSubscription = onRequest({
   cors: true,
   invoker: "public",
@@ -4405,17 +4475,20 @@ exports.stripeWebhook = onRequest({
   // Vi bryr oss bare om betalinger som faktisk går igjennom
   if (event.type === 'payment_intent.succeeded') {
     const paymentIntent = event.data.object;
-    const metadata = paymentIntent.metadata || {};
+    let metadata = paymentIntent.metadata || {};
     const amount = paymentIntent.amount ? (paymentIntent.amount / 100) : 0;
     
     try {
+      const schoolMetadata = await schoolMetadataForIntent(require('stripe')(stripeSecretKeyParam.value(), { apiVersion: '2023-10-16' }), paymentIntent);
+      if (schoolMetadata) metadata = schoolMetadata;
       await db.collection('donations').doc(paymentIntent.id).set({
         transactionId: paymentIntent.id,
         amount: amount,
         amountNok: amount,
         amountOre: paymentIntent.amount || 0,
         currency: paymentIntent.currency || "nok",
-        method: "stripe",
+        method: schoolMetadata ? "stripe_subscription" : "stripe",
+        ...(metadata.subscription_id ? { subscriptionId: metadata.subscription_id } : {}),
         status: 'completed',
         completedAt: admin.firestore.FieldValue.serverTimestamp(),
         timestamp: admin.firestore.FieldValue.serverTimestamp(),
@@ -4432,6 +4505,8 @@ exports.stripeWebhook = onRequest({
       console.log("Stripe donasjon godkjent og oppdatert i db:", paymentIntent.id);
     } catch (dbError) {
       console.error("Feil ved lagring av Stripe-donasjon til db:", dbError);
+      res.status(500).send({ error: "Payment recording unavailable; retry webhook" });
+      return;
     }
   }
 
@@ -9565,4 +9640,24 @@ exports.onCourseEnrollmentUpdatedTrigger = onDocumentUpdated({
       console.error("[onCourseEnrollmentUpdated] Feil ved sending av e-post:", err);
     }
   }
+});
+
+// Private service: only the existing Community SSO service account can invoke it.
+exports.schoolPaymentAccount = onRequest({ invoker: ['578298544771-compute@developer.gserviceaccount.com'], secrets: [stripeSecretKeyParam, paypalClientIdParam, paypalClientSecretParam] }, async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  if (req.method !== 'POST') return res.status(405).send({ error: 'method-not-allowed' });
+  try {
+    const { schoolAccountService } = require('./student-payment-account.cjs');
+    const result = await schoolAccountService({ body: req.body || {}, db, timestamp: Timestamp.now(), getAgreement: async record => {
+      if (record.provider === 'stripe') {
+        const stripe = require('stripe')(stripeSecretKeyParam.value(), { apiVersion: '2023-10-16' });
+        const plan = await stripe.subscriptions.retrieve(record.subscriptionId);
+        return { provider: 'stripe', status: plan.status, nextDate: ['active', 'past_due'].includes(plan.status) && plan.current_period_end < plan.cancel_at ? new Date(plan.current_period_end * 1000).toISOString() : null, nextAmount: 1000 };
+      }
+      const { api } = await recurringPayPalApi();
+      const plan = await api(`/v1/billing/subscriptions/${record.subscriptionId}`, 'GET');
+      return { provider: 'paypal', status: plan.status.toLowerCase(), nextDate: plan.status === 'ACTIVE' ? plan.billing_info?.next_billing_time || null : null, nextAmount: 1000 };
+    } });
+    res.status(200).send(result);
+  } catch (error) { console.error('School payment account failed:', error.message); res.status(['payment-already-linked','school-payment-not-found','invalid-student','invalid-reference','invalid-request'].includes(error.message) ? 400 : 503).send({ error: 'school-payments-unavailable' }); }
 });

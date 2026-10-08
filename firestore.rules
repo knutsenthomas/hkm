@@ -204,6 +204,7 @@ service cloud.firestore {
     function validDonationCreate(donationId) {
       let d = request.resource.data;
       return d is map &&
+        d.keys().hasOnly(['paymentIntentId', 'amount', 'currency', 'status', 'timestamp', 'uid', 'email', 'type', 'method']) &&
         hasKey(d, 'paymentIntentId') &&
         d.paymentIntentId is string &&
         d.paymentIntentId == donationId &&
