@@ -203,3 +203,24 @@ body.builder-recipients-open #newsletter-builder-layout .hkm-newsletter-text-too
     outline:none!important;
     box-shadow:none!important;
 }
+
+.newsletter-more-actions { position:relative; flex-shrink:0; }
+#newsletter-more-menu { position:absolute; right:0; top:calc(100% + 8px); z-index:2500; width:250px; max-width:calc(100vw - 24px); padding:6px; background:var(--admin-surface,#fff); border:1px solid var(--admin-border,#e5e7eb); border-radius:12px; box-shadow:0 12px 32px #0f172a20; }
+#newsletter-more-menu[hidden] { display:none!important; }
+#newsletter-builder-layout #newsletter-more-menu .newsletter-more-item { display:flex!important; align-items:center; gap:10px; width:100%!important; height:auto!important; min-height:40px; max-width:none!important; padding:10px 12px!important; border:0; border-radius:7px; background:transparent; color:var(--admin-text,#2c3e50); font:inherit; font-size:13px; text-align:left; cursor:pointer; }
+#newsletter-more-menu .newsletter-more-item:hover { background:rgba(197,104,40,.08)!important; }
+#newsletter-more-menu .newsletter-more-item:focus-visible { outline:2px solid #c56828; outline-offset:-2px; }
+#newsletter-builder-layout #newsletter-more-menu .btn-label-text { display:inline!important; }
+#newsletter-more-menu .material-symbols-outlined { font-size:18px; }
+
+.desktop-elements-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--admin-border,#e5e7eb); }
+.desktop-elements-header h3 { margin:0; font-size:17px; }
+.desktop-elements-header button { border:0; background:transparent; color:var(--admin-text,#2c3e50); cursor:pointer; padding:6px; border-radius:8px; }
+@media(min-width:992px) {
+    #newsletter-builder-layout #elements-panel { width:280px!important; min-width:0!important; max-width:280px!important; flex:0 0 auto!important; overflow:hidden auto; transition:width 200ms ease,max-width 200ms ease,opacity 160ms ease; }
+    body.elements-panel-collapsed #newsletter-builder-layout #elements-panel { width:0!important; max-width:0!important; padding:0!important; border:0!important; opacity:0; pointer-events:none; }
+    #newsletter-builder-layout #elements-panel > * { min-width:260px; }
+    #newsletter-builder-layout #elements-panel .mobile-panel-header { display:none!important; }
+}
+@media(max-width:991px) { .desktop-elements-header { display:none; } }
+@media(prefers-reduced-motion:reduce) { #newsletter-builder-layout #elements-panel { transition:none!important; } }

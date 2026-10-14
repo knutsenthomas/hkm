@@ -315,6 +315,11 @@ class NewsletterBuilder {
         this.setupEventListeners();
         this.setupRichTextToolbar();
         this.setupCanvasControls();
+        if (!this.isMobileViewport()) this.toggleElementsPanel(false);
+        window.addEventListener('resize', () => {
+            const panel = document.getElementById('elements-panel');
+            if (panel) panel.inert = !this.isMobileViewport() && !this.elementsPanelOpen;
+        });
         this.setupThemePanelEvents();
         this.setupBubbleMenu();
         this.applyBackgrounds();
@@ -325,11 +330,30 @@ class NewsletterBuilder {
         return window.matchMedia('(max-width: 991px)').matches;
     }
 
+    toggleElementsPanel(force) {
+        if (this.isMobileViewport()) { this.toggleMobileElementsDrawer(); return; }
+        const panel = document.getElementById('elements-panel');
+        if (!panel) return;
+        this.saveSelection();
+        const open = typeof force === 'boolean' ? force : document.body.classList.contains('elements-panel-collapsed');
+        this.elementsPanelOpen = open;
+        document.body.classList.toggle('elements-panel-collapsed', !open);
+        panel.inert = !open;
+        document.getElementById('btn-create-new-campaign')?.setAttribute('aria-expanded', String(open));
+        if (!open) document.getElementById('btn-create-new-campaign')?.focus();
+    }
+
+    animateInsertedElement(node) {
+        if (!node?.animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        node.animate([{ opacity: 0.4, transform: 'translateY(6px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 180, easing: 'ease-out' });
+    }
+
     toggleMobileElementsDrawer() {
         const elementsPanel = document.getElementById('elements-panel');
         const backdrop = document.getElementById('mobile-elements-backdrop');
         if (!elementsPanel) return;
 
+        elementsPanel.inert = false;
         const isOpen = elementsPanel.classList.contains('mobile-drawer-open');
         this.closeMobileDrawers();
 
@@ -1376,6 +1400,7 @@ class NewsletterBuilder {
             versionHistoryBtn.addEventListener('click', () => this.openNewsletterVersionHistory());
         }
         
+        this.setupEditorMoreMenu();
         const saveTemplateBtn = document.getElementById('save-template-btn');
         if (saveTemplateBtn) {
             saveTemplateBtn.addEventListener('click', () => this.saveTemplate());
@@ -4117,12 +4142,14 @@ class NewsletterBuilder {
         // A generated writing paragraph is only needed at the end of the document.
         if (next && last?.tagName === 'P' && !last.textContent.trim() && !last.querySelector('img,video,iframe')) last.remove();
 
+        const insertedElements = Array.from(temp.children);
         const insertedTail = temp.lastElementChild;
         if (afterElement && container.contains(afterElement)) {
             while (temp.firstChild) {
                 container.insertBefore(temp.firstChild, afterElement);
             }
             this.normalizeCanvasBlocks(container);
+            insertedElements.forEach(node => this.animateInsertedElement(node));
             this.placeCaretAfterInserted(insertedTail);
             this.syncUnifiedBlocks();
             this.triggerAutosave();
@@ -4160,6 +4187,7 @@ class NewsletterBuilder {
         }
 
         this.normalizeCanvasBlocks(container);
+        insertedElements.forEach(node => this.animateInsertedElement(node));
         this.placeCaretAfterInserted(lastInsertedNode);
         this.syncUnifiedBlocks();
         this.triggerAutosave();
@@ -4840,7 +4868,7 @@ class NewsletterBuilder {
                 if (action === 'insert') {
                     this.saveSelection();
                     if (this.isMobileViewport()) this.toggleMobileElementsDrawer();
-                    else document.getElementById('elements-panel')?.scrollIntoView({ block: 'nearest' });
+                    else this.toggleElementsPanel(true);
                     document.getElementById('elements-search-input')?.focus();
                 }
             });
@@ -7591,6 +7619,44 @@ class NewsletterBuilder {
                 }
             }, 200);
         }
+    }
+
+    setupEditorMoreMenu() {
+        const toggle = document.getElementById('newsletter-more-toggle');
+        const menu = document.getElementById('newsletter-more-menu');
+        if (!toggle || !menu || this.editorMoreMenuBound) return;
+        this.editorMoreMenuBound = true;
+        const close = () => { menu.hidden = true; toggle.setAttribute('aria-expanded', 'false'); };
+        toggle.addEventListener('click', () => {
+            const open = menu.hidden; menu.hidden = !open; toggle.setAttribute('aria-expanded', String(open));
+            if (open) menu.querySelector('button')?.focus();
+        });
+        document.addEventListener('click', event => { if (!event.target.closest('.newsletter-more-actions')) close(); });
+        menu.addEventListener('keydown', event => {
+            if (event.key === 'Escape') { event.preventDefault(); close(); toggle.focus(); }
+            if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+                event.preventDefault();
+                const items = Array.from(menu.querySelectorAll('button')).filter(button => !button.disabled);
+                const current = items.indexOf(document.activeElement);
+                const index = event.key === 'Home' ? 0 : event.key === 'End' ? items.length - 1 : (current + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+                items[index]?.focus();
+            }
+        });
+        menu.addEventListener('click', event => {
+            const button = event.target.closest('button'); if (!button) return;
+            close();
+            const action = button.dataset.editorAction;
+            if (action === 'duplicate') this.saveDraft(true);
+            if (action === 'export') this.exportHtmlFile();
+            if (action === 'overview') this.openNewsletterOverview();
+            if (action === 'help') {
+                const dialog = document.createElement('dialog'); dialog.className = 'newsletter-start-dialog';
+                dialog.innerHTML = '<h2>Hjelp og snarveier</h2><p>Enter: nytt avsnitt. Shift+Enter: linjeskift.</p><p>Ctrl/⌘+S: lagre. Ctrl/⌘+Z: angre. Ctrl/⌘+Shift+Z: gjør om.</p><p>Bruk avsnittsmenyen i margen for flytting og kopiering. Lagre som … oppretter kopier eller erstatter en mal.</p><button type="button">Lukk</button>';
+                dialog.querySelector('button').onclick = () => dialog.close();
+                dialog.addEventListener('close', () => { dialog.remove(); toggle.focus(); }, { once: true });
+                document.body.append(dialog); dialog.showModal();
+            }
+        });
     }
 
     updateTemplateSaveUi() {
@@ -11077,6 +11143,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             if (builder) builder.style.display = 'block';
             if (mainHeader) mainHeader.style.setProperty('display', 'none', 'important');
             document.body.className = 'builder-active';
+            if (!this.isMobileViewport()) document.body.classList.toggle('elements-panel-collapsed', !this.elementsPanelOpen);
 
             // Maintain URL search parameters
             const url = new URL(window.location.href);

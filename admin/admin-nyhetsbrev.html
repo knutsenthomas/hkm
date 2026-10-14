@@ -1014,14 +1014,23 @@
                         <span class="btn-label-text">Lagre utkast</span>
                     </button>
                     <span id="editing-template-name" hidden style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;"></span>
-                    <button id="save-template-btn" class="btn-secondary-outline" title="Lagre som …">
+                    <div class="newsletter-more-actions">
+                        <button type="button" id="newsletter-more-toggle" class="btn-secondary-outline" aria-label="Flere handlinger" aria-expanded="false" aria-controls="newsletter-more-menu"><span class="material-symbols-outlined">more_horiz</span></button>
+                        <div id="newsletter-more-menu" role="menu" aria-label="Flere handlinger" hidden>
+                    <button id="save-template-btn" class="newsletter-more-item" role="menuitem" title="Lagre som …">
                         <span class="material-symbols-outlined" style="font-size: 18px;">description</span>
                         <span class="btn-label-text">Lagre som …</span>
                     </button>
-                    <button id="version-history-btn" class="btn-secondary-outline" title="Versjonshistorikk">
+                    <button id="version-history-btn" class="newsletter-more-item" role="menuitem" title="Versjonshistorikk">
                         <span class="material-symbols-outlined" style="font-size: 18px;">history</span>
                         <span class="btn-label-text">Versjoner</span>
                     </button>
+                            <button type="button" class="newsletter-more-item" role="menuitem" data-editor-action="duplicate"><span class="material-symbols-outlined">content_copy</span>Dupliser til nytt utkast</button>
+                            <button type="button" class="newsletter-more-item" role="menuitem" data-editor-action="export"><span class="material-symbols-outlined">download</span>Eksporter HTML</button>
+                            <button type="button" class="newsletter-more-item" role="menuitem" data-editor-action="overview"><span class="material-symbols-outlined">dashboard</span>Nyhetsbrevoversikt</button>
+                            <button type="button" class="newsletter-more-item" role="menuitem" data-editor-action="help"><span class="material-symbols-outlined">help</span>Hjelp og snarveier</button>
+                        </div>
+                    </div>
                     <button id="preview-btn" class="btn-secondary-outline" title="Forhåndsvisning">
                         <span class="material-symbols-outlined" style="font-size: 18px;">visibility</span>
                         <span class="btn-label-text">Forhåndsvisning</span>
@@ -1076,7 +1085,7 @@
                 <!-- 1. HKM Venstre Navigasjonsmeny (Lys profil) -->
                 <aside class="builder-dark-sidebar">
                     <div class="sidebar-top-create">
-                        <button class="btn-create-new" id="btn-create-new-campaign" onclick="if(window.builder) builder.switchSidebarView('builder');" title="Ny kampanje" aria-label="Ny kampanje">
+                        <button class="btn-create-new" id="btn-create-new-campaign" onclick="if(window.builder) builder.toggleElementsPanel();" title="Legg til element" aria-label="Legg til element" aria-controls="elements-panel" aria-expanded="false">
                             <span class="material-symbols-outlined">add</span>
                             <span>Ny kampanje</span>
                         </button>
@@ -1125,7 +1134,7 @@
                 <!-- Builder Main Workspace Wrapper (Kanvas, Elementer og Egenskaper) -->
                 <div id="builder-main-workspace" style="display: flex; flex: 1; min-width: 0; height: 100%;">
                     <!-- 2. Elementpanel (Lys profil) -->
-                    <aside class="builder-elements-panel" id="elements-panel">
+                    <aside class="builder-elements-panel" id="elements-panel"><div class="desktop-elements-header"><h3>Legg til</h3><button type="button" aria-label="Lukk elementpanelet" onclick="window.builder?.toggleElementsPanel(false)"><span class="material-symbols-outlined">close</span></button></div>
                         <div class="mobile-panel-header">
                             <h3>Elementer</h3>
                             <button type="button" class="btn-close-mobile-panel" onclick="if(window.builder) builder.closeMobileDrawers();" title="Lukk meny">
