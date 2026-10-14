@@ -3,6 +3,8 @@ const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const { JSDOM } = require('jsdom');
 const source = fs.readFileSync('admin/js/newsletter-builder.js', 'utf8');
+const builderCss = fs.readFileSync('admin/css/newsletter-builder.css', 'utf8');
+assert.doesNotMatch(builderCss, /\.docs-rte-surface p\s*\{[^}]*margin:[^;]*!important/);
 const dom = new JSDOM(`<div id="blocks-container"><p>First</p></div><input id="newsletter-subject" value="Subject"><div class="canvas-header">HKM</div><div id="newsletter-autosave-status"><span class="material-symbols-outlined"></span></div><span id="newsletter-autosave-text"></span><div id="desktop-richtools"><button data-tool="undo"></button><button data-tool="redo"></button></div>`, { url: 'https://example.com/admin?draftId=draft' });
 let timers = new Map(), nextTimer = 0, writes = [], release, fail = false;
 const db = { collection: () => ({ doc: () => ({ set: data => {

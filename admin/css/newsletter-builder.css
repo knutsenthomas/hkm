@@ -5898,7 +5898,8 @@ body.builder-active.sidebar-collapsed .sidebar {
 }
 
 .docs-rte-surface p {
-    margin: 0 0 1.5rem 0 !important;
+    /* Enter creates the next paragraph; explicit template spacing stays editable. */
+    margin: 0;
 }
 
 .docs-rte-surface h1,
