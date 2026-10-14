@@ -29,6 +29,11 @@ Object.assign(editor, { currentMode: 'builder', currentDraftId: 'draft', current
     editorDocumentKey: 'draft', blocks: [], recordNewsletterVersion: async () => {},
     normalizeCanvasBlocks() {}, isMobileViewport: () => false });
 const box = context.document.getElementById('blocks-container');
+// Exercise the actual selection callback after clicking outside the document.
+const selectionSection = source.slice(source.indexOf('// Inspector controls retain'), source.indexOf('// Clear pending delete'));
+const selectionBody = selectionSection.slice(selectionSection.indexOf("() => {") + 7, selectionSection.lastIndexOf('});'));
+assert.doesNotThrow(() => vm.runInContext('(function(){' + selectionBody + '}).call({blockSelectionCleared:true})', context));
+
 const text = context.document.getElementById('newsletter-autosave-text');
 const runSaveTimer = () => {
     const [id, timer] = [...timers].find(([, timer]) => timer.ms === 2000);
@@ -80,11 +85,14 @@ const runSaveTimer = () => {
     assert.equal(box.children.length, 2);
     box.innerHTML = '<p><br></p>';
     context.document.body.classList.add('builder-active');
+    const editorLayout = context.document.createElement('div'); editorLayout.id = 'newsletter-builder-layout';
+    context.document.body.append(editorLayout); editorLayout.append(box);
     editor.positionDocumentTools = () => {};
     editor.updateDocumentTools(box.firstElementChild);
     editor.attachBlockQuickToolbar(box.firstElementChild);
     editor.updateDocumentTools(box.firstElementChild);
     assert.equal(box.querySelector('#block-quick-toolbar'), null);
+    assert.equal(context.document.getElementById('hkm-document-tools').parentElement, editorLayout);
     assert.equal(context.document.querySelector('[data-document-tool="insert"]').hidden, false);
     assert.equal(context.document.querySelector('[data-document-tool="menu"]').hidden, true);
     box.firstElementChild.textContent = 'Written text';

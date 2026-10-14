@@ -919,6 +919,7 @@ class NewsletterBuilder {
 
             // Inspector controls retain the current block even if the browser keeps an old canvas caret.
             document.addEventListener('selectionchange', () => {
+                const container = document.getElementById('blocks-container');
                 if (this.blockSelectionCleared && document.activeElement !== container) return;
                 if (document.activeElement?.closest('.builder-properties-panel, .builder-toolbar-header, dialog')) return;
                 const selection = window.getSelection();
@@ -926,7 +927,6 @@ class NewsletterBuilder {
                 const anchorNode = selection.anchorNode;
                 if (!anchorNode) return;
 
-                const container = document.getElementById('blocks-container');
                 const header = document.querySelector('.canvas-header');
 
                 if (header && header.contains(anchorNode)) {
@@ -4931,7 +4931,7 @@ class NewsletterBuilder {
                     document.getElementById('elements-search-input')?.focus();
                 }
             });
-            document.body.append(tools);
+            (document.getElementById('newsletter-builder-layout') || document.body).append(tools);
             window.addEventListener('scroll', () => { if (this.activeEditNode?.isConnected) this.positionDocumentTools(this.activeEditNode); }, true);
             window.addEventListener('resize', () => { if (this.activeEditNode?.isConnected) this.positionDocumentTools(this.activeEditNode); });
         }
