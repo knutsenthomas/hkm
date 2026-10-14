@@ -919,9 +919,8 @@ class NewsletterBuilder {
 
             // Inspector controls retain the current block even if the browser keeps an old canvas caret.
             document.addEventListener('selectionchange', () => {
-                if (this.blockSelectionCleared) return;
+                if (this.blockSelectionCleared && document.activeElement !== container) return;
                 if (document.activeElement?.closest('.builder-properties-panel, .builder-toolbar-header, dialog')) return;
-                if (this.activeBlockNode?.querySelector('img') || this.activeBlockNode?.tagName === 'IMG') return;
                 const selection = window.getSelection();
                 if (!selection || !selection.rangeCount) return;
                 const anchorNode = selection.anchorNode;
@@ -940,9 +939,10 @@ class NewsletterBuilder {
                         this.showHeaderInspector();
                     }
                 } else if (container && container.contains(anchorNode)) {
-                    const blockNode = this.getCurrentBlock(anchorNode);
+                    const caretNode = anchorNode === container ? container.childNodes[selection.anchorOffset] || container.lastChild : anchorNode;
+                    const blockNode = this.getCurrentBlock(caretNode);
                     if (blockNode) {
-                        this.selectBlock(blockNode, anchorNode.nodeType === Node.TEXT_NODE ? anchorNode.parentElement : anchorNode);
+                        this.selectBlock(blockNode, caretNode.nodeType === Node.TEXT_NODE ? caretNode.parentElement : caretNode);
                     }
                 }
             });
@@ -4902,7 +4902,8 @@ class NewsletterBuilder {
     }
 
     updateDocumentTools(editNode) {
-        const textMode = /^(P|H[1-6]|LI|BLOCKQUOTE)$/.test(editNode?.tagName || '');
+        const emptyTextDiv = editNode?.tagName === 'DIV' && !editNode.textContent.replace(/[\u200B\uFEFF]/g, '').trim() && !editNode.querySelector('img,video,iframe,svg,button,input,table,[contenteditable="false"]');
+        const textMode = emptyTextDiv || /^(P|H[1-6]|LI|BLOCKQUOTE)$/.test(editNode?.tagName || '');
         const formatControl = document.getElementById('toolbar-text-format');
         const sizeControl = document.getElementById('toolbar-text-size');
         if (formatControl) { formatControl.disabled = !textMode; if (textMode) formatControl.value = /^(H1|H2|H3)$/.test(editNode.tagName) ? editNode.tagName.toLowerCase() : 'p'; }
