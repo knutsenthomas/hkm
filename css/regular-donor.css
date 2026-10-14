@@ -50,12 +50,12 @@
 .donor-impact-grid article > span { color: var(--primary-orange); font-size: 32px; margin-bottom: 18px; }
 .donor-impact-grid h3 { font-weight: 700; font-size: 20px; margin-bottom: 12px; }
 .donor-impact-grid p { color: var(--text-light); line-height: 1.8; }
-.donor-help { max-width: 900px; margin: 36px auto 0; border-top: 1px solid #eee5dc; padding: 24px 0 0; background: transparent; }
-.donor-help-main { display: flex; align-items: center; justify-content: space-between; gap: 24px; text-align: left; }
+.donor-help { max-width: 720px; margin: 28px auto 0; border-top: 1px solid #eee5dc; padding: 24px 0 0; background: transparent; }
+.donor-help-main { display: flex; align-items: center; justify-content: flex-start; flex-wrap: wrap; gap: 18px 28px; text-align: left; }
 .donor-help h3 { font-size: 22px; font-weight: 700; margin-bottom: 8px; color: var(--text-dark); }
 .donor-help p { color: var(--text-light); line-height: 1.7; }
 .donor-help .donor-help-contact { display: inline-flex; align-items: center; gap: 12px; flex-shrink: 0; margin: 0; }
-.donor-help-alternative { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 16px; margin-top: 16px; padding-top: 0; font-size: 13px; color: var(--text-light); }
+.donor-help-alternative { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 8px 16px; margin-top: 12px; padding-top: 0; font-size: 13px; color: var(--text-light); }
 .donor-help-alternative a { color: var(--text-dark); text-decoration: underline; text-underline-offset: 4px; }
 .donor-help-alternative i { margin-left: 4px; font-size: 12px; }
 html[data-theme="dark"] .donor-help { border-color: #334155; }
