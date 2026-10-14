@@ -544,6 +544,10 @@ document.addEventListener("DOMContentLoaded", () => {
 function openAgreementModal(method = "vipps") {
     const giftForm = document.getElementById('donor-gift-form');
     if (giftForm && !giftForm.reportValidity()) return;
+    if (giftForm?.elements.frequency?.value === 'once') {
+        window.showOneTimeGift(method);
+        return;
+    }
     // Remove existing modal if any
     const existing = document.getElementById("vipps-recurring-modal");
     if (existing) existing.remove();

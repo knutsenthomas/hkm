@@ -69,7 +69,7 @@ const ROUTES = {
     no: {
         home: '/',
         donate: '/donasjoner',
-        regularDonor: '/bli-fast-giver',
+        regularDonor: '/donasjoner?frequency=monthly',
         churches: '/for-menigheter',
         businesses: '/for-bedrifter',
         network: '/bnn',

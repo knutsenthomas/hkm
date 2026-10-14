@@ -10,7 +10,7 @@ if (form) {
     amount.addEventListener('input', syncAmount);
     form.addEventListener('change', () => {
         const monthly = form.elements.frequency.value === 'monthly';
-        form.action = monthly ? '/bli-fast-giver' : '/donasjoner';
+        form.action = '/donasjoner';
         document.getElementById('home-giving-note').textContent = monthly
             ? 'Gaven trekkes hver måned. Du bekrefter avtalen i Vipps i neste steg.'
             : 'Du fyller inn opplysningene dine i neste steg.';
@@ -20,6 +20,6 @@ if (form) {
         if (!form.reportValidity()) return;
         const monthly = form.elements.frequency.value === 'monthly';
         const params = new URLSearchParams(new FormData(form));
-        window.location.assign(`${monthly ? '/bli-fast-giver' : '/donasjoner'}?${params}${monthly ? '' : '#gi-gave'}`);
+        window.location.assign(`${'/donasjoner'}?${params}${monthly ? '' : '#gi-gave'}`);
     });
 }
