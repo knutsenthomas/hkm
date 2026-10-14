@@ -870,8 +870,10 @@ class NewsletterBuilder {
                 }
             });
 
-            // Wix-style selection change listener to auto-detect text editing/caret placement
+            // Inspector controls retain the current block even if the browser keeps an old canvas caret.
             document.addEventListener('selectionchange', () => {
+                if (document.activeElement?.closest('.builder-properties-panel, .builder-toolbar-header, dialog')) return;
+                if (this.activeBlockNode?.querySelector('img') || this.activeBlockNode?.tagName === 'IMG') return;
                 const selection = window.getSelection();
                 if (!selection || !selection.rangeCount) return;
                 const anchorNode = selection.anchorNode;
@@ -4690,7 +4692,11 @@ class NewsletterBuilder {
     }
 
     selectBlock(node) {
-        if (this.activeBlockNode === node) return;
+        if (this.activeBlockNode === node) {
+            node.classList.add('selected-block-active');
+            node.setAttribute('data-editor-label', this.getEditorBlockLabel(node));
+            return;
+        }
 
         console.log('[HKM Inspector] selectBlock triggered for element:', node);
 
@@ -7058,6 +7064,7 @@ class NewsletterBuilder {
         // 1. Remove all pre-existing edit/delete buttons AND quick toolbar controls to prevent duplicates or leaked editor UI
         container.querySelectorAll('.card-delete-btn, .card-edit-btn, #block-quick-toolbar, .block-quick-toolbar, .quick-tb-btn').forEach(b => b.remove());
         container.querySelectorAll('.selected-block-active, [data-editor-label]').forEach(el => {
+            if (el === this.activeBlockNode && container.contains(el)) return;
             el.classList.remove('selected-block-active');
             el.removeAttribute('data-editor-label');
         });
