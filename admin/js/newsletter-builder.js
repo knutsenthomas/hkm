@@ -804,6 +804,8 @@ class NewsletterBuilder {
         // Unified Editor Reactivity & Drop Zone
         const container = document.getElementById('blocks-container');
         if (container) {
+            container.addEventListener('beforeinput', () => this.captureEditorStep());
+            container.addEventListener('keydown', event => { this.handleDocumentDelete(event); if (!event.defaultPrevented) this.handleDocumentEnter(event); });
             container.addEventListener('input', () => this.syncUnifiedBlocks());
             container.addEventListener('blur', () => this.syncUnifiedBlocks());
             container.addEventListener('keyup', (e) => {
@@ -822,14 +824,13 @@ class NewsletterBuilder {
                 } else if (pastedText) {
                     document.execCommand('insertText', false, pastedText);
                 }
-                this.cleanPastedFormatting();
                 this.syncUnifiedBlocks();
             });
             container.addEventListener('click', (e) => {
                 // Determine active block clicked (Wix-style property panel selector)
                 const blockNode = this.getCurrentBlock(e.target);
                 if (blockNode) {
-                    this.selectBlock(blockNode);
+                    this.selectBlock(blockNode, e.target);
                 }
 
                 const img = e.target.closest('img');
@@ -880,7 +881,7 @@ class NewsletterBuilder {
                 const container = document.getElementById('blocks-container');
                 if (!container || this.currentMode !== 'builder') return;
                 const target = e.target;
-                if (target.closest('.builder-properties-panel, .builder-elements-sidebar-v2, #elements-panel, .builder-toolbar-header, #desktop-richtools, dialog, .profile-modal, .hkm-modal, .hkm-prompt-overlay, .hkm-image-modal, #custom-prompt-modal, .cropper-container, .img-resizer-overlay, #block-quick-toolbar')) return;
+                if (target.closest('.builder-properties-panel, .builder-elements-sidebar-v2, #elements-panel, .builder-toolbar-header, #desktop-richtools, #hkm-document-tools, dialog, .profile-modal, .hkm-modal, .hkm-prompt-overlay, .hkm-image-modal, #custom-prompt-modal, .cropper-container, .img-resizer-overlay, #block-quick-toolbar')) return;
                 if (target.closest('.canvas-header')) return;
                 if (container.contains(target) && target !== container && this.getCurrentBlock(target)) return;
                 this.blockSelectionCleared = true;
@@ -913,8 +914,8 @@ class NewsletterBuilder {
                     }
                 } else if (container && container.contains(anchorNode)) {
                     const blockNode = this.getCurrentBlock(anchorNode);
-                    if (blockNode && blockNode !== this.activeBlockNode) {
-                        this.selectBlock(blockNode);
+                    if (blockNode) {
+                        this.selectBlock(blockNode, anchorNode.nodeType === Node.TEXT_NODE ? anchorNode.parentElement : anchorNode);
                     }
                 }
             });
@@ -985,6 +986,7 @@ class NewsletterBuilder {
 
             // Keyboard handling for Enter, Backspace & Delete (Mac WebKit & Blink compatible)
             container.addEventListener('keydown', (e) => {
+                if (e.defaultPrevented) return;
                 // If a non-text block card is currently selected, Backspace or Delete removes it immediately!
                 if ((e.key === 'Backspace' || e.key === 'Delete') && this.selectedBlockCard && container.contains(this.selectedBlockCard)) {
                     e.preventDefault();
@@ -1501,6 +1503,80 @@ class NewsletterBuilder {
         }
     }
 
+    handleDocumentDelete(event) {
+        if (!['Backspace', 'Delete'].includes(event.key) || event.isComposing) return;
+        const selection = window.getSelection();
+        const container = document.getElementById('blocks-container');
+        if (!selection?.isCollapsed || !selection.rangeCount || !container?.contains(selection.anchorNode)) return;
+        const range = selection.getRangeAt(0);
+        const element = range.startContainer.nodeType === Node.TEXT_NODE ? range.startContainer.parentElement : range.startContainer;
+        if (element.closest('li,td,th')) return;
+        const paragraph = element.closest('p,h1,h2,h3,h4,h5,h6');
+        if (!paragraph || !container.contains(paragraph)) return;
+        const edge = range.cloneRange(); edge.selectNodeContents(paragraph);
+        if (event.key === 'Backspace') edge.setEnd(range.startContainer, range.startOffset);
+        else edge.setStart(range.endContainer, range.endOffset);
+        if (edge.toString().length) return;
+        const neighbour = event.key === 'Backspace' ? paragraph.previousElementSibling : paragraph.nextElementSibling;
+        if (!neighbour) return;
+        // Never merge text into a media card or delete a whole layout at its boundary.
+        if (!/^(P|H[1-6])$/.test(neighbour.tagName) || neighbour.querySelector('img,iframe,video,[contenteditable="false"]') || paragraph.querySelector('img,iframe,video')) {
+            event.preventDefault(); return;
+        }
+        event.preventDefault(); this.captureEditorStep();
+        const left = event.key === 'Backspace' ? neighbour : paragraph;
+        const right = event.key === 'Backspace' ? paragraph : neighbour;
+        if (left.innerHTML === '<br>') left.replaceChildren();
+        const boundary = left.childNodes.length;
+        while (right.firstChild) left.append(right.firstChild);
+        right.remove();
+        const caret = document.createRange(); caret.setStart(left, boundary); caret.collapse(true);
+        selection.removeAllRanges(); selection.addRange(caret);
+        this.saveSelection(); this.selectBlock(this.getCurrentBlock(left), left); this.syncUnifiedBlocks();
+    }
+
+    placeCaretAfterInserted(node) {
+        if (!node?.isConnected) return;
+        let paragraph = node.tagName === 'P' && !node.querySelector('img,iframe,video') ? node : node.nextElementSibling;
+        if (!paragraph || paragraph.tagName !== 'P' || paragraph.querySelector('img,iframe,video')) {
+            paragraph = document.createElement('p'); paragraph.append(document.createElement('br')); node.after(paragraph);
+        }
+        const range = document.createRange(); range.selectNodeContents(paragraph); range.collapse(paragraph !== node);
+        const selection = window.getSelection(); selection.removeAllRanges(); selection.addRange(range);
+        this.saveSelection(); this.selectBlock(this.getCurrentBlock(paragraph), paragraph);
+    }
+
+    handleDocumentEnter(event) {
+        if (event.key !== 'Enter' || event.isComposing || event.ctrlKey || event.metaKey || event.altKey) return;
+        const container = document.getElementById('blocks-container');
+        const selection = window.getSelection();
+        if (!selection?.rangeCount || !container?.contains(selection.anchorNode)) return;
+        const range = selection.getRangeAt(0);
+        const target = range.startContainer.nodeType === Node.TEXT_NODE ? range.startContainer.parentElement : range.startContainer;
+        // Preserve native list/table behaviour and avoid editing embedded media cards.
+        if (target.closest('li,td,th,[contenteditable="false"]')) return;
+        this.captureEditorStep();
+        event.preventDefault();
+        const heading = target.closest('h1,h2,h3,h4,h5,h6');
+        if (event.shiftKey) document.execCommand('insertLineBreak', false);
+        else if (heading && range.collapsed) {
+            const tail = range.cloneRange(); tail.selectNodeContents(heading); tail.setStart(range.endContainer, range.endOffset);
+            if (!tail.toString().length) {
+                const paragraph = document.createElement('p'); paragraph.append(document.createElement('br'));
+                heading.after(paragraph);
+                const caret = document.createRange(); caret.selectNodeContents(paragraph); caret.collapse(true);
+                selection.removeAllRanges(); selection.addRange(caret);
+            } else document.execCommand('insertParagraph', false);
+        } else {
+            document.execCommand('defaultParagraphSeparator', false, 'p');
+            document.execCommand('insertParagraph', false);
+        }
+        this.saveSelection();
+        const node = this.getCurrentBlock(selection.anchorNode);
+        if (node) this.selectBlock(node, selection.anchorNode);
+        this.syncUnifiedBlocks();
+    }
+
     setLineHeight(value) {
         const spacing = Number(value);
         if (!Number.isFinite(spacing) || spacing < 0.8 || spacing > 4) {
@@ -1807,6 +1883,9 @@ class NewsletterBuilder {
                 }
             });
 
+            doc.body.querySelectorAll('p,h1,h2,h3,h4,h5,h6,ul,ol,blockquote').forEach(block => {
+                block.style.marginTop = '0'; block.style.marginBottom = '12px';
+            });
             return doc.body.innerHTML.trim();
         } catch (e) {
             return (fallbackText || '').split(/\n\s*\n/).map(para => `<p>${para}</p>`).join('');
@@ -3996,18 +4075,46 @@ class NewsletterBuilder {
         this.insertHtmlAtCursorOrEndAt(html, null);
     }
 
+    prepareInsertedSpacing(fragment) {
+        // Standard spacing applies to new content only, never existing layouts.
+        fragment.querySelectorAll('p').forEach(paragraph => {
+            const image = paragraph.querySelector('img');
+            if (image) {
+                paragraph.style.margin = '16px 0';
+                image.style.margin = '0';
+            } else if (!paragraph.style.margin && !paragraph.style.marginBottom) {
+                paragraph.style.margin = '0 0 12px';
+            }
+        });
+        let previous;
+        Array.from(fragment.children).forEach(node => {
+            const empty = node.tagName === 'P' && !node.textContent.trim() && !node.querySelector('img,video,iframe');
+            if (empty && previous) node.remove();
+            previous = empty;
+        });
+    }
+
     insertHtmlAtCursorOrEndAt(html, afterElement) {
         const container = document.getElementById('blocks-container');
         if (!container) return;
 
         const temp = document.createElement('div');
         temp.innerHTML = html;
+        this.prepareInsertedSpacing(temp);
+        this.restoreSelection();
+        const insertionAnchor = afterElement || this.getCurrentBlock(window.getSelection()?.anchorNode);
+        const next = afterElement || insertionAnchor?.nextElementSibling;
+        const last = temp.lastElementChild;
+        // A generated writing paragraph is only needed at the end of the document.
+        if (next && last?.tagName === 'P' && !last.textContent.trim() && !last.querySelector('img,video,iframe')) last.remove();
 
+        const insertedTail = temp.lastElementChild;
         if (afterElement && container.contains(afterElement)) {
             while (temp.firstChild) {
                 container.insertBefore(temp.firstChild, afterElement);
             }
             this.normalizeCanvasBlocks(container);
+            this.placeCaretAfterInserted(insertedTail);
             this.syncUnifiedBlocks();
             this.triggerAutosave();
             return;
@@ -4044,6 +4151,7 @@ class NewsletterBuilder {
         }
 
         this.normalizeCanvasBlocks(container);
+        this.placeCaretAfterInserted(lastInsertedNode);
         this.syncUnifiedBlocks();
         this.triggerAutosave();
     }
@@ -4700,11 +4808,61 @@ class NewsletterBuilder {
         document.querySelectorAll('#block-quick-toolbar').forEach(el => el.remove());
     }
 
-    selectBlock(node) {
+    updateDocumentTools(editNode) {
+        const textMode = /^(P|H[1-6]|LI|BLOCKQUOTE)$/.test(editNode?.tagName || '');
+        document.body.classList.toggle('document-text-active', textMode);
+        let tools = document.getElementById('hkm-document-tools');
+        if (!textMode) { if (tools) tools.hidden = true; return; }
+        if (!tools) {
+            tools = document.createElement('div'); tools.id = 'hkm-document-tools';
+            tools.setAttribute('role', 'toolbar'); tools.setAttribute('aria-label', 'Avsnittsverktøy');
+            tools.innerHTML = '<button type="button" data-document-tool="insert" aria-label="Legg til element her" title="Legg til element her">+</button><button type="button" data-document-tool="menu" aria-label="Avsnittsvalg" title="Avsnittsvalg">⋮</button><div class="document-block-menu" hidden><button type="button" data-document-tool="up">Flytt opp</button><button type="button" data-document-tool="down">Flytt ned</button><button type="button" data-document-tool="copy">Kopier</button><button type="button" data-document-tool="properties">Egenskaper</button></div>';
+            tools.addEventListener('pointerdown', event => { this.saveSelection(); event.preventDefault(); });
+            tools.addEventListener('click', event => {
+                const action = event.target.closest('[data-document-tool]')?.dataset.documentTool;
+                const menu = tools.querySelector('.document-block-menu');
+                if (action === 'menu') { menu.hidden = !menu.hidden; return; }
+                menu.hidden = true;
+                if (['up', 'down', 'copy'].includes(action) && this.activeEditNode?.isConnected) this.activeBlockNode = this.activeEditNode;
+                if (action === 'up') this.moveActiveBlock(-1);
+                if (action === 'down') this.moveActiveBlock(1);
+                if (action === 'copy') this.duplicateActiveBlock();
+                if (action === 'properties') document.body.classList.remove('document-text-active');
+                if (action === 'insert') {
+                    this.saveSelection();
+                    if (this.isMobileViewport()) this.toggleMobileElementsDrawer();
+                    else document.getElementById('elements-panel')?.scrollIntoView({ block: 'nearest' });
+                    document.getElementById('elements-search-input')?.focus();
+                }
+            });
+            document.body.append(tools);
+            window.addEventListener('scroll', () => { if (this.activeEditNode?.isConnected) this.positionDocumentTools(this.activeEditNode); }, true);
+            window.addEventListener('resize', () => { if (this.activeEditNode?.isConnected) this.positionDocumentTools(this.activeEditNode); });
+        }
+        tools.hidden = false;
+        tools.querySelector('[data-document-tool="insert"]').hidden = !!editNode.textContent.trim() || !!editNode.querySelector('img,video,iframe');
+        this.positionDocumentTools(editNode);
+    }
+
+    positionDocumentTools(node) {
+        const tools = document.getElementById('hkm-document-tools');
+        if (!tools || tools.hidden) return;
+        const rect = node.getBoundingClientRect();
+        tools.style.left = Math.max(4, rect.left - 38) + 'px';
+        tools.style.top = rect.top + 'px';
+        tools.style.visibility = rect.bottom < 120 || rect.top > window.innerHeight ? 'hidden' : 'visible';
+    }
+
+    selectBlock(node, target = node) {
+        const element = target?.nodeType === Node.TEXT_NODE ? target.parentElement : target;
+        const text = element?.closest('h1,h2,h3,h4,h5,h6,p,li,blockquote');
+        const directButton = element?.closest('a[href],button');
+        const editNode = text && node.contains(text) && !directButton ? text : node;
         this.blockSelectionCleared = false;
-        if (this.activeBlockNode === node) {
+        this.updateDocumentTools(editNode);
+        if (this.activeBlockNode === node && this.activeEditNode === editNode) {
             node.classList.add('selected-block-active');
-            node.setAttribute('data-editor-label', this.getEditorBlockLabel(node));
+            node.setAttribute('data-editor-label', this.getEditorBlockLabel(editNode));
             return;
         }
 
@@ -4714,17 +4872,18 @@ class NewsletterBuilder {
         this.deselectBlock();
 
         this.activeBlockNode = node;
+        this.activeEditNode = editNode;
         this.activeBlockNode.classList.add('selected-block-active');
-        this.activeBlockNode.setAttribute('data-editor-label', this.getEditorBlockLabel(node));
+        this.activeBlockNode.setAttribute('data-editor-label', this.getEditorBlockLabel(editNode));
 
-        const mediaSelection = !!node.querySelector('img, video, iframe') || ['IMG', 'VIDEO', 'IFRAME'].includes(node.tagName);
+        const mediaSelection = editNode === node && !!node.querySelector('img, video, iframe') || ['IMG', 'VIDEO', 'IFRAME'].includes(node.tagName);
         document.querySelectorAll('#desktop-richtools [data-tool]').forEach(button => {
             if (!['undo', 'redo'].includes(button.dataset.tool)) button.disabled = mediaSelection;
         });
         // Determine block type
         const isSocial = (node.classList && node.classList.contains('newsletter-social-block')) || (node.closest && node.closest('.newsletter-social-block'));
-        const img = node.querySelector('img') || (node.tagName === 'IMG' ? node : null);
-        const btn = node.querySelector('.block-btn, .product-cta-btn, .newsletter-btn, .btn, a[href], button') || 
+        const img = (editNode === node ? node.querySelector('img') : null) || (node.tagName === 'IMG' ? node : null);
+        const btn = (editNode === node ? node.querySelector('.block-btn, .product-cta-btn, .newsletter-btn, .btn, a[href], button') : null) ||
                     ((node.classList && (node.classList.contains('block-btn') || node.classList.contains('product-cta-btn') || node.classList.contains('newsletter-btn') || node.classList.contains('btn'))) || node.tagName === 'A' || node.tagName === 'BUTTON' ? node : null);
 
         // Add move/delete controls only after identifying the original block
@@ -4744,10 +4903,11 @@ class NewsletterBuilder {
             this.showButtonInspector(btn, node);
         } else {
             console.log('[HKM Inspector] Loading TEXT inspector');
-            this.showTextInspector(node);
+            this.showTextInspector(editNode);
         }
 
-        if (this.isMobileViewport()) {
+        this.updateDocumentTools(editNode);
+        if (this.isMobileViewport() && editNode === node && !/^(P|H[1-6]|LI|BLOCKQUOTE)$/.test(editNode.tagName)) {
             this.openMobilePropertiesDrawer();
         }
     }
@@ -4758,6 +4918,7 @@ class NewsletterBuilder {
         const classList = node.classList;
 
         if (/^H[1-6]$/.test(tagName)) return 'Overskrift';
+        if (tagName === 'DIV' && node.querySelector('h1,h2,h3,p') && node.querySelector('a[href],button')) return 'Seksjon';
         if (classList?.contains('newsletter-social-block') || node.querySelector?.('.newsletter-social-block')) return 'Sosialt';
         if (classList?.contains('newsletter-product-block') || node.querySelector?.('.newsletter-product-block, .product-card')) return 'Produkt';
         if (classList?.contains('newsletter-event-block') || node.querySelector?.('.newsletter-event-block, .event-card')) return 'Arrangement';
@@ -4770,6 +4931,9 @@ class NewsletterBuilder {
     }
 
     deselectBlock() {
+        document.body.classList.remove('document-text-active');
+        const documentTools = document.getElementById('hkm-document-tools');
+        if (documentTools) documentTools.hidden = true;
         document.querySelectorAll('#block-quick-toolbar').forEach(el => el.remove());
         document.querySelectorAll('#blocks-container .selected-block-active').forEach(el => {
             el.classList.remove('selected-block-active');
@@ -11527,20 +11691,61 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
         }
     }
 
+    editorCaretBookmark() {
+        const container = document.getElementById('blocks-container');
+        const selection = window.getSelection();
+        if (!selection?.rangeCount || !container?.contains(selection.anchorNode)) return null;
+        const offset = (node, index) => {
+            const range = document.createRange(); range.selectNodeContents(container); range.setEnd(node, index);
+            const clone = range.cloneContents(); clone.querySelectorAll('#block-quick-toolbar,.card-delete-btn,.card-edit-btn,.editor-only').forEach(control => control.remove());
+            return clone.textContent.length;
+        };
+        const path = node => { const result = []; while (node !== container && node?.parentNode) { result.unshift(Array.from(node.parentNode.childNodes).indexOf(node)); node = node.parentNode; } return result; };
+        return { anchor: offset(selection.anchorNode, selection.anchorOffset), focus: offset(selection.focusNode, selection.focusOffset), anchorPath: path(selection.anchorNode), focusPath: path(selection.focusNode), anchorOffset: selection.anchorOffset, focusOffset: selection.focusOffset };
+    }
+
+    restoreCaretBookmark(bookmark) {
+        if (!bookmark) return;
+        const container = document.getElementById('blocks-container');
+        const texts = [];
+        const walker = document.createTreeWalker(container, 4);
+        while (walker.nextNode()) if (!walker.currentNode.parentElement.closest('#block-quick-toolbar,.card-delete-btn,.card-edit-btn,.editor-only')) texts.push(walker.currentNode);
+        const point = offset => {
+            for (const text of texts) { if (offset <= text.length) return [text, offset]; offset -= text.length; }
+            return texts.length ? [texts[texts.length - 1], texts[texts.length - 1].length] : [container, 0];
+        };
+        const resolve = (path, index, fallback) => {
+            let node = container;
+            for (const part of path || []) node = node?.childNodes[part];
+            const limit = node?.nodeType === Node.TEXT_NODE ? node.length : node?.childNodes.length;
+            return path && node && index <= limit ? [node, index] : point(fallback);
+        };
+        const [anchor, anchorOffset] = resolve(bookmark.anchorPath, bookmark.anchorOffset, bookmark.anchor);
+        const [focus, focusOffset] = resolve(bookmark.focusPath, bookmark.focusOffset, bookmark.focus);
+        const selection = window.getSelection(); selection.setBaseAndExtent(anchor, anchorOffset, focus, focusOffset);
+        this.saveSelection();
+    }
+
     captureEditorStep() {
         if (this.restoringEditorStep) return;
         const snapshot = JSON.stringify({
             html: this.getCleanCanvasHtml(),
             subject: document.getElementById('newsletter-subject')?.value || '',
             header: document.querySelector('.canvas-header')?.outerHTML || '',
-            lang: this.currentEditorLang || 'no'
+            lang: this.currentEditorLang || 'no',
+            caret: this.editorCaretBookmark()
         });
         this.editorDocumentKey ||= this.currentDraftId || ('new-' + Date.now());
         const key = this.editorDocumentKey + ':' + (this.currentEditorLang || 'no');
         if (this.editorHistoryKey !== key) {
             this.editorHistoryKey = key; this.editorHistory = [snapshot]; this.editorHistoryIndex = 0; this.updateHistoryUi(); return;
         }
-        if (this.editorHistory?.[this.editorHistoryIndex] === snapshot) return;
+        const previous = this.editorHistory?.[this.editorHistoryIndex];
+        if (previous) {
+            const oldContent = JSON.parse(previous); const newContent = JSON.parse(snapshot);
+            delete oldContent.caret; delete newContent.caret;
+            if (JSON.stringify(oldContent) === JSON.stringify(newContent)) { this.editorHistory[this.editorHistoryIndex] = snapshot; return; }
+        }
         this.editorHistory = (this.editorHistory || []).slice(0, this.editorHistoryIndex + 1);
         this.editorHistory.push(snapshot);
         if (this.editorHistory.length > 100) this.editorHistory.shift();
@@ -11568,8 +11773,9 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             if (header && snapshot.header) header.outerHTML = snapshot.header;
             this.normalizeCanvasBlocks(document.getElementById('blocks-container'));
             this.editorHistoryIndex = index;
+            this.restoreCaretBookmark(snapshot.caret);
             this.syncUnifiedBlocks();
-        } finally { this.restoringEditorStep = false; this.savedRange = null; this.updateHistoryUi(); }
+        } finally { this.restoringEditorStep = false; this.updateHistoryUi(); }
     }
 
     triggerAutosave() {
