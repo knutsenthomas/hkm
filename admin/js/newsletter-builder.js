@@ -7701,6 +7701,9 @@ class NewsletterBuilder {
     a { color: #d17d39; text-decoration: none; }
     
     @media only screen and (max-width: 600px) {
+      .hkd-workbook-card, .hkd-workbook-card tbody, .hkd-workbook-card tr { display: block; width: 100%; }
+      .hkd-workbook-card td { display: block !important; width: 100% !important; box-sizing: border-box; }
+      .hkd-workbook-card .hkd-workbook-image { padding: 0 0 18px !important; }
       .email-wrapper { width: 100% !important; padding: 10px !important; }
       .email-body { padding: 24px 16px !important; }
       .email-header { padding: 24px 16px !important; }

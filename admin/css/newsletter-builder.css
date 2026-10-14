@@ -8829,3 +8829,10 @@ body.builder-active .sidebar-overlay.active {
 body.builder-active .sidebar .mobile-sidebar-close-btn {
     display: inline-flex !important;
 }
+
+/* Compact workbook card: stack the image above the description on mobile. */
+@media only screen and (max-width: 600px) {
+    .hkd-workbook-card, .hkd-workbook-card tbody, .hkd-workbook-card tr { display: block; width: 100%; }
+    .hkd-workbook-card td { display: block !important; width: 100% !important; box-sizing: border-box; }
+    .hkd-workbook-card .hkd-workbook-image { padding: 0 0 18px !important; }
+}
