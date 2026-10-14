@@ -123,3 +123,8 @@ dialog.newsletter-save-dialog {
 #newsletter-builder-layout .builder-properties-panel .inspector-input:focus-visible {
     border-color:#c56828!important; outline:2px solid rgba(197,104,40,.25)!important; outline-offset:2px;
 }
+
+.newsletter-workspace .workspace-saved-row { display:flex; align-items:center; gap:12px; }
+.newsletter-workspace .workspace-saved-row a { flex:1; min-width:0; overflow-wrap:anywhere; }
+.newsletter-workspace .workspace-delete { flex-shrink:0; padding:10px 14px; border:1px solid var(--admin-border,#e5e7eb); border-radius:10px; background:var(--admin-surface,#fff); color:#b42318; cursor:pointer; }
+.newsletter-workspace .workspace-delete:focus-visible { outline:2px solid #c56828; outline-offset:3px; }

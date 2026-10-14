@@ -92,7 +92,36 @@ if (root) {
         if (!rows.length) { const row = document.createElement('tr'); const cell = el('td', 'Ingen kampanjer passer søket.'); cell.colSpan = 6; row.append(cell); table.append(row); }
         for (const [kind, values] of [['drafts', drafts], ['templates', templates]]) {
             const box = root.querySelector(`[data-${kind}]`); box.replaceChildren();
-            values.forEach(item => { const link = el('a', item.name || item.subject || 'Uten navn'); link.href = '/admin/admin-nyhetsbrev.html?draftId=' + encodeURIComponent(item.id); box.append(link); });
+            values.forEach(item => {
+                const row = el('div', ''); row.className = 'workspace-saved-row';
+                const name = item.name || item.subject || 'Uten navn';
+                const link = el('a', name); link.href = '/admin/admin-nyhetsbrev.html?draftId=' + encodeURIComponent(item.id);
+                const remove = el('button', 'Slett'); remove.type = 'button'; remove.className = 'workspace-delete';
+                remove.setAttribute('aria-label', 'Slett ' + name);
+                remove.addEventListener('click', async () => {
+                    const builder = window.builder;
+                    const confirmed = builder?.showConfirm
+                        ? await builder.showConfirm('Slett ' + (kind === 'drafts' ? 'kladd' : 'mal'), `Vil du slette «${name}»? Dette kan ikke angres.`, 'Slett')
+                        : window.confirm(`Vil du slette «${name}»? Dette kan ikke angres.`);
+                    if (!confirmed) return;
+                    // Do not let an open editor's autosave recreate a deleted document.
+                    if (builder?.currentDraftId === item.id) {
+                        status.textContent = 'Dette dokumentet er åpent i editoren. Lukk eller åpne et annet dokument før du sletter det.';
+                        return;
+                    }
+                    remove.disabled = true;
+                    try {
+                        await window.firebaseService.db.collection('newsletter_templates').doc(item.id).delete();
+                        if (kind === 'drafts') drafts = drafts.filter(saved => saved.id !== item.id);
+                        else templates = templates.filter(saved => saved.id !== item.id);
+                        try { if (sessionStorage.getItem('hkm_active_draft_id') === item.id) sessionStorage.removeItem('hkm_active_draft_id'); } catch (_) {}
+                        root.querySelector('[data-count-drafts]').textContent = drafts.length;
+                        status.textContent = (kind === 'drafts' ? 'Kladden' : 'Malen') + ' er slettet.';
+                        render();
+                    } catch { status.textContent = 'Kunne ikke slette. Kontroller tilgangen og prøv igjen.'; remove.disabled = false; }
+                });
+                row.append(link, remove); box.append(row);
+            });
             if (!values.length) box.append(el('p', kind === 'drafts' ? 'Ingen lagrede kladder i dette utvalget.' : 'Ingen lagrede maler i dette utvalget.'));
         }
     };
