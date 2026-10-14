@@ -1,8 +1,19 @@
 import { HKD_PRODUCT_TEMPLATE } from './newsletter-product-template.js';
 
-export function campaignState(campaign) {
+export function campaignTime(value) {
+    if (!value) return 0;
+    const result = value?.toDate ? value.toDate().getTime() : new Date(value).getTime();
+    return Number.isFinite(result) ? result : 0;
+}
+export function campaignState(campaign, now = Date.now()) {
     if (campaign.status === 'completed') return Number(campaign.sentCount || 0) < Number(campaign.recipientCount || 0) ? 'Avvik' : 'Fullført';
     if (['failed', 'error'].includes(campaign.status)) return 'Feil';
+    if (campaign.status === 'cancelled') return 'Avbrutt';
+    const unfinished = !campaign.dispatchCompletedAt && (campaign.dispatchStartedAt || campaign.status === 'queued');
+    if (unfinished) {
+        const started = campaignTime(campaign.dispatchStartedAt || campaign.queuedAt || campaign.createdAt);
+        if (!started || now - started > 24 * 60 * 60 * 1000) return 'Uavklart';
+    }
     if (campaign.dispatchStartedAt && !campaign.dispatchCompletedAt) return 'Sender';
     return ({ queued: 'I kø', draft: 'Utkast', scheduled: 'Planlagt', cancelled: 'Avbrutt' })[campaign.status] || 'Ukjent';
 }
@@ -47,7 +58,25 @@ if (root) {
     const filter = root.querySelector('[data-campaign-filter]');
     const el = (tag, text) => { const element = document.createElement(tag); element.textContent = text; return element; };
     const date = data => data.queuedAt || data.sentAt || data.createdAt || '';
-    const time = value => value?.toDate ? value.toDate().getTime() : new Date(value).getTime() || 0;
+    const time = campaignTime;
+    const showLogs = async campaign => {
+        const dialog = document.createElement('dialog');
+        dialog.className = 'newsletter-start-dialog';
+        dialog.append(el('h2', 'Utsendingslogg'), el('p', campaign.subject || 'Uten emne'), el('p', 'Lagret status: ' + (campaign.status || 'Ukjent') + '. Kampanje: ' + campaign.id));
+        dialog.append(el('p', 'Loggene kobles via emne. Flere forsøk med samme emne kan ikke skilles sikkert, og loggene bekrefter ikke levering til innboksen.'));
+        const output = el('p', 'Henter logger …');
+        const close = el('button', 'Lukk'); close.type = 'button'; close.addEventListener('click', () => dialog.close());
+        dialog.append(output, close); document.body.append(dialog);
+        dialog.addEventListener('close', () => dialog.remove(), { once: true }); dialog.showModal();
+        try {
+            if (!campaign.subject) { output.textContent = 'Kampanjen mangler emne; loggene kan ikke kobles.'; return; }
+            const snapshot = await window.firebaseService.db.collection('email_logs').where('subject', '==', campaign.subject).limit(100).get();
+            const logs = []; snapshot.forEach(doc => { const data = doc.data(); if (data.type === 'newsletter') logs.push(data); });
+            const sent = logs.filter(log => log.status === 'sent').length;
+            const failed = logs.filter(log => log.status === 'failed').length;
+            output.textContent = logs.length ? `Fant ${sent} registrert som sendt og ${failed} registrert som feilet med dette emnet. Utvalget er begrenset til 100 logger og kan omfatte flere utsendinger.` : 'Ingen nyhetsbrevlogger med dette emnet ble funnet. Dette beviser ikke at utsendingen mislyktes.';
+        } catch { output.textContent = 'Kunne ikke hente loggene. Kontroller administratortilgangen og prøv igjen.'; }
+    };
     const render = () => {
         table.replaceChildren();
         const term = search.value.trim().toLocaleLowerCase('nb');
@@ -56,10 +85,11 @@ if (root) {
             const row = document.createElement('tr');
             const state = campaignState(campaign);
             const cells = [campaign.subject || 'Uten emne', state, Number(campaign.recipientCount || 0), campaign.sentCount ?? '–', time(date(campaign)) ? new Date(time(date(campaign))).toLocaleDateString('nb-NO') : '–'];
-            cells.forEach((value, index) => { const cell = el('td', value); if (index === 1) cell.className = 'workspace-status'; row.append(cell); });
+            cells.forEach((value, index) => { const cell = el('td', value); if (index === 1) { cell.className = 'workspace-status'; if (state === 'Uavklart') cell.title = 'Uavsluttet forsøk eldre enn 24 timer, eller manglende tidspunkt. Faktisk utsending er ikke bekreftet.'; } row.append(cell); });
+            const logCell = document.createElement('td'); const logButton = el('button', 'Se logg'); logButton.type = 'button'; logButton.addEventListener('click', () => showLogs(campaign)); logCell.append(logButton); row.append(logCell);
             table.append(row);
         }
-        if (!rows.length) { const row = document.createElement('tr'); const cell = el('td', 'Ingen kampanjer passer søket.'); cell.colSpan = 5; row.append(cell); table.append(row); }
+        if (!rows.length) { const row = document.createElement('tr'); const cell = el('td', 'Ingen kampanjer passer søket.'); cell.colSpan = 6; row.append(cell); table.append(row); }
         for (const [kind, values] of [['drafts', drafts], ['templates', templates]]) {
             const box = root.querySelector(`[data-${kind}]`); box.replaceChildren();
             values.forEach(item => { const link = el('a', item.name || item.subject || 'Uten navn'); link.href = '/admin/admin-nyhetsbrev.html?draftId=' + encodeURIComponent(item.id); box.append(link); });
@@ -84,7 +114,7 @@ if (root) {
             root.querySelector('[data-count-campaigns]').textContent=campaigns.length;
             root.querySelector('[data-count-drafts]').textContent=drafts.length;
             root.querySelector('[data-count-sent]').textContent=campaigns.reduce((sum,c)=>sum+Number(c.sentCount||0),0);
-            status.textContent='Viser siste 25 kampanjer per datofelt og siste 25 kladder/maler. «Sendt» betyr sendt fra serveren, ikke bekreftet levering.';
+            status.textContent='Viser siste 25 kampanjer per datofelt og siste 25 kladder/maler. «Sendt» betyr sendt fra serveren, ikke bekreftet levering. «Uavklart» betyr at forsøket mangler avslutning og er eldre enn 24 timer eller mangler tidspunkt. Ingen utsendinger startes på nytt.';
             render();
         } catch { status.textContent='Kunne ikke hente oversikten. Kontroller tilgangen og prøv igjen.'; }
         finally { root.querySelector('[data-workspace-refresh]').disabled=false; }

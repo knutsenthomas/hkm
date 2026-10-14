@@ -426,6 +426,7 @@ class NewsletterBuilder {
         this.skipAutosavedHeader = true;
         this.blocks = [];
         this.currentDraftId = null;
+        this.currentDocumentIsTemplate = false;
         this.currentDraftName = null;
         this.hasCustomDraftName = false;
         this.resetEditorLanguageState();
@@ -515,6 +516,7 @@ class NewsletterBuilder {
                 this.skipAutosavedHeader = false;
                 const data = doc.data();
                 this.currentDraftId = doc.id;
+                this.currentDocumentIsTemplate = data.isDraft === false;
                 this.currentDraftName = data.name || 'Utkast';
                 this.hasCustomDraftName = true;
                 let loadedBlocks = typeof data.blocks === 'string' ? JSON.parse(data.blocks) : (data.blocks || []);
@@ -7402,17 +7404,24 @@ class NewsletterBuilder {
                         blocks: this.blocks,
                         subject,
                         englishPayload: this.englishPayload || null,
-                        createdAt: new Date().toISOString(),
+                        headerHtml: document.querySelector('.canvas-header')?.outerHTML || '',
+                        updatedAt: new Date().toISOString(),
                         isDraft: false
                     };
-                    await window.firebaseService.db.collection('newsletter_templates').add(data);
+                    if (this.currentDocumentIsTemplate && this.currentDraftId) {
+                        await window.firebaseService.db.collection('newsletter_templates').doc(this.currentDraftId).set(data, { merge: true });
+                        this.currentDraftName = name;
+                    } else {
+                        data.createdAt = new Date().toISOString();
+                        await window.firebaseService.db.collection('newsletter_templates').add(data);
+                    }
                     showToast("Mal lagret!", "success");
                     this.loadTemplates();
                 } catch (e) {
                     showToast("Kunne ikke lagre mal.");
                 }
             },
-            "Nyhetsbrev Mal",
+            this.currentDocumentIsTemplate ? this.currentDraftName : "Nyhetsbrev Mal",
             "Vennligst oppgi et navn.",
             "Lagre mal",
             "Lagre"
@@ -9583,7 +9592,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                         subject: canonicalSubject,
                         englishPayload: this.englishPayload || null,
                         updatedAt: new Date().toISOString(),
-                        isDraft: true
+                        isDraft: !this.currentDocumentIsTemplate
                     };
 
                     this.currentDraftName = trimmedName;
@@ -9606,8 +9615,9 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                         source: 'newsletter-save-button'
                     });
 
-                    if (typeof showToast === 'function') showToast(`Kladd "${trimmedName}" lagret!`, "success");
+                    if (typeof showToast === 'function') showToast(`${this.currentDocumentIsTemplate ? 'Mal' : 'Kladd'} "${trimmedName}" lagret!`, "success");
                     this.loadDrafts();
+                    this.loadTemplates();
                 } catch (e) {
                     console.error("Save draft failed:", e);
                     if (typeof showToast === 'function') showToast("Kunne ikke lagre kladd.");
@@ -9677,6 +9687,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                     const confirmed = await this.showConfirm('Last inn kladd', `Last inn kladden "${data.name}"? Dette vil erstatte innholdet i editoren.`, 'Last inn');
                     if (confirmed) {
                         this.currentDraftId = id;
+            this.currentDocumentIsTemplate = false;
                         this.currentDraftName = data.name;
                         this.hasCustomDraftName = true;
                         this.blocks = data.blocks;
@@ -11349,6 +11360,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
         );
         if (confirmed) {
             this.currentDraftId = id;
+            this.currentDocumentIsTemplate = false;
             this.currentDraftName = draft.name;
             this.blocks = JSON.parse(JSON.stringify(draft.blocks || []));
             this.resetEditorLanguageState(draft);
@@ -11449,7 +11461,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                     localStorage.setItem(`hkm_builder_autosave_subject${languageSuffix}`, subject);
                 } catch(e) {}
                 
-                if (!this.currentDraftId) {
+                if (!this.currentDraftId && !this.currentDocumentIsTemplate) {
                     try {
                         this.currentDraftId = sessionStorage.getItem('hkm_active_draft_id') || null;
                     } catch(e) {}
@@ -11469,7 +11481,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                     subject: canonicalSubject,
                     englishPayload: this.englishPayload || null,
                     updatedAt: new Date().toISOString(),
-                    isDraft: true
+                    isDraft: !this.currentDocumentIsTemplate
                 };
 
                 // Ensure we ALWAYS reuse a single document ID for this newsletter session
@@ -11574,6 +11586,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
         if (confirmed) {
             try {
                 this.currentDraftId = id;
+            this.currentDocumentIsTemplate = false;
                 this.currentDraftName = name;
                 this.blocks = JSON.parse(blocksStr);
                 this.resetEditorLanguageState({ subject });
