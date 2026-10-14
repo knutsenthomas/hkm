@@ -103,7 +103,7 @@ class NewsletterBuilder {
         this.activeColumnIndex = null;
         this.savedRange = null;
         this.activeBlockNode = null;
-        this.canvasZoom = 100;
+        this.canvasZoom = window.matchMedia('(min-width: 992px)').matches ? 125 : 100;
 
         // Recipient Selection State
         this.selectedSegments = new Set();
@@ -2319,12 +2319,12 @@ class NewsletterBuilder {
 
     setCanvasZoom(value) {
         const canvas = document.getElementById('newsletter-canvas');
-        const zoomValue = document.getElementById('canvas-zoom-value');
+        const zoomValue = document.getElementById('canvas-zoom-value') || document.getElementById('canvas-zoom-reset');
         const nextZoom = Math.max(60, Math.min(130, Number(value) || 100));
 
         this.canvasZoom = nextZoom;
         if (canvas) {
-            canvas.style.zoom = String(nextZoom / 100);
+            canvas.style.zoom = this.currentView === 'mobile' ? '1' : String(nextZoom / 100);
         }
         if (zoomValue) {
             zoomValue.textContent = `${nextZoom}%`;
@@ -4733,6 +4733,7 @@ class NewsletterBuilder {
 
     setView(view) {
         this.currentView = view;
+        this.setCanvasZoom(this.canvasZoom);
         document.querySelectorAll('.device-btn, .device-pill-btn').forEach(btn => {
             if (btn) btn.classList.toggle('active', btn.dataset.view === view);
         });
@@ -6851,7 +6852,7 @@ class NewsletterBuilder {
             if (this.isRecipientsDrawerOpen) {
                 continueBtn.innerHTML = '<span class="material-symbols-outlined" style="margin-right: 6px;">arrow_back</span><span class="btn-label" style="white-space: nowrap !important;">Tilbake til design</span>';
             } else {
-                continueBtn.innerHTML = '<span class="btn-label" style="white-space: nowrap !important;">Kontroller og send</span><span class="material-symbols-outlined" style="margin-left: 6px;">arrow_forward</span>';
+                continueBtn.innerHTML = '<svg class="hkm-send-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg><span class="btn-publish-label">Send</span>';
             }
         }
     }
@@ -10143,7 +10144,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             }
             const continueBtn = document.getElementById('continue-btn');
             if (continueBtn) {
-                continueBtn.innerHTML = '<span class="btn-label" style="white-space: nowrap !important;">Velg mottakere</span><span class="material-symbols-outlined" style="margin-left: 6px;">arrow_forward</span>';
+                continueBtn.innerHTML = '<svg class="hkm-send-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg><span class="btn-publish-label">Send</span>';
             }
         }
         const recipientsDrawer = document.getElementById('recipients-drawer');

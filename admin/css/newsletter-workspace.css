@@ -263,3 +263,22 @@ body.builder-active #newsletter-builder-layout #newsletter-autosave-text { displ
     .newsletter-back-button { font-size:12px; padding:6px; }
     body.builder-active #newsletter-builder-layout .toolbar-right-actions { gap:4px!important; }
 }
+
+#newsletter-builder-layout .hkm-send-icon { display:inline-block; flex-shrink:0; width:20px; height:20px; }
+#newsletter-builder-layout #continue-btn { display:inline-flex!important; align-items:center!important; gap:8px!important; }
+#newsletter-builder-layout #publish-dropdown-btn svg { width:16px; height:16px; display:block; }
+
+/* Continuous white writing surface, like a document editor. */
+body.builder-active #newsletter-builder-layout,
+body.builder-active #newsletter-builder-layout .builder-body-container,
+body.builder-active #newsletter-builder-layout #builder-main-workspace,
+body.builder-active #newsletter-builder-layout #builder-workspace-center,
+body.builder-active #newsletter-builder-layout #canvas-container {
+    background-color:#fff!important;
+    background-image:none!important;
+}
+body.builder-active #newsletter-builder-layout #newsletter-canvas.canvas-paper-frame {
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+}
