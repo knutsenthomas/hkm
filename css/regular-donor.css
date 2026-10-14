@@ -3,6 +3,13 @@
 .donor-hero-label { display: inline-block; font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 20px; color: #ffcfaa; }
 .donor-photo-hero h1 { color: white; font-size: clamp(40px, 4.4vw, 64px); font-weight: 800; line-height: 1.12; letter-spacing: -.03em; margin-bottom: 22px; }
 .donor-photo-hero p { color: #fff; font-size: 20px; line-height: 1.7; max-width: 570px; }
+.donations-page-view .donor-photo-hero .donor-photo-hero-copy,
+.donations-page-view .donor-photo-hero .donor-photo-hero-copy h1,
+.donations-page-view .donor-photo-hero .donor-photo-hero-copy p {
+    text-align: left !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
 @media (max-width: 900px) { .donor-photo-hero { min-height: 440px !important; padding-bottom: 64px !important; } }
 .donor-welcome { background: #faf6f1; padding: 0 0 72px; }
 .donor-welcome-layout { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 72px; }
@@ -47,5 +54,30 @@
 .donor-help a { text-decoration: underline; text-underline-offset: 3px; }
 .donor-help > a { display: inline-block; color: var(--text-light); font-size: 13px; margin-top: 12px; }
 :is(.donor-gift-card,.donor-help) :is(button,input,select,summary,a):focus-visible { outline: 3px solid var(--primary-orange); outline-offset: 4px; }
+html[data-theme="dark"] .donor-welcome,
+html[data-theme="dark"] .donor-impact { background: #0f172a; }
+html[data-theme="dark"] .donor-gift-card,
+html[data-theme="dark"] .donor-impact-grid article {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f8fafc;
+}
+html[data-theme="dark"] .donor-gift-card { box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+html[data-theme="dark"] .donor-gift-card > p,
+html[data-theme="dark"] .donor-impact-grid p,
+html[data-theme="dark"] .donor-other-methods > span { color: #cbd5e1; }
+html[data-theme="dark"] .donor-amount-presets button {
+    background: #0f172a;
+    border-color: #475569;
+    color: #f8fafc;
+}
+html[data-theme="dark"] .donor-amount-presets button[aria-pressed="true"] {
+    background: #483326;
+    border-color: #e8a66f;
+    color: #ffcfaa;
+}
+html[data-theme="dark"] .donor-other-methods,
+html[data-theme="dark"] .donor-bank-details { border-color: #475569; }
+html[data-theme="dark"] .donor-card-eyebrow { color: #ffcfaa; }
 @media (max-width: 900px) { .donor-welcome-layout { grid-template-columns: 1fr; gap: 36px; } .donor-welcome { padding: 0 0 48px; } .donor-welcome-copy { padding-top: 36px; } .donor-gift-card { margin-top: 0; } .donor-impact-grid { grid-template-columns: 1fr; gap: 16px; } }
 @media (max-width: 480px) { .donor-gift-card { padding: 28px 20px; border-radius: 22px; }  .donor-gift-card h2 { font-size: 25px; } }
