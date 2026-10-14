@@ -1,20 +1,23 @@
-.donor-welcome { background: #faf6f1; padding: 80px 0 88px; }
+.donor-photo-hero { padding-bottom: 150px !important; min-height: 560px !important; }
+.donor-photo-hero-copy { text-align: left; max-width: 680px; }
+.donor-hero-label { display: inline-block; font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 20px; color: #ffcfaa; }
+.donor-photo-hero h1 { color: white; font-size: clamp(40px, 4.4vw, 64px); font-weight: 800; line-height: 1.12; letter-spacing: -.03em; margin-bottom: 22px; }
+.donor-photo-hero p { color: #fff; font-size: 20px; line-height: 1.7; max-width: 570px; }
+@media (max-width: 900px) { .donor-photo-hero { min-height: 440px !important; padding-bottom: 64px !important; } }
+.donor-welcome { background: #faf6f1; padding: 0 0 72px; }
 .donor-welcome-layout { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 72px; }
-.donor-welcome-copy { padding-top: 22px; }
-.donor-welcome-copy h1 { font-size: clamp(38px, 4.3vw, 62px); font-weight: 800; line-height: 1.12; letter-spacing: -.04em; color: var(--text-dark, #2c3e50); margin: 22px 0 28px; }
-.donor-welcome-copy h1 span { color: var(--primary-orange); }
+.donor-welcome-copy { padding-top: 72px; }
+.donor-welcome-copy h2 { font-size: clamp(38px, 4.3vw, 62px); font-weight: 800; line-height: 1.12; letter-spacing: -.04em; color: var(--text-dark, #2c3e50); margin: 22px 0 28px; }
 .donor-welcome-copy p { color: var(--text-light); font-size: 17px; line-height: 1.8; max-width: 520px; }
 .donor-welcome-copy .donor-welcome-lead { font-size: 21px; color: var(--text-dark); margin-bottom: 18px; }
-.donor-welcome-art { margin-top: 28px; max-width: 460px; }
-.donor-welcome-art img { width: 100%; height: auto; border-radius: 20px; }
 .donor-reassurance { display: flex; flex-wrap: wrap; gap: 12px 24px; margin-top: 24px; font-weight: 600; font-size: 14px; color: var(--text-dark); }
 .donor-reassurance span::before { content: '✓'; color: var(--primary-orange); margin-right: 8px; }
-.donor-gift-card { background: white; border: 1px solid #eee5dc; border-radius: 28px; padding: 40px; box-shadow: 0 20px 60px rgba(44,62,80,.08); color: var(--text-dark); }
+.donor-gift-card { background: white; border: 1px solid #eee5dc; border-radius: 24px; padding: 30px; position: relative; margin-top: -100px; box-shadow: 0 20px 60px rgba(44,62,80,.08); color: var(--text-dark); }
 .donor-card-eyebrow { color: var(--primary-orange); font-weight: 700; text-transform: uppercase; letter-spacing: .12em; font-size: 12px; }
 .donor-gift-card h2 { font-size: 29px; font-weight: 800; line-height: 1.25; margin: 12px 0; }
-.donor-gift-card > p { line-height: 1.7; color: var(--text-light); margin-bottom: 24px; }
+.donor-gift-card > p { line-height: 1.7; color: var(--text-light); margin-bottom: 18px; }
 .donor-gift-card legend, .donor-gift-card label { font-weight: 600; display: block; margin-bottom: 10px; }
-.donor-gift-card fieldset { margin-bottom: 22px; }
+.donor-gift-card fieldset { margin-bottom: 18px; }
 .donor-amount-presets { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin: 4px 0 18px; }
 .donor-amount-presets button { padding: 14px 6px; border-radius: 12px; border: 1px solid #dce0e3; font-weight: 700; }
 .donor-amount-presets button[aria-pressed="true"] { color: var(--primary-orange); background: #fff3e9; border-color: var(--primary-orange); }
@@ -39,5 +42,5 @@
 .donor-help a { text-decoration: underline; text-underline-offset: 3px; }
 .donor-help > a { display: inline-block; color: var(--text-light); font-size: 13px; margin-top: 12px; }
 :is(.donor-gift-card,.donor-help) :is(button,input,select,summary,a):focus-visible { outline: 3px solid var(--primary-orange); outline-offset: 4px; }
-@media (max-width: 900px) { .donor-welcome-layout { grid-template-columns: 1fr; gap: 36px; } .donor-welcome { padding: 48px 0; } .donor-welcome-art { display: none; } .donor-impact-grid { grid-template-columns: 1fr; gap: 16px; } }
-@media (max-width: 480px) { .donor-gift-card { padding: 28px 20px; border-radius: 22px; } .donor-welcome-copy { padding-top: 0; } .donor-gift-card h2 { font-size: 25px; } }
+@media (max-width: 900px) { .donor-welcome-layout { grid-template-columns: 1fr; gap: 36px; } .donor-welcome { padding: 0 0 48px; } .donor-welcome-copy { padding-top: 36px; } .donor-gift-card { margin-top: 0; } .donor-impact-grid { grid-template-columns: 1fr; gap: 16px; } }
+@media (max-width: 480px) { .donor-gift-card { padding: 28px 20px; border-radius: 22px; }  .donor-gift-card h2 { font-size: 25px; } }
