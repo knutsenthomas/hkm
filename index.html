@@ -790,13 +790,19 @@
                 <p>Vær med og gjør evangeliet tilgjengelig gjennom undervisning, reisevirksomhet og fellesskap. En fast gave gir forutsigbarhet og hjelper oss å planlegge arbeidet videre.</p>
                 <a href="/donasjoner" class="feature-link">Les mer om å støtte HKM <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
             </div>
-            <form class="home-giving-card" id="home-giving-form" action="/donasjoner" method="get">
+            <form class="home-giving-card" id="home-giving-form" action="/bli-fast-giver" method="get">
                 <h3>Gi din støtte</h3>
                 <fieldset class="home-giving-frequency">
                     <legend class="sr-only">Hvor ofte vil du gi?</legend>
-                    <label><input type="radio" name="frequency" value="once" checked> Engangsgave</label>
-                    <label><input type="radio" name="frequency" value="monthly"> Månedlig gave</label>
+                    <label><input type="radio" name="frequency" value="once"> Engangsgave</label>
+                    <label><input type="radio" name="frequency" value="monthly" checked> Månedlig gave</label>
                 </fieldset>
+                <label class="home-giving-purpose-label" for="home-gift-fund">Hva ønsker du å støtte?</label>
+                <select class="home-giving-purpose" id="home-gift-fund" name="fund">
+                    <option value="general">Der behovet er størst</option>
+                    <option value="misjon">Misjon</option>
+                    <option value="basar">Basar</option>
+                </select>
                 <fieldset class="home-giving-amounts">
                     <legend>Velg beløp</legend>
                     <div class="home-giving-presets">
@@ -809,7 +815,7 @@
                 </fieldset>
                 <input type="hidden" name="payment" value="vipps">
                 <button type="submit" class="btn btn-primary home-giving-submit">Gi med Vipps <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
-                <p class="home-giving-note" id="home-giving-note">Du fyller inn opplysningene dine i neste steg.</p>
+                <p class="home-giving-note" id="home-giving-note">Gaven trekkes hver måned. Du bekrefter avtalen i Vipps i neste steg.</p>
                 <details class="home-giving-bank">
                     <summary>Fast gave via nettbank</summary>
                     <p>Opprett en fast månedlig overføring til His Kingdom Ministry. Velg selv beløp og betalingsdato.</p>

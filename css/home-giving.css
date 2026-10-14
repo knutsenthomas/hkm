@@ -8,6 +8,8 @@
 .home-giving-frequency label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 600; }
 .home-giving-frequency input { accent-color: var(--primary-orange); width: 20px; height: 20px; }
 .home-giving-amounts legend { font-weight: 600; margin-bottom: 12px; }
+.home-giving-purpose-label { display: block; font-weight: 600; margin-bottom: 10px; }
+.home-giving-purpose { width: 100%; border: 1px solid #d9dee3; border-radius: 12px; padding: 14px 16px; background: white; color: inherit; margin-bottom: 24px; }
 .home-giving-presets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 18px; }
 .home-giving-presets button { border: 1px solid #d9dee3; border-radius: 12px; padding: 14px 6px; font-weight: 700; }
 .home-giving-presets button[aria-pressed="true"] { border-color: var(--primary-orange); background: #fff3e9; color: var(--primary-orange); }
@@ -18,6 +20,6 @@
 .home-giving-bank { border-top: 1px solid #e8e8e8; padding-top: 20px; }
 .home-giving-bank summary { cursor: pointer; font-weight: 600; }
 .home-giving-bank p { font-size: 14px; line-height: 1.7; margin-top: 12px; }
-.home-giving-card :is(input, button, summary):focus-visible { outline: 3px solid var(--primary-orange); outline-offset: 4px; }
+.home-giving-card :is(input, select, button, summary):focus-visible { outline: 3px solid var(--primary-orange); outline-offset: 4px; }
 @media (max-width: 900px) { .home-giving-layout { grid-template-columns: 1fr; gap: 32px; } }
 @media (max-width: 480px) { .home-giving-card { padding: 24px 20px; } .home-giving-frequency { gap: 16px; } }

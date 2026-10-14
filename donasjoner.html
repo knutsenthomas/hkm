@@ -1040,6 +1040,13 @@
                 }
 
                 // Trigger initial check
+                const giftFund = giftParams.get('fund');
+                if (['general', 'misjon', 'basar'].includes(giftFund)) {
+                    document.getElementById('donation-purpose').value = giftFund;
+                    document.querySelectorAll('#donation-purpose-grid .purpose-option-btn').forEach(button => {
+                        button.classList.toggle('active', button.dataset.value === giftFund);
+                    });
+                }
                 handlePaymentMethodChange();
 
                 // Attach event listener to the donation form submit

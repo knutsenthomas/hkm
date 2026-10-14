@@ -511,6 +511,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const modal = document.getElementById('vipps-recurring-modal');
         modal.querySelectorAll('.hkm-amount-btn').forEach(button => button.classList.remove('selected'));
         modal.querySelector('#hkm-custom-amount').value = giftAmount;
+        const fund = giftParams.get('fund');
+        if (['general', 'misjon', 'basar'].includes(fund)) modal.querySelector('#hkm-donor-fund').value = fund;
     }
 
     // Check if we are returning from Vipps
@@ -601,7 +603,12 @@ function openAgreementModal(method = "vipps") {
                 </div>
 
                 <!-- Fund purpose (hidden or defaults to general) -->
-                <input type="hidden" id="hkm-donor-fund" value="general">
+                <label class="hkm-form-label" for="hkm-donor-fund">${isEnglish ? 'What would you like to support?' : isSpanish ? '¿Qué desea apoyar?' : 'Hva ønsker du å støtte?'}</label>
+                <select id="hkm-donor-fund" class="hkm-input">
+                    <option value="general">${isEnglish ? 'Where the need is greatest' : isSpanish ? 'Donde más se necesita' : 'Der behovet er størst'}</option>
+                    <option value="misjon">${isEnglish ? 'Mission' : isSpanish ? 'Misiones' : 'Misjon'}</option>
+                    <option value="basar">${isEnglish ? 'Bazaar' : isSpanish ? 'Bazar' : 'Basar'}</option>
+                </select>
 
                 <label style="display:flex;gap:12px;align-items:flex-start;margin:20px 0;font-size:14px;line-height:1.6;">
                     <input type="checkbox" required style="margin-top:5px;" aria-label="${isEnglish ? 'Authorise monthly payments' : isSpanish ? 'Autorizar pagos mensuales' : 'Godkjenn månedlige trekk'}">
