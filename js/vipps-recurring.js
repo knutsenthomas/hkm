@@ -504,6 +504,15 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
     
+    const giftParams = new URLSearchParams(window.location.search);
+    const giftAmount = Number(giftParams.get('amount'));
+    if (trigger && giftParams.get('payment') === 'vipps' && giftParams.get('frequency') === 'monthly' && Number.isSafeInteger(giftAmount) && giftAmount > 0) {
+        openAgreementModal('vipps');
+        const modal = document.getElementById('vipps-recurring-modal');
+        modal.querySelectorAll('.hkm-amount-btn').forEach(button => button.classList.remove('selected'));
+        modal.querySelector('#hkm-custom-amount').value = giftAmount;
+    }
+
     // Check if we are returning from Vipps
     handleVippsReturn();
     handlePayPalRecurringReturn();

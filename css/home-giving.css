@@ -1,0 +1,23 @@
+.home-giving { background: var(--bg-light, #f8f9fa); }
+.home-giving-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+.home-giving-copy .section-title { margin-bottom: 24px; }
+.home-giving-copy p { color: var(--text-light); font-size: 18px; line-height: 1.8; margin-bottom: 28px; }
+.home-giving-card { background: white; border: 1px solid #e8e8e8; border-radius: 24px; padding: 36px; box-shadow: 0 16px 48px rgba(44,62,80,.07); color: var(--text-dark, #2c3e50); }
+.home-giving-card h3 { font-size: 28px; font-weight: 800; margin-bottom: 24px; }
+.home-giving-frequency { display: flex; flex-wrap: wrap; gap: 24px; margin-bottom: 28px; }
+.home-giving-frequency label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 600; }
+.home-giving-frequency input { accent-color: var(--primary-orange); width: 20px; height: 20px; }
+.home-giving-amounts legend { font-weight: 600; margin-bottom: 12px; }
+.home-giving-presets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 18px; }
+.home-giving-presets button { border: 1px solid #d9dee3; border-radius: 12px; padding: 14px 6px; font-weight: 700; }
+.home-giving-presets button[aria-pressed="true"] { border-color: var(--primary-orange); background: #fff3e9; color: var(--primary-orange); }
+.home-giving-amounts label { display: block; font-size: 14px; margin-bottom: 8px; }
+.home-giving-amounts input { width: 100%; border: 1px solid #d9dee3; border-radius: 12px; padding: 14px 16px; font-size: 18px; background: white; }
+.home-giving-card .home-giving-submit { width: 100%; margin-top: 24px; display: flex; justify-content: center; gap: 12px; }
+.home-giving-note { font-size: 13px; line-height: 1.6; color: var(--text-light); text-align: center; margin: 14px 0 22px; }
+.home-giving-bank { border-top: 1px solid #e8e8e8; padding-top: 20px; }
+.home-giving-bank summary { cursor: pointer; font-weight: 600; }
+.home-giving-bank p { font-size: 14px; line-height: 1.7; margin-top: 12px; }
+.home-giving-card :is(input, button, summary):focus-visible { outline: 3px solid var(--primary-orange); outline-offset: 4px; }
+@media (max-width: 900px) { .home-giving-layout { grid-template-columns: 1fr; gap: 32px; } }
+@media (max-width: 480px) { .home-giving-card { padding: 24px 20px; } .home-giving-frequency { gap: 16px; } }

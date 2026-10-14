@@ -97,6 +97,7 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block"></noscript>
 
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/home-giving.css">
     <link rel="preload" href="css/notifications.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="css/notifications.css"></noscript>
     <link rel="preload" href="css/cookie-consent.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="css/cookie-consent.css"></noscript>
 
@@ -781,6 +782,44 @@
         </div>
     </section>
 
+    <section class="home-giving section" aria-labelledby="home-giving-title">
+        <div class="container home-giving-layout">
+            <div class="home-giving-copy">
+                <span class="section-label">Sammen når vi flere</span>
+                <h2 class="section-title" id="home-giving-title">Din gave gjør en forskjell</h2>
+                <p>Vær med og gjør evangeliet tilgjengelig gjennom undervisning, reisevirksomhet og fellesskap. En fast gave gir forutsigbarhet og hjelper oss å planlegge arbeidet videre.</p>
+                <a href="/donasjoner" class="feature-link">Les mer om å støtte HKM <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+            <form class="home-giving-card" id="home-giving-form" action="/donasjoner" method="get">
+                <h3>Gi din støtte</h3>
+                <fieldset class="home-giving-frequency">
+                    <legend class="sr-only">Hvor ofte vil du gi?</legend>
+                    <label><input type="radio" name="frequency" value="once" checked> Engangsgave</label>
+                    <label><input type="radio" name="frequency" value="monthly"> Månedlig gave</label>
+                </fieldset>
+                <fieldset class="home-giving-amounts">
+                    <legend>Velg beløp</legend>
+                    <div class="home-giving-presets">
+                        <button type="button" data-gift-amount="100" aria-pressed="false">100 kr</button>
+                        <button type="button" data-gift-amount="250" aria-pressed="true">250 kr</button>
+                        <button type="button" data-gift-amount="500" aria-pressed="false">500 kr</button>
+                    </div>
+                    <label for="home-gift-amount">Beløp i kroner</label>
+                    <input id="home-gift-amount" name="amount" type="number" min="1" step="1" value="250" required inputmode="numeric">
+                </fieldset>
+                <input type="hidden" name="payment" value="vipps">
+                <button type="submit" class="btn btn-primary home-giving-submit">Gi med Vipps <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                <p class="home-giving-note" id="home-giving-note">Du fyller inn opplysningene dine i neste steg.</p>
+                <details class="home-giving-bank">
+                    <summary>Fast gave via nettbank</summary>
+                    <p>Opprett en fast månedlig overføring til His Kingdom Ministry. Velg selv beløp og betalingsdato.</p>
+                    <p><strong>Konto: <span data-content-doc="settings_global" data-content-key="contact.account">3000.66.08759</span></strong></p>
+                    <p>Merk betalingen med «Gave» og navnet ditt. Du endrer eller avslutter overføringen selv i nettbanken.</p>
+                </details>
+            </form>
+        </div>
+    </section>
+
     <!-- Causes / Fundraising -->
     <section class="causes" id="innsamling" style="display: none;">
         <div class="container">
@@ -1248,6 +1287,7 @@
         </div>
     </div>
 
+    <script type="module" src="js/home-giving.js"></script>
 </body>
 
 </html>
