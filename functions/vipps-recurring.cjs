@@ -82,18 +82,18 @@ async function reconcile({ ref, record, db, api, timestamp, now = Date.now(), sc
     });
   }
   if (status !== 'ACTIVE' || !schedule) return { status, paid: allPaid };
-  if (!record.gift && charges.size >= 10) {
+  const incomplete = charges.docs.find(doc => !doc.data().chargeId);
+  if (!record.gift && charges.size >= 10 && !incomplete) {
     if (allPaid) { await api(`/agreements/${encodeURIComponent(record.agreementId)}`, 'PATCH', { status: 'STOPPED' }, hash(`stop:${ref.id}`).slice(0, 36)); await ref.set({ status: 'completed' }, { merge: true }); await db.collection('school_payment_plans').doc(ref.id).set({ status: 'completed' }, { merge: true }); }
     return { status: allPaid ? 'COMPLETED' : 'ACTIVE', paid: allPaid };
   }
   // Never stack unpaid monthly charges, catch up several months at once, or exceed ten school charges.
-  const incomplete = charges.docs.find(doc => !doc.data().chargeId);
   if (charges.size && !allPaid && !incomplete) return { status, paid: false };
   const next = incomplete ? incomplete.data().cycle : charges.size;
   const originalDue = dueDate(anchor, next);
   const minimumDue = new Date(now + 2 * 86400000).toISOString().slice(0, 10);
   const due = originalDue < minimumDue ? minimumDue : originalDue;
-  if (Date.parse(due) > now + 30 * 86400000) return { status, paid: allPaid };
+  if (!incomplete && Date.parse(due) > now + 30 * 86400000) return { status, paid: allPaid };
   const chargeRef = ref.collection('charges').doc(String(next));
   const planned = await db.runTransaction(async tx => {
     const snap = await tx.get(chargeRef);

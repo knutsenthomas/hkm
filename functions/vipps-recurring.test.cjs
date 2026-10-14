@@ -44,3 +44,9 @@ test('refunded Vipps charge updates the existing ledger entry without double cou
  const api=async path=>path.includes('/charges/')?{id:'charge_refund',amount:10000,status:refunded?'REFUNDED':'CHARGED',summary:{captured:10000,refunded:refunded?10000:0}}:{id:'agr_gift',status:'ACTIVE',start:new Date().toISOString(),pricing:{currency:'NOK',amount:10000}};
  await reconcile({ref,record,db,api,timestamp:1});refunded=true;await reconcile({ref,record,db,api,timestamp:2});const ledger=[...records.entries()].filter(([key])=>key.startsWith('donations/'));assert.equal(ledger.length,1);assert.equal(ledger[0][1].status,'refunded');assert.equal(ledger[0][1].amountNok,0);assert.equal(ledger[0][1].timestamp,1);
 });
+test('a timed-out tenth school charge can retry without creating an eleventh',async()=>{
+ const {db}=database();const details=validateRecurring({...input,gift:false,studentName:'Elev',schoolYear:'2027'});const ref=db.collection('recurring_payment_agreements').doc(details.key);const record={...details,agreementId:'agr_school',anchor:Date.now()};await ref.set(record);
+ for(let i=0;i<10;i++)await ref.collection('charges').doc(String(i)).set({cycle:i,amountOre:100000,due:'2027-10-15',orderId:`order${i}`,status:i===9?'creating':'CHARGED',...(i===9?{}:{chargeId:`order${i}`})});
+ let posts=0;const api=async(path,method,body)=>{if(method==='POST'){posts++;assert.equal(body.orderId,'order9');return {chargeId:body.orderId};}if(method==='PATCH')return {};if(path.includes('/charges/'))return {id:path.split('/').at(-1),status:'CHARGED',amount:100000,summary:{captured:100000,refunded:0}};return {id:'agr_school',status:'ACTIVE',start:new Date().toISOString(),pricing:{currency:'NOK',amount:100000}};};
+ await reconcile({ref,record,db,api,timestamp:1,schedule:true});await reconcile({ref,record,db,api,timestamp:1,schedule:true});assert.equal(posts,1);
+});
