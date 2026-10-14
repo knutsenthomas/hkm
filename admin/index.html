@@ -438,6 +438,7 @@
             border-image: none !important;
         }
     </style>
+<link rel="stylesheet" href="css/newsletter-workspace.css">
 </head>
 
 <body class="admin-body main-dashboard cloak">
@@ -1384,24 +1385,13 @@
                     <p class="section-subtitle">Skap og send profesjonelle nyhetsbrev og viktige meldinger.</p>
                 </div>
 
-                <div class="card modern newsletter-promo">
-                    <div class="card-body">
-                        <div class="newsletter-content">
-                            <div class="promo-icon purple">
-                                <span class="material-symbols-outlined">auto_awesome</span>
-                            </div>
-                            <div>
-                                <h3 class="card-title">Nyhetsbrev Builder</h3>
-                                <p>Bruk vårt nye blokk-baserte verktøy for å designe vakre e-poster som ser bra ut på
-                                    alle enheter.</p>
-                            </div>
-                        </div>
-                        <div class="newsletter-action">
-                            <a href="/admin/admin-nyhetsbrev.html" class="btn-primary">Åpne Email Builder</a>
-                        </div>
-                    </div>
-                </div>
-
+<section class="newsletter-workspace" id="newsletter-workspace" aria-labelledby="workspace-title">
+<div class="workspace-heading"><div><h3 id="workspace-title">Nyhetsbrev</h3><p>Kampanjer, kladder og maler samlet på ett sted.</p></div><div class="workspace-actions"><button type="button" data-workspace-refresh>Oppdater</button><a href="/admin/admin-nyhetsbrev.html?draftId=new" class="workspace-primary">Nytt nyhetsbrev</a></div></div>
+<div class="workspace-metrics"><div><span>Kampanjer i utvalget</span><strong data-count-campaigns>–</strong></div><div><span>Kladder i utvalget</span><strong data-count-drafts>–</strong></div><div><span>E-poster sendt i utvalget</span><strong data-count-sent>–</strong></div></div>
+<nav class="workspace-nav" aria-label="Nyhetsbrevoversikt"><button type="button" data-workspace-view="campaigns" aria-pressed="true">Kampanjer</button><button type="button" data-workspace-view="drafts" aria-pressed="false">Kladder</button><button type="button" data-workspace-view="templates" aria-pressed="false">Maler</button></nav>
+<div data-workspace-panel="campaigns"><div class="workspace-tools"><input type="search" data-campaign-search placeholder="Søk etter kampanje" aria-label="Søk etter kampanje"><select data-campaign-filter aria-label="Filtrer kampanjestatus"><option value="">Alle statuser</option><option>I kø</option><option>Sender</option><option>Fullført</option><option>Avvik</option><option>Feil</option></select></div><div class="workspace-table"><table><thead><tr><th>Emne</th><th>Status</th><th>Mottakere</th><th>Sendt</th><th>Dato</th></tr></thead><tbody><tr><td colspan="5">Trykk Oppdater for å hente kampanjene.</td></tr></tbody></table></div></div>
+<div data-workspace-panel="drafts" data-drafts hidden>Hent oversikten for å se kladder.</div><div data-workspace-panel="templates" data-templates hidden>Hent oversikten for å se maler.</div>
+<p data-workspace-status role="status" aria-live="polite">Oversikten henter eksisterende data fra Firebase.</p></section>
                 <div class="card mt-4">
                     <div class="card-body">
                         <h3 class="card-title">Hurtigmelding (Tekst)</h3>
@@ -2059,6 +2049,7 @@
             </div>
         </div>
     </div>
+<script type="module" src="js/newsletter-workspace.js"></script>
 </body>
 
 </html>
