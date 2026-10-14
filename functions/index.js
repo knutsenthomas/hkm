@@ -9638,13 +9638,26 @@ exports.onCourseEnrollmentUpdatedTrigger = onDocumentUpdated({
 });
 
 // Private service: only the Community payment gateway can invoke it.
-exports.schoolPaymentAccount = onRequest({ timeoutSeconds: 300, invoker: ['578298544771-compute@developer.gserviceaccount.com'], secrets: [stripeSecretKeyParam, paypalClientIdParam, paypalClientSecretParam] }, async (req, res) => {
+exports.schoolPaymentAccount = onRequest({ timeoutSeconds: 300, invoker: ['578298544771-compute@developer.gserviceaccount.com'], secrets: [stripeSecretKeyParam, paypalClientIdParam, paypalClientSecretParam, ...vippsRecurringSecrets] }, async (req, res) => {
   res.set('Cache-Control', 'no-store');
   if (req.method !== 'POST') return res.status(405).send({ error: 'method-not-allowed' });
   try {
     const { schoolAccountService } = require('./student-payment-account.cjs');
     if (req.body?.mode === 'checkout') return res.status(200).send(await require('./school-checkout.cjs').schoolCheckout({body:req.body,db,timestamp:Timestamp.now()}));
     const result = await schoolAccountService({ body: req.body || {}, db, timestamp: Timestamp.now(), getAgreement: async record => {
+      if (record.provider === 'vipps') {
+        const api = await recurringVippsApi();
+        const agreement = await api(`/agreements/${encodeURIComponent(record.agreementId)}`, 'GET');
+        if (agreement.id !== record.agreementId || agreement.pricing?.amount !== Math.round(record.amount*100) || agreement.pricing?.currency !== 'NOK') throw new Error('unexpected-vipps-agreement');
+        const charges = await db.collection('recurring_payment_agreements').doc(record.key).collection('charges').get();
+        let nextDate = null;
+        for (const snap of charges.docs) {
+          if (!snap.data().chargeId) continue;
+          const charge = await api(`/agreements/${encodeURIComponent(record.agreementId)}/charges/${encodeURIComponent(snap.data().chargeId)}`, 'GET');
+          if (['DUE','PENDING'].includes(charge.status) && /^\d{4}-\d{2}-\d{2}$/.test(charge.due || '')) nextDate = !nextDate || charge.due < nextDate ? charge.due : nextDate;
+        }
+        return { provider: 'vipps', status: record.status === 'completed' && agreement.status === 'STOPPED' ? 'completed' : agreement.status.toLowerCase(), nextDate, nextAmount: record.amount };
+      }
       if (record.provider === 'stripe') {
         const stripe = require('stripe')(stripeSecretKeyParam.value(), { apiVersion: '2023-10-16' });
         const plan = await stripe.subscriptions.retrieve(record.subscriptionId);

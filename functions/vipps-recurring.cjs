@@ -39,7 +39,7 @@ async function createAgreement({ details, input, db, api, timestamp }) {
     if (plan?.exists) throw fail('school-plan-exists', 409);
     const next = { ...details, provider: 'vipps', msn: MSN, status: 'creating', timestamp, manageTokenHash: hash(manageToken), agreementPayload: payload, chargeCount: 0 };
     tx.set(ref, next);
-    if (!details.gift) tx.set(db.collection('school_payment_plans').doc(details.key), { ...next, total: details.amount * 10, instalments: 10 });
+    if (!details.gift) tx.set(db.collection('school_payment_plans').doc(details.key), { ...next, schoolYear: details.year, reference: details.metadata.reference, total: details.amount * 10, instalments: 10 });
     return next;
   });
   if (record.agreementId && record.redirectUrl) return { redirectUrl: record.redirectUrl, agreementId: record.agreementId };
@@ -48,7 +48,8 @@ async function createAgreement({ details, input, db, api, timestamp }) {
   if (!/^agr_[a-zA-Z0-9_-]+$/.test(result.agreementId || '')) throw fail('invalid-vipps-agreement', 502);
   const url = new URL(result.vippsConfirmationUrl);
   if (url.protocol !== 'https:' || !/(^|\.)vipps\.no$|(^|\.)vippsmobilepay\.com$/.test(url.hostname)) throw fail('invalid-vipps-redirect', 502);
-  await ref.set({ agreementId: result.agreementId, redirectUrl: url.href, status: 'pending' }, { merge: true });
+  await ref.set({ agreementId: result.agreementId, subscriptionId: result.agreementId, redirectUrl: url.href, status: 'pending' }, { merge: true });
+  if (!details.gift) await db.collection('school_payment_plans').doc(details.key).set({ agreementId: result.agreementId, subscriptionId: result.agreementId, schoolYear: details.year, status: 'pending' }, { merge: true });
   return { redirectUrl: url.href, agreementId: result.agreementId };
 }
 function dueDate(anchor, cycle) { return new Date(addMonths(Math.floor(anchor / 1000), cycle) * 1000).toISOString().slice(0, 10); }
@@ -58,7 +59,8 @@ async function reconcile({ ref, record, db, api, timestamp, now = Date.now(), sc
   const status = String(agreement.status || '');
   const anchor = record.anchor || (Date.parse(agreement.start) + 2 * 86400000);
   if (status === 'ACTIVE' && !Number.isFinite(anchor)) throw fail('missing-vipps-start', 502);
-  await ref.set({ status: status.toLowerCase(), lastCheckedAt: now, ...(status === 'ACTIVE' ? { anchor } : {}) }, { merge: true });
+  await ref.set({ status: record.status === 'completed' && status === 'STOPPED' ? 'completed' : status.toLowerCase(), lastCheckedAt: now, ...(status === 'ACTIVE' ? { anchor } : {}) }, { merge: true });
+  if (!record.gift) await db.collection('school_payment_plans').doc(ref.id).set({ schoolYear: record.year, subscriptionId: record.agreementId, status: record.status === 'completed' && status === 'STOPPED' ? 'completed' : status.toLowerCase(), agreementId: record.agreementId }, { merge: true });
   const charges = await ref.collection('charges').get();
   let allPaid = charges.size > 0;
   for (const chargeDoc of charges.docs) {
@@ -81,7 +83,7 @@ async function reconcile({ ref, record, db, api, timestamp, now = Date.now(), sc
   }
   if (status !== 'ACTIVE' || !schedule) return { status, paid: allPaid };
   if (!record.gift && charges.size >= 10) {
-    if (allPaid) { await api(`/agreements/${encodeURIComponent(record.agreementId)}`, 'PATCH', { status: 'STOPPED' }, hash(`stop:${ref.id}`).slice(0, 36)); await ref.set({ status: 'completed' }, { merge: true }); }
+    if (allPaid) { await api(`/agreements/${encodeURIComponent(record.agreementId)}`, 'PATCH', { status: 'STOPPED' }, hash(`stop:${ref.id}`).slice(0, 36)); await ref.set({ status: 'completed' }, { merge: true }); await db.collection('school_payment_plans').doc(ref.id).set({ status: 'completed' }, { merge: true }); }
     return { status: allPaid ? 'COMPLETED' : 'ACTIVE', paid: allPaid };
   }
   // Never stack unpaid monthly charges, catch up several months at once, or exceed ten school charges.
