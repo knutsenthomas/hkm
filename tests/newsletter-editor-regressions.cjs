@@ -78,5 +78,17 @@ const runSaveTimer = () => {
     editor.handleDocumentEnter({ key: 'Enter', shiftKey: true, preventDefault() {} });
     assert.equal(commands.at(-1), 'insertLineBreak');
     assert.equal(box.children.length, 2);
+    box.innerHTML = '<p><br></p>';
+    context.document.body.classList.add('builder-active');
+    editor.positionDocumentTools = () => {};
+    editor.updateDocumentTools(box.firstElementChild);
+    editor.attachBlockQuickToolbar(box.firstElementChild);
+    editor.updateDocumentTools(box.firstElementChild);
+    assert.equal(box.querySelector('#block-quick-toolbar'), null);
+    assert.equal(context.document.querySelector('[data-document-tool="insert"]').hidden, false);
+    assert.equal(context.document.querySelector('[data-document-tool="menu"]').hidden, true);
+    box.firstElementChild.textContent = 'Written text';
+    editor.updateDocumentTools(box.firstElementChild);
+    assert.equal(context.document.querySelector('[data-document-tool="insert"]').hidden, true);
     console.log('Passed: queued edits, truthful save status, failed save, undo/redo and paragraph-only spacing.');
 })().catch(error => { console.error(error); process.exitCode = 1; });

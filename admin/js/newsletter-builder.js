@@ -4890,10 +4890,6 @@ class NewsletterBuilder {
         if (typeof showToast === 'function') showToast("Elementet ble slettet.", "success");
     }
 
-    attachBlockQuickToolbar(node) {
-        document.querySelectorAll('#block-quick-toolbar').forEach(el => el.remove());
-    }
-
     setPropertiesPanel(open) {
         this.propertiesPanelOpen = open;
         document.body.classList.toggle('properties-panel-open', open);
@@ -5580,6 +5576,8 @@ class NewsletterBuilder {
     attachBlockQuickToolbar(node) {
         document.querySelectorAll('#block-quick-toolbar').forEach(el => el.remove());
         if (!node) return;
+        // Text uses margin tools; embedded toolbar text makes empty lines look populated.
+        if (/^(P|H[1-6]|LI|BLOCKQUOTE)$/.test(node.tagName) || document.body.classList.contains('document-text-active')) return;
 
         const isSocial = (node.classList && node.classList.contains('newsletter-social-block')) || (node.closest && node.closest('.newsletter-social-block'));
         const socialNode = isSocial ? (node.classList && node.classList.contains('newsletter-social-block') ? node : node.closest('.newsletter-social-block')) : null;

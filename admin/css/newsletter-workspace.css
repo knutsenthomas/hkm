@@ -371,3 +371,9 @@ body.builder-active #newsletter-builder-layout .builder-toolbar-header .toolbar-
 #newsletter-builder-layout #blocks-container [data-editor-active-empty="true"] { position:relative; }
 #newsletter-builder-layout #blocks-container [data-editor-active-empty="true"]::after { content:'Begynn å skrive …'; position:absolute; left:0; top:0; color:#94a3b8; font-size:14px; pointer-events:none; }
 #hkm-document-tools [data-document-tool="insert"] { border:0; background:rgba(209,125,57,.12); color:var(--admin-accent-dark,#bd4f2a); box-shadow:none; font-weight:400; }
+
+/* Writing lines never receive a block frame or selection badge. */
+body.builder-active #newsletter-builder-layout #blocks-container p.selected-block-active,
+body.builder-active #newsletter-builder-layout #blocks-container p:hover,
+body.builder-active #newsletter-builder-layout #blocks-container [data-editor-active-empty="true"] { outline:none!important; box-shadow:none!important; }
+body.builder-active #newsletter-builder-layout #blocks-container p.selected-block-active::before { display:none!important; }
