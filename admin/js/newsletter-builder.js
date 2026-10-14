@@ -6538,6 +6538,7 @@ class NewsletterBuilder {
         const saveDraftBtn = document.getElementById('save-draft-btn');
         const versionHistoryBtn = document.getElementById('version-history-btn');
         const previewBtn = document.getElementById('preview-btn');
+        const saveTemplateBtn = document.getElementById('save-template-btn');
 
         if (!drawer) return;
 
@@ -6553,6 +6554,7 @@ class NewsletterBuilder {
             if (rightInspector) rightInspector.style.setProperty('display', 'none', 'important');
             if (centerToolbarCell) centerToolbarCell.style.setProperty('display', 'none', 'important');
             if (saveDraftBtn) saveDraftBtn.style.setProperty('display', 'none', 'important');
+            if (saveTemplateBtn) saveTemplateBtn.style.setProperty('display', 'none', 'important');
             if (versionHistoryBtn) versionHistoryBtn.style.setProperty('display', 'none', 'important');
             if (previewBtn) previewBtn.style.setProperty('display', 'none', 'important');
             if (leftToolbarTitle) leftToolbarTitle.textContent = 'Mottakere & Utsendelse';
@@ -6577,6 +6579,7 @@ class NewsletterBuilder {
             if (rightInspector) rightInspector.style.setProperty('display', 'block', 'important');
             if (centerToolbarCell) centerToolbarCell.style.setProperty('display', 'flex', 'important');
             if (saveDraftBtn) saveDraftBtn.style.removeProperty('display');
+            if (saveTemplateBtn) saveTemplateBtn.style.removeProperty('display');
             if (versionHistoryBtn) versionHistoryBtn.style.removeProperty('display');
             if (previewBtn) previewBtn.style.removeProperty('display');
             if (leftToolbarTitle) leftToolbarTitle.textContent = 'Elementer';
@@ -6945,6 +6948,13 @@ class NewsletterBuilder {
     }
 
     renderCanvas() {
+        const templateButton = document.getElementById('save-template-btn');
+        if (templateButton) {
+            const label = this.currentDocumentIsTemplate ? 'Lagre mal' : 'Lagre som mal';
+            templateButton.title = label;
+            const text = templateButton.querySelector('.btn-label-text');
+            if (text) text.textContent = label;
+        }
         const saveButton = document.getElementById('save-draft-btn');
         if (saveButton) {
             const label = this.currentDocumentIsTemplate ? 'Lagre mal' : 'Lagre utkast';
@@ -7396,7 +7406,10 @@ class NewsletterBuilder {
     }
 
     async saveTemplate() {
-        if (!window.firebaseService || !window.firebaseService.isInitialized) return;
+        if (!window.firebaseService?.isInitialized) {
+            showToast('Vent til innloggingen er klar før du lagrer malen.', 'error');
+            return;
+        }
         this.showPromptModal(
             "Navn på malen",
             "F.eks. Månedlig nyhetsbrev",
@@ -7422,7 +7435,7 @@ class NewsletterBuilder {
                         data.createdAt = new Date().toISOString();
                         await window.firebaseService.db.collection('newsletter_templates').add(data);
                     }
-                    showToast("Mal lagret!", "success");
+                    showToast("Malen er lagret under Nyhetsbrev → Maler. Trykk Oppdater i oversikten.", "success");
                     this.loadTemplates();
                 } catch (e) {
                     showToast("Kunne ikke lagre mal.");
