@@ -95,7 +95,13 @@ if (root) {
             values.forEach(item => {
                 const row = el('div', ''); row.className = 'workspace-saved-row';
                 const name = item.name || item.subject || 'Uten navn';
-                const link = el('a', name); link.href = '/admin/admin-nyhetsbrev.html?draftId=' + encodeURIComponent(item.id);
+                const details = el('div', ''); details.className = 'workspace-saved-details';
+                const title = el('strong', name);
+                const modified = time(item.updatedAt || item.createdAt);
+                const meta = el('span', modified ? 'Sist endret ' + new Date(modified).toLocaleDateString('nb-NO') : (kind === 'drafts' ? 'Utkast' : 'Lagret mal'));
+                details.append(title, meta);
+                const actions = el('div', ''); actions.className = 'workspace-saved-actions';
+                const link = el('a', 'Åpne'); link.setAttribute('aria-label', 'Åpne ' + name); link.href = '/admin/admin-nyhetsbrev.html?draftId=' + encodeURIComponent(item.id);
                 const remove = el('button', 'Slett'); remove.type = 'button'; remove.className = 'workspace-delete';
                 remove.setAttribute('aria-label', 'Slett ' + name);
                 remove.addEventListener('click', async () => {
@@ -120,7 +126,7 @@ if (root) {
                         render();
                     } catch { status.textContent = 'Kunne ikke slette. Kontroller tilgangen og prøv igjen.'; remove.disabled = false; }
                 });
-                row.append(link, remove); box.append(row);
+                actions.append(link, remove); row.append(details, actions); box.append(row);
             });
             if (!values.length) box.append(el('p', kind === 'drafts' ? 'Ingen lagrede kladder i dette utvalget.' : 'Ingen lagrede maler i dette utvalget.'));
         }
@@ -143,7 +149,7 @@ if (root) {
             root.querySelector('[data-count-campaigns]').textContent=campaigns.length;
             root.querySelector('[data-count-drafts]').textContent=drafts.length;
             root.querySelector('[data-count-sent]').textContent=campaigns.reduce((sum,c)=>sum+Number(c.sentCount||0),0);
-            status.textContent='Viser siste 25 kampanjer per datofelt og lagrede kladder/maler. «Sendt» betyr sendt fra serveren, ikke bekreftet levering. «Uavklart» betyr at forsøket mangler avslutning og er eldre enn 24 timer eller mangler tidspunkt. Ingen utsendinger startes på nytt.';
+            status.textContent='Oversikten er oppdatert.';
             render();
         } catch { status.textContent='Kunne ikke hente oversikten. Kontroller tilgangen og prøv igjen.'; }
         finally { root.querySelector('[data-workspace-refresh]').disabled=false; }
@@ -166,6 +172,7 @@ if (root) {
     root.querySelectorAll('[data-workspace-view]').forEach(button=>button.addEventListener('click',()=>{
         root.querySelectorAll('[data-workspace-view]').forEach(tab=>tab.setAttribute('aria-pressed',String(tab===button)));
         root.querySelectorAll('[data-workspace-panel]').forEach(panel=>panel.hidden=panel.dataset.workspacePanel!==button.dataset.workspaceView);
+        root.querySelector('[data-campaign-note]').hidden = button.dataset.workspaceView !== 'campaigns';
     }));
 }
 const check = document.getElementById('newsletter-content-check');
