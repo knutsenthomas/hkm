@@ -5545,12 +5545,6 @@ ol.block-list {
     transition: none;
 }
 
-#min-side-og-skole .slide-buttons {
-    justify-content: center !important;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
 .hero-slide.active .hero-title,
 .hero-slide.active .hero-subtitle,
 .hero-slide.active .slide-buttons {
