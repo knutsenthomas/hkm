@@ -224,3 +224,11 @@ body.builder-recipients-open #newsletter-builder-layout .hkm-newsletter-text-too
 }
 @media(max-width:991px) { .desktop-elements-header { display:none; } }
 @media(prefers-reduced-motion:reduce) { #newsletter-builder-layout #elements-panel { transition:none!important; } }
+
+/* Properties occupy space only when explicitly opened. */
+body.builder-active:not(.properties-panel-open) #newsletter-builder-layout .builder-properties-panel { display:none!important; }
+body.builder-active.properties-panel-open #newsletter-builder-layout .builder-properties-panel { display:flex!important; }
+.newsletter-history-actions { display:flex; align-items:center; gap:4px; }
+.newsletter-history-actions button { width:34px; height:34px; border:0; border-radius:8px; background:transparent; color:var(--admin-text,#2c3e50); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.newsletter-history-actions button:disabled { opacity:.35; cursor:default; }
+.newsletter-history-actions button:focus-visible { outline:2px solid #c56828; outline-offset:2px; }

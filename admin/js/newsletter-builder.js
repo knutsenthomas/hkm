@@ -2175,6 +2175,10 @@ class NewsletterBuilder {
     setupRichTextToolbar() {
         const toolbar = document.getElementById('desktop-richtools');
         if (!toolbar) return;
+        document.querySelectorAll('#newsletter-history-actions [data-tool]').forEach(button => {
+            button.addEventListener('pointerdown', event => event.preventDefault());
+            button.addEventListener('click', () => this.restoreEditorStep(button.dataset.tool === 'undo' ? -1 : 1));
+        });
 
         document.addEventListener('selectionchange', () => {
             const selection = window.getSelection();
@@ -4845,9 +4849,17 @@ class NewsletterBuilder {
         document.querySelectorAll('#block-quick-toolbar').forEach(el => el.remove());
     }
 
+    setPropertiesPanel(open) {
+        this.propertiesPanelOpen = open;
+        document.body.classList.toggle('properties-panel-open', open);
+        if (open) document.body.classList.remove('document-text-active');
+        else this.closeMobileDrawers();
+    }
+
     updateDocumentTools(editNode) {
         const textMode = /^(P|H[1-6]|LI|BLOCKQUOTE)$/.test(editNode?.tagName || '');
         document.body.classList.toggle('document-text-active', textMode);
+        if (textMode) { this.propertiesPanelOpen = false; document.body.classList.remove('properties-panel-open'); }
         let tools = document.getElementById('hkm-document-tools');
         if (!textMode) { if (tools) tools.hidden = true; return; }
         if (!tools) {
@@ -4864,7 +4876,7 @@ class NewsletterBuilder {
                 if (action === 'up') this.moveActiveBlock(-1);
                 if (action === 'down') this.moveActiveBlock(1);
                 if (action === 'copy') this.duplicateActiveBlock();
-                if (action === 'properties') document.body.classList.remove('document-text-active');
+                if (action === 'properties') this.setPropertiesPanel(true);
                 if (action === 'insert') {
                     this.saveSelection();
                     if (this.isMobileViewport()) this.toggleMobileElementsDrawer();
@@ -4968,6 +4980,7 @@ class NewsletterBuilder {
     }
 
     deselectBlock() {
+        this.propertiesPanelOpen = false; document.body.classList.remove('properties-panel-open');
         document.body.classList.remove('document-text-active');
         const documentTools = document.getElementById('hkm-document-tools');
         if (documentTools) documentTools.hidden = true;
@@ -5303,6 +5316,7 @@ class NewsletterBuilder {
     }
 
     showHeaderInspector() {
+        this.setPropertiesPanel(true);
         const propertiesPanel = document.querySelector('.builder-properties-panel');
         if (propertiesPanel) propertiesPanel.style.display = 'flex';
 
@@ -5574,6 +5588,7 @@ class NewsletterBuilder {
     }
 
     showSocialInspector(socialNode) {
+        this.setPropertiesPanel(true);
         const defaultView = document.getElementById('sidebar-default-view');
         const inspectorView = document.getElementById('sidebar-inspector-view');
         if (!inspectorView) return;
@@ -6159,6 +6174,7 @@ class NewsletterBuilder {
     }
 
     showImageInspector(img, node) {
+        this.setPropertiesPanel(true);
         const defaultView = document.getElementById('sidebar-default-view');
         const inspectorView = document.getElementById('sidebar-inspector-view');
         if (!inspectorView) return;
@@ -6465,6 +6481,7 @@ class NewsletterBuilder {
     }
 
     showButtonInspector(btn, node) {
+        this.setPropertiesPanel(true);
         const defaultView = document.getElementById('sidebar-default-view');
         const inspectorView = document.getElementById('sidebar-inspector-view');
         if (!inspectorView) return;
@@ -11143,6 +11160,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             if (builder) builder.style.display = 'block';
             if (mainHeader) mainHeader.style.setProperty('display', 'none', 'important');
             document.body.className = 'builder-active';
+            if (this.propertiesPanelOpen) document.body.classList.add('properties-panel-open');
             if (!this.isMobileViewport()) document.body.classList.toggle('elements-panel-collapsed', !this.elementsPanelOpen);
 
             // Maintain URL search parameters
@@ -11832,8 +11850,8 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
     }
 
     updateHistoryUi() {
-        const undo = document.querySelector('#desktop-richtools [data-tool="undo"]');
-        const redo = document.querySelector('#desktop-richtools [data-tool="redo"]');
+        const undo = document.querySelector('#newsletter-builder-layout [data-tool="undo"], #desktop-richtools [data-tool="undo"]');
+        const redo = document.querySelector('#newsletter-builder-layout [data-tool="redo"], #desktop-richtools [data-tool="redo"]');
         if (undo) undo.disabled = !(this.editorHistoryIndex > 0);
         if (redo) redo.disabled = !(this.editorHistoryIndex < (this.editorHistory?.length || 0) - 1);
     }
