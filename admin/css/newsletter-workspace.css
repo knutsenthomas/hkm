@@ -169,9 +169,9 @@ dialog.newsletter-save-dialog {
 
 /* Empty paragraphs remain usable writing space without becoming heavy cards. */
 #newsletter-builder-layout #blocks-container p { min-height:1lh; }
-#newsletter-builder-layout #blocks-container p[data-editor-empty="true"]::after { content:'Begynn å skrive …'; color:#94a3b8; font-size:14px; pointer-events:none; }
+#newsletter-builder-layout #blocks-container > p[data-editor-empty="true"]:only-child::after { content:'Begynn å skrive …'; color:#94a3b8; font-size:14px; pointer-events:none; }
 #newsletter-builder-layout #blocks-container p[data-editor-empty="true"] { position:relative; }
-#newsletter-builder-layout #blocks-container p[data-editor-empty="true"]::after { position:absolute; left:0; top:0; }
+#newsletter-builder-layout #blocks-container > p[data-editor-empty="true"]:only-child::after { position:absolute; left:0; top:0; }
 
 /* Document mode: text uses the caret; block operations stay in the margin. */
 body.document-text-active #newsletter-builder-layout #blocks-container .selected-block-active { outline:none!important; box-shadow:none!important; }
@@ -362,3 +362,8 @@ body.builder-active #newsletter-builder-layout .builder-toolbar-header .toolbar-
     #mobile-floating-add .material-symbols-outlined { font-size:28px; }
     #mobile-floating-add:focus-visible { outline:2px solid var(--admin-accent,#d17d39); outline-offset:3px; }
 }
+
+/* Explicit display rules must not override inactive paragraph tools. */
+#hkm-document-tools[hidden],
+#hkm-document-tools button[hidden],
+#hkm-document-tools .document-block-menu[hidden] { display:none!important; }

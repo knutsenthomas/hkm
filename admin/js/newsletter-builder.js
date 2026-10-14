@@ -4939,7 +4939,10 @@ class NewsletterBuilder {
             window.addEventListener('resize', () => { if (this.activeEditNode?.isConnected) this.positionDocumentTools(this.activeEditNode); });
         }
         tools.hidden = false;
-        tools.querySelector('[data-document-tool="insert"]').hidden = !!editNode.textContent.trim() || !!editNode.querySelector('img,video,iframe');
+        const emptyParagraph = !editNode.textContent.replace(/[\u200B\uFEFF]/g, '').trim() && !editNode.querySelector('img,video,iframe');
+        tools.querySelector('[data-document-tool="insert"]').hidden = !emptyParagraph;
+        tools.querySelector('[data-document-tool="menu"]').hidden = emptyParagraph;
+        if (emptyParagraph) tools.querySelector('.document-block-menu').hidden = true;
         this.positionDocumentTools(editNode);
     }
 
