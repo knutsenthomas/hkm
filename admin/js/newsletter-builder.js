@@ -534,7 +534,7 @@ class NewsletterBuilder {
                 
                 this.toggleMode('builder');
                 this.renderCanvas();
-                showToast(`Kladden "${this.currentDraftName}" ble gjenopprettet.`, "info");
+                showToast(`${this.currentDocumentIsTemplate ? 'Malen' : 'Kladden'} "${this.currentDraftName}" ble gjenopprettet.`, "info");
             } else {
                 showToast("Fant ikke den angitte kladden.", "error");
                 const url = new URL(window.location.href);
@@ -6945,6 +6945,13 @@ class NewsletterBuilder {
     }
 
     renderCanvas() {
+        const saveButton = document.getElementById('save-draft-btn');
+        if (saveButton) {
+            const label = this.currentDocumentIsTemplate ? 'Lagre mal' : 'Lagre utkast';
+            saveButton.title = label;
+            const text = saveButton.querySelector('.btn-label-text');
+            if (text) text.textContent = label;
+        }
         const container = document.getElementById('blocks-container');
         if (!container) return;
 
@@ -7459,11 +7466,7 @@ class NewsletterBuilder {
                 div.onclick = async () => {
                     const confirmed = await this.showConfirm('Last inn mal', `Last inn malen "${data.name}"? Dette vil erstatte innholdet i editoren.`, 'Last inn');
                     if (confirmed) {
-                        this.blocks = data.blocks;
-                        this.resetEditorLanguageState(data);
-                        document.getElementById('newsletter-subject').value = data.subject || '';
-                        this.renderCanvas();
-                        showToast(`Malen "${data.name}" er lastet inn.`, "info");
+                        await this.openSavedNewsletterTemplate(doc.id);
                     }
                 };
                 container.appendChild(div);
@@ -11541,6 +11544,14 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
         }, 2000);
     }
 
+    async openSavedNewsletterTemplate(id) {
+        clearTimeout(this.autosaveTimer);
+        const url = new URL(window.location.href);
+        url.searchParams.set('draftId', id);
+        window.history.pushState({}, '', url.toString());
+        await this.loadDraftFromUrl(id);
+    }
+
     async loadCustomTemplateById(id) {
         const tpl = this.templatesCache && this.templatesCache[id];
         if (!tpl) return;
@@ -11549,14 +11560,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             `Last inn malen "${tpl.name}"? Dette vil erstatte innholdet i editoren.`,
             'Last inn'
         );
-        if (confirmed) {
-            this.blocks = JSON.parse(JSON.stringify(tpl.blocks || []));
-            this.resetEditorLanguageState(tpl);
-            document.getElementById('newsletter-subject').value = tpl.subject || '';
-            this.toggleMode('builder');
-            this.renderCanvas();
-            showToast(`Malen "${tpl.name}" er lastet inn.`, "info");
-        }
+        if (confirmed) await this.openSavedNewsletterTemplate(id);
     }
 
     async loadTemplateById(id) {
@@ -11627,25 +11631,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             `Last inn malen "${name}"?`,
             'Last inn'
         );
-        if (confirmed) {
-            try {
-                this.blocks = JSON.parse(blocksStr);
-                this.resetEditorLanguageState({ subject });
-                document.getElementById('newsletter-subject').value = subject || '';
-                
-                // Update URL parameter immediately (new unsaved builder state)
-                const url = new URL(window.location.href);
-                url.searchParams.set('draftId', 'new');
-                window.history.pushState({}, '', url.toString());
-                
-                this.toggleMode('builder');
-                this.renderCanvas();
-                showToast(`Malen "${name}" er lastet inn.`, "info");
-            } catch (e) {
-                console.error("Failed to parse blocks:", e);
-                showToast("Kunne ikke laste inn mal pga. formatfeil.", "error");
-            }
-        }
+        if (confirmed) await this.openSavedNewsletterTemplate(id);
     }
 
     async generateAiSuggestions() {
