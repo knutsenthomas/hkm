@@ -2013,7 +2013,7 @@ class NewsletterBuilder {
         container.querySelectorAll('p').forEach(paragraph => {
             const empty = !paragraph.textContent.replace(/[\u200B\uFEFF]/g, '').trim() && !paragraph.querySelector('img,video,iframe,svg,button,input');
             if (empty) paragraph.setAttribute('data-editor-empty', 'true');
-            else paragraph.removeAttribute('data-editor-empty');
+            else { paragraph.removeAttribute('data-editor-empty'); paragraph.removeAttribute('data-editor-active-empty'); }
         });
     }
 
@@ -4912,7 +4912,7 @@ class NewsletterBuilder {
         document.body.classList.toggle('document-text-active', textMode);
         if (textMode) { this.propertiesPanelOpen = false; document.body.classList.remove('properties-panel-open'); }
         let tools = document.getElementById('hkm-document-tools');
-        if (!textMode) { if (tools) tools.hidden = true; return; }
+        if (!textMode) { document.querySelectorAll('[data-editor-active-empty]').forEach(node => node.removeAttribute('data-editor-active-empty')); if (tools) tools.hidden = true; return; }
         if (!tools) {
             tools = document.createElement('div'); tools.id = 'hkm-document-tools';
             tools.setAttribute('role', 'toolbar'); tools.setAttribute('aria-label', 'Avsnittsverktøy');
@@ -4941,6 +4941,8 @@ class NewsletterBuilder {
         }
         tools.hidden = false;
         const emptyParagraph = !editNode.textContent.replace(/[\u200B\uFEFF]/g, '').trim() && !editNode.querySelector('img,video,iframe');
+        document.querySelectorAll('[data-editor-active-empty]').forEach(node => node.removeAttribute('data-editor-active-empty'));
+        if (emptyParagraph) editNode.setAttribute('data-editor-active-empty', 'true');
         tools.querySelector('[data-document-tool="insert"]').hidden = !emptyParagraph;
         tools.querySelector('[data-document-tool="menu"]').hidden = emptyParagraph;
         if (emptyParagraph) tools.querySelector('.document-block-menu').hidden = true;
@@ -7361,6 +7363,7 @@ class NewsletterBuilder {
             el.removeAttribute('data-editor-label');
         });
         clone.querySelectorAll('[data-editor-empty]').forEach(node => node.removeAttribute('data-editor-empty'));
+        clone.querySelectorAll('[data-editor-active-empty]').forEach(node => node.removeAttribute('data-editor-active-empty'));
         return clone.innerHTML;
     }
 
