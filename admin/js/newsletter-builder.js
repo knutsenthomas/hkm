@@ -427,6 +427,7 @@ class NewsletterBuilder {
         this.blocks = [];
         this.currentDraftId = null;
         this.currentDocumentIsTemplate = false;
+        this.confirmedTemplateId = null;
         this.currentDraftName = null;
         this.hasCustomDraftName = false;
         this.resetEditorLanguageState();
@@ -517,6 +518,7 @@ class NewsletterBuilder {
                 const data = doc.data();
                 this.currentDraftId = doc.id;
                 this.currentDocumentIsTemplate = data.isDraft === false;
+                this.confirmedTemplateId = null;
                 this.currentDraftName = data.name || 'Utkast';
                 this.hasCustomDraftName = true;
                 let loadedBlocks = typeof data.blocks === 'string' ? JSON.parse(data.blocks) : (data.blocks || []);
@@ -533,6 +535,7 @@ class NewsletterBuilder {
                 }
                 
                 this.toggleMode('builder');
+                this.switchSidebarView('builder');
                 this.renderCanvas();
                 showToast(`${this.currentDocumentIsTemplate ? 'Malen' : 'Kladden'} "${this.currentDraftName}" ble gjenopprettet.`, "info");
             } else {
@@ -543,6 +546,7 @@ class NewsletterBuilder {
             }
         } catch (e) {
             console.error("Gjenoppretting av kladd feilet:", e);
+            showToast('Kunne ikke laste inn malen eller kladden. Prøv igjen.', 'error');
         }
     }
 
@@ -6948,20 +6952,7 @@ class NewsletterBuilder {
     }
 
     renderCanvas() {
-        const templateButton = document.getElementById('save-template-btn');
-        if (templateButton) {
-            const label = this.currentDocumentIsTemplate ? 'Lagre mal' : 'Lagre som mal';
-            templateButton.title = label;
-            const text = templateButton.querySelector('.btn-label-text');
-            if (text) text.textContent = label;
-        }
-        const saveButton = document.getElementById('save-draft-btn');
-        if (saveButton) {
-            const label = this.currentDocumentIsTemplate ? 'Lagre mal' : 'Lagre utkast';
-            saveButton.title = label;
-            const text = saveButton.querySelector('.btn-label-text');
-            if (text) text.textContent = label;
-        }
+        this.updateTemplateSaveUi();
         const container = document.getElementById('blocks-container');
         if (!container) return;
 
@@ -7405,65 +7396,108 @@ class NewsletterBuilder {
         }
     }
 
+    updateTemplateSaveUi() {
+        const named = this.currentDocumentIsTemplate && this.currentDraftId;
+        const save = document.getElementById('save-draft-btn');
+        if (save) {
+            save.title = named ? 'Lagre mal' : 'Lagre utkast';
+            const label = save.querySelector('.btn-label-text');
+            if (label) label.textContent = save.title;
+        }
+        const saveAs = document.getElementById('save-template-btn');
+        if (saveAs) {
+            saveAs.title = 'Lagre som …';
+            const label = saveAs.querySelector('.btn-label-text');
+            if (label) label.textContent = 'Lagre som …';
+        }
+        const name = document.getElementById('editing-template-name');
+        if (name) { name.hidden = !named; name.textContent = named ? 'Mal: ' + this.currentDraftName : ''; }
+    }
+
     async saveTemplate() {
         if (!window.firebaseService?.isInitialized) {
             showToast('Vent til innloggingen er klar før du lagrer malen.', 'error');
             return;
         }
-        this.showPromptModal(
-            "Navn på malen",
-            "F.eks. Månedlig nyhetsbrev",
-            async (name) => {
-                try {
-                    clearTimeout(this.autosaveTimer);
-                    // Finish an active autosave before changing the editor's document identity.
-                    while (this._autosaveInFlight) await new Promise(resolve => setTimeout(resolve, 50));
-                    this.syncUnifiedBlocks();
-                    const subject = this.currentEditorLang === 'en'
-                        ? (this.subjectNo || '')
-                        : (document.getElementById('newsletter-subject')?.value || '');
-                    const data = {
-                        name,
-                        blocks: this.blocks,
-                        subject,
-                        englishPayload: this.englishPayload || null,
-                        headerHtml: document.querySelector('.canvas-header')?.outerHTML || '',
-                        updatedAt: new Date().toISOString(),
-                        isDraft: false
-                    };
-                    if (this.currentDocumentIsTemplate && this.currentDraftId) {
-                        await window.firebaseService.db.collection('newsletter_templates').doc(this.currentDraftId).set(data, { merge: true });
-                        this.currentDraftName = name;
-                    } else {
-                        data.createdAt = new Date().toISOString();
-                        const templateRef = await window.firebaseService.db.collection('newsletter_templates').add(data);
-                        this.currentDraftId = templateRef.id;
-                    }
-                    this.currentDocumentIsTemplate = true;
-                    this.currentDraftName = name;
-                    this.hasCustomDraftName = true;
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('draftId', this.currentDraftId);
-                    window.history.replaceState({}, '', url.toString());
-                    try { sessionStorage.setItem('hkm_active_draft_id', this.currentDraftId); } catch (_) {}
-                    for (const id of ['save-draft-btn', 'save-template-btn']) {
-                        const button = document.getElementById(id);
-                        if (!button) continue;
-                        button.title = 'Lagre mal';
-                        const label = button.querySelector('.btn-label-text');
-                        if (label) label.textContent = 'Lagre mal';
-                    }
-                    showToast("Malen er lagret under Nyhetsbrev → Maler. Trykk Oppdater i oversikten.", "success");
-                    this.loadTemplates();
-                } catch (e) {
-                    showToast("Kunne ikke lagre mal.");
-                }
-            },
-            this.currentDocumentIsTemplate ? this.currentDraftName : "Nyhetsbrev Mal",
-            "Vennligst oppgi et navn.",
-            "Lagre mal",
-            "Lagre"
-        );
+        const dialog = document.createElement('dialog');
+        dialog.className = 'newsletter-start-dialog';
+        const heading = document.createElement('h2'); heading.textContent = 'Lagre som …';
+        const create = document.createElement('button'); create.type = 'button'; create.textContent = 'Ny mal';
+        const label = document.createElement('label'); label.textContent = 'Erstatt eksisterende mal';
+        const select = document.createElement('select'); select.setAttribute('aria-label', 'Velg mal som skal erstattes');
+        const replace = document.createElement('button'); replace.type = 'button'; replace.textContent = 'Erstatt valgt mal'; replace.disabled = true;
+        const message = document.createElement('p'); message.textContent = 'Henter lagrede maler …';
+        const cancel = document.createElement('button'); cancel.type = 'button'; cancel.textContent = 'Avbryt';
+        dialog.append(heading, create, label, select, replace, message, cancel);
+        document.body.append(dialog); dialog.showModal();
+        dialog.addEventListener('close', () => dialog.remove(), { once: true });
+        cancel.onclick = () => dialog.close();
+        create.onclick = () => {
+            dialog.close();
+            this.showPromptModal('Navn på malen', 'F.eks. Månedlig nyhetsbrev', name => this.persistNewsletterTemplate(null, name), this.currentDraftName || 'Ny mal', 'Oppgi et navn.', 'Ny mal', 'Lagre');
+        };
+        replace.onclick = async () => {
+            const id = select.value; const name = select.selectedOptions[0]?.textContent;
+            dialog.close();
+            if (await this.showConfirm('Erstatt mal', `Innholdet i malen "${name}" blir erstattet med brevet du redigerer. Vil du fortsette?`, 'Erstatt mal')) {
+                await this.persistNewsletterTemplate(id, name);
+            }
+        };
+        try {
+            const snap = await this.safeGet(window.firebaseService.db.collection('newsletter_templates').orderBy('createdAt', 'desc'), 8000);
+            snap.forEach(doc => { const data = doc.data(); if (data.isDraft === true) return;
+                const option = document.createElement('option'); option.value = doc.id; option.textContent = data.name || 'Uten navn'; select.append(option);
+            });
+            replace.disabled = !select.options.length;
+            message.textContent = select.options.length ? 'Velg en mal for å erstatte innholdet, eller lagre en ny.' : 'Ingen lagrede maler. Velg Ny mal.';
+        } catch { message.textContent = 'Kunne ikke hente malene. Prøv igjen.'; }
+    }
+
+    async saveCurrentNewsletterTemplate() {
+        if (this.confirmedTemplateId !== this.currentDraftId) {
+            if (!await this.showConfirm('Oppdater mal', `Du oppdaterer malen "${this.currentDraftName}". Vil du fortsette?`, 'Lagre mal')) return;
+        }
+        await this.persistNewsletterTemplate(this.currentDraftId, this.currentDraftName);
+    }
+
+    async persistNewsletterTemplate(id, name) {
+        if (!window.firebaseService?.isInitialized || !(name || '').trim()) return;
+        try {
+            clearTimeout(this.autosaveTimer);
+            while (this._autosaveInFlight) await new Promise(resolve => setTimeout(resolve, 50));
+            this.syncUnifiedBlocks();
+            const data = {
+                name: name.trim(), blocks: this.blocks,
+                subject: this.currentEditorLang === 'en' ? (this.subjectNo || '') : (document.getElementById('newsletter-subject')?.value || ''),
+                englishPayload: this.englishPayload || null,
+                headerHtml: document.querySelector('.canvas-header')?.outerHTML || '',
+                updatedAt: new Date().toISOString(), isDraft: false
+            };
+            const collection = window.firebaseService.db.collection('newsletter_templates');
+            if (id) {
+                // Archive the stored content before replacing it, using existing version history.
+                const previousId = this.currentDraftId;
+                this.currentDraftId = id;
+                try { await this.recordNewsletterVersion('Før oppdatering av mal', { minIntervalMs: 0 }); }
+                finally { this.currentDraftId = previousId; }
+                await collection.doc(id).set(data, { merge: true });
+            } else {
+                data.createdAt = new Date().toISOString();
+                id = (await collection.add(data)).id;
+            }
+            this.currentDraftId = id;
+            this.currentDocumentIsTemplate = true;
+            this.currentDraftName = data.name;
+            this.hasCustomDraftName = true;
+            this.confirmedTemplateId = id;
+            const url = new URL(window.location.href); url.searchParams.set('draftId', id);
+            window.history.replaceState({}, '', url.toString());
+            try { sessionStorage.setItem('hkm_active_draft_id', id); } catch (_) {}
+            this.updateTemplateSaveUi();
+            await this.recordNewsletterVersion('Mal lagret', { minIntervalMs: 0 });
+            showToast('Malen er lagret under Nyhetsbrev → Maler.', 'success');
+            this.loadTemplates();
+        } catch (error) { console.error('Template save failed:', error); showToast('Kunne ikke lagre malen. Endringene er fortsatt i editoren.', 'error'); }
     }
 
     async loadTemplates() {
@@ -9601,6 +9635,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
     }
 
     async saveDraft() {
+        if (this.currentDocumentIsTemplate) return this.saveCurrentNewsletterTemplate();
         if (!window.firebaseService || !window.firebaseService.isInitialized) return;
 
         const subjectVal = document.getElementById('newsletter-subject')?.value || '';
@@ -11426,6 +11461,11 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
     }
 
     triggerAutosave() {
+        if (this.currentDocumentIsTemplate && this.confirmedTemplateId !== this.currentDraftId) {
+            const text = document.getElementById('newsletter-autosave-text');
+            if (text) text.textContent = 'Ulagrede endringer – trykk Lagre mal';
+            return;
+        }
         if (this.currentMode !== 'builder') return;
         if (!window.firebaseService || !window.firebaseService.isInitialized) return;
         
@@ -11603,10 +11643,15 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             'Last inn'
         );
         if (confirmed) {
+            this.startEmptyNewsletter();
+            const url = new URL(window.location.href);
+            url.searchParams.set('draftId', 'new');
+            window.history.replaceState({}, '', url.toString());
             this.blocks = JSON.parse(JSON.stringify(tpl.blocks || []));
             this.resetEditorLanguageState(tpl);
             document.getElementById('newsletter-subject').value = tpl.subject || '';
             this.toggleMode('builder');
+                this.switchSidebarView('builder');
             this.renderCanvas();
             showToast(`Malen "${tpl.name}" er lastet inn.`, "info");
         }
