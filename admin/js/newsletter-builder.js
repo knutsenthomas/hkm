@@ -2836,6 +2836,15 @@ class NewsletterBuilder {
                         <input type="text" id="hkm-product-search-input" placeholder="Søk etter produkter..." style="width: 100%; padding: 10px 12px 10px 40px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; font-weight: 500; outline: none; transition: border-color 0.2s, box-shadow: 0.2s; box-sizing: border-box; background: white;" />
                     </div>
                 </div>
+                <div style="padding:12px 24px;display:flex;gap:12px;flex-wrap:wrap;background:#f8fafc;">
+                    <label style="flex:1;min-width:160px;font-size:12px;">Kategori
+                        <select id="hkm-product-category" style="display:block;width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:10px;background:white;"><option value="">Alle kategorier</option></select>
+                    </label>
+                    <label style="flex:1;min-width:160px;font-size:12px;">Sortering
+                        <select id="hkm-product-sort" style="display:block;width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:10px;background:white;"><option value="newest">Nyeste først</option><option value="name">Navn A–Å</option><option value="price-low">Laveste pris</option><option value="price-high">Høyeste pris</option></select>
+                    </label>
+                    <p id="hkm-product-filter-status" role="status" style="width:100%;margin:0;font-size:12px;color:#64748b;"></p>
+                </div>
                 <div id="hkm-product-results" style="padding: 20px 24px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; min-height: 250px; max-height: 380px; background: white;">
                     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 0; color: #94a3b8; gap: 12px;">
                         <div style="width: 24px; height: 24px; border: 3px solid #e2e8f0; border-top-color: #d17d39; border-radius: 50%; animation: spin 1s linear infinite;"></div>
@@ -2916,7 +2925,21 @@ class NewsletterBuilder {
                 .replace(/'/g, "&#039;");
         };
 
+        const categorySelect = modal.querySelector('#hkm-product-category');
+        const sortSelect = modal.querySelector('#hkm-product-sort');
+        const filterStatus = modal.querySelector('#hkm-product-filter-status');
         let productsList = window.hkmWixProductsCache || [];
+        const updateFilters = () => {
+            const categories = new Map();
+            productsList.forEach(product => (product.categories || []).forEach(category => categories.set(category.id, category.name)));
+            categorySelect.replaceChildren(new Option('Alle kategorier', ''));
+            [...categories].sort((a,b) => a[1].localeCompare(b[1], 'nb')).forEach(([id, name]) => categorySelect.add(new Option(name, id)));
+            categorySelect.disabled = !categories.size;
+            const hasDates = productsList.some(product => Number.isFinite(Date.parse(product.createdDate)));
+            sortSelect.querySelector('[value="newest"]').disabled = !hasDates;
+            if (!hasDates) sortSelect.value = 'name';
+            filterStatus.textContent = [!categories.size ? 'Kategoridata er ikke tilgjengelige.' : '', !hasDates ? 'Opprettelsesdatoer mangler; nyeste først er utilgjengelig.' : ''].filter(Boolean).join(' ');
+        };
         const selectedProductsMap = new Map();
 
         const updateSelectionUI = () => {
@@ -2938,7 +2961,7 @@ class NewsletterBuilder {
             }
         };
 
-        const renderProducts = (query = '') => {
+        const renderProducts = (query = searchInput.value) => {
             const q = query.trim().toLowerCase();
             let filtered = productsList;
 
@@ -2964,6 +2987,14 @@ class NewsletterBuilder {
                     return searchTerms.some(term => nameLower.includes(term) || descLower.includes(term)) || nameLower.includes(q);
                 });
             }
+
+            if (categorySelect.value) filtered = filtered.filter(product => (product.categories || []).some(category => category.id === categorySelect.value));
+            filtered = [...filtered].sort((a, b) => {
+                if (sortSelect.value === 'newest') return (Date.parse(b.createdDate) || 0) - (Date.parse(a.createdDate) || 0);
+                if (sortSelect.value === 'price-low') return Number(a.price) - Number(b.price);
+                if (sortSelect.value === 'price-high') return Number(b.price) - Number(a.price);
+                return String(a.name || '').localeCompare(String(b.name || ''), 'nb');
+            });
 
             if (filtered.length === 0) {
                 resultsContainer.innerHTML = `
@@ -3095,8 +3126,9 @@ class NewsletterBuilder {
                 }
             ];
 
-            if (productsList.length > 0) {
-                renderProducts();
+            if (productsList.length > 0 && productsList.every(p => 'createdDate' in p && 'categories' in p)) {
+                        updateFilters();
+                        renderProducts();
                 return;
             }
 
@@ -3109,8 +3141,9 @@ class NewsletterBuilder {
                     });
                     const data = await res.json();
                     if (data.success && Array.isArray(data.products) && data.products.length > 0) {
-                        window.hkmWixProductsCache = data.products.sort((a, b) => a.name.localeCompare(b.name));
+                        window.hkmWixProductsCache = data.products;
                         productsList = window.hkmWixProductsCache;
+                        updateFilters();
                         renderProducts();
                         return;
                     }
@@ -3125,8 +3158,9 @@ class NewsletterBuilder {
                 try {
                     const doc = await window.firebaseService.getPageContent('wix_products');
                     if (doc && Array.isArray(doc.items) && doc.items.length > 0) {
-                        window.hkmWixProductsCache = doc.items.filter(p => p.inStock !== false).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+                        window.hkmWixProductsCache = doc.items.filter(p => p.inStock !== false);
                         productsList = window.hkmWixProductsCache;
+                        updateFilters();
                         renderProducts();
                         return;
                     }
@@ -3138,12 +3172,16 @@ class NewsletterBuilder {
             // Fallback catalog guarantees products are ALWAYS available to insert
             window.hkmWixProductsCache = fallbackProducts;
             productsList = window.hkmWixProductsCache;
+            updateFilters();
             renderProducts();
         };
 
         searchInput.oninput = (e) => {
             renderProducts(e.target.value);
         };
+
+        categorySelect.onchange = () => renderProducts();
+        sortSelect.onchange = () => renderProducts();
 
         loadProducts();
     }
