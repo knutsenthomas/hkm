@@ -30,8 +30,8 @@ const isSpanish = window.location.href.includes("/es/");
 
 const translations = {
     vipps_subtitle: {
-        no: "Opprett en fast månedlig avtale direkte i Vipps",
-        en: "Create a recurring monthly agreement directly in Vipps",
+        no: "Opprett en fast månedlig avtale direkte i Vipps. Første trekk skjer tidligst to dager etter godkjenning.",
+        en: "Create a monthly agreement in Vipps. The first payment is due at least two days after approval.",
         es: "Cree un acuerdo mensual recurrente directamente en Vipps"
     },
     stripe_subtitle: {
@@ -672,12 +672,13 @@ function openAgreementModal(method = "vipps") {
             submitBtn.innerHTML = `<span class="hkm-spinner" style="width: 20px; height: 20px; border-width: 2px; margin-right: 10px; margin-bottom: 0; display: inline-block; vertical-align: middle;"></span>${t('loading_vipps')}`;
 
             try {
-                const response = await fetch(VIPPS_CREATE_AGREEMENT_URL, {
+                const requestId = await recurringGiftRequestId(amount, { name: donorName, email: donorEmail, fund }, "vipps");
+                const response = await fetch(RECURRING_PAYMENT_URL, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         amount,
-                        currency: "NOK",
+                        currency: "NOK", gift: true, provider: "vipps", consent: true, requestId, language: isEnglish ? "en" : "no",
                         customerDetails: {
                             name: donorName,
                             email: donorEmail,
@@ -794,7 +795,7 @@ function openAgreementModal(method = "vipps") {
 
 async function handlePayPalRecurringReturn() {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('recurring_provider') !== 'paypal') return;
+    if (!['paypal','vipps'].includes(params.get('recurring_provider'))) return;
     if (params.get('cancelled') === '1') { showResultModal(false, isEnglish ? 'PayPal setup was cancelled.' : 'PayPal-avtalen ble avbrutt.'); return; }
     try {
         const response = await fetch(RECURRING_VERIFY_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: params.get('agreement_key'), requestId: params.get('request_id') }) });

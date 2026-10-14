@@ -12,6 +12,10 @@ const vippsClientIdParam = defineSecret('VIPPS_CLIENT_ID');
 const vippsClientSecretParam = defineSecret('VIPPS_CLIENT_SECRET');
 const vippsSubscriptionKeyParam = defineSecret('VIPPS_SUBSCRIPTION_KEY');
 const vippsMsnParam = defineSecret('VIPPS_MSN');
+const vippsRecurringClientId = defineSecret('VIPPS_RECURRING_CLIENT_ID');
+const vippsRecurringClientSecret = defineSecret('VIPPS_RECURRING_CLIENT_SECRET');
+const vippsRecurringSubscriptionKey = defineSecret('VIPPS_RECURRING_SUBSCRIPTION_KEY');
+const vippsRecurringSecrets = [vippsRecurringClientId, vippsRecurringClientSecret, vippsRecurringSubscriptionKey];
 const googleChatWebhookUrlParam = defineSecret('GOOGLE_CHAT_WEBHOOK_URL');
 const googleChatBridgeTokenParam = defineSecret('GOOGLE_CHAT_BRIDGE_TOKEN');
 const stripeSecretKeyParam = defineSecret('STRIPE_SECRET_KEY');
@@ -3757,7 +3761,7 @@ async function recurringPayPalApi() {
   };
   return { api, config, token };
 }
-exports.createRecurringPayment = onRequest({ cors: true, invoker: 'public', secrets: [stripeSecretKeyParam, paypalClientIdParam, paypalClientSecretParam] }, async (req, res) => {
+exports.createRecurringPayment = onRequest({ cors: true, invoker: 'public', secrets: [stripeSecretKeyParam, paypalClientIdParam, paypalClientSecretParam, ...vippsRecurringSecrets] }, async (req, res) => {
   if (req.method !== 'POST') return res.status(405).send({ error: 'Method not allowed' });
   try {
     const input = req.body || {};
@@ -3790,6 +3794,8 @@ exports.createRecurringPayment = onRequest({ cors: true, invoker: 'public', secr
       const { api, config, token } = await recurringPayPalApi();
       const productId = await getOrCreatePayPalProduct(token, config);
       result = await createPayPalAgreement({ details, input, db, api, productId, timestamp });
+    } else if (input.provider === 'vipps') {
+      result = await require('./vipps-recurring.cjs').createAgreement({ details, input, db, api: await recurringVippsApi(), timestamp });
     } else return res.status(400).send({ error: 'invalid-provider' });
     if (!details.gift && details.centralUid) await require('./student-payment-account.cjs').schoolAccountService({body:{mode:'link',centralUid:details.centralUid,year:details.year,kind:'plan',reference:details.key},db,timestamp});
     res.status(200).send(result);
@@ -3798,14 +3804,17 @@ exports.createRecurringPayment = onRequest({ cors: true, invoker: 'public', secr
     res.status(error.status || 500).send({ error: error.status ? error.message : 'recurring-payment-unavailable' });
   }
 });
-exports.verifyRecurringPayment = onRequest({ cors: true, invoker: 'public', secrets: [paypalClientIdParam, paypalClientSecretParam] }, async (req, res) => {
+exports.verifyRecurringPayment = onRequest({ cors: true, invoker: 'public', secrets: [paypalClientIdParam, paypalClientSecretParam, ...vippsRecurringSecrets] }, async (req, res) => {
   if (req.method !== 'POST') return res.status(405).send({ error: 'Method not allowed' });
   try {
     const { key, requestId } = req.body || {};
     if (!/^[a-f0-9]{64}$/.test(key || '') || !/^[a-f0-9-]{36}$/i.test(requestId || '')) return res.status(400).send({ error: 'invalid-agreement' });
     const ref = db.collection('recurring_payment_agreements').doc(key);
     const snap = await ref.get();
-    if (!snap.exists || snap.data().requestId !== requestId || snap.data().provider !== 'paypal') return res.status(404).send({ error: 'agreement-not-found' });
+    if (!snap.exists || snap.data().requestId !== requestId || !['paypal','vipps'].includes(snap.data().provider)) return res.status(404).send({ error: 'agreement-not-found' });
+    if (snap.data().provider === 'vipps') {
+      return res.status(200).send(await require('./vipps-recurring.cjs').reconcile({ ref, record: snap.data(), db, api: await recurringVippsApi(), timestamp: Timestamp.now() }));
+    }
     const { api } = await recurringPayPalApi();
     res.status(200).send(await reconcilePayPalAgreement({ ref, record: snap.data(), api, timestamp: Timestamp.now() }));
   } catch (error) { res.status(error.status || 500).send({ error: 'verification-unavailable' }); }
@@ -9696,4 +9705,44 @@ exports.schoolCheckoutDetails = onRequest({cors:true,invoker:'public'}, async (r
  if(req.method!=='POST')return res.status(405).send({error:'method-not-allowed'});
  try {const quote=await require('./school-checkout.cjs').readSchoolCheckout(db,req.body?.quote);res.status(200).send({year:quote.year,name:quote.name,email:quote.email,registrationRemaining:quote.registrationRemaining,amount:1000+quote.registrationRemaining/10});}
  catch(error){res.status(error.status || 503).send({error:error.message});}
+});
+
+// Sales unit 1174856: isolated from legacy one-time Vipps credentials and agreements.
+async function recurringVippsApi() {
+  const config = { baseUrls: ['https://api.vipps.no'], clientId: vippsRecurringClientId.value(), clientSecret: vippsRecurringClientSecret.value(), subscriptionKey: vippsRecurringSubscriptionKey.value(), merchantSerialNumber: '1174856', systemName: 'hiskingdomministry', systemVersion: '2.0.0', systemPluginName: 'hkm-hkpc-recurring', systemPluginVersion: '1.0.0' };
+  const { accessToken, baseUrl } = await getVippsAccessToken(config);
+  return async (path, method = 'GET', body, idempotencyKey) => {
+    const response = await fetch(`${baseUrl}/recurring/v3${path}`, { method, headers: { Authorization: `Bearer ${accessToken}`, 'Ocp-Apim-Subscription-Key': config.subscriptionKey, 'Merchant-Serial-Number': config.merchantSerialNumber, 'Content-Type': 'application/json', ...getVippsSystemHeaders(config), ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}) }, ...(body ? { body: JSON.stringify(body) } : {}), signal: AbortSignal.timeout(20000) });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw Object.assign(new Error('vipps-provider-unavailable'), { status: 502 });
+    return result;
+  };
+}
+exports.reconcileRecurringVipps = onSchedule({ schedule: 'every 60 minutes', secrets: vippsRecurringSecrets, timeoutSeconds: 540 }, async () => {
+  const api = await recurringVippsApi();
+  let cursor;
+  do {
+    let query = db.collection('recurring_payment_agreements').where('provider', '==', 'vipps').orderBy('__name__').limit(50);
+    if (cursor) query = query.startAfter(cursor);
+    const page = await query.get();
+    for (const snap of page.docs) {
+      if (!snap.data().agreementId) continue;
+      try { await require('./vipps-recurring.cjs').reconcile({ ref: snap.ref, record: snap.data(), db, api, timestamp: Timestamp.now(), schedule: true }); }
+      catch (error) { console.error('Vipps reconciliation failed', snap.id, error.message); }
+    }
+    cursor = page.size === 50 ? page.docs.at(-1) : null;
+  } while (cursor);
+});
+exports.manageRecurringVipps = onRequest({ cors: true, invoker: 'public', secrets: vippsRecurringSecrets }, async (req, res) => {
+  if (req.method !== 'POST') return res.status(405).send({ error: 'Method not allowed' });
+  try {
+    const { key, token, action } = req.body || {};
+    if (!/^[a-f0-9]{64}$/.test(key || '') || !/^[a-f0-9]{48}$/.test(token || '') || !['read','stop'].includes(action)) return res.status(400).send({ error: 'invalid-agreement' });
+    const ref = db.collection('recurring_payment_agreements').doc(key); const snap = await ref.get();
+    if (!snap.exists || snap.data().provider !== 'vipps' || snap.data().manageTokenHash !== require('./vipps-recurring.cjs').hash(token)) return res.status(404).send({ error: 'agreement-not-found' });
+    const api = await recurringVippsApi(); const record = snap.data();
+    if (action === 'stop') { await api(`/agreements/${encodeURIComponent(record.agreementId)}`, 'PATCH', { status: 'STOPPED' }, require('./vipps-recurring.cjs').hash(`stop:${key}`).slice(0,36)); await ref.set({ status: 'stopped' }, { merge: true }); }
+    const result = await require('./vipps-recurring.cjs').reconcile({ ref, record, db, api, timestamp: Timestamp.now() });
+    res.send({ status: result.status, amount: record.amount, gift: record.gift, fund: record.metadata.fund, cycles: record.gift ? null : 10 });
+  } catch (error) { res.status(error.status || 500).send({ error: 'agreement-unavailable' }); }
 });

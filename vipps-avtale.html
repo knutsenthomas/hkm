@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+ <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+ <meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+ <title>Din Vipps-avtale | His Kingdom Ministry</title><link rel="stylesheet" href="styles.css">
+ <script>
+ // Remove the management credential before shared navigation or analytics loads.
+ const vippsManageParams = new URLSearchParams(location.search);
+ const vippsManageKey = vippsManageParams.get('key');
+ const vippsManageToken = vippsManageParams.get('token') || sessionStorage.getItem('vipps-manage-'+vippsManageKey);
+ if (vippsManageKey && vippsManageToken) sessionStorage.setItem('vipps-manage-'+vippsManageKey,vippsManageToken);
+ vippsManageParams.delete('token');history.replaceState(null,'',location.pathname+'?'+vippsManageParams.toString());
+ </script>
+ <style>.vipps-account{max-width:640px;margin:3rem auto;padding:1.5rem;border:1px solid #dce5e8;border-radius:24px;background:var(--bg-card,#fff);color:var(--text-primary,#173b49)}.vipps-account h1{font-size:1.75rem;margin-bottom:1rem}.vipps-account p{line-height:1.65;margin-bottom:1rem}.vipps-account button{min-height:44px;border-radius:12px;padding:.75rem 1rem;border:1px solid #bd2735;color:#9f1727;background:transparent;font-weight:600}.vipps-account button:disabled{opacity:.5}.vipps-account a{color:inherit;text-decoration:underline} main{padding:1rem}</style>
+ <script defer src="script.js"></script><script defer src="js/vipps-account.js"></script>
+</head>
+<body><main><section class="vipps-account" aria-labelledby="vipps-title"><h1 id="vipps-title">Din Vipps-avtale</h1><p id="vipps-account-status" role="status">Henter avtalen …</p><p id="vipps-account-info"></p><p id="vipps-account-help">Du kan avslutte avtalen her eller i Vipps. Ubetalt skoleavgift må fortsatt avklares med skolen.</p><button id="vipps-stop" type="button" hidden>Avslutt avtalen</button><p><a href="/kontakt.html" id="vipps-contact">Kontakt oss</a></p></section></main></body>
+</html>

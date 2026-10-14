@@ -4,7 +4,7 @@ HKM `/bli-fast-giver` and HKPC `/betaling` and `/gi-gave` use the same Firebase 
 
 ## Entry points
 
-- `createRecurringPayment`: server-validated setup, `provider: stripe|paypal`.
+- `createRecurringPayment`: server-validated setup, `provider: stripe|paypal|vipps`.
 - `verifyRecurringPayment`: verifies PayPal approval using the server's saved subscription and plan identifiers. Approval is not recorded as money received.
 - `reconcileRecurringPayPal`: daily provider verification and transaction reconciliation, independent of the browser returning. Failed checks are logged and retried on the next run.
 - `stripeWebhook`: signature-verified successful charges, including every subscription renewal. Failed database writes return 500 so Stripe can retry.
@@ -19,13 +19,19 @@ Stripe agreements are managed in the Stripe dashboard, PayPal agreements in the 
 
 Bank standing orders are created and stopped by the payer in their online bank; they are registered manually when received. Buy Me a Coffee remains an external HKM giving channel and is not represented as an HKPC transaction in this ledger.
 
-Recurring Vipps on HKPC is unavailable pending the new sales unit's activation and integration. Existing HKM Vipps code is not used by these school plans. Before enabling it, implement finite school charges, provider verification and recurring charge reconciliation; activating the merchant product alone is insufficient.
+Recurring Vipps uses production sales unit 1174856 and separate `VIPPS_RECURRING_CLIENT_ID`, `VIPPS_RECURRING_CLIENT_SECRET`, and `VIPPS_RECURRING_SUBSCRIPTION_KEY` secrets. Legacy one-time Vipps credentials remain unchanged. Both websites use `createRecurringPayment` and `verifyRecurringPayment` for new Vipps agreements.
+
+Vipps agreements have no immediate initial charge: the first due date is at least two days after approval. `reconcileRecurringVipps` checks agreement/charge status hourly and creates each subsequent charge with a stable idempotency key. Gifts have no payment-count cap and continue until cancellation. School plans can create at most ten charges and stop the agreement when all ten are fully captured. Unpaid/failed charges block further charges until reviewed; they never reduce the balance. No accumulated catch-up charges are created. Completed payments are recorded only after a provider-verified full capture. Provider refunds update the ledger.
+
+`/vipps-avtale.html` is the customer management page linked from Vipps. Its unguessable per-agreement management token is removed from the URL before the shared shell loads. `manageRecurringVipps` checks the stored token hash and allows reading or stopping that agreement. Vipps automatically cancels upcoming charges on a stopped agreement. Outstanding tuition remains payable and needs follow-up.
+
+Validation: `node --test functions/vipps-recurring.test.cjs` covers unlimited gifts, ten school charges, duplicate prevention, pending/failed charges, idempotent timeout recovery, and month-end dates. No production agreement or charge was created while testing.
 
 ## Validation
 
 `node --test functions/recurring-payments.test.cjs` covers fixed prices/cycles, month ends, duplicate setup, renewal metadata and the distinction between approved agreements and completed payments. HKPC's `test/school-payments.test.js` covers payment payloads, failed/unverified states and duplicate agreements. No live agreement or monetary charge was created while testing.
 
-Deploy only the four entry points above. Functions runtime is Node 22.
+Deploy only the relevant payment entry points above and `reconcileRecurringVipps` / `manageRecurringVipps`. Functions runtime is Node 22.
 
 ## Administrative school payment views
 
