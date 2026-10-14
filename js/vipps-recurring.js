@@ -474,8 +474,28 @@ function showLoadingOverlayRecurring(show) {
 
 // Initialize trigger listener
 document.addEventListener("DOMContentLoaded", () => {
+    const giftForm = document.getElementById('donor-gift-form');
+    if (giftForm) {
+        const amountInput = giftForm.elements.amount;
+        const presets = [...giftForm.querySelectorAll('[data-donor-amount]')];
+        const syncPresets = () => presets.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.donorAmount === amountInput.value)));
+        presets.forEach(button => button.addEventListener('click', () => {
+            amountInput.value = button.dataset.donorAmount;
+            syncPresets();
+        }));
+        amountInput.addEventListener('input', syncPresets);
+        const params = new URLSearchParams(window.location.search);
+        const amount = Number(params.get('amount'));
+        if (Number.isSafeInteger(amount) && amount > 0) amountInput.value = amount;
+        if (['general', 'misjon', 'basar'].includes(params.get('fund'))) giftForm.elements.fund.value = params.get('fund');
+        syncPresets();
+        giftForm.addEventListener('submit', event => {
+            event.preventDefault();
+            if (giftForm.reportValidity()) openAgreementModal('vipps');
+        });
+    }
     const trigger = document.getElementById("vipps-recurring-trigger");
-    if (trigger) {
+    if (trigger && !giftForm) {
         trigger.setAttribute("href", "javascript:void(0)");
         trigger.removeAttribute("target");
         trigger.addEventListener("click", (e) => {
@@ -522,6 +542,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Helper to open modal
 function openAgreementModal(method = "vipps") {
+    const giftForm = document.getElementById('donor-gift-form');
+    if (giftForm && !giftForm.reportValidity()) return;
     // Remove existing modal if any
     const existing = document.getElementById("vipps-recurring-modal");
     if (existing) existing.remove();
@@ -629,6 +651,11 @@ function openAgreementModal(method = "vipps") {
     // Amount buttons events
     const amountBtns = modal.querySelectorAll(".hkm-amount-btn");
     const customInput = modal.querySelector("#hkm-custom-amount");
+    if (giftForm) {
+        amountBtns.forEach(button => button.classList.remove('selected'));
+        customInput.value = giftForm.elements.amount.value;
+        modal.querySelector('#hkm-donor-fund').value = giftForm.elements.fund.value;
+    }
 
     amountBtns.forEach(btn => {
         btn.addEventListener("click", () => {
