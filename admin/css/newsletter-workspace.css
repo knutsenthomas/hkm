@@ -55,3 +55,23 @@
 .newsletter-hub-links { padding:24px; border:1px solid var(--admin-border,#e5e7eb); border-radius:16px; display:flex; flex-wrap:wrap; align-items:center; gap:16px; }
 .newsletter-hub-links p { width:100%; margin:0; color:var(--admin-text-muted,#64748b); }
 .newsletter-hub-links .workspace-primary { padding:12px 18px; background:#c56828; color:white; border-radius:10px; text-decoration:none; }
+
+/* Keep the native modal centered despite the editor's global dialog resets. */
+dialog.newsletter-save-dialog {
+    position:fixed!important; inset:0!important; margin:auto!important;
+    width:min(480px,calc(100vw - 32px)); height:fit-content;
+    max-height:calc(100dvh - 48px); box-sizing:border-box;
+    padding:28px; border-radius:20px; text-align:left;
+    box-shadow:0 24px 70px rgba(15,23,42,.2);
+}
+.newsletter-save-dialog[open] { display:flex!important; flex-direction:column; gap:16px; }
+.newsletter-save-dialog h2 { margin:0; font-size:24px; line-height:1.3; }
+.newsletter-save-dialog p { margin:0; font-size:14px; line-height:1.6; }
+.newsletter-save-dialog button { min-height:44px; font-size:14px; font-weight:600; text-align:center; }
+.newsletter-save-dialog .save-new-template { width:100%; background:#c56828; border-color:#c56828; color:#fff; }
+.newsletter-save-dialog .save-existing-template { display:grid; gap:12px; border-top:1px solid var(--admin-border,#e5e7eb); padding-top:20px; margin-top:4px; }
+.newsletter-save-dialog label { font-size:14px; font-weight:650; }
+.newsletter-save-dialog select { width:100%; min-width:0; min-height:46px; padding:10px 36px 10px 12px; border:1px solid var(--admin-border,#e5e7eb); border-radius:10px; background:var(--admin-surface,#fff); color:inherit; font:inherit; font-size:14px; }
+.newsletter-save-dialog button:disabled { opacity:.5; cursor:default; }
+.newsletter-save-dialog .save-dialog-footer { display:flex; justify-content:flex-end; border-top:1px solid var(--admin-border,#e5e7eb); padding-top:16px; }
+.newsletter-save-dialog::backdrop { background:rgba(15,23,42,.5); backdrop-filter:blur(4px); }

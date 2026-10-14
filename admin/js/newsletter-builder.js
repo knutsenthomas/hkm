@@ -7420,15 +7420,19 @@ class NewsletterBuilder {
             return;
         }
         const dialog = document.createElement('dialog');
-        dialog.className = 'newsletter-start-dialog';
-        const heading = document.createElement('h2'); heading.textContent = 'Lagre som …';
-        const create = document.createElement('button'); create.type = 'button'; create.textContent = 'Ny mal';
-        const label = document.createElement('label'); label.textContent = 'Erstatt eksisterende mal';
-        const select = document.createElement('select'); select.setAttribute('aria-label', 'Velg mal som skal erstattes');
+        dialog.className = 'newsletter-start-dialog newsletter-save-dialog';
+        dialog.setAttribute('aria-labelledby', 'newsletter-save-title');
+        const heading = document.createElement('h2'); heading.textContent = 'Lagre som …'; heading.id = 'newsletter-save-title';
+        const create = document.createElement('button'); create.type = 'button'; create.textContent = 'Opprett ny mal'; create.className = 'save-new-template';
+        const label = document.createElement('label'); label.textContent = 'Eller erstatt en eksisterende mal'; label.htmlFor = 'newsletter-replace-template';
+        const select = document.createElement('select'); select.setAttribute('aria-label', 'Velg mal som skal erstattes'); select.id = 'newsletter-replace-template';
         const replace = document.createElement('button'); replace.type = 'button'; replace.textContent = 'Erstatt valgt mal'; replace.disabled = true;
         const message = document.createElement('p'); message.textContent = 'Henter lagrede maler …';
         const cancel = document.createElement('button'); cancel.type = 'button'; cancel.textContent = 'Avbryt';
-        dialog.append(heading, create, label, select, replace, message, cancel);
+        const intro = document.createElement('p'); intro.textContent = 'Behold oppsettet for senere nyhetsbrev.';
+        const existing = document.createElement('div'); existing.className = 'save-existing-template'; existing.append(label, select, replace, message);
+        const footer = document.createElement('div'); footer.className = 'save-dialog-footer'; footer.append(cancel);
+        dialog.append(heading, intro, create, existing, footer);
         document.body.append(dialog); dialog.showModal();
         dialog.addEventListener('close', () => dialog.remove(), { once: true });
         cancel.onclick = () => dialog.close();
