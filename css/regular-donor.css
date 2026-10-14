@@ -50,9 +50,21 @@
 .donor-impact-grid article > span { color: var(--primary-orange); font-size: 32px; margin-bottom: 18px; }
 .donor-impact-grid h3 { font-weight: 700; font-size: 20px; margin-bottom: 12px; }
 .donor-impact-grid p { color: var(--text-light); line-height: 1.8; }
-.donor-help { text-align: center; margin-top: 40px; line-height: 1.8; }
-.donor-help a { text-decoration: underline; text-underline-offset: 3px; }
-.donor-help > a { display: inline-block; color: var(--text-light); font-size: 13px; margin-top: 12px; }
+.donor-help { max-width: 900px; margin: 40px auto 0; border: 1px solid #eee5dc; border-radius: 24px; padding: 32px; background: #faf6f1; }
+.donor-help-main { display: flex; align-items: center; justify-content: space-between; gap: 24px; text-align: left; }
+.donor-help h3 { font-size: 22px; font-weight: 700; margin-bottom: 8px; color: var(--text-dark); }
+.donor-help p { color: var(--text-light); line-height: 1.7; }
+.donor-help .donor-help-contact { display: inline-flex; align-items: center; gap: 12px; flex-shrink: 0; margin: 0; }
+.donor-help-alternative { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 16px; margin-top: 24px; padding-top: 20px; border-top: 1px solid #e6ddd4; font-size: 14px; color: var(--text-light); }
+.donor-help-alternative a { color: var(--text-dark); text-decoration: underline; text-underline-offset: 4px; }
+.donor-help-alternative i { margin-left: 4px; font-size: 12px; }
+html[data-theme="dark"] .donor-help { background: #1e293b; border-color: #334155; }
+html[data-theme="dark"] .donor-help-alternative { border-color: #475569; }
+@media (max-width: 600px) {
+    .donor-help { padding: 24px; border-radius: 20px; }
+    .donor-help-main { flex-direction: column; align-items: flex-start; gap: 18px; }
+    .donor-help-alternative { justify-content: flex-start; }
+}
 :is(.donor-gift-card,.donor-help) :is(button,input,select,summary,a):focus-visible { outline: 3px solid var(--primary-orange); outline-offset: 4px; }
 html[data-theme="dark"] .donor-welcome,
 html[data-theme="dark"] .donor-impact { background: #0f172a; }
