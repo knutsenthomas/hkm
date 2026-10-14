@@ -7867,7 +7867,14 @@ class NewsletterBuilder {
             this.englishPayload = JSON.parse(JSON.stringify(data.englishPayload));
             this.saveEnglishPayloadToLocalStorage();
         } else {
-            this.loadEnglishPayloadFromLocalStorage();
+            // An unrelated newsletter's cached translation must never become this draft's English version.
+            this.englishPayload = null;
+            try {
+                ['hkm_builder_autosave_english_payload', 'hkm_builder_autosave_html_en', 'hkm_builder_autosave_subject_en']
+                    .forEach(key => localStorage.removeItem(key));
+            } catch (error) {
+                console.warn('Kunne ikke fjerne gammel engelsk oversettelse:', error);
+            }
         }
         this.updateEditorLanguageButtons('no');
     }
