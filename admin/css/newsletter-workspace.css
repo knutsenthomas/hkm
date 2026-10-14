@@ -341,3 +341,16 @@ body.builder-active #newsletter-builder-layout #newsletter-canvas.canvas-paper-f
 #newsletter-builder-layout .hkm-newsletter-text-toolbar .hkm-format-group:last-of-type { margin-right:auto; }
 #newsletter-builder-layout .hkm-newsletter-text-toolbar .desktop-richtools-btn,
 #newsletter-builder-layout .hkm-newsletter-text-toolbar select { flex-shrink:0; }
+
+/* Keep document actions against the right edge at every viewport width. */
+body.builder-active #newsletter-builder-layout .builder-toolbar-header .toolbar-right-actions {
+    justify-content:flex-end!important;
+    flex-basis:auto!important;
+    margin-left:auto!important;
+}
+@media (max-width:600px) {
+    body.builder-active #newsletter-builder-layout .builder-toolbar-header { padding:8px!important; gap:4px!important; }
+    body.builder-active #newsletter-builder-layout .newsletter-back-button { padding:6px!important; font-size:13px; gap:5px; }
+    body.builder-active #newsletter-builder-layout .newsletter-history-actions { gap:0; }
+    body.builder-active #newsletter-builder-layout .newsletter-history-actions button { width:28px; height:36px; }
+}
