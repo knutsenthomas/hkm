@@ -1027,9 +1027,9 @@
                         <span class="btn-label-text">Forhåndsvisning</span>
                     </button>
                     <div class="btn-group-publish">
-                        <button id="continue-btn" class="btn-primary-publish" title="Publiser">
+                        <button id="continue-btn" class="btn-primary-publish" title="Kontroller og send">
                             <span class="material-symbols-outlined btn-publish-icon">send</span>
-                            <span class="btn-publish-label">Publiser</span>
+                            <span class="btn-publish-label">Kontroller og send</span>
                         </button>
                         <button id="publish-dropdown-btn" class="btn-primary-publish-arrow" title="Flere utsendelsesvalg">
                             <span class="material-symbols-outlined">expand_more</span>
@@ -1071,6 +1071,7 @@
                 </div>
             </div>
 
+<div id="desktop-richtools" class="hkm-newsletter-text-toolbar" role="toolbar" aria-label="Tekst og avsnitt"><div class="hkm-format-group" role="group" aria-label="Historikk"><span class="hkm-format-group-label">Historikk</span><button type="button" class="desktop-richtools-btn" data-tool="undo" title="Angre" aria-label="Angre"><span class="material-symbols-outlined">undo</span></button><button type="button" class="desktop-richtools-btn" data-tool="redo" title="Gjør om" aria-label="Gjør om"><span class="material-symbols-outlined">redo</span></button></div><div class="hkm-format-group" role="group" aria-label="Tekst"><span class="hkm-format-group-label">Tekst</span><button type="button" class="desktop-richtools-btn" data-tool="bold" title="Fet" aria-label="Fet"><span class="material-symbols-outlined">format_bold</span></button><button type="button" class="desktop-richtools-btn" data-tool="italic" title="Kursiv" aria-label="Kursiv"><span class="material-symbols-outlined">format_italic</span></button><button type="button" class="desktop-richtools-btn" data-tool="underline" title="Understrek" aria-label="Understrek"><span class="material-symbols-outlined">format_underlined</span></button><button type="button" class="desktop-richtools-btn" data-tool="link" title="Lenke" aria-label="Lenke"><span class="material-symbols-outlined">link</span></button><button type="button" class="desktop-richtools-btn" data-tool="textColor" title="Tekstfarge" aria-label="Tekstfarge"><span class="material-symbols-outlined">format_color_text</span></button></div><div class="hkm-format-group" role="group" aria-label="Avsnitt"><span class="hkm-format-group-label">Avsnitt</span><button type="button" class="desktop-richtools-btn" data-tool="justifyLeft" title="Venstrejuster" aria-label="Venstrejuster"><span class="material-symbols-outlined">format_align_left</span></button><button type="button" class="desktop-richtools-btn" data-tool="justifyCenter" title="Midtstill" aria-label="Midtstill"><span class="material-symbols-outlined">format_align_center</span></button><button type="button" class="desktop-richtools-btn" data-tool="justifyRight" title="Høyrejuster" aria-label="Høyrejuster"><span class="material-symbols-outlined">format_align_right</span></button><button type="button" class="desktop-richtools-btn" data-tool="list" title="Punktliste" aria-label="Punktliste"><span class="material-symbols-outlined">format_list_bulleted</span></button><button type="button" class="desktop-richtools-btn" data-tool="lineHeight" title="Linjeavstand" aria-label="Linjeavstand"><span class="material-symbols-outlined">format_line_spacing</span></button></div><input type="color" data-color-input="text" aria-label="Velg tekstfarge" value="#2c3e50" hidden></div>
             <!-- Hovedområde (Navigasjonsmeny | Elementpanel | E-postkanvas | Egenskaper-inspektør) -->
             <div class="builder-body-container">
                 <!-- 1. HKM Venstre Navigasjonsmeny (Lys profil) -->
@@ -1567,7 +1568,7 @@
                                     <span class="material-symbols-outlined">send</span> Send test-e-post
                                 </button>
                                 <button id="final-send-btn" class="btn-v2 btn-v2-primary">
-                                    <span>Send kampanje nå</span>
+                                    <span>Send nyhetsbrev</span>
                                     <span class="material-symbols-outlined">send</span>
                                 </button>
                             </div>
@@ -1809,7 +1810,7 @@
     <!-- Modals -->
     <div id="preview-modal" class="modal">
         <div class="modal-content preview-content">
-            <button class="close-modal">&times;</button>
+            <div class="newsletter-preview-toolbar"><div role="group" aria-label="Visning"><button type="button" data-preview-device="desktop" aria-pressed="true">Skrivebord</button><button type="button" data-preview-device="mobile" aria-pressed="false">Mobil</button></div><button type="button" class="close-modal" aria-label="Tilbake til redigering">Tilbake til redigering</button></div>
             <div class="preview-frame-wrap">
                 <div id="preview-frame" class="preview-frame desktop"></div>
             </div>

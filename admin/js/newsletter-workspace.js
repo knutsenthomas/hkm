@@ -170,6 +170,7 @@ if (root) {
     }
     render();
     root.querySelectorAll('[data-workspace-view]').forEach(button=>button.addEventListener('click',()=>{
+        try { sessionStorage.setItem('hkm_newsletter_overview_tab', button.dataset.workspaceView); } catch (_) {}
         root.querySelectorAll('[data-workspace-view]').forEach(tab=>tab.setAttribute('aria-pressed',String(tab===button)));
         root.querySelectorAll('[data-workspace-panel]').forEach(panel=>panel.hidden=panel.dataset.workspacePanel!==button.dataset.workspaceView);
         root.querySelector('[data-campaign-note]').hidden = button.dataset.workspaceView !== 'campaigns';
@@ -185,3 +186,5 @@ if (check) check.addEventListener('click', () => {
     output.textContent = findings.length ? findings.join(' ') : 'Emne, innhold og lenker er kontrollert. Send en test-e-post og se over mobilvisningen før utsending.';
     output.hidden = false;
 });
+
+if (root) { try { const tab = sessionStorage.getItem('hkm_newsletter_overview_tab'); root.querySelector(`[data-workspace-view="${['campaigns','drafts','templates'].includes(tab) ? tab : 'campaigns'}"]`)?.click(); } catch (_) {} }

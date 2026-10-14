@@ -291,6 +291,27 @@ class NewsletterBuilder {
             }
         }, 100);
 
+        window.addEventListener('beforeunload', event => {
+            if (this.hasUnsavedChanges) { event.preventDefault(); event.returnValue = ''; }
+        });
+        document.addEventListener('keydown', event => {
+            if (this.currentMode !== 'builder') return;
+            const preview = document.getElementById('preview-modal');
+            if (event.key === 'Escape' && preview?.style.display === 'flex') {
+                preview.style.display = 'none'; document.getElementById('preview-btn')?.focus(); return;
+            }
+            if (!(event.ctrlKey || event.metaKey)) return;
+            if (event.key.toLowerCase() === 's') {
+                event.preventDefault();
+                if (this.currentDocumentIsTemplate) this.saveCurrentNewsletterTemplate(); else this.saveDraft();
+                return;
+            }
+            if (event.target.closest('input, textarea, dialog')) return;
+            if (event.key.toLowerCase() === 'z' || event.key.toLowerCase() === 'y') {
+                event.preventDefault();
+                this.restoreEditorStep(event.shiftKey || event.key.toLowerCase() === 'y' ? 1 : -1);
+            }
+        });
         this.setupEventListeners();
         this.setupRichTextToolbar();
         this.setupCanvasControls();
@@ -417,6 +438,10 @@ class NewsletterBuilder {
     }
 
     startEmptyNewsletter() {
+        clearTimeout(this.autosaveTimer);
+        this.editorDocumentKey = 'new-' + Date.now();
+        this.editorHistoryKey = null;
+        this.savedRange = null;
         this.skipAutosavedHeader = true;
         this.blocks = [];
         this.currentDraftId = null;
@@ -510,6 +535,9 @@ class NewsletterBuilder {
             if (doc.exists) {
                 this.skipAutosavedHeader = false;
                 const data = doc.data();
+                this.editorDocumentKey = doc.id;
+                this.editorHistoryKey = null;
+                this.savedRange = null;
                 this.currentDraftId = doc.id;
                 this.currentDocumentIsTemplate = data.isDraft === false;
                 this.confirmedTemplateId = null;
@@ -847,25 +875,23 @@ class NewsletterBuilder {
                 }
             });
 
-            // Wix-style deselect listener when clicking outside
-            document.addEventListener('click', (e) => {
+            // Blank canvas space clears selection; inspector and editor controls keep it.
+            document.addEventListener('pointerdown', (e) => {
                 const container = document.getElementById('blocks-container');
-                const sidebar = document.querySelector('.builder-elements-sidebar-v2');
-                const modal = document.querySelector('.hkm-modal, .hkm-prompt-overlay, .hkm-image-modal, #custom-prompt-modal');
-                
-                if (container && !container.contains(e.target) && 
-                    !e.target.closest('.canvas-header') &&
-                    !e.target.closest('.builder-properties-panel') &&
-                    sidebar && !sidebar.contains(e.target) && 
-                    (!modal || !modal.contains(e.target)) &&
-                    !e.target.closest('.cropper-container') &&
-                    !e.target.closest('.img-resizer-overlay')) {
-                    this.deselectBlock();
-                }
+                if (!container || this.currentMode !== 'builder') return;
+                const target = e.target;
+                if (target.closest('.builder-properties-panel, .builder-elements-sidebar-v2, #elements-panel, .builder-toolbar-header, #desktop-richtools, dialog, .profile-modal, .hkm-modal, .hkm-prompt-overlay, .hkm-image-modal, #custom-prompt-modal, .cropper-container, .img-resizer-overlay, #block-quick-toolbar')) return;
+                if (target.closest('.canvas-header')) return;
+                if (container.contains(target) && target !== container && this.getCurrentBlock(target)) return;
+                this.blockSelectionCleared = true;
+                this.deselectBlock();
+                this.selectedBlockCard = null;
+                container.querySelectorAll('.hkm-selected-block').forEach(node => node.classList.remove('hkm-selected-block'));
             });
 
             // Inspector controls retain the current block even if the browser keeps an old canvas caret.
             document.addEventListener('selectionchange', () => {
+                if (this.blockSelectionCleared) return;
                 if (document.activeElement?.closest('.builder-properties-panel, .builder-toolbar-header, dialog')) return;
                 if (this.activeBlockNode?.querySelector('img') || this.activeBlockNode?.tagName === 'IMG') return;
                 const selection = window.getSelection();
@@ -1340,7 +1366,7 @@ class NewsletterBuilder {
         
         const saveDraftBtn = document.getElementById('save-draft-btn');
         if (saveDraftBtn) {
-            saveDraftBtn.addEventListener('click', () => this.saveDraft());
+            saveDraftBtn.addEventListener('click', () => this.currentDocumentIsTemplate ? this.saveCurrentNewsletterTemplate() : this.saveDraft());
         }
 
         const versionHistoryBtn = document.getElementById('version-history-btn');
@@ -1390,7 +1416,7 @@ class NewsletterBuilder {
             const range = sel.getRangeAt(0);
             const container = document.getElementById('blocks-container');
             if (container && container.contains(range.commonAncestorContainer)) {
-                this.savedRange = range;
+                this.savedRange = range.cloneRange();
             }
         }
     }
@@ -1459,7 +1485,8 @@ class NewsletterBuilder {
     }
 
     restoreSelection() {
-        if (this.savedRange) {
+        const canvas = document.getElementById('blocks-container');
+        if (this.savedRange && canvas?.contains(this.savedRange.commonAncestorContainer)) {
             const sel = window.getSelection();
             sel.removeAllRanges();
             sel.addRange(this.savedRange);
@@ -1475,44 +1502,22 @@ class NewsletterBuilder {
     }
 
     setLineHeight(value) {
+        const spacing = Number(value);
+        if (!Number.isFinite(spacing) || spacing < 0.8 || spacing > 4) {
+            showToast('Velg linjeavstand mellom 0,8 og 4.', 'error'); return;
+        }
         this.restoreSelection();
         const selection = window.getSelection();
-        if (selection.rangeCount > 0) {
-            const range = selection.getRangeAt(0);
-            const container = document.getElementById('blocks-container');
-            let node = range.commonAncestorContainer;
-            if (node.nodeType === Node.TEXT_NODE) {
-                node = node.parentNode;
-            }
-            
-            while (node && node !== container && node.parentNode && node.parentNode !== container) {
-                node = node.parentNode;
-            }
-            
-            if (node && node !== container) {
-                node.style.lineHeight = value;
-                this.syncUnifiedBlocks();
-            } else {
-                const fragment = range.cloneContents();
-                const blocks = fragment.querySelectorAll('p, h1, h2, h3, li, div');
-                if (blocks.length > 0) {
-                    const container = document.getElementById('blocks-container');
-                    const allBlocks = container.querySelectorAll('p, h1, h2, h3, li, div');
-                    allBlocks.forEach(block => {
-                        if (selection.containsNode(block, true)) {
-                            block.style.lineHeight = value;
-                        }
-                    });
-                    this.syncUnifiedBlocks();
-                } else {
-                    const parent = range.startContainer.parentElement;
-                    if (parent && parent !== container) {
-                        parent.style.lineHeight = value;
-                        this.syncUnifiedBlocks();
-                    }
-                }
-            }
-        }
+        const container = document.getElementById('blocks-container');
+        if (!selection?.rangeCount || !container?.contains(selection.anchorNode)) return;
+        const range = selection.getRangeAt(0);
+        const start = range.startContainer.nodeType === Node.TEXT_NODE ? range.startContainer.parentElement : range.startContainer;
+        const paragraph = start.closest('p,h1,h2,h3,h4,h5,h6,li,blockquote');
+        if (range.collapsed && paragraph) paragraph.style.lineHeight = String(spacing);
+        else container.querySelectorAll('p,h1,h2,h3,h4,h5,h6,li,blockquote').forEach(node => {
+            if (range.intersectsNode(node)) node.style.lineHeight = String(spacing);
+        });
+        this.syncUnifiedBlocks();
     }
 
     getCurrentLineHeight() {
@@ -1751,7 +1756,9 @@ class NewsletterBuilder {
     }
 
     exec(command, value = null) {
+        this.captureEditorStep();
         this.restoreSelection();
+        if (!document.getElementById('blocks-container')?.contains(window.getSelection()?.anchorNode)) return;
         document.execCommand(command, false, value);
         this.syncUnifiedBlocks();
     }
@@ -2056,6 +2063,14 @@ class NewsletterBuilder {
         const toolbar = document.getElementById('desktop-richtools');
         if (!toolbar) return;
 
+        document.addEventListener('selectionchange', () => {
+            const selection = window.getSelection();
+            const canvas = document.getElementById('blocks-container');
+            if (selection?.rangeCount && !selection.isCollapsed && canvas?.contains(selection.anchorNode)) this.saveSelection();
+        });
+        toolbar.addEventListener('pointerdown', event => {
+            if (event.target.closest('.desktop-richtools-btn')) { this.saveSelection(); event.preventDefault(); }
+        }, true);
         // Click Handler (Event Delegation)
         toolbar.addEventListener('click', (e) => {
             const btn = e.target.closest('.desktop-richtools-btn');
@@ -2073,10 +2088,10 @@ class NewsletterBuilder {
 
             switch (tool) {
                 case 'undo':
-                    this.exec('undo');
+                    this.restoreEditorStep(-1);
                     break;
                 case 'redo':
-                    this.exec('redo');
+                    this.restoreEditorStep(1);
                     break;
                 case 'bold':
                     this.exec('bold');
@@ -2158,7 +2173,7 @@ class NewsletterBuilder {
             });
         });
 
-        // Color input listeners
+        document.querySelector('.builder-properties-panel')?.addEventListener('pointerdown', () => this.saveSelection(), true);
         const textColorInput = toolbar.querySelector('[data-color-input="text"]');
         if (textColorInput) {
             textColorInput.addEventListener('input', (e) => {
@@ -4686,6 +4701,7 @@ class NewsletterBuilder {
     }
 
     selectBlock(node) {
+        this.blockSelectionCleared = false;
         if (this.activeBlockNode === node) {
             node.classList.add('selected-block-active');
             node.setAttribute('data-editor-label', this.getEditorBlockLabel(node));
@@ -4701,6 +4717,10 @@ class NewsletterBuilder {
         this.activeBlockNode.classList.add('selected-block-active');
         this.activeBlockNode.setAttribute('data-editor-label', this.getEditorBlockLabel(node));
 
+        const mediaSelection = !!node.querySelector('img, video, iframe') || ['IMG', 'VIDEO', 'IFRAME'].includes(node.tagName);
+        document.querySelectorAll('#desktop-richtools [data-tool]').forEach(button => {
+            if (!['undo', 'redo'].includes(button.dataset.tool)) button.disabled = mediaSelection;
+        });
         // Determine block type
         const isSocial = (node.classList && node.classList.contains('newsletter-social-block')) || (node.closest && node.closest('.newsletter-social-block'));
         const img = node.querySelector('img') || (node.tagName === 'IMG' ? node : null);
@@ -4751,6 +4771,10 @@ class NewsletterBuilder {
 
     deselectBlock() {
         document.querySelectorAll('#block-quick-toolbar').forEach(el => el.remove());
+        document.querySelectorAll('#blocks-container .selected-block-active').forEach(el => {
+            el.classList.remove('selected-block-active');
+            el.removeAttribute('data-editor-label');
+        });
         if (this.activeBlockNode) {
             console.log('[HKM Inspector] deselectBlock triggered');
             this.activeBlockNode.classList.remove('selected-block-active');
@@ -4758,6 +4782,9 @@ class NewsletterBuilder {
             this.activeBlockNode = null;
         }
 
+        document.querySelectorAll('#desktop-richtools [data-tool]').forEach(button => {
+            if (!['undo', 'redo'].includes(button.dataset.tool)) button.disabled = true;
+        });
         // Show default elements view
         const defaultView = document.getElementById('sidebar-default-view');
         const inspectorView = document.getElementById('sidebar-inspector-view');
@@ -5689,15 +5716,26 @@ class NewsletterBuilder {
 
         if (selectFont) {
             selectFont.addEventListener('change', () => {
-                currentNode.style.fontFamily = selectFont.value;
-                this.syncUnifiedBlocks();
+                this.restoreSelection();
+                const selection = window.getSelection();
+                if (selection?.rangeCount && !selection.isCollapsed) this.exec('fontName', selectFont.value);
+                else { currentNode.style.fontFamily = selectFont.value; this.syncUnifiedBlocks(); }
             });
         }
 
         if (selectSize) {
             selectSize.addEventListener('change', () => {
-                currentNode.style.fontSize = selectSize.value + 'px';
-                this.syncUnifiedBlocks();
+                this.restoreSelection();
+                const selection = window.getSelection();
+                const container = document.getElementById('blocks-container');
+                if (selection?.rangeCount && !selection.isCollapsed && container?.contains(selection.anchorNode)) {
+                    this.captureEditorStep();
+                    document.execCommand('fontSize', false, '7');
+                    container.querySelectorAll('font[size="7"]').forEach(font => {
+                        font.removeAttribute('size'); font.style.fontSize = selectSize.value + 'px';
+                    });
+                    this.saveSelection(); this.syncUnifiedBlocks();
+                } else { currentNode.style.fontSize = selectSize.value + 'px'; this.syncUnifiedBlocks(); }
             });
         }
 
@@ -6595,7 +6633,7 @@ class NewsletterBuilder {
             if (this.isRecipientsDrawerOpen) {
                 continueBtn.innerHTML = '<span class="material-symbols-outlined" style="margin-right: 6px;">arrow_back</span><span class="btn-label" style="white-space: nowrap !important;">Tilbake til design</span>';
             } else {
-                continueBtn.innerHTML = '<span class="btn-label" style="white-space: nowrap !important;">Velg mottakere</span><span class="material-symbols-outlined" style="margin-left: 6px;">arrow_forward</span>';
+                continueBtn.innerHTML = '<span class="btn-label" style="white-space: nowrap !important;">Kontroller og send</span><span class="material-symbols-outlined" style="margin-left: 6px;">arrow_forward</span>';
             }
         }
     }
@@ -6975,6 +7013,7 @@ class NewsletterBuilder {
         if (this.blocks.length === 0) {
             container.innerHTML = '<p><br></p>';
             this.normalizeCanvasBlocks(container);
+            this.captureEditorStep();
             return;
         }
 
@@ -7045,8 +7084,8 @@ class NewsletterBuilder {
         if (!container) return '';
         const clone = container.cloneNode(true);
         clone.querySelectorAll('.card-delete-btn, .card-edit-btn, #block-quick-toolbar, .block-quick-toolbar, .quick-tb-btn, button.quick-tb-btn').forEach(el => el.remove());
-        clone.querySelectorAll('.selected-block-active, [data-editor-label]').forEach(el => {
-            el.classList.remove('selected-block-active');
+        clone.querySelectorAll('.selected-block-active, .hkm-selected-block, [data-editor-label]').forEach(el => {
+            el.classList.remove('selected-block-active', 'hkm-selected-block');
             el.removeAttribute('data-editor-label');
         });
         return clone.innerHTML;
@@ -7227,39 +7266,21 @@ class NewsletterBuilder {
         const modal = document.getElementById('preview-modal');
         const frame = document.getElementById('preview-frame');
         if (!modal || !frame) return;
+        this.syncUnifiedBlocks();
         this.mountEditorModal(modal, 'Forhåndsvis nyhetsbrev');
-        const canvas = document.getElementById('newsletter-canvas').cloneNode(true);
-        canvas.querySelectorAll('.block-controls, input, .col-type-toggle, .card-delete-btn, .card-edit-btn, #block-quick-toolbar, .block-quick-toolbar, .quick-tb-btn').forEach(c => c.remove());
-        canvas.querySelectorAll('[contenteditable]').forEach(e => e.removeAttribute('contenteditable'));
-        canvas.querySelectorAll('.image-overlay').forEach(o => o.remove());
-
-        // Override modal container width/height constraints from dashboard.css
-        const content = modal.querySelector('.preview-content');
-        if (content) {
-            content.style.maxWidth = '90vw';
-            content.style.maxHeight = '90vh';
-            content.style.width = '1000px';
-            content.style.height = '800px';
-        }
-
-        // Style the cloned canvas to match standard email client widths (600px)
-        if (this.currentView === 'desktop') {
-            canvas.style.maxWidth = '600px';
-            canvas.style.width = '100%';
-            canvas.style.margin = '0 auto';
-            canvas.style.boxShadow = 'none';
-            canvas.style.border = 'none';
-        } else {
-            canvas.style.width = '100%';
-            canvas.style.maxWidth = '100%';
-            canvas.style.margin = '0';
-            canvas.style.boxShadow = 'none';
-            canvas.style.border = 'none';
-        }
-
-        frame.innerHTML = '';
-        frame.appendChild(canvas);
-        frame.className = `preview-frame ${this.currentView}`;
+        const email = document.createElement('iframe');
+        email.title = 'Forhåndsvisning av e-posten';
+        email.setAttribute('sandbox', '');
+        email.srcdoc = this.compileEmailHtml(this.currentEditorLang || 'no');
+        email.className = 'newsletter-email-preview';
+        frame.replaceChildren(email);
+        const setPreview = view => {
+            email.style.width = view === 'mobile' ? '375px' : '680px';
+            frame.className = 'preview-frame ' + view;
+            modal.querySelectorAll('[data-preview-device]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.previewDevice === view)));
+        };
+        modal.querySelectorAll('[data-preview-device]').forEach(button => button.onclick = () => setPreview(button.dataset.previewDevice));
+        setPreview(this.currentView || 'desktop');
         modal.style.display = 'flex';
     }
 
@@ -7401,7 +7422,7 @@ class NewsletterBuilder {
         const named = this.currentDocumentIsTemplate && this.currentDraftId;
         const save = document.getElementById('save-draft-btn');
         if (save) {
-            save.title = 'Lagre utkast';
+            save.title = 'Lagre';
             const label = save.querySelector('.btn-label-text');
             if (label) label.textContent = save.title;
         }
@@ -7412,7 +7433,7 @@ class NewsletterBuilder {
             if (label) label.textContent = 'Lagre som …';
         }
         const name = document.getElementById('editing-template-name');
-        if (name) { name.hidden = !named; name.textContent = named ? 'Mal: ' + this.currentDraftName : ''; }
+        if (name) { name.hidden = false; name.textContent = (named ? 'Mal: ' : 'Kladd: ') + (this.currentDraftName || 'Nytt nyhetsbrev'); name.title = name.textContent; }
     }
 
     async saveTemplate() {
@@ -7441,7 +7462,9 @@ class NewsletterBuilder {
             update.onclick = () => { dialog.close(); this.saveCurrentNewsletterTemplate(); };
             dialog.append(update);
         }
-        dialog.append(create, existing, footer);
+        const draftCopy = document.createElement('button'); draftCopy.type = 'button'; draftCopy.textContent = 'Lagre som nytt utkast';
+        draftCopy.onclick = () => { dialog.close(); this.saveDraft(true); };
+        dialog.append(create, draftCopy, existing, footer);
         document.body.append(dialog); dialog.showModal();
         dialog.addEventListener('close', () => dialog.remove(), { once: true });
         cancel.onclick = () => dialog.close();
@@ -7483,6 +7506,7 @@ class NewsletterBuilder {
             clearTimeout(this.autosaveTimer);
             while (this._autosaveInFlight) await new Promise(resolve => setTimeout(resolve, 50));
             this.syncUnifiedBlocks();
+            const savingRevision = this.editRevision;
             const data = {
                 name: name.trim(), blocks: this.blocks,
                 subject: this.currentEditorLang === 'en' ? (this.subjectNo || '') : (document.getElementById('newsletter-subject')?.value || ''),
@@ -7512,6 +7536,7 @@ class NewsletterBuilder {
             try { sessionStorage.setItem('hkm_active_draft_id', id); } catch (_) {}
             this.updateTemplateSaveUi();
             await this.recordNewsletterVersion('Mal lagret', { minIntervalMs: 0 });
+            this.hasUnsavedChanges = this.editRevision !== savingRevision;
             showToast('Malen er lagret under Nyhetsbrev → Maler.', 'success');
             this.loadTemplates();
         } catch (error) { console.error('Template save failed:', error); showToast('Kunne ikke lagre malen. Endringene er fortsatt i editoren.', 'error'); }
@@ -7707,6 +7732,17 @@ class NewsletterBuilder {
             this.inlineHeadingStylesForEmail(blocksContainer, contentClone);
         }
 
+        contentClone.querySelectorAll('.newsletter-columns-block').forEach(block => {
+            const columns = block.firstElementChild;
+            if (!columns) return;
+            const table = document.createElement('table'); table.className = 'email-columns';
+            table.setAttribute('role', 'presentation'); table.setAttribute('width', '100%'); table.setAttribute('cellpadding', '0'); table.setAttribute('cellspacing', '0');
+            const row = table.insertRow();
+            Array.from(columns.children).forEach(column => {
+                const cell = row.insertCell(); cell.className = 'email-column'; cell.style.cssText = 'width:50%;vertical-align:top;padding:12px;'; cell.innerHTML = column.innerHTML;
+            });
+            block.replaceWith(table);
+        });
         // Remove editor UI controls, quick toolbars, buttons, overlays, and drag handles
         contentClone.querySelectorAll(`
             .block-quick-toolbar,
@@ -7833,6 +7869,7 @@ class NewsletterBuilder {
     a { color: #d17d39; text-decoration: none; }
     
     @media only screen and (max-width: 600px) {
+        .email-column { display:block!important; width:100%!important; box-sizing:border-box; }
       .hkd-workbook-card, .hkd-workbook-card tbody, .hkd-workbook-card tr { display: block; width: 100%; }
       .hkd-workbook-card td { display: block !important; width: 100% !important; box-sizing: border-box; }
       .hkd-workbook-card .hkd-workbook-image { padding: 0 0 18px !important; }
@@ -9651,16 +9688,13 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
         });
     }
 
-    async saveDraft() {
+    async saveDraft(forceCopy = false) {
         if (!window.firebaseService || !window.firebaseService.isInitialized) return;
 
         const subjectVal = document.getElementById('newsletter-subject')?.value || '';
         const defaultName = this.currentDraftName || (subjectVal ? `Kladd: ${subjectVal}` : "Min Kladd");
 
-        this.showPromptModal(
-            "Oppgi navnet på kladden din:",
-            "f.eks. Juli Månedsbrev, Konsertinvitasjon...",
-            async (name) => {
+        const persist = async (name) => {
                 const trimmedName = (name || '').trim();
                 if (!trimmedName) return;
 
@@ -9672,6 +9706,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                     const canonicalSubject = this.currentEditorLang === 'en'
                         ? (this.subjectNo || '')
                         : subjectVal;
+                    const savingRevision = this.editRevision;
                     const data = {
                         name: trimmedName,
                         blocks: this.blocks,
@@ -9685,7 +9720,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                     this.currentDraftName = trimmedName;
                     this.hasCustomDraftName = true;
 
-                    if (this.currentDraftId && !this.currentDocumentIsTemplate) {
+                    if (this.currentDraftId && !this.currentDocumentIsTemplate && !forceCopy) {
                         await window.firebaseService.db.collection('newsletter_templates').doc(this.currentDraftId).set(data, { merge: true });
                     } else {
                         data.createdAt = new Date().toISOString();
@@ -9706,6 +9741,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                         source: 'newsletter-save-button'
                     });
 
+                    this.hasUnsavedChanges = this.editRevision !== savingRevision;
                     if (typeof showToast === 'function') showToast(`${this.currentDocumentIsTemplate ? 'Mal' : 'Kladd'} "${trimmedName}" lagret!`, "success");
                     this.loadDrafts();
                     this.loadTemplates();
@@ -9713,12 +9749,16 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                     console.error("Save draft failed:", e);
                     if (typeof showToast === 'function') showToast("Kunne ikke lagre kladd.");
                 }
-            },
+            };
+        if (this.currentDraftId && !this.currentDocumentIsTemplate && !forceCopy) return persist(defaultName);
+        return new Promise(resolve => this.showPromptModal(
+            "Navn på utkastet", "F.eks. Sommerbrev",
+            async name => { await persist(name); resolve(); },
             defaultName,
             "Vennligst oppgi et navn på kladden.",
             "Lagre utkast",
             "Lagre"
-        );
+        ));
     }
 
     async loadDrafts() {
@@ -9811,7 +9851,11 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
         }
     }
 
-    openNewsletterOverview() {
+    async openNewsletterOverview() {
+        if (this.hasUnsavedChanges) {
+            const leave = await this.showConfirm('Ulagrede endringer', 'Du har ulagrede endringer. Fortsette til oversikten? Brevet beholdes i editoren, men du bør lagre før du lukker siden.', 'Til oversikten', 'Fortsett å redigere');
+            if (!leave) return;
+        }
         const url = new URL(window.location.href);
         url.searchParams.set('section', 'newsletter');
         window.history.replaceState({}, '', url.toString());
@@ -11450,6 +11494,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             'Last inn'
         );
         if (confirmed) {
+            this.editorDocumentKey = id; this.editorHistoryKey = null; this.savedRange = null;
             this.currentDraftId = id;
             this.currentDocumentIsTemplate = false;
             this.currentDraftName = draft.name;
@@ -11482,7 +11527,55 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
         }
     }
 
+    captureEditorStep() {
+        if (this.restoringEditorStep) return;
+        const snapshot = JSON.stringify({
+            html: this.getCleanCanvasHtml(),
+            subject: document.getElementById('newsletter-subject')?.value || '',
+            header: document.querySelector('.canvas-header')?.outerHTML || '',
+            lang: this.currentEditorLang || 'no'
+        });
+        this.editorDocumentKey ||= this.currentDraftId || ('new-' + Date.now());
+        const key = this.editorDocumentKey + ':' + (this.currentEditorLang || 'no');
+        if (this.editorHistoryKey !== key) {
+            this.editorHistoryKey = key; this.editorHistory = [snapshot]; this.editorHistoryIndex = 0; this.updateHistoryUi(); return;
+        }
+        if (this.editorHistory?.[this.editorHistoryIndex] === snapshot) return;
+        this.editorHistory = (this.editorHistory || []).slice(0, this.editorHistoryIndex + 1);
+        this.editorHistory.push(snapshot);
+        if (this.editorHistory.length > 100) this.editorHistory.shift();
+        this.editorHistoryIndex = this.editorHistory.length - 1;
+        this.updateHistoryUi();
+    }
+
+    updateHistoryUi() {
+        const undo = document.querySelector('#desktop-richtools [data-tool="undo"]');
+        const redo = document.querySelector('#desktop-richtools [data-tool="redo"]');
+        if (undo) undo.disabled = !(this.editorHistoryIndex > 0);
+        if (redo) redo.disabled = !(this.editorHistoryIndex < (this.editorHistory?.length || 0) - 1);
+    }
+
+    restoreEditorStep(direction) {
+        const index = (this.editorHistoryIndex || 0) + direction;
+        if (!this.editorHistory || index < 0 || index >= this.editorHistory.length) return;
+        const snapshot = JSON.parse(this.editorHistory[index]);
+        this.restoringEditorStep = true;
+        try {
+            this.deselectBlock();
+            document.getElementById('blocks-container').innerHTML = snapshot.html;
+            const subject = document.getElementById('newsletter-subject'); if (subject) subject.value = snapshot.subject;
+            const header = document.querySelector('.canvas-header');
+            if (header && snapshot.header) header.outerHTML = snapshot.header;
+            this.normalizeCanvasBlocks(document.getElementById('blocks-container'));
+            this.editorHistoryIndex = index;
+            this.syncUnifiedBlocks();
+        } finally { this.restoringEditorStep = false; this.savedRange = null; this.updateHistoryUi(); }
+    }
+
     triggerAutosave() {
+        this.captureEditorStep();
+        this.hasUnsavedChanges = true;
+        this.editRevision = (this.editRevision || 0) + 1;
         if (this.currentDocumentIsTemplate && this.confirmedTemplateId !== this.currentDraftId) {
             const text = document.getElementById('newsletter-autosave-text');
             if (text) text.textContent = 'Ulagrede endringer – trykk Lagre mal';
@@ -11519,8 +11612,9 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
         if (this.autosaveTimer) clearTimeout(this.autosaveTimer);
         
         this.autosaveTimer = setTimeout(async () => {
-            if (this._autosaveInFlight) return;
+            if (this._autosaveInFlight) { this._autosavePending = true; return; }
             this._autosaveInFlight = true;
+            const savingRevision = this.editRevision;
 
             try {
                 // Get clean state without edit/delete controls
@@ -11557,11 +11651,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                     localStorage.setItem(`hkm_builder_autosave_subject${languageSuffix}`, subject);
                 } catch(e) {}
                 
-                if (!this.currentDraftId && !this.currentDocumentIsTemplate) {
-                    try {
-                        this.currentDraftId = sessionStorage.getItem('hkm_active_draft_id') || null;
-                    } catch(e) {}
-                }
+
 
                 let draftName = this.currentDraftName;
                 if (!this.hasCustomDraftName || !draftName) {
@@ -11605,11 +11695,12 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                     source: 'newsletter-autosave'
                 });
 
+                this.hasUnsavedChanges = this.editRevision !== savingRevision;
                 // Update UI status to Success
                 if (statusEl && textEl) {
                     const now = new Date();
                     const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    textEl.innerHTML = `Sist lagret kl. ${timeStr}`;
+                    textEl.textContent = this.hasUnsavedChanges ? 'Ulagrede endringer – lagrer siste endring …' : `Sist lagret kl. ${timeStr}`;
                     const icon = statusEl.querySelector('.material-symbols-outlined');
                     if (icon) {
                         icon.style.color = '#10b981'; // Green
@@ -11633,6 +11724,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                 }
             } finally {
                 this._autosaveInFlight = false;
+                if (this._autosavePending) { this._autosavePending = false; this.triggerAutosave(); }
             }
         }, 2000);
     }
