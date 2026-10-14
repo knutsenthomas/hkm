@@ -50,5 +50,28 @@ const runSaveTimer = () => {
     editor.saveSelection(); editor.setLineHeight('2');
     assert.equal(context.document.getElementById('one').style.lineHeight, '2');
     assert.equal(context.document.getElementById('two').style.lineHeight, '');
+    box.innerHTML = '<p style="margin:16px 0">Text</p>';
+    const original = box.firstElementChild;
+    const caret = context.document.createRange(); caret.selectNodeContents(original); caret.collapse(false);
+    dom.window.getSelection().removeAllRanges(); dom.window.getSelection().addRange(caret);
+    const commands = [];
+    context.document.execCommand = command => {
+        commands.push(command);
+        if (command === 'insertParagraph') {
+            const next = original.cloneNode(false); next.innerHTML = '<br>'; original.after(next);
+            const nextCaret = context.document.createRange(); nextCaret.selectNodeContents(next); nextCaret.collapse(true);
+            dom.window.getSelection().removeAllRanges(); dom.window.getSelection().addRange(nextCaret);
+        }
+    };
+    editor.selectBlock = () => {};
+    editor.handleDocumentEnter({ key: 'Enter', preventDefault() {} });
+    assert.equal(commands.filter(command => command === 'insertParagraph').length, 1);
+    assert.equal(box.children.length, 2);
+    assert.equal(original.style.marginBottom, '0px');
+    assert.equal(box.lastElementChild.style.marginTop, '0px');
+    assert.equal(box.lastElementChild.style.marginBottom, '0px');
+    editor.handleDocumentEnter({ key: 'Enter', shiftKey: true, preventDefault() {} });
+    assert.equal(commands.at(-1), 'insertLineBreak');
+    assert.equal(box.children.length, 2);
     console.log('Passed: queued edits, truthful save status, failed save, undo/redo and paragraph-only spacing.');
 })().catch(error => { console.error(error); process.exitCode = 1; });

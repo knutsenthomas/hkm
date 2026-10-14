@@ -1583,6 +1583,7 @@ class NewsletterBuilder {
         this.captureEditorStep();
         event.preventDefault();
         const heading = target.closest('h1,h2,h3,h4,h5,h6');
+        const previousParagraph = target.closest('p');
         if (event.shiftKey) document.execCommand('insertLineBreak', false);
         else if (heading && range.collapsed) {
             const tail = range.cloneRange(); tail.selectNodeContents(heading); tail.setStart(range.endContainer, range.endOffset);
@@ -1595,6 +1596,18 @@ class NewsletterBuilder {
         } else {
             document.execCommand('defaultParagraphSeparator', false, 'p');
             document.execCommand('insertParagraph', false);
+        }
+        // A paragraph split must advance one line, without inherited template margins.
+        // Keep deliberate blank paragraphs and soft breaks intact.
+        if (!event.shiftKey) {
+            const anchor = selection.anchorNode;
+            const element = anchor?.nodeType === Node.TEXT_NODE ? anchor.parentElement : anchor;
+            const paragraph = element?.closest?.('p');
+            if (paragraph && paragraph !== previousParagraph) {
+                paragraph.style.marginTop = '0px';
+                paragraph.style.marginBottom = '0px';
+                if (previousParagraph) previousParagraph.style.marginBottom = '0px';
+            }
         }
         this.saveSelection();
         const node = this.getCurrentBlock(selection.anchorNode);
@@ -2224,7 +2237,6 @@ class NewsletterBuilder {
                     break;
                 case 'removeFormat':
                     this.exec('removeFormat');
-                    this.cleanPastedFormatting();
                     break;
                 case 'justifyLeft':
                     this.exec('justifyLeft');
@@ -2238,6 +2250,8 @@ class NewsletterBuilder {
                 case 'justifyFull':
                     this.exec('justifyFull');
                     break;
+                case 'indent': this.exec('indent'); break;
+                case 'outdent': this.exec('outdent'); break;
                 case 'list':
                     this.exec('insertUnorderedList');
                     break;
@@ -2281,6 +2295,14 @@ class NewsletterBuilder {
             }
         });
 
+        for (const id of ['toolbar-text-format', 'toolbar-text-size']) {
+            const control = document.getElementById(id);
+            control?.addEventListener('pointerdown', () => this.saveSelection());
+            control?.addEventListener('change', () => {
+                if (id === 'toolbar-text-format') this.exec('formatBlock', control.value);
+                else this.applySelectedFontSize(control.value);
+            });
+        }
         // Prevent focus loss on mousedown
         toolbar.querySelectorAll('.desktop-richtools-btn').forEach(btn => {
             btn.addEventListener('mousedown', (e) => {
@@ -2304,6 +2326,25 @@ class NewsletterBuilder {
                 this.exec('backColor', e.target.value);
             });
         }
+    }
+
+    applySelectedFontSize(value) {
+        const size = Number(value);
+        if (!Number.isFinite(size) || size < 8 || size > 96) return;
+        this.restoreSelection();
+        const selection = window.getSelection();
+        const container = document.getElementById('blocks-container');
+        if (!selection?.rangeCount || !container?.contains(selection.anchorNode)) return;
+        this.captureEditorStep();
+        if (!selection.isCollapsed) {
+            document.execCommand('fontSize', false, '7');
+            container.querySelectorAll('font[size="7"]').forEach(font => { font.removeAttribute('size'); font.style.fontSize = size + 'px'; });
+        } else {
+            const element = selection.anchorNode.nodeType === Node.TEXT_NODE ? selection.anchorNode.parentElement : selection.anchorNode;
+            const paragraph = element.closest('p,h1,h2,h3,h4,h5,h6,li,blockquote');
+            if (paragraph) paragraph.style.fontSize = size + 'px';
+        }
+        this.saveSelection(); this.syncUnifiedBlocks();
     }
 
     setupCanvasControls() {
@@ -4859,6 +4900,11 @@ class NewsletterBuilder {
 
     updateDocumentTools(editNode) {
         const textMode = /^(P|H[1-6]|LI|BLOCKQUOTE)$/.test(editNode?.tagName || '');
+        const formatControl = document.getElementById('toolbar-text-format');
+        const sizeControl = document.getElementById('toolbar-text-size');
+        if (formatControl) { formatControl.disabled = !textMode; if (textMode) formatControl.value = /^(H1|H2|H3)$/.test(editNode.tagName) ? editNode.tagName.toLowerCase() : 'p'; }
+        if (sizeControl) { sizeControl.disabled = !textMode; if (textMode) { const size = String(parseInt(window.getComputedStyle(editNode).fontSize, 10)); if (Array.from(sizeControl.options).some(option => option.value === size)) sizeControl.value = size; } }
+
         document.body.classList.toggle('document-text-active', textMode);
         if (textMode) { this.propertiesPanelOpen = false; document.body.classList.remove('properties-panel-open'); }
         let tools = document.getElementById('hkm-document-tools');
@@ -7692,7 +7738,7 @@ class NewsletterBuilder {
             if (label) label.textContent = 'Lagre som …';
         }
         const name = document.getElementById('editing-template-name');
-        if (name) { name.hidden = false; name.textContent = (named ? 'Mal: ' : 'Kladd: ') + (this.currentDraftName || 'Nytt nyhetsbrev'); name.title = name.textContent; }
+        if (name) { name.hidden = false; name.textContent = (named ? 'Mal: ' : 'Kladd: ') + (this.currentDraftName || 'Nytt nyhetsbrev').replace(/^(?:(?:Kladd|Mal):\s*)+/i, ''); name.title = name.textContent; }
     }
 
     async saveTemplate() {

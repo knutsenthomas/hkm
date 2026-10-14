@@ -168,7 +168,7 @@ dialog.newsletter-save-dialog {
 #newsletter-builder-layout #blocks-container > *:hover:not(.selected-block-active) { outline:1px dashed rgba(197,104,40,.35)!important; outline-offset:1px!important; }
 
 /* Empty paragraphs remain usable writing space without becoming heavy cards. */
-#newsletter-builder-layout #blocks-container p { min-height:1.4em; }
+#newsletter-builder-layout #blocks-container p { min-height:1lh; }
 #newsletter-builder-layout #blocks-container p[data-editor-empty="true"]::after { content:'Begynn å skrive …'; color:#94a3b8; font-size:14px; pointer-events:none; }
 #newsletter-builder-layout #blocks-container p[data-editor-empty="true"] { position:relative; }
 #newsletter-builder-layout #blocks-container p[data-editor-empty="true"]::after { position:absolute; left:0; top:0; }
@@ -281,4 +281,36 @@ body.builder-active #newsletter-builder-layout #newsletter-canvas.canvas-paper-f
     border:0!important;
     border-radius:0!important;
     box-shadow:none!important;
+}
+
+#newsletter-builder-layout .hkm-newsletter-text-toolbar select { min-height:32px; width:auto; border:0; border-radius:6px; padding:5px 24px 5px 8px; background-color:transparent; color:var(--admin-text,#2c3e50); font:inherit; font-size:13px; }
+#newsletter-builder-layout .hkm-newsletter-text-toolbar select:focus-visible { outline:2px solid #c56828; outline-offset:2px; }
+#newsletter-builder-layout .hkm-newsletter-text-toolbar .hkm-format-group-label { display:none; }
+#newsletter-builder-layout .hkm-newsletter-text-toolbar { gap:4px!important; }
+
+/* Match the Studio menu to shared admin colours and compact controls. */
+#newsletter-builder-layout #newsletter-more-menu { width:300px; padding:12px; border-radius:14px; max-height:calc(100dvh - 90px); overflow-y:auto; }
+#newsletter-more-menu .newsletter-menu-heading { padding:4px 8px 0; font-size:14px; font-weight:700; color:var(--admin-text,#1e293b); }
+#newsletter-builder-layout #newsletter-more-menu #editing-template-name { padding:4px 8px 12px; color:var(--admin-text-muted,#64748b); font-weight:400; }
+#newsletter-more-menu .newsletter-menu-section-label { padding:8px 8px 0; font-size:11px; font-weight:600; color:var(--admin-text-muted,#64748b); }
+#newsletter-more-menu .newsletter-menu-divider { height:1px; margin:10px 4px; background:var(--admin-border,#e2e8f0); }
+#newsletter-builder-layout #newsletter-more-menu .device-switch-pill,
+#newsletter-builder-layout #newsletter-more-menu #editor-language-switcher { width:100%!important; display:flex!important; gap:4px!important; padding:4px!important; border:1px solid var(--admin-border,#e2e8f0)!important; border-radius:9px!important; background:var(--admin-bg,#f8fafc)!important; box-sizing:border-box; }
+#newsletter-builder-layout #newsletter-more-menu .toolbar-center-cell { padding:6px 0 0!important; height:auto!important; }
+#newsletter-builder-layout #newsletter-more-menu .device-pill-btn,
+#newsletter-builder-layout #newsletter-more-menu .editor-lang-btn { flex:1 1 0!important; min-width:0!important; justify-content:center!important; min-height:34px!important; padding:6px 8px!important; font-size:12px!important; font-weight:600!important; border:0!important; border-radius:6px!important; background:transparent!important; color:var(--admin-text-muted,#64748b)!important; box-shadow:none!important; }
+#newsletter-builder-layout #newsletter-more-menu .device-pill-btn.active,
+#newsletter-builder-layout #newsletter-more-menu .editor-lang-btn.active { background:var(--admin-surface,#fff)!important; color:var(--admin-accent-dark,#bd4f2a)!important; box-shadow:0 1px 3px #0f172a14!important; }
+#newsletter-builder-layout #newsletter-more-menu button:focus-visible { outline:2px solid var(--admin-accent,#d17d39)!important; outline-offset:1px!important; }
+#newsletter-builder-layout #newsletter-more-menu .device-pill-btn .material-symbols-outlined,
+#newsletter-builder-layout #newsletter-more-menu .lang-translate-icon { font-size:18px!important; color:inherit!important; }
+#newsletter-builder-layout #newsletter-more-menu .newsletter-more-item { min-height:38px!important; padding:8px!important; font-weight:500; }
+
+@media (max-width:991px) {
+    body.builder-active #newsletter-builder-layout .btn-group-publish { display:flex!important; flex:0 0 auto!important; height:36px!important; border-radius:10px!important; overflow:hidden; }
+    body.builder-active #newsletter-builder-layout #continue-btn { display:inline-flex!important; align-items:center!important; justify-content:center!important; gap:6px!important; width:auto!important; min-width:36px!important; height:36px!important; min-height:36px!important; padding:0 10px!important; border-radius:10px 0 0 10px!important; }
+    body.builder-active #newsletter-builder-layout #continue-btn .btn-publish-label { display:none!important; }
+    body.builder-active #newsletter-builder-layout #continue-btn .hkm-send-icon { width:16px!important; height:16px!important; }
+    body.builder-active #newsletter-builder-layout #publish-dropdown-btn { display:flex!important; align-items:center!important; justify-content:center!important; width:30px!important; min-width:30px!important; height:36px!important; min-height:36px!important; padding:0!important; border-radius:0 10px 10px 0!important; }
+    body.builder-active #newsletter-builder-layout #publish-dropdown-btn svg { width:14px!important; height:14px!important; }
 }
