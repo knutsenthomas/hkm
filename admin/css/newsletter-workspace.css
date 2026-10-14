@@ -314,3 +314,30 @@ body.builder-active #newsletter-builder-layout #newsletter-canvas.canvas-paper-f
     body.builder-active #newsletter-builder-layout #publish-dropdown-btn { display:flex!important; align-items:center!important; justify-content:center!important; width:30px!important; min-width:30px!important; height:36px!important; min-height:36px!important; padding:0!important; border-radius:0 10px 10px 0!important; }
     body.builder-active #newsletter-builder-layout #publish-dropdown-btn svg { width:14px!important; height:14px!important; }
 }
+
+/* Constrain the whole split button, including inherited minimum heights. */
+@media (max-width:991px) {
+    body.builder-active #newsletter-builder-layout .builder-toolbar-header .btn-group-publish { min-height:36px!important; max-height:36px!important; padding:0!important; gap:0!important; box-sizing:border-box!important; overflow:visible!important; align-items:stretch!important; }
+    body.builder-active #newsletter-builder-layout .builder-toolbar-header #continue-btn,
+    body.builder-active #newsletter-builder-layout .builder-toolbar-header #publish-dropdown-btn { max-height:36px!important; box-sizing:border-box!important; margin:0!important; flex-shrink:0!important; }
+    body.builder-active #newsletter-builder-layout .builder-toolbar-header #continue-btn { width:36px!important; max-width:36px!important; padding:0!important; }
+}
+
+/* One centred tool row; overflow remains reachable by touch and keyboard. */
+#newsletter-builder-layout #builder-workspace-center > .hkm-newsletter-text-toolbar {
+    flex-wrap:nowrap!important;
+    justify-content:flex-start!important;
+    overflow-x:auto;
+    overflow-y:hidden;
+    min-width:0;
+    max-width:100%;
+    scrollbar-width:none;
+    -ms-overflow-style:none;
+    overscroll-behavior-x:contain;
+}
+#newsletter-builder-layout .hkm-newsletter-text-toolbar::-webkit-scrollbar { display:none; }
+#newsletter-builder-layout .hkm-newsletter-text-toolbar .hkm-format-group { flex:0 0 auto; flex-wrap:nowrap; white-space:nowrap; }
+#newsletter-builder-layout .hkm-newsletter-text-toolbar .hkm-format-group:first-of-type { margin-left:auto; }
+#newsletter-builder-layout .hkm-newsletter-text-toolbar .hkm-format-group:last-of-type { margin-right:auto; }
+#newsletter-builder-layout .hkm-newsletter-text-toolbar .desktop-richtools-btn,
+#newsletter-builder-layout .hkm-newsletter-text-toolbar select { flex-shrink:0; }
