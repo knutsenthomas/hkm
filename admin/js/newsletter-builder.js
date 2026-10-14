@@ -7400,7 +7400,7 @@ class NewsletterBuilder {
         const named = this.currentDocumentIsTemplate && this.currentDraftId;
         const save = document.getElementById('save-draft-btn');
         if (save) {
-            save.title = named ? 'Lagre mal' : 'Lagre utkast';
+            save.title = 'Lagre utkast';
             const label = save.querySelector('.btn-label-text');
             if (label) label.textContent = save.title;
         }
@@ -7432,7 +7432,14 @@ class NewsletterBuilder {
         const intro = document.createElement('p'); intro.textContent = 'Behold oppsettet for senere nyhetsbrev.';
         const existing = document.createElement('div'); existing.className = 'save-existing-template'; existing.append(label, select, replace, message);
         const footer = document.createElement('div'); footer.className = 'save-dialog-footer'; footer.append(cancel);
-        dialog.append(heading, intro, create, existing, footer);
+        dialog.append(heading, intro);
+        if (this.currentDocumentIsTemplate && this.currentDraftId) {
+            const update = document.createElement('button'); update.type = 'button';
+            update.textContent = 'Lagre endringer i «' + this.currentDraftName + '»';
+            update.onclick = () => { dialog.close(); this.saveCurrentNewsletterTemplate(); };
+            dialog.append(update);
+        }
+        dialog.append(create, existing, footer);
         document.body.append(dialog); dialog.showModal();
         dialog.addEventListener('close', () => dialog.remove(), { once: true });
         cancel.onclick = () => dialog.close();
@@ -9639,7 +9646,6 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
     }
 
     async saveDraft() {
-        if (this.currentDocumentIsTemplate) return this.saveCurrentNewsletterTemplate();
         if (!window.firebaseService || !window.firebaseService.isInitialized) return;
 
         const subjectVal = document.getElementById('newsletter-subject')?.value || '';
@@ -9653,6 +9659,8 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                 if (!trimmedName) return;
 
                 try {
+                    clearTimeout(this.autosaveTimer);
+                    while (this._autosaveInFlight) await new Promise(resolve => setTimeout(resolve, 50));
                     this.syncUnifiedBlocks();
                     const headerNode = document.querySelector('.canvas-header');
                     const canonicalSubject = this.currentEditorLang === 'en'
@@ -9665,13 +9673,13 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                         subject: canonicalSubject,
                         englishPayload: this.englishPayload || null,
                         updatedAt: new Date().toISOString(),
-                        isDraft: !this.currentDocumentIsTemplate
+                        isDraft: true
                     };
 
                     this.currentDraftName = trimmedName;
                     this.hasCustomDraftName = true;
 
-                    if (this.currentDraftId) {
+                    if (this.currentDraftId && !this.currentDocumentIsTemplate) {
                         await window.firebaseService.db.collection('newsletter_templates').doc(this.currentDraftId).set(data, { merge: true });
                     } else {
                         data.createdAt = new Date().toISOString();
@@ -9683,6 +9691,10 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                         window.history.replaceState({}, '', url.toString());
                     }
 
+                    this.currentDocumentIsTemplate = false;
+                    this.confirmedTemplateId = null;
+                    try { sessionStorage.setItem('hkm_active_draft_id', this.currentDraftId); } catch (_) {}
+                    this.updateTemplateSaveUi();
                     await this.recordNewsletterVersion('Manuell lagring', {
                         minIntervalMs: 0,
                         source: 'newsletter-save-button'
