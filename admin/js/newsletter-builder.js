@@ -278,13 +278,7 @@ class NewsletterBuilder {
         // Only open editor mode if draftId is explicitly present in URL (e.g. ?draftId=xxx or ?draftId=new)
         if (urlDraftId) {
             this.toggleMode('builder');
-            let savedView = 'builder';
-            try {
-                savedView = localStorage.getItem('hkm_builder_active_view') || 'builder';
-            } catch(e) {}
-            if (savedView) {
-                this.switchSidebarView(savedView);
-            }
+            this.switchSidebarView('builder');
         } else {
             this.toggleMode('dashboard');
         }
@@ -10869,7 +10863,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             const url = new URL(window.location.href);
             if (this.currentDraftId) {
                 url.searchParams.set('draftId', this.currentDraftId);
-            } else {
+            } else if (!url.searchParams.get('draftId')) {
                 url.searchParams.set('draftId', 'new');
             }
             window.history.replaceState({}, '', url.toString());
