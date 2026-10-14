@@ -1,3 +1,5 @@
+import { HKD_PRODUCT_TEMPLATE } from './newsletter-product-template.js';
+
 function escapeHtml(str) {
     if (!str && str !== 0) return '';
     return String(str)
@@ -450,9 +452,23 @@ class NewsletterBuilder {
         dialog.addEventListener('cancel', () => dialog.remove());
         dialog.showModal();
         const list = dialog.querySelector('.start-templates');
+        const addProductTemplate = () => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.textContent = HKD_PRODUCT_TEMPLATE.name;
+            button.onclick = () => {
+                this.blocks = JSON.parse(JSON.stringify(HKD_PRODUCT_TEMPLATE.blocks));
+                this.resetEditorLanguageState(HKD_PRODUCT_TEMPLATE);
+                document.getElementById('newsletter-subject').value = HKD_PRODUCT_TEMPLATE.subject;
+                this.renderCanvas();
+                dialog.close(); dialog.remove();
+            };
+            list.append(button);
+        };
         try {
             const snapshot = await this.safeGet(window.firebaseService.db.collection('newsletter_templates').orderBy('createdAt', 'desc'), 8000);
             list.replaceChildren();
+            addProductTemplate();
             snapshot.forEach(doc => {
                 const data = doc.data();
                 if (data.isDraft) return;
@@ -475,10 +491,18 @@ class NewsletterBuilder {
                 list.append(button);
             });
             if (!list.children.length) list.textContent = 'Ingen lagrede maler ennå. Start tomt og lagre oppsettet som en mal senere.';
-        } catch { list.textContent = 'Kunne ikke hente malene. Du kan fortsatt starte tomt.'; }
+        } catch { list.textContent = 'Kunne ikke hente lagrede maler. Standardmalen er tilgjengelig.'; addProductTemplate(); }
     }
 
     async loadDraftFromUrl(draftId) {
+        if (draftId === HKD_PRODUCT_TEMPLATE.id) {
+            this.startEmptyNewsletter();
+            this.blocks = JSON.parse(JSON.stringify(HKD_PRODUCT_TEMPLATE.blocks));
+            this.resetEditorLanguageState(HKD_PRODUCT_TEMPLATE);
+            document.getElementById('newsletter-subject').value = HKD_PRODUCT_TEMPLATE.subject;
+            this.renderCanvas();
+            return;
+        }
         if (draftId === 'new') {
             this.startEmptyNewsletter();
             await this.chooseNewsletterStart();
@@ -10747,6 +10771,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
 
             // Default premium templates with descriptions and thumbnails (never empty)
             const DEFAULT_TEMPLATES = [
+                HKD_PRODUCT_TEMPLATE,
                 {
                     id: 'tpl-ukeshilsen',
                     name: 'Ukeshilsen & Andakt',
@@ -11475,7 +11500,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
     }
 
     async loadTemplateById(id) {
-        const tpl = this.defaultTemplates && this.defaultTemplates.find(t => t.id === id);
+        const tpl = id === HKD_PRODUCT_TEMPLATE.id ? HKD_PRODUCT_TEMPLATE : this.defaultTemplates?.find(t => t.id === id);
         if (!tpl) return;
         const confirmed = await this.showConfirm(
             'Last inn mal',

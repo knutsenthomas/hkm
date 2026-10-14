@@ -1,3 +1,5 @@
+import { HKD_PRODUCT_TEMPLATE } from './newsletter-product-template.js';
+
 export function campaignState(campaign) {
     if (campaign.status === 'completed') return Number(campaign.sentCount || 0) < Number(campaign.recipientCount || 0) ? 'Avvik' : 'Fullført';
     if (['failed', 'error'].includes(campaign.status)) return 'Feil';
@@ -38,7 +40,7 @@ if (root) {
     });
     let campaigns = [];
     let drafts = [];
-    let templates = [];
+    let templates = [HKD_PRODUCT_TEMPLATE];
     const status = root.querySelector('[data-workspace-status]');
     const table = root.querySelector('tbody');
     const search = root.querySelector('[data-campaign-search]');
@@ -78,7 +80,7 @@ if (root) {
             const map = new Map(); snapshots.slice(0,2).forEach(snapshot => snapshot.forEach(doc => map.set(doc.id, { ...doc.data(), id: doc.id })));
             campaigns = [...map.values()].sort((a,b)=>time(date(b))-time(date(a)));
             const saved=[];snapshots[2].forEach(doc=>saved.push({...doc.data(),id:doc.id}));
-            drafts=saved.filter(item=>item.isDraft);templates=saved.filter(item=>!item.isDraft);
+            drafts=saved.filter(item=>item.isDraft);templates=[HKD_PRODUCT_TEMPLATE, ...saved.filter(item=>!item.isDraft)];
             root.querySelector('[data-count-campaigns]').textContent=campaigns.length;
             root.querySelector('[data-count-drafts]').textContent=drafts.length;
             root.querySelector('[data-count-sent]').textContent=campaigns.reduce((sum,c)=>sum+Number(c.sentCount||0),0);
@@ -101,6 +103,7 @@ if (root) {
         }, 100);
         window.addEventListener('pagehide', () => clearInterval(readyTimer), { once: true });
     }
+    render();
     root.querySelectorAll('[data-workspace-view]').forEach(button=>button.addEventListener('click',()=>{
         root.querySelectorAll('[data-workspace-view]').forEach(tab=>tab.setAttribute('aria-pressed',String(tab===button)));
         root.querySelectorAll('[data-workspace-panel]').forEach(panel=>panel.hidden=panel.dataset.workspacePanel!==button.dataset.workspaceView);
