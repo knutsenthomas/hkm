@@ -75,3 +75,29 @@ dialog.newsletter-save-dialog {
 .newsletter-save-dialog button:disabled { opacity:.5; cursor:default; }
 .newsletter-save-dialog .save-dialog-footer { display:flex; justify-content:flex-end; border-top:1px solid var(--admin-border,#e5e7eb); padding-top:16px; }
 .newsletter-save-dialog::backdrop { background:rgba(15,23,42,.5); backdrop-filter:blur(4px); }
+
+/* Keep preview controls in normal flow so actions cannot cover them. */
+#newsletter-builder-layout .builder-toolbar-header { height:auto!important; min-height:64px!important; max-height:none!important; flex-wrap:wrap!important; gap:12px!important; padding:10px 16px!important; }
+#newsletter-builder-layout .toolbar-center-cell { position:static!important; left:auto!important; transform:none!important; flex:0 0 auto!important; visibility:visible!important; display:flex!important; }
+#newsletter-builder-layout .toolbar-right-actions { flex:1 1 auto!important; min-width:0!important; flex-wrap:wrap!important; height:auto!important; gap:8px!important; }
+#newsletter-builder-layout .device-switch-pill { flex-shrink:0; }
+#newsletter-builder-layout .device-pill-btn { flex-shrink:0; }
+#newsletter-builder-layout #editing-template-name { max-width:140px!important; flex:0 1 140px; }
+@media (max-width:1200px) {
+    #newsletter-builder-layout .toolbar-left-cell { flex:1 1 auto!important; height:auto!important; }
+    #newsletter-builder-layout .toolbar-center-cell { margin-left:auto; }
+    #newsletter-builder-layout .toolbar-right-actions { flex-basis:100%!important; margin-left:0!important; justify-content:flex-end!important; }
+    #newsletter-builder-layout #editing-template-name { margin-right:auto; max-width:240px!important; flex:1 1 120px; }
+}
+@media (max-width:600px) {
+    #newsletter-builder-layout .builder-toolbar-header { padding:8px!important; gap:8px!important; }
+    #newsletter-builder-layout #editing-template-name { flex-basis:100%; max-width:100%!important; font-size:12px; }
+    #newsletter-builder-layout .toolbar-right-actions { justify-content:flex-start!important; gap:6px!important; }
+    #newsletter-builder-layout #editor-language-switcher { flex-shrink:0; margin-right:auto!important; }
+    #newsletter-builder-layout #editor-language-switcher .lang-text { display:none; }
+    #newsletter-builder-layout #save-template-btn,
+    #newsletter-builder-layout #version-history-btn,
+    #newsletter-builder-layout #save-draft-btn,
+    #newsletter-builder-layout #preview-btn { width:36px!important; min-width:36px!important; padding:0!important; }
+    #newsletter-builder-layout .device-pill-btn { padding:0 8px!important; font-size:12px!important; gap:4px!important; }
+}
