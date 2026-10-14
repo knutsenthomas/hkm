@@ -86,6 +86,7 @@ function applySubpageHeroCentering() {
     if (!document.body || document.body.classList.contains('page-index')) return;
 
     document.querySelectorAll('.page-hero').forEach((hero) => {
+        if (hero.dataset.heroAlign === 'left') return;
         hero.style.setProperty('text-align', 'center', 'important');
 
         hero.querySelectorAll('.container, .page-hero-title, .page-hero-subtitle, .page-title, .breadcrumbs, .blog-meta, p, h1, h2, h3').forEach((el) => {
