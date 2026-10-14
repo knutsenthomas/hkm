@@ -1968,10 +1968,19 @@ class NewsletterBuilder {
         }
     }
 
+    updateEmptyParagraphHints(container) {
+        container.querySelectorAll('p').forEach(paragraph => {
+            const empty = !paragraph.textContent.replace(/[\u200B\uFEFF]/g, '').trim() && !paragraph.querySelector('img,video,iframe,svg,button,input');
+            if (empty) paragraph.setAttribute('data-editor-empty', 'true');
+            else paragraph.removeAttribute('data-editor-empty');
+        });
+    }
+
     syncUnifiedBlocks() {
         const container = document.getElementById('blocks-container');
         if (!container) return;
 
+        this.updateEmptyParagraphHints(container);
         this.enforceLayout();
 
         // Force browser layout reflow to ensure the flex footer position recalculates dynamically
@@ -7252,11 +7261,13 @@ class NewsletterBuilder {
             el.classList.remove('selected-block-active', 'hkm-selected-block');
             el.removeAttribute('data-editor-label');
         });
+        clone.querySelectorAll('[data-editor-empty]').forEach(node => node.removeAttribute('data-editor-empty'));
         return clone.innerHTML;
     }
 
     normalizeCanvasBlocks(container) {
         if (!container) return;
+        this.updateEmptyParagraphHints(container);
 
         // 1. Remove all pre-existing edit/delete buttons AND quick toolbar controls to prevent duplicates or leaked editor UI
         container.querySelectorAll('.card-delete-btn, .card-edit-btn, #block-quick-toolbar, .block-quick-toolbar, .quick-tb-btn').forEach(b => b.remove());

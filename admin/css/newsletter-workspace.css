@@ -169,9 +169,9 @@ dialog.newsletter-save-dialog {
 
 /* Empty paragraphs remain usable writing space without becoming heavy cards. */
 #newsletter-builder-layout #blocks-container p { min-height:1.4em; }
-#newsletter-builder-layout #blocks-container p:has(> br:only-child)::after { content:'Begynn å skrive …'; color:#94a3b8; font-size:14px; pointer-events:none; }
-#newsletter-builder-layout #blocks-container p:has(> br:only-child) { position:relative; }
-#newsletter-builder-layout #blocks-container p:has(> br:only-child)::after { position:absolute; left:0; top:0; }
+#newsletter-builder-layout #blocks-container p[data-editor-empty="true"]::after { content:'Begynn å skrive …'; color:#94a3b8; font-size:14px; pointer-events:none; }
+#newsletter-builder-layout #blocks-container p[data-editor-empty="true"] { position:relative; }
+#newsletter-builder-layout #blocks-container p[data-editor-empty="true"]::after { position:absolute; left:0; top:0; }
 
 /* Document mode: text uses the caret; block operations stay in the margin. */
 body.document-text-active #newsletter-builder-layout #blocks-container .selected-block-active { outline:none!important; box-shadow:none!important; }
@@ -185,3 +185,21 @@ body.document-text-active #newsletter-builder-layout #block-quick-toolbar { disp
 #hkm-document-tools button:focus-visible { outline:2px solid #c56828; outline-offset:2px; }
 #hkm-document-tools .document-block-menu { position:absolute; top:32px; left:32px; min-width:150px; padding:6px; border:1px solid var(--admin-border,#e5e7eb); border-radius:10px; background:var(--admin-surface,#fff); box-shadow:0 8px 24px #0f172a18; }
 #hkm-document-tools .document-block-menu button { display:block; width:100%; border:0; padding:8px 12px; text-align:left; font-size:13px; }
+
+/* Center formatting controls on the paper column, independently of side panels. */
+#newsletter-builder-layout #builder-workspace-center > .hkm-newsletter-text-toolbar { flex:0 0 auto; justify-content:center!important; position:relative!important; z-index:20; }
+body.builder-recipients-open #newsletter-builder-layout .hkm-newsletter-text-toolbar { display:none!important; }
+@media(max-width:600px) { #newsletter-builder-layout #builder-workspace-center > .hkm-newsletter-text-toolbar { gap:4px; } }
+
+/* The writing canvas reads as a document, without a surrounding card frame. */
+#newsletter-builder-layout .canvas-paper-frame {
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+}
+#newsletter-builder-layout #blocks-container,
+#newsletter-builder-layout #blocks-container:focus {
+    border:0!important;
+    outline:none!important;
+    box-shadow:none!important;
+}
