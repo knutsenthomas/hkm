@@ -33,7 +33,7 @@
 @media(max-width:600px) { .newsletter-workspace { padding:18px; } .workspace-metrics { gap:8px; } .workspace-metrics > div { padding:12px; } .workspace-nav { flex-wrap:wrap; } }
 
 #continue-btn, #final-send-btn { background: var(--admin-orange-gradient,linear-gradient(135deg,#d17d39,#bd4f2a)) !important; color: white !important; }
-.newsletter-start-dialog { width:min(540px,calc(100% - 32px)); max-height:80vh; overflow:auto; padding:28px; border:1px solid var(--admin-border,#e5e7eb); border-radius:18px; color:var(--admin-text,#2c3e50); background:var(--admin-surface,#fff); }
+dialog.newsletter-start-dialog { position:fixed!important; inset:0!important; margin:auto!important; height:fit-content!important; box-sizing:border-box; width:min(540px,calc(100vw - 32px)); max-height:calc(100dvh - 48px); overflow:auto; padding:28px; border:1px solid var(--admin-border,#e5e7eb); border-radius:18px; color:var(--admin-text,#2c3e50); background:var(--admin-surface,#fff); }
 .newsletter-start-dialog::backdrop { background:rgba(11,27,40,.5); }
 .newsletter-start-dialog h2 { font-size:24px; margin:0 0 12px; }
 .newsletter-start-dialog p { color:var(--admin-text-muted,#64748b); margin-bottom:20px; }
