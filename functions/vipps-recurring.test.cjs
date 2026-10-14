@@ -35,3 +35,12 @@ test('monthly gifts continue beyond ten payments until the giver cancels',async(
  const api=async(path,method,body)=>{if(method==='PATCH'){stops++;return {};}if(method==='POST'){posts++;return {chargeId:body.orderId};}if(path.includes('/charges/'))return {id:path.split('/').at(-1),status:'CHARGED',amount:10000,summary:{captured:10000,refunded:0}};return {id:'agr_gift',status:'ACTIVE',start:'2027-01-13T12:00:00Z',pricing:{currency:'NOK',amount:10000}};};
  for(let cycle=0;cycle<13;cycle++)await reconcile({ref,record,db,api,timestamp:1,now:Date.parse(dueDate(record.anchor,cycle)),schedule:true});assert.equal(posts,13);assert.equal(stops,0);
 });
+test('Vipps school agreement can be linked to the authenticated student account',async()=>{
+ const {db}=database();const schoolInput={...input,gift:false,studentName:'Elev',schoolYear:'2027',verifiedCentralUid:'student1'};const details=validateRecurring(schoolInput);await createAgreement({details,input:schoolInput,db,api:async()=>({agreementId:'agr_school',vippsConfirmationUrl:'https://api.vipps.no/approve'}),timestamp:1});
+ const result=await require('./student-payment-account.cjs').schoolAccountService({body:{mode:'link',centralUid:'student1',year:'2027',kind:'plan',reference:details.key},db,timestamp:1});assert.equal(result.linked,true);const stored=await db.collection('recurring_payment_agreements').doc(details.key).get();assert.equal(stored.data().subscriptionId,'agr_school');
+});
+test('refunded Vipps charge updates the existing ledger entry without double counting',async()=>{
+ const {db,records}=database();const details=validateRecurring(input);const ref=db.collection('recurring_payment_agreements').doc(details.key);const record={...details,agreementId:'agr_gift',anchor:Date.now()};await ref.set(record);await ref.collection('charges').doc('0').set({chargeId:'charge_refund',amountOre:10000,cycle:0});let refunded=false;
+ const api=async path=>path.includes('/charges/')?{id:'charge_refund',amount:10000,status:refunded?'REFUNDED':'CHARGED',summary:{captured:10000,refunded:refunded?10000:0}}:{id:'agr_gift',status:'ACTIVE',start:new Date().toISOString(),pricing:{currency:'NOK',amount:10000}};
+ await reconcile({ref,record,db,api,timestamp:1});refunded=true;await reconcile({ref,record,db,api,timestamp:2});const ledger=[...records.entries()].filter(([key])=>key.startsWith('donations/'));assert.equal(ledger.length,1);assert.equal(ledger[0][1].status,'refunded');assert.equal(ledger[0][1].amountNok,0);assert.equal(ledger[0][1].timestamp,1);
+});
