@@ -9637,7 +9637,19 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
         }
     }
 
+    openNewsletterOverview() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('section', 'newsletter');
+        window.history.replaceState({}, '', url.toString());
+        this.toggleMode('dashboard');
+        window.dispatchEvent(new CustomEvent('hkm:newsletter-overview', { detail: { resumeEditor: true } }));
+    }
+
     switchSidebarView(viewName) {
+        if (viewName === 'overview') {
+            this.openNewsletterOverview();
+            return;
+        }
         console.log('[HKM Navigation] Switching sidebar view to:', viewName);
         try {
             localStorage.setItem('hkm_builder_active_view', viewName);
@@ -10703,6 +10715,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
 
             this.loadDashboardData();
         }
+        window.dispatchEvent(new CustomEvent('hkm:newsletter-modechange'));
     }
 
     setupDashboardEvents() {

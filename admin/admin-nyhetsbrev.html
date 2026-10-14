@@ -809,7 +809,7 @@
             </div>
 
 <section class="newsletter-workspace" id="newsletter-workspace" hidden aria-labelledby="workspace-title">
-<div class="workspace-heading"><div><h3 id="workspace-title">Nyhetsbrev</h3><p>Kampanjer, kladder og maler samlet på ett sted.</p></div><div class="workspace-actions"><button type="button" data-workspace-refresh>Oppdater</button><a href="/admin/admin-nyhetsbrev.html?draftId=new" class="workspace-primary">Nytt nyhetsbrev</a></div></div>
+<div class="workspace-heading"><div><h3 id="workspace-title">Nyhetsbrev</h3><p>Kampanjer, kladder og maler samlet på ett sted.</p></div><div class="workspace-actions"><button type="button" data-resume-editor hidden>Tilbake til utkast</button><button type="button" data-workspace-refresh>Oppdater</button><a href="/admin/admin-nyhetsbrev.html?draftId=new" class="workspace-primary">Nytt nyhetsbrev</a></div></div>
 <div class="workspace-metrics"><div><span>Kampanjer i utvalget</span><strong data-count-campaigns>–</strong></div><div><span>Kladder i utvalget</span><strong data-count-drafts>–</strong></div><div><span>E-poster sendt i utvalget</span><strong data-count-sent>–</strong></div></div>
 <nav class="workspace-nav" aria-label="Nyhetsbrevoversikt"><button type="button" data-workspace-view="campaigns" aria-pressed="true">Kampanjer</button><button type="button" data-workspace-view="drafts" aria-pressed="false">Kladder</button><button type="button" data-workspace-view="templates" aria-pressed="false">Maler</button><button type="button" data-open-subscribers>Mottakere</button></nav>
 <div data-workspace-panel="campaigns"><div class="workspace-tools"><input type="search" data-campaign-search placeholder="Søk etter kampanje" aria-label="Søk etter kampanje"><select data-campaign-filter aria-label="Filtrer kampanjestatus"><option value="">Alle statuser</option><option>I kø</option><option>Sender</option><option>Fullført</option><option>Avvik</option><option>Feil</option></select></div><div class="workspace-table"><table><thead><tr><th>Emne</th><th>Status</th><th>Mottakere</th><th>Sendt</th><th>Dato</th></tr></thead><tbody><tr><td colspan="5">Trykk Oppdater for å hente kampanjene.</td></tr></tbody></table></div></div>
@@ -1076,7 +1076,7 @@
                         </button>
                     </div>
                     <nav class="sidebar-nav-menu">
-                        <a href="javascript:void(0)" onclick="if(window.builder) builder.switchSidebarView('overview');" class="nav-item" data-view="overview" title="Oversikt" aria-label="Oversikt">
+                        <a href="javascript:void(0)" onclick="if(window.builder) builder.switchSidebarView('overview');" class="nav-item" data-view="overview" title="Nyhetsbrevoversikt" aria-label="Nyhetsbrevoversikt">
                             <span class="material-symbols-outlined">dashboard</span>
                             <span>Oversikt</span>
                         </a>
@@ -1572,51 +1572,6 @@
                 </div>
             </div>
 
-            <!-- Subview 1: Oversikt (Overview) -->
-            <div id="view-overview-panel" class="subview-panel" style="display: none;">
-                <div class="subview-header">
-                    <h2 class="subview-title">Oversikt</h2>
-                    <p class="subview-subtitle">Nøkkeltall og oversikt over dine e-postkampanjer</p>
-                </div>
-                <div class="subview-grid-4">
-                    <div class="subview-card">
-                        <span class="material-symbols-outlined card-icon">group</span>
-                        <div class="card-num">1,248</div>
-                        <div class="card-label">Aktive abonnenter</div>
-                    </div>
-                    <div class="subview-card">
-                        <span class="material-symbols-outlined card-icon">mark_email_read</span>
-                        <div class="card-num">48.5%</div>
-                        <div class="card-label">Gjennomsnittlig åpningsrate</div>
-                    </div>
-                    <div class="subview-card">
-                        <span class="material-symbols-outlined card-icon">ads_click</span>
-                        <div class="card-num">12.3%</div>
-                        <div class="card-label">Klikkrate (CTR)</div>
-                    </div>
-                    <div class="subview-card">
-                        <span class="material-symbols-outlined card-icon">send</span>
-                        <div class="card-num">14</div>
-                        <div class="card-label">Sendte utsendelser i år</div>
-                    </div>
-                </div>
-                <div class="subview-section" style="margin-top: 32px;">
-                    <h3 style="font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 16px;">Siste utkast og utsendelser</h3>
-                    <div id="overview-drafts-list" style="display: flex; flex-direction: column; gap: 12px;">
-                        <div class="subview-list-item">
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <span class="material-symbols-outlined" style="color: #d17d39;">edit_note</span>
-                                <div>
-                                    <strong style="color: #1e293b; font-size: 14px;">HKM Studio Månedsbrev - Juli utgave</strong>
-                                    <div style="font-size: 12px; color: #64748b;">Sist endret: I dag, 14:20</div>
-                                </div>
-                            </div>
-                            <button class="btn-secondary-outline" onclick="if(window.builder) builder.switchSidebarView('builder');" style="padding: 6px 16px; border-radius: 8px; font-size: 13px;">Åpne i bygger</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Subview 2: Maler (Templates Gallery) -->
             <div id="view-templates-panel" class="subview-panel" style="display: none;">
                 <div class="subview-header">
@@ -1750,28 +1705,8 @@
                     <h2 class="subview-title">Kampanjeanalyse</h2>
                     <p class="subview-subtitle">Innsikt og ytelsestall for dine nyhetsbrev</p>
                 </div>
-                <div class="subview-grid-4">
-                    <div class="subview-card">
-                        <div class="card-label">Åpningsrate (Open Rate)</div>
-                        <div class="card-num" style="color: #16a34a;">48.5%</div>
-                        <div style="font-size: 12px; color: #16a34a; margin-top: 4px;">↑ +4.2% fra forrige måned</div>
-                    </div>
-                    <div class="subview-card">
-                        <div class="card-label">Klikkfrekvens (CTR)</div>
-                        <div class="card-num" style="color: #2563eb;">12.3%</div>
-                        <div style="font-size: 12px; color: #2563eb; margin-top: 4px;">↑ +1.8% høyere enn snitt</div>
-                    </div>
-                    <div class="subview-card">
-                        <div class="card-label">Leveringsgrad</div>
-                        <div class="card-num" style="color: #d17d39;">99.8%</div>
-                        <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Strenge DKIM/SPF innstillinger</div>
-                    </div>
-                    <div class="subview-card">
-                        <div class="card-label">Avmeldinger</div>
-                        <div class="card-num" style="color: #64748b;">0.1%</div>
-                        <div style="font-size: 12px; color: #16a34a; margin-top: 4px;">Meget lav avmeldingsrate</div>
-                    </div>
-                </div>
+                <p>Åpninger og klikk registreres ikke i dagens utsendingsflyt. Se kampanjer og antall sendt i nyhetsbrevoversikten.</p>
+                <button type="button" class="btn-secondary-outline" onclick="window.builder.openNewsletterOverview()">Åpne nyhetsbrevoversikten</button>
             </div>
 
             <!-- Subview 5: Innstillinger (Settings) -->

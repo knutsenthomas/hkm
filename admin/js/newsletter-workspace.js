@@ -15,8 +15,22 @@ export function inspectNewsletter(subject, blocks, html) {
 const root = document.getElementById('newsletter-workspace');
 if (root) {
     const isNewsletterArea = new URLSearchParams(location.search).get('section') === 'newsletter';
-    root.hidden = !isNewsletterArea;
-    document.body.classList.toggle('newsletter-area-active', isNewsletterArea);
+    const syncArea = () => {
+        const active = new URLSearchParams(location.search).get('section') === 'newsletter';
+        root.hidden = !active;
+        document.body.classList.toggle('newsletter-area-active', active);
+    };
+    syncArea();
+    window.addEventListener('hkm:newsletter-modechange', syncArea);
+    window.addEventListener('hkm:newsletter-overview', event => {
+        syncArea();
+        root.querySelector('[data-resume-editor]').hidden = !event.detail?.resumeEditor;
+        root.querySelector('[data-workspace-refresh]').click();
+    });
+    root.querySelector('[data-resume-editor]')?.addEventListener('click', () => {
+        window.builder?.toggleMode('builder');
+        window.builder?.switchSidebarView('builder');
+    });
     root.querySelector('[data-open-subscribers]')?.addEventListener('click', () => {
         if (!window.builder) return;
         window.builder.toggleMode('builder');
