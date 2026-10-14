@@ -33,3 +33,25 @@
 @media(max-width:600px) { .newsletter-workspace { padding:18px; } .workspace-metrics { gap:8px; } .workspace-metrics > div { padding:12px; } .workspace-nav { flex-wrap:wrap; } }
 
 #continue-btn, #final-send-btn { background: var(--admin-orange-gradient,linear-gradient(135deg,#d17d39,#bd4f2a)) !important; color: white !important; }
+.newsletter-start-dialog { width:min(540px,calc(100% - 32px)); max-height:80vh; overflow:auto; padding:28px; border:1px solid var(--admin-border,#e5e7eb); border-radius:18px; color:var(--admin-text,#2c3e50); background:var(--admin-surface,#fff); }
+.newsletter-start-dialog::backdrop { background:rgba(11,27,40,.5); }
+.newsletter-start-dialog h2 { font-size:24px; margin:0 0 12px; }
+.newsletter-start-dialog p { color:var(--admin-text-muted,#64748b); margin-bottom:20px; }
+.newsletter-start-dialog h3 { font-size:16px; margin:24px 0 12px; }
+.newsletter-start-dialog button { cursor:pointer; padding:12px 18px; border:1px solid var(--admin-border,#e5e7eb); border-radius:10px; text-align:left; color:inherit; background:var(--admin-surface,#fff); }
+.newsletter-start-dialog .start-blank { background:#c56828; color:white; border:0; }
+.newsletter-start-dialog .start-templates { display:grid; gap:10px; }
+.newsletter-start-dialog button:focus-visible { outline:3px solid #d17d39; outline-offset:3px; }
+.newsletter-workspace[hidden] { display:none!important; }
+.studio-area-nav { display:flex; gap:12px; margin-bottom:24px; }
+.studio-area-nav a { color:var(--admin-text,#2c3e50); padding:10px 16px; border:1px solid var(--admin-border,#e5e7eb); border-radius:10px; text-decoration:none; }
+.newsletter-area-active .studio-creation-grid,
+.newsletter-area-active .ai-inspirasjon-hero,
+.newsletter-area-active .studio-feed-section,
+.newsletter-area-active .studio-saved-tools,
+.newsletter-area-active .dashboard-header-container { display:none!important; }
+.studio-saved-tools { margin:24px 0; }
+.studio-saved-tools summary { cursor:pointer; font-weight:650; padding:12px 0; }
+.newsletter-hub-links { padding:24px; border:1px solid var(--admin-border,#e5e7eb); border-radius:16px; display:flex; flex-wrap:wrap; align-items:center; gap:16px; }
+.newsletter-hub-links p { width:100%; margin:0; color:var(--admin-text-muted,#64748b); }
+.newsletter-hub-links .workspace-primary { padding:12px 18px; background:#c56828; color:white; border-radius:10px; text-decoration:none; }

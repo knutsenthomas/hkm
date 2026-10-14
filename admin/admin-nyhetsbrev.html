@@ -747,7 +747,7 @@
                             </a>
                         </li>
                         <li class="nav-item" data-nav-category="kommunikasjon">
-                            <a href="/admin/admin-nyhetsbrev.html" class="nav-link active">
+                            <a href="/admin/admin-nyhetsbrev.html?section=newsletter" class="nav-link">
                                 <span class="material-symbols-outlined">mail</span>
                                 <span>Nyhetsbrev</span>
                             </a>
@@ -798,8 +798,8 @@
             <div id="newsletter-dashboard-layout" class="newsletter-dashboard-layout" style="display: block;">
             <div class="dashboard-header-container" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; width: 100%; box-sizing: border-box;">
                 <div class="dashboard-header-left">
-                    <h2 class="dashboard-main-title" style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 800; color: #0f172a; margin: 0 0 4px 0; letter-spacing: -0.02em;">Nyhetsbrev & Utsendelser</h2>
-                    <p class="dashboard-main-subtitle" style="font-size: 15px; color: #64748b; margin: 0; font-weight: 500;">Administrer e-postkampanjer, prøveutgaver, maler og abonnenter for His Kingdom Ministry.</p>
+                    <h2 class="dashboard-main-title" style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 800; color: #0f172a; margin: 0 0 4px 0; letter-spacing: -0.02em;">HKM Studio</h2>
+                    <p class="dashboard-main-subtitle" style="font-size: 15px; color: #64748b; margin: 0; font-weight: 500;">Opprett blogginnlegg og bibelstudier, eller gå til nyhetsbrevområdet.</p>
                 </div>
                 <div class="dashboard-header-right" style="display: none;">
                     <button id="open-empty-builder-btn" class="btn btn-primary primary-gradient-btn" style="background: var(--accent-gradient, linear-gradient(135deg, #f97316 0%, #ff8854 100%)); border: none; padding: 14px 28px; font-weight: 700; border-radius: 12px; display: flex; align-items: center; gap: 10px; color: white; cursor: pointer; font-family: 'Inter', sans-serif; box-shadow: 0 4px 14px rgba(249, 115, 22, 0.3); transition: all 0.3s ease;">
@@ -808,13 +808,14 @@
                 </div>
             </div>
 
-<section class="newsletter-workspace" id="newsletter-workspace" aria-labelledby="workspace-title">
+<section class="newsletter-workspace" id="newsletter-workspace" hidden aria-labelledby="workspace-title">
 <div class="workspace-heading"><div><h3 id="workspace-title">Nyhetsbrev</h3><p>Kampanjer, kladder og maler samlet på ett sted.</p></div><div class="workspace-actions"><button type="button" data-workspace-refresh>Oppdater</button><a href="/admin/admin-nyhetsbrev.html?draftId=new" class="workspace-primary">Nytt nyhetsbrev</a></div></div>
 <div class="workspace-metrics"><div><span>Kampanjer i utvalget</span><strong data-count-campaigns>–</strong></div><div><span>Kladder i utvalget</span><strong data-count-drafts>–</strong></div><div><span>E-poster sendt i utvalget</span><strong data-count-sent>–</strong></div></div>
-<nav class="workspace-nav" aria-label="Nyhetsbrevoversikt"><button type="button" data-workspace-view="campaigns" aria-pressed="true">Kampanjer</button><button type="button" data-workspace-view="drafts" aria-pressed="false">Kladder</button><button type="button" data-workspace-view="templates" aria-pressed="false">Maler</button></nav>
+<nav class="workspace-nav" aria-label="Nyhetsbrevoversikt"><button type="button" data-workspace-view="campaigns" aria-pressed="true">Kampanjer</button><button type="button" data-workspace-view="drafts" aria-pressed="false">Kladder</button><button type="button" data-workspace-view="templates" aria-pressed="false">Maler</button><button type="button" data-open-subscribers>Mottakere</button></nav>
 <div data-workspace-panel="campaigns"><div class="workspace-tools"><input type="search" data-campaign-search placeholder="Søk etter kampanje" aria-label="Søk etter kampanje"><select data-campaign-filter aria-label="Filtrer kampanjestatus"><option value="">Alle statuser</option><option>I kø</option><option>Sender</option><option>Fullført</option><option>Avvik</option><option>Feil</option></select></div><div class="workspace-table"><table><thead><tr><th>Emne</th><th>Status</th><th>Mottakere</th><th>Sendt</th><th>Dato</th></tr></thead><tbody><tr><td colspan="5">Trykk Oppdater for å hente kampanjene.</td></tr></tbody></table></div></div>
 <div data-workspace-panel="drafts" data-drafts hidden>Hent oversikten for å se kladder.</div><div data-workspace-panel="templates" data-templates hidden>Hent oversikten for å se maler.</div>
 <p data-workspace-status role="status" aria-live="polite">Oversikten henter eksisterende data fra Firebase.</p></section>
+<nav class="studio-area-nav" aria-label="Studioområder"><a href="/admin/admin-nyhetsbrev.html">Studio</a><a href="/admin/admin-nyhetsbrev.html?section=newsletter">Nyhetsbrev</a></nav>
             <!-- Quick Creator Cards -->
             <div class="studio-creation-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; margin-bottom: 32px; box-sizing: border-box; width: 100%;">
                 <!-- Card 1: Blogg -->
@@ -924,6 +925,7 @@
                 </div>
             </div>
 
+<details class="studio-saved-tools"><summary>Kladder og standardmaler</summary>
             <!-- Templates and drafts grid -->
             <div class="dashboard-grid-layout" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 40px; box-sizing: border-box; width: 100%;">
                 <!-- Column 1: Kladder (Drafts) -->
@@ -952,6 +954,7 @@
                     </div>
                 </div>
             </div>
+</details>
         </div> <!-- Close newsletter-dashboard-layout -->
     </main> <!-- Close newsletter-dashboard-wrapper -->
 

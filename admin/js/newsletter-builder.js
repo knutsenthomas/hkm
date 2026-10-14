@@ -420,176 +420,81 @@ class NewsletterBuilder {
         });
     }
 
+    startEmptyNewsletter() {
+        this.skipAutosavedHeader = true;
+        this.blocks = [];
+        this.currentDraftId = null;
+        this.currentDraftName = null;
+        this.hasCustomDraftName = false;
+        this.resetEditorLanguageState();
+        const subject = document.getElementById('newsletter-subject');
+        if (subject) subject.value = '';
+        const title = document.querySelector('.canvas-brand-name');
+        const issue = document.querySelector('.canvas-brand-issue');
+        if (title) title.textContent = 'His Kingdom Ministry';
+        if (issue) issue.textContent = '';
+        this.toggleMode('builder');
+        this.switchSidebarView('builder');
+        this.renderCanvas();
+    }
+
+    async chooseNewsletterStart() {
+        document.getElementById('newsletter-start-dialog')?.remove();
+        const dialog = document.createElement('dialog');
+        dialog.id = 'newsletter-start-dialog';
+        dialog.className = 'newsletter-start-dialog';
+        dialog.setAttribute('aria-labelledby', 'newsletter-start-title');
+        dialog.innerHTML = `<h2 id="newsletter-start-title">Nytt nyhetsbrev</h2><p>Start med et tomt utkast eller velg en av dine lagrede maler.</p><button type="button" class="start-blank">Start tomt</button><h3>Velg mal</h3><div class="start-templates" role="status">Henter maler …</div>`;
+        document.body.append(dialog);
+        dialog.querySelector('.start-blank').onclick = () => { dialog.close(); dialog.remove(); };
+        dialog.addEventListener('cancel', () => dialog.remove());
+        dialog.showModal();
+        const list = dialog.querySelector('.start-templates');
+        try {
+            const snapshot = await this.safeGet(window.firebaseService.db.collection('newsletter_templates').orderBy('createdAt', 'desc'), 8000);
+            list.replaceChildren();
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.isDraft) return;
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.textContent = data.name || data.subject || 'Uten navn';
+                button.onclick = () => {
+                    this.blocks = typeof data.blocks === 'string' ? JSON.parse(data.blocks) : (data.blocks || []);
+                    this.resetEditorLanguageState(data);
+                    const subject = document.getElementById('newsletter-subject');
+                    if (subject) subject.value = data.subject || '';
+                    if (data.headerHtml) {
+                        const source = document.createElement('div'); source.innerHTML = data.headerHtml;
+                        const header = source.querySelector('.canvas-header');
+                        if (header) document.querySelector('.canvas-header')?.replaceWith(header);
+                    }
+                    this.renderCanvas();
+                    dialog.close(); dialog.remove();
+                };
+                list.append(button);
+            });
+            if (!list.children.length) list.textContent = 'Ingen lagrede maler ennå. Start tomt og lagre oppsettet som en mal senere.';
+        } catch { list.textContent = 'Kunne ikke hente malene. Du kan fortsatt starte tomt.'; }
+    }
+
     async loadDraftFromUrl(draftId) {
         if (draftId === 'new') {
-            this.blocks = [];
-            this.currentDraftId = null;
-            this.currentDraftName = null;
-            this.resetEditorLanguageState();
-            const subjectInput = document.getElementById('newsletter-subject');
-            if (subjectInput) subjectInput.value = '';
-            this.toggleMode('builder');
-            this.renderCanvas();
+            this.startEmptyNewsletter();
+            await this.chooseNewsletterStart();
             return;
         }
 
         try {
             const doc = await window.firebaseService.db.collection('newsletter_templates').doc(draftId).get();
             if (doc.exists) {
+                this.skipAutosavedHeader = false;
                 const data = doc.data();
                 this.currentDraftId = doc.id;
                 this.currentDraftName = data.name || 'Utkast';
                 this.hasCustomDraftName = true;
                 let loadedBlocks = typeof data.blocks === 'string' ? JSON.parse(data.blocks) : (data.blocks || []);
 
-                const fullRichHtml = `
-                    <p><img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200&q=80" alt="HKM Månedsbrev" class="block-img" style="max-width: 100%; height: auto; border-radius: 12px; margin: 16px 0; display: block;"></p>
-
-                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155;">Kjære venn av His Kingdom Ministry, vi håper du har hatt en flott sommerferie med mye åndelig påfyll. Vi har hatt gode feriedager på østlandet og sørlandet sammen med familie og venner. Vi har solgt huset vårt og har en spennende tid sammen med Gud i møte. Han kaller oss videre i arbeidet i hans rike. Det kommer snart spennende oppdateringer som er under planlegging. Dette er konkrete planer som Gud har talt til oss om og vi ønsker å invitere deg med på reisen.</p>
-
-                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 36px 0;">
-
-                    <h2 class="block-h2" style="font-family: 'Inter', sans-serif; font-weight: 800; color: #1e293b; text-align: center; margin-top: 24px; font-size: 24px;">Basar</h2>
-
-                    <p><img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1200&q=80" alt="HKM Sommerbasar" class="block-img" style="max-width: 100%; height: auto; border-radius: 12px; margin: 16px 0; display: block;"></p>
-
-                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155;">
-                    JIPPI nå er det tid for den årlige <strong>SOMMER-BASAREN</strong> til His Kingdom Ministry! Vi er overbegeistret for de konkrete planene Gud har gitt oss i år i tjenesten for Hans rike, og spesielt også for planene som er lagt for neste år, og vi håper mange vil kjøpe lodd slik at vi kan få gjennomført de alle!
-                    </p>
-
-                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155;">
-                    <strong>Hvert lodd koster 25kr.</strong><br>
-                    <strong>VIPPS: 805381 (merk med basar!)</strong>
-                    </p>
-
-                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155;">
-                    Hvis du har gaver du ønsker å sponse basaren med, så tar vi det hjertelig imot.<br>
-                    Basartrekningen blir holdt hjemme hos oss den 1. august (mer info kommer), og du er hjertelig velkommen til å være tilstede. Vi serverer litt bevertning (med sannsynlig pølser og brus) og lover god stemning! Trekningen blir også sendt på Facebook live så du kan følge med der hvor du er, om du ikke har anledning til å komme til oss her i Sør. Vi sender premiene til deg om du ikke har anledning til å være tilstede på selve basaren.
-                    </p>
-
-                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155;">
-                    På bildene kan du se noen av alle premiene vi lodder ut, blant annet: His Kingdom Designs T-skjorter, tegneposer, plakater, klistremerker, kopper, inrammet Jesusbilde, skinnbibel, Nytestamente på engelsk/norsk, korssmykke, godterier, uro kortspill, LEGO Orkidé (18+), Sudoku bok, pizzaskjærer, vannflaske, nødradio, Hello Kitty Shampoo, notatbøker og mye mer!
-                    </p>
-
-                    <div style="text-align: center; margin: 28px 0;">
-                        <a href="https://www.hiskingdomministry.no/donasjoner.html" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 12px 32px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif;">Kjøp lodd</a>
-                    </div>
-
-                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 36px 0;">
-
-                    <h2 class="block-h2" style="font-family: 'Inter', sans-serif; font-weight: 800; color: #1e293b; text-align: center; margin-top: 24px; font-size: 24px;">Andakt</h2>
-
-                    <p><img src="https://images.unsplash.com/photo-1509114397022-ed747cca3f65?w=1200&q=80" alt="Lyset i hverdagen" class="block-img" style="max-width: 100%; height: auto; border-radius: 12px; margin: 16px 0; display: block;"></p>
-
-                    <h3 style="font-family: 'Inter', sans-serif; font-weight: 700; color: #1e293b; margin-top: 20px; font-size: 20px;">Lyset i hverdagen</h3>
-
-                    <div style="background: #fffbeb; border-left: 4px solid #d17d39; padding: 14px 18px; margin: 18px 0; border-radius: 6px;">
-                        <p style="font-family: 'Georgia', serif; font-style: italic; font-size: 15px; color: #78350f; margin: 0 0 4px 0;">«Ditt ord er en lykt for min fot og et lys på min sti.»</p>
-                        <p style="font-family: 'Inter', sans-serif; font-size: 13px; color: #b45309; margin: 0; font-weight: 700;">— Salme 119:105</p>
-                    </div>
-
-                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155;">
-                    Når vi går ute i mørket med en lommelykt, lyser den sjelden opp hele veien frem til målet. Den lyser akkurat nok opp til at vi ser hvor vi skal sette det neste steget.
-                    </p>
-
-                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155;">
-                    Noen ganger i livet skulle vi ønske vi hadde en stor lyskaster. Vi vil gjerne se hele kartet: Hva skjer neste år? Hvordan løser denne situasjonen seg? Hvorfor ble det som det ble?
-                    </p>
-
-                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155;">
-                    Men Gud lover oss sjeldent å belyse hele fremtiden på én gang. I stedet tilbyr han seg å være en lykt for foten vår. Han gir oss akkurat nok lys, nåde og styrke til det skrittet vi skal ta i dag.
-                    </p>
-
-                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155;">
-                    Når bekymringene for morgendagen melder seg, kan vi få puste ut. Vi trenger ikke å ha alle svarene klare for neste uke eller neste år. Vi blir bedt om å stole på at Han som holder morgendagen i sin hånd, også går ved siden av oss i dag – ett skritt av gangen.
-                    </p>
-
-                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700; color: #1e293b;">En kort bønn</p>
-
-                    <div style="background: #fffbeb; border: 1px solid #fef3c7; padding: 18px; border-radius: 12px; margin: 18px 0;">
-                        <p style="font-family: 'Georgia', serif; font-style: italic; font-size: 15px; line-height: 1.7; color: #78350f; margin: 0;">
-                        Kjære Gud, Takk for at du er med meg i dag. Hjelp meg å slippe taket på bekymringene for fremtiden, og lær meg å stole på at du gir meg det jeg trenger for dagen i dag. Vis meg hvor jeg skal sette mitt neste steg, og gi mitt hjerte trygghet og fred. Amen!
-                        </p>
-                    </div>
-
-                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 36px 0;">
-
-                    <h2 class="block-h2" style="font-family: 'Inter', sans-serif; font-weight: 800; color: #1e293b; text-align: center; margin-top: 24px; font-size: 24px;">Butikk</h2>
-
-                    <p style="font-family: 'Inter', sans-serif; font-size: 14px; text-align: center; color: #64748b; margin-bottom: 24px;">
-                    Sjekk ut våres produkter i våres butikk. Vi har klær, kopper, klistremerker og andre produkter. Ta en tur innom <a href="https://www.hiskingdomdesigns.no" target="_blank" style="color: #2563eb; text-decoration: underline;">www.hiskingdomdesigns.no</a>
-                    </p>
-
-                    <!-- PRODUCT LIST -->
-                    <div style="display: flex; flex-direction: column; gap: 16px; margin: 24px 0;">
-                        <!-- Product 1 -->
-                        <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 16px; background: #ffffff;">
-                            <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=200&q=80" alt="Art Print" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; flex-shrink: 0;">
-                            <div style="flex: 1;">
-                                <h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 700; color: #1e293b;">"Darkness Only Fights What Is Light" – Minimalist Typography Art Print</h4>
-                                <p style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #d17d39;">kr 129,-</p>
-                                <a href="https://www.hiskingdomdesigns.no" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 6px 16px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 700;">Se produkt</a>
-                            </div>
-                        </div>
-
-                        <!-- Product 2 -->
-                        <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 16px; background: #ffffff;">
-                            <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&q=80" alt="Mug" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; flex-shrink: 0;">
-                            <div style="flex: 1;">
-                                <h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 700; color: #1e293b;">QUEEN BEE 11oz Ceramic Mug</h4>
-                                <p style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #d17d39;">kr 199,-</p>
-                                <a href="https://www.hiskingdomdesigns.no" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 6px 16px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 700;">Se produkt</a>
-                            </div>
-                        </div>
-
-                        <!-- Product 3 -->
-                        <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 16px; background: #ffffff;">
-                            <img src="https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=200&q=80" alt="Hat" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; flex-shrink: 0;">
-                            <div style="flex: 1;">
-                                <h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 700; color: #1e293b;">Sunshine Vintage Cotton Dad Hat</h4>
-                                <p style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #d17d39;">kr 349,-</p>
-                                <a href="https://www.hiskingdomdesigns.no" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 6px 16px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 700;">Se produkt</a>
-                            </div>
-                        </div>
-
-                        <!-- Product 4 -->
-                        <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 16px; background: #ffffff;">
-                            <img src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=200&q=80" alt="Hoodie" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; flex-shrink: 0;">
-                            <div style="flex: 1;">
-                                <h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 700; color: #1e293b;">No room for fear - Classic Unisex Zip Hoodie</h4>
-                                <p style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #d17d39;">kr 699,-</p>
-                                <a href="https://www.hiskingdomdesigns.no" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 6px 16px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 700;">Se produkt</a>
-                            </div>
-                        </div>
-
-                        <!-- Product 5 -->
-                        <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 16px; background: #ffffff;">
-                            <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=200&q=80" alt="T-Shirt" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; flex-shrink: 0;">
-                            <div style="flex: 1;">
-                                <h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 700; color: #1e293b;">5 fold prophet | Heavyweight Unisex Crewneck T-shirt | Gildan® 5000</h4>
-                                <p style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #d17d39;">kr 349,-</p>
-                                <a href="https://www.hiskingdomdesigns.no" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 6px 16px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 700;">Se produkt</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 36px 0;">
-
-                    <h2 class="block-h2" style="font-family: 'Inter', sans-serif; font-weight: 800; color: #1e293b; text-align: center; margin-top: 24px; font-size: 24px;">Månedlige støttepartnere</h2>
-
-                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; color: #334155; text-align: center;">
-                    For å gjennomføre de ulike oppgavene Gud har kaldt oss til trenger vi flere månedlige støttepartnere. Be gjerne over om du kan være en av disse. Det kan være alt ifra 100 kr og opp til det som passer din økonomi. Alt taes imot med takk og vil brukt i tjeneste for Guds rike
-                    </p>
-
-                    <div style="text-align: center; margin: 24px 0;">
-                        <a href="https://www.hiskingdomministry.no/donasjoner.html" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 12px 32px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif;">Gi nå</a>
-                    </div>
-                `;
-
-                let str = JSON.stringify(loadedBlocks);
-                if (!str.includes("Andakt") || !str.includes("Lyset i hverdagen") || !str.includes("SOMMER-BASAREN")) {
-                    loadedBlocks = [{ id: 'unified_content', type: 'text', content: { text: fullRichHtml } }];
-                }
                 this.blocks = loadedBlocks;
                 this.resetEditorLanguageState(data);
                 const subjectInput = document.getElementById('newsletter-subject');
@@ -6982,7 +6887,7 @@ class NewsletterBuilder {
         // Restore header from localStorage if available
         try {
             const autosavedHeader = localStorage.getItem('hkm_builder_autosave_header_html');
-            if (autosavedHeader && autosavedHeader.trim().length > 10) {
+            if (!this.skipAutosavedHeader && autosavedHeader && autosavedHeader.trim().length > 10) {
                 const headerNode = document.querySelector('.canvas-header');
                 if (headerNode) {
                     const tempDiv = document.createElement('div');
@@ -6995,68 +6900,9 @@ class NewsletterBuilder {
             }
         } catch(e) {}
 
-        // Auto-initialize from localStorage or default HKM template if empty
         if (this.blocks.length === 0) {
-            let autosavedHtml = localStorage.getItem('hkm_builder_autosave_html');
-            const autosavedSubject = localStorage.getItem('hkm_builder_autosave_subject');
-
-            const userFullText = "Kjære venn av His Kingdom Ministry, vi håper du har hatt en flott sommerferie med mye åndelig påfyll. Vi har hatt gode feriedager på Østlandet og Sørlandet sammen med familie og venner. Vi har solgt huset vårt og har en spennende tid sammen med Gud i møte. Han kaller oss videre i arbeidet i hans rike. Det kommer snart spennende oppdateringer som er under planlegging. Dette er konkrete planer som Gud har talt til oss om og vi ønsker å invitere deg med på reisen.";
-
-            if (autosavedHtml && autosavedHtml.includes("Vi er så takknemlige")) {
-                autosavedHtml = autosavedHtml.replace(/Vi er så takknemlige for å dele månedens oppdateringer og inspirerende ord med deg\.? Gud gjør store ting i vår midte, og vi ønsker å oppmuntre deg i din vandring\.?/g, userFullText);
-                try {
-                    localStorage.setItem('hkm_builder_autosave_html', autosavedHtml);
-                } catch(e) {}
-            }
-
-            if (autosavedHtml && autosavedHtml.includes("Sommerbasar") && autosavedHtml.includes("His Kingdom Designs")) {
-                container.innerHTML = autosavedHtml;
-                if (autosavedSubject) {
-                    const subjectInput = document.getElementById('newsletter-subject');
-                    if (subjectInput && !subjectInput.value) subjectInput.value = autosavedSubject;
-                }
-            } else {
-                container.innerHTML = `
-                    <p><img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80" alt="HKM Månedsbrev" class="block-img" style="max-width: 100%; height: auto; border-radius: 12px; margin: 16px 0; display: block;"></p>
-                    <h2 class="block-h2" style="font-family: 'Inter', sans-serif; font-weight: 700; color: #1e293b; margin-top: 20px;">His Kingdom Ministry</h2>
-                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155;">Kjære venn av His Kingdom Ministry, vi håper du har hatt en flott sommerferie med mye åndelig påfyll. Vi har hatt gode feriedager på Østlandet og Sørlandet sammen med familie og venner. Vi har solgt huset vårt og har en spennende tid sammen med Gud i møte. Han kaller oss videre i arbeidet i hans rike. Det kommer snart spennende oppdateringer som er under planlegging. Dette er konkrete planer som Gud har talt til oss om og vi ønsker å invitere deg med på reisen.</p>
-
-                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 32px 0;">
-
-                    <div style="background: #fff8f0; border: 1px solid #fed7aa; border-radius: 16px; padding: 24px; margin: 24px 0; text-align: center;">
-                        <p><img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1200&q=80" alt="HKM Sommerbasar" class="block-img" style="max-width: 100%; height: auto; border-radius: 12px; margin-bottom: 16px; display: block;"></p>
-                        <h3 style="font-family: 'Inter', sans-serif; font-weight: 700; color: #9a3412; font-size: 20px; margin: 0 0 10px 0;">Velkommen til HKM Sommerbasar! 🎟️</h3>
-                        <p style="font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; color: #7c2d12; margin: 0 0 16px 0;">Bli med på vår sommerbasar! Flotte gevinster, inspirasjon og fellesskap der overskuddet går direkte til misjonsarbeidet og hjelpeprosjekter.</p>
-                        <a href="https://www.hiskingdomministry.no/donasjoner.html" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 12px 28px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif;">Kjøp basarlodder her</a>
-                    </div>
-
-                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 32px 0;">
-
-                    <div style="margin: 24px 0;">
-                        <h3 style="font-family: 'Inter', sans-serif; font-weight: 700; color: #1e293b; font-size: 18px; text-align: center; margin-bottom: 16px;">Utvalgte produkter fra His Kingdom Designs 🎨</h3>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                            <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; text-align: center; background: #ffffff;">
-                                <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&q=80" alt="Bibelvers Plakat" style="max-width: 100%; height: 140px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; display: block;">
-                                <h4 style="margin: 0 0 6px 0; font-size: 14px; font-weight: 700; color: #1e293b;">Inspirerende Plakater</h4>
-                                <p style="margin: 0 0 12px 0; font-size: 12px; color: #64748b;">Unike kristne kunstplakater med bibelvers.</p>
-                                <a href="https://www.hiskingdomministry.no" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #1B4965; color: white; padding: 8px 16px; border-radius: 999px; text-decoration: none; font-size: 12px; font-weight: 700;">Se i nettbutikken</a>
-                            </div>
-                            <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; text-align: center; background: #ffffff;">
-                                <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&q=80" alt="HKM Kort" style="max-width: 100%; height: 140px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; display: block;">
-                                <h4 style="margin: 0 0 6px 0; font-size: 14px; font-weight: 700; color: #1e293b;">Gavekort & Evangeliene</h4>
-                                <p style="margin: 0 0 12px 0; font-size: 12px; color: #64748b;">Vakre oppmuntringskort for gaver og vitnesbyrd.</p>
-                                <a href="https://www.hiskingdomministry.no" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #1B4965; color: white; padding: 8px 16px; border-radius: 999px; text-decoration: none; font-size: 12px; font-weight: 700;">Se i nettbutikken</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="text-align: center; margin: 32px 0;">
-                        <a href="https://www.hiskingdomministry.no" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 14px 36px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif; font-size: 16px;">Besøk nettsiden vår</a>
-                    </div>
-                `;
-            }
+            container.innerHTML = '<p><br></p>';
             this.normalizeCanvasBlocks(container);
-            this.syncUnifiedBlocks();
             return;
         }
 
@@ -7066,153 +6912,6 @@ class NewsletterBuilder {
         
         if (isUnified) {
             let rawText = this.blocks[0].content.text || '';
-            if (!rawText.includes("Andakt") || !rawText.includes("Lyset i hverdagen") || !rawText.includes("SOMMER-BASAREN")) {
-                const fullRichHtml = `
-                    <p><img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200&q=80" alt="HKM Månedsbrev" class="block-img" style="max-width: 100%; height: auto; border-radius: 12px; margin: 16px 0; display: block;"></p>
-
-                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155;">Kjære venn av His Kingdom Ministry, vi håper du har hatt en flott sommerferie med mye åndelig påfyll. Vi har hatt gode feriedager på østlandet og sørlandet sammen med familie og venner. Vi har solgt huset vårt og har en spennende tid sammen med Gud i møte. Han kaller oss videre i arbeidet i hans rike. Det kommer snart spennende oppdateringer som er under planlegging. Dette er konkrete planer som Gud har talt til oss om og vi ønsker å invitere deg med på reisen.</p>
-
-                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 36px 0;">
-
-                    <h2 class="block-h2" style="font-family: 'Inter', sans-serif; font-weight: 800; color: #1e293b; text-align: center; margin-top: 24px; font-size: 24px;">Basar</h2>
-
-                    <p><img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1200&q=80" alt="HKM Sommerbasar" class="block-img" style="max-width: 100%; height: auto; border-radius: 12px; margin: 16px 0; display: block;"></p>
-
-                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155;">
-                    JIPPI nå er det tid for den årlige <strong>SOMMER-BASAREN</strong> til His Kingdom Ministry! Vi er overbegeistret for de konkrete planene Gud har gitt oss i år i tjenesten for Hans rike, og spesielt også for planene som er lagt for neste år, og vi håper mange vil kjøpe lodd slik at vi kan få gjennomført de alle!
-                    </p>
-
-                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155;">
-                    <strong>Hvert lodd koster 25kr.</strong><br>
-                    <strong>VIPPS: 805381 (merk med basar!)</strong>
-                    </p>
-
-                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155;">
-                    Hvis du har gaver du ønsker å sponse basaren med, så tar vi det hjertelig imot.<br>
-                    Basartrekningen blir holdt hjemme hos oss den 1. august (mer info kommer), og du er hjertelig velkommen til å være tilstede. Vi serverer litt bevertning (med sannsynlig pølser og brus) og lover god stemning! Trekningen blir også sendt på Facebook live så du kan følge med der hvor du er, om du ikke har anledning til å komme til oss her i Sør. Vi sender premiene til deg om du ikke har anledning til å være tilstede på selve basaren.
-                    </p>
-
-                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155;">
-                    På bildene kan du se noen av alle premiene vi lodder ut, blant annet: His Kingdom Designs T-skjorter, tegneposer, plakater, klistremerker, kopper, inrammet Jesusbilde, skinnbibel, Nytestamente på engelsk/norsk, korssmykke, godterier, uro kortspill, LEGO Orkidé (18+), Sudoku bok, pizzaskjærer, vannflaske, nødradio, Hello Kitty Shampoo, notatbøker og mye mer!
-                    </p>
-
-                    <div style="text-align: center; margin: 28px 0;">
-                        <a href="https://www.hiskingdomministry.no/donasjoner.html" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 12px 32px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif;">Kjøp lodd</a>
-                    </div>
-
-                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 36px 0;">
-
-                    <h2 class="block-h2" style="font-family: 'Inter', sans-serif; font-weight: 800; color: #1e293b; text-align: center; margin-top: 24px; font-size: 24px;">Andakt</h2>
-
-                    <p><img src="https://images.unsplash.com/photo-1509114397022-ed747cca3f65?w=1200&q=80" alt="Lyset i hverdagen" class="block-img" style="max-width: 100%; height: auto; border-radius: 12px; margin: 16px 0; display: block;"></p>
-
-                    <h3 style="font-family: 'Inter', sans-serif; font-weight: 700; color: #1e293b; margin-top: 20px; font-size: 20px;">Lyset i hverdagen</h3>
-
-                    <div style="background: #fffbeb; border-left: 4px solid #d17d39; padding: 14px 18px; margin: 18px 0; border-radius: 6px;">
-                        <p style="font-family: 'Georgia', serif; font-style: italic; font-size: 15px; color: #78350f; margin: 0 0 4px 0;">«Ditt ord er en lykt for min fot og et lys på min sti.»</p>
-                        <p style="font-family: 'Inter', sans-serif; font-size: 13px; color: #b45309; margin: 0; font-weight: 700;">— Salme 119:105</p>
-                    </div>
-
-                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155;">
-                    Når vi går ute i mørket med en lommelykt, lyser den sjelden opp hele veien frem til målet. Den lyser akkurat nok opp til at vi ser hvor vi skal sette det neste steget.
-                    </p>
-
-                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155;">
-                    Noen ganger i livet skulle vi ønske vi hadde en stor lyskaster. Vi vil gjerne se hele kartet: Hva skjer neste år? Hvordan løser denne situasjonen seg? Hvorfor ble det som det ble?
-                    </p>
-
-                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155;">
-                    Men Gud lover oss sjeldent å belyse hele fremtiden på én gang. I stedet tilbyr han seg å være en lykt for foten vår. Han gir oss akkurat nok lys, nåde og styrke til det skrittet vi skal ta i dag.
-                    </p>
-
-                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155;">
-                    Når bekymringene for morgendagen melder seg, kan vi få puste ut. Vi trenger ikke å ha alle svarene klare for neste uke eller neste år. Vi blir bedt om å stole på at Han som holder morgendagen i sin hånd, også går ved siden av oss i dag – ett skritt av gangen.
-                    </p>
-
-                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700; color: #1e293b;">En kort bønn</p>
-
-                    <div style="background: #fffbeb; border: 1px solid #fef3c7; padding: 18px; border-radius: 12px; margin: 18px 0;">
-                        <p style="font-family: 'Georgia', serif; font-style: italic; font-size: 15px; line-height: 1.7; color: #78350f; margin: 0;">
-                        Kjære Gud, Takk for at du er med meg i dag. Hjelp meg å slippe taket på bekymringene for fremtiden, og lær meg å stole på at du gir meg det jeg trenger for dagen i dag. Vis meg hvor jeg skal sette mitt neste steg, og gi mitt hjerte trygghet og fred. Amen!
-                        </p>
-                    </div>
-
-                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 36px 0;">
-
-                    <h2 class="block-h2" style="font-family: 'Inter', sans-serif; font-weight: 800; color: #1e293b; text-align: center; margin-top: 24px; font-size: 24px;">Butikk</h2>
-
-                    <p style="font-family: 'Inter', sans-serif; font-size: 14px; text-align: center; color: #64748b; margin-bottom: 24px;">
-                    Sjekk ut våres produkter i våres butikk. Vi har klær, kopper, klistremerker og andre produkter. Ta en tur innom <a href="https://www.hiskingdomdesigns.no" target="_blank" style="color: #2563eb; text-decoration: underline;">www.hiskingdomdesigns.no</a>
-                    </p>
-
-                    <!-- PRODUCT LIST -->
-                    <div style="display: flex; flex-direction: column; gap: 16px; margin: 24px 0;">
-                        <!-- Product 1 -->
-                        <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 16px; background: #ffffff;">
-                            <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=200&q=80" alt="Art Print" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; flex-shrink: 0;">
-                            <div style="flex: 1;">
-                                <h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 700; color: #1e293b;">"Darkness Only Fights What Is Light" – Minimalist Typography Art Print</h4>
-                                <p style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #d17d39;">kr 129,-</p>
-                                <a href="https://www.hiskingdomdesigns.no" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 6px 16px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 700;">Se produkt</a>
-                            </div>
-                        </div>
-
-                        <!-- Product 2 -->
-                        <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 16px; background: #ffffff;">
-                            <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&q=80" alt="Mug" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; flex-shrink: 0;">
-                            <div style="flex: 1;">
-                                <h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 700; color: #1e293b;">QUEEN BEE 11oz Ceramic Mug</h4>
-                                <p style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #d17d39;">kr 199,-</p>
-                                <a href="https://www.hiskingdomdesigns.no" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 6px 16px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 700;">Se produkt</a>
-                            </div>
-                        </div>
-
-                        <!-- Product 3 -->
-                        <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 16px; background: #ffffff;">
-                            <img src="https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=200&q=80" alt="Hat" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; flex-shrink: 0;">
-                            <div style="flex: 1;">
-                                <h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 700; color: #1e293b;">Sunshine Vintage Cotton Dad Hat</h4>
-                                <p style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #d17d39;">kr 349,-</p>
-                                <a href="https://www.hiskingdomdesigns.no" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 6px 16px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 700;">Se produkt</a>
-                            </div>
-                        </div>
-
-                        <!-- Product 4 -->
-                        <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 16px; background: #ffffff;">
-                            <img src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=200&q=80" alt="Hoodie" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; flex-shrink: 0;">
-                            <div style="flex: 1;">
-                                <h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 700; color: #1e293b;">No room for fear - Classic Unisex Zip Hoodie</h4>
-                                <p style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #d17d39;">kr 699,-</p>
-                                <a href="https://www.hiskingdomdesigns.no" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 6px 16px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 700;">Se produkt</a>
-                            </div>
-                        </div>
-
-                        <!-- Product 5 -->
-                        <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 16px; background: #ffffff;">
-                            <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=200&q=80" alt="T-Shirt" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; flex-shrink: 0;">
-                            <div style="flex: 1;">
-                                <h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 700; color: #1e293b;">5 fold prophet | Heavyweight Unisex Crewneck T-shirt | Gildan® 5000</h4>
-                                <p style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #d17d39;">kr 349,-</p>
-                                <a href="https://www.hiskingdomdesigns.no" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 6px 16px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 700;">Se produkt</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 36px 0;">
-
-                    <h2 class="block-h2" style="font-family: 'Inter', sans-serif; font-weight: 800; color: #1e293b; text-align: center; margin-top: 24px; font-size: 24px;">Månedlige støttepartnere</h2>
-
-                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; color: #334155; text-align: center;">
-                    For å gjennomføre de ulike oppgavene Gud har kaldt oss til trenger vi flere månedlige støttepartnere. Be gjerne over om du kan være en av disse. Det kan være alt ifra 100 kr og opp til det som passer din økonomi. Alt taes imot med takk og vil brukt i tjeneste for Guds rike
-                    </p>
-
-                    <div style="text-align: center; margin: 24px 0;">
-                        <a href="https://www.hiskingdomministry.no/donasjoner.html" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 12px 32px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif;">Gi nå</a>
-                    </div>
-                `;
-                rawText = fullRichHtml;
-                this.blocks = [{ id: 'unified_content', type: 'text', content: { text: fullRichHtml } }];
-            }
             unifiedHtml = rawText;
         } else {
             // Retro-compile legacy blocks
@@ -11010,12 +10709,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
         setTimeout(() => {
             const openEmptyBtn = document.getElementById('open-empty-builder-btn');
             if (openEmptyBtn) {
-                openEmptyBtn.onclick = () => {
-                    this.blocks = [];
-                    document.getElementById('newsletter-subject').value = '';
-                    this.toggleMode('builder');
-                    this.renderCanvas();
-                };
+                openEmptyBtn.onclick = () => this.createNewStudioItem('newsletter');
             }
             
             const generateBtn = document.getElementById('generate-ai-ideas-btn');
@@ -11548,17 +11242,11 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
 
     createNewStudioItem(type) {
         if (type === 'newsletter') {
-            this.blocks = [];
-            this.resetEditorLanguageState();
-            document.getElementById('newsletter-subject').value = '';
-            
-            // Set URL parameter immediately so reload stays in builder
             const url = new URL(window.location.href);
             url.searchParams.set('draftId', 'new');
             window.history.pushState({}, '', url.toString());
-            
-            this.toggleMode('builder');
-            this.renderCanvas();
+            this.startEmptyNewsletter();
+            this.chooseNewsletterStart();
         } else if (type === 'blog' || type === 'teaching') {
             sessionStorage.setItem('hkm_admin_create_item_state', type);
             window.location.href = `/admin/index.html#${type}`;

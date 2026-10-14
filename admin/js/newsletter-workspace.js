@@ -14,6 +14,14 @@ export function inspectNewsletter(subject, blocks, html) {
 }
 const root = document.getElementById('newsletter-workspace');
 if (root) {
+    const isNewsletterArea = new URLSearchParams(location.search).get('section') === 'newsletter';
+    root.hidden = !isNewsletterArea;
+    document.body.classList.toggle('newsletter-area-active', isNewsletterArea);
+    root.querySelector('[data-open-subscribers]')?.addEventListener('click', () => {
+        if (!window.builder) return;
+        window.builder.toggleMode('builder');
+        window.builder.switchSidebarView('subscribers');
+    });
     let campaigns = [];
     let drafts = [];
     let templates = [];
@@ -66,6 +74,19 @@ if (root) {
         finally { root.querySelector('[data-workspace-refresh]').disabled=false; }
     });
     search.addEventListener('input',render); filter.addEventListener('change',render);
+    if (isNewsletterArea) {
+        let attempts = 0;
+        const readyTimer = setInterval(() => {
+            if (window.firebaseService?.db && window.firebase?.auth().currentUser) {
+                clearInterval(readyTimer);
+                root.querySelector('[data-workspace-refresh]').click();
+            } else if (++attempts >= 100) {
+                clearInterval(readyTimer);
+                status.textContent = 'Trykk Oppdater når innloggingen er klar.';
+            }
+        }, 100);
+        window.addEventListener('pagehide', () => clearInterval(readyTimer), { once: true });
+    }
     root.querySelectorAll('[data-workspace-view]').forEach(button=>button.addEventListener('click',()=>{
         root.querySelectorAll('[data-workspace-view]').forEach(tab=>tab.setAttribute('aria-pressed',String(tab===button)));
         root.querySelectorAll('[data-workspace-panel]').forEach(panel=>panel.hidden=panel.dataset.workspacePanel!==button.dataset.workspaceView);
