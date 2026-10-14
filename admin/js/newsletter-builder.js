@@ -468,7 +468,7 @@ class NewsletterBuilder {
             list.append(button);
         };
         try {
-            const snapshot = await this.safeGet(window.firebaseService.db.collection('newsletter_templates').orderBy('createdAt', 'desc'), 8000);
+            const snapshot = await this.safeGet(window.firebaseService.db.collection('newsletter_templates'), 8000);
             list.replaceChildren();
             addProductTemplate();
             snapshot.forEach(doc => {
@@ -7432,7 +7432,8 @@ class NewsletterBuilder {
         const heading = document.createElement('h2'); heading.textContent = 'Lagre som …'; heading.id = 'newsletter-save-title';
         const create = document.createElement('button'); create.type = 'button'; create.textContent = 'Opprett ny mal'; create.className = 'save-new-template';
         const label = document.createElement('label'); label.textContent = 'Eller erstatt en eksisterende mal'; label.htmlFor = 'newsletter-replace-template';
-        const select = document.createElement('select'); select.setAttribute('aria-label', 'Velg mal som skal erstattes'); select.id = 'newsletter-replace-template';
+        const select = document.createElement('select'); select.setAttribute('aria-label', 'Velg mal som skal erstattes'); select.id = 'newsletter-replace-template'; select.disabled = true;
+        const placeholder = document.createElement('option'); placeholder.value = ''; placeholder.textContent = 'Henter lagrede maler …'; select.append(placeholder);
         const replace = document.createElement('button'); replace.type = 'button'; replace.textContent = 'Erstatt valgt mal'; replace.disabled = true;
         const message = document.createElement('p'); message.textContent = 'Henter lagrede maler …';
         const cancel = document.createElement('button'); cancel.type = 'button'; cancel.textContent = 'Avbryt';
@@ -7462,12 +7463,16 @@ class NewsletterBuilder {
             }
         };
         try {
-            const snap = await this.safeGet(window.firebaseService.db.collection('newsletter_templates').orderBy('createdAt', 'desc'), 8000);
-            snap.forEach(doc => { const data = doc.data(); if (data.isDraft === true) return;
+            const snap = await this.safeGet(window.firebaseService.db.collection('newsletter_templates'), 8000);
+            select.replaceChildren();
+            let draftCount = 0;
+            snap.forEach(doc => { const data = doc.data(); if (data.isDraft === true) { draftCount++; return; }
                 const option = document.createElement('option'); option.value = doc.id; option.textContent = data.name || 'Uten navn'; select.append(option);
             });
-            replace.disabled = !select.options.length;
-            message.textContent = select.options.length ? 'Velg en mal for å erstatte innholdet, eller lagre en ny.' : 'Ingen lagrede maler. Velg Ny mal.';
+            const hasTemplates = select.options.length > 0;
+            replace.disabled = !hasTemplates; select.disabled = !hasTemplates;
+            if (!hasTemplates) { placeholder.textContent = 'Ingen lagrede maler'; select.append(placeholder); }
+            message.textContent = hasTemplates ? 'Velg en mal for å erstatte innholdet, eller lagre en ny.' : `Ingen lagrede maler ble funnet${draftCount ? ', men ' + draftCount + ' kladder finnes under Kladder' : ''}. Standardmaler må først lagres med «Opprett ny mal».`;
         } catch { message.textContent = 'Kunne ikke hente malene. Prøv igjen.'; }
     }
 
@@ -7523,7 +7528,7 @@ class NewsletterBuilder {
         try {
             const container = document.getElementById('templates-list');
             if (!container) return;
-            const snap = await this.safeGet(window.firebaseService.db.collection('newsletter_templates').orderBy('createdAt', 'desc'), 8000);
+            const snap = await this.safeGet(window.firebaseService.db.collection('newsletter_templates'), 8000);
             
             let count = 0;
             container.innerHTML = '';
@@ -9727,7 +9732,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
         try {
             const container = document.getElementById('drafts-list');
             if (!container) return;
-            const snap = await this.safeGet(window.firebaseService.db.collection('newsletter_templates').orderBy('createdAt', 'desc'), 8000);
+            const snap = await this.safeGet(window.firebaseService.db.collection('newsletter_templates'), 8000);
             
             let count = 0;
             container.innerHTML = '';
@@ -10967,7 +10972,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             this.draftsCache = {};
             this.templatesCache = {};
 
-            const snap = await this.safeGet(window.firebaseService.db.collection('newsletter_templates').orderBy('createdAt', 'desc'), 8000);
+            const snap = await this.safeGet(window.firebaseService.db.collection('newsletter_templates'), 8000);
             
             let draftsHtml = '';
             let templatesHtml = '';

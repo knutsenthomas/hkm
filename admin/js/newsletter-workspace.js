@@ -105,7 +105,7 @@ if (root) {
             const snapshots = await Promise.all([
                 db.collection('newsletter_campaigns').orderBy('queuedAt', 'desc').limit(25).get(),
                 db.collection('newsletter_campaigns').orderBy('sentAt', 'desc').limit(25).get(),
-                db.collection('newsletter_templates').orderBy('createdAt', 'desc').limit(25).get()
+                db.collection('newsletter_templates').get()
             ]);
             const map = new Map(); snapshots.slice(0,2).forEach(snapshot => snapshot.forEach(doc => map.set(doc.id, { ...doc.data(), id: doc.id })));
             campaigns = [...map.values()].sort((a,b)=>time(date(b))-time(date(a)));
@@ -114,7 +114,7 @@ if (root) {
             root.querySelector('[data-count-campaigns]').textContent=campaigns.length;
             root.querySelector('[data-count-drafts]').textContent=drafts.length;
             root.querySelector('[data-count-sent]').textContent=campaigns.reduce((sum,c)=>sum+Number(c.sentCount||0),0);
-            status.textContent='Viser siste 25 kampanjer per datofelt og siste 25 kladder/maler. «Sendt» betyr sendt fra serveren, ikke bekreftet levering. «Uavklart» betyr at forsøket mangler avslutning og er eldre enn 24 timer eller mangler tidspunkt. Ingen utsendinger startes på nytt.';
+            status.textContent='Viser siste 25 kampanjer per datofelt og lagrede kladder/maler. «Sendt» betyr sendt fra serveren, ikke bekreftet levering. «Uavklart» betyr at forsøket mangler avslutning og er eldre enn 24 timer eller mangler tidspunkt. Ingen utsendinger startes på nytt.';
             render();
         } catch { status.textContent='Kunne ikke hente oversikten. Kontroller tilgangen og prøv igjen.'; }
         finally { root.querySelector('[data-workspace-refresh]').disabled=false; }
