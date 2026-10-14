@@ -92,5 +92,10 @@ html[data-theme="dark"] .donor-bank-details { border-color: #475569; }
 html[data-theme="dark"] .donor-card-eyebrow { color: #ffcfaa; }
 @media (max-width: 900px) { .donor-welcome-layout { grid-template-columns: 1fr; gap: 36px; } .donor-welcome { padding: 0 0 48px; } .donor-welcome-copy { padding-top: 36px; } .donor-gift-card { margin-top: 0; } .donor-impact-grid { grid-template-columns: 1fr; gap: 16px; } }
 @media (max-width: 480px) { .donor-gift-card { padding: 28px 20px; border-radius: 22px; }  .donor-gift-card h2 { font-size: 25px; } }
+@media (max-width: 768px) {
+    .donor-welcome.section { padding-top: 20px !important; }
+    .donor-welcome-copy { padding-top: 0; }
+    .donor-welcome-copy h2 { margin-top: 0; }
+}
 
 html[data-theme="dark"] .donor-impact-grid article { border-color: #334155; }
