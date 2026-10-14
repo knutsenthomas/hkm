@@ -7415,6 +7415,9 @@ class NewsletterBuilder {
             "F.eks. Månedlig nyhetsbrev",
             async (name) => {
                 try {
+                    clearTimeout(this.autosaveTimer);
+                    // Finish an active autosave before changing the editor's document identity.
+                    while (this._autosaveInFlight) await new Promise(resolve => setTimeout(resolve, 50));
                     this.syncUnifiedBlocks();
                     const subject = this.currentEditorLang === 'en'
                         ? (this.subjectNo || '')
@@ -7433,7 +7436,22 @@ class NewsletterBuilder {
                         this.currentDraftName = name;
                     } else {
                         data.createdAt = new Date().toISOString();
-                        await window.firebaseService.db.collection('newsletter_templates').add(data);
+                        const templateRef = await window.firebaseService.db.collection('newsletter_templates').add(data);
+                        this.currentDraftId = templateRef.id;
+                    }
+                    this.currentDocumentIsTemplate = true;
+                    this.currentDraftName = name;
+                    this.hasCustomDraftName = true;
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('draftId', this.currentDraftId);
+                    window.history.replaceState({}, '', url.toString());
+                    try { sessionStorage.setItem('hkm_active_draft_id', this.currentDraftId); } catch (_) {}
+                    for (const id of ['save-draft-btn', 'save-template-btn']) {
+                        const button = document.getElementById(id);
+                        if (!button) continue;
+                        button.title = 'Lagre mal';
+                        const label = button.querySelector('.btn-label-text');
+                        if (label) label.textContent = 'Lagre mal';
                     }
                     showToast("Malen er lagret under Nyhetsbrev → Maler. Trykk Oppdater i oversikten.", "success");
                     this.loadTemplates();
