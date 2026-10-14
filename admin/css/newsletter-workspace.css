@@ -377,3 +377,6 @@ body.builder-active #newsletter-builder-layout #blocks-container p.selected-bloc
 body.builder-active #newsletter-builder-layout #blocks-container p:hover,
 body.builder-active #newsletter-builder-layout #blocks-container [data-editor-active-empty="true"] { outline:none!important; box-shadow:none!important; }
 body.builder-active #newsletter-builder-layout #blocks-container p.selected-block-active::before { display:none!important; }
+
+#newsletter-builder-layout #elements-panel .desktop-elements-header { padding:18px 24px; }
+#newsletter-builder-layout #elements-panel .elements-search-container { margin:20px 24px 10px!important; }
