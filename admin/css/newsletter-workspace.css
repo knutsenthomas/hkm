@@ -354,3 +354,11 @@ body.builder-active #newsletter-builder-layout .builder-toolbar-header .toolbar-
     body.builder-active #newsletter-builder-layout .newsletter-history-actions { gap:0; }
     body.builder-active #newsletter-builder-layout .newsletter-history-actions button { width:28px; height:36px; }
 }
+
+#mobile-floating-add { display:none; }
+@media (max-width:991px) {
+    body.builder-active #newsletter-builder-layout .builder-dark-sidebar { display:none!important; }
+    body.builder-active:not(.builder-recipients-open) #mobile-floating-add { display:flex; position:fixed; right:max(16px,env(safe-area-inset-right)); bottom:calc(20px + env(safe-area-inset-bottom)); z-index:1100; align-items:center; justify-content:center; width:48px; height:48px; padding:0; border:0; border-radius:14px; background:linear-gradient(135deg,var(--admin-accent,#d17d39),var(--admin-accent-dark,#bd4f2a)); color:#fff; box-shadow:0 4px 14px #bd4f2a30; cursor:pointer; }
+    #mobile-floating-add .material-symbols-outlined { font-size:28px; }
+    #mobile-floating-add:focus-visible { outline:2px solid var(--admin-accent,#d17d39); outline-offset:3px; }
+}

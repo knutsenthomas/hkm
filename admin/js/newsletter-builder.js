@@ -357,7 +357,9 @@ class NewsletterBuilder {
         const isOpen = elementsPanel.classList.contains('mobile-drawer-open');
         this.closeMobileDrawers();
 
+        document.getElementById('mobile-floating-add')?.setAttribute('aria-expanded', String(!isOpen));
         if (!isOpen) {
+            this.saveSelection();
             elementsPanel.classList.add('mobile-drawer-open');
             if (backdrop) backdrop.classList.add('active');
         }
@@ -379,6 +381,7 @@ class NewsletterBuilder {
         const propsPanel = document.querySelector('.builder-properties-panel');
         const backdrop = document.getElementById('mobile-elements-backdrop');
 
+        document.getElementById('mobile-floating-add')?.setAttribute('aria-expanded', 'false');
         if (elementsPanel) elementsPanel.classList.remove('mobile-drawer-open');
         if (propsPanel) propsPanel.classList.remove('mobile-drawer-open');
         if (backdrop) backdrop.classList.remove('active');
