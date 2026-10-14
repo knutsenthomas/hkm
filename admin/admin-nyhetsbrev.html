@@ -965,7 +965,7 @@
 
             <!-- Verktøylinje / Sub-Header -->
             <div class="builder-toolbar-header" style="height: 56px; min-height: 56px; max-height: 56px; background: #ffffff; border-bottom: 1px solid #e2e8f0; display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: space-between; padding: 0 16px; box-sizing: border-box; width: 100%; max-width: 100%; position: relative; z-index: 1000; overflow: visible;">
-                <div class="toolbar-left-cell" style="display: flex; align-items: center; justify-content: flex-start; height: 100%; flex: 0 1 auto; min-width: 0; gap: 8px;">
+                <div class="toolbar-left-cell" style="display: flex; align-items: center; justify-content: flex-start; height: 100%; flex: 0 1 auto; min-width: 0; gap: 8px;"><button type="button" class="newsletter-back-button" onclick="window.builder?.openNewsletterOverview()"><span class="material-symbols-outlined">arrow_back</span>Tilbake</button>
                     <button type="button" class="mobile-nav-toggle" aria-label="Vis meny" title="Vis meny">
                         <span class="material-symbols-outlined">menu</span>
                     </button>
@@ -973,65 +973,27 @@
                         <span class="material-symbols-outlined">add</span>
                         <span>Elementer</span>
                     </button>
-                    <h3 id="sidebar-title" style="margin: 0 !important; font-size: 18px !important; font-weight: 700 !important; color: #1e293b !important; line-height: 1 !important; white-space: nowrap !important; display: flex !important; align-items: center !important;">Elementer</h3>
-                    <div id="newsletter-autosave-status" class="autosave-pill" style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: #10b981; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 20px; padding: 2px 8px; margin-left: 4px;">
-                        <span class="material-symbols-outlined" style="font-size: 14px;">cloud_done</span>
-                        <span id="newsletter-autosave-text" style="font-weight: 600;">Lagret</span>
-                    </div>
+                    <h3 id="sidebar-title" style="display:none!important;">Elementer</h3>
+
                 </div>
 
-                <div class="toolbar-center-cell" style="display: flex; align-items: center; justify-content: center; height: 100%; flex: 0 1 auto; min-width: 0; gap: 12px;">
-                    <div class="device-switch-pill">
-                        <button type="button" class="device-pill-btn device-btn active" data-view="desktop" title="Skrivebord">
-                            <span class="material-symbols-outlined">desktop_windows</span>
-                            <span>Skrivebord</span>
-                        </button>
-                        <button type="button" class="device-pill-btn device-btn" data-view="mobile" title="Mobil">
-                            <span class="material-symbols-outlined">smartphone</span>
-                            <span>Mobil</span>
-                        </button>
-                    </div>
-                </div>
+
 
                 <div class="toolbar-right-cell toolbar-right-actions" style="display: flex; align-items: center; justify-content: flex-end; height: 100%; gap: 8px; flex: 0 0 auto; margin-left: auto; white-space: nowrap;">
                     <!-- TOSPRÅKLIG SPRÅKVELGER -->
-                    <div id="editor-language-switcher" style="display: flex; align-items: center; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px; padding: 3px; gap: 4px; flex-shrink: 0; margin-right: 4px;">
-                        <button type="button" id="editor-lang-btn-no" class="editor-lang-btn active" style="display: flex; align-items: center; gap: 6px; padding: 5px 12px; border: none; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; background: #ffffff; color: #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.06); transition: all 0.2s;">
-                            <span>NO</span><span class="lang-text">Norsk</span>
-                        </button>
-                        <button type="button" id="editor-lang-btn-en" class="editor-lang-btn" style="display: flex; align-items: center; gap: 6px; padding: 5px 12px; border: none; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; background: transparent; color: #64748b; transition: all 0.2s;">
-                            <span class="material-symbols-outlined lang-translate-icon" style="font-size: 16px; color: #2563eb;">translate</span>
-                            <span class="lang-text">English</span>
-                        </button>
-                        <button type="button" id="editor-retranslate-btn" title="Re-oversett fra norsk med AI" style="display: none; align-items: center; gap: 4px; padding: 5px 10px; border: none; border-radius: 9px; font-size: 12px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af; transition: all 0.2s;">
-                            <span class="material-symbols-outlined" style="font-size: 15px;">sync</span>
-                            <span>Re-oversett</span>
-                        </button>
-                    </div>
 
-                    <div class="newsletter-history-actions" id="newsletter-history-actions" role="group" aria-label="Historikk"><button type="button" class="desktop-richtools-btn" data-tool="undo" title="Angre" aria-label="Angre"><span class="material-symbols-outlined">undo</span></button><button type="button" class="desktop-richtools-btn" data-tool="redo" title="Gjør om" aria-label="Gjør om"><span class="material-symbols-outlined">redo</span></button></div>
+
+                                        <div id="newsletter-autosave-status" class="autosave-pill" style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: #10b981; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 20px; padding: 2px 8px; margin-left: 4px;">
+                        <span class="material-symbols-outlined" style="font-size: 14px;">cloud_done</span>
+                        <span id="newsletter-autosave-text" style="font-weight: 600;">Lagret</span>
+                    </div>
+<div class="newsletter-history-actions" id="newsletter-history-actions" role="group" aria-label="Historikk"><button type="button" class="desktop-richtools-btn" data-tool="undo" title="Angre" aria-label="Angre"><span class="material-symbols-outlined">undo</span></button><button type="button" class="desktop-richtools-btn" data-tool="redo" title="Gjør om" aria-label="Gjør om"><span class="material-symbols-outlined">redo</span></button></div>
                     <button id="save-draft-btn" class="btn-secondary-outline" title="Lagre utkast" style="position: relative !important; margin: 0 !important;">
                         <span class="material-symbols-outlined" style="font-size: 18px;">save</span>
                         <span class="btn-label-text">Lagre utkast</span>
                     </button>
-                    <span id="editing-template-name" hidden style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;"></span>
-                    <div class="newsletter-more-actions">
-                        <button type="button" id="newsletter-more-toggle" class="btn-secondary-outline" aria-label="Flere handlinger" aria-expanded="false" aria-controls="newsletter-more-menu"><span class="material-symbols-outlined">more_horiz</span></button>
-                        <div id="newsletter-more-menu" role="menu" aria-label="Flere handlinger" hidden>
-                    <button id="save-template-btn" class="newsletter-more-item" role="menuitem" title="Lagre som …">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">description</span>
-                        <span class="btn-label-text">Lagre som …</span>
-                    </button>
-                    <button id="version-history-btn" class="newsletter-more-item" role="menuitem" title="Versjonshistorikk">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">history</span>
-                        <span class="btn-label-text">Versjoner</span>
-                    </button>
-                            <button type="button" class="newsletter-more-item" role="menuitem" data-editor-action="duplicate"><span class="material-symbols-outlined">content_copy</span>Dupliser til nytt utkast</button>
-                            <button type="button" class="newsletter-more-item" role="menuitem" data-editor-action="export"><span class="material-symbols-outlined">download</span>Eksporter HTML</button>
-                            <button type="button" class="newsletter-more-item" role="menuitem" data-editor-action="overview"><span class="material-symbols-outlined">dashboard</span>Nyhetsbrevoversikt</button>
-                            <button type="button" class="newsletter-more-item" role="menuitem" data-editor-action="help"><span class="material-symbols-outlined">help</span>Hjelp og snarveier</button>
-                        </div>
-                    </div>
+
+
                     <button id="preview-btn" class="btn-secondary-outline" title="Forhåndsvisning">
                         <span class="material-symbols-outlined" style="font-size: 18px;">visibility</span>
                         <span class="btn-label-text">Forhåndsvisning</span>
@@ -1076,6 +1038,47 @@
                                     <small>Last ned e-post kildekode</small>
                                 </div>
                             </button>
+                        </div>
+                    </div>
+                    <div class="newsletter-more-actions">
+                        <button type="button" id="newsletter-more-toggle" class="btn-secondary-outline" aria-label="Flere handlinger" aria-expanded="false" aria-controls="newsletter-more-menu"><span class="material-symbols-outlined">more_horiz</span></button>
+                        <div id="newsletter-more-menu" role="menu" aria-label="Flere handlinger" hidden>                    <span id="editing-template-name" hidden style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;"></span>
+                <div class="toolbar-center-cell" style="display: flex; align-items: center; justify-content: center; height: 100%; flex: 0 1 auto; min-width: 0; gap: 12px;">
+                    <div class="device-switch-pill">
+                        <button type="button" class="device-pill-btn device-btn active" data-view="desktop" title="Skrivebord">
+                            <span class="material-symbols-outlined">desktop_windows</span>
+                            <span>Skrivebord</span>
+                        </button>
+                        <button type="button" class="device-pill-btn device-btn" data-view="mobile" title="Mobil">
+                            <span class="material-symbols-outlined">smartphone</span>
+                            <span>Mobil</span>
+                        </button>
+                    </div>
+                </div>                    <div id="editor-language-switcher" style="display: flex; align-items: center; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px; padding: 3px; gap: 4px; flex-shrink: 0; margin-right: 4px;">
+                        <button type="button" id="editor-lang-btn-no" class="editor-lang-btn active" style="display: flex; align-items: center; gap: 6px; padding: 5px 12px; border: none; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; background: #ffffff; color: #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.06); transition: all 0.2s;">
+                            <span>NO</span><span class="lang-text">Norsk</span>
+                        </button>
+                        <button type="button" id="editor-lang-btn-en" class="editor-lang-btn" style="display: flex; align-items: center; gap: 6px; padding: 5px 12px; border: none; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; background: transparent; color: #64748b; transition: all 0.2s;">
+                            <span class="material-symbols-outlined lang-translate-icon" style="font-size: 16px; color: #2563eb;">translate</span>
+                            <span class="lang-text">English</span>
+                        </button>
+                        <button type="button" id="editor-retranslate-btn" title="Re-oversett fra norsk med AI" style="display: none; align-items: center; gap: 4px; padding: 5px 10px; border: none; border-radius: 9px; font-size: 12px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af; transition: all 0.2s;">
+                            <span class="material-symbols-outlined" style="font-size: 15px;">sync</span>
+                            <span>Re-oversett</span>
+                        </button>
+                    </div>
+                    <button id="save-template-btn" class="newsletter-more-item" role="menuitem" title="Lagre som …">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">description</span>
+                        <span class="btn-label-text">Lagre som …</span>
+                    </button>
+                    <button id="version-history-btn" class="newsletter-more-item" role="menuitem" title="Versjonshistorikk">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">history</span>
+                        <span class="btn-label-text">Versjoner</span>
+                    </button>
+                            <button type="button" class="newsletter-more-item" role="menuitem" data-editor-action="duplicate"><span class="material-symbols-outlined">content_copy</span>Dupliser til nytt utkast</button>
+                            <button type="button" class="newsletter-more-item" role="menuitem" data-editor-action="export"><span class="material-symbols-outlined">download</span>Eksporter HTML</button>
+                            <button type="button" class="newsletter-more-item" role="menuitem" data-editor-action="overview"><span class="material-symbols-outlined">dashboard</span>Nyhetsbrevoversikt</button>
+                            <button type="button" class="newsletter-more-item" role="menuitem" data-editor-action="help"><span class="material-symbols-outlined">help</span>Hjelp og snarveier</button>
                         </div>
                     </div>
                 </div>

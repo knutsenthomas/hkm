@@ -245,3 +245,21 @@ body.builder-active #newsletter-builder-layout #newsletter-canvas.canvas-paper-f
     body.builder-active #newsletter-builder-layout #editing-template-name { min-width:0!important; flex:0 1 120px!important; max-width:120px!important; }
     body.builder-active #newsletter-builder-layout .btn-group-publish { flex-shrink:0!important; }
 }
+
+/* Minimal document action row; language and canvas preview controls live in More. */
+body.builder-active #newsletter-builder-layout .builder-toolbar-header { display:flex!important; flex-wrap:nowrap!important; }
+body.builder-active #newsletter-builder-layout .toolbar-left-cell { flex:0 0 auto!important; }
+body.builder-active #newsletter-builder-layout .toolbar-right-actions { flex:1 1 auto!important; flex-wrap:nowrap!important; }
+.newsletter-back-button { display:flex; align-items:center; gap:8px; border:0; background:transparent; color:var(--admin-text,#2c3e50); cursor:pointer; padding:10px; font:inherit; font-size:14px; }
+body.builder-active #newsletter-builder-layout .builder-toolbar-header .mobile-nav-toggle,
+body.builder-active #newsletter-builder-layout .builder-toolbar-header #mobile-add-element-btn { display:none!important; }
+body.builder-active #newsletter-builder-layout #newsletter-autosave-status { display:flex!important; visibility:visible!important; flex:0 1 auto!important; }
+body.builder-active #newsletter-builder-layout #newsletter-autosave-text { display:inline!important; }
+#newsletter-builder-layout #newsletter-more-menu #editing-template-name { display:block!important; max-width:100%!important; padding:8px 12px; font-size:12px; }
+#newsletter-builder-layout #newsletter-more-menu .toolbar-center-cell { display:flex!important; position:static!important; width:100%!important; padding:8px 0; }
+#newsletter-builder-layout #newsletter-more-menu #editor-language-switcher { margin:8px 0!important; width:100%; box-sizing:border-box; }
+@media(max-width:600px) {
+    body.builder-active #newsletter-builder-layout #newsletter-autosave-status { display:none!important; }
+    .newsletter-back-button { font-size:12px; padding:6px; }
+    body.builder-active #newsletter-builder-layout .toolbar-right-actions { gap:4px!important; }
+}
