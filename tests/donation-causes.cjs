@@ -1,12 +1,12 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const {JSDOM}=require('jsdom');
 const {validateRecurring}=require('../functions/recurring-payments.cjs');
-const source=fs.readFileSync('js/donation-causes.js','utf8').replace(/^import .*;\n/,'').replaceAll('export function','function');
+const source=fs.readFileSync('js/donation-causes.js','utf8').replace(/^import .*;\n/gm,'').replaceAll('export function','function');
 const fixture={items:[{id:'skoleprosjekt',title:'Skoleprosjekt',description:'St√∏tt barn og skole',collected:1500,goal:10000,active:true,infoUrl:'https://example.com/more'},{id:'hidden',title:'Hidden',active:false}]};
 (async()=>{
  for(const query of ['','?aksjon=skoleprosjekt','?aksjon=hidden']) {
   const dom=new JSDOM(fs.readFileSync('donasjoner.html','utf8'),{url:'https://example.com/donasjoner'+query});
-  const context={console,document:dom.window.document,location:dom.window.location,URL,URLSearchParams,Event:dom.window.Event,firebaseService:{getPageContent:async()=>fixture}};
+  const context={console,document:dom.window.document,location:dom.window.location,URL,URLSearchParams,Event:dom.window.Event,firebaseService:{invalidatePageContentCache:()=>{},getPageContent:async()=>fixture}};
   vm.createContext(context);vm.runInContext(source,context);await new Promise(resolve=>setImmediate(resolve));
   const document=dom.window.document;
   assert.equal(document.querySelectorAll('#donor-gift-fund option[value="skoleprosjekt"]').length,1);
@@ -18,7 +18,7 @@ const fixture={items:[{id:'skoleprosjekt',title:'Skoleprosjekt',description:'St√
  for (const [path,lang] of [['en/donations.html','en'],['es/donaciones.html','es']]) {
   const dom=new JSDOM(fs.readFileSync(path,'utf8'),{url:'https://example.com/'+path+'?aksjon=skoleprosjekt'});
   const localized={items:[{...fixture.items[0],translations:{[lang]:{title:'Translated title',description:'Translated description'}},giving:{amountMode:'fixed',amounts:[750],frequency:'once'}}]};
-  const context={console,document:dom.window.document,location:dom.window.location,URL,URLSearchParams,Event:dom.window.Event,firebaseService:{getPageContent:async()=>localized}};
+  const context={console,document:dom.window.document,location:dom.window.location,URL,URLSearchParams,Event:dom.window.Event,firebaseService:{invalidatePageContentCache:()=>{},getPageContent:async()=>localized}};
   vm.createContext(context);vm.runInContext(source,context);await new Promise(resolve=>setImmediate(resolve));
   assert.equal(context.document.querySelector('#donor-welcome-title').textContent,'Translated title');
   assert.equal(context.document.querySelector('#donor-gift-amount').value,'750');
@@ -31,7 +31,7 @@ const fixture={items:[{id:'skoleprosjekt',title:'Skoleprosjekt',description:'St√
  const markup=adminSource.slice(adminSource.indexOf('<dialog id="cause-form-modal"'),adminSource.indexOf('<!-- Manual In-Kind Modal -->'));
  const dom=new JSDOM(markup);dom.window.document.querySelector('dialog').close=()=>{};
  let saved;
- const context={document:dom.window.document,Date,URL,console,firebaseService:{getPageContent:async()=>({items:[]}),savePageContent:async(id,data)=>{saved={id,data};}}};
+ const context={document:dom.window.document,Date,URL,console,firebaseService:{invalidatePageContentCache:()=>{},getPageContent:async()=>({items:[]}),savePageContent:async(id,data)=>{saved={id,data};}}};
  vm.createContext(context);
  const method=adminSource.slice(adminSource.indexOf('    toggleCauseGivingFields()'),adminSource.indexOf('    editCause(index)'));
  vm.runInContext('this.manager=new (class {'+method+"})();Object.assign(this.manager,{_translateTextChunk:async(text,lang)=>lang+':'+text,generateSlug:()=> 'ny-aksjon',loadCauses:async()=>{},showToast:()=>{}});",context);

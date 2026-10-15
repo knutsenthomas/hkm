@@ -1,3 +1,5 @@
+// Load public configuration before requesting the campaign collection.
+import './firebase-config.js';
 import firebaseService from './firebase-service.js';
 const language = document.documentElement.lang?.slice(0,2) || 'no';
 const copy = {
@@ -59,6 +61,8 @@ if (form) {
         } catch { return null; }
     };
     const load = async () => {
+        // Other page modules may have requested this collection before configuration was ready.
+        firebaseService.invalidatePageContentCache('collection_causes');
         const causes = activeDonationCauses(await firebaseService.getPageContent('collection_causes')).map(cause => localizeCause(cause));
         const selects = [form.elements.fund, document.getElementById('donation-purpose')].filter(select => select?.options);
         causes.forEach(cause => selects.forEach(select => { if (![...select.options].some(option => option.value === cause.id)) { const option = element('option', cause.title || text.campaign); option.value = cause.id; select.append(option); } }));
