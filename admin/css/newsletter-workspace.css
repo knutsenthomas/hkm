@@ -389,3 +389,9 @@ body.builder-active #newsletter-builder-layout #blocks-container p.selected-bloc
 .newsletter-workspace [data-analytics-period] { padding:10px 12px; border:1px solid var(--admin-border,#e2e8f0); border-radius:8px; background:var(--nw-bg); color:inherit; font:inherit; }
 .newsletter-workspace [data-analytics-metrics] { grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); }
 .newsletter-workspace [data-workspace-panel="analytics"] h4 { margin:24px 0 12px; }
+
+.newsletter-engagement-choice { margin-bottom:24px; padding:20px; border:1px solid var(--admin-border,#e2e8f0); border-radius:12px; background:var(--admin-surface,#fff); }
+.newsletter-engagement-choice label { display:flex; align-items:center; gap:10px; font-weight:600; }
+.newsletter-engagement-choice input { accent-color:var(--admin-accent,#d17d39); width:18px; height:18px; }
+.newsletter-engagement-choice p { margin:8px 0 0; color:var(--admin-text-muted,#64748b); font-size:13px; }
+.newsletter-workspace [data-analytics-campaigns] button { margin:2px; white-space:nowrap; }

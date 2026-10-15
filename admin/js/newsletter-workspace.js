@@ -32,9 +32,10 @@ export function summarizeCampaigns(campaigns, days = 'all', now = Date.now()) {
         return days === 'all' || (timestamp > 0 && timestamp >= now - Number(days) * 86400000 && timestamp <= now);
     });
     const months = new Map();
-    let sent = 0, unknown = 0, issues = 0, completed = 0;
+    let sent = 0, unknown = 0, issues = 0, completed = 0, opens = 0, clicks = 0, trackedSent = 0;
     rows.forEach(c => {
         const amount = count(c.sentCount); sent += amount || 0; unknown += amount === null ? 1 : 0;
+        if (c.trackingEnabled === true) { trackedSent += amount || 0; opens += count(c.engagement?.uniqueOpens) || 0; clicks += count(c.engagement?.uniqueClicks) || 0; }
         const state = campaignState(c, now);
         if (['Avvik', 'Feil', 'Uavklart'].includes(state)) issues++;
         if (state === 'Fullført') completed++;
@@ -43,7 +44,7 @@ export function summarizeCampaigns(campaigns, days = 'all', now = Date.now()) {
         const month = months.get(key) || { campaigns:0, sent:0, unknown:0 };
         month.campaigns++; month.sent += amount || 0; month.unknown += amount === null ? 1 : 0; months.set(key, month);
     });
-    return { rows, sent, unknown, issues, completed, months: [...months].sort((a,b) => a[0].localeCompare(b[0])) };
+    return { rows, sent, unknown, issues, completed, opens, clicks, trackedSent, months: [...months].sort((a,b) => a[0].localeCompare(b[0])) };
 }
 const root = document.getElementById('newsletter-workspace');
 if (root) {
@@ -97,10 +98,20 @@ if (root) {
             output.textContent = logs.length ? `Fant ${sent} registrert som sendt og ${failed} registrert som feilet med dette emnet. Utvalget er begrenset til 100 logger og kan omfatte flere utsendinger.` : 'Ingen nyhetsbrevlogger med dette emnet ble funnet. Dette beviser ikke at utsendingen mislyktes.';
         } catch { output.textContent = 'Kunne ikke hente loggene. Kontroller administratortilgangen og prøv igjen.'; }
     };
+    const showEngagement = campaign => {
+        const dialog = document.createElement('dialog'); dialog.className = 'newsletter-start-dialog';
+        dialog.append(el('h2', 'Åpninger og klikk'), el('p', campaign.subject || 'Uten emne'));
+        dialog.append(el('p', 'Antatt aktivitet per mottakereksemplar. Automatiske sikkerhetssjekker og personvernfunksjoner kan påvirke tallene. Dette bekrefter ikke lesing. Måling varer i 180 dager etter sending.'));
+        const links = Object.values(campaign.engagement?.links || {}).sort((a,b) => Number(b.uniqueClicks || 0) - Number(a.uniqueClicks || 0));
+        links.forEach(link => { const row = el('p', `${link.uniqueClicks || 0} unike klikk · ${link.url}`); row.style.overflowWrap = 'anywhere'; dialog.append(row); });
+        if (!links.length) dialog.append(el('p', 'Ingen lenkeklikk registrert ennå.'));
+        const close = el('button', 'Lukk'); close.type = 'button'; close.onclick = () => dialog.close(); dialog.append(close);
+        dialog.addEventListener('close', () => dialog.remove(), {once:true}); document.body.append(dialog); dialog.showModal();
+    };
     const renderAnalytics = () => {
         const summary = summarizeCampaigns(campaigns, root.querySelector('[data-analytics-period]').value);
         const metrics = root.querySelector('[data-analytics-metrics]'); metrics.replaceChildren();
-        for (const [label, value] of [['Utsendelser', summary.rows.length], ['Registrert sendt', summary.sent], ['Fullført uten avvik', summary.completed], ['Avvik, feil eller uavklart', summary.issues], ['Mangler sendetall', summary.unknown]]) {
+        for (const [label, value] of [['Utsendelser', summary.rows.length], ['Registrert sendt', summary.sent], ['Fullført uten avvik', summary.completed], ['Avvik, feil eller uavklart', summary.issues], ['Mangler sendetall', summary.unknown], ['Antatte unike åpninger', summary.opens], ['Unike mottakereksemplar med klikk', summary.clicks], ['Antatt åpningsrate', summary.trackedSent ? (100 * summary.opens / summary.trackedSent).toFixed(1) + ' %' : '–'], ['Klikkrate', summary.trackedSent ? (100 * summary.clicks / summary.trackedSent).toFixed(1) + ' %' : '–']]) {
             const card = el('div', ''); card.append(el('span', label), el('strong', value)); metrics.append(card);
         }
         const months = root.querySelector('[data-analytics-months]'); months.replaceChildren();
@@ -109,10 +120,10 @@ if (root) {
         });
         const details = root.querySelector('[data-analytics-campaigns]'); details.replaceChildren();
         summary.rows.forEach(campaign => {
-            const row = el('tr', ''); [campaign.subject || 'Uten emne', campaignState(campaign), `${campaign.sentCount ?? 'Ukjent'} / ${campaign.recipientCount ?? 'Ukjent'}`].forEach(value => row.append(el('td', value)));
-            const cell = el('td', ''); const button = el('button', 'Se logg'); button.type = 'button'; button.onclick = () => showLogs(campaign); cell.append(button); row.append(cell); details.append(row);
+            const row = el('tr', ''); [campaign.subject || 'Uten emne', campaignState(campaign), `${campaign.sentCount ?? 'Ukjent'} / ${campaign.recipientCount ?? 'Ukjent'}`, campaign.trackingEnabled ? campaign.engagement?.uniqueOpens || 0 : 'Ikke målt', campaign.trackingEnabled ? campaign.engagement?.uniqueClicks || 0 : 'Ikke målt'].forEach(value => row.append(el('td', value)));
+            const cell = el('td', ''); const button = el('button', 'Se logg'); button.type = 'button'; button.onclick = () => showLogs(campaign); cell.append(button); if (campaign.trackingEnabled) { const activity = el('button', 'Se klikk'); activity.type = 'button'; activity.onclick = () => showEngagement(campaign); cell.append(activity); } row.append(cell); details.append(row);
         });
-        for (const [body, columns] of [[months, 3], [details, 4]]) if (!body.children.length) { const row = el('tr', ''); const cell = el('td', 'Ingen kampanjer i perioden.'); cell.colSpan = columns; row.append(cell); body.append(row); }
+        for (const [body, columns] of [[months, 3], [details, 6]]) if (!body.children.length) { const row = el('tr', ''); const cell = el('td', 'Ingen kampanjer i perioden.'); cell.colSpan = columns; row.append(cell); body.append(row); }
     };
     root.querySelector('[data-analytics-period]').addEventListener('change', renderAnalytics);
     const render = () => {

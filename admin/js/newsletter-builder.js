@@ -8880,6 +8880,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             const campaignData = {
                 subject: subject,
                 subjectEn,
+                trackingEnabled: document.getElementById('newsletter-track-engagement')?.checked === true,
                 recipientCount: recipients.length,
                 blockCount: this.blocks.length,
                 blocks: this.blocks,

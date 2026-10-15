@@ -1,0 +1,17 @@
+const fs = require('node:fs');
+const vm = require('node:vm');
+const assert = require('node:assert/strict');
+const {JSDOM} = require('jsdom');
+const source = fs.readFileSync('admin/js/newsletter-workspace.js','utf8').replace(/^import .*;\n/, '').replaceAll('export function','function');
+const dom = new JSDOM(fs.readFileSync('admin/admin-nyhetsbrev.html','utf8'),{url:'https://example.com/admin/'});
+const context = {document:dom.window.document, window:dom.window, location:dom.window.location, sessionStorage:dom.window.sessionStorage, URLSearchParams, Date, HKD_PRODUCT_TEMPLATE:{id:'test',name:'Test'}, console};
+vm.createContext(context);vm.runInContext(source+';this.summarize=summarizeCampaigns;',context);
+const now=Date.now();
+const rows=[{queuedAt:new Date(now),status:'completed',sentCount:10,recipientCount:10,trackingEnabled:true,engagement:{uniqueOpens:4,uniqueClicks:2}},{queuedAt:new Date(now-2*86400000),status:'queued'},{queuedAt:new Date(now-100*86400000),status:'completed',sentCount:4,recipientCount:4,engagement:{uniqueOpens:99}}];
+const summary=context.summarize(rows,'30',now);
+assert.equal(summary.sent,10);assert.equal(summary.unknown,1);assert.equal(summary.issues,1);assert.equal(summary.opens,4);assert.equal(summary.clicks,2);assert.equal(summary.trackedSent,10);
+assert.equal(context.summarize(rows,'all',now).sent,14);assert.equal(context.summarize(rows,'all',now).opens,4);
+const button=dom.window.document.querySelector('[data-workspace-view="analytics"]');button.click();
+assert.equal(dom.window.document.querySelector('[data-workspace-panel="analytics"]').hidden,false);
+assert.equal(dom.window.document.querySelectorAll('[data-analytics-metrics] > div').length,9);
+console.log('Passed: analytics periods, unknown counts, tracked-only denominator, unique events and tab rendering.');

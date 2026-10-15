@@ -1,3 +1,4 @@
+const { prepareTracking, trackingHandler } = require('./newsletter-tracking.cjs');
 const { validateRecurring, createStripeGift, createPayPalAgreement, reconcilePayPalAgreement } = require('./recurring-payments.cjs');
 const { createSchoolPaymentPlan, schoolMetadataForIntent } = require('./school-payment-plan.cjs');
 const { defineSecret } = require('firebase-functions/params');
@@ -5196,6 +5197,8 @@ exports.onNewsletterSubscribe = onDocumentCreated({
  * Reads target recipients and checks tags for 'Engelsk' / 'English' / 'en'.
  * Sends English translated version to English recipients and Norwegian to all others.
  */
+exports.newsletterTracking = onRequest({ region: 'us-central1', maxInstances: 10 }, trackingHandler(admin.firestore(), FieldValue.increment));
+
 exports.onNewsletterCampaignCreate = onDocumentCreated({
   document: "newsletter_campaigns/{id}",
   secrets: [emailUserParam, emailPassParam],
@@ -5331,7 +5334,9 @@ exports.onNewsletterCampaignCreate = onDocumentCreated({
           }
         }
 
-        await sendEmail({
+        if (campaign.trackingEnabled === true) emailHtml = await prepareTracking(db, snapshot.id, emailHtml);
+
+        const sendResult = await sendEmail({
           to: recipient.email,
           subject: recipientSubject,
           html: emailHtml,
@@ -5344,6 +5349,7 @@ exports.onNewsletterCampaignCreate = onDocumentCreated({
             "X-Auto-Response-Suppress": "OOF, AutoReply"
           }
         });
+        if (!sendResult?.success) throw new Error(sendResult?.error || 'Sending failed');
         sentCount++;
       } catch (err) {
         console.error(`[onNewsletterCampaignCreate] Failed to send email to ${recipient.email}:`, err);

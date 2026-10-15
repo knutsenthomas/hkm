@@ -817,8 +817,8 @@
 <div class="workspace-heading"><div><h3>Analyse av utsendelser</h3><p>Basert på registrerte kampanjer i dette utvalget.</p></div><select data-analytics-period aria-label="Analyseperiode"><option value="30">Siste 30 dager</option><option value="90">Siste 90 dager</option><option value="all">Hele utvalget</option></select></div>
 <div class="workspace-metrics" data-analytics-metrics></div>
 <h4>Utvikling per måned</h4><div class="workspace-table"><table><thead><tr><th>Måned</th><th>Utsendelser</th><th>Registrert sendt</th></tr></thead><tbody data-analytics-months></tbody></table></div>
-<h4>Kampanjer i perioden</h4><div class="workspace-table"><table><thead><tr><th>Emne</th><th>Status</th><th>Sendt / mottakere</th><th>Detaljer</th></tr></thead><tbody data-analytics-campaigns></tbody></table></div>
-<p class="workspace-campaign-note">Viser opptil 25 kampanjer per datofelt, ikke nødvendigvis hele historikken. Manglende sendetall vises som ukjent. «Sendt» betyr registrert sendt fra serveren. Levering, åpninger og klikk måles ikke.</p>
+<h4>Kampanjer i perioden</h4><div class="workspace-table"><table><thead><tr><th>Emne</th><th>Status</th><th>Sendt / mottakere</th><th>Antatte åpninger</th><th>Unike klikk</th><th>Detaljer</th></tr></thead><tbody data-analytics-campaigns></tbody></table></div>
+<p class="workspace-campaign-note">Viser opptil 25 kampanjer per datofelt, ikke nødvendigvis hele historikken. Manglende sendetall vises som ukjent. «Sendt» betyr registrert sendt fra serveren. Levering til innboksen måles ikke. Åpninger og klikk gjelder bare nye utsendinger med måling aktivert. Ratene beregnes av registrert sendt for disse kampanjene. Automatiske systemer kan påvirke tallene; dette bekrefter ikke lesing.</p>
 </div>
 <div data-workspace-panel="drafts" data-drafts hidden>Hent oversikten for å se kladder.</div><div data-workspace-panel="templates" data-templates hidden>Hent oversikten for å se maler.</div>
 <p data-campaign-note class="workspace-campaign-note">Viser opptil 25 kampanjer per datofelt. «Sendt» betyr sendt fra serveren, ikke bekreftet levering. «Uavklart» er et uavsluttet forsøk eldre enn 24 timer eller uten tidspunkt.</p>
@@ -1444,6 +1444,7 @@
                                 </div>
                             </div>
 
+                            <div class="newsletter-engagement-choice"><label><input type="checkbox" id="newsletter-track-engagement" checked> Mål åpninger og lenkeklikk</label><p>Viser antatt aktivitet per kampanje. Automatiske e-postsystemer kan påvirke tallene. Dette bekrefter ikke at brevet er lest.</p></div>
                             <!-- Card 3: Spesifikk segmentering og kontakter -->
                             <div class="selection-card-v2" id="target-groups-section">
                                 <div class="card-header-v2">
