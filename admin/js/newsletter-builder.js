@@ -4014,6 +4014,13 @@ class NewsletterBuilder {
                         </div>
                     </div>
 
+                    <div style="margin-bottom:16px;">
+                        <label for="social-brand-select" style="display:block;font-size:13px;font-weight:700;margin-bottom:8px;">Velg virksomhet</label>
+                        <select id="social-brand-select" class="inspector-input" style="width:100%;min-height:44px;padding:10px 12px;border:1px solid #cbd5e1;border-radius:10px;background:white;font:inherit;">
+                            <option value="hkm">His Kingdom Ministry</option>
+                            <option value="hkd">His Kingdom Designs</option>
+                        </select>
+                    </div>
                     <!-- Platforms and URLs -->
                     <div>
                         <label style="display: block; font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Velg plattformer & lenker</label>
@@ -4026,7 +4033,7 @@ class NewsletterBuilder {
                                             <span style="display: flex; align-items: center; justify-content: center; color: ${p.color};">${p.svg}</span>
                                             <span>${p.name}</span>
                                         </label>
-                                        <span style="font-size: 11px; font-weight: 700; color: #15803d; background: #dcfce7; padding: 2px 8px; border-radius: 99px;">HKM Forhåndskoblet</span>
+                                        <span style="font-size: 11px; font-weight: 700; color: #15803d; background: #dcfce7; padding: 2px 8px; border-radius: 99px;" data-social-brand-badge>HKM Forhåndskoblet</span>
                                     </div>
                                     <input type="text" id="social-url-${p.id}" value="${p.url}" placeholder="URL for ${p.name}" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; outline: none; box-sizing: border-box; background: white;" />
                                 </div>
@@ -4043,6 +4050,27 @@ class NewsletterBuilder {
         `;
 
         this.mountEditorModal(modal, isEditing ? 'Endre sosiale medier' : 'Sett inn sosiale medier');
+        const brandLinks = {
+            hkm: Object.fromEntries(defaultPlatforms.map(platform => [platform.id, platform.url])),
+            hkd: { facebook: 'https://www.facebook.com/HisKingdomDesigns?locale=nb_NO', instagram: 'https://www.instagram.com/hiskingdomdesigns/', youtube: '', website: 'https://hiskingdomdesigns.no/' }
+        };
+        let selectedBrand = 'hkm';
+        modal.querySelector('#social-brand-select').addEventListener('change', event => {
+            defaultPlatforms.forEach(platform => {
+                brandLinks[selectedBrand][platform.id] = modal.querySelector(`#social-url-${platform.id}`).value;
+            });
+            selectedBrand = event.target.value;
+            defaultPlatforms.forEach(platform => {
+                const url = brandLinks[selectedBrand][platform.id];
+                modal.querySelector(`#social-url-${platform.id}`).value = url;
+                modal.querySelector(`#social-check-${platform.id}`).checked = !!url;
+            });
+            modal.querySelectorAll('[data-social-brand-badge]').forEach((badge, index) => {
+                const url = brandLinks[selectedBrand][defaultPlatforms[index].id];
+                badge.textContent = url ? `${selectedBrand.toUpperCase()} Forhåndskoblet` : 'Legg inn profil';
+            });
+        });
+
 
         let selectedStyle = initialStyle;
         const styleBtns = modal.querySelectorAll('.hkm-style-btn');
@@ -4077,9 +4105,13 @@ class NewsletterBuilder {
                 const urlInput = document.getElementById(`social-url-${p.id}`);
                 return {
                     ...p,
-                    url: urlInput ? urlInput.value.trim() || p.url : p.url
+                    url: urlInput ? urlInput.value.trim() : p.url
                 };
             });
+
+            if (activePlatforms.some(platform => !/^https?:\/\//i.test(platform.url))) {
+                showToast('Legg inn en gyldig nettadresse for de valgte plattformene.', 'warning'); return;
+            }
 
             if (activePlatforms.length === 0) {
                 showToast("Velg minst én sosial plattform", "warning");

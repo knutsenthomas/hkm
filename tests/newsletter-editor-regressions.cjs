@@ -98,5 +98,16 @@ const runSaveTimer = () => {
     box.firstElementChild.textContent = 'Written text';
     editor.updateDocumentTools(box.firstElementChild);
     assert.equal(context.document.querySelector('[data-document-tool="insert"]').hidden, true);
+    editor.mountEditorModal = modal => context.document.body.append(modal);
+    editor.openSocialInsertionFlowAt(null);
+    const brand = context.document.getElementById('social-brand-select');
+    brand.value = 'hkd'; brand.dispatchEvent(new dom.window.Event('change'));
+    assert.equal(context.document.getElementById('social-url-facebook').value, 'https://www.facebook.com/HisKingdomDesigns?locale=nb_NO');
+    assert.equal(context.document.getElementById('social-url-website').value, 'https://hiskingdomdesigns.no/');
+    assert.equal(context.document.getElementById('social-check-instagram').checked, true);
+    assert.equal(context.document.getElementById('social-url-instagram').value, 'https://www.instagram.com/hiskingdomdesigns/');
+    assert.equal(context.document.getElementById('social-url-youtube').value, '');
+    brand.value = 'hkm'; brand.dispatchEvent(new dom.window.Event('change'));
+    assert.equal(context.document.getElementById('social-url-facebook').value, 'https://facebook.com/hiskingdomministry');
     console.log('Passed: queued edits, truthful save status, failed save, undo/redo and paragraph-only spacing.');
 })().catch(error => { console.error(error); process.exitCode = 1; });
