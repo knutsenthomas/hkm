@@ -49,6 +49,8 @@ const fixture={items:[{id:'skoleprosjekt',title:'Skoleprosjekt',description:'StÃ
  context.document.querySelector('#cause-info-url').value='';
  context.manager._translateTextChunk=async()=>{throw Error('Unavailable');};
  await context.manager.saveCause(true);assert.equal(saved.data.items[0].translationStatus,'pending');assert.equal(saved.data.items[0].active,false);
+ await context.manager.saveCause();assert.equal(saved.data.items[0].translationStatus,'pending');assert.equal(saved.data.items[0].active,true);
+ assert.equal(saved.data.items[0].image,'https://example.com/image.jpg');
  saved=null;context.document.querySelector('#cause-goal').value='-10';await context.manager.saveCause();assert.equal(saved,null);
  console.log('Passed: creation/validation, public active list, dedicated campaign view, hidden campaigns and recurring fund preservation.');
 })().catch(error=>{console.error(error);process.exitCode=1;});

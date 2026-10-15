@@ -22155,7 +22155,7 @@ class AdminManager {
             }));
             const translationFailure = translationResults.find(result => result.status === 'rejected');
             if (translationFailure) {
-                if (!asDraft) throw translationFailure.reason;
+                console.warn('Aksjonen lagres med ventende oversettelser:', translationFailure.reason);
                 translationStatusValue = 'pending';
             }
 
@@ -22179,11 +22179,16 @@ class AdminManager {
             await firebaseService.savePageContent('collection_causes', { items: causes });
             document.getElementById('cause-form-modal').close();
             await this.loadCauses();
-            this.showToast(asDraft ? 'Innsamlingsaksjonen er lagret som kladd.' : 'Innsamlingsaksjon lagret!', 'success');
+            if (translationStatusValue === 'pending') {
+                this.showToast((asDraft ? 'Kladden' : 'Aksjonen') + ' er lagret. Oversettelsestjenesten svarte ikke. Norsk vises inntil du åpner aksjonen og lagrer på nytt.', 'warning', 10000);
+            } else {
+                this.showToast(asDraft ? 'Innsamlingsaksjonen er lagret som kladd.' : 'Innsamlingsaksjon lagret!', 'success');
+            }
         } catch (error) {
             console.error('Error saving cause:', error);
-            translationStatus.textContent = 'Kunne ikke oversette eller lagre. Innholdet ligger fortsatt i skjemaet. Prøv igjen.';
-            this.showToast('Feil ved oversettelse eller lagring av innsamlingsaksjon', 'error', 5000);
+            const reason = String(error?.message || 'Ukjent feil');
+            translationStatus.textContent = `Kunne ikke lagre aksjonen: ${reason}. Innholdet ligger fortsatt i skjemaet.`;
+            this.showToast('Aksjonen kunne ikke lagres. Se feilmeldingen i skjemaet.', 'error', 7000);
         } finally {
             saveButtons.forEach(button => button.disabled = false);
         }
