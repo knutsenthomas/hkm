@@ -115,8 +115,9 @@ if (form) {
             const card = element('article', '', 'donor-campaign-card');
             if (/^https?:\/\//i.test(cause.image || cause.imageUrl || '')) { const image = element('img'); image.src = cause.image || cause.imageUrl; image.alt = ''; image.loading = 'lazy'; card.append(image); }
             const content = element('div'); content.append(element('h3', cause.title || text.campaign), element('p', cause.description || ''), details(cause));
-            const info = moreInfo(cause); if (info) content.append(info);
-            const link = element('a', text.view, 'btn btn-primary'); link.href = campaignPath + '?aksjon=' + encodeURIComponent(cause.id); content.append(link); card.append(content); grid.append(card);
+            const actions = element('div', '', 'donor-campaign-actions');
+            const info = moreInfo(cause); if (info) actions.append(info);
+            const link = element('a', text.view, 'btn btn-primary'); link.href = campaignPath + '?aksjon=' + encodeURIComponent(cause.id); actions.append(link); content.append(actions); card.append(content); grid.append(card);
         });
         container.append(grid); section.append(container); document.querySelector('.donor-welcome').after(section);
     };

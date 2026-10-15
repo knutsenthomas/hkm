@@ -62,6 +62,14 @@ const fixture={items:[{id:'skoleprosjekt',title:'Skoleprosjekt',description:'StÃ
  await context.manager.saveCause(true);assert.equal(saved.data.items[0].translationStatus,'pending');assert.equal(saved.data.items[0].active,false);
  await context.manager.saveCause();assert.equal(saved.data.items[0].translationStatus,'pending');assert.equal(saved.data.items[0].active,true);
  assert.equal(saved.data.items[0].image,'https://example.com/image.jpg');
+ for (const lang of ['en','es']) {
+  context.document.querySelector(`#cause-${lang}-title`).value=lang+' manual title';
+  context.document.querySelector(`#cause-${lang}-description`).value=lang+' manual description';
+  context.document.querySelector(`#cause-${lang}-heroIntro`).value=lang+' manual intro';
+ }
+ await context.manager.saveCause();assert.equal(saved.data.items[0].translationStatus,'complete');assert.equal(saved.data.items[0].translations.en.description,'en manual description');assert.equal(saved.data.items[0].translations.es.title,'es manual title');
+ context.manager.setCauseGivingFields(saved.data.items[0]);assert.equal(context.document.querySelector('#cause-en-title').value,'en manual title');
+ context.manager.setCauseGivingFields({});assert.equal(context.document.querySelector('#cause-en-title').value,'');
  saved=null;context.document.querySelector('#cause-goal').value='-10';await context.manager.saveCause();assert.equal(saved,null);
  console.log('Passed: creation/validation, public active list, dedicated campaign view, hidden campaigns and recurring fund preservation.');
 })().catch(error=>{console.error(error);process.exitCode=1;});

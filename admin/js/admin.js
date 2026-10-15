@@ -21044,7 +21044,7 @@ class AdminManager {
                         </div>
                         <div class="form-group">
                             <label for="cause-description">Beskrivelse</label>
-                            <p class="text-muted">Tittel og beskrivelse oversettes automatisk til engelsk og spansk ved lagring.</p>
+                            <p class="text-muted">Oversettelser kan redigeres i feltene for engelsk og spansk nedenfor. Tomme felt forsøkes oversatt automatisk.</p>
                             <textarea id="cause-description" class="form-control" style="height: 100px;" placeholder="Beskriv hva innsamlingen er for..."></textarea>
                         </div>
                         <div class="form-group">
@@ -21056,6 +21056,8 @@ class AdminManager {
                             <input type="number" id="cause-goal" class="form-control" placeholder="100000" value="100000">
                         </div>
                         <div class="form-group"><label for="cause-hero-intro">Kort tekst i toppbildet (valgfritt)</label><textarea id="cause-hero-intro" class="form-control" maxlength="220" rows="2" placeholder="En kort introduksjon til aksjonen"></textarea><small>Maks 220 tegn. La feltet stå tomt for å vise bare tittelen.</small></div>
+                        <details class="cause-language-fields"><summary>Engelsk</summary><p class="text-muted">Utfylte felt brukes direkte. Tomme felt forsøkes oversatt automatisk.</p><div class="form-group"><label for="cause-en-title">Tittel (engelsk)</label><input id="cause-en-title" class="form-control"></div><div class="form-group"><label for="cause-en-description">Beskrivelse (engelsk)</label><textarea id="cause-en-description" class="form-control" rows="5"></textarea></div><div class="form-group"><label for="cause-en-heroIntro">Kort tekst i toppbildet (engelsk)</label><textarea id="cause-en-heroIntro" class="form-control" rows="2" maxlength="220"></textarea></div></details>
+                        <details class="cause-language-fields"><summary>Spansk</summary><p class="text-muted">Utfylte felt brukes direkte. Tomme felt forsøkes oversatt automatisk.</p><div class="form-group"><label for="cause-es-title">Tittel (spansk)</label><input id="cause-es-title" class="form-control"></div><div class="form-group"><label for="cause-es-description">Beskrivelse (spansk)</label><textarea id="cause-es-description" class="form-control" rows="5"></textarea></div><div class="form-group"><label for="cause-es-heroIntro">Kort tekst i toppbildet (spansk)</label><textarea id="cause-es-heroIntro" class="form-control" rows="2" maxlength="220"></textarea></div></details>
                         <div class="form-group"><label for="cause-amount-mode">Gavebeløp</label><select id="cause-amount-mode" class="form-control"><option value="open">Valgfritt beløp</option><option value="fixed">Ett bestemt beløp</option><option value="presets">Flere beløpsvalg</option></select></div>
                         <div class="form-group" id="cause-fixed-group" hidden><label for="cause-fixed-amount">Fast beløp (kr)</label><input id="cause-fixed-amount" class="form-control" type="number" min="1" max="100000" step="1" value="250"></div>
                         <div class="form-group" id="cause-presets-group" hidden><label for="cause-amount-options">Beløpsvalg i kroner, adskilt med komma</label><input id="cause-amount-options" class="form-control" value="100, 250, 500"><label><input id="cause-allow-custom" type="checkbox" checked> Tillat også valgfritt beløp</label></div>
@@ -22082,6 +22084,9 @@ class AdminManager {
         const giving = cause.giving || {};
         document.getElementById('cause-info-url').value = cause.infoUrl || '';
         document.getElementById('cause-hero-intro').value = cause.heroIntro || '';
+        for (const lang of ['en', 'es']) {
+            for (const field of ['title', 'description', 'heroIntro']) document.getElementById(`cause-${lang}-${field}`).value = cause.translations?.[lang]?.[field] || '';
+        }
         document.getElementById('cause-amount-mode').value = giving.amountMode || 'open';
         document.getElementById('cause-fixed-amount').value = giving.amounts?.[0] || 250;
         document.getElementById('cause-amount-options').value = (giving.amounts?.length ? giving.amounts : [100,250,500]).join(', ');
@@ -22151,12 +22156,17 @@ class AdminManager {
             const previous = editId !== '' ? causes[parseInt(editId)] : null;
             const translations = {no: {title, description, heroIntro}};
             let translationStatusValue = 'complete';
-            const translationResults = await Promise.allSettled(['en', 'es'].map(async lang => {
-                const old = previous?.translations?.[lang];
-                const translatedTitle = old?.title && previous.title === title ? old.title : await this._translateTextChunk(title, lang, 'no', true);
-                const translatedDescription = old?.description && previous.description === description ? old.description : await this._translateTextChunk(description, lang, 'no', true);
-                const translatedIntro = !heroIntro ? '' : old?.heroIntro && previous.heroIntro === heroIntro ? old.heroIntro : await this._translateTextChunk(heroIntro, lang, 'no', true);
-                translations[lang] = {title: translatedTitle, description: translatedDescription, heroIntro: translatedIntro};
+            const translationResults = await Promise.allSettled(['en', 'es'].flatMap(lang => {
+                translations[lang] = {};
+                return ['title', 'description', 'heroIntro'].map(async field => {
+                    const original = translations.no[field];
+                    const manual = document.getElementById(`cause-${lang}-${field}`).value.trim();
+                    const old = previous?.translations?.[lang]?.[field];
+                    if (manual) translations[lang][field] = manual;
+                    else if (!original) translations[lang][field] = '';
+                    else if (old && previous[field] === original) translations[lang][field] = old;
+                    else translations[lang][field] = await this._translateTextChunk(original, lang, 'no', true);
+                });
             }));
             const translationFailure = translationResults.find(result => result.status === 'rejected');
             if (translationFailure) {

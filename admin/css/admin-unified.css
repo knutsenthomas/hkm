@@ -11584,3 +11584,7 @@ body.admin-body dialog#cause-form-modal {
 #cause-form-modal .modal-header,#cause-form-modal .modal-footer { flex-shrink:0; }
 #cause-form-modal .modal-body { overflow-y:auto; min-height:0; }
 #cause-form-modal .modal-body .text-muted { font-size:13px; line-height:1.5; margin:6px 0 10px; color:var(--admin-text-muted,#64748b); }
+
+#cause-form-modal .cause-language-fields { grid-column:1/-1; padding:16px; border:1px solid var(--admin-border,#e2e8f0); border-radius:12px; }
+#cause-form-modal .cause-language-fields summary { cursor:pointer; color:var(--admin-text,#1e293b); font-weight:600; }
+#cause-form-modal .cause-language-fields .form-group { margin-top:14px!important; }

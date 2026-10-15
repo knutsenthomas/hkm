@@ -184,3 +184,14 @@ html[data-theme="dark"] .donor-impact-grid article { border-color: #334155; }
     .donor-cause-detail .donor-welcome-lead,
     .donor-campaign-card p { font-size:16px; }
 }
+
+.donations-page-view .donor-welcome-copy .donor-welcome-lead,
+.donor-campaign-card p {
+    -webkit-hyphens:none!important;
+    hyphens:none!important;
+    word-break:normal!important;
+    overflow-wrap:break-word;
+}
+
+.donor-campaign-actions { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-top:20px; }
+.donor-campaign-actions .btn { margin:0; }
