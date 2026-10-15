@@ -3,6 +3,7 @@ const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const { JSDOM } = require('jsdom');
 const source = fs.readFileSync('admin/js/newsletter-builder.js', 'utf8');
+assert.doesNotMatch(source.slice(source.indexOf('    async sendTestEmail('), source.indexOf('    filterRecipientsBySelection(')), /\balert\s*\(/);
 const builderCss = fs.readFileSync('admin/css/newsletter-builder.css', 'utf8');
 const workspaceCss = fs.readFileSync('admin/css/newsletter-workspace.css', 'utf8');
 assert.doesNotMatch(workspaceCss, /p\[data-editor-empty="true"\]::after/);
