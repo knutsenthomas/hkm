@@ -10447,6 +10447,22 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
         return Array.from(subscribersMap.values());
     }
 
+    matchesSubscriberFilters(subscriber, query = '', segment = '', tag = '') {
+        const normalize = value => String(value || '').trim().toLowerCase();
+        const label = value => normalize(value) === 'ny' ? 'nyhetsbrev' : normalize(value);
+        const tags = (subscriber.tags || []).map(label);
+        const segments = (subscriber.segments || []).map(normalize);
+        const source = normalize(subscriber.source);
+        const newsletterMember = tags.includes('nyhetsbrev') || segments.includes('nyhetsbrev')
+            || ['nyhetsbrev', 'direkte påmeldt', 'nettsted'].includes(source)
+            || subscriber.collection === 'newsletter_subscriptions';
+        const q = normalize(query), seg = normalize(segment), selectedTag = label(tag);
+        const matchesQuery = !q || [subscriber.name, subscriber.email, subscriber.phone, ...tags, ...segments].some(value => normalize(value).includes(q));
+        const matchesSegment = !seg || (seg === 'nyhetsbrev' ? newsletterMember : source.includes(seg) || segments.some(value => value.includes(seg)));
+        const matchesTag = !selectedTag || (selectedTag === 'nyhetsbrev' ? newsletterMember : tags.includes(selectedTag));
+        return matchesQuery && matchesSegment && matchesTag;
+    }
+
     async loadSubscribers() {
         if (!window.firebaseService || !window.firebaseService.isInitialized) return;
         const tbody = document.getElementById('subscribers-table-body') || document.querySelector('#view-subscribers-panel tbody');
@@ -10475,7 +10491,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
 
             // Populate unique tags dropdown
             const allUniqueTags = new Set();
-            subscribersList.forEach(s => (s.tags || []).forEach(t => allUniqueTags.add(t)));
+            subscribersList.forEach(s => (s.tags || []).forEach(t => allUniqueTags.add(String(t).trim().toLowerCase() === 'ny' ? 'Nyhetsbrev' : t)));
             const tagFilterSelect = document.getElementById('subscriber-tag-filter');
             if (tagFilterSelect) {
                 const curVal = tagFilterSelect.value;
@@ -10498,21 +10514,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                 const seg = (segmentFilterSelect?.value || '').trim().toLowerCase();
                 const tag = (tagFilterSelect?.value || '').trim().toLowerCase();
 
-                const filtered = subscribersList.filter(s => {
-                    const matchesQ = !q
-                        || (s.name || '').toLowerCase().includes(q)
-                        || (s.email || '').toLowerCase().includes(q)
-                        || (s.phone || '').toLowerCase().includes(q)
-                        || (s.tags || []).some(t => t.toLowerCase().includes(q))
-                        || (s.segments || []).some(sg => sg.toLowerCase().includes(q));
-                    const matchesSeg = !seg
-                        || (s.source || '').toLowerCase().includes(seg)
-                        || (s.segments || []).some(sg => sg.toLowerCase().includes(seg));
-                    const matchesTag = !tag
-                        || (s.tags || []).some(t => t.toLowerCase() === tag);
-
-                    return matchesQ && matchesSeg && matchesTag;
-                });
+                const filtered = subscribersList.filter(subscriber => this.matchesSubscriberFilters(subscriber, q, seg, tag));
 
                 tbody.innerHTML = '';
                 if (filtered.length === 0) {

@@ -110,5 +110,10 @@ const runSaveTimer = () => {
     assert.equal(context.document.getElementById('social-url-youtube').value, '');
     brand.value = 'hkm'; brand.dispatchEvent(new dom.window.Event('change'));
     assert.equal(context.document.getElementById('social-url-facebook').value, 'https://facebook.com/hiskingdomministry');
+    const newsletterRecipients = Array.from({length:73}, (_, index) => ({name:'Person '+index, email:`person${index}@example.com`, source:index < 2 ? 'Nyhetsbrev' : 'Kontaktliste (CRM)', tags:[index % 2 ? 'Ny' : 'Nyhetsbrev'], segments:[]}));
+    assert.equal(newsletterRecipients.filter(person => editor.matchesSubscriberFilters(person, '', 'Nyhetsbrev', 'Nyhetsbrev')).length, 73);
+    assert.equal(editor.matchesSubscriberFilters({source:'Kontaktliste (CRM)', tags:[], segments:[]}, '', 'Nyhetsbrev'), false);
+    assert.equal(editor.matchesSubscriberFilters(newsletterRecipients[4], 'missing@example.com', 'Nyhetsbrev'), false);
+    assert.equal(newsletterRecipients.filter(person => editor.matchesSubscriberFilters(person, '', 'Kontaktliste (CRM)', 'Nyhetsbrev')).length, 71);
     console.log('Passed: queued edits, truthful save status, failed save, undo/redo and paragraph-only spacing.');
 })().catch(error => { console.error(error); process.exitCode = 1; });
