@@ -1203,7 +1203,10 @@ class ContentManager {
     async loadCauses() {
         try {
             const data = await this.getContentDoc('collection_causes');
-            return this.getCollectionItems(data);
+            return this.getCollectionItems(data).filter(cause => cause.active !== false && !['draft', 'archived', 'completed', 'cancelled'].includes(cause.status)).map(cause => {
+                const translated = cause.translations?.[this.getCurrentLanguage()];
+                return {...cause, title: translated?.title || cause.title, description: translated?.description || cause.description};
+            });
         } catch (e) {
             this.reportError('loadCauses', e);
             return [];

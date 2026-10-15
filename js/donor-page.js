@@ -3,16 +3,18 @@ const details = document.getElementById('gi-gave');
 if (giftForm && details) {
     const params = new URLSearchParams(location.search);
     if (params.get('frequency') === 'once') giftForm.elements.frequency.value = 'once';
+    const lang = document.documentElement.lang?.slice(0,2);
+    const labels = lang === 'en' ? {monthly:'Monthly amount',once:'Gift amount',card:'card',bank:'View bank details',recurring:'Give monthly with ',next:'Continue with ',bankHelp:'Give directly through your bank.',monthlyHelp:'Choose your monthly gift. Confirm securely with your payment provider.',onceHelp:'Choose an amount and purpose. Enter your details in the next step.'} : lang === 'es' ? {monthly:'Importe mensual',once:'Importe de la donación',card:'tarjeta',bank:'Ver datos bancarios',recurring:'Dona mensualmente con ',next:'Continuar con ',bankHelp:'Dona directamente desde tu banco.',monthlyHelp:'Elige tu donación mensual. Confirma de forma segura con tu proveedor de pago.',onceHelp:'Elige el importe y el destino. Introduce tus datos en el siguiente paso.'} : null;
     const syncFrequency = () => {
         const monthly = giftForm.elements.frequency.value === 'monthly';
         const method = giftForm.elements['gift-payment']?.value || 'vipps';
-        const names = { vipps:'Vipps', stripe:'kort', paypal:'PayPal' };
+        const names = { vipps:'Vipps', stripe:labels?.card || 'kort', paypal:'PayPal' };
         const bank = method === 'bank';
         const trigger = document.getElementById('vipps-recurring-trigger');
-        document.getElementById('donor-amount-label').textContent = monthly ? 'Månedlig beløp' : 'Gavebeløp';
+        document.getElementById('donor-amount-label').textContent = monthly ? (labels?.monthly || 'Månedlig beløp') : (labels?.once || 'Gavebeløp');
         trigger.hidden = false;
-        trigger.innerHTML = `${bank ? 'Vis bankinformasjon' : (monthly ? 'Bli fast giver med ' : 'Fortsett med ') + (names[method] || 'Vipps')} <i class="fas fa-arrow-right" aria-hidden="true"></i>`;
-        giftForm.querySelector('h2 + p').textContent = bank
+        trigger.innerHTML = `${bank ? (labels?.bank || 'Vis bankinformasjon') : (monthly ? (labels?.recurring || 'Bli fast giver med ') : (labels?.next || 'Fortsett med ')) + (names[method] || 'Vipps')} <i class="fas fa-arrow-right" aria-hidden="true"></i>`;
+        giftForm.querySelector('h2 + p').textContent = labels ? (bank ? labels.bankHelp : monthly ? labels.monthlyHelp : labels.onceHelp) : bank
             ? 'Gi direkte fra nettbanken din.'
             : monthly ? `Velg din månedlige gave. Du bekrefter avtalen trygt ${method === 'vipps' ? 'i Vipps' : method === 'paypal' ? 'hos PayPal' : 'med kort'}.` : 'Velg beløp og formål. Du fyller inn opplysningene dine i neste steg.';
         document.getElementById('donor-bank-information').hidden = true;
@@ -25,7 +27,11 @@ if (giftForm && details) {
     };
     giftForm.querySelectorAll('[name="frequency"], [name="gift-payment"], [name="fund"]').forEach(input => input.addEventListener('change', syncFrequency));
     giftForm.elements.amount.addEventListener('input', syncFrequency);
-    giftForm.querySelectorAll('[data-donor-amount]').forEach(button => button.addEventListener('click', () => { giftForm.elements.amount.value = button.dataset.donorAmount; syncFrequency(); }));
+    giftForm.addEventListener('click', event => {
+        const button = event.target.closest('[data-donor-amount]'); if (!button || !giftForm.contains(button)) return;
+        giftForm.elements.amount.value = button.dataset.donorAmount; syncFrequency();
+        giftForm.querySelectorAll('[data-donor-amount]').forEach(choice => choice.setAttribute('aria-pressed', String(choice === button)));
+    });
     document.getElementById('donor-copy-account').addEventListener('click', async () => {
         const account = document.getElementById('donor-bank-account').textContent.trim();
         const output = document.getElementById('donor-copy-status');

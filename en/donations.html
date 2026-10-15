@@ -178,6 +178,7 @@
             background-color: rgba(16, 185, 129, 0.02) !important;
         }
     </style>
+    <link rel="stylesheet" href="../css/regular-donor.css">
 </head>
 
 <body class="cms-loading">
@@ -465,35 +466,70 @@
 
     <main>
         <!-- Page Hero -->
-        <section class="page-hero subpage-hero" data-content-key="hero.backgroundImage"
-            style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat !important;">
+        <section class="page-hero subpage-hero donor-photo-hero" data-hero-align="left" aria-labelledby="donor-welcome-title"
+            style="background-image: linear-gradient(90deg, rgba(11,27,40,.85), rgba(11,27,40,.35)), url('https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=1920&q=85') !important;">
             <div class="container">
-                <div class="page-hero-content">
-                    <h1 class="page-title" data-content-key="hero.title">Donations</h1>
-                    <div class="breadcrumbs">
-                        <a href="/">Home</a>
-                        <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">chevron_right</span>
-                        <span>Donations</span>
-                    </div>
+                <div class="donor-photo-hero-copy">
+                    <span class="donor-hero-label">Give a gift</span>
+                    <h1 id="donor-welcome-title">Together we make<br>a difference.</h1>
+                    <p>Help share the gospel, strengthen faith and build community. Your gift makes our work possible.</p>
                 </div>
             </div>
         </section>
+        <section class="donor-welcome section" aria-labelledby="donor-intro-title">
+            <div class="container donor-welcome-layout">
+                <div class="donor-welcome-copy">
+                    <h2 id="donor-intro-title">Small gifts.<br>Lasting impact.</h2>
+                    <p class="donor-welcome-lead">Your gift supports teaching, mission and community. Monthly gifts help us plan our work.</p>
+                    <div class="donor-reassurance"><span>You choose the amount</span><span>Cancel anytime</span></div>
+                </div>
+                <form class="donor-gift-card" id="donor-gift-form">
+                    <h2>Give your support</h2>
+                    <p>Choose your monthly gift. Confirm your agreement securely with Vipps.</p>
+                    <fieldset class="donor-frequency"><legend class="sr-only">How often would you like to give?</legend>
+                        <label><input type="radio" name="frequency" value="monthly" checked> Monthly gift</label>
+                        <label><input type="radio" name="frequency" value="once"> One-time gift</label>
+                    </fieldset>
+                    <fieldset>
+                        <legend id="donor-amount-label">Monthly amount</legend>
+                        <div class="donor-amount-presets">
+                            <button type="button" data-donor-amount="100" aria-pressed="false">100 kr</button>
+                            <button type="button" data-donor-amount="250" aria-pressed="true">250 kr</button>
+                            <button type="button" data-donor-amount="500" aria-pressed="false">500 kr</button>
+                        </div>
+                        <label for="donor-gift-amount">Amount in NOK</label>
+                        <input type="number" id="donor-gift-amount" name="amount" min="1" step="1" value="250" required inputmode="numeric">
+                    </fieldset>
+                    <label for="donor-gift-fund">What would you like to support?</label>
+                    <select id="donor-gift-fund" name="fund">
+                        <option value="general">Where it is needed most</option>
+                        <option value="misjon">Missions</option>
+                        <option value="basar">Raffle</option>
+                    </select>
+                    <fieldset class="donor-payment-methods">
+                        <legend>Choose payment method</legend>
+                        <div class="donor-payment-options">
+                            <label><input type="radio" name="gift-payment" value="vipps" checked><span>Vipps</span></label>
+                            <label><input type="radio" name="gift-payment" value="stripe"><span>Card</span></label>
+                            <label><input type="radio" name="gift-payment" value="paypal"><span>PayPal</span></label>
+                            <label><input type="radio" name="gift-payment" value="bank"><span>Bank</span></label>
+                        </div>
+                    </fieldset>
+                    <div id="donor-bank-information" class="donor-bank-information" hidden>
+                        <p>Pay to <strong>His Kingdom Ministry</strong></p>
+                        <p>Account number: <strong id="donor-bank-account" data-content-doc="settings_global" data-content-key="contact.account">3000.66.08759</strong></p>
+                        <p id="donor-bank-instructions"></p>
+                        <button type="button" id="donor-copy-account" class="btn btn-primary donor-vipps-button">Copy account number</button>
+                        <p id="donor-copy-status" role="status" aria-live="polite"></p>
+                    </div>
+                    <button type="submit" id="vipps-recurring-trigger" class="btn btn-primary donor-vipps-button">Give monthly with Vipps <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                </form>
+            </div>
+        </section>
+
 
         <!-- Donations Grid -->
-        <section class="donations-page section">
-            <div class="container">
-                <div class="section-header">
-                    <span class="section-label">Support Our Work</span>
-                    <h2 class="section-title">Our Active Fundraising Campaigns</h2>
-                    <p class="section-description">Your gift makes a difference. Choose a project you want to support
-                        and join us in changing lives.</p>
-                </div>
 
-                <div class="causes-grid">
-                    <!-- Dynamic content from Firebase -->
-                </div>
-            </div>
-        </section>
 
         <!-- Regular Donor Section -->
         <section class="regular-donor section" id="regular-donors" style="background: white;">
@@ -578,7 +614,7 @@
         </section>
 
         <!-- Donation Form -->
-        <section class="donation-form section" id="give-gift"
+        <section class="donation-form section" id="gi-gave" hidden
             style="background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);">
             <div class="container">
                 <div class="section-header">
@@ -1041,6 +1077,9 @@
 
         </div>
     </div>
+    <script type="module" src="../js/donor-page.js"></script>
+    <script type="module" src="../js/donation-causes.js"></script>
+    <script type="module" src="../js/vipps-recurring.js"></script>
 </body>
 
 </html>

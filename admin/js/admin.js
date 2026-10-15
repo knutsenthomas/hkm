@@ -1124,7 +1124,7 @@ class AdminManager {
         return translated;
     }
 
-    async _translateTextChunk(text, targetLang, sourceLang = 'no') {
+    async _translateTextChunk(text, targetLang, sourceLang = 'no', strict = false) {
         const raw = String(text || '');
         if (!raw.trim()) return raw;
         if (this._isLikelyNonTranslatableToken(raw)) return raw;
@@ -1219,6 +1219,7 @@ class AdminManager {
             }
 
             console.warn(`[AdminManager] Translation failed (${targetLang})`, error);
+            if (strict) throw error;
             return raw;
         }
     }
@@ -21043,6 +21044,7 @@ class AdminManager {
                         </div>
                         <div class="form-group">
                             <label for="cause-description">Beskrivelse</label>
+                            <p class="text-muted">Tittel og beskrivelse oversettes automatisk til engelsk og spansk ved lagring.</p>
                             <textarea id="cause-description" class="form-control" style="height: 100px;" placeholder="Beskriv hva innsamlingen er for..."></textarea>
                         </div>
                         <div class="form-group">
@@ -21053,19 +21055,28 @@ class AdminManager {
                             <label for="cause-goal">Målbeløp (kr)</label>
                             <input type="number" id="cause-goal" class="form-control" placeholder="100000" value="100000">
                         </div>
+                        <div class="form-group"><label for="cause-amount-mode">Gavebeløp</label><select id="cause-amount-mode" class="form-control"><option value="open">Valgfritt beløp</option><option value="fixed">Ett bestemt beløp</option><option value="presets">Flere beløpsvalg</option></select></div>
+                        <div class="form-group" id="cause-fixed-group" hidden><label for="cause-fixed-amount">Fast beløp (kr)</label><input id="cause-fixed-amount" class="form-control" type="number" min="1" max="100000" step="1" value="250"></div>
+                        <div class="form-group" id="cause-presets-group" hidden><label for="cause-amount-options">Beløpsvalg i kroner, adskilt med komma</label><input id="cause-amount-options" class="form-control" value="100, 250, 500"><label><input id="cause-allow-custom" type="checkbox" checked> Tillat også valgfritt beløp</label></div>
+                        <div class="form-group"><label for="cause-frequency">Gavetype</label><select id="cause-frequency" class="form-control"><option value="both">Engangsgave og fast gave</option><option value="once">Bare engangsgave</option><option value="monthly">Bare fast månedlig gave</option></select></div>
+                        <div class="form-group"><label for="cause-info-url">Lenke til mer informasjon (valgfritt)</label><input type="url" id="cause-info-url" class="form-control" placeholder="https://..."><small>Lenke til mer informasjon eller en ekstern side.</small></div>
                         <div class="form-group"><label><input type="checkbox" id="cause-active" checked> Vis aksjonen på donasjonssiden</label></div>
                         <div class="form-group">
                             <label for="cause-image">Bildekilde (URL)</label>
                             <div style="display: flex; gap: 8px;">
                                 <input type="url" id="cause-image" class="form-control" placeholder="https://images.unsplash.com/..." style="flex: 1;">
+                                <button type="button" id="cause-upload-btn" class="btn btn-secondary">Last opp bilde</button>
+                                <input type="file" id="cause-image-file" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
                                 <button type="button" id="cause-unsplash-btn" class="btn btn-secondary" style="padding: 0 12px; border-radius: 8px; display: flex; align-items: center; gap: 4px; font-size: 13px;">
                                     <span class="material-symbols-outlined" style="font-size: 18px;">image_search</span> Unsplash
                                 </button>
                             </div>
                         </div>
+                        <p id="cause-upload-status" role="status" class="cause-upload-status"></p><img id="cause-image-preview" alt="Valgt aksjonsbilde" hidden>
                     </div>
                     <div class="modal-footer" style="padding:24px 32px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; gap:12px;">
                         <button class="btn-secondary" onclick="document.getElementById('cause-form-modal').close()">Avbryt</button>
+                        <button type="button" class="btn-secondary" id="save-cause-draft-btn">Lagre som kladd</button>
                         <button class="btn-primary" id="save-cause-btn">Lagre</button>
                     </div>
                 </div>
@@ -21169,6 +21180,7 @@ class AdminManager {
             document.getElementById('cause-collected').value = '0';
             document.getElementById('cause-goal').value = '100000';
             document.getElementById('cause-image').value = '';
+            this.setCauseGivingFields({});
             document.getElementById('cause-active').checked = true;
             document.getElementById('cause-form-modal').dataset.editId = '';
             document.getElementById('cause-form-modal').showModal();
@@ -21182,12 +21194,18 @@ class AdminManager {
                         const input = document.getElementById('cause-image');
                         if (input && selection && selection.url) {
                             input.value = selection.url;
+                            this.updateCauseImagePreview();
                         }
                     }, document.getElementById('cause-form-modal'));
                 }
             };
         }
 
+        document.getElementById('cause-amount-mode').addEventListener('change', () => this.toggleCauseGivingFields());
+        document.getElementById('cause-upload-btn').onclick = () => document.getElementById('cause-image-file').click();
+        document.getElementById('cause-image-file').onchange = event => this.uploadCauseImage(event.target.files[0]);
+        document.getElementById('cause-image').addEventListener('change', () => this.updateCauseImagePreview());
+        document.getElementById('save-cause-draft-btn').addEventListener('click', () => this.saveCause(true));
         document.getElementById('save-cause-btn').addEventListener('click', () => this.saveCause());
     }
 
@@ -21918,7 +21936,7 @@ class AdminManager {
                         <div class="cause-item" style="border: 1px solid #e2e8f0; padding: 20px; border-radius: 12px; margin-bottom: 16px; background: white;">
                             <div class="cause-header-row" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
                                 <div class="cause-title-wrap">
-                                    <h4 class="cause-title-text" style="margin:0 0 4px 0; font-size:16px; font-weight:700; color:#1e293b;">${cause.title || 'Uten tittel'}</h4>
+                                    <h4 class="cause-title-text" style="margin:0 0 4px 0; font-size:16px; font-weight:700; color:#1e293b;">${cause.title || 'Uten tittel'}</h4><span class="cause-publication-status">${cause.status === 'draft' ? 'Kladd' : cause.active === false ? 'Skjult' : 'Publisert'}</span>
                                     <p class="cause-desc-text" style="margin:0; font-size:13px; color:#64748b;">${cause.description || ''}</p>
                                     <span style="font-size:11px; background:#f1f5f9; color:#475569; padding:2px 6px; border-radius:4px; font-weight:600; text-transform:lowercase; display:inline-block; margin-top:6px;">ID: ${causeId}</span>
                                 </div>
@@ -22053,12 +22071,52 @@ class AdminManager {
         }
     }
 
-    async saveCause() {
+    toggleCauseGivingFields() {
+        const mode = document.getElementById('cause-amount-mode').value;
+        document.getElementById('cause-fixed-group').hidden = mode !== 'fixed';
+        document.getElementById('cause-presets-group').hidden = mode !== 'presets';
+    }
+
+    setCauseGivingFields(cause) {
+        const giving = cause.giving || {};
+        document.getElementById('cause-info-url').value = cause.infoUrl || '';
+        document.getElementById('cause-amount-mode').value = giving.amountMode || 'open';
+        document.getElementById('cause-fixed-amount').value = giving.amounts?.[0] || 250;
+        document.getElementById('cause-amount-options').value = (giving.amounts?.length ? giving.amounts : [100,250,500]).join(', ');
+        document.getElementById('cause-allow-custom').checked = giving.allowCustom !== false;
+        document.getElementById('cause-frequency').value = giving.frequency || 'both';
+        document.getElementById('cause-upload-status').textContent = '';
+        document.getElementById('cause-image-file').value = '';
+        this.toggleCauseGivingFields(); this.updateCauseImagePreview();
+    }
+
+    updateCauseImagePreview() {
+        const preview = document.getElementById('cause-image-preview');
+        const value = document.getElementById('cause-image').value.trim();
+        preview.hidden = !/^https?:\/\//i.test(value);
+        if (!preview.hidden) preview.src = value;
+    }
+
+    async uploadCauseImage(file) {
+        if (!file) return;
+        const status = document.getElementById('cause-upload-status');
+        if (!['image/jpeg','image/png','image/webp','image/gif'].includes(file.type) || file.size > 20 * 1024 * 1024) { status.textContent = 'Velg et JPG-, PNG-, WebP- eller GIF-bilde på inntil 20 MB.'; return; }
+        const buttons = ['save-cause-btn','save-cause-draft-btn','cause-upload-btn'].map(id => document.getElementById(id));
+        buttons.forEach(button => button.disabled = true); status.textContent = 'Laster opp bilde …';
+        try {
+            const url = await firebaseService.uploadImage(file, `mediebibliotek/causes/${Date.now()}-${file.name.replace(/[^a-z0-9.]/gi, '_')}`);
+            document.getElementById('cause-image').value = url; this.updateCauseImagePreview(); status.textContent = 'Bildet er lastet opp. Lagre aksjonen for å beholde valget.';
+        } catch { status.textContent = 'Kunne ikke laste opp bildet. Prøv igjen.'; }
+        finally { buttons.forEach(button => button.disabled = false); }
+    }
+
+    async saveCause(asDraft = false) {
         const title = document.getElementById('cause-title').value.trim();
         const description = document.getElementById('cause-description').value.trim();
         const collected = Number(document.getElementById('cause-collected').value);
         const goal = Number(document.getElementById('cause-goal').value);
         const image = document.getElementById('cause-image').value.trim();
+        const infoUrl = document.getElementById('cause-info-url').value.trim();
         const editId = document.getElementById('cause-form-modal').dataset.editId;
 
         if (!title) {
@@ -22068,9 +22126,38 @@ class AdminManager {
 
         if (!Number.isFinite(collected) || collected < 0 || !Number.isFinite(goal) || goal <= 0) { this.showToast('Bruk et positivt målbeløp og et innsamlet beløp på minst 0.', 'warning'); return; }
         if (image && !/^https?:\/\//i.test(image)) { this.showToast('Bruk en gyldig bildeadresse.', 'warning'); return; }
+        if (infoUrl) {
+            try { const url = new URL(infoUrl); if (!['http:', 'https:'].includes(url.protocol)) throw new Error(); }
+            catch { this.showToast('Bruk en gyldig lenke som begynner med https:// eller http://.', 'warning'); return; }
+        }
+        let giving;
+        try {
+            const amountMode = document.getElementById('cause-amount-mode').value;
+            const amounts = amountMode === 'fixed' ? [Number(document.getElementById('cause-fixed-amount').value)] : amountMode === 'presets' ? [...new Set(document.getElementById('cause-amount-options').value.split(',').map(value => Number(value.trim())))] : [];
+            if (amounts.length > 8 || amounts.some(amount => !Number.isSafeInteger(amount) || amount < 1 || amount > 100000)) throw new Error('Velg inntil åtte hele beløp mellom 1 og 100 000 kr.');
+            giving = {amountMode, amounts, allowCustom: amountMode === 'open' || (amountMode === 'presets' && document.getElementById('cause-allow-custom').checked), frequency:document.getElementById('cause-frequency').value};
+        } catch (error) { this.showToast(error.message, 'warning'); return; }
+        const saveButtons = ['save-cause-btn', 'save-cause-draft-btn'].map(id => document.getElementById(id));
+        saveButtons.forEach(button => button.disabled = true);
+        const translationStatus = document.getElementById('cause-upload-status');
+        translationStatus.textContent = 'Oversetter og lagrer aksjonen …';
         try {
             let causesData = await firebaseService.getPageContent('collection_causes');
             let causes = causesData && Array.isArray(causesData.items) ? causesData.items : [];
+            const previous = editId !== '' ? causes[parseInt(editId)] : null;
+            const translations = {no: {title, description}};
+            let translationStatusValue = 'complete';
+            const translationResults = await Promise.allSettled(['en', 'es'].map(async lang => {
+                const old = previous?.translations?.[lang];
+                const translatedTitle = old?.title && previous.title === title ? old.title : await this._translateTextChunk(title, lang, 'no', true);
+                const translatedDescription = old?.description && previous.description === description ? old.description : await this._translateTextChunk(description, lang, 'no', true);
+                translations[lang] = {title: translatedTitle, description: translatedDescription};
+            }));
+            const translationFailure = translationResults.find(result => result.status === 'rejected');
+            if (translationFailure) {
+                if (!asDraft) throw translationFailure.reason;
+                translationStatusValue = 'pending';
+            }
 
             // Opprett en stabil slug-ID
             let causeId = '';
@@ -22081,7 +22168,7 @@ class AdminManager {
                 if (causes.some(cause => cause.id === causeId)) causeId += '-' + Date.now();
             }
 
-            const newCause = { ...(editId !== '' ? causes[parseInt(editId)] : {}), id: causeId, title, description, collected, goal, image, active: document.getElementById('cause-active').checked };
+            const newCause = { ...(editId !== '' ? causes[parseInt(editId)] : {}), id: causeId, title, description, collected, goal, image, infoUrl, giving, translations, translationStatus: translationStatusValue, status: asDraft ? 'draft' : 'published', active: !asDraft && document.getElementById('cause-active').checked };
 
             if (editId !== '') {
                 causes[parseInt(editId)] = newCause;
@@ -22092,10 +22179,13 @@ class AdminManager {
             await firebaseService.savePageContent('collection_causes', { items: causes });
             document.getElementById('cause-form-modal').close();
             await this.loadCauses();
-            this.showToast('Innsamlingsaksjon lagret!', 'success');
+            this.showToast(asDraft ? 'Innsamlingsaksjonen er lagret som kladd.' : 'Innsamlingsaksjon lagret!', 'success');
         } catch (error) {
             console.error('Error saving cause:', error);
-            this.showToast('Feil ved lagring av innsamlingsaksjon', 'error', 5000);
+            translationStatus.textContent = 'Kunne ikke oversette eller lagre. Innholdet ligger fortsatt i skjemaet. Prøv igjen.';
+            this.showToast('Feil ved oversettelse eller lagring av innsamlingsaksjon', 'error', 5000);
+        } finally {
+            saveButtons.forEach(button => button.disabled = false);
         }
     }
 
@@ -22111,7 +22201,8 @@ class AdminManager {
                 document.getElementById('cause-collected').value = cause.collected || 0;
                 document.getElementById('cause-goal').value = cause.goal || 100000;
                 document.getElementById('cause-image').value = cause.image || '';
-                document.getElementById('cause-active').checked = cause.active !== false;
+                this.setCauseGivingFields(cause);
+                document.getElementById('cause-active').checked = cause.active !== false && cause.status !== 'draft';
                 document.getElementById('cause-form-modal').dataset.editId = index;
                 document.getElementById('cause-form-modal').showModal();
             }

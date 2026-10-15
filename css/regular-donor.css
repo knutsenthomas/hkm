@@ -156,3 +156,5 @@ html[data-theme="dark"] .donor-impact-grid article { border-color: #334155; }
 .donor-cause-progress span { color:var(--text-light); font-size:14px; }
 .donor-cause-image { width:100%; max-height:340px; object-fit:cover; border-radius:18px; margin-bottom:24px; }
 .donor-cause-notice { padding:14px; margin-bottom:20px; border:1px solid #e8c6a9; border-radius:10px; background:#fff8f0; }
+
+.donor-cause-more { display:inline-block; margin:16px 16px 16px 0; color:var(--primary-orange,#c56728); font-weight:600; text-decoration:underline; text-underline-offset:3px; }
