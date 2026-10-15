@@ -3,9 +3,9 @@ import './firebase-config.js';
 import firebaseService from './firebase-service.js';
 const language = document.documentElement.lang?.slice(0,2) || 'no';
 const copy = {
- en: {more:'Read more',collected:'raised',goal:'Goal',campaign:'Fundraiser',support:'Support this fundraiser',fallback:'Help support this fundraiser.',choose:'Choose an amount and payment method to support this fundraiser.',unavailable:'This fundraiser is unavailable. Please choose another purpose below.',heading:'Current fundraisers',intro:'Choose a cause to support.',view:'View fundraiser',error:'Unable to load this fundraiser. Reload the page before donating.'},
- es: {more:'Más información',collected:'recaudados',goal:'Meta',campaign:'Recaudación',support:'Apoya esta recaudación',fallback:'Ayuda a apoyar esta recaudación.',choose:'Elige el importe y el método de pago para apoyar esta recaudación.',unavailable:'Esta recaudación no está disponible. Elige otro destino abajo.',heading:'Recaudaciones actuales',intro:'Elige la causa que deseas apoyar.',view:'Ver recaudación',error:'No se pudo cargar esta recaudación. Recarga la página antes de donar.'},
- no: {more:'Les mer',collected:'samlet inn',goal:'Mål',campaign:'Innsamling',support:'Støtt innsamlingen',fallback:'Vær med og støtt denne innsamlingen.',choose:'Velg beløp og betalingsmåte for å støtte innsamlingen.',unavailable:'Denne innsamlingen er ikke tilgjengelig. Du kan velge et annet formål nedenfor.',heading:'Aktuelle innsamlinger',intro:'Velg hjertesaken du vil støtte.',view:'Se innsamlingen',error:'Kunne ikke hente innsamlingen. Last siden på nytt før du gir til aksjonen.'}
+ en: {activity:'Activity',donors:'identified donors',more:'Read more',collected:'raised',goal:'Goal',campaign:'Fundraiser',support:'Support this fundraiser',fallback:'Help support this fundraiser.',choose:'Choose an amount and payment method to support this fundraiser.',unavailable:'This fundraiser is unavailable. Please choose another purpose below.',heading:'Current fundraisers',intro:'Choose a cause to support.',view:'View fundraiser',error:'Unable to load this fundraiser. Reload the page before donating.'},
+ es: {activity:'Actividad',donors:'donantes identificados',more:'Más información',collected:'recaudados',goal:'Meta',campaign:'Recaudación',support:'Apoya esta recaudación',fallback:'Ayuda a apoyar esta recaudación.',choose:'Elige el importe y el método de pago para apoyar esta recaudación.',unavailable:'Esta recaudación no está disponible. Elige otro destino abajo.',heading:'Recaudaciones actuales',intro:'Elige la causa que deseas apoyar.',view:'Ver recaudación',error:'No se pudo cargar esta recaudación. Recarga la página antes de donar.'},
+ no: {activity:'Aktivitet',donors:'registrerte givere',more:'Les mer',collected:'samlet inn',goal:'Mål',campaign:'Innsamling',support:'Støtt innsamlingen',fallback:'Vær med og støtt denne innsamlingen.',choose:'Velg beløp og betalingsmåte for å støtte innsamlingen.',unavailable:'Denne innsamlingen er ikke tilgjengelig. Du kan velge et annet formål nedenfor.',heading:'Aktuelle innsamlinger',intro:'Velg hjertesaken du vil støtte.',view:'Se innsamlingen',error:'Kunne ikke hente innsamlingen. Last siden på nytt før du gir til aksjonen.'}
 };
 const text = copy[language] || copy.no;
 const campaignPath = language === 'en' ? '/en/donations' : language === 'es' ? '/es/donaciones' : '/donasjoner';
@@ -47,7 +47,14 @@ if (form) {
     const details = cause => {
         const group = element('div', '', 'donor-cause-progress');
         const amount = Math.max(0, Number(cause.collected ?? cause.raised) || 0), goal = Math.max(0, Number(cause.goal) || 0);
-        group.append(element('strong', `${money(amount)} ${text.collected}`));
+        if (cause.activity) {
+            group.classList.add('donor-activity');
+            group.append(element('h3', text.activity, 'donor-activity-heading'));
+            const metrics = element('div', '', 'donor-activity-metrics');
+            const raised = element('div'); raised.append(element('strong', money(amount)), element('span', text.collected));
+            const donors = element('div'); donors.append(element('strong', String(cause.activity.donorCount)), element('span', text.donors));
+            metrics.append(raised, donors); group.append(metrics);
+        } else group.append(element('strong', `${money(amount)} ${text.collected}`));
         if (goal) { const meter = element('progress'); meter.max = goal; meter.value = Math.min(amount, goal); meter.setAttribute('aria-label', `${money(amount)} / ${money(goal)}`); group.append(meter, element('span', `${text.goal}: ${money(goal)}`)); }
         return group;
     };
@@ -63,7 +70,15 @@ if (form) {
     const load = async () => {
         // Other page modules may have requested this collection before configuration was ready.
         firebaseService.invalidatePageContentCache('collection_causes');
-        const causes = activeDonationCauses(await firebaseService.getPageContent('collection_causes')).map(cause => localizeCause(cause));
+        const [data, activity] = await Promise.all([
+            firebaseService.getPageContent('collection_causes'),
+            firebaseService.getPageContent('cause_activity', {silent:true}).catch(() => null)
+        ]);
+        const causes = activeDonationCauses(data).map(cause => {
+            const stats = activity?.campaigns?.[cause.id];
+            return localizeCause(stats && Number.isFinite(stats.collected) && Number.isSafeInteger(stats.donorCount)
+                ? {...cause, collected:stats.collected, activity:stats} : cause);
+        });
         const selects = [form.elements.fund, document.getElementById('donation-purpose')].filter(select => select?.options);
         causes.forEach(cause => selects.forEach(select => { if (![...select.options].some(option => option.value === cause.id)) { const option = element('option', cause.title || text.campaign); option.value = cause.id; select.append(option); } }));
         form.elements.fund.addEventListener('change', () => applyCauseGiving(form, causes.find(cause => cause.id === form.elements.fund.value)));

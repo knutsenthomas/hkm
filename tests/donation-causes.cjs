@@ -27,6 +27,15 @@ const fixture={items:[{id:'skoleprosjekt',title:'Skoleprosjekt',description:'StÃ
   assert.equal(context.document.querySelector('#donor-gift-amount').readOnly,true);
   assert.equal(context.document.querySelector('[name=frequency][value=monthly]').disabled,true);
  }
+ {
+  const dom=new JSDOM(fs.readFileSync('donasjoner.html','utf8'),{url:'https://example.com/donasjoner?aksjon=skoleprosjekt'});
+  const context={console,document:dom.window.document,location:dom.window.location,URL,URLSearchParams,Event:dom.window.Event,firebaseService:{invalidatePageContentCache:()=>{},getPageContent:async id=>id==='cause_activity'?{campaigns:{skoleprosjekt:{collected:250,donorCount:1,donationCount:2}}}:fixture}};
+  vm.createContext(context);vm.runInContext(source,context);await new Promise(resolve=>setImmediate(resolve));
+  assert.match(context.document.querySelector('.donor-activity').textContent,/Aktivitet/);
+  assert.match(context.document.querySelector('.donor-activity-metrics').textContent,/250 kr/);
+  assert.match(context.document.querySelector('.donor-activity-metrics').textContent,/1registrerte givere/);
+  assert.equal(context.document.querySelector('progress').value,250);
+ }
  const result=validateRecurring({gift:true,amount:250,requestId:'12345678-1234-1234-1234-123456789abc',consent:true,customerDetails:{name:'Test Person',email:'test@example.com',fund:'skoleprosjekt'}});
  assert.equal(result.metadata.fund,'skoleprosjekt');
  const adminSource=fs.readFileSync('admin/js/admin.js','utf8');

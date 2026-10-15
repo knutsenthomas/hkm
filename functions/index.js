@@ -9765,3 +9765,13 @@ exports.manageRecurringVipps = onRequest({ cors: true, invoker: 'public', secret
     res.send({ status: result.status, amount: record.amount, gift: record.gift, fund: record.metadata.fund, cycles: record.gift ? null : 10 });
   } catch (error) { res.status(error.status || 500).send({ error: 'agreement-unavailable' }); }
 });
+
+// Publish aggregate fundraiser activity without exposing donor records.
+const { refreshCauseActivity } = require('./cause-activity.cjs');
+exports.updateCauseActivity = onDocumentWritten({document:'donations/{donationId}',region:'us-central1',retry:true}, async event => {
+  const funds = [...new Set([event.data?.before.data()?.fund,event.data?.after.data()?.fund].filter(Boolean))];
+  if (funds.length) await refreshCauseActivity(db, funds);
+});
+exports.updateCauseActivitySettings = onDocumentWritten({document:'content/collection_causes',region:'us-central1',retry:true}, async () => {
+  await refreshCauseActivity(db);
+});
