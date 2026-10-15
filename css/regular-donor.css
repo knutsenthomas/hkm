@@ -195,3 +195,11 @@ html[data-theme="dark"] .donor-impact-grid article { border-color: #334155; }
 
 .donor-campaign-actions { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-top:20px; }
 .donor-campaign-actions .btn { margin:0; }
+
+.donations-page-view .donor-welcome.section { padding-top:0!important; }
+.donations-page-view .donor-welcome-copy { padding-top:32px; }
+.donations-page-view .donor-welcome-copy h2 { margin-top:0; }
+@media (max-width:900px) {
+    .donations-page-view .donor-welcome.section { padding-top:24px!important; }
+    .donations-page-view .donor-welcome-copy { padding-top:0; }
+}
