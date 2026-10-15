@@ -11,7 +11,7 @@ const text = copy[language] || copy.no;
 const campaignPath = language === 'en' ? '/en/donations' : language === 'es' ? '/es/donaciones' : '/donasjoner';
 export function localizeCause(cause, lang = language) {
     const translated = cause.translations?.[lang];
-    return {...cause, title: translated?.title || cause.title, description: translated?.description || cause.description};
+    return {...cause, title: translated?.title || cause.title, description: translated?.description || cause.description, heroIntro: translated?.heroIntro ?? cause.heroIntro};
 }
 export function activeDonationCauses(data) {
     const items = Array.isArray(data?.items) ? data.items : Object.values(data?.items || {});
@@ -72,8 +72,10 @@ if (form) {
             form.elements.fund.value = selected.id; form.elements.fund.dispatchEvent(new Event('change'));
             document.title = `${selected.title} | His Kingdom Ministry`;
             document.getElementById('donor-welcome-title').textContent = selected.title;
-            document.querySelector('.donor-photo-hero-copy > p').textContent = selected.description || text.fallback;
-            document.getElementById('donor-intro-title').textContent = selected.title;
+            const heroIntro = document.querySelector('.donor-photo-hero-copy > p');
+            heroIntro.textContent = selected.heroIntro || '';
+            heroIntro.hidden = !selected.heroIntro;
+            document.getElementById('donor-intro-title').hidden = true;
             document.querySelector('.donor-welcome-lead').textContent = selected.description || text.choose;
             document.querySelector('.donor-welcome-copy').append(details(selected));
             const info = moreInfo(selected); if (info) document.querySelector('.donor-welcome-copy').append(info);

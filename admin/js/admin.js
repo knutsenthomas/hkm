@@ -21055,6 +21055,7 @@ class AdminManager {
                             <label for="cause-goal">Målbeløp (kr)</label>
                             <input type="number" id="cause-goal" class="form-control" placeholder="100000" value="100000">
                         </div>
+                        <div class="form-group"><label for="cause-hero-intro">Kort tekst i toppbildet (valgfritt)</label><textarea id="cause-hero-intro" class="form-control" maxlength="220" rows="2" placeholder="En kort introduksjon til aksjonen"></textarea><small>Maks 220 tegn. La feltet stå tomt for å vise bare tittelen.</small></div>
                         <div class="form-group"><label for="cause-amount-mode">Gavebeløp</label><select id="cause-amount-mode" class="form-control"><option value="open">Valgfritt beløp</option><option value="fixed">Ett bestemt beløp</option><option value="presets">Flere beløpsvalg</option></select></div>
                         <div class="form-group" id="cause-fixed-group" hidden><label for="cause-fixed-amount">Fast beløp (kr)</label><input id="cause-fixed-amount" class="form-control" type="number" min="1" max="100000" step="1" value="250"></div>
                         <div class="form-group" id="cause-presets-group" hidden><label for="cause-amount-options">Beløpsvalg i kroner, adskilt med komma</label><input id="cause-amount-options" class="form-control" value="100, 250, 500"><label><input id="cause-allow-custom" type="checkbox" checked> Tillat også valgfritt beløp</label></div>
@@ -22080,6 +22081,7 @@ class AdminManager {
     setCauseGivingFields(cause) {
         const giving = cause.giving || {};
         document.getElementById('cause-info-url').value = cause.infoUrl || '';
+        document.getElementById('cause-hero-intro').value = cause.heroIntro || '';
         document.getElementById('cause-amount-mode').value = giving.amountMode || 'open';
         document.getElementById('cause-fixed-amount').value = giving.amounts?.[0] || 250;
         document.getElementById('cause-amount-options').value = (giving.amounts?.length ? giving.amounts : [100,250,500]).join(', ');
@@ -22113,6 +22115,8 @@ class AdminManager {
     async saveCause(asDraft = false) {
         const title = document.getElementById('cause-title').value.trim();
         const description = document.getElementById('cause-description').value.trim();
+        const heroIntro = document.getElementById('cause-hero-intro').value.trim();
+        if (heroIntro.length > 220) { this.showToast('Bruk maks 220 tegn i toppbildet.', 'warning'); return; }
         const collected = Number(document.getElementById('cause-collected').value);
         const goal = Number(document.getElementById('cause-goal').value);
         const image = document.getElementById('cause-image').value.trim();
@@ -22145,13 +22149,14 @@ class AdminManager {
             let causesData = await firebaseService.getPageContent('collection_causes');
             let causes = causesData && Array.isArray(causesData.items) ? causesData.items : [];
             const previous = editId !== '' ? causes[parseInt(editId)] : null;
-            const translations = {no: {title, description}};
+            const translations = {no: {title, description, heroIntro}};
             let translationStatusValue = 'complete';
             const translationResults = await Promise.allSettled(['en', 'es'].map(async lang => {
                 const old = previous?.translations?.[lang];
                 const translatedTitle = old?.title && previous.title === title ? old.title : await this._translateTextChunk(title, lang, 'no', true);
                 const translatedDescription = old?.description && previous.description === description ? old.description : await this._translateTextChunk(description, lang, 'no', true);
-                translations[lang] = {title: translatedTitle, description: translatedDescription};
+                const translatedIntro = !heroIntro ? '' : old?.heroIntro && previous.heroIntro === heroIntro ? old.heroIntro : await this._translateTextChunk(heroIntro, lang, 'no', true);
+                translations[lang] = {title: translatedTitle, description: translatedDescription, heroIntro: translatedIntro};
             }));
             const translationFailure = translationResults.find(result => result.status === 'rejected');
             if (translationFailure) {
@@ -22168,7 +22173,7 @@ class AdminManager {
                 if (causes.some(cause => cause.id === causeId)) causeId += '-' + Date.now();
             }
 
-            const newCause = { ...(editId !== '' ? causes[parseInt(editId)] : {}), id: causeId, title, description, collected, goal, image, infoUrl, giving, translations, translationStatus: translationStatusValue, status: asDraft ? 'draft' : 'published', active: !asDraft && document.getElementById('cause-active').checked };
+            const newCause = { ...(editId !== '' ? causes[parseInt(editId)] : {}), id: causeId, title, description, heroIntro, collected, goal, image, infoUrl, giving, translations, translationStatus: translationStatusValue, status: asDraft ? 'draft' : 'published', active: !asDraft && document.getElementById('cause-active').checked };
 
             if (editId !== '') {
                 causes[parseInt(editId)] = newCause;

@@ -12,15 +12,17 @@ const fixture={items:[{id:'skoleprosjekt',title:'Skoleprosjekt',description:'StÃ
   assert.equal(document.querySelectorAll('#donor-gift-fund option[value="skoleprosjekt"]').length,1);
   assert.equal(document.querySelector('#donor-gift-fund option[value="hidden"]'),null);
   if(!query) { assert.equal(document.querySelectorAll('.donor-campaign-card').length,1);assert.match(document.querySelector('.donor-campaign-card a.btn').href,/aksjon=skoleprosjekt/); }
-  else if(query.includes('skoleprosjekt')) { assert.equal(document.title,'Skoleprosjekt | His Kingdom Ministry');assert.equal(document.querySelector('#donor-gift-fund').value,'skoleprosjekt');assert.equal(document.querySelector('progress').value,1500);assert.equal(document.querySelector('.donor-cause-more').href,'https://example.com/more'); }
+  else if(query.includes('skoleprosjekt')) { assert.equal(document.title,'Skoleprosjekt | His Kingdom Ministry');assert.equal(document.querySelector('.donor-photo-hero-copy > p').hidden,true);assert.equal(document.querySelector('#donor-intro-title').hidden,true);assert.equal(document.querySelector('.donor-welcome-lead').textContent,'StÃ¸tt barn og skole');assert.equal(document.querySelector('#donor-gift-fund').value,'skoleprosjekt');assert.equal(document.querySelector('progress').value,1500);assert.equal(document.querySelector('.donor-cause-more').href,'https://example.com/more'); }
   else assert.match(document.querySelector('.donor-cause-notice').textContent,/ikke tilgjengelig/);
  }
  for (const [path,lang] of [['en/donations.html','en'],['es/donaciones.html','es']]) {
   const dom=new JSDOM(fs.readFileSync(path,'utf8'),{url:'https://example.com/'+path+'?aksjon=skoleprosjekt'});
-  const localized={items:[{...fixture.items[0],translations:{[lang]:{title:'Translated title',description:'Translated description'}},giving:{amountMode:'fixed',amounts:[750],frequency:'once'}}]};
+  const localized={items:[{...fixture.items[0],translations:{[lang]:{title:'Translated title',description:'Translated description',heroIntro:'A short introduction'}},giving:{amountMode:'fixed',amounts:[750],frequency:'once'}}]};
   const context={console,document:dom.window.document,location:dom.window.location,URL,URLSearchParams,Event:dom.window.Event,firebaseService:{invalidatePageContentCache:()=>{},getPageContent:async()=>localized}};
   vm.createContext(context);vm.runInContext(source,context);await new Promise(resolve=>setImmediate(resolve));
   assert.equal(context.document.querySelector('#donor-welcome-title').textContent,'Translated title');
+  assert.equal(context.document.querySelector('.donor-photo-hero-copy > p').textContent,'A short introduction');
+  assert.equal(context.document.querySelector('.donor-photo-hero-copy > p').hidden,false);
   assert.equal(context.document.querySelector('#donor-gift-amount').value,'750');
   assert.equal(context.document.querySelector('#donor-gift-amount').readOnly,true);
   assert.equal(context.document.querySelector('[name=frequency][value=monthly]').disabled,true);
@@ -35,10 +37,10 @@ const fixture={items:[{id:'skoleprosjekt',title:'Skoleprosjekt',description:'StÃ
  vm.createContext(context);
  const method=adminSource.slice(adminSource.indexOf('    toggleCauseGivingFields()'),adminSource.indexOf('    editCause(index)'));
  vm.runInContext('this.manager=new (class {'+method+"})();Object.assign(this.manager,{_translateTextChunk:async(text,lang)=>lang+':'+text,generateSlug:()=> 'ny-aksjon',loadCauses:async()=>{},showToast:()=>{}});",context);
- context.document.querySelector('#cause-title').value='Ny aksjon';context.document.querySelector('#cause-info-url').value='https://example.com/info';context.document.querySelector('#cause-form-modal').dataset.editId='';
+ context.document.querySelector('#cause-title').value='Ny aksjon';context.document.querySelector('#cause-hero-intro').value='Kort intro';context.document.querySelector('#cause-info-url').value='https://example.com/info';context.document.querySelector('#cause-form-modal').dataset.editId='';
  await context.manager.saveCause();assert.equal(saved.data.items[0].active,true);assert.equal(saved.data.items[0].id,'ny-aksjon');
  assert.equal(saved.data.items[0].infoUrl,'https://example.com/info');
- assert.equal(saved.data.items[0].translations.en.title,'en:Ny aksjon');
+ assert.equal(saved.data.items[0].translations.en.title,'en:Ny aksjon');assert.equal(saved.data.items[0].heroIntro,'Kort intro');assert.equal(saved.data.items[0].translations.es.heroIntro,'es:Kort intro');
  await context.manager.saveCause(true);assert.equal(saved.data.items[0].status,'draft');assert.equal(saved.data.items[0].active,false);
  context.document.querySelector('#cause-amount-mode').value='fixed';context.document.querySelector('#cause-fixed-amount').value='750';
  await context.manager.saveCause();assert.equal(saved.data.items[0].giving.amounts[0],750);

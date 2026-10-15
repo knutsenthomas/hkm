@@ -100,6 +100,7 @@ html[data-theme="dark"] .donor-card-eyebrow { color: #ffcfaa; }
 
 html[data-theme="dark"] .donor-impact-grid article { border-color: #334155; }
 
+.donor-gift-card #donor-gift-fund { margin-bottom:24px; }
 .donor-payment-options { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
 .donor-payment-options label { position:relative; cursor:pointer; }
 .donor-gift-card .donor-payment-options input { position:absolute; width:1px; height:1px; opacity:0; padding:0; }
