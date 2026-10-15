@@ -25,6 +25,26 @@ export function inspectNewsletter(subject, blocks, html) {
     if (/\b(?:Lorem ipsum|Sett inn tekst|Din tekst her)\b/i.test(html)) findings.push('Erstatt eksempelteksten før utsending.');
     return findings;
 }
+export function summarizeCampaigns(campaigns, days = 'all', now = Date.now()) {
+    const count = value => value != null && value !== '' && Number.isFinite(Number(value)) && Number(value) >= 0 ? Number(value) : null;
+    const rows = campaigns.filter(c => {
+        const timestamp = campaignTime(c.queuedAt || c.sentAt || c.createdAt);
+        return days === 'all' || (timestamp > 0 && timestamp >= now - Number(days) * 86400000 && timestamp <= now);
+    });
+    const months = new Map();
+    let sent = 0, unknown = 0, issues = 0, completed = 0;
+    rows.forEach(c => {
+        const amount = count(c.sentCount); sent += amount || 0; unknown += amount === null ? 1 : 0;
+        const state = campaignState(c, now);
+        if (['Avvik', 'Feil', 'Uavklart'].includes(state)) issues++;
+        if (state === 'Fullført') completed++;
+        const timestamp = campaignTime(c.queuedAt || c.sentAt || c.createdAt);
+        const key = timestamp ? new Date(timestamp).toLocaleDateString('sv-SE', { year:'numeric', month:'2-digit' }) : 'Ukjent dato';
+        const month = months.get(key) || { campaigns:0, sent:0, unknown:0 };
+        month.campaigns++; month.sent += amount || 0; month.unknown += amount === null ? 1 : 0; months.set(key, month);
+    });
+    return { rows, sent, unknown, issues, completed, months: [...months].sort((a,b) => a[0].localeCompare(b[0])) };
+}
 const root = document.getElementById('newsletter-workspace');
 if (root) {
     const isNewsletterArea = new URLSearchParams(location.search).get('section') === 'newsletter';
@@ -77,7 +97,26 @@ if (root) {
             output.textContent = logs.length ? `Fant ${sent} registrert som sendt og ${failed} registrert som feilet med dette emnet. Utvalget er begrenset til 100 logger og kan omfatte flere utsendinger.` : 'Ingen nyhetsbrevlogger med dette emnet ble funnet. Dette beviser ikke at utsendingen mislyktes.';
         } catch { output.textContent = 'Kunne ikke hente loggene. Kontroller administratortilgangen og prøv igjen.'; }
     };
+    const renderAnalytics = () => {
+        const summary = summarizeCampaigns(campaigns, root.querySelector('[data-analytics-period]').value);
+        const metrics = root.querySelector('[data-analytics-metrics]'); metrics.replaceChildren();
+        for (const [label, value] of [['Utsendelser', summary.rows.length], ['Registrert sendt', summary.sent], ['Fullført uten avvik', summary.completed], ['Avvik, feil eller uavklart', summary.issues], ['Mangler sendetall', summary.unknown]]) {
+            const card = el('div', ''); card.append(el('span', label), el('strong', value)); metrics.append(card);
+        }
+        const months = root.querySelector('[data-analytics-months]'); months.replaceChildren();
+        summary.months.forEach(([month, data]) => {
+            const row = el('tr', ''); [month, data.campaigns, data.sent + (data.unknown ? ` (${data.unknown} ukjent)` : '')].forEach(value => row.append(el('td', value))); months.append(row);
+        });
+        const details = root.querySelector('[data-analytics-campaigns]'); details.replaceChildren();
+        summary.rows.forEach(campaign => {
+            const row = el('tr', ''); [campaign.subject || 'Uten emne', campaignState(campaign), `${campaign.sentCount ?? 'Ukjent'} / ${campaign.recipientCount ?? 'Ukjent'}`].forEach(value => row.append(el('td', value)));
+            const cell = el('td', ''); const button = el('button', 'Se logg'); button.type = 'button'; button.onclick = () => showLogs(campaign); cell.append(button); row.append(cell); details.append(row);
+        });
+        for (const [body, columns] of [[months, 3], [details, 4]]) if (!body.children.length) { const row = el('tr', ''); const cell = el('td', 'Ingen kampanjer i perioden.'); cell.colSpan = columns; row.append(cell); body.append(row); }
+    };
+    root.querySelector('[data-analytics-period]').addEventListener('change', renderAnalytics);
     const render = () => {
+        renderAnalytics();
         table.replaceChildren();
         const term = search.value.trim().toLocaleLowerCase('nb');
         const rows = campaigns.filter(c => (!term || String(c.subject || '').toLocaleLowerCase('nb').includes(term)) && (!filter.value || campaignState(c) === filter.value));
@@ -187,4 +226,4 @@ if (check) check.addEventListener('click', () => {
     output.hidden = false;
 });
 
-if (root) { try { const tab = sessionStorage.getItem('hkm_newsletter_overview_tab'); root.querySelector(`[data-workspace-view="${['campaigns','drafts','templates'].includes(tab) ? tab : 'campaigns'}"]`)?.click(); } catch (_) {} }
+if (root) { try { const tab = sessionStorage.getItem('hkm_newsletter_overview_tab'); root.querySelector(`[data-workspace-view="${['campaigns','drafts','templates','analytics'].includes(tab) ? tab : 'campaigns'}"]`)?.click(); } catch (_) {} }

@@ -384,3 +384,8 @@ body.builder-active #newsletter-builder-layout #blocks-container p.selected-bloc
 /* Divider spacing belongs to its wrapper, never both wrapper and rule. */
 #newsletter-builder-layout #blocks-container .newsletter-divider-block { margin:12px 0!important; padding:4px 0!important; min-height:0!important; }
 #newsletter-builder-layout #blocks-container .newsletter-divider-block > hr { margin:0!important; }
+
+.newsletter-workspace .workspace-nav { flex-wrap:wrap; }
+.newsletter-workspace [data-analytics-period] { padding:10px 12px; border:1px solid var(--admin-border,#e2e8f0); border-radius:8px; background:var(--nw-bg); color:inherit; font:inherit; }
+.newsletter-workspace [data-analytics-metrics] { grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); }
+.newsletter-workspace [data-workspace-panel="analytics"] h4 { margin:24px 0 12px; }
