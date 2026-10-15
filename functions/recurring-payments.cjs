@@ -14,7 +14,8 @@ function validateRecurring(input) {
   const amount = Number(input.amount);
   const requestId = String(input.requestId || '');
   if (!name || name.length > 120 || email.length > 254 || !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email) || !Number.isFinite(amount) || amount < 1 || amount > 100000 || Math.abs(amount * 100 - Math.round(amount * 100)) > 0.000001 || !/^[a-f0-9-]{36}$/i.test(requestId) || input.consent !== true) throw fail('invalid-recurring-gift');
-  const fund = input.customerDetails?.fund === 'hkpc' ? 'hkpc' : 'general';
+  const requestedFund = String(input.customerDetails?.fund || 'general');
+  const fund = /^[a-z0-9][a-z0-9_-]{0,119}$/i.test(requestedFund) ? requestedFund : 'general';
   const key = createHash('sha256').update(`gift|${requestId}`).digest('hex');
   const metadata = { donor_plan: 'monthly_gift', plan_key: key, customer_name: name, customer_email: email, fund, type: 'Fast giver', message: String(input.customerDetails?.message || '').slice(0, 500) };
   return { name, email, amount, requestId, key, metadata, cycles: 0, gift: true };

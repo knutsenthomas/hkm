@@ -21030,32 +21030,32 @@ class AdminManager {
                 </div>
             </div>
 
-            <div id="cause-form-modal" style="display: none;">
-                <div class="modal-backdrop" onclick="document.getElementById('cause-form-modal').style.display = 'none'"></div>
+            <dialog id="cause-form-modal" aria-labelledby="form-title">
                 <div class="modal-content" style="max-width: 600px;">
                     <div class="modal-header" style="padding:24px 32px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
                         <h3 id="form-title">Ny innsamlingsaksjon</h3>
-                        <button class="modal-close" onclick="document.getElementById('cause-form-modal').style.display = 'none'">×</button>
+                        <button class="modal-close" onclick="document.getElementById('cause-form-modal').close()">×</button>
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label>Tittel</label>
+                            <label for="cause-title">Tittel</label>
                             <input type="text" id="cause-title" class="form-control" placeholder="f.eks. Støtt vårt arbeid">
                         </div>
                         <div class="form-group">
-                            <label>Beskrivelse</label>
+                            <label for="cause-description">Beskrivelse</label>
                             <textarea id="cause-description" class="form-control" style="height: 100px;" placeholder="Beskriv hva innsamlingen er for..."></textarea>
                         </div>
                         <div class="form-group">
-                            <label>Innsamlet beløp (kr)</label>
+                            <label for="cause-collected">Innsamlet beløp (kr)</label>
                             <input type="number" id="cause-collected" class="form-control" placeholder="0" value="0">
                         </div>
                         <div class="form-group">
-                            <label>Målbeløp (kr)</label>
+                            <label for="cause-goal">Målbeløp (kr)</label>
                             <input type="number" id="cause-goal" class="form-control" placeholder="100000" value="100000">
                         </div>
+                        <div class="form-group"><label><input type="checkbox" id="cause-active" checked> Vis aksjonen på donasjonssiden</label></div>
                         <div class="form-group">
-                            <label>Bildekilde (URL)</label>
+                            <label for="cause-image">Bildekilde (URL)</label>
                             <div style="display: flex; gap: 8px;">
                                 <input type="url" id="cause-image" class="form-control" placeholder="https://images.unsplash.com/..." style="flex: 1;">
                                 <button type="button" id="cause-unsplash-btn" class="btn btn-secondary" style="padding: 0 12px; border-radius: 8px; display: flex; align-items: center; gap: 4px; font-size: 13px;">
@@ -21065,11 +21065,11 @@ class AdminManager {
                         </div>
                     </div>
                     <div class="modal-footer" style="padding:24px 32px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; gap:12px;">
-                        <button class="btn-secondary" onclick="document.getElementById('cause-form-modal').style.display = 'none'">Avbryt</button>
+                        <button class="btn-secondary" onclick="document.getElementById('cause-form-modal').close()">Avbryt</button>
                         <button class="btn-primary" id="save-cause-btn">Lagre</button>
                     </div>
                 </div>
-            </div>
+            </dialog>
 
             <!-- Manual In-Kind Modal -->
             <div id="manual-inkind-modal" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:24px;">
@@ -21169,8 +21169,9 @@ class AdminManager {
             document.getElementById('cause-collected').value = '0';
             document.getElementById('cause-goal').value = '100000';
             document.getElementById('cause-image').value = '';
+            document.getElementById('cause-active').checked = true;
             document.getElementById('cause-form-modal').dataset.editId = '';
-            document.getElementById('cause-form-modal').style.display = 'flex';
+            document.getElementById('cause-form-modal').showModal();
         });
 
         const causeUnsplashBtn = document.getElementById('cause-unsplash-btn');
@@ -21182,7 +21183,7 @@ class AdminManager {
                         if (input && selection && selection.url) {
                             input.value = selection.url;
                         }
-                    });
+                    }, document.getElementById('cause-form-modal'));
                 }
             };
         }
@@ -21921,7 +21922,7 @@ class AdminManager {
                                     <p class="cause-desc-text" style="margin:0; font-size:13px; color:#64748b;">${cause.description || ''}</p>
                                     <span style="font-size:11px; background:#f1f5f9; color:#475569; padding:2px 6px; border-radius:4px; font-weight:600; text-transform:lowercase; display:inline-block; margin-top:6px;">ID: ${causeId}</span>
                                 </div>
-                                <div class="cause-actions-wrap" style="display:flex; gap:8px;">
+                                <div class="cause-actions-wrap" style="display:flex; gap:8px;"><a class="btn-secondary" href="/donasjoner?aksjon=${encodeURIComponent(causeId)}" target="_blank" rel="noopener">Se aksjon</a>
                                     <button class="action-btn edit-cause-btn" data-index="${index}" title="Rediger">
                                         <span class="material-symbols-outlined" style="pointer-events: none;">edit</span>
                                     </button>
@@ -22055,8 +22056,8 @@ class AdminManager {
     async saveCause() {
         const title = document.getElementById('cause-title').value.trim();
         const description = document.getElementById('cause-description').value.trim();
-        const collected = parseInt(document.getElementById('cause-collected').value) || 0;
-        const goal = parseInt(document.getElementById('cause-goal').value) || 100000;
+        const collected = Number(document.getElementById('cause-collected').value);
+        const goal = Number(document.getElementById('cause-goal').value);
         const image = document.getElementById('cause-image').value.trim();
         const editId = document.getElementById('cause-form-modal').dataset.editId;
 
@@ -22065,6 +22066,8 @@ class AdminManager {
             return;
         }
 
+        if (!Number.isFinite(collected) || collected < 0 || !Number.isFinite(goal) || goal <= 0) { this.showToast('Bruk et positivt målbeløp og et innsamlet beløp på minst 0.', 'warning'); return; }
+        if (image && !/^https?:\/\//i.test(image)) { this.showToast('Bruk en gyldig bildeadresse.', 'warning'); return; }
         try {
             let causesData = await firebaseService.getPageContent('collection_causes');
             let causes = causesData && Array.isArray(causesData.items) ? causesData.items : [];
@@ -22075,9 +22078,10 @@ class AdminManager {
                 causeId = causes[parseInt(editId)].id || this.generateSlug(title);
             } else {
                 causeId = this.generateSlug(title) || `cause-${Date.now()}`;
+                if (causes.some(cause => cause.id === causeId)) causeId += '-' + Date.now();
             }
 
-            const newCause = { id: causeId, title, description, collected, goal, image };
+            const newCause = { ...(editId !== '' ? causes[parseInt(editId)] : {}), id: causeId, title, description, collected, goal, image, active: document.getElementById('cause-active').checked };
 
             if (editId !== '') {
                 causes[parseInt(editId)] = newCause;
@@ -22086,7 +22090,7 @@ class AdminManager {
             }
 
             await firebaseService.savePageContent('collection_causes', { items: causes });
-            document.getElementById('cause-form-modal').style.display = 'none';
+            document.getElementById('cause-form-modal').close();
             await this.loadCauses();
             this.showToast('Innsamlingsaksjon lagret!', 'success');
         } catch (error) {
@@ -22107,8 +22111,9 @@ class AdminManager {
                 document.getElementById('cause-collected').value = cause.collected || 0;
                 document.getElementById('cause-goal').value = cause.goal || 100000;
                 document.getElementById('cause-image').value = cause.image || '';
+                document.getElementById('cause-active').checked = cause.active !== false;
                 document.getElementById('cause-form-modal').dataset.editId = index;
-                document.getElementById('cause-form-modal').style.display = 'flex';
+                document.getElementById('cause-form-modal').showModal();
             }
         });
     }

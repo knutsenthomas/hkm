@@ -112,11 +112,12 @@ class UnsplashManager {
         this.eventsBound = true;
     }
 
-    open(callback) {
+    open(callback, parent = null) {
         this.ensureModal();
         this.init();
         this.onSelectCallback = callback;
         if (this.modal) {
+            if (parent) { this.returnParent = this.modal.parentElement; parent.append(this.modal); }
             this.modal.style.display = 'flex';
         }
         if (this.input) {
@@ -138,6 +139,7 @@ class UnsplashManager {
     close() {
         if (this.modal) {
             this.modal.style.display = 'none';
+            if (this.returnParent) { this.returnParent.append(this.modal); this.returnParent = null; }
         }
         this.onSelectCallback = null;
     }

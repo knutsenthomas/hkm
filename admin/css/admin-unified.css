@@ -11547,3 +11547,16 @@ html body.minside-body .section-content > .design-ui-header:not(.in-topbar) {
 
 
 
+
+#cause-form-modal { position:fixed; inset:0; margin:auto; width:min(600px,calc(100vw - 32px)); max-height:calc(100dvh - 48px); padding:0; border:1px solid var(--admin-border,#e2e8f0); border-radius:18px; background:var(--admin-surface,#fff); color:var(--admin-text,#1e293b); overflow:auto; }
+#cause-form-modal::backdrop { background:rgba(15,23,42,.5); backdrop-filter:blur(4px); }
+#cause-form-modal .modal-content { position:static!important; width:100%!important; margin:0!important; max-height:none!important; box-shadow:none!important; transform:none!important; }
+#cause-form-modal .modal-body { padding:24px 32px; }
+#cause-form-modal .modal-header,#cause-form-modal .modal-footer { padding:20px 24px!important; }
+#cause-form-modal .modal-header h3 { margin:0!important; font-size:22px!important; }
+#cause-form-modal .modal-body { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; padding:24px; }
+#cause-form-modal .form-group { margin:0!important; grid-column:1/-1; }
+#cause-form-modal .form-group:nth-child(3),#cause-form-modal .form-group:nth-child(4) { grid-column:auto; }
+#cause-form-modal input[type="checkbox"] { accent-color:var(--admin-accent,#d17d39); }
+#cause-form-modal .modal-footer { position:sticky; bottom:0; }
+@media(max-width:480px) { #cause-form-modal .modal-body { grid-template-columns:1fr; } }

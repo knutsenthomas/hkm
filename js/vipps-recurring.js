@@ -681,7 +681,12 @@ function openAgreementModal(method = "vipps") {
     if (giftForm) {
         amountBtns.forEach(button => button.classList.remove('selected'));
         customInput.value = giftForm.elements.amount.value;
-        modal.querySelector('#hkm-donor-fund').value = giftForm.elements.fund.value;
+        const fundSelect = modal.querySelector('#hkm-donor-fund');
+        const selectedFund = giftForm.elements.fund.selectedOptions[0];
+        if (selectedFund && ![...fundSelect.options].some(option => option.value === selectedFund.value)) {
+            const option = document.createElement('option'); option.value = selectedFund.value; option.textContent = selectedFund.textContent; fundSelect.append(option);
+        }
+        fundSelect.value = giftForm.elements.fund.value;
     }
 
     const bankInstruction = modal.querySelector('.hkm-checkout-bank p:last-child');

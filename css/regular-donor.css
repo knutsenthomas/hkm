@@ -142,3 +142,17 @@ html[data-theme="dark"] .donor-impact-grid article { border-color: #334155; }
 
 .hkm-gift-summary { position:relative; padding-right:80px; }
 .hkm-gift-edit { position:absolute; top:20px; right:20px; padding:6px 0; color:#a65c2c; font-size:13px; font-weight:600; text-decoration:underline; text-underline-offset:3px; }
+
+.donor-campaigns { background:#fff; }
+.donor-campaigns h2 { font-size:32px; margin-bottom:12px; }
+.donor-campaign-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr)); gap:24px; margin-top:28px; }
+.donor-campaign-card { border:1px solid #eee5dc; border-radius:20px; overflow:hidden; background:#fff; }
+.donor-campaign-card > img { width:100%; height:200px; object-fit:cover; }
+.donor-campaign-card > div { padding:24px; }
+.donor-campaign-card h3 { font-size:22px; margin-bottom:12px; }
+.donor-campaign-card p { color:var(--text-light); line-height:1.7; margin-bottom:20px; }
+.donor-cause-progress { display:flex; flex-direction:column; gap:10px; margin:24px 0; }
+.donor-cause-progress progress { width:100%; height:10px; accent-color:var(--primary-orange); }
+.donor-cause-progress span { color:var(--text-light); font-size:14px; }
+.donor-cause-image { width:100%; max-height:340px; object-fit:cover; border-radius:18px; margin-bottom:24px; }
+.donor-cause-notice { padding:14px; margin-bottom:20px; border:1px solid #e8c6a9; border-radius:10px; background:#fff8f0; }
