@@ -1635,7 +1635,7 @@
 
             // Global click delegation
             document.addEventListener('click', (e) => {
-                const link = e.target.closest('.nav-link[data-section], .mobile-nav-item[data-section]');
+                const link = e.target.closest('.nav-link[data-section], .mobile-nav-item[data-section], .automation-tab[data-section]');
                 if (link) {
                     e.preventDefault();
                     const targetSectionId = link.getAttribute('data-section');

@@ -18773,7 +18773,7 @@ class AdminManager {
     }
 
     bindCausesTabs() {
-        const tabs = document.querySelectorAll('#causes-section .automation-tab');
+        const tabs = document.querySelectorAll('#causes-section .automation-tab[data-tab]');
         const panes = document.querySelectorAll('#causes-section .cause-tab-pane');
         
         tabs.forEach(tab => {
@@ -20571,7 +20571,7 @@ class AdminManager {
                         <button class="automation-tab" data-tab="donations">Pr. gave</button>
                         <button class="automation-tab" data-tab="donors">Pr. giver</button>
                         <button class="automation-tab" data-tab="inkind">Fysiske gaver</button>
-                        <a class="automation-tab" href="/admin/index.html#school-payments">Skolebetalinger</a>
+                        <a class="automation-tab" data-section="school-payments" href="/admin/index.html#school-payments">Skolebetalinger</a>
                     </div>
                     
                     <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0; flex-wrap: wrap;">
@@ -28967,7 +28967,7 @@ class AdminManager {
     }
 
     initAutomationTabs() {
-        const tabs = document.querySelectorAll('.automation-tab');
+        const tabs = document.querySelectorAll('.automation-tab[data-tab]');
         const panes = document.querySelectorAll('.automation-pane');
 
         tabs.forEach(tab => {

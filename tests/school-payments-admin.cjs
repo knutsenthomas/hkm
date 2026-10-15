@@ -20,3 +20,23 @@ const source=fs.readFileSync('admin/js/skolebetalinger.js','utf8').replace(/^imp
  assert.equal(requests,1);
  console.log('Passed: shared sidebar route, old URL redirect, scoped controls, authorized fetch, filtering and sign-out privacy.');
 })().catch(error=>{console.error(error);process.exitCode=1;});
+// Exercise the actual shared navigation listener with the dynamically rendered gift tab.
+{
+ const navDom=new JSDOM(html,{url:'https://example.com/admin/index.html#causes',runScripts:'outside-only'});
+ const navDoc=navDom.window.document;
+ const adminSource=fs.readFileSync('admin/js/admin.js','utf8');
+ const anchor=adminSource.match(/<a class="automation-tab" data-section="school-payments"[^>]*>Skolebetalinger<\/a>/)?.[0];assert.ok(anchor);
+ navDoc.querySelector('#causes-section').insertAdjacentHTML('beforeend',anchor);
+ const start=html.indexOf('<script>',html.indexOf('<!-- Core Dashboard Logic'))+8;
+ const script=html.slice(start,html.indexOf('</script>',start));
+ let switched;
+ navDom.window.adminManager={onSectionSwitch:id=>{switched=id;}};
+ navDom.window.eval(script);navDoc.dispatchEvent(new navDom.window.Event('DOMContentLoaded'));
+ const event=new navDom.window.MouseEvent('click',{bubbles:true,cancelable:true});
+ navDoc.querySelector('#causes-section .automation-tab[data-section="school-payments"]').dispatchEvent(event);
+ assert.equal(event.defaultPrevented,true);assert.equal(switched,'school-payments');
+ assert.equal(navDom.window.location.hash,'#school-payments');assert.equal(navDoc.querySelector('#school-payments-section').classList.contains('active'),true);
+ assert.equal(navDoc.querySelector('#causes-section').classList.contains('active'),false);
+ console.log('Passed: clicking school payments from Gifts opens the correct admin section without a document navigation.');
+ navDom.window.close();
+}
