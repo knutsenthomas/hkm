@@ -17877,7 +17877,7 @@ class AdminManager {
         updatePreview();
     }
 
-    openManualDonationModal() {
+    async openManualDonationModal() {
         const modal = document.getElementById('manual-donation-modal');
         if (!modal) return;
 
@@ -17894,9 +17894,30 @@ class AdminManager {
         const methodInput = document.getElementById('manual-donation-method');
         if (methodInput) methodInput.value = 'bank';
         modal.style.display = 'flex';
+        const run = this._manualDonationLoadGeneration = (this._manualDonationLoadGeneration || 0) + 1;
+        const fund = document.getElementById('manual-donation-fund');
+        const save = document.getElementById('save-manual-donation-btn');
+        const hint = document.getElementById('manual-donation-fund-hint');
+        fund.disabled = true; save.disabled = true;
+        fund.replaceChildren(new Option('Henter innsamlingsaksjoner …', ''));
+        try {
+            const data = await firebaseService.getPageContent('collection_causes');
+            if (run !== this._manualDonationLoadGeneration) return;
+            if (!data || !Array.isArray(data.items)) throw new Error('Kunne ikke hente aksjonene');
+            fund.replaceChildren(new Option('Generell gave (ingen aksjon)', 'general'));
+            data.items.filter(cause => /^[a-z0-9][a-z0-9_-]{0,119}$/i.test(cause.id || '') && cause.status !== 'draft')
+                .forEach(cause => fund.append(new Option(cause.title || cause.id, cause.id)));
+            hint.textContent = 'Fullførte gaver regnes med på den valgte aksjonen. Givers e-post eller bruker brukes for å telle unike givere.';
+            fund.disabled = false; save.disabled = false;
+        } catch (error) {
+            if (run !== this._manualDonationLoadGeneration) return;
+            hint.textContent = 'Kunne ikke hente innsamlingsaksjoner. Lukk skjemaet og prøv igjen før du registrerer gaven.';
+            this.showToast('Kunne ikke hente innsamlingsaksjoner.', 'error');
+        }
     }
 
     closeManualDonationModal() {
+        this._manualDonationLoadGeneration = (this._manualDonationLoadGeneration || 0) + 1;
         const modal = document.getElementById('manual-donation-modal');
         if (modal) modal.style.display = 'none';
     }
@@ -17916,6 +17937,9 @@ class AdminManager {
     async saveManualDonation() {
         const saveBtn = document.getElementById('save-manual-donation-btn');
         const getValue = (id) => document.getElementById(id)?.value?.trim() || '';
+        const fundInput = document.getElementById('manual-donation-fund');
+        if (fundInput.disabled || !fundInput.value) { this.showToast('Vent til innsamlingsaksjonene er lastet.', 'warning'); return; }
+        const fund = fundInput.value;
         const amountNok = Number(getValue('manual-donation-amount').replace(',', '.'));
         const selectedUserId = getValue('manual-donation-user');
         const donorName = getValue('manual-donor-name');
@@ -17970,6 +17994,7 @@ class AdminManager {
                 reference,
                 type: 'Gave',
                 source: 'manual_admin',
+                fund,
                 matchMethod: resolvedUserId ? 'manual_user_select' : 'manual_unmatched',
                 registeredBy: currentAdmin?.uid || null,
                 registeredByEmail: currentAdmin?.email || '',
@@ -20983,6 +21008,11 @@ class AdminManager {
                                     <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Givers e-post</label>
                                     <input id="manual-donor-email" class="form-control" type="email" placeholder="navn@eksempel.no" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                 </div>
+                            </div>
+                            <div class="form-group" style="margin:0;">
+                                <label for="manual-donation-fund" style="display:block;margin-bottom:8px;font-weight:600;">Innsamlingsaksjon</label>
+                                <select id="manual-donation-fund" class="form-control" style="width:100%;padding:10px 16px;border:1px solid #cbd5e1;border-radius:8px;" disabled><option value="">Henter innsamlingsaksjoner …</option></select>
+                                <p id="manual-donation-fund-hint" role="status" style="font-size:13px;color:#64748b;line-height:1.5;margin:8px 0 0;"></p>
                             </div>
                             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;">
                                 <div class="form-group" style="margin:0;">

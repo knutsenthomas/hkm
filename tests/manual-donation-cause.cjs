@@ -1,0 +1,21 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const {JSDOM}=require('jsdom');
+const {summarizeCauseDonations}=require('../functions/cause-activity.cjs');
+const source=fs.readFileSync('admin/js/admin.js','utf8');
+const markup=source.slice(source.indexOf('<div id="manual-donation-modal"'),source.indexOf('<dialog id="cause-form-modal"'));
+const dom=new JSDOM(markup);let saved,fail=false;
+const context={console,document:dom.window.document,Option:dom.window.Option,Date,Number,firebaseService:{getPageContent:async()=>{if(fail)throw Error('offline');return {items:[{id:'school',title:'Bibelskole',status:'published'},{id:'draft',title:'Kladd',status:'draft'}]};},db:{collection:()=>({doc:()=>({id:'manual-1',set:async value=>{saved=value;}})})}},firebase:{auth:()=>({currentUser:{uid:'admin'}}),firestore:{Timestamp:{fromDate:date=>date},FieldValue:{serverTimestamp:()=>new Date()}}}};
+vm.createContext(context);const methods=source.slice(source.indexOf('    async openManualDonationModal()'),source.indexOf('    async openEditSaleModal('));
+vm.runInContext('this.manager=new (class {'+methods+'})();',context);
+Object.assign(context.manager,{showToast:()=>{},_runWriteLocked:async(key,action)=>action(),_withButtonLoading:async(button,action)=>action(),renderDonationAdminViews:()=>{},getDonationDate:record=>record.timestamp});
+(async()=>{
+ const d=context.document;
+ await context.manager.openManualDonationModal();assert.equal(d.querySelector('#save-manual-donation-btn').disabled,false);
+ assert.equal(d.querySelector('#manual-donation-fund option[value=draft]'),null);
+ d.querySelector('#manual-donation-fund').value='school';d.querySelector('#manual-donation-amount').value='500';d.querySelector('#manual-donor-name').value='Test Giver';d.querySelector('#manual-donor-email').value='giver@example.com';
+ await context.manager.saveManualDonation();assert.equal(saved.fund,'school');assert.equal(saved.method,'bank');assert.equal(saved.status,'completed');
+ assert.deepEqual(summarizeCauseDonations([{id:'manual-1',...saved}]),{collected:500,donorCount:1,donationCount:1,anonymousDonationCount:0});
+ await context.manager.openManualDonationModal();assert.equal(d.querySelector('#manual-donation-fund').value,'general');
+ saved=null;fail=true;await context.manager.openManualDonationModal();assert.equal(d.querySelector('#save-manual-donation-btn').disabled,true);await context.manager.saveManualDonation();assert.equal(saved,null);
+ console.log('Passed: campaign options, draft exclusion, bank gift attribution, public totals, reset and failed-load protection.');
+})().catch(error=>{console.error(error);process.exitCode=1;});
