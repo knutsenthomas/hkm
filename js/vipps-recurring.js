@@ -492,7 +492,6 @@ document.addEventListener("DOMContentLoaded", () => {
         giftForm.addEventListener('submit', event => {
             event.preventDefault();
             const method = giftForm.elements['gift-payment']?.value || 'vipps';
-            if (method === 'bank') return;
             if (giftForm.reportValidity()) openAgreementModal(method);
         });
     }
@@ -546,10 +545,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function openAgreementModal(method = "vipps") {
     const giftForm = document.getElementById('donor-gift-form');
     if (giftForm && !giftForm.reportValidity()) return;
-    if (giftForm?.elements.frequency?.value === 'once') {
-        window.showOneTimeGift(method);
-        return;
-    }
+    const monthly = giftForm?.elements.frequency?.value !== 'once';
     // Remove existing modal if any
     const existing = document.getElementById("vipps-recurring-modal");
     if (existing) existing.remove();
@@ -560,7 +556,8 @@ function openAgreementModal(method = "vipps") {
 
     const modal = document.createElement("div");
     modal.id = "vipps-recurring-modal";
-    modal.className = "hkm-modal-overlay";
+    modal.className = "hkm-modal-overlay hkm-gift-checkout";
+    modal.setAttribute("role", "dialog"); modal.setAttribute("aria-modal", "true"); modal.setAttribute("aria-labelledby", "hkm-gift-title");
     
     let subtitleText = "";
     let submitBtnText = "";
@@ -576,11 +573,13 @@ function openAgreementModal(method = "vipps") {
         submitBtnText = t("paypal_btn");
     }
 
+    if (!monthly) { subtitleText = 'Se over gaven og fyll inn opplysningene dine.'; submitBtnText = `Fortsett med ${method === 'stripe' ? 'kort' : method === 'paypal' ? 'PayPal' : 'Vipps'}`; }
+    if (method === 'bank') { subtitleText = 'Bruk opplysningene under når du betaler i nettbanken.'; submitBtnText = 'Kopier kontonummer'; }
     modal.innerHTML = `
         <div class="hkm-modal-panel">
             <div class="hkm-modal-header">
                 <div class="hkm-modal-title-wrapper">
-                    <h3 class="hkm-modal-title">${t('title')}</h3>
+                    <span class="hkm-checkout-eyebrow">HIS KINGDOM MINISTRY</span><h3 class="hkm-modal-title" id="hkm-gift-title">${isEnglish ? (monthly ? 'Your monthly gift' : 'Your gift') : isSpanish ? (monthly ? 'Tu donación mensual' : 'Tu donación') : (monthly ? 'Din månedlige gave' : 'Din gave')}</h3>
                     <p class="hkm-modal-subtitle">${subtitleText}</p>
                 </div>
                 <button class="hkm-modal-close" id="hkm-modal-close-btn" type="button" aria-label="Lukk">
@@ -604,7 +603,7 @@ function openAgreementModal(method = "vipps") {
                 </div>
 
                 <!-- Personal Info -->
-                <div class="hkm-form-group">
+                <div class="hkm-form-group hkm-donor-fields">
                     <label class="hkm-form-label">${t('details_label')}</label>
                     <label for="hkm-donor-name" class="sr-only">${t('name_placeholder')}</label>
                     <input type="text" id="hkm-donor-name" name="name" autocomplete="name" class="hkm-input" placeholder="${t('name_placeholder')}" required style="margin-bottom: 16px;">
@@ -649,6 +648,28 @@ function openAgreementModal(method = "vipps") {
         </div>
     `;
 
+    const summary = document.createElement('div'); summary.className = 'hkm-gift-summary';
+    const summaryAmount = document.createElement('strong');
+    const summaryDetails = document.createElement('span');
+    summary.append(summaryAmount, summaryDetails); modal.querySelector('.hkm-modal-header').after(summary);
+    const errorBox = document.createElement('p'); errorBox.className = 'hkm-checkout-error'; errorBox.setAttribute('role','alert'); errorBox.hidden = true;
+    modal.querySelector('form').append(errorBox);
+    const reportError = message => { errorBox.textContent = message; errorBox.hidden = false; };
+    const consent = modal.querySelector('input[type="checkbox"]');
+    if (!monthly || method === 'bank') { consent.required = false; consent.closest('label').hidden = true; }
+    if (!monthly) {
+        modal.querySelector('.hkm-form-label').textContent = 'Gavebeløp';
+        modal.querySelector('#hkm-custom-amount').placeholder = 'Annet beløp (kr)';
+    }
+    if (method === 'bank') {
+        modal.querySelectorAll('[name="name"],[name="email"],[name="tel"],[name="address"],[name="postal-code"],[name="city"]').forEach(input => { input.required = false; input.disabled = true; input.closest('.hkm-form-group').hidden = true; });
+        const bank = document.createElement('div'); bank.className = 'hkm-checkout-bank';
+        const account = document.createElement('strong'); account.id = 'hkm-checkout-account'; account.textContent = document.getElementById('donor-bank-account')?.textContent.trim() || '3000.66.08759';
+        const label = document.createElement('p'); label.textContent = 'Kontonummer · His Kingdom Ministry';
+        const instruction = document.createElement('p'); instruction.textContent = monthly ? 'Opprett et fast oppdrag i nettbanken. Du velger betalingsdato og kan stoppe oppdraget når du vil.' : 'Overfør beløpet fra nettbanken din.';
+        instruction.append(document.createTextNode(' Merk betalingen «Gave – ' + modal.querySelector('#hkm-donor-fund').selectedOptions[0].textContent + '».'));
+        bank.append(label, account, instruction); modal.querySelector('#hkm-donor-fund').after(bank);
+    }
     document.body.appendChild(modal);
     
     // Smooth fade-in
@@ -663,6 +684,18 @@ function openAgreementModal(method = "vipps") {
         modal.querySelector('#hkm-donor-fund').value = giftForm.elements.fund.value;
     }
 
+    const bankInstruction = modal.querySelector('.hkm-checkout-bank p:last-child');
+    const updateSummary = () => {
+        const chosen = modal.querySelector('.hkm-amount-btn.selected');
+        const amount = Number(customInput.value || chosen?.dataset.amount || 0);
+        summaryAmount.textContent = `${amount.toLocaleString('nb-NO')} kr${monthly ? ' / måned' : ''}`;
+        summaryDetails.textContent = `${modal.querySelector('#hkm-donor-fund').selectedOptions[0].textContent} · ${method === 'stripe' ? 'Kort' : method === 'paypal' ? 'PayPal' : method === 'bank' ? 'Bank' : 'Vipps'}`;
+    };
+    modal.querySelector('form').addEventListener('input', updateSummary);
+    modal.querySelector('form').addEventListener('change', updateSummary);
+    amountBtns.forEach(button => button.addEventListener('click', () => queueMicrotask(updateSummary)));
+    updateSummary();
+    if (bankInstruction) bankInstruction.textContent = (monthly ? 'Opprett et fast oppdrag i nettbanken. Du velger betalingsdato og kan stoppe oppdraget når du vil.' : 'Overfør beløpet fra nettbanken din.') + ' Merk betalingen «Gave – ' + modal.querySelector('#hkm-donor-fund').selectedOptions[0].textContent + '».';
     amountBtns.forEach(btn => {
         btn.addEventListener("click", () => {
             amountBtns.forEach(b => b.classList.remove("selected"));
@@ -676,12 +709,30 @@ function openAgreementModal(method = "vipps") {
     });
 
     // Close buttons events
+    if (giftForm) {
+        customInput.closest('.hkm-form-group').hidden = true;
+        const fundControl = modal.querySelector('#hkm-donor-fund');
+        fundControl.hidden = true; modal.querySelector('label[for="hkm-donor-fund"]').hidden = true;
+        const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'hkm-gift-edit'; edit.textContent = 'Endre';
+        edit.addEventListener('click', () => modal.querySelector('#hkm-modal-close-btn').click()); summary.append(edit);
+    }
     const closeBtn = modal.querySelector("#hkm-modal-close-btn");
     const closeModal = () => {
         modal.classList.remove("active");
-        setTimeout(() => modal.remove(), 300);
+        setTimeout(() => { modal.remove(); document.getElementById('vipps-recurring-trigger')?.focus(); }, 300);
     };
     closeBtn.addEventListener("click", closeModal);
+    modal.addEventListener('keydown', event => {
+        if (event.key === 'Escape') { event.preventDefault(); closeModal(); }
+        if (event.key === 'Tab') {
+            const controls = [...modal.querySelectorAll('button,input,select,a[href]')].filter(control => !control.disabled && !control.hidden && !control.closest('[hidden]'));
+            const first = controls[0], last = controls.at(-1);
+            if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+            else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+        }
+    });
+    closeBtn.focus();
+
     modal.addEventListener("click", (e) => {
         if (e.target === modal) closeModal();
     });
@@ -705,6 +756,12 @@ function openAgreementModal(method = "vipps") {
             return;
         }
 
+        if (method === 'bank') {
+            const account = modal.querySelector('#hkm-checkout-account').textContent;
+            try { await navigator.clipboard.writeText(account.replace(/[.\s]/g, '')); modal.querySelector('#hkm-submit-btn').textContent = 'Kontonummer kopiert'; }
+            catch { reportError('Marker kontonummeret over og kopier det manuelt.'); }
+            return;
+        }
         const submitBtn = modal.querySelector("#hkm-submit-btn");
         const originalText = submitBtn.textContent;
         submitBtn.disabled = true;
@@ -716,6 +773,22 @@ function openAgreementModal(method = "vipps") {
         const donorZip = modal.querySelector("#hkm-donor-zip").value.trim();
         const donorCity = modal.querySelector("#hkm-donor-city").value.trim();
         const fund = modal.querySelector("#hkm-donor-fund").value;
+
+        if (!monthly && method !== 'stripe') {
+            const customerDetails = { name:donorName, email:donorEmail, phone:donorPhone, address:donorAddress, zip:donorZip, city:donorCity, fund, userId:currentUser?.email?.toLowerCase() === donorEmail.toLowerCase() ? currentUser.uid : null };
+            try {
+                if (method === 'vipps') await window.startVippsPayment(amount, customerDetails);
+                else {
+                    if (typeof window.initPayPalDonation !== 'function') throw new Error('PayPal er ikke tilgjengelig akkurat nå.');
+                    const payment = document.createElement('div'); payment.className = 'hkm-paypal-checkout'; form.append(payment);
+                    form.querySelectorAll('input,select').forEach(input => input.disabled = true);
+                    submitBtn.hidden = true;
+                    window.initPayPalDonation({ container:payment, details:{amount,customerDetails}, onSuccess:closeModal });
+                }
+            } catch (error) { reportError(error.message || 'Kunne ikke starte betalingen.'); }
+            finally { submitBtn.disabled = false; }
+            return;
+        }
 
         if (method === "vipps") {
             submitBtn.innerHTML = `<span class="hkm-spinner" style="width: 20px; height: 20px; border-width: 2px; margin-right: 10px; margin-bottom: 0; display: inline-block; vertical-align: middle;"></span>${t('loading_vipps')}`;
@@ -778,7 +851,7 @@ function openAgreementModal(method = "vipps") {
                         </div>
                         <button id="submit-payment" class="hkm-submit-btn" type="button">
                             <span class="hkm-spinner hidden" id="spinner" style="width: 20px; height: 20px; border-width: 2px; margin-right: 10px; margin-bottom: 0; display: inline-block; vertical-align: middle;"></span>
-                            <span id="button-text">${t('stripe_confirm_btn')} (${amount} kr/mnd)</span>
+                            <span id="button-text">${monthly ? t('stripe_confirm_btn') : 'Bekreft gave'} (${amount} kr${monthly ? '/mnd' : ''})</span>
                         </button>
                         <div id="payment-message" class="hidden"></div>
                     </div>
@@ -788,7 +861,7 @@ function openAgreementModal(method = "vipps") {
                     throw new Error("Stripe checkout-skriptet er ikke ferdig lastet.");
                 }
 
-                await window.initializeStripe(amount, customerDetails, "card", true);
+                await window.initializeStripe(amount, customerDetails, "card", monthly);
 
                 const submitPaymentBtn = form.querySelector("#submit-payment");
                 if (submitPaymentBtn) {

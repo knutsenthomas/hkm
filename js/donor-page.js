@@ -10,12 +10,12 @@ if (giftForm && details) {
         const bank = method === 'bank';
         const trigger = document.getElementById('vipps-recurring-trigger');
         document.getElementById('donor-amount-label').textContent = monthly ? 'Månedlig beløp' : 'Gavebeløp';
-        trigger.hidden = bank;
-        trigger.innerHTML = `${monthly ? 'Bli fast giver med' : 'Fortsett med'} ${names[method] || 'Vipps'} <i class="fas fa-arrow-right" aria-hidden="true"></i>`;
+        trigger.hidden = false;
+        trigger.innerHTML = `${bank ? 'Vis bankinformasjon' : (monthly ? 'Bli fast giver med ' : 'Fortsett med ') + (names[method] || 'Vipps')} <i class="fas fa-arrow-right" aria-hidden="true"></i>`;
         giftForm.querySelector('h2 + p').textContent = bank
             ? 'Gi direkte fra nettbanken din.'
             : monthly ? `Velg din månedlige gave. Du bekrefter avtalen trygt ${method === 'vipps' ? 'i Vipps' : method === 'paypal' ? 'hos PayPal' : 'med kort'}.` : 'Velg beløp og formål. Du fyller inn opplysningene dine i neste steg.';
-        document.getElementById('donor-bank-information').hidden = !bank;
+        document.getElementById('donor-bank-information').hidden = true;
         const fund = giftForm.elements.fund.selectedOptions[0].textContent;
         const amount = giftForm.elements.amount.value;
         document.getElementById('donor-bank-instructions').textContent = monthly

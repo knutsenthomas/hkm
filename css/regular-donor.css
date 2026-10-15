@@ -110,3 +110,35 @@ html[data-theme="dark"] .donor-impact-grid article { border-color: #334155; }
 .donor-bank-information { margin-top:20px; padding-top:16px; border-top:1px solid #eee5dc; }
 .donor-bank-information p { font-size:14px; line-height:1.65; margin:8px 0; }
 @media(max-width:360px) { .donor-payment-options { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+
+/* One checkout shell for every giving method. */
+.hkm-gift-checkout { padding:24px 12px!important; box-sizing:border-box; background:rgba(15,23,42,.48)!important; backdrop-filter:blur(6px)!important; }
+.hkm-gift-checkout .hkm-modal-panel { max-width:560px; padding:32px; margin:auto; background:#fff; border:1px solid #eee5dc; border-radius:24px; box-shadow:0 24px 70px #0f172a26; }
+.hkm-gift-checkout .hkm-checkout-eyebrow { display:block; color:#a65c2c; font-size:10px; font-weight:700; letter-spacing:.13em; margin-bottom:8px; }
+.hkm-gift-checkout .hkm-modal-title { color:var(--text-dark,#2c3e50); font-size:28px; }
+.hkm-gift-checkout .hkm-modal-subtitle { line-height:1.6; color:#64748b; margin-top:8px; }
+.hkm-gift-summary { display:flex; flex-direction:column; gap:6px; padding:20px; margin:0 0 24px; background:#fcf7f2; border:1px solid #efe2d7; border-radius:16px; }
+.hkm-gift-summary strong { font-size:26px; color:var(--text-dark,#2c3e50); }
+.hkm-gift-summary span { font-size:13px; color:#7c6b5e; }
+.hkm-gift-checkout .hkm-input { border:1px solid #dce0e3; border-radius:12px; background:#fff; box-shadow:none; }
+.hkm-gift-checkout .hkm-input:focus { border-color:#c56828; box-shadow:0 0 0 3px #c568281a; }
+.hkm-gift-checkout .hkm-amount-btn.selected { border-color:#c56828; color:#b85a22; background:#fff3e9; }
+.hkm-gift-checkout .hkm-submit-btn { background:linear-gradient(120deg,#d17d39,#bd4f2a); border-radius:12px; box-shadow:0 4px 12px #c5682820; }
+.hkm-gift-checkout [hidden] { display:none!important; }
+.hkm-checkout-bank { padding:20px; margin:20px 0; background:#fcf7f2; border:1px solid #efe2d7; border-radius:14px; }
+.hkm-checkout-bank p { font-size:14px; line-height:1.7; margin:8px 0; }
+.hkm-checkout-bank strong { font-size:25px; letter-spacing:.04em; color:var(--text-dark,#2c3e50); }
+.hkm-checkout-error { color:#b42318; padding:12px; background:#fff1f0; border-radius:10px; font-size:14px; }
+.hkm-gift-checkout .hkm-modal-panel { max-height:calc(100dvh - 48px); overflow-y:auto; }
+@media(max-width:600px) { .hkm-gift-checkout .hkm-modal-panel { padding:24px 20px; border-radius:20px; } .hkm-gift-checkout .hkm-modal-title { font-size:24px; } }
+@media(prefers-reduced-motion:reduce) { .hkm-gift-checkout,.hkm-gift-checkout .hkm-modal-panel { transition:none!important; } }
+
+.hkm-gift-checkout .hkm-donor-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.hkm-gift-checkout .hkm-donor-fields > .hkm-form-label { grid-column:1/-1; margin-bottom:0; }
+.hkm-gift-checkout .hkm-donor-fields .hkm-input { margin:0!important; min-width:0; }
+.hkm-gift-checkout .hkm-donor-fields > div,
+.hkm-gift-checkout .hkm-donor-fields > div > div { display:contents!important; }
+@media(max-width:420px) { .hkm-gift-checkout .hkm-donor-fields { grid-template-columns:1fr; } }
+
+.hkm-gift-summary { position:relative; padding-right:80px; }
+.hkm-gift-edit { position:absolute; top:20px; right:20px; padding:6px 0; color:#a65c2c; font-size:13px; font-weight:600; text-decoration:underline; text-underline-offset:3px; }

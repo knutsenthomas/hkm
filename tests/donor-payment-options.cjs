@@ -12,7 +12,7 @@ const select=(name,value)=>{const input=form.querySelector(`[name="${name}"][val
 assert.match(trigger.textContent,/Vipps/);
 select('gift-payment','stripe');assert.match(trigger.textContent,/kort/);assert.equal(trigger.hidden,false);
 select('gift-payment','paypal');assert.match(trigger.textContent,/PayPal/);
-select('gift-payment','bank');assert.equal(trigger.hidden,true);assert.equal(document.getElementById('donor-bank-information').hidden,false);assert.match(document.getElementById('donor-bank-instructions').textContent,/fast oppdrag/);
+select('gift-payment','bank');assert.equal(trigger.hidden,false);assert.equal(document.getElementById('donor-bank-information').hidden,true);assert.match(trigger.textContent,/Vis bankinformasjon/);assert.match(document.getElementById('donor-bank-instructions').textContent,/fast oppdrag/);
 select('frequency','once');assert.match(document.getElementById('donor-bank-instructions').textContent,/Overfør 250 kr/);
 select('gift-payment','stripe');assert.equal(document.getElementById('donor-bank-information').hidden,true);assert.match(trigger.textContent,/Fortsett med kort/);
 document.getElementById('gi-gave').scrollIntoView=()=>{};dom.window.showOneTimeGift('stripe');assert.equal(document.querySelector('[name="payment-method"]:checked').value,'card');assert.equal(document.getElementById('gi-gave').hidden,false);
@@ -21,6 +21,6 @@ const start=recurring.indexOf("        giftForm.addEventListener('submit', event
 const handler=recurring.slice(start+"        giftForm.addEventListener('submit', event => {".length,end);
 let opened;form.reportValidity=()=>true;
 vm.runInNewContext('(function(event){'+handler+'})({preventDefault(){}})',{giftForm:form,openAgreementModal:method=>{opened=method;}});assert.equal(opened,'stripe');
-select('gift-payment','bank');opened=null;vm.runInNewContext('(function(event){'+handler+'})({preventDefault(){}})',{giftForm:form,openAgreementModal:method=>{opened=method;}});assert.equal(opened,null);
+select('gift-payment','bank');opened=null;vm.runInNewContext('(function(event){'+handler+'})({preventDefault(){}})',{giftForm:form,openAgreementModal:method=>{opened=method;}});assert.equal(opened,'bank');
 document.getElementById('donor-copy-account').click();assert.equal(copied,'30006608759');
 console.log('Passed: payment choices, monthly/one-time copy, bank instructions, account copying and existing flow routing.');

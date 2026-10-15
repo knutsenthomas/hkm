@@ -68,8 +68,9 @@ function getDonationDetails() {
 }
 
 // Function to handle donation form submit when PayPal is selected
-export function initPayPalDonation() {
-    const paypalContainer = document.getElementById("paypal-button-container");
+export function initPayPalDonation(options = {}) {
+    const paypalContainer = options.container || document.getElementById("paypal-button-container");
+    const donationDetails = () => options.details || getDonationDetails();
     if (!paypalContainer) return;
 
     // Show PayPal container
@@ -78,7 +79,7 @@ export function initPayPalDonation() {
     // Clear previous button if any and render heading
     paypalContainer.innerHTML = `
         <h4 style="margin-bottom: 16px; color: #1B4965; font-weight: 700; font-size: 16px; text-align: center;">Fullfør med PayPal</h4>
-        <div id="paypal-button" style="margin-bottom: 16px;"></div>
+        <div class="paypal-button-mount" style="margin-bottom: 16px;"></div>
     `;
 
     // Load SDK and render buttons
@@ -92,10 +93,10 @@ export function initPayPalDonation() {
         paypal.Buttons({
             onClick: function(data, actions) {
                 // Validate form inputs before opening the PayPal window
-                const form = document.querySelector('.donation-form-content');
+                const form = options.details ? null : document.querySelector('.donation-form-content');
                 if (!form) return actions.resolve();
 
-                const details = getDonationDetails();
+                const details = donationDetails();
                 if (details.amount <= 0) {
                     alert("Vennligst velg eller skriv inn et beløp.");
                     return actions.reject();
@@ -110,7 +111,7 @@ export function initPayPalDonation() {
             },
             createOrder: async () => {
                 try {
-                    const details = getDonationDetails();
+                    const details = donationDetails();
                     const response = await fetch(PAYPAL_CREATE_ORDER_URL, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -158,7 +159,8 @@ export function initPayPalDonation() {
                     
                     // Reset form and container
                     paypalContainer.style.display = "none";
-                    const donationForm = document.querySelector('.donation-form-content');
+                    options.onSuccess?.();
+                    const donationForm = options.details ? null : document.querySelector('.donation-form-content');
                     if (donationForm) {
                         donationForm.reset();
                         // Re-trigger default selection
@@ -187,7 +189,7 @@ export function initPayPalDonation() {
                 shape:  'rect',
                 label:  'paypal'
             }
-        }).render('#paypal-button');
+        }).render(paypalContainer.querySelector('.paypal-button-mount'));
     });
 }
 

@@ -63,7 +63,7 @@ async function initializeStripe(amount, customerDetails = {}, paymentMethodPrefe
         const appearance = {
             theme: 'stripe',
             variables: {
-                colorPrimary: '#FFA500',
+                colorPrimary: '#c56828',
                 colorBackground: '#ffffff',
                 colorText: '#30313d',
                 colorDanger: '#df1b41',
@@ -86,13 +86,13 @@ async function initializeStripe(amount, customerDetails = {}, paymentMethodPrefe
         };
 
         const paymentElement = elements.create("payment", paymentElementOptions);
-        paymentElement.mount("#payment-element");
+        paymentElement.mount(document.querySelector("#vipps-recurring-modal #payment-element") || document.getElementById("payment-element"));
 
         // Show the container
-        document.getElementById("stripe-checkout-container").style.display = "block";
+        (document.querySelector("#vipps-recurring-modal #stripe-checkout-container") || document.getElementById("stripe-checkout-container")).style.display = "block";
 
         // Scroll to the container
-        document.getElementById("stripe-checkout-container").scrollIntoView({ behavior: 'smooth' });
+        (document.querySelector("#vipps-recurring-modal #stripe-checkout-container") || document.getElementById("stripe-checkout-container")).scrollIntoView({ behavior: 'smooth' });
 
     } catch (error) {
         console.error("Stripe initialization failed:", error);
@@ -330,7 +330,7 @@ async function recordDonation(paymentIntent) {
 
 // UI Helpers
 function showMessage(messageText) {
-    const messageContainer = document.querySelector("#payment-message");
+    const messageContainer = (document.querySelector("#vipps-recurring-modal #payment-message") || document.querySelector("#payment-message"));
     if (!messageContainer) {
         return;
     }
@@ -344,9 +344,9 @@ function showMessage(messageText) {
 }
 
 function setLoading(isLoading) {
-    const submitButton = document.querySelector("#submit-payment");
-    const spinner = document.querySelector("#spinner");
-    const buttonText = document.querySelector("#button-text");
+    const submitButton = (document.querySelector("#vipps-recurring-modal #submit-payment") || document.querySelector("#submit-payment"));
+    const spinner = (document.querySelector("#vipps-recurring-modal #spinner") || document.querySelector("#spinner"));
+    const buttonText = (document.querySelector("#vipps-recurring-modal #button-text") || document.querySelector("#button-text"));
 
     if (!submitButton || !spinner || !buttonText) {
         return;
