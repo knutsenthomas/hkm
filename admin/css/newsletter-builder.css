@@ -5956,7 +5956,7 @@ body.builder-active.sidebar-collapsed .sidebar {
 .docs-rte-surface hr {
     border: none !important;
     border-top: 2px solid #e2e8f0 !important;
-    margin: 32px 0 !important;
+    margin: 12px 0;
 }
 
 .docs-rte-surface:focus {

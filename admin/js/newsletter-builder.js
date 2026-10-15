@@ -2901,7 +2901,7 @@ class NewsletterBuilder {
                 break;
             case 'divider':
                 html = `
-                    <div class="newsletter-divider-block" contenteditable="false" style="position: relative; margin: 24px 0; padding: 12px 0;">
+                    <div class="newsletter-divider-block" contenteditable="false" style="position: relative; margin: 12px 0; padding: 4px 0;">
                         <hr style="border: none; border-top: 2px solid #e2e8f0; margin: 0;">
                     </div><p><br></p>`;
                 break;
@@ -4321,7 +4321,7 @@ class NewsletterBuilder {
                 break;
             case 'divider':
                 html = `
-                    <div class="newsletter-divider-block" contenteditable="false" style="position: relative; margin: 24px 0; padding: 12px 0;">
+                    <div class="newsletter-divider-block" contenteditable="false" style="position: relative; margin: 12px 0; padding: 4px 0;">
                         <hr style="border: none; border-top: 2px solid #e2e8f0; margin: 0;">
                     </div><p><br></p>`;
                 break;
@@ -5051,6 +5051,7 @@ class NewsletterBuilder {
         const classList = node.classList;
 
         if (/^H[1-6]$/.test(tagName)) return 'Overskrift';
+        if (tagName === 'HR' || classList?.contains('newsletter-divider-block')) return 'Skillelinje';
         if (tagName === 'DIV' && node.querySelector('h1,h2,h3,p') && node.querySelector('a[href],button')) return 'Seksjon';
         if (classList?.contains('newsletter-social-block') || node.querySelector?.('.newsletter-social-block')) return 'Sosialt';
         if (classList?.contains('newsletter-product-block') || node.querySelector?.('.newsletter-product-block, .product-card')) return 'Produkt';

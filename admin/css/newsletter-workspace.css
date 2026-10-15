@@ -380,3 +380,7 @@ body.builder-active #newsletter-builder-layout #blocks-container p.selected-bloc
 
 #newsletter-builder-layout #elements-panel .desktop-elements-header { padding:18px 24px; }
 #newsletter-builder-layout #elements-panel .elements-search-container { margin:20px 24px 10px!important; }
+
+/* Divider spacing belongs to its wrapper, never both wrapper and rule. */
+#newsletter-builder-layout #blocks-container .newsletter-divider-block { margin:12px 0!important; padding:4px 0!important; min-height:0!important; }
+#newsletter-builder-layout #blocks-container .newsletter-divider-block > hr { margin:0!important; }
