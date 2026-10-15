@@ -2897,6 +2897,9 @@ class AdminManager {
                 case 'app':
                     this.renderAppSection();
                     break;
+                case 'school-payments':
+                    import('./skolebetalinger.js').then(module => module.mountSchoolPayments(section.querySelector('.school-finance'))).catch(error => { console.error('Kunne ikke åpne skolebetalinger:', error); section.querySelector('[role="status"]').textContent = 'Kunne ikke åpne skolebetalinger. Last siden på nytt.'; });
+                    break;
                 case 'causes':
                     this.renderCausesManager();
                     break;
@@ -20543,7 +20546,7 @@ class AdminManager {
                         <button class="automation-tab" data-tab="donations">Pr. gave</button>
                         <button class="automation-tab" data-tab="donors">Pr. giver</button>
                         <button class="automation-tab" data-tab="inkind">Fysiske gaver</button>
-                        <a class="automation-tab" href="/admin/skolebetalinger.html">Skolebetalinger</a>
+                        <a class="automation-tab" href="/admin/index.html#school-payments">Skolebetalinger</a>
                     </div>
                     
                     <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0; flex-wrap: wrap;">

@@ -439,6 +439,7 @@
         }
     </style>
 <link rel="stylesheet" href="css/newsletter-workspace.css">
+    <link rel="stylesheet" href="css/skolebetalinger.css">
 </head>
 
 <body class="admin-body main-dashboard cloak">
@@ -589,6 +590,7 @@
                             <span>Gaver</span>
                         </a>
                     </li>
+                    <li class="nav-item" data-nav-category="administrasjon"><a href="#school-payments" class="nav-link" data-section="school-payments"><span class="material-symbols-outlined">school</span><span>Skolebetalinger</span></a></li>
                     <li class="nav-item" data-nav-category="administrasjon">
                         <a href="javascript:void(0)" class="nav-link" data-section="shop">
                             <span class="material-symbols-outlined">shopping_cart</span>
@@ -1181,6 +1183,8 @@
                 <div class="loader"></div>
             </div>
 
+            <div id="school-payments-section" class="section-content"><div class="section-header"><h2 class="section-title">Skolebetalinger</h2></div><div class="school-finance"><p class="school-finance-intro">Skoleavgift og trekkavtaler for HKPC. Gaver administreres i gaveoversikten.</p><section class="finance-card"><div class="finance-controls"><label>Skoleår<select id="school-finance-school-year"><option value="2027">2027–2028</option><option value="2026">2026–2027</option></select></label><label>Søk<input id="school-finance-search" type="search" placeholder="Navn, e-post eller referanse"></label><button id="school-finance-refresh" type="button">Oppdater</button></div><p id="school-finance-status" role="status">Bekrefter administratortilgang …</p><button id="school-finance-finance-login" class="finance-button" type="button" hidden>Logg inn med Google</button><div id="school-finance-finance-content" hidden><h2>Saldo per tilknyttet elev</h2><p>Bankbetalinger teller først når de er registrert som mottatt. Engangsavgiften vises separat.</p><div id="school-finance-students"></div><h2>Skoleavtaler og elevkobling</h2><p>Bruk avtalereferansen når du knytter en skoleavtale til elevkontoen i HKPC-appen.</p><div id="school-finance-plans"></div><h2>Transaksjoner</h2><p>Viser skolebetalinger. En betaling uten registrert skoleår vises med «Ukjent». Koblingsstatus gjelder valgt skoleår.</p><div id="school-finance-transactions"></div><p id="school-finance-limit-note" hidden>Oversikten er begrenset til 100 elevkoblinger, 100 avtaler og 500 transaksjoner. Den viser ikke en fullstendig regnskapsrapport.</p><a class="finance-button" href="https://app.hkpc.no/betalinger">Knytt betaling til elev i HKPC</a></div></section></div></div>
+
             <div id="shop-section" class="section-content">
                 <div class="section-header">
                     <h2 class="section-title">Butikk & Salg</h2>
@@ -1510,6 +1514,7 @@
                 podcast: { icon: 'podcasts', title: 'Podcast Studio', subtitle: 'Episoder, lydfiler og RSS-distribusjon.' },
                 users: { icon: 'group', title: 'Brukeradministrasjon', subtitle: 'Oversikt over alle registrerte brukere og tilganger.' },
                 comments: { icon: 'forum', title: 'Kommentarer & Moderering', subtitle: 'Behandle og godkjenn innkommende kommentarer.' },
+                'school-payments': { icon: 'school', title: 'Skolebetalinger', subtitle: 'Skoleavgift og trekkavtaler for HKPC.' },
                 causes: { icon: 'volunteer_activism', title: 'Hjertesaker', subtitle: 'Administrer innsamlinger og hjertesaker.' },
                 hero: { icon: 'view_carousel', title: 'Hero Slider', subtitle: 'Administrer forside-bannere og visuelle kampanjer.' },
                 seo: { icon: 'travel_explore', title: 'Søkemotoroptimalisering (SEO)', subtitle: 'Meta-titler, beskrivelser, Open Graph og synlighet.' },
