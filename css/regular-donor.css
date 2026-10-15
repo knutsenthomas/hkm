@@ -152,10 +152,21 @@ html[data-theme="dark"] .donor-impact-grid article { border-color: #334155; }
 .donor-campaign-card > div { padding:24px; }
 .donor-campaign-card h3 { font-size:22px; margin-bottom:12px; }
 .donor-campaign-card p { color:var(--text-light); line-height:1.7; margin-bottom:20px; }
-.donor-cause-progress { display:flex; flex-direction:column; gap:10px; margin:24px 0; }
-.donor-cause-progress progress { width:100%; height:10px; accent-color:var(--primary-orange); }
+.donor-cause-progress { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:14px 16px; margin:24px 0; }
+.donor-cause-progress progress { grid-column:1/-1; grid-row:2; width:100%; height:10px; border:0; border-radius:99px; overflow:hidden; appearance:none; background:#eee5dc; }
+.donor-cause-progress progress::-webkit-progress-bar { background:#eee5dc; border-radius:99px; }
+.donor-cause-progress progress::-webkit-progress-value { background:var(--primary-orange,#c56728); border-radius:99px; }
+.donor-cause-progress progress::-moz-progress-bar { background:var(--primary-orange,#c56728); border-radius:99px; }
 .donor-cause-progress span { color:var(--text-light); font-size:14px; }
 .donor-cause-image { width:100%; max-height:340px; object-fit:cover; border-radius:18px; margin-bottom:24px; }
 .donor-cause-notice { padding:14px; margin-bottom:20px; border:1px solid #e8c6a9; border-radius:10px; background:#fff8f0; }
 
-.donor-cause-more { display:inline-block; margin:16px 16px 16px 0; color:var(--primary-orange,#c56728); font-weight:600; text-decoration:underline; text-underline-offset:3px; }
+.donor-cause-more { display:inline-flex; align-items:center; justify-content:center; min-height:46px; padding:12px 22px; margin:10px 0 0; border:1px solid var(--primary-orange,#c56728); border-radius:12px; color:var(--primary-orange,#c56728); font-weight:600; text-decoration:none; }
+.donor-cause-more::after { content:'↗'; margin-left:10px; }
+.donor-cause-more:hover { background:#fff3e9; }
+.donor-cause-more:focus-visible { outline:3px solid var(--primary-orange,#c56728); outline-offset:4px; }
+.donor-cause-detail .donor-cause-progress { padding:22px 24px; margin:0 0 28px; background:var(--bg-white,#fff); border:1px solid #eee5dc; border-radius:16px; }
+.donor-cause-detail .donor-cause-progress strong { font-size:18px; color:var(--text-dark,#2c3e50); }
+.donor-cause-detail .donor-welcome-lead { max-width:none; font-size:18px; line-height:1.85; hyphens:none; overflow-wrap:break-word; }
+.donor-cause-detail .donor-reassurance { font-size:13px; gap:12px 20px; margin:22px 0; }
+@media(max-width:480px) { .donor-cause-detail .donor-cause-progress { padding:18px; } .donor-cause-progress { grid-template-columns:1fr; gap:10px; } .donor-cause-progress progress { grid-row:3; } }

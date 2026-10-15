@@ -55,7 +55,7 @@ if (form) {
         try {
             const url = new URL(cause.infoUrl);
             if (!['https:', 'http:'].includes(url.protocol)) return null;
-            const link = element('a', text.more, 'donor-cause-more');
+            const link = element('a', text.more, 'btn btn-outline donor-cause-more');
             link.href = url.href; link.target = '_blank'; link.rel = 'noopener noreferrer';
             return link;
         } catch { return null; }
@@ -75,12 +75,16 @@ if (form) {
             const heroIntro = document.querySelector('.donor-photo-hero-copy > p');
             heroIntro.textContent = selected.heroIntro || '';
             heroIntro.hidden = !selected.heroIntro;
+            document.getElementById('donor-intro-title').textContent = selected.title;
             document.getElementById('donor-intro-title').hidden = true;
             document.querySelector('.donor-welcome-lead').textContent = selected.description || text.choose;
-            document.querySelector('.donor-welcome-copy').append(details(selected));
+            const copy = document.querySelector('.donor-welcome-copy');
+            copy.classList.add('donor-cause-detail');
+            const progress = details(selected);
+            document.querySelector('.donor-welcome-lead').before(progress);
             const info = moreInfo(selected); if (info) document.querySelector('.donor-welcome-copy').append(info);
             if (/^https?:\/\//i.test(selected.image || selected.imageUrl || '')) {
-                const image = element('img'); image.src = selected.image || selected.imageUrl; image.alt = selected.title; image.className = 'donor-cause-image'; document.querySelector('.donor-welcome-copy').prepend(image);
+                const image = element('img'); image.src = selected.image || selected.imageUrl; image.alt = selected.title; image.className = 'donor-cause-image'; copy.prepend(image); image.before(progress);
             }
             form.querySelector('h2').textContent = text.support;
         } else if (requested && !['general','misjon','basar'].includes(requested)) {

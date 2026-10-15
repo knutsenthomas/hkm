@@ -2,7 +2,7 @@ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/st
 const {JSDOM}=require('jsdom');
 const {validateRecurring}=require('../functions/recurring-payments.cjs');
 const source=fs.readFileSync('js/donation-causes.js','utf8').replace(/^import .*;\n/gm,'').replaceAll('export function','function');
-const fixture={items:[{id:'skoleprosjekt',title:'Skoleprosjekt',description:'Støtt barn og skole',collected:1500,goal:10000,active:true,infoUrl:'https://example.com/more'},{id:'hidden',title:'Hidden',active:false}]};
+const fixture={items:[{id:'skoleprosjekt',title:'Skoleprosjekt',description:'Støtt barn og skole',collected:1500,goal:10000,active:true,image:'https://example.com/campaign.jpg',infoUrl:'https://example.com/more'},{id:'hidden',title:'Hidden',active:false}]};
 (async()=>{
  for(const query of ['','?aksjon=skoleprosjekt','?aksjon=hidden']) {
   const dom=new JSDOM(fs.readFileSync('donasjoner.html','utf8'),{url:'https://example.com/donasjoner'+query});
@@ -11,8 +11,8 @@ const fixture={items:[{id:'skoleprosjekt',title:'Skoleprosjekt',description:'St�
   const document=dom.window.document;
   assert.equal(document.querySelectorAll('#donor-gift-fund option[value="skoleprosjekt"]').length,1);
   assert.equal(document.querySelector('#donor-gift-fund option[value="hidden"]'),null);
-  if(!query) { assert.equal(document.querySelectorAll('.donor-campaign-card').length,1);assert.match(document.querySelector('.donor-campaign-card a.btn').href,/aksjon=skoleprosjekt/); }
-  else if(query.includes('skoleprosjekt')) { assert.equal(document.title,'Skoleprosjekt | His Kingdom Ministry');assert.equal(document.querySelector('.donor-photo-hero-copy > p').hidden,true);assert.equal(document.querySelector('#donor-intro-title').hidden,true);assert.equal(document.querySelector('.donor-welcome-lead').textContent,'Støtt barn og skole');assert.equal(document.querySelector('#donor-gift-fund').value,'skoleprosjekt');assert.equal(document.querySelector('progress').value,1500);assert.equal(document.querySelector('.donor-cause-more').href,'https://example.com/more'); }
+  if(!query) { assert.equal(document.querySelectorAll('.donor-campaign-card').length,1);assert.match(document.querySelector('.donor-campaign-card a.btn-primary').href,/aksjon=skoleprosjekt/); }
+  else if(query.includes('skoleprosjekt')) { assert.equal(document.title,'Skoleprosjekt | His Kingdom Ministry');assert.equal(document.querySelector('.donor-photo-hero-copy > p').hidden,true);assert.equal(document.querySelector('#donor-intro-title').hidden,true);assert.equal(document.querySelector('.donor-welcome-lead').textContent,'Støtt barn og skole');assert.equal(document.querySelector('.donor-cause-progress').nextElementSibling.className,'donor-cause-image');assert.equal(document.querySelector('.donor-cause-more').classList.contains('btn'),true);assert.equal(document.querySelector('#donor-gift-fund').value,'skoleprosjekt');assert.equal(document.querySelector('progress').value,1500);assert.equal(document.querySelector('.donor-cause-more').href,'https://example.com/more'); }
   else assert.match(document.querySelector('.donor-cause-notice').textContent,/ikke tilgjengelig/);
  }
  for (const [path,lang] of [['en/donations.html','en'],['es/donaciones.html','es']]) {
