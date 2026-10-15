@@ -587,6 +587,22 @@
                         <option value="misjon">Misjon</option>
                         <option value="basar">Basar</option>
                     </select>
+                    <fieldset class="donor-payment-methods">
+                        <legend>Velg betalingsmåte</legend>
+                        <div class="donor-payment-options">
+                            <label><input type="radio" name="gift-payment" value="vipps" checked><span>Vipps</span></label>
+                            <label><input type="radio" name="gift-payment" value="stripe"><span>Kort</span></label>
+                            <label><input type="radio" name="gift-payment" value="paypal"><span>PayPal</span></label>
+                            <label><input type="radio" name="gift-payment" value="bank"><span>Bank</span></label>
+                        </div>
+                    </fieldset>
+                    <div id="donor-bank-information" class="donor-bank-information" hidden>
+                        <p>Betal til <strong>His Kingdom Ministry</strong></p>
+                        <p>Kontonummer: <strong id="donor-bank-account" data-content-doc="settings_global" data-content-key="contact.account">3000.66.08759</strong></p>
+                        <p id="donor-bank-instructions"></p>
+                        <button type="button" id="donor-copy-account" class="btn btn-primary donor-vipps-button">Kopier kontonummer</button>
+                        <p id="donor-copy-status" role="status" aria-live="polite"></p>
+                    </div>
                     <button type="submit" id="vipps-recurring-trigger" class="btn btn-primary donor-vipps-button">Bli fast giver med Vipps <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
                 </form>
             </div>

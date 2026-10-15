@@ -99,3 +99,14 @@ html[data-theme="dark"] .donor-card-eyebrow { color: #ffcfaa; }
 }
 
 html[data-theme="dark"] .donor-impact-grid article { border-color: #334155; }
+
+.donor-payment-options { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+.donor-payment-options label { position:relative; cursor:pointer; }
+.donor-gift-card .donor-payment-options input { position:absolute; width:1px; height:1px; opacity:0; padding:0; }
+.donor-payment-options span { display:flex; justify-content:center; align-items:center; min-height:46px; border:1px solid #dce0e3; border-radius:12px; font-size:14px; font-weight:600; }
+.donor-payment-options input:checked + span { border-color:var(--primary-orange); color:var(--primary-orange); background:#fff3e9; }
+.donor-payment-options input:focus-visible + span { outline:3px solid var(--primary-orange); outline-offset:3px; }
+.donor-gift-card [hidden] { display:none!important; }
+.donor-bank-information { margin-top:20px; padding-top:16px; border-top:1px solid #eee5dc; }
+.donor-bank-information p { font-size:14px; line-height:1.65; margin:8px 0; }
+@media(max-width:360px) { .donor-payment-options { grid-template-columns:repeat(2,minmax(0,1fr)); } }

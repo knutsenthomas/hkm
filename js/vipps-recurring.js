@@ -491,7 +491,9 @@ document.addEventListener("DOMContentLoaded", () => {
         syncPresets();
         giftForm.addEventListener('submit', event => {
             event.preventDefault();
-            if (giftForm.reportValidity()) openAgreementModal('vipps');
+            const method = giftForm.elements['gift-payment']?.value || 'vipps';
+            if (method === 'bank') return;
+            if (giftForm.reportValidity()) openAgreementModal(method);
         });
     }
     const trigger = document.getElementById("vipps-recurring-trigger");
