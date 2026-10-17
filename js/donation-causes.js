@@ -64,6 +64,9 @@ if (form) {
             if (!['https:', 'http:'].includes(url.protocol)) return null;
             const link = element('a', text.more, 'btn btn-outline donor-cause-more');
             link.href = url.href; link.target = '_blank'; link.rel = 'noopener noreferrer';
+            const icon = element('i', '', 'fas fa-arrow-right');
+            icon.setAttribute('aria-hidden', 'true');
+            link.append(icon);
             return link;
         } catch { return null; }
     };

@@ -1248,7 +1248,7 @@
                     </div>
                     
                     <button class="btn-start-plan" id="start-plan-btn">
-                        Start denne leseplanen <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                        Start denne leseplanen <i class="fas fa-arrow-right text-lg" aria-hidden="true"></i>
                     </button>
                 </div>
 
@@ -1650,7 +1650,7 @@
                     // Update start button text initially
                     const startBtn = document.getElementById('start-plan-btn');
                     if (startBtn) {
-                        startBtn.innerHTML = `Start denne bønneappen <span class="material-symbols-outlined text-lg">arrow_forward</span>`;
+                        startBtn.innerHTML = `Start denne bønneappen <i class="fas fa-arrow-right text-lg" aria-hidden="true"></i>`;
                     }
                 }
 
@@ -1949,7 +1949,7 @@
                                     </div>
                                     ${versesText ? `
                                     <a href="/bibel.html?ref=${encodeURIComponent(versesText)}&plan=${plan.id}&day=${day.dayNumber}" class="hkm-rp-start-day-link" title="${lang === 'en' ? 'Read today' : (lang === 'es' ? 'Leer hoy' : 'Les i dag')}" style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; aspect-ratio: 1 / 1; border-radius: 50%; background: rgba(209, 125, 57, 0.08); border: 1px solid rgba(209, 125, 57, 0.15); color: var(--primary-orange); transition: all 0.2s ease; cursor: pointer; text-decoration: none; flex-shrink: 0; box-sizing: border-box;">
-                                        <span class="material-symbols-outlined" style="font-size: 20px; font-weight: 700;">arrow_forward</span>
+                                        <i class="fas fa-arrow-right" style="font-size: 20px; font-weight: 700;" aria-hidden="true"></i>
                                     </a>
                                     ` : `<span class="material-symbols-outlined prayer-icon-right">${headerIcon}</span>`}
                                 </div>
@@ -2057,7 +2057,7 @@
                                             startBtn.style.whiteSpace = 'normal';
                                             startBtn.style.textAlign = 'center';
                                             startBtn.style.fontSize = '0.95rem';
-                                            startBtn.innerHTML = `${btnText} (${dayLabel} ${currentDay}) <span class="material-symbols-outlined text-lg">arrow_forward</span>`;
+                                            startBtn.innerHTML = `${btnText} (${dayLabel} ${currentDay}) <i class="fas fa-arrow-right text-lg" aria-hidden="true"></i>`;
                                             startBtn.onclick = () => {
                                                 window.location.href = `/bibel.html?plan=${plan.id}&day=${currentDay}`;
                                             };
@@ -2296,7 +2296,7 @@
                             <p class="other-plan-desc">${escapeHtml(plan.description || 'Ingen beskrivelse tilgjengelig.')}</p>
                         </div>
                         <div class="other-plan-footer">
-                            <span class="other-plan-link">Les mer <span class="material-symbols-outlined text-sm">arrow_forward</span></span>
+                            <span class="other-plan-link">Les mer <i class="fas fa-arrow-right text-sm" aria-hidden="true"></i></span>
                         </div>
                     </a>
                 `).join('');

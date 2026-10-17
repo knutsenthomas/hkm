@@ -8340,7 +8340,7 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                     <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 800px; box-sizing: border-box;">
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <button class="hkm-rp-back-btn" onclick="window.bibleReader.exitReadingPlanMode()" style="background: none; border: none; padding: 8px; cursor: pointer; color: var(--text-base); display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='var(--highlight-bg)'" onmouseout="this.style.backgroundColor='transparent'">
-                                <span class="material-symbols-outlined" style="font-size: 24px; font-weight: 700;">arrow_back</span>
+                                <i class="fas fa-arrow-left" style="font-size: 24px; font-weight: 700;" aria-hidden="true"></i>
                             </button>
                             <h2 class="hkm-rp-sidebar-title" style="margin: 0; font-size: 15px; font-weight: 800; color: var(--text-base); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${displayTitle}</h2>
                         </div>
@@ -10122,7 +10122,7 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                 <!-- 1. Top Header Bar -->
                 <div class="hkm-yv-header">
                     <button class="hkm-yv-header-btn-close" id="hkm-yv-btn-close" title="Lukk">
-                        <span class="material-symbols-outlined">arrow_back</span>
+                        <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     </button>
                     
                     <div class="hkm-yv-header-title">

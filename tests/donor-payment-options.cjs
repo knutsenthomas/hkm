@@ -2,7 +2,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const {JSDOM} = require('jsdom');
-const dom = new JSDOM(fs.readFileSync('donasjoner.html','utf8'),{url:'https://example.com/donasjoner'});
+const dom = new JSDOM(fs.readFileSync(process.argv[2] || 'donasjoner.html','utf8'),{url:'https://example.com/donasjoner'});
 const {document, Event}=dom.window;
 let copied;
 vm.runInNewContext(fs.readFileSync('js/donor-page.js','utf8'),{document,window:dom.window,location:dom.window.location,URLSearchParams,Event,navigator:{clipboard:{writeText:async text=>{copied=text;}}}});
@@ -15,7 +15,7 @@ select('gift-payment','paypal');assert.match(trigger.textContent,/PayPal/);
 select('gift-payment','bank');assert.equal(trigger.hidden,false);assert.equal(document.getElementById('donor-bank-information').hidden,true);assert.match(trigger.textContent,/Vis bankinformasjon/);assert.match(document.getElementById('donor-bank-instructions').textContent,/fast oppdrag/);
 select('frequency','once');assert.match(document.getElementById('donor-bank-instructions').textContent,/Overfør 250 kr/);
 select('gift-payment','stripe');assert.equal(document.getElementById('donor-bank-information').hidden,true);assert.match(trigger.textContent,/Fortsett med kort/);
-document.getElementById('gi-gave').scrollIntoView=()=>{};dom.window.showOneTimeGift('stripe');assert.equal(document.querySelector('[name="payment-method"]:checked').value,'card');assert.equal(document.getElementById('gi-gave').hidden,false);
+if(document.getElementById('gi-gave')) { document.getElementById('gi-gave').scrollIntoView=()=>{};dom.window.showOneTimeGift('stripe');assert.equal(document.querySelector('[name="payment-method"]:checked').value,'card');assert.equal(document.getElementById('gi-gave').hidden,false); }
 const recurring=fs.readFileSync('js/vipps-recurring.js','utf8');
 const start=recurring.indexOf("        giftForm.addEventListener('submit', event => {");const end=recurring.indexOf('\n        });',start);
 const handler=recurring.slice(start+"        giftForm.addEventListener('submit', event => {".length,end);

@@ -162,7 +162,7 @@ html[data-theme="dark"] .donor-impact-grid article { border-color: #334155; }
 .donor-cause-notice { padding:14px; margin-bottom:20px; border:1px solid #e8c6a9; border-radius:10px; background:#fff8f0; }
 
 .donor-cause-more { display:inline-flex; align-items:center; justify-content:center; min-height:46px; padding:12px 22px; margin:10px 0 0; border:1px solid var(--primary-orange,#c56728); border-radius:12px; color:var(--primary-orange,#c56728); font-weight:600; text-decoration:none; }
-.donor-cause-more::after { content:'↗'; margin-left:10px; }
+.donor-cause-more > i { margin-left:10px; flex-shrink:0; }
 .donor-cause-more:hover { background:#fff3e9; }
 .donor-cause-more:focus-visible { outline:3px solid var(--primary-orange,#c56728); outline-offset:4px; }
 .donor-cause-detail .donor-cause-progress { padding:22px 24px; margin:0 0 28px; background:var(--bg-white,#fff); border:1px solid #eee5dc; border-radius:16px; }

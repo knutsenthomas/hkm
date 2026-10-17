@@ -97,6 +97,7 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block"></noscript>
 
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/regular-donor.css">
     <link rel="stylesheet" href="css/home-giving.css">
     <link rel="preload" href="css/notifications.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="css/notifications.css"></noscript>
     <link rel="preload" href="css/cookie-consent.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="css/cookie-consent.css"></noscript>
@@ -166,6 +167,7 @@
             }, 4000);
         })();
     </script>
+    <script src="https://js.stripe.com/v3/"></script>
 </head>
 
 <body class="page-index header-dark-start cms-loading">
@@ -790,39 +792,47 @@
                 <p>Vær med og gjør evangeliet tilgjengelig gjennom undervisning, reisevirksomhet og fellesskap. En fast gave gir forutsigbarhet og hjelper oss å planlegge arbeidet videre.</p>
                 <a href="/donasjoner" class="feature-link">Les mer om å støtte HKM <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
             </div>
-            <form class="home-giving-card" id="home-giving-form" action="/donasjoner" method="get">
-                <h3>Gi din støtte</h3>
-                <fieldset class="home-giving-frequency">
-                    <legend class="sr-only">Hvor ofte vil du gi?</legend>
-                    <label><input type="radio" name="frequency" value="once"> Engangsgave</label>
-                    <label><input type="radio" name="frequency" value="monthly" checked> Månedlig gave</label>
-                </fieldset>
-                <label class="home-giving-purpose-label" for="home-gift-fund">Hva ønsker du å støtte?</label>
-                <select class="home-giving-purpose" id="home-gift-fund" name="fund">
-                    <option value="general">Der behovet er størst</option>
-                    <option value="misjon">Misjon</option>
-                    <option value="basar">Basar</option>
-                </select>
-                <fieldset class="home-giving-amounts">
-                    <legend>Velg beløp</legend>
-                    <div class="home-giving-presets">
-                        <button type="button" data-gift-amount="100" aria-pressed="false">100 kr</button>
-                        <button type="button" data-gift-amount="250" aria-pressed="true">250 kr</button>
-                        <button type="button" data-gift-amount="500" aria-pressed="false">500 kr</button>
+            <form class="donor-gift-card home-giving-card" id="donor-gift-form">
+                    <h2>Gi din støtte</h2>
+                    <p>Velg din månedlige gave. Du bekrefter avtalen trygt i Vipps.</p>
+                    <fieldset class="donor-frequency"><legend class="sr-only">Hvor ofte vil du gi?</legend>
+                        <label><input type="radio" name="frequency" value="monthly" checked> Månedlig gave</label>
+                        <label><input type="radio" name="frequency" value="once"> Engangsgave</label>
+                    </fieldset>
+                    <fieldset>
+                        <legend id="donor-amount-label">Månedlig beløp</legend>
+                        <div class="donor-amount-presets">
+                            <button type="button" data-donor-amount="100" aria-pressed="false">100 kr</button>
+                            <button type="button" data-donor-amount="250" aria-pressed="true">250 kr</button>
+                            <button type="button" data-donor-amount="500" aria-pressed="false">500 kr</button>
+                        </div>
+                        <label for="donor-gift-amount">Beløp i kroner</label>
+                        <input type="number" id="donor-gift-amount" name="amount" min="1" step="1" value="250" required inputmode="numeric">
+                    </fieldset>
+                    <label for="donor-gift-fund">Hva ønsker du å støtte?</label>
+                    <select id="donor-gift-fund" name="fund">
+                        <option value="general">Der behovet er størst</option>
+                        <option value="misjon">Misjon</option>
+                        <option value="basar">Basar</option>
+                    </select>
+                    <fieldset class="donor-payment-methods">
+                        <legend>Velg betalingsmåte</legend>
+                        <div class="donor-payment-options">
+                            <label><input type="radio" name="gift-payment" value="vipps" checked><span>Vipps</span></label>
+                            <label><input type="radio" name="gift-payment" value="stripe"><span>Kort</span></label>
+                            <label><input type="radio" name="gift-payment" value="paypal"><span>PayPal</span></label>
+                            <label><input type="radio" name="gift-payment" value="bank"><span>Bank</span></label>
+                        </div>
+                    </fieldset>
+                    <div id="donor-bank-information" class="donor-bank-information" hidden>
+                        <p>Betal til <strong>His Kingdom Ministry</strong></p>
+                        <p>Kontonummer: <strong id="donor-bank-account" data-content-doc="settings_global" data-content-key="contact.account">3000.66.08759</strong></p>
+                        <p id="donor-bank-instructions"></p>
+                        <button type="button" id="donor-copy-account" class="btn btn-primary donor-vipps-button">Kopier kontonummer</button>
+                        <p id="donor-copy-status" role="status" aria-live="polite"></p>
                     </div>
-                    <label for="home-gift-amount">Beløp i kroner</label>
-                    <input id="home-gift-amount" name="amount" type="number" min="1" step="1" value="250" required inputmode="numeric">
-                </fieldset>
-                <input type="hidden" name="payment" value="vipps">
-                <button type="submit" class="btn btn-primary home-giving-submit">Gi med Vipps <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
-                <p class="home-giving-note" id="home-giving-note">Gaven trekkes hver måned. Du bekrefter avtalen i Vipps i neste steg.</p>
-                <details class="home-giving-bank">
-                    <summary>Fast gave via nettbank</summary>
-                    <p>Opprett en fast månedlig overføring til His Kingdom Ministry. Velg selv beløp og betalingsdato.</p>
-                    <p><strong>Konto: <span data-content-doc="settings_global" data-content-key="contact.account">3000.66.08759</span></strong></p>
-                    <p>Merk betalingen med «Gave» og navnet ditt. Du endrer eller avslutter overføringen selv i nettbanken.</p>
-                </details>
-            </form>
+                    <button type="submit" id="vipps-recurring-trigger" class="btn btn-primary donor-vipps-button">Bli fast giver med Vipps <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                </form>
         </div>
     </section>
 

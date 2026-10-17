@@ -548,7 +548,7 @@ onDOMReady(() => {
                             <span class="search-suggestion-label">${item.label}</span>
                             <span class="search-suggestion-type">${item.type}</span>
                         </div>
-                        <span class="material-symbols-outlined" style="font-size: 18px; color: #cbd5e1;">north_east</span>
+                        <i class="fas fa-arrow-right" style="font-size: 18px; color: #cbd5e1;" aria-hidden="true"></i>
                     </div>
                 `).join('')}
             `;
@@ -574,7 +574,7 @@ onDOMReady(() => {
                             <span class="search-suggestion-label">${item.label}</span>
                             <span class="search-suggestion-type">${item.type}</span>
                         </div>
-                        <span class="material-symbols-outlined" style="font-size: 18px; color: #cbd5e1;">north_east</span>
+                        <i class="fas fa-arrow-right" style="font-size: 18px; color: #cbd5e1;" aria-hidden="true"></i>
                     </div>
                 `).join('')}
             `;

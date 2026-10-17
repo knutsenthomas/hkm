@@ -1,6 +1,6 @@
 const fs=require('node:fs'), vm=require('node:vm'), assert=require('node:assert/strict');
 const {JSDOM}=require('jsdom');
-const dom=new JSDOM(fs.readFileSync('donasjoner.html','utf8'),{url:'https://example.com/donasjoner'});
+const dom=new JSDOM(fs.readFileSync(process.argv[2] || 'donasjoner.html','utf8'),{url:'https://example.com/donasjoner'});
 const {document,Event}=dom.window;
 const ctx={document,window:dom.window,console,setTimeout:fn=>{fn();return 1;},queueMicrotask:fn=>fn(),URL,URLSearchParams,navigator:{clipboard:{writeText:async()=>{}}},fetch:()=>{throw new Error('No network in UI test');}};
 vm.createContext(ctx);vm.runInContext(fs.readFileSync('js/vipps-recurring.js','utf8'),ctx);

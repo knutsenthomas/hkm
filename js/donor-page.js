@@ -1,6 +1,6 @@
 const giftForm = document.getElementById('donor-gift-form');
 const details = document.getElementById('gi-gave');
-if (giftForm && details) {
+if (giftForm) {
     const params = new URLSearchParams(location.search);
     if (params.get('frequency') === 'once') giftForm.elements.frequency.value = 'once';
     const lang = document.documentElement.lang?.slice(0,2);
@@ -23,7 +23,7 @@ if (giftForm && details) {
         document.getElementById('donor-bank-instructions').textContent = monthly
             ? `Opprett et fast oppdrag på ${amount} kr per måned i nettbanken. Merk betalingen «Gave – ${fund}». Du velger selv betalingsdato og kan stoppe oppdraget i nettbanken.`
             : `Overfør ${amount} kr i nettbanken. Merk betalingen «Gave – ${fund}».`;
-        details.hidden = true;
+        if (details) details.hidden = true;
     };
     giftForm.querySelectorAll('[name="frequency"], [name="gift-payment"], [name="fund"]').forEach(input => input.addEventListener('change', syncFrequency));
     giftForm.elements.amount.addEventListener('input', syncFrequency);
@@ -40,6 +40,7 @@ if (giftForm && details) {
     });
     syncFrequency();
     window.showOneTimeGift = method => {
+        if (!details) return;
         if (!giftForm.reportValidity()) return;
         document.getElementById('custom-amount').value = giftForm.elements.amount.value;
         document.querySelectorAll('.amount-btn').forEach(button => button.classList.remove('selected'));
