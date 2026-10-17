@@ -3630,7 +3630,10 @@ class ContentManager {
                     .filter(Boolean)
                     .forEach(attr => {
                         if (attr === 'src' && el.tagName === 'IMG') {
-                            const imageValue = typeof value === 'string' ? value.trim() : '';
+                            // CMS image paths are relative to the site root, not the language folder.
+                            const imageValue = typeof value === 'string'
+                                ? value.trim().replace(/^(?:\.\.?\/)*(?=(?:img|assets)\/)/, '/')
+                                : '';
                             const effectiveImage = imageValue || fallbackSrc;
                             el.onerror = () => {
                                 const currentFallback = el.getAttribute('data-fallback-src') || '';
