@@ -76,7 +76,7 @@
         })();
     </script>
     <link rel="icon" type="image/png" href="/img/logo-hkm.png">
-        
+
     <link rel="preload" href="../css/search-v2.css?v=1.0.3" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="../css/search-v2.css?v=1.0.3"></noscript>
 
     <!-- Open Graph / Facebook -->
@@ -115,7 +115,7 @@
                     <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Search the site">
                         <span class="material-symbols-outlined text-xl" style="position: relative; top: 0px; left: 9px;">search</span>
                     </button>
-                    
+
                     <div class="header-actions-expandable">
                         <a href="/en/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-bible-btn" aria-label="Read the Bible" title="Read the Bible">
                             <span class="material-symbols-outlined text-xl">menu_book</span>
@@ -123,7 +123,7 @@
                         <a href="/en/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-reading-plans-btn" aria-label="Reading Plans" title="Reading Plans">
                             <span class="material-symbols-outlined text-xl">calendar_today</span>
                         </a>
-                        
+
                         <div class="hidden md:block w-px h-5 bg-white/20 mx-1 dock-divider"></div>
 
                         <!-- Language Switcher in same styling -->
@@ -379,74 +379,68 @@
 
     <main>
             <!-- Page Hero -->
-            <section class="page-hero subpage-hero" data-content-key="hero.backgroundImage"
-                style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat !important;">
-                <div class="container">
-                    <h1 class="page-title">For Businesses</h1>
-                    <div class="breadcrumbs">
-                        <a href="/">Home</a>
-                        <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">chevron_right</span>
-                        <span>Businesses</span>
-                    </div>
-                </div>
-            </section>
+            <section class="page-hero" data-content-key="hero.bg" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&amp;auto=format&amp;fit=crop&amp;w=1920&amp;q=80'); display: flex; align-items: center; min-height: 350px;">
+            <div class="container flex flex-col items-center justify-center text-center py-16" style="min-height: 300px;">
+                <h1 class="page-hero-title" data-content-key="hero.title" style="margin-bottom: 1rem;">For Businesses</h1>
+                <p class="page-hero-subtitle" data-content-key="hero.subtitle">Become a partner and help fund meaningful work that changes lives.</p>
+            </div>
+        </section>
 
             <!-- Content Sections -->
             <section class="section" style="background: white;">
-                <div class="container">
-                    <div class="about-grid"
-                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;">
-                        <div class="about-image">
-                            <img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                                alt="Business Partnership" style="border-radius: 20px; box-shadow: var(--shadow);" loading="lazy">
-                        </div>
-                        <div class="about-content">
-                            <span class="section-label">Partnership</span>
-                            <h2 class="section-title">Businesses with a Heart for Mission</h2>
-                            <p class="section-text">We invite businesses to stand with us in our mission. Through
+            <div class="container">
+                <div class="flex flex-col lg:flex-row gap-12 lg:gap-20 items-center">
+                    <div class="about-image flex-1 flex justify-center">
+                        <img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-4.0.3&amp;auto=format&amp;fit=crop&amp;w=800&amp;q=80" data-content-key="intro.image" alt="Partnership" class="rounded-2xl shadow-lg object-cover w-full max-w-md h-72 lg:h-96" loading="lazy">
+                    </div>
+                    <div class="about-content flex-1">
+                        <span class="section-label" data-content-key="intro.label">Partnership</span>
+                        <h2 class="section-title" data-content-key="intro.title">Businesses with a Heart for Mission</h2>
+                        <p class="section-text" data-content-key="intro.text">We invite businesses to stand with us in our mission. Through
                                 corporate
                                 gifts, you contribute directly to spiritual growth and help for people who need it.</p>
-
-                            <div style="margin: 30px 0; display: grid; gap: 20px;">
-                                <div style="display: flex; gap: 15px;">
-                                    <div style="flex-shrink: 0; color: var(--primary-orange);"><i
-                                            class="fas fa-chart-line fa-2x"></i></div>
-                                    <div>
-                                        <h4 style="margin-bottom: 5px;">Measurable Results</h4>
-                                        <p style="font-size: 0.95rem; color: var(--text-light);">We send regular updates
+                        <div class="my-10 grid gap-8">
+                            <div class="flex gap-6 items-center">
+                                <div class="w-14 h-14 shrink-0 flex items-center justify-center bg-orange-50 rounded-2xl text-primary-orange">
+                                    <i class="fas fa-chart-line text-2xl"></i>
+                                </div>
+                                <div class="flex flex-col justify-center">
+                                    <h4 class="text-lg font-bold text-gray-900 leading-tight mb-1" data-content-key="features.f1.title">Measurable Results</h4>
+                                    <p class="text-sm text-gray-500 leading-relaxed" data-content-key="features.f1.text">We send regular updates
                                             on
                                             how your support is being used.</p>
-                                    </div>
-                                </div>
-                                <div style="display: flex; gap: 15px;">
-                                    <div style="flex-shrink: 0; color: var(--primary-orange);"><i
-                                            class="fas fa-handshake fa-2x"></i></div>
-                                    <div>
-                                        <h4 style="margin-bottom: 5px;">Value-based Collaboration</h4>
-                                        <p style="font-size: 0.95rem; color: var(--text-light);">We share values like
-                                            integrity, care, and charity.</p>
-                                    </div>
                                 </div>
                             </div>
-
-                            <a href="/en/contact" class="btn btn-primary">Contact us for a conversation</a>
+                            <div class="flex gap-6 items-center">
+                                <div class="w-14 h-14 shrink-0 flex items-center justify-center bg-orange-50 rounded-2xl text-primary-orange">
+                                    <i class="fas fa-handshake text-2xl"></i>
+                                </div>
+                                <div class="flex flex-col justify-center">
+                                    <h4 class="text-lg font-bold text-gray-900 leading-tight mb-1" data-content-key="features.f2.title">Value-based Collaboration</h4>
+                                    <p class="text-sm text-gray-500 leading-relaxed" data-content-key="features.f2.text">We share values like
+                                            integrity, care, and charity.</p>
+                                </div>
+                            </div>
                         </div>
+                        <a href="/en/contact" class="btn btn-primary">Contact us for a conversation</a>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
             <!-- CTA Section -->
-            <section class="cta-section"
-                style="background: linear-gradient(135deg, var(--primary-orange), var(--primary-red)); color: white; padding: 100px 0;">
-                <div class="container text-center">
-                    <h2 style="color: white; margin-bottom: 20px;">Interested in a corporate partnership?</h2>
-                    <p style="margin-bottom: 30px; font-size: 1.1rem; opacity: 0.9;">We would love to have a
+            <section class="cta-section" style="background: linear-gradient(135deg, var(--primary-orange), var(--primary-red)); color: white;">
+            <div class="container flex flex-col items-center justify-center text-center py-16 md:py-20">
+                <h2 class="mb-7 text-3xl md:text-4xl font-bold md:font-extrabold leading-tight" data-content-key="cta.title" style="color: white; margin-bottom: 2rem;">Interested in a corporate partnership?</h2>
+                <p class="mb-8 text-lg opacity-90" data-content-key="cta.text">We would love to have a
                         non-committal
                         talk about how your business can contribute.</p>
-                    <a href="/en/contact" class="btn btn-outline" style="border-color: white; color: white;">Contact us
+                <a href="/en/contact" class="btn btn-primary rounded-full px-6 py-3 font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform shadow-md" data-content-key="cta.btnText">Contact us
                         today</a>
-                </div>
-            </section>
+            </div>
+
+
+        </section>
 
             <!-- Footer -->
             <footer class="footer" id="contact">
@@ -582,19 +576,20 @@
                 <span class="material-symbols-outlined">search</span>
                 <input type="text" id="site-search-input-v2" class="search-input-field" placeholder="What are you looking for? Type for suggestions..." autocomplete="off">
             </div>
-            
+
             <!-- Live Suggestions Container -->
             <div id="site-search-suggestions" class="search-suggestions-container hidden"></div>
-            
+
             <!-- Full Results Container (When Enter is pressed) -->
             <div id="site-search-results-v2" class="search-suggestions-container hidden"></div>
-            
+
             <div class="search-help-text">
                 <span data-content-doc="settings_global" data-content-key="search.helpText">Press 'Enter' for full search.</span>
             </div>
 
         </div>
     </div>
+    <script type="module" src="../js/user-roles.js"></script>
 </body>
 
 </html>

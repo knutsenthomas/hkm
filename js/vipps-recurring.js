@@ -25,8 +25,8 @@ async function parseJsonOrThrow(response) {
 }
 
 // Localization settings
-const isEnglish = window.location.href.includes("/en/");
-const isSpanish = window.location.href.includes("/es/");
+const isEnglish = document.documentElement.lang?.split("-")[0] === "en" || /^\/en(?:\/|$)/.test(window.location.pathname);
+const isSpanish = document.documentElement.lang?.split("-")[0] === "es" || /^\/es(?:\/|$)/.test(window.location.pathname);
 
 const translations = {
     vipps_subtitle: {
@@ -150,6 +150,8 @@ const translations = {
         es: "Cerrar"
     }
 };
+
+function giftText(no, en, es) { return isEnglish ? en : isSpanish ? es : no; }
 
 function t(key) {
     const lang = isEnglish ? "en" : (isSpanish ? "es" : "no");
@@ -446,7 +448,7 @@ function loadPayPalSdkRecurring(callback) {
     };
     script.onerror = () => {
         console.error("Failed to load PayPal Subscription SDK");
-        alert("Kunne ikke laste PayPal-betalingstjenesten. Vennligst prøv igjen.");
+        alert(giftText("Kunne ikke laste PayPal-betalingstjenesten. Vennligst prøv igjen.","Unable to load PayPal. Please try again.","No se pudo cargar PayPal. Inténtalo de nuevo."));
     };
     document.head.appendChild(script);
 }
@@ -573,8 +575,8 @@ function openAgreementModal(method = "vipps") {
         submitBtnText = t("paypal_btn");
     }
 
-    if (!monthly) { subtitleText = 'Se over gaven og fyll inn opplysningene dine.'; submitBtnText = `Fortsett med ${method === 'stripe' ? 'kort' : method === 'paypal' ? 'PayPal' : 'Vipps'}`; }
-    if (method === 'bank') { subtitleText = 'Bruk opplysningene under når du betaler i nettbanken.'; submitBtnText = 'Kopier kontonummer'; }
+    if (!monthly) { subtitleText = giftText('Se over gaven og fyll inn opplysningene dine.',"Review your gift and enter your details.","Revisa tu donación e introduce tus datos."); submitBtnText = `${giftText('Fortsett med', 'Continue with', 'Continuar con')} ${method === 'stripe' ? giftText('kort', 'card', 'tarjeta') : method === 'paypal' ? 'PayPal' : 'Vipps'}`; }
+    if (method === 'bank') { subtitleText = giftText('Bruk opplysningene under når du betaler i nettbanken.',"Use the details below to make a bank transfer.","Utiliza los datos siguientes para hacer una transferencia bancaria."); submitBtnText = giftText('Kopier kontonummer',"Copy account number","Copiar número de cuenta"); }
     modal.innerHTML = `
         <div class="hkm-modal-panel">
             <div class="hkm-modal-header">
@@ -582,7 +584,7 @@ function openAgreementModal(method = "vipps") {
                     <span class="hkm-checkout-eyebrow">HIS KINGDOM MINISTRY</span><h3 class="hkm-modal-title" id="hkm-gift-title">${isEnglish ? (monthly ? 'Your monthly gift' : 'Your gift') : isSpanish ? (monthly ? 'Tu donación mensual' : 'Tu donación') : (monthly ? 'Din månedlige gave' : 'Din gave')}</h3>
                     <p class="hkm-modal-subtitle">${subtitleText}</p>
                 </div>
-                <button class="hkm-modal-close" id="hkm-modal-close-btn" type="button" aria-label="Lukk">
+                <button class="hkm-modal-close" id="hkm-modal-close-btn" type="button" aria-label="${giftText('Lukk','Close','Cerrar')}">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -658,16 +660,16 @@ function openAgreementModal(method = "vipps") {
     const consent = modal.querySelector('input[type="checkbox"]');
     if (!monthly || method === 'bank') { consent.required = false; consent.closest('label').hidden = true; }
     if (!monthly) {
-        modal.querySelector('.hkm-form-label').textContent = 'Gavebeløp';
-        modal.querySelector('#hkm-custom-amount').placeholder = 'Annet beløp (kr)';
+        modal.querySelector('.hkm-form-label').textContent = giftText('Gavebeløp',"Gift amount","Importe de la donación");
+        modal.querySelector('#hkm-custom-amount').placeholder = giftText('Annet beløp (kr)',"Other amount (NOK)","Otro importe (NOK)");
     }
     if (method === 'bank') {
         modal.querySelectorAll('[name="name"],[name="email"],[name="tel"],[name="address"],[name="postal-code"],[name="city"]').forEach(input => { input.required = false; input.disabled = true; input.closest('.hkm-form-group').hidden = true; });
         const bank = document.createElement('div'); bank.className = 'hkm-checkout-bank';
         const account = document.createElement('strong'); account.id = 'hkm-checkout-account'; account.textContent = document.getElementById('donor-bank-account')?.textContent.trim() || '3000.66.08759';
-        const label = document.createElement('p'); label.textContent = 'Kontonummer · His Kingdom Ministry';
-        const instruction = document.createElement('p'); instruction.textContent = monthly ? 'Opprett et fast oppdrag i nettbanken. Du velger betalingsdato og kan stoppe oppdraget når du vil.' : 'Overfør beløpet fra nettbanken din.';
-        instruction.append(document.createTextNode(' Merk betalingen «Gave – ' + modal.querySelector('#hkm-donor-fund').selectedOptions[0].textContent + '».'));
+        const label = document.createElement('p'); label.textContent = giftText('Kontonummer · His Kingdom Ministry',"Account number · His Kingdom Ministry","Número de cuenta · His Kingdom Ministry");
+        const instruction = document.createElement('p'); instruction.textContent = monthly ? giftText('Opprett et fast oppdrag i nettbanken. Du velger betalingsdato og kan stoppe oppdraget når du vil.',"Set up a recurring transfer in your bank. Choose the payment date and cancel whenever you like.","Programa una transferencia periódica en tu banco. Elige la fecha de pago y cancélala cuando quieras.") : giftText('Overfør beløpet fra nettbanken din.',"Transfer the amount through your bank.","Transfiere el importe desde tu banco.");
+        instruction.append(document.createTextNode(giftText(' Merk betalingen «Gave – ', ' Payment reference: «Gift – ', ' Concepto de la transferencia: «Donación – ') + modal.querySelector('#hkm-donor-fund').selectedOptions[0].textContent + '».'));
         bank.append(label, account, instruction); modal.querySelector('#hkm-donor-fund').after(bank);
     }
     document.body.appendChild(modal);
@@ -693,14 +695,14 @@ function openAgreementModal(method = "vipps") {
     const updateSummary = () => {
         const chosen = modal.querySelector('.hkm-amount-btn.selected');
         const amount = Number(customInput.value || chosen?.dataset.amount || 0);
-        summaryAmount.textContent = `${amount.toLocaleString('nb-NO')} kr${monthly ? ' / måned' : ''}`;
-        summaryDetails.textContent = `${modal.querySelector('#hkm-donor-fund').selectedOptions[0].textContent} · ${method === 'stripe' ? 'Kort' : method === 'paypal' ? 'PayPal' : method === 'bank' ? 'Bank' : 'Vipps'}`;
+        summaryAmount.textContent = `${amount.toLocaleString(giftText('nb-NO','en-GB','es-ES'))} kr${monthly ? giftText(' / måned',' / month',' / mes') : ''}`;
+        summaryDetails.textContent = `${modal.querySelector('#hkm-donor-fund').selectedOptions[0].textContent} · ${method === 'stripe' ? giftText('Kort','Card','Tarjeta') : method === 'paypal' ? 'PayPal' : method === 'bank' ? giftText('Bank','Bank transfer','Transferencia bancaria') : 'Vipps'}`;
     };
     modal.querySelector('form').addEventListener('input', updateSummary);
     modal.querySelector('form').addEventListener('change', updateSummary);
     amountBtns.forEach(button => button.addEventListener('click', () => queueMicrotask(updateSummary)));
     updateSummary();
-    if (bankInstruction) bankInstruction.textContent = (monthly ? 'Opprett et fast oppdrag i nettbanken. Du velger betalingsdato og kan stoppe oppdraget når du vil.' : 'Overfør beløpet fra nettbanken din.') + ' Merk betalingen «Gave – ' + modal.querySelector('#hkm-donor-fund').selectedOptions[0].textContent + '».';
+    if (bankInstruction) bankInstruction.textContent = (monthly ? giftText('Opprett et fast oppdrag i nettbanken. Du velger betalingsdato og kan stoppe oppdraget når du vil.',"Set up a recurring transfer in your bank. Choose the payment date and cancel whenever you like.","Programa una transferencia periódica en tu banco. Elige la fecha de pago y cancélala cuando quieras.") : giftText('Overfør beløpet fra nettbanken din.',"Transfer the amount through your bank.","Transfiere el importe desde tu banco.")) + giftText(' Merk betalingen «Gave – ', ' Payment reference: «Gift – ', ' Concepto de la transferencia: «Donación – ') + modal.querySelector('#hkm-donor-fund').selectedOptions[0].textContent + '».';
     amountBtns.forEach(btn => {
         btn.addEventListener("click", () => {
             amountBtns.forEach(b => b.classList.remove("selected"));
@@ -718,7 +720,7 @@ function openAgreementModal(method = "vipps") {
         customInput.closest('.hkm-form-group').hidden = true;
         const fundControl = modal.querySelector('#hkm-donor-fund');
         fundControl.hidden = true; modal.querySelector('label[for="hkm-donor-fund"]').hidden = true;
-        const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'hkm-gift-edit'; edit.textContent = 'Endre';
+        const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'hkm-gift-edit'; edit.textContent = giftText('Endre',"Edit","Cambiar");
         edit.addEventListener('click', () => modal.querySelector('#hkm-modal-close-btn').click()); summary.append(edit);
     }
     const closeBtn = modal.querySelector("#hkm-modal-close-btn");
@@ -763,8 +765,8 @@ function openAgreementModal(method = "vipps") {
 
         if (method === 'bank') {
             const account = modal.querySelector('#hkm-checkout-account').textContent;
-            try { await navigator.clipboard.writeText(account.replace(/[.\s]/g, '')); modal.querySelector('#hkm-submit-btn').textContent = 'Kontonummer kopiert'; }
-            catch { reportError('Marker kontonummeret over og kopier det manuelt.'); }
+            try { await navigator.clipboard.writeText(account.replace(/[.\s]/g, '')); modal.querySelector('#hkm-submit-btn').textContent = giftText('Kontonummer kopiert',"Account number copied","Número de cuenta copiado"); }
+            catch { reportError(giftText('Marker kontonummeret over og kopier det manuelt.',"Select the account number above and copy it manually.","Selecciona el número de cuenta anterior y cópialo manualmente.")); }
             return;
         }
         const submitBtn = modal.querySelector("#hkm-submit-btn");
@@ -784,13 +786,13 @@ function openAgreementModal(method = "vipps") {
             try {
                 if (method === 'vipps') await window.startVippsPayment(amount, customerDetails);
                 else {
-                    if (typeof window.initPayPalDonation !== 'function') throw new Error('PayPal er ikke tilgjengelig akkurat nå.');
+                    if (typeof window.initPayPalDonation !== 'function') throw new Error(giftText('PayPal er ikke tilgjengelig akkurat nå.',"PayPal is currently unavailable.","PayPal no está disponible en este momento."));
                     const payment = document.createElement('div'); payment.className = 'hkm-paypal-checkout'; form.append(payment);
                     form.querySelectorAll('input,select').forEach(input => input.disabled = true);
                     submitBtn.hidden = true;
                     window.initPayPalDonation({ container:payment, details:{amount,customerDetails}, onSuccess:closeModal });
                 }
-            } catch (error) { reportError(error.message || 'Kunne ikke starte betalingen.'); }
+            } catch (error) { reportError(error.message || giftText('Kunne ikke starte betalingen.',"Unable to start the payment.","No se pudo iniciar el pago.")); }
             finally { submitBtn.disabled = false; }
             return;
         }
@@ -830,7 +832,7 @@ function openAgreementModal(method = "vipps") {
 
             } catch (err) {
                 console.error("Vipps recurring initiation failed:", err);
-                alert("Kunne ikke starte avtalen: " + err.message);
+                alert(giftText("Kunne ikke starte avtalen: ","Unable to start the agreement: ","No se pudo iniciar el acuerdo: ") + err.message);
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalText;
             }
@@ -889,14 +891,14 @@ function openAgreementModal(method = "vipps") {
                             await window.handleStripeSubmit(ev, { billingDetails });
                         } else {
                             console.error("handleStripeSubmit is not defined!");
-                            alert("Kunne ikke fullføre betalingen: betalingsskriptet mangler.");
+                            alert(giftText("Kunne ikke fullføre betalingen: betalingsskriptet mangler.","Unable to complete payment: the payment service did not load.","No se pudo completar el pago: el servicio de pago no se ha cargado."));
                         }
                     });
                 }
 
             } catch (err) {
                 console.error("Stripe recurring initiation failed:", err);
-                alert("Kunne ikke starte avtalen: " + err.message);
+                alert(giftText("Kunne ikke starte avtalen: ","Unable to start the agreement: ","No se pudo iniciar el acuerdo: ") + err.message);
                 modal.classList.remove("active");
                 setTimeout(() => modal.remove(), 300);
             }
@@ -913,7 +915,7 @@ function openAgreementModal(method = "vipps") {
                 if (target.protocol !== 'https:' || !/(^|\.)paypal\.com$/.test(target.hostname)) throw new Error('Invalid PayPal approval link');
                 window.location.assign(target.href);
             } catch (error) {
-                alert(isEnglish ? 'We could not start the agreement. Contact us before trying again if you already approved payment.' : 'Kunne ikke starte avtalen. Kontakt oss før du prøver igjen hvis du allerede har godkjent en betaling.');
+                alert(giftText('Kunne ikke starte avtalen. Kontakt oss før du prøver igjen hvis du allerede har godkjent en betaling.','We could not start the agreement. Contact us before trying again if you already approved payment.','No se pudo iniciar el acuerdo. Si ya has aprobado un pago, contacta con nosotros antes de intentarlo de nuevo.'));
                 submitBtn.disabled = false; submitBtn.textContent = originalText;
             }
         }
@@ -923,13 +925,13 @@ function openAgreementModal(method = "vipps") {
 async function handlePayPalRecurringReturn() {
     const params = new URLSearchParams(window.location.search);
     if (!['paypal','vipps'].includes(params.get('recurring_provider'))) return;
-    if (params.get('cancelled') === '1') { showResultModal(false, isEnglish ? 'PayPal setup was cancelled.' : 'PayPal-avtalen ble avbrutt.'); return; }
+    if (params.get('cancelled') === '1') { showResultModal(false, giftText('PayPal-avtalen ble avbrutt.','PayPal setup was cancelled.','Se ha cancelado la configuración de PayPal.')); return; }
     try {
         const response = await fetch(RECURRING_VERIFY_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: params.get('agreement_key'), requestId: params.get('request_id') }) });
         const data = await parseJsonOrThrow(response);
-        showResultModal(data.status === 'ACTIVE', data.status === 'ACTIVE' ? (isEnglish ? 'Your monthly gift agreement is active. Each payment is registered after confirmation.' : 'Din månedlige gaveavtale er aktiv. Hver betaling registreres når den er bekreftet.') : (isEnglish ? 'The agreement is not confirmed. Contact us before creating another.' : 'Avtalen er ikke bekreftet. Kontakt oss før du oppretter en ny.'));
+        showResultModal(data.status === 'ACTIVE', data.status === 'ACTIVE' ? (giftText('Din månedlige gaveavtale er aktiv. Hver betaling registreres når den er bekreftet.','Your monthly gift agreement is active. Each payment is registered after confirmation.','Tu acuerdo de donación mensual está activo. Cada pago se registra tras su confirmación.')) : (giftText('Avtalen er ikke bekreftet. Kontakt oss før du oppretter en ny.','The agreement is not confirmed. Contact us before creating another.','El acuerdo no se ha confirmado. Contacta con nosotros antes de crear otro.')));
         window.history.replaceState({}, '', window.location.pathname);
-    } catch { showResultModal(false, isEnglish ? 'We could not verify the agreement. Contact us before trying again.' : 'Vi kunne ikke bekrefte avtalen. Kontakt oss før du prøver igjen.'); }
+    } catch { showResultModal(false, giftText('Vi kunne ikke bekrefte avtalen. Kontakt oss før du prøver igjen.','We could not verify the agreement. Contact us before trying again.','No se pudo verificar el acuerdo. Contacta con nosotros antes de intentarlo de nuevo.')); }
 }
 
 // Check URL and handle agreement validation
@@ -944,8 +946,8 @@ async function handleVippsReturn() {
     overlay.className = "hkm-status-overlay active";
     overlay.innerHTML = `
         <div class="hkm-spinner"></div>
-        <h3 style="font-weight: 700; font-size: 20px; margin-bottom: 8px;">Bekrefter avtale med Vipps...</h3>
-        <p style="color: #94a3b8; font-size: 14px;">Dette tar bare et øyeblikk.</p>
+        <h3 style="font-weight: 700; font-size: 20px; margin-bottom: 8px;">${giftText('Bekrefter avtale med Vipps...','Confirming your Vipps agreement...','Confirmando tu acuerdo con Vipps...')}</h3>
+        <p style="color: #94a3b8; font-size: 14px;">${giftText('Dette tar bare et øyeblikk.','This will only take a moment.','Solo tardará un momento.')}</p>
     `;
     document.body.appendChild(overlay);
 
@@ -965,16 +967,16 @@ async function handleVippsReturn() {
         window.history.replaceState({}, document.title, url.toString());
 
         if (response.ok && data.status === "ACTIVE") {
-            showResultModal(true, "Avtalen ble vellykket opprettet! Tusen takk for at du blir fast giver.");
+            showResultModal(true, giftText("Avtalen ble vellykket opprettet! Tusen takk for at du blir fast giver.","Your agreement was created successfully. Thank you for becoming a monthly donor.","El acuerdo se ha creado correctamente. Gracias por donar mensualmente."));
         } else {
-            const errorMsg = data.error || "Avtalen ble ikke godkjent eller ble avbrutt i Vipps-appen.";
+            const errorMsg = data.error || giftText("Avtalen ble ikke godkjent eller ble avbrutt i Vipps-appen.","The agreement was not approved or was cancelled in Vipps.","El acuerdo no se ha aprobado o se ha cancelado en Vipps.");
             showResultModal(false, errorMsg);
         }
 
     } catch (err) {
         console.error("Vipps agreement finalization error:", err);
         overlay.remove();
-        showResultModal(false, "Det oppstod en feil under bekreftelsen av avtalen: " + err.message);
+        showResultModal(false, giftText("Det oppstod en feil under bekreftelsen av avtalen: ","An error occurred while confirming the agreement: ","Se ha producido un error al confirmar el acuerdo: ") + err.message);
     }
 }
 
@@ -996,7 +998,7 @@ function showResultModal(isSuccess, message) {
             </h3>
             <p style="color: #5a6e7f; font-size: 15px; margin-bottom: 32px; line-height: 1.6; text-align: center; font-weight: 500;">${message}</p>
             <button class="hkm-submit-btn" id="hkm-result-close-btn">
-                ${t('close_btn')}
+                ${giftText('Lukk','Close','Cerrar')}
             </button>
         </div>
     `;

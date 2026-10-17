@@ -74,7 +74,7 @@
         })();
     </script>
     <link rel="icon" type="image/png" href="/img/logo-hkm.png">
-        
+
     <link rel="preload" href="../css/search-v2.css?v=1.0.3" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="../css/search-v2.css?v=1.0.3"></noscript>
 
     <!-- Open Graph / Facebook -->
@@ -113,7 +113,7 @@
                     <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Buscar en el sitio">
                         <span class="material-symbols-outlined text-xl" style="position: relative; top: 0px; left: 9px;">search</span>
                     </button>
-                    
+
                     <div class="header-actions-expandable">
                         <a href="/es/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-bible-btn" aria-label="Leer la Biblia" title="Leer la Biblia">
                             <span class="material-symbols-outlined text-xl">menu_book</span>
@@ -121,7 +121,7 @@
                         <a href="/es/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-reading-plans-btn" aria-label="Planes de lectura" title="Planes de lectura">
                             <span class="material-symbols-outlined text-xl">calendar_today</span>
                         </a>
-                        
+
                         <div class="hidden md:block w-px h-5 bg-white/20 mx-1 dock-divider"></div>
 
                         <!-- Language Switcher in same styling -->
@@ -383,68 +383,56 @@
 
     <main>
         <!-- Page Hero -->
-        <section class="page-hero subpage-hero" data-content-key="hero.backgroundImage"
-            style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1438232992991-995b7058bbb3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat !important;">
-            <div class="container">
-                <h1 class="page-title" data-content-key="hero.title">Para Iglesias</h1>
-                <div class="breadcrumbs">
-                    <a href="/">Inicio</a>
-                    <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">chevron_right</span>
-                    <span>Iglesias</span>
-                </div>
+        <section class="page-hero" data-content-key="hero.bg" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1438232992991-995b7058bbb3?ixlib=rb-4.0.3&amp;auto=format&amp;fit=crop&amp;w=1920&amp;q=80'); display: flex; align-items: center; min-height: 350px;">
+            <div class="container flex flex-col items-center justify-center text-center py-16" style="min-height: 300px;">
+                <h1 class="page-hero-title" data-content-key="hero.title" style="margin-bottom: 1rem;">Para Iglesias</h1>
+                <p class="page-hero-subtitle" data-content-key="hero.subtitle">Queremos colaborar con las iglesias locales para equipar a los creyentes y compartir el evangelio.</p>
             </div>
         </section>
 
         <!-- Content Sections -->
         <section class="section" style="background: white;">
             <div class="container">
-                <div class="about-grid"
-                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;">
-                    <div class="about-content">
+                <div class="flex flex-col lg:flex-row gap-12 lg:gap-20 items-center">
+                    <div class="about-content flex-1">
                         <span class="section-label" data-content-key="intro.label">Colaboración</span>
                         <h2 class="section-title" data-content-key="intro.title">Una Misión Compartida</h2>
                         <p class="section-text" data-content-key="intro.text">His Kingdom Ministry siente pasión por ver florecer a la iglesia local.
                             Ofrecemos recursos, seminarios y enseñanzas que pueden complementar su trabajo existente e
                             inspirar un seguimiento más profundo de Jesús.</p>
-
-                        <ul data-content-list="features" style="margin: 30px 0; display: grid; gap: 15px;">
+                        <ul class="my-8 grid gap-3" data-content-list="features">
                             <template>
-                                <li><i class="fas fa-check-circle" style="color: var(--primary-orange); margin-right: 10px;"></i> <span data-item-text></span></li>
+                                <li><i class="fas fa-check-circle text-primary-orange mr-2"></i> <span data-item-text=""></span></li>
                             </template>
-                            <li><i class="fas fa-check-circle"
-                                    style="color: var(--primary-orange); margin-right: 10px;"></i> Seminarios sobre
-                                oración y discipulado</li>
-                            <li><i class="fas fa-check-circle"
-                                    style="color: var(--primary-orange); margin-right: 10px;"></i> Recursos para grupos
-                                pequeños</li>
-                            <li><i class="fas fa-check-circle"
-                                    style="color: var(--primary-orange); margin-right: 10px;"></i> Visitas de nuestros
-                                maestros</li>
-                            <li><i class="fas fa-check-circle"
-                                    style="color: var(--primary-orange); margin-right: 10px;"></i> Iniciativas de
-                                oración compartida</li>
+                            <li><i class="fas fa-check-circle text-primary-orange mr-2"></i> <span>Seminarios sobre
+                                oración y discipulado</span></li>
+                            <li><i class="fas fa-check-circle text-primary-orange mr-2"></i> <span>Recursos para grupos
+                                pequeños</span></li>
+                            <li><i class="fas fa-check-circle text-primary-orange mr-2"></i> <span>Visitas de nuestros
+                                maestros</span></li>
+                            <li><i class="fas fa-check-circle text-primary-orange mr-2"></i> <span>Iniciativas de
+                                oración compartida</span></li>
                         </ul>
-
                         <a href="/es/contacto" class="btn btn-primary">Contáctenos para colaborar</a>
                     </div>
-                    <div class="about-image">
-                        <img data-content-key="intro.image" data-content-attr="src" src="https://images.unsplash.com/photo-1438232992991-995b7058bbb3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                            alt="Colaboración con Iglesias" style="border-radius: 20px; box-shadow: var(--shadow);" loading="lazy">
+                    <div class="about-image flex-1 flex justify-center">
+                        <img src="https://images.unsplash.com/photo-1438232992991-995b7058bbb3?ixlib=rb-4.0.3&amp;auto=format&amp;fit=crop&amp;w=800&amp;q=80" data-content-key="intro.image" alt="Colaboración" class="rounded-2xl shadow-lg object-cover w-full max-w-md h-72 lg:h-96" loading="lazy">
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- CTA Section -->
-        <section class="cta-section"
-            style="background: linear-gradient(135deg, var(--primary-orange), var(--primary-red)); color: white;">
-            <div class="container text-center">
-                <h2 data-content-key="cta.title" style="color: white; margin-bottom: 20px;">¿Quiere saber más?</h2>
-                <p data-content-key="cta.text" style="margin-bottom: 30px; font-size: 1.1rem; opacity: 0.9;">Nos encantaría enviarle más información
+        <section class="cta-section" style="background: linear-gradient(135deg, var(--primary-orange), var(--primary-red)); color: white;">
+            <div class="container flex flex-col items-center justify-center text-center py-16 md:py-20">
+                <h2 class="mb-7 text-3xl md:text-4xl font-bold md:font-extrabold leading-tight" data-content-key="cta.title" style="color: white; margin-bottom: 2rem;">¿Quiere saber más?</h2>
+                <p class="mb-8 text-lg opacity-90" data-content-key="cta.text">Nos encantaría enviarle más información
                     sobre cómo podemos apoyar a su iglesia.</p>
-                <a data-content-key="cta.btnText" href="/es/contacto" class="btn btn-outline" style="border-color: white; color: white;">Contáctenos
+                <a href="/es/contacto" class="btn btn-primary rounded-full px-6 py-3 font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform shadow-md" data-content-key="cta.btnText">Contáctenos
                     hoy</a>
             </div>
+
+
         </section>
 
         <!-- Footer -->
@@ -582,19 +570,20 @@
                 <span class="material-symbols-outlined">search</span>
                 <input type="text" id="site-search-input-v2" class="search-input-field" placeholder="¿Qué estás buscando? Escribe para sugerencias..." autocomplete="off">
             </div>
-            
+
             <!-- Live Suggestions Container -->
             <div id="site-search-suggestions" class="search-suggestions-container hidden"></div>
-            
+
             <!-- Full Results Container (When Enter is pressed) -->
             <div id="site-search-results-v2" class="search-suggestions-container hidden"></div>
-            
+
             <div class="search-help-text">
                 <span data-content-doc="settings_global" data-content-key="search.helpText">Presione 'Enter' para búsqueda completa.</span>
             </div>
 
         </div>
     </div>
+    <script type="module" src="../js/user-roles.js"></script>
 </body>
 
 </html>

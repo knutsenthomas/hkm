@@ -13,7 +13,7 @@
     <meta name="description"
         content="Únete a His Kingdom Ministry. Experimenta el crecimiento espiritual a través de enseñanzas bíblicas, podcasts inspiradores y viajes misioneros internacionales.">
     <meta name="keywords" content="His Kingdom Ministry, ministerio cristiano, crecimiento espiritual, enseñanza bíblica, podcast cristiano, misiones, Noruega">
-    
+
     <!-- Internationalization -->
 
     <!-- Open Graph / Facebook -->
@@ -89,7 +89,7 @@
     <!-- Font Awesome (Deferred) -->
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
-    
+
     <!-- Material Symbols Outlined -->
     <!-- Material Symbols Outlined (Deferred) -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -99,7 +99,7 @@
     <link rel="preload" href="../css/notifications.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="../css/notifications.css"></noscript>
     <link rel="preload" href="../css/cookie-consent.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="../css/cookie-consent.css"></noscript>
     <link rel="preload" href="../css/features-enhanced.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="../css/features-enhanced.css"></noscript>
-    
+
     <!-- Firebase Config & Service -->
     <script type="module" src="../js/firebase-config.js?v=20260930_V1"></script>
     <script type="module" src="../js/firebase-service.js?v=2026.05.10.1"></script>
@@ -138,6 +138,9 @@
             }, 4000);
         })();
     </script>
+    <link rel="stylesheet" href="../css/regular-donor.css">
+    <link rel="stylesheet" href="../css/home-giving.css">
+    <script src="https://js.stripe.com/v3/"></script>
 </head>
 
 <body class="page-index header-dark-start cms-loading">
@@ -161,7 +164,7 @@
                     <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Buscar en el sitio">
                         <span class="material-symbols-outlined text-xl" style="position: relative; top: 0px; left: 9px;">search</span>
                     </button>
-                    
+
                     <div class="header-actions-expandable">
                         <a href="/es/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-bible-btn" aria-label="Leer la Biblia" title="Leer la Biblia">
                             <span class="material-symbols-outlined text-xl">menu_book</span>
@@ -169,7 +172,7 @@
                         <a href="/es/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-reading-plans-btn" aria-label="Planes de lectura" title="Planes de lectura">
                             <span class="material-symbols-outlined text-xl">calendar_today</span>
                         </a>
-                        
+
                         <div class="hidden md:block w-px h-5 bg-white/20 mx-1 dock-divider"></div>
 
                         <!-- Language Switcher in same styling -->
@@ -589,7 +592,73 @@
     </section>
 
     <!-- Fun Facts / Statistics -->
-    <section class="funfacts">
+    <section class="shop-home-promo" id="butikk-promo">
+        <div class="container">
+            <div class="shop-home-promo-card">
+                <div class="shop-home-promo-content">
+                    <span class="shop-home-promo-pill">
+                        <i class="fas fa-store"></i>
+                        <span data-content-key="shopPromo.badge">His Kingdom Designs</span>
+                    </span>
+                    <h2 class="shop-home-promo-title" data-content-key="shopPromo.title">Productos de diseño y tarjetas regalo en una sola tienda</h2>
+                    <p class="shop-home-promo-text" data-content-key="shopPromo.description">
+                        Descubre ropa, tazas, pegatinas y tarjetas regalo digitales con diseños cristianos. También ofrecemos suscripciones mensuales para quienes desean recibir nuevos productos de forma regular.
+                    </p>
+
+                    <div class="shop-home-promo-actions">
+                        <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" class="btn btn-primary" data-content-key="shopPromo.ctaPrimary">Visitar la tienda</a>
+                    </div>
+                </div>
+
+                <div class="shop-home-promo-panel" aria-label="Categorías de la tienda">
+                    <div class="shop-home-promo-chip-grid">
+                        <a href="https://www.hiskingdomdesigns.no/category/kl%C3%A6r" target="_blank" rel="noopener noreferrer" class="shop-home-promo-chip">
+                            <span class="shop-home-promo-chip-title" data-content-key="shopPromo.cards.clothesTitle">Ropa</span>
+                            <span class="shop-home-promo-chip-meta" data-content-key="shopPromo.cards.clothesMeta">Camisetas y más</span>
+                        </a>
+                        <a href="https://www.hiskingdomdesigns.no/category/cups-bottles" target="_blank" rel="noopener noreferrer" class="shop-home-promo-chip">
+                            <span class="shop-home-promo-chip-title" data-content-key="shopPromo.cards.mugsTitle">Tazas</span>
+                            <span class="shop-home-promo-chip-meta" data-content-key="shopPromo.cards.mugsMeta">Regalos para el hogar</span>
+                        </a>
+                        <a href="https://www.hiskingdomdesigns.no/category/klistermerker" target="_blank" rel="noopener noreferrer" class="shop-home-promo-chip">
+                            <span class="shop-home-promo-chip-title" data-content-key="shopPromo.cards.stickersTitle">Pegatinas</span>
+                            <span class="shop-home-promo-chip-meta" data-content-key="shopPromo.cards.stickersMeta">Pequeños productos con un gran mensaje</span>
+                        </a>
+                        <a href="https://www.hiskingdomdesigns.no/category/gavekort" target="_blank" rel="noopener noreferrer" class="shop-home-promo-chip">
+                            <span class="shop-home-promo-chip-title" data-content-key="shopPromo.cards.giftCardsTitle">Tarjetas regalo</span>
+                            <span class="shop-home-promo-chip-meta" data-content-key="shopPromo.cards.giftCardsMeta">Regalos digitales con el importe que elijas</span>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="bible-home-promo" id="bibel-promo">
+        <div class="container">
+            <div class="bible-home-promo-card">
+                <div class="bible-home-promo-content">
+                    <span class="bible-home-promo-pill">
+                        <i class="fas fa-book-open"></i>
+                        <span>Estudio bíblico y herramientas</span>
+                    </span>
+                    <h2 class="bible-home-promo-title">Explora la Biblia directamente en nuestra web</h2>
+                    <p class="bible-home-promo-text">
+                        Nuestro lector digital de la Biblia incluye herramientas para profundizar: una enciclopedia bíblica, historial de lectura y favoritos. También puedes escribir notas personales que se sincronizan automáticamente con Mi página.
+                    </p>
+                    <div class="bible-home-promo-actions" style="margin-top: 24px;">
+                        <a href="/es/bibel" class="btn btn-primary" style="white-space: nowrap; min-height: 42px !important; display: inline-flex; align-items: center; justify-content: center; margin: 0 !important; font-size: 14px; font-weight: 600;">Abrir la Biblia</a>
+                    </div>
+                </div>
+                <div class="bible-home-promo-image-panel" aria-label="Ilustración del lector de la Biblia">
+                    <img src="../img/bible-promo.webp" alt="Biblia abierta sobre una mesa de madera" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="funfacts">
         <div class="container">
             <div class="section-header impact-section-header">
                 <span class="section-label" data-content-key="impact.label">Impacto</span>
@@ -640,6 +709,58 @@
                 </div>
                 </div>
             </div>
+        </div>
+    </section>
+
+<section class="home-giving section" aria-labelledby="home-giving-title">
+        <div class="container home-giving-layout">
+            <div class="home-giving-copy">
+                <span class="section-label">Juntos llegamos a más personas</span>
+                <h2 class="section-title" id="home-giving-title">Tu donación marca la diferencia</h2>
+                <p>Ayuda a compartir el evangelio mediante la enseñanza, la misión y la comunidad. Una donación mensual nos da estabilidad y nos permite planificar nuestro trabajo.</p>
+                <a href="/es/donaciones" class="feature-link">Más información sobre cómo apoyar a HKM <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+            <form class="donor-gift-card home-giving-card" id="donor-gift-form">
+                    <h2>Ofrece tu apoyo</h2>
+                    <p>Elige tu donación mensual. Confirma el acuerdo de forma segura con Vipps.</p>
+                    <fieldset class="donor-frequency"><legend class="sr-only">¿Con qué frecuencia deseas donar?</legend>
+                        <label><input type="radio" name="frequency" value="monthly" checked=""> Donación mensual</label>
+                        <label><input type="radio" name="frequency" value="once"> Donación única</label>
+                    </fieldset>
+                    <fieldset>
+                        <legend id="donor-amount-label">Importe mensual</legend>
+                        <div class="donor-amount-presets">
+                            <button type="button" data-donor-amount="100" aria-pressed="false">100 kr</button>
+                            <button type="button" data-donor-amount="250" aria-pressed="true">250 kr</button>
+                            <button type="button" data-donor-amount="500" aria-pressed="false">500 kr</button>
+                        </div>
+                        <label for="donor-gift-amount">Importe en NOK</label>
+                        <input type="number" id="donor-gift-amount" name="amount" min="1" step="1" value="250" required="" inputmode="numeric">
+                    </fieldset>
+                    <label for="donor-gift-fund">¿Qué deseas apoyar?</label>
+                    <select id="donor-gift-fund" name="fund">
+                        <option value="general">Donde más se necesite</option>
+                        <option value="misjon">Misiones</option>
+                        <option value="basar">Rifa</option>
+                    </select>
+                    <fieldset class="donor-payment-methods">
+                        <legend>Elige el método de pago</legend>
+                        <div class="donor-payment-options">
+                            <label><input type="radio" name="gift-payment" value="vipps" checked=""><span>Vipps</span></label>
+                            <label><input type="radio" name="gift-payment" value="stripe"><span>Tarjeta</span></label>
+                            <label><input type="radio" name="gift-payment" value="paypal"><span>PayPal</span></label>
+                            <label><input type="radio" name="gift-payment" value="bank"><span>Banco</span></label>
+                        </div>
+                    </fieldset>
+                    <div id="donor-bank-information" class="donor-bank-information" hidden="">
+                        <p>Pagar a <strong>His Kingdom Ministry</strong></p>
+                        <p>Número de cuenta: <strong id="donor-bank-account" data-content-doc="settings_global" data-content-key="contact.account">3000.66.08759</strong></p>
+                        <p id="donor-bank-instructions"></p>
+                        <button type="button" id="donor-copy-account" class="btn btn-primary donor-vipps-button">Copiar número de cuenta</button>
+                        <p id="donor-copy-status" role="status" aria-live="polite"></p>
+                    </div>
+                    <button type="submit" id="vipps-recurring-trigger" class="btn btn-primary donor-vipps-button">Dona mensualmente con Vipps <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                </form>
         </div>
     </section>
 
@@ -793,7 +914,61 @@
     </section>
 
     <!-- Newsletter -->
-    <section class="newsletter">
+    <section class="facebook-feed-section" id="facebook-feed" style="display: none;">
+        <div class="container">
+            <div class="facebook-feed-shell">
+                <div class="section-header" style="margin-bottom: 48px;">
+                    <span class="section-label" data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.label">Síguenos en Facebook</span>
+                    <h2 class="section-title" data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.title">Lo último de nuestra página de Facebook</h2>
+                    <p class="section-description" style="margin-bottom: 24px;" data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.description">Descubre novedades, anuncios y momentos de nuestro trabajo directamente desde Facebook.</p>
+                    <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank" rel="noopener noreferrer" class="btn btn-outline facebook-feed-cta" data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.pageUrl" data-content-attr="href"><span data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.pageCta">Abrir nuestra página de Facebook</span></a>
+                </div>
+
+                <div class="facebook-feed-grid grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank" rel="noopener noreferrer" class="facebook-post-card" data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.posts.first.link" data-content-attr="href">
+                        <div class="facebook-post-image-wrap">
+                            <img class="facebook-post-image" alt="Publicación de Facebook" src="../img/facebook-post-1.svg" data-fallback-src="../img/facebook-post-1.svg" data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.posts.first.image" data-content-attr="src" data-visibility-target=".facebook-post-image-wrap" loading="lazy">
+                        </div>
+                        <div class="facebook-post-meta">
+                            <span class="facebook-post-badge"><i class="fab fa-facebook-f"></i> Facebook</span>
+                            <span data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.posts.first.date">Esta semana</span>
+                        </div>
+                        <h3 class="facebook-post-title" data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.posts.first.title">Nuevos momentos de nuestro ministerio</h3>
+                        <p class="facebook-post-excerpt" data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.posts.first.excerpt">Mantente al día con novedades, fotos y breves reflexiones de nuestro trabajo.</p>
+                        <span class="facebook-post-link" data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.posts.first.cta">Leer en Facebook</span>
+                    </a>
+
+                    <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank" rel="noopener noreferrer" class="facebook-post-card" data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.posts.second.link" data-content-attr="href">
+                        <div class="facebook-post-image-wrap">
+                            <img class="facebook-post-image" alt="Publicación de Facebook" src="../img/facebook-post-2.svg" data-fallback-src="../img/facebook-post-2.svg" data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.posts.second.image" data-content-attr="src" data-visibility-target=".facebook-post-image-wrap" loading="lazy">
+                        </div>
+                        <div class="facebook-post-meta">
+                            <span class="facebook-post-badge"><i class="fab fa-facebook-f"></i> Facebook</span>
+                            <span data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.posts.second.date">Última actualización</span>
+                        </div>
+                        <h3 class="facebook-post-title" data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.posts.second.title">Anuncios e invitaciones</h3>
+                        <p class="facebook-post-excerpt" data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.posts.second.excerpt">Encuentra nuevas invitaciones, eventos y mensajes que compartimos.</p>
+                        <span class="facebook-post-link" data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.posts.second.cta">Ver publicación</span>
+                    </a>
+
+                    <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank" rel="noopener noreferrer" class="facebook-post-card" data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.posts.third.link" data-content-attr="href">
+                        <div class="facebook-post-image-wrap">
+                            <img class="facebook-post-image" alt="Publicación de Facebook" src="../img/facebook-post-3.svg" data-fallback-src="../img/facebook-post-3.svg" data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.posts.third.image" data-content-attr="src" data-visibility-target=".facebook-post-image-wrap" loading="lazy">
+                        </div>
+                        <div class="facebook-post-meta">
+                            <span class="facebook-post-badge"><i class="fab fa-facebook-f"></i> Facebook</span>
+                            <span data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.posts.third.date">Desde nuestra comunidad</span>
+                        </div>
+                        <h3 class="facebook-post-title" data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.posts.third.title">Testimonios y momentos cotidianos</h3>
+                        <p class="facebook-post-excerpt" data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.posts.third.excerpt">Compartimos pequeños momentos, gratitud y lo que sucede en nuestra comunidad.</p>
+                        <span class="facebook-post-link" data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.posts.third.cta">Ir a Facebook</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="newsletter">
         <div class="container">
             <div class="newsletter-content">
                 <h2 class="newsletter-title">Mantente al Día</h2>
@@ -938,19 +1113,21 @@
                 <span class="material-symbols-outlined">search</span>
                 <input type="text" id="site-search-input-v2" class="search-input-field" placeholder="¿Qué estás buscando? Escribe para sugerencias..." autocomplete="off">
             </div>
-            
+
             <!-- Live Suggestions Container -->
             <div id="site-search-suggestions" class="search-suggestions-container hidden"></div>
-            
+
             <!-- Full Results Container (When Enter is pressed) -->
             <div id="site-search-results-v2" class="search-suggestions-container hidden"></div>
-            
+
             <div class="search-help-text">
                 <span data-content-doc="settings_global" data-content-key="search.helpText">Presione 'Enter' para búsqueda completa.</span>
             </div>
 
         </div>
     </div>
+    <script type="module" src="../js/home-giving.js"></script>
+    <script type="module" src="../js/notifications.js"></script>
 </body>
 
 </html>

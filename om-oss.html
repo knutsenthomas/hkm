@@ -27,7 +27,7 @@
     <meta name="description"
         content="Lær mer om His Kingdom Ministry, vår visjon om å utruste mennesker til et dypere liv med Gud, og møt teamet bak tjenesten.">
     <meta name="keywords" content="om oss, visjon, team, His Kingdom Ministry, Hilde Karin Knutsen, Thomas Knutsen, Mandal">
-    
+
     <!-- Internationalization -->
 
     <!-- Open Graph / Facebook -->
@@ -65,7 +65,7 @@
     <link rel="preload" href="css/notifications.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="css/notifications.css"></noscript>
     <link rel="preload" href="css/cookie-consent.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="css/cookie-consent.css"></noscript>
     <link rel="stylesheet" href="css/subpage-hero.css">
-    
+
     <!-- Firebase Config & Service (Moved to head for early loading) -->
     <script type="module" src="js/firebase-config.js"></script>
     <script type="module" src="js/firebase-service.js?v=2026.05.10.1"></script>
@@ -86,329 +86,9 @@
         })();
     </script>
     <link rel="icon" type="image/png" href="/img/logo-hkm.png">
-        
+
     <link rel="preload" href="css/search-v2.css?v=1.0.3" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="css/search-v2.css?v=1.0.3"></noscript>
-    <style>
-        /* ===================================
-           Premium Design Overrides for Om Oss
-           =================================== */
-
-        /* 1. Hero Section */
-        .page-hero.subpage-hero {
-            background-attachment: scroll !important;
-            padding: 140px 0 100px 0 !important;
-            position: relative !important;
-            overflow: hidden !important;
-        }
-        .page-hero.subpage-hero::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 70% 30%, rgba(209, 125, 57, 0.15) 0%, transparent 60%) !important;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        /* 2. Circular Image video block */
-        .about-image {
-            position: relative !important;
-        }
-        .circular-image {
-            border: 8px solid var(--bg-white, #ffffff) !important;
-            box-shadow: 0 30px 60px -15px rgba(27, 73, 101, 0.18) !important;
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        }
-        .about-image:hover .circular-image {
-            transform: scale(1.02) !important;
-        }
-        .play-button {
-            width: 72px !important;
-            height: 72px !important;
-            font-size: 22px !important;
-            background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
-            box-shadow: 0 12px 28px rgba(189, 79, 42, 0.35) !important;
-        }
-        .play-button::before {
-            background: rgba(189, 79, 42, 0.3) !important;
-            animation: pulse-ring 2s infinite !important;
-        }
-        @keyframes pulse-ring {
-            0% { transform: translate(-50%, -50%) scale(0.9); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(1.4); opacity: 0; }
-        }
-
-        /* 3. About Features (Oppdrag / Historie) */
-        .about-feature-item {
-            background: rgba(255, 255, 255, 0.6) !important;
-            backdrop-filter: blur(12px) !important;
-            -webkit-backdrop-filter: blur(12px) !important;
-            border: 1px solid rgba(27, 73, 101, 0.05) !important;
-            border-radius: 18px !important;
-            padding: 20px !important;
-            box-shadow: 0 10px 30px -15px rgba(27, 73, 101, 0.04) !important;
-            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        }
-        .about-feature-item:hover {
-            background: #ffffff !important;
-            border-color: rgba(209, 125, 57, 0.25) !important;
-            transform: translateY(-3px) !important;
-            box-shadow: 0 16px 36px -12px rgba(27, 73, 101, 0.08) !important;
-        }
-        .about-feature-icon-box {
-            width: 48px !important;
-            height: 48px !important;
-            border-radius: 12px !important;
-            background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
-            color: #ffffff !important;
-            font-size: 18px !important;
-            box-shadow: 0 6px 14px rgba(189, 79, 42, 0.2) !important;
-        }
-        .about-feature-text h4 {
-            color: #1B4965 !important;
-            font-size: 16px !important;
-            font-weight: 700 !important;
-        }
-        .about-feature-text p {
-            color: #475569 !important;
-            font-size: 14px !important;
-            line-height: 1.6 !important;
-        }
-
-        /* 4. Hva Vi Står For Value Cards */
-        .vision-values {
-            background: linear-gradient(to bottom, #f8fafc, #ffffff) !important;
-            padding: 100px 0 !important;
-        }
-        .values-grid {
-            display: grid !important;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
-            gap: 28px !important;
-            margin-top: 60px !important;
-        }
-        .value-card {
-            text-align: left !important;
-            padding: 40px 32px !important;
-            border-radius: 24px !important;
-            background: #ffffff !important;
-            border: 1px solid rgba(27, 73, 101, 0.05) !important;
-            box-shadow: 0 10px 35px -12px rgba(27, 73, 101, 0.04) !important;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            position: relative !important;
-            overflow: hidden !important;
-        }
-        .value-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #d17d39, #bd4f2a);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .value-card:hover {
-            transform: translateY(-6px) !important;
-            box-shadow: 0 24px 48px -15px rgba(27, 73, 101, 0.12) !important;
-            border-color: rgba(27, 73, 101, 0.12) !important;
-        }
-        .value-card:hover::before {
-            opacity: 1;
-        }
-        .value-icon {
-            margin: 0 0 24px 0 !important;
-            width: 56px !important;
-            height: 56px !important;
-            background: linear-gradient(135deg, #1B4965, #2c6e95) !important;
-            border-radius: 14px !important;
-            font-size: 22px !important;
-            box-shadow: 0 8px 20px rgba(27, 73, 101, 0.15) !important;
-            color: #ffffff !important;
-        }
-        .value-card:nth-child(even) .value-icon {
-            background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
-            box-shadow: 0 8px 20px rgba(189, 79, 42, 0.15) !important;
-        }
-        .value-card h3 {
-            font-size: 19px !important;
-            font-weight: 700 !important;
-            color: #1B4965 !important;
-            margin-bottom: 14px !important;
-            letter-spacing: -0.02em !important;
-        }
-        .value-card p {
-            font-size: 14.5px !important;
-            line-height: 1.65 !important;
-            color: #475569 !important;
-            margin: 0 !important;
-        }
-
-        /* 5. Team Section */
-        .team-section {
-            padding: 100px 0 !important;
-        }
-        .team-grid {
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)) !important;
-            gap: 32px !important;
-            margin-top: 60px !important;
-        }
-        .team-member {
-            background: #ffffff !important;
-            border-radius: 28px !important;
-            border: 1px solid rgba(27, 73, 101, 0.05) !important;
-            box-shadow: 0 12px 40px -15px rgba(27, 73, 101, 0.04) !important;
-            padding: 40px 32px !important;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            text-align: center !important;
-        }
-        .team-member:hover {
-            transform: translateY(-5px) !important;
-            box-shadow: 0 24px 50px -15px rgba(27, 73, 101, 0.08) !important;
-            border-color: rgba(209, 125, 57, 0.15) !important;
-        }
-        .team-image {
-            width: 148px !important;
-            height: 148px !important;
-            border-radius: 50% !important;
-            border: 6px solid #ffffff !important;
-            box-shadow: 0 10px 25px rgba(27, 73, 101, 0.08) !important;
-            margin-bottom: 24px !important;
-            overflow: hidden !important;
-            transition: transform 0.4s ease !important;
-        }
-        .team-member:hover .team-image {
-            transform: scale(1.03) !important;
-        }
-        .team-name {
-            font-size: 21px !important;
-            font-weight: 700 !important;
-            color: #1B4965 !important;
-            margin-bottom: 6px !important;
-        }
-        .team-role {
-            font-size: 13px !important;
-            font-weight: 700 !important;
-            color: #bd4f2a !important;
-            margin-bottom: 20px !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.08em !important;
-        }
-        .team-bio {
-            font-size: 14.5px !important;
-            line-height: 1.7 !important;
-            color: #475569 !important;
-            text-align: left !important;
-            margin-top: 0 !important;
-            border-top: 1px solid rgba(0, 0, 0, 0.04) !important;
-            padding-top: 20px !important;
-        }
-        .team-toggle {
-            background: rgba(189, 79, 42, 0.06) !important;
-            border: none !important;
-            color: #bd4f2a !important;
-            font-weight: 600 !important;
-            font-size: 13px !important;
-            cursor: pointer !important;
-            margin-top: 16px !important;
-            padding: 8px 16px !important;
-            border-radius: 20px !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            gap: 4px !important;
-            transition: all 0.2s !important;
-        }
-        .team-toggle:hover {
-            background: #bd4f2a !important;
-            color: #ffffff !important;
-        }
-        .team-social {
-            margin-top: 24px !important;
-            display: flex !important;
-            justify-content: center !important;
-            gap: 16px !important;
-        }
-        .team-social a {
-            width: 38px !important;
-            height: 38px !important;
-            border-radius: 50% !important;
-            background: #f8fafc !important;
-            border: 1px solid rgba(0, 0, 0, 0.02) !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            color: #475569 !important;
-            font-size: 15px !important;
-            transition: all 0.25s ease !important;
-        }
-        .team-social a:hover {
-            background: #1B4965 !important;
-            color: #ffffff !important;
-            transform: translateY(-3px) !important;
-            box-shadow: 0 6px 12px rgba(27, 73, 101, 0.15) !important;
-        }
-        .team-social a[href*="instagram"]:hover {
-            background: linear-gradient(45deg, #f9ce34, #ee2a7b, #6228d7) !important;
-        }
-        .team-social a[href*="youtube"]:hover {
-            background: #ff0000 !important;
-        }
-        .team-social a[href*="facebook"]:hover {
-            background: #1877f2 !important;
-        }
-
-        /* Dark Mode Overrides for Om Oss Page */
-        html[data-theme="dark"] .vision-values {
-            background: #0f172a !important;
-            background-image: none !important;
-        }
-        html[data-theme="dark"] .value-card {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
-        }
-        html[data-theme="dark"] .value-card h3 {
-            color: #f8fafc !important;
-        }
-        html[data-theme="dark"] .value-card p {
-            color: #cbd5e1 !important;
-        }
-        html[data-theme="dark"] .team-section {
-            background: #0f172a !important;
-        }
-        html[data-theme="dark"] .team-member {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
-        }
-        html[data-theme="dark"] .team-name {
-            color: #f8fafc !important;
-        }
-        html[data-theme="dark"] .team-bio {
-            color: #cbd5e1 !important;
-            border-top-color: #334155 !important;
-        }
-        html[data-theme="dark"] .team-image {
-            border-color: #334155 !important;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
-        }
-        html[data-theme="dark"] .team-toggle {
-            background: rgba(209, 125, 57, 0.15) !important;
-            color: #fb923c !important;
-        }
-        html[data-theme="dark"] .team-toggle:hover {
-            background: #bd4f2a !important;
-            color: #ffffff !important;
-        }
-        html[data-theme="dark"] .team-social a {
-            background: #0f172a !important;
-            color: #94a3b8 !important;
-            border-color: #334155 !important;
-        }
-    </style>
+    <link rel="stylesheet" href="css/about-page.css">
 </head>
 
 <body class="cms-loading">
@@ -433,7 +113,7 @@
                     <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Søk i nettsiden">
                         <span class="material-symbols-outlined text-xl" style="position: relative; top: 0px; left: 9px;">search</span>
                     </button>
-                    
+
                     <div class="header-actions-expandable">
                         <a href="/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-bible-btn" aria-label="Les Bibelen" title="Les Bibelen">
                             <span class="material-symbols-outlined text-xl">menu_book</span>
@@ -441,7 +121,7 @@
                         <a href="/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-reading-plans-btn" aria-label="Leseplaner" title="Leseplaner">
                             <span class="material-symbols-outlined text-xl">calendar_today</span>
                         </a>
-                        
+
                         <div class="hidden md:block w-px h-5 bg-white/20 mx-1 dock-divider"></div>
 
                         <!-- Language Switcher in same styling -->
@@ -896,7 +576,7 @@
                 <h2 class="section-title text-[#1B4965]" data-content-key="shop.showcase.title">Kreative produkter for troen</h2>
                 <p class="section-description mt-2" data-content-key="shop.showcase.subtitle">Besøk vår nettbutikk for å se hele utvalget av gaver, kunst og verktøy til evangelisering.</p>
             </div>
-            
+
             <div id="latest-designs-container" class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Product 1 -->
                 <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" class="group bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
@@ -948,7 +628,7 @@
                     </div>
                 </a>
             </div>
-            
+
             <div class="mt-12 text-center">
                 <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-[#d17d39] to-[#bd4f2a] hover:shadow-lg hover:scale-102 active:scale-98 transition-all duration-300">
                     <span data-content-key="shop.showcase.btn">Besøk His Kingdom Designs</span>
@@ -1148,13 +828,13 @@
                 <span class="material-symbols-outlined">search</span>
                 <input type="text" id="site-search-input-v2" class="search-input-field" placeholder="Hva leter du etter? Skriv for forslag..." autocomplete="off">
             </div>
-            
+
             <!-- Live Suggestions Container -->
             <div id="site-search-suggestions" class="search-suggestions-container hidden"></div>
-            
+
             <!-- Full Results Container (When Enter is pressed) -->
             <div id="site-search-results-v2" class="search-suggestions-container hidden"></div>
-            
+
             <div class="search-help-text">
                 <span data-content-doc="settings_global" data-content-key="search.helpText">Trykk 'Enter' for fullstendig søk.</span>
             </div>
@@ -1184,7 +864,7 @@
 
             if (playButton && lightbox && iframe) {
                 const videoUrl = playButton.getAttribute('href');
-                
+
                 // Extract video ID from youtube URL
                 let videoId = '';
                 if (videoUrl.includes('v=')) {
@@ -1195,7 +875,7 @@
 
                 if (videoId) {
                     const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
-                    
+
                     playButton.addEventListener('click', (e) => {
                         e.preventDefault();
                         iframe.setAttribute('src', embedUrl);
@@ -1229,7 +909,7 @@
                 if (btn && bio) {
                     btn.setAttribute('aria-expanded', 'false');
                     btn.setAttribute('aria-label', 'Vis mer biografi');
-                    
+
                     const updateAria = () => {
                         const isExpanded = member.classList.contains('expanded');
                         btn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
@@ -1239,7 +919,7 @@
                     btn.addEventListener('click', () => {
                         setTimeout(updateAria, 50);
                     });
-                    
+
                     const name = member.querySelector('.team-name');
                     const img = member.querySelector('.team-image');
                     if (name) name.addEventListener('click', () => setTimeout(updateAria, 50));

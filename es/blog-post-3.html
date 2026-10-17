@@ -60,7 +60,7 @@
             }, 4000);
         })();
     </script>
-        
+
     <link rel="preload" href="../css/search-v2.css?v=1.0.3" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="../css/search-v2.css?v=1.0.3"></noscript>
 
     <!-- Open Graph / Facebook -->
@@ -76,6 +76,7 @@
     <meta property="twitter:title" content="Nuevo episodio de podcast: Fe, duda y crecimiento | His Kingdom Ministry">
     <meta property="twitter:description" content="Lea nuestros últimos artículos y actualizaciones en el blog de His Kingdom Ministry.">
     <meta property="twitter:image" content="https://images.unsplash.com/photo-1475483768296-6163e08872a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80">
+    <link rel="stylesheet" href="../css/subpage-hero.css">
 </head>
 
 <body class="cms-loading">
@@ -99,7 +100,7 @@
                     <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Buscar en el sitio">
                         <span class="material-symbols-outlined text-xl" style="position: relative; top: 0px; left: 9px;">search</span>
                     </button>
-                    
+
                     <div class="header-actions-expandable">
                         <a href="/es/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-bible-btn" aria-label="Leer la Biblia" title="Leer la Biblia">
                             <span class="material-symbols-outlined text-xl">menu_book</span>
@@ -107,7 +108,7 @@
                         <a href="/es/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-reading-plans-btn" aria-label="Planes de lectura" title="Planes de lectura">
                             <span class="material-symbols-outlined text-xl">calendar_today</span>
                         </a>
-                        
+
                         <div class="hidden md:block w-px h-5 bg-white/20 mx-1 dock-divider"></div>
 
                         <!-- Language Switcher in same styling -->
@@ -367,8 +368,7 @@
         </div>
     </div>
 
-    <section class="page-hero" data-content-key="hero.backgroundImage"
-        style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1475483768296-6163e08872a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); padding-top: 160px;">
+    <section class="page-hero relative" id="blog-hero" style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1475483768296-6163e08872a1?ixlib=rb-4.0.3&amp;auto=format&amp;fit=crop&amp;w=1920&amp;q=80'); padding-top: 180px; margin-top: 0;">
         <div class="container">
             <h1 class="page-hero-title">Nuevo episodio de podcast: Fe, duda y crecimiento</h1>
             <div class="blog-meta"
@@ -567,19 +567,20 @@
                 <span class="material-symbols-outlined">search</span>
                 <input type="text" id="site-search-input-v2" class="search-input-field" placeholder="¿Qué estás buscando? Escribe para sugerencias..." autocomplete="off">
             </div>
-            
+
             <!-- Live Suggestions Container -->
             <div id="site-search-suggestions" class="search-suggestions-container hidden"></div>
-            
+
             <!-- Full Results Container (When Enter is pressed) -->
             <div id="site-search-results-v2" class="search-suggestions-container hidden"></div>
-            
+
             <div class="search-help-text">
                 <span data-content-doc="settings_global" data-content-key="search.helpText">Presione 'Enter' para búsqueda completa.</span>
             </div>
 
         </div>
     </div>
+    <script type="module" src="../js/user-roles.js"></script>
 </body>
 
 </html>

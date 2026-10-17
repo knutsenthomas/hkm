@@ -75,7 +75,7 @@
         })();
     </script>
     <link rel="icon" type="image/png" href="/img/logo-hkm.png">
-        
+
     <link rel="preload" href="../css/search-v2.css?v=1.0.3" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="../css/search-v2.css?v=1.0.3"></noscript>
 
     <!-- Open Graph / Facebook -->
@@ -114,7 +114,7 @@
                     <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Buscar en el sitio">
                         <span class="material-symbols-outlined text-xl" style="position: relative; top: 0px; left: 9px;">search</span>
                     </button>
-                    
+
                     <div class="header-actions-expandable">
                         <a href="/es/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-bible-btn" aria-label="Leer la Biblia" title="Leer la Biblia">
                             <span class="material-symbols-outlined text-xl">menu_book</span>
@@ -122,7 +122,7 @@
                         <a href="/es/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-reading-plans-btn" aria-label="Planes de lectura" title="Planes de lectura">
                             <span class="material-symbols-outlined text-xl">calendar_today</span>
                         </a>
-                        
+
                         <div class="hidden md:block w-px h-5 bg-white/20 mx-1 dock-divider"></div>
 
                         <!-- Language Switcher in same styling -->
@@ -384,48 +384,42 @@
 
     <main>
         <!-- Page Hero -->
-        <section class="page-hero subpage-hero" data-content-key="hero.backgroundImage"
-            style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat !important;">
-            <div class="container">
-                <h1 class="page-title">Business Network (BNN)</h1>
-                <div class="breadcrumbs">
-                    <a href="/">Inicio</a>
-                    <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">chevron_right</span>
-                    <span>Business Network</span>
-                </div>
+        <section class="page-hero" data-content-key="hero.bg" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&amp;auto=format&amp;fit=crop&amp;w=1920&amp;q=80'); display: flex; align-items: center; min-height: 350px;">
+            <div class="container flex flex-col items-center justify-center text-center py-16" style="min-height: 300px;">
+                <h1 class="page-hero-title" data-content-key="hero.title" style="margin-bottom: 1rem;">Business Network (BNN)</h1>
+                <p class="page-hero-subtitle" data-content-key="hero.subtitle">Una red para líderes y empresarios cristianos que desean usar sus recursos para el reino de Dios.</p>
             </div>
         </section>
 
         <!-- Content Sections -->
         <section class="section" style="background: white;">
             <div class="container text-center">
-                <span class="section-label">Red</span>
-                <h2 class="section-title">Más que Solo Negocios</h2>
-                <p class="section-description" style="max-width: 800px; margin: 0 auto 50px;">BNN es una comunidad donde
+                <span class="section-label" data-content-key="intro.label">Red</span>
+                <h2 class="section-title" data-content-key="intro.title">Más que Solo Negocios</h2>
+                <p class="section-description" data-content-key="intro.text" style="max-width: 800px; margin: 0 auto 50px;">BNN es una comunidad donde
                     combinamos la experiencia profesional con un enfoque espiritual. Creemos que el mundo de los
                     negocios desempeña un papel clave en la financiación e impulso de la misión.</p>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
-                    <div style="padding: 30px; background: #f8f9fa; border-radius: 15px;">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+                    <div class="p-8 bg-[#f8f9fa] rounded-2xl flex flex-col items-center">
                         <i class="fas fa-users fa-3x" style="color: var(--primary-orange); margin-bottom: 20px;"></i>
-                        <h4>Encuentros de Red</h4>
-                        <p>Conozca a líderes con ideas afines para inspirarse e intercambiar experiencias.</p>
+                        <h4 class="font-semibold mb-2" data-content-key="features.f1.title">Encuentros de Red</h4>
+                        <p data-content-key="features.f1.text">Conozca a líderes con ideas afines para inspirarse e intercambiar experiencias.</p>
                     </div>
-                    <div style="padding: 30px; background: #f8f9fa; border-radius: 15px;">
-                        <i class="fas fa-lightbulb fa-3x"
-                            style="color: var(--primary-orange); margin-bottom: 20px;"></i>
-                        <h4>Inspiración</h4>
-                        <p>Reciba enseñanza dirigida específicamente al liderazgo cristiano en el lugar de trabajo.</p>
+                    <div class="p-8 bg-[#f8f9fa] rounded-2xl flex flex-col items-center">
+                        <i class="fas fa-lightbulb fa-3x" style="color: var(--primary-orange); margin-bottom: 20px;"></i>
+                        <h4 class="font-semibold mb-2" data-content-key="features.f2.title">Inspiración</h4>
+                        <p data-content-key="features.f2.text">Reciba enseñanza dirigida específicamente al liderazgo cristiano en el lugar de trabajo.</p>
                     </div>
-                    <div style="padding: 30px; background: #f8f9fa; border-radius: 15px;">
+                    <div class="p-8 bg-[#f8f9fa] rounded-2xl flex flex-col items-center">
                         <i class="fas fa-seedling fa-3x" style="color: var(--primary-orange); margin-bottom: 20px;"></i>
-                        <h4>Crecimiento</h4>
-                        <p>Vea cómo su empresa puede ser una plataforma para el Reino de Dios.</p>
+                        <h4 class="font-semibold mb-2" data-content-key="features.f3.title">Crecimiento</h4>
+                        <p data-content-key="features.f3.text">Vea cómo su empresa puede ser una plataforma para el Reino de Dios.</p>
                     </div>
                 </div>
 
-                <div style="margin-top: 80px;">
-                    <a href="/es/contacto" class="btn btn-primary">Únete a la red</a>
+                <div class="mt-16">
+                    <a href="/es/contacto" class="btn btn-primary" data-content-key="cta.btnText">Únete a la red</a>
                 </div>
             </div>
         </section>
@@ -565,19 +559,20 @@
                 <span class="material-symbols-outlined">search</span>
                 <input type="text" id="site-search-input-v2" class="search-input-field" placeholder="¿Qué estás buscando? Escribe para sugerencias..." autocomplete="off">
             </div>
-            
+
             <!-- Live Suggestions Container -->
             <div id="site-search-suggestions" class="search-suggestions-container hidden"></div>
-            
+
             <!-- Full Results Container (When Enter is pressed) -->
             <div id="site-search-results-v2" class="search-suggestions-container hidden"></div>
-            
+
             <div class="search-help-text">
                 <span data-content-doc="settings_global" data-content-key="search.helpText">Presione 'Enter' para búsqueda completa.</span>
             </div>
 
         </div>
     </div>
+    <script type="module" src="../js/user-roles.js"></script>
 </body>
 
 </html>
