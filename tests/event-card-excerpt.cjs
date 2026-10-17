@@ -1,0 +1,13 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const {JSDOM}=require('jsdom');const dom=new JSDOM('');const source=fs.readFileSync('js/content-manager.js','utf8');
+const method=source.slice(source.indexOf('    getEventCardExcerpt(event) {'),source.indexOf('    renderEvents(events) {'));
+const context={document:dom.window.document};vm.createContext(context);vm.runInContext('this.manager=({'+method+'});',context);
+const excerpt=event=>context.manager.getEventCardExcerpt(event);
+const event={title:'Free HKM Seer Zoom activation',description:'Free HKM Seer Zoom activationhttps://us06web.zoom.us/j/88674860715?pwd=secret\nMeeting ID: 886 7486 0715\nPasscode: 123456'};
+const original=event.description;assert.equal(excerpt(event),'');assert.equal(event.description,original);
+assert.equal(excerpt({title:'Gratis trening',description:'https://us06web.zoom.us/j/88637524926?pwd=secret\nMeeting ID: 886 3752 4926\nPasscode: abc123'}),'');
+assert.equal(excerpt({description:'<p>Velkommen til trening &amp; fellesskap.</p><p>Meeting ID: 886 3752 4926<br>Passcode: 123456</p>'}),'Velkommen til trening & fellesskap.');
+assert.equal(excerpt({description:'<p>Lær mer om bønn.</p><p>https://example.com/join</p>'}),'Lær mer om bønn.');
+assert.equal(excerpt({excerpt:'Kort introduksjon',description:'https://zoom.us/j/123'}),'Kort introduksjon');
+assert.ok(excerpt({description:'En hyggelig kveld med undervisning og fellesskap. '.repeat(6)}).length<=120);
+console.log('Passed: clean event previews, Zoom invitation removal, readable HTML, excerpt priority and unchanged event details.');

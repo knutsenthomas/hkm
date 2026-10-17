@@ -2396,6 +2396,24 @@ class ContentManager {
         }
     }
 
+    getEventCardExcerpt(event) {
+        const raw = event.seoDescription || event.excerpt || event.description || event.content || '';
+        if (typeof raw !== 'string') return '';
+        // Preserve paragraphs before extracting text from calendar/Zoom invitations.
+        const container = document.createElement('div');
+        container.innerHTML = raw.replace(/<br\s*\/?\s*>|<\/p>|<\/div>/gi, '\n');
+        container.querySelectorAll('script,style').forEach(node => node.remove());
+        let text = (container.textContent || '')
+            .replace(/(?:https?:\/\/|www\.)[^\s<>]+/gi, '')
+            .replace(/(?:meeting\s*id|møte[-\s]*id|id\s+de\s+reuni[oó]n)\s*:?\s*[\d\s-]+/gi, '')
+            .replace(/(?:passcode|password|passord|contrase[ñn]a|c[oó]digo\s+de\s+acceso)\s*:?\s*[^\s]+/gi, '')
+            .replace(/(?:join\s+zoom\s+meeting|bli\s+med\s+(?:i|på)\s+zoom[-\s]*møtet|unirse\s+a\s+la\s+reuni[oó]n\s+zoom)\s*:?/gi, '')
+            .replace(/\s+/g, ' ').trim();
+        if (text.toLocaleLowerCase() === String(event.title || '').trim().toLocaleLowerCase()) return '';
+        if (text.length > 120) text = text.slice(0, 117).replace(/\s+\S*$/, '').trimEnd() + '…';
+        return text;
+    }
+
     renderEvents(events) {
         if (window.cmsLog) window.cmsLog(`Viser ${events ? events.length : 0} arrangementer...`);
         const container = document.querySelector('.events-grid');
@@ -2478,13 +2496,7 @@ class ContentManager {
                     const imageAlt = event.title || 'Arrangement';
                     const fallbackSrc = this.getFallbackEventImage(event);
 
-                    const rawDesc = event.seoDescription || event.excerpt || event.description || event.content || '';
-                    const cleanExcerpt = typeof rawDesc === 'string' 
-                        ? rawDesc.replace(/<[^>]*>?/gm, '').trim() 
-                        : '';
-                    const limitExcerpt = cleanExcerpt.length > 120 
-                        ? cleanExcerpt.slice(0, 117) + '...' 
-                        : cleanExcerpt;
+                    const limitExcerpt = this.getEventCardExcerpt(event);
 
                     // Cards open the site's event detail page; calendar links remain event data.
                     const detailsUrl = this.getLocalizedLink('arrangement-detaljer.html') + '?id=' + encodeURIComponent(eventKey);
@@ -2504,7 +2516,7 @@ class ContentManager {
                                 <h3 class="event-title">${event.title || 'Uten tittel'}</h3>
                                 ${limitExcerpt ? `
                                     <p class="event-desc-excerpt" style="font-size: 0.9rem; color: #64748b; margin-bottom: 12px; line-clamp: 2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.45;">
-                                        ${limitExcerpt}
+                                        ${this.escapeHtml(limitExcerpt)}
                                     </p>
                                 ` : ''}
                                 <div class="event-meta" style="font-weight: 600; color: var(--text-light); display: flex; align-items: center; gap: 6px; margin-top: auto; font-size: 0.92rem;">
