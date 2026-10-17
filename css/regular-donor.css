@@ -203,3 +203,9 @@ html[data-theme="dark"] .donor-impact-grid article { border-color: #334155; }
     .donations-page-view .donor-welcome.section { padding-top:24px!important; }
     .donations-page-view .donor-welcome-copy { padding-top:0; }
 }
+
+/* A little more room above the donation introduction heading. */
+.donations-page-view .donor-welcome-copy:not(.donor-cause-detail) { padding-top:48px; }
+@media (max-width:900px) {
+    .donations-page-view .donor-welcome-copy:not(.donor-cause-detail) { padding-top:16px; }
+}

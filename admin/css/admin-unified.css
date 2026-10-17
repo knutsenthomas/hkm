@@ -6877,7 +6877,7 @@ body.admin-body .template-item:active {
   .modal-content input:not([type="checkbox"]):not([type="radio"]),
   .modal-content select:not(.crm-editor-toolbar select):not(#crm-editor-format-block):not(#crm-email-merge-tag-select),
   .modal-content textarea,
-  .modal-content button:not(.close-modal):not(.close-modal-btn):not(.editor-btn):not(.editor-media-btn):not(#btn-toggle-new-label):not(#crm-email-insert-img-btn):not(#crm-email-insert-yt-btn),
+  .modal-content button:not(.modal-close):not(.close-modal):not(.close-modal-btn):not(.editor-btn):not(.editor-media-btn):not(#btn-toggle-new-label):not(#crm-email-insert-img-btn):not(#crm-email-insert-yt-btn),
   #admin-modal-profile-form input:not([type="checkbox"]):not([type="radio"]),
   #admin-modal-profile-form textarea,
   #admin-modal-profile-form button:not(.close-modal):not(.close-modal-btn),
@@ -11150,7 +11150,7 @@ body.builder-active .main-content,
 
 .hkm-tasks-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
     gap: 16px;
 }
 
@@ -11588,3 +11588,53 @@ body.admin-body dialog#cause-form-modal {
 #cause-form-modal .cause-language-fields { grid-column:1/-1; padding:16px; border:1px solid var(--admin-border,#e2e8f0); border-radius:12px; }
 #cause-form-modal .cause-language-fields summary { cursor:pointer; color:var(--admin-text,#1e293b); font-weight:600; }
 #cause-form-modal .cause-language-fields .form-group { margin-top:14px!important; }
+
+/* Shared mobile containment for all admin workspaces. */
+@media (max-width: 768px) {
+  body.admin-body .section-content,
+  body.admin-body .content-wrapper,
+  body.admin-body .card,
+  body.admin-body .card-body,
+  body.admin-body .hkm-tasks-main {
+    min-width: 0;
+    max-width: 100%;
+  }
+  body.admin-body .hkm-tasks-main { width:100%; }
+  body.admin-body .modal-header > div { min-width:0; flex:1; }
+  body.admin-body :is(.modal-close,.close-modal,.close-modal-btn) {
+    width:44px!important; min-width:44px!important; max-width:44px!important;
+    min-height:44px!important; flex:0 0 44px!important; padding:4px!important;
+  }
+  body.admin-body .modal-header :is(h2,h3) {
+    word-break:normal!important; overflow-wrap:break-word; hyphens:none!important;
+  }
+  body.admin-body .section-content :is(.card-title,.section-title) {
+    word-break:normal!important; overflow-wrap:break-word; hyphens:none!important;
+  }
+  body.admin-body .section-content .card-header { flex-wrap:wrap; gap:12px; }
+  body.admin-body .section-content .card-header > div { min-width:0; }
+  body.admin-body .modal { z-index:20000!important; }
+  body.admin-body .section-content :is(.integrations-grid,.app-dashboard-grid,.media-grid,.media-library-stats) { grid-template-columns:minmax(0,1fr)!important; }
+}
+@media (max-width:768px) {
+  body.admin-body .tools-grid { grid-template-columns:minmax(0,1fr)!important; }
+  body.admin-body .tool-card { min-width:0; }
+  body.admin-body .tool-info { min-width:0; }
+  body.admin-body .app-dashboard-grid .card > div > div { min-width:0; max-width:100%; }
+  body.admin-body #btn-force-app-sync { white-space:normal; height:auto!important; min-height:48px; max-width:100%; }
+  body.admin-body .ai-inspirasjon-hero > div > div { min-width:0!important; max-width:100%; }
+  body.admin-body .ai-inspirasjon-hero { padding:20px!important; }
+  body.admin-body .period-selector { max-width:100%; min-width:0; box-sizing:border-box; }
+  body.admin-body .period-btn { min-height:44px; }
+  body.admin-body :is(.chart-container-inner,.donut-chart-wrapper) { min-width:0; max-width:100%; }
+  body.admin-body :is(.chart-container-inner,.donut-chart-wrapper) canvas { max-width:100%!important; }
+}
+@media (max-width:768px) {
+  body.admin-body .design-ui-upload-card { flex-direction:column; }
+  body.admin-body .design-ui-upload-card-preview { width:100%; box-sizing:border-box; border-right:0; border-bottom:1px solid var(--admin-border,#e2e8f0); }
+  body.admin-body .design-ui-upload-card-body { min-width:0; padding:16px; }
+  body.admin-body .design-ui-upload-card-actions { flex-wrap:wrap; }
+  body.admin-body .design-ui-upload-url-input { flex-basis:100%; font-size:16px!important; min-height:44px; }
+  body.admin-body .courses-sub-tabs { flex-wrap:wrap; }
+  body.admin-body .courses-sub-tabs .sub-tab-btn { min-height:44px; }
+}

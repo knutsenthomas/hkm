@@ -3556,7 +3556,7 @@ class AdminManager {
                         </button>
                     </div>
                     <div class="card-body" style="padding: 20px;">
-                        <div class="form-section" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                        <div class="form-section" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 16px;">
                             <div class="form-group">
                                 <label style="font-weight: 700; font-size: 13px; color: #334155;">RSS Feed URL</label>
                                 <input type="text" id="podcast-rss-url" class="form-control" placeholder="https://anchor.fm/s/f7a13dec/podcast/rss">
@@ -5160,7 +5160,7 @@ class AdminManager {
                 }
                 .hkm-widgets-grid {
                     display: grid !important;
-                    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+                    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)) !important;
                     gap: 24px !important;
                     width: 100% !important;
                 }
@@ -7751,7 +7751,7 @@ class AdminManager {
         if (!section) return;
 
         section.innerHTML = `
-            <div class="media-library-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 32px;">
+            <div class="media-library-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 20px; margin-bottom: 32px;">
                 <div class="stat-card" style="padding: 20px; background: white; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 16px;">
                     <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(209, 125, 57, 0.1); color: #d17d39; display: flex; align-items: center; justify-content: center;">
                         <span class="material-symbols-outlined">image</span>
@@ -7808,7 +7808,7 @@ class AdminManager {
                 <input type="file" id="media-file-input" style="display: none;" accept="image/*" multiple>
             </div>
 
-            <div id="media-grid" class="media-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px;">
+            <div id="media-grid" class="media-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 24px;">
                 <div class="loader-container" style="grid-column: 1/-1; text-align: center; padding: 60px 0;">
                     <div class="loader" style="margin: 0 auto;"></div>
                     <p style="margin-top: 16px; color: #64748b;">Henter mediebibliotek...</p>
@@ -7826,7 +7826,7 @@ class AdminManager {
         if (!section) return;
 
         section.innerHTML = `
-            <div class="integrations-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; align-items: stretch;">
+            <div class="integrations-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 24px; align-items: stretch;">
                 <div class="card modern" style="height: 100%; display: flex; flex-direction: column;">
                     <div class="card-header flex-between">
                         <div style="display: flex; align-items: center; gap: 12px;">
@@ -8068,7 +8068,7 @@ class AdminManager {
         if (!section) return;
 
         section.innerHTML = `
-            <div class="app-dashboard-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+            <div class="app-dashboard-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 24px;">
                 
                 <!-- Status & Sync Control Card -->
                 <div class="card modern" style="grid-column: 1 / -1; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; border-radius: 20px; padding: 28px; box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.3);">
@@ -8173,7 +8173,7 @@ class AdminManager {
                     <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 700;">Mobilapp Konfigurasjon (PWA Manifest)</h3>
                     <p style="margin: 0 0 24px 0; font-size: 14px; color: #64748b;">Konfigurasjon for hvordan HKM-appen oppfører seg når den installeres på Hjem-skjermen på iOS og Android.</p>
                     
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 20px;">
                         <div class="form-group">
                             <label style="font-size: 13px; font-weight: 700; color: #334155;">App-navn</label>
                             <input type="text" id="pwa-app-name" class="form-control" value="His Kingdom Ministry" readonly style="background: #f8fafc;">
@@ -8746,7 +8746,7 @@ class AdminManager {
                                 <input type="file" id="modal-file-input" style="display:none;" accept="image/*,video/*" multiple>
                             </div>
                         </div>
-                        <div id="modal-media-grid" class="media-grid" style="flex: 1; overflow-y: auto; padding: 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px;">
+                        <div id="modal-media-grid" class="media-grid" style="flex: 1; overflow-y: auto; padding: 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr)); gap: 16px;">
                             <div class="admin-loading" style="grid-column: 1/-1; text-align: center; padding: 40px;">
                                 <div class="spinner"></div>
                                 <p style="margin-top: 12px; color: #64748b; font-size: 14px;">Henter filer...</p>
@@ -15291,7 +15291,7 @@ class AdminManager {
                             </div>
                             <div class="design-ui-panel-body">
                                 <h4 class="design-ui-panel-subtitle" style="margin-bottom: 16px; font-weight: 700; color: var(--text-main); font-size: 15px;">Min Side bunn-meny</h4>
-                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr)); gap: 16px; margin-bottom: 24px;">
                                     <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
                                         <input type="checkbox" id="nav-minside-overview" value="overview" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
                                         <span>Oversikt</span>
@@ -15329,7 +15329,7 @@ class AdminManager {
                                 <div class="design-ui-divider" style="margin: 20px 0; border-top: 1px solid var(--border-color); opacity: 0.5;"></div>
 
                                 <h4 class="design-ui-panel-subtitle" style="margin-bottom: 16px; font-weight: 700; color: var(--text-main); font-size: 15px;">Admin bunn-meny</h4>
-                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px;">
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr)); gap: 16px;">
                                     <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
                                         <input type="checkbox" id="nav-admin-overview" value="overview" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
                                         <span>Oversikt</span>
@@ -17893,7 +17893,7 @@ class AdminManager {
         if (statusInput) statusInput.value = 'completed';
         const methodInput = document.getElementById('manual-donation-method');
         if (methodInput) methodInput.value = 'bank';
-        modal.style.display = 'flex';
+        if (!modal.open) modal.showModal();
         const run = this._manualDonationLoadGeneration = (this._manualDonationLoadGeneration || 0) + 1;
         const fund = document.getElementById('manual-donation-fund');
         const save = document.getElementById('save-manual-donation-btn');
@@ -17919,7 +17919,7 @@ class AdminManager {
     closeManualDonationModal() {
         this._manualDonationLoadGeneration = (this._manualDonationLoadGeneration || 0) + 1;
         const modal = document.getElementById('manual-donation-modal');
-        if (modal) modal.style.display = 'none';
+        if (modal?.open) modal.close();
     }
 
     handleManualDonationUserSelect(userId) {
@@ -19461,12 +19461,12 @@ class AdminManager {
         if (!modal) return;
         const form = document.getElementById('manual-inkind-form');
         if (form) form.reset();
-        modal.style.display = 'flex';
+        if (!modal.open) modal.showModal();
     }
 
     closeManualInKindModal() {
         const modal = document.getElementById('manual-inkind-modal');
-        if (modal) modal.style.display = 'none';
+        if (modal?.open) modal.close();
     }
 
     handleManualInKindUserSelect(userId) {
@@ -19593,12 +19593,12 @@ class AdminManager {
         if (saveBtn) saveBtn.disabled = true;
         this.pendingBankImportRows = [];
         this.resetBankImportDropzone();
-        modal.style.display = 'flex';
+        if (!modal.open) modal.showModal();
     }
 
     closeBankImportModal() {
         const modal = document.getElementById('bank-import-modal');
-        if (modal) modal.style.display = 'none';
+        if (modal?.open) modal.close();
     }
 
     resetBankImportDropzone() {
@@ -20535,7 +20535,7 @@ class AdminManager {
                         grid-template-columns: 1fr !important;
                     }
                     body.admin-body .causes-stats-grid > * {
-                        grid-column: span 12 !important;
+                        grid-column: 1 / -1 !important;
                     }
                 }
                 .btn-link-profile, .btn-link-donor-profile {
@@ -20565,7 +20565,7 @@ class AdminManager {
             <!-- Tabs Navigation -->
             <div class="causes-tabs-container" style="margin-bottom: 24px;">
                 <div class="automation-tabs" style="border-bottom: 2px solid #e2e8f0; background: #fff; border-radius: 12px 12px 0 0; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-                    <div style="display: flex; gap: 8px; align-items: center;">
+                    <div class="causes-tab-links" style="display: flex; gap: 8px; align-items: center;">
                         <button class="automation-tab active" data-tab="dashboard">Dashboard</button>
                         <button class="automation-tab" data-tab="causes">Innsamlinger</button>
                         <button class="automation-tab" data-tab="donations">Pr. gave</button>
@@ -20574,7 +20574,7 @@ class AdminManager {
                         <a class="automation-tab" data-section="school-payments" href="/admin/index.html#school-payments">Skolebetalinger</a>
                     </div>
                     
-                    <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0; flex-wrap: wrap;">
+                    <div class="causes-toolbar" style="display: flex; align-items: center; gap: 12px; padding: 8px 0; flex-wrap: wrap;">
                         <!-- Global Period Selector -->
                         <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 8px;">
                             <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; white-space: nowrap;">Periode:</label>
@@ -20598,7 +20598,7 @@ class AdminManager {
                                 <input type="date" id="global-end-date" class="form-control" style="border-radius: 8px; height: 36px; padding: 4px 8px; font-size: 12px; border: 1px solid #cbd5e1;">
                             </div>
                         </div>
-                        <div style="display: flex; gap: 8px; align-items: center;">
+                        <div class="causes-toolbar-actions" style="display: flex; gap: 8px; align-items: center;">
                             <button type="button" class="btn-primary" id="add-manual-donation-btn" style="display:flex; align-items:center; gap:8px; padding:8px 16px; border-radius:8px; font-weight:600; height:36px; font-size: 13px; margin: 0;">
                                 <span class="material-symbols-outlined" style="font-size:18px;">add_card</span>
                                 Registrer gave
@@ -20710,7 +20710,7 @@ class AdminManager {
                         </div>
                     </div>
                     <div class="card-body">
-                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:16px;">
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%, 130px), 1fr));gap:12px;margin-bottom:16px;">
                             <div class="form-group" style="margin:0;">
                                 <label>Status</label>
                                 <select id="donation-status-filter" class="form-control">
@@ -20825,7 +20825,7 @@ class AdminManager {
                         </div>
                     </div>
                     <div class="card-body">
-                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:16px;">
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%, 130px), 1fr));gap:12px;margin-bottom:16px;">
                             <div class="form-group" style="margin:0;">
                                 <label>Status</label>
                                 <select id="donor-status-filter" class="form-control">
@@ -20938,19 +20938,18 @@ class AdminManager {
             </div>
 
             <!-- Global Modals -->
-            <div id="bank-import-modal" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:20px;">
-                <div class="modal-backdrop" onclick="window.adminManager?.closeBankImportModal?.()" style="position:absolute;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(8px);"></div>
+            <dialog id="bank-import-modal" class="donation-admin-dialog" aria-label="Importer bankgaver">
                 <div class="modal-content" style="max-width:1100px;position:relative;max-height:min(92vh,820px);overflow:auto;">
                     <div class="modal-header" style="padding:24px 32px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
                         <div>
                             <h3 style="margin:0;">Importer bankgaver</h3>
                             <p class="section-subtitle" style="margin:4px 0 0;">Last opp CSV eller CAMT/XML fra nettbanken. Du får forhåndsvisning før lagring.</p>
                         </div>
-                        <button class="modal-close" type="button" onclick="window.adminManager?.closeBankImportModal?.()">×</button>
+                        <button class="modal-close" aria-label="Lukk vinduet" type="button" onclick="window.adminManager?.closeBankImportModal?.()">×</button>
                     </div>
                     <div class="modal-body" style="display:grid;gap:16px; padding:24px 32px;">
                         <div class="form-group" style="margin:0;">
-                            <label style="display:block; font-weight:600; color:#334155; font-size:0.875rem; margin-bottom:12px;">Bankfil</label>
+                            <label for="bank-import-file" style="display:block; font-weight:600; color:#334155; font-size:0.875rem; margin-bottom:12px;">Bankfil</label>
                             <input id="bank-import-file" type="file" accept=".csv,.txt,.xml,text/csv,text/plain,application/xml,text/xml" style="display:none;">
                             <div id="bank-import-dropzone" style="border:2px dashed #cbd5e1; border-radius:12px; padding:32px 24px; text-align:center; background:#f8fafc; cursor:pointer; transition:all 0.2s ease-in-out; display:flex; flex-direction:column; align-items:center; gap:12px;" onmouseover="this.style.borderColor='#1B4965'; this.style.background='#f0f4f8';" onmouseout="this.style.borderColor='#cbd5e1'; this.style.background='#f8fafc';">
                                 <span class="material-symbols-outlined" style="font-size:48px; color:#1B4965;">cloud_upload</span>
@@ -20976,36 +20975,35 @@ class AdminManager {
                         </button>
                     </div>
                 </div>
-            </div>
+            </dialog>
 
-            <div id="manual-donation-modal" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:24px;">
-                <div class="modal-backdrop" onclick="window.adminManager?.closeManualDonationModal?.()" style="position:absolute;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(8px);"></div>
+            <dialog id="manual-donation-modal" class="donation-admin-dialog" aria-label="Registrer gave">
                 <div class="modal-content" style="max-width:720px;position:relative;max-height:min(90vh,760px);overflow:auto;">
                     <div class="modal-header" style="padding:24px 32px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:flex-start;">
                         <div>
                             <h3 style="margin:0; font-size:1.5rem; color:#0f172a; font-weight:700;">Registrer manuell gave</h3>
                             <p class="section-subtitle" style="margin:8px 0 0; color:#64748b; font-size:0.875rem; line-height:1.5;">For bank, kontant, Vipps utenom nettbetaling eller andre tjenester.</p>
                         </div>
-                        <button class="modal-close" type="button" onclick="window.adminManager?.closeManualDonationModal?.()" style="background:transparent; border:none; color:#64748b; cursor:pointer; padding:4px; margin:-4px; display:flex; align-items:center; justify-content:center; transition:color 0.2s ease, transform 0.2s ease;" onmouseover="this.style.color='#0f172a'; this.style.transform='scale(1.1)';" onmouseout="this.style.color='#64748b'; this.style.transform='scale(1)';">
+                        <button class="modal-close" aria-label="Lukk vinduet" type="button" onclick="window.adminManager?.closeManualDonationModal?.()" style="background:transparent; border:none; color:#64748b; cursor:pointer; padding:4px; margin:-4px; display:flex; align-items:center; justify-content:center; transition:color 0.2s ease, transform 0.2s ease;" onmouseover="this.style.color='#0f172a'; this.style.transform='scale(1.1)';" onmouseout="this.style.color='#64748b'; this.style.transform='scale(1)';">
                             <span class="material-symbols-outlined" style="font-size:24px;">close</span>
                         </button>
                     </div>
                     <form id="manual-donation-form">
                         <div class="modal-body" style="display:grid;gap:24px; padding:24px 32px;">
                             <div class="form-group" style="margin:0;">
-                                <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Koble til eksisterende bruker</label>
+                                <label for="manual-donation-user" style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Koble til eksisterende bruker</label>
                                 <select id="manual-donation-user" class="form-control" style="width:100%; padding:10px 42px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                     <option value="">Ikke koble til profil</option>
                                     ${manualDonationUserOptions}
                                 </select>
                             </div>
-                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%, 220px), 1fr));gap:16px;">
                                 <div class="form-group" style="margin:0;">
-                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Givers navn</label>
+                                    <label for="manual-donor-name" style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Givers navn</label>
                                     <input id="manual-donor-name" class="form-control" type="text" placeholder="Fullt navn" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                 </div>
                                 <div class="form-group" style="margin:0;">
-                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Givers e-post</label>
+                                    <label for="manual-donor-email" style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Givers e-post</label>
                                     <input id="manual-donor-email" class="form-control" type="email" placeholder="navn@eksempel.no" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                 </div>
                             </div>
@@ -21014,19 +21012,19 @@ class AdminManager {
                                 <select id="manual-donation-fund" class="form-control" style="width:100%;padding:10px 16px;border:1px solid #cbd5e1;border-radius:8px;" disabled><option value="">Henter innsamlingsaksjoner …</option></select>
                                 <p id="manual-donation-fund-hint" role="status" style="font-size:13px;color:#64748b;line-height:1.5;margin:8px 0 0;"></p>
                             </div>
-                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;">
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%, 160px), 1fr));gap:16px;">
                                 <div class="form-group" style="margin:0;">
-                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Beløp (NOK)</label>
+                                    <label for="manual-donation-amount" style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Beløp (NOK)</label>
                                     <input id="manual-donation-amount" class="form-control" type="number" min="1" step="0.01" required placeholder="500" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                 </div>
                                 <div class="form-group" style="margin:0;">
-                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Dato</label>
+                                    <label for="manual-donation-date" style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Dato</label>
                                     <input id="manual-donation-date" class="form-control" type="datetime-local" required style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                 </div>
                             </div>
-                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%, 180px), 1fr));gap:16px;">
                                 <div class="form-group" style="margin:0;">
-                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Metode</label>
+                                    <label for="manual-donation-method" style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Metode</label>
                                     <select id="manual-donation-method" class="form-control" style="width:100%; padding:10px 42px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                         <option value="bank">Bank</option>
                                         <option value="manual">Manuell</option>
@@ -21036,7 +21034,7 @@ class AdminManager {
                                     </select>
                                 </div>
                                 <div class="form-group" style="margin:0;">
-                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Status</label>
+                                    <label for="manual-donation-status" style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Status</label>
                                     <select id="manual-donation-status" class="form-control" style="width:100%; padding:10px 42px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                         <option value="completed">Fullført</option>
                                         <option value="pending">Venter</option>
@@ -21044,12 +21042,12 @@ class AdminManager {
                                     </select>
                                 </div>
                                 <div class="form-group" style="margin:0;">
-                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Referanse</label>
+                                    <label for="manual-donation-reference" style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Referanse</label>
                                     <input id="manual-donation-reference" class="form-control" type="text" placeholder="Bankreferanse e.l." style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                 </div>
                             </div>
                             <div class="form-group" style="margin:0;">
-                                <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Notat</label>
+                                <label for="manual-donation-note" style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Notat</label>
                                 <textarea id="manual-donation-note" class="form-control" rows="3" placeholder="Valgfritt internt notat" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease; resize:vertical;"></textarea>
                             </div>
                         </div>
@@ -21062,13 +21060,13 @@ class AdminManager {
                         </div>
                     </form>
                 </div>
-            </div>
+            </dialog>
 
             <dialog id="cause-form-modal" aria-labelledby="form-title">
                 <div class="modal-content" style="max-width: 600px;">
                     <div class="modal-header" style="padding:24px 32px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
                         <h3 id="form-title">Ny innsamlingsaksjon</h3>
-                        <button class="modal-close" onclick="document.getElementById('cause-form-modal').close()">×</button>
+                        <button class="modal-close" aria-label="Lukk vinduet" onclick="document.getElementById('cause-form-modal').close()">×</button>
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
@@ -21119,50 +21117,49 @@ class AdminManager {
             </dialog>
 
             <!-- Manual In-Kind Modal -->
-            <div id="manual-inkind-modal" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:24px;">
-                <div class="modal-backdrop" onclick="window.adminManager?.closeManualInKindModal?.()" style="position:absolute;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(8px);"></div>
+            <dialog id="manual-inkind-modal" class="donation-admin-dialog" aria-label="Registrer fysisk gave">
                 <div class="modal-content" style="max-width:720px;position:relative;max-height:min(90vh,760px);overflow:auto;">
                     <div class="modal-header" style="padding:24px 32px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:flex-start;">
                         <div>
                             <h3 style="margin:0; font-size:1.5rem; color:#0f172a; font-weight:700;">Registrer fysisk gave</h3>
                             <p class="section-subtitle" style="margin:8px 0 0; color:#64748b; font-size:0.875rem; line-height:1.5;">For registrering av fysiske gaver, utstyr, tjenester eller aksjer.</p>
                         </div>
-                        <button class="modal-close" type="button" onclick="window.adminManager?.closeManualInKindModal?.()" style="background:transparent; border:none; color:#64748b; cursor:pointer; padding:4px; margin:-4px; display:flex; align-items:center; justify-content:center; transition:color 0.2s ease, transform 0.2s ease;" onmouseover="this.style.color='#0f172a'; this.style.transform='scale(1.1)';" onmouseout="this.style.color='#64748b'; this.style.transform='scale(1)';">
+                        <button class="modal-close" aria-label="Lukk vinduet" type="button" onclick="window.adminManager?.closeManualInKindModal?.()" style="background:transparent; border:none; color:#64748b; cursor:pointer; padding:4px; margin:-4px; display:flex; align-items:center; justify-content:center; transition:color 0.2s ease, transform 0.2s ease;" onmouseover="this.style.color='#0f172a'; this.style.transform='scale(1.1)';" onmouseout="this.style.color='#64748b'; this.style.transform='scale(1)';">
                             <span class="material-symbols-outlined" style="font-size:24px;">close</span>
                         </button>
                     </div>
                     <form id="manual-inkind-form">
                         <div class="modal-body" style="display:grid;gap:24px; padding:24px 32px;">
                             <div class="form-group" style="margin:0;">
-                                <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Koble til eksisterende bruker</label>
+                                <label for="manual-inkind-user" style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Koble til eksisterende bruker</label>
                                 <select id="manual-inkind-user" class="form-control" style="width:100%; padding:10px 42px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                     <option value="">Ikke koble til profil</option>
                                     ${manualDonationUserOptions}
                                 </select>
                             </div>
-                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%, 220px), 1fr));gap:16px;">
                                 <div class="form-group" style="margin:0;">
-                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Givers navn</label>
+                                    <label for="manual-inkind-donor-name" style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Givers navn</label>
                                     <input id="manual-inkind-donor-name" class="form-control" type="text" placeholder="Fullt navn" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                 </div>
                                 <div class="form-group" style="margin:0;">
-                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Givers e-post</label>
+                                    <label for="manual-inkind-donor-email" style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Givers e-post</label>
                                     <input id="manual-inkind-donor-email" class="form-control" type="email" placeholder="navn@eksempel.no" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                 </div>
                             </div>
-                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%, 220px), 1fr));gap:16px;">
                                 <div class="form-group" style="margin:0;">
-                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Beskrivelse av fysisk gave</label>
+                                    <label for="manual-inkind-desc" style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Beskrivelse av fysisk gave</label>
                                     <input id="manual-inkind-desc" class="form-control" type="text" required placeholder="f.eks. Kjøleskap, maling, etc." style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                 </div>
                                 <div class="form-group" style="margin:0;">
-                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Dato mottatt</label>
+                                    <label for="manual-inkind-date" style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Dato mottatt</label>
                                     <input id="manual-inkind-date" class="form-control" type="date" required style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                 </div>
                             </div>
-                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%, 180px), 1fr));gap:16px;">
                                 <div class="form-group" style="margin:0;">
-                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Formål (Fund)</label>
+                                    <label for="manual-inkind-fund" style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Formål (Fund)</label>
                                     <select id="manual-inkind-fund" class="form-control" style="width:100%; padding:10px 42px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                         <option value="general">general</option>
                                         <option value="basar">basar</option>
@@ -21172,7 +21169,7 @@ class AdminManager {
                                     </select>
                                 </div>
                                 <div class="form-group" style="margin:0;">
-                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Verdi (USD, valgfritt)</label>
+                                    <label for="manual-inkind-value" style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Verdi (USD, valgfritt)</label>
                                     <input id="manual-inkind-value" class="form-control" type="number" min="0" step="0.01" placeholder="300" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                 </div>
                                 <div class="form-group" style="margin:0; display:flex; align-items:center; padding-top:28px;">
@@ -21192,7 +21189,7 @@ class AdminManager {
                         </div>
                     </form>
                 </div>
-            </div>
+            </dialog>
         `;
         section.setAttribute('data-rendered', 'true');
 
@@ -21452,7 +21449,7 @@ class AdminManager {
                         </div>
                     </div>
                     <div class="card-body">
-                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:16px;">
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%, 130px), 1fr));gap:12px;margin-bottom:16px;">
                             <div class="form-group" style="margin:0;">
                                 <label>Status</label>
                                 <select id="shop-status-filter" class="form-control">
@@ -21674,11 +21671,11 @@ class AdminManager {
                                 </div>
                                 <!-- Visual product image grid -->
                                 <div id="manual-sale-product-grid"
-                                     style="display:grid; grid-template-columns: repeat(auto-fill, minmax(108px,1fr)); gap:8px; max-height:280px; overflow-y:auto; padding:4px; border:1px solid #e2e8f0; border-radius:10px; background:#f8fafc;">
+                                     style="display:grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 108px), 1fr)); gap:8px; max-height:280px; overflow-y:auto; padding:4px; border:1px solid #e2e8f0; border-radius:10px; background:#f8fafc;">
                                     <div style="grid-column:1/-1; padding:24px; text-align:center; color:#64748b; font-size:0.875rem;">Laster produkter...</div>
                                 </div>
                             </div>
-                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%, 220px), 1fr));gap:16px;">
                                 <div class="form-group" style="margin:0;">
                                     <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Kjøpers navn</label>
                                     <input id="manual-sale-buyer-name" class="form-control" type="text" placeholder="Fullt navn" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
@@ -21688,7 +21685,7 @@ class AdminManager {
                                     <input id="manual-sale-buyer-email" class="form-control" type="email" placeholder="navn@eksempel.no" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                 </div>
                             </div>
-                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;">
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%, 140px), 1fr));gap:16px;">
                                 <div class="form-group" style="margin:0;">
                                     <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Antall</label>
                                     <input id="manual-sale-quantity" class="form-control" type="number" min="1" step="1" value="1" required style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
@@ -21702,7 +21699,7 @@ class AdminManager {
                                     <input id="manual-sale-date" class="form-control" type="datetime-local" required style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                 </div>
                             </div>
-                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%, 180px), 1fr));gap:16px;">
                                 <div class="form-group" style="margin:0;">
                                     <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Metode</label>
                                     <select id="manual-sale-method" class="form-control" style="width:100%; padding:10px 42px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
@@ -21977,10 +21974,10 @@ class AdminManager {
                                     <span style="font-size:11px; background:#f1f5f9; color:#475569; padding:2px 6px; border-radius:4px; font-weight:600; text-transform:lowercase; display:inline-block; margin-top:6px;">ID: ${causeId}</span>
                                 </div>
                                 <div class="cause-actions-wrap" style="display:flex; gap:8px;"><a class="btn-secondary" href="/donasjoner?aksjon=${encodeURIComponent(causeId)}" target="_blank" rel="noopener">Se aksjon</a>
-                                    <button class="action-btn edit-cause-btn" data-index="${index}" title="Rediger">
+                                    <button class="action-btn edit-cause-btn" data-index="${index}" title="Rediger" aria-label="Rediger aksjon">
                                         <span class="material-symbols-outlined" style="pointer-events: none;">edit</span>
                                     </button>
-                                    <button class="action-btn delete-cause-btn" data-index="${index}" title="Slett" style="color: #ef4444;">
+                                    <button class="action-btn delete-cause-btn" data-index="${index}" title="Slett" aria-label="Slett aksjon" style="color: #ef4444;">
                                         <span class="material-symbols-outlined" style="pointer-events: none;">delete</span>
                                     </button>
                                 </div>
@@ -22005,7 +22002,7 @@ class AdminManager {
                             </div>
                             
                             ${hasDifference ? `
-                            <div style="margin-top:16px; padding:12px; background:#fffbeb; border:1px solid #fef3c7; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                            <div class="cause-reconcile" style="margin-top:16px; padding:12px; background:#fffbeb; border:1px solid #fef3c7; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
                                 <div style="display:flex; align-items:center; gap:8px;">
                                     <span class="material-symbols-outlined" style="color:#d97706; font-size:20px;">warning</span>
                                     <span style="font-size:13px; color:#b45309; font-weight:500;">Avvik: Det er registrert ${actualSum.toLocaleString('no-NO')} kr i betalinger.</span>
@@ -22456,7 +22453,7 @@ class AdminManager {
 
             // Render stats grid
             let statsHtml = `
-                <div class="stats-grid donation-metrics-grid causes-stats-grid" style="margin-bottom: 32px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px;">
+                <div class="stats-grid donation-metrics-grid causes-stats-grid" style="margin-bottom: 32px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 24px;">
                     <div class="stat-card modern">
                         <div class="stat-icon-wrap green">
                             <span class="material-symbols-outlined">payments</span>
@@ -22502,7 +22499,7 @@ class AdminManager {
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 24px; align-items: start;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 24px; margin-bottom: 24px; align-items: start;">
                     <!-- Monthly Breakdown -->
                     <div class="card" style="margin: 0;">
                         <div class="card-header" style="padding: 20px 24px; border-bottom: 1px solid #f1f5f9;">
@@ -24186,7 +24183,7 @@ class AdminManager {
             </style>
 
             <!-- Sub-tab Bar -->
-            <div style="display: flex; gap: 8px; border-bottom: 1px solid #e2e8f0; margin-bottom: 24px; padding-bottom: 0;">
+            <div class="courses-sub-tabs" style="display: flex; gap: 8px; border-bottom: 1px solid #e2e8f0; margin-bottom: 24px; padding-bottom: 0;">
                 <button class="sub-tab-btn active" id="courses-list-tab-btn">Kursliste</button>
                 <button class="sub-tab-btn" id="courses-enrollments-tab-btn">Påmeldinger & Tilganger</button>
                 <button class="sub-tab-btn" id="courses-finance-tab-btn">Økonomi</button>
@@ -24363,7 +24360,7 @@ class AdminManager {
             <div id="finance-tab-view" style="display: none;">
                 <div class="design-ui-shell">
                     <!-- Key stats cards grid -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 16px; margin-bottom: 24px;">
                         <div class="design-ui-panel" style="padding: 20px; border-radius: 12px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 8px;">
                             <div style="font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Total Omsetning</div>
                             <div id="finance-total-revenue" style="font-size: 24px; font-weight: 800; color: #1B4965;">kr 0</div>
@@ -27505,7 +27502,7 @@ class AdminManager {
                                 </span>
                             </div>
 
-                            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
+                            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap:16px;">
                                 ${this.renderFacebookFeedField({
                                     key: 'facebookFeed.enabled',
                                     label: 'Vis seksjonen',
@@ -27612,7 +27609,7 @@ class AdminManager {
                                 <h3 style="margin:0 0 6px; font-size:16px;">Seksjonsforhåndsvisning</h3>
                                 <p style="margin:0; color:#64748b; font-size:13px;">Oppdateres mens du skriver.</p>
                             </div>
-                            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:12px;">
+                            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 140px), 1fr)); gap:12px;">
                                 <div style="border:1px solid #e2e8f0; border-radius:16px; padding:14px; background:#fff;">
                                     <div style="font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#94a3b8;">Seksjon</div>
                                     <div data-preview-status="enabled" style="margin-top:6px; font-size:16px; font-weight:700; color:#0f172a;">
@@ -27675,7 +27672,7 @@ class AdminManager {
                     </div>
                 </div>
 
-                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap:20px;">
                     ${this.renderFacebookFeedPostEditor('first', 'Kort 1', '#2563eb', 'img/facebook-post-1.svg', posts.first || {})}
                     ${this.renderFacebookFeedPostEditor('second', 'Kort 2', '#0ea5e9', 'img/facebook-post-2.svg', posts.second || {})}
                     ${this.renderFacebookFeedPostEditor('third', 'Kort 3', '#f97316', 'img/facebook-post-3.svg', posts.third || {})}
