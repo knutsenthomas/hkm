@@ -14,6 +14,36 @@
       "permanent": true
     },
     {
+      "source": "/es/undervisning",
+      "destination": "/es/ensenanza",
+      "permanent": true
+    },
+    {
+      "source": "/en/prayer-1",
+      "destination": "/en/bnn",
+      "permanent": true
+    },
+    {
+      "source": "/en/kalender",
+      "destination": "/en/calendar",
+      "permanent": true
+    },
+    {
+      "source": "/en/gave-takkeside",
+      "destination": "/en/donations",
+      "permanent": true
+    },
+    {
+      "source": "/es/videoer",
+      "destination": "/es/youtube",
+      "permanent": true
+    },
+    {
+      "source": "/es/blog-feed.xml",
+      "destination": "/es/blog",
+      "permanent": true
+    },
+    {
       "source": "/es/nyhetsbrev",
       "destination": "/es#newsletter-form",
       "permanent": true
