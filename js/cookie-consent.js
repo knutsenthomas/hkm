@@ -1,3 +1,4 @@
+import { flushDonationAnalytics } from './donation-analytics.js';
 /**
  * Cookie Consent Manager
  * Handles GDPR compliance by managing user consent for different categories of cookies.
@@ -227,6 +228,7 @@ function loadGA4(measurementId) {
     });
 
     window.gtagLoaded = true;
+    flushDonationAnalytics();
 }
 
 (function() {

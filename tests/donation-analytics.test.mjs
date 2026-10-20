@@ -1,0 +1,23 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {trackConfirmedDonation,flushDonationAnalytics} from '../js/donation-analytics.js';
+test('requires payment confirmation and analytics consent, then deduplicates',()=>{
+ const values=new Map(); const calls=[];
+ const environment={localStorage:{getItem:key=>values.get(key),setItem:(key,value)=>values.set(key,value)},gtag:(...args)=>calls.push(args),location:{origin:'https://example.test',pathname:'/donasjoner'}};
+ assert.equal(trackConfirmedDonation('stripe',{id:'failed',status:'processing'},environment),false);
+ assert.equal(trackConfirmedDonation('vipps',{reference:'agreement',state:'ACTIVE'},environment),false);
+ const payment={id:'pi_test',status:'succeeded',currency:'nok',amount_received:50000,receipt_email:'private@example.test'};
+ assert.equal(trackConfirmedDonation('stripe',payment,environment),false);
+ values.set('hkm_cookie_consent',JSON.stringify({analytics:true}));
+ assert.equal(flushDonationAnalytics(environment),true);
+ assert.equal(calls[0][2].value,500);
+ assert.ok(!JSON.stringify(calls).includes('private'));
+ assert.equal(trackConfirmedDonation('stripe',payment,environment),false);
+ assert.equal(calls.length,1);
+ assert.equal(trackConfirmedDonation('vipps',{reference:'gift',state:'CAPTURED',amount:{value:25000,currency:'NOK'}},environment),true);
+ assert.equal(calls[1][2].value,250);
+ assert.equal(trackConfirmedDonation('paypal',{orderId:'paypal-test',status:'success'},environment),true);
+ assert.equal(calls[2][2].value,undefined);
+ environment.location.pathname='/kurs';
+ assert.equal(trackConfirmedDonation('stripe',{...payment,id:'course-payment'},environment),false);
+});

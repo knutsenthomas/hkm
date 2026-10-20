@@ -1,3 +1,4 @@
+import { trackConfirmedDonation } from './donation-analytics.js';
 // Replace 'test' with your live Client ID.
 const PAYPAL_CLIENT_ID = "Adja3K8kDYk5_GUz10nBkwlYMgHNNXwiiwfGdGD7wkU354Z-qf9UJApOfD_YfV98t-SuzjXJZg2kPp-a"; 
 const PAYPAL_CREATE_ORDER_URL = "https://createpaypalorder-42bhgdjkcq-uc.a.run.app";
@@ -149,6 +150,8 @@ export function initPayPalDonation(options = {}) {
                     if (!response.ok || resData.status !== "success") {
                         throw new Error(resData.error || "Failed to capture PayPal order");
                     }
+
+                    trackConfirmedDonation("paypal", resData);
 
                     // Success modal or alert
                     if (window.showResultModal) {

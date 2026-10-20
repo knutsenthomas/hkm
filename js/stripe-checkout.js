@@ -1,3 +1,4 @@
+import { trackConfirmedDonation } from './donation-analytics.js';
 // Replace with your public key
 // TODO: User needs to replace this placeholder or configure environment variables
 const stripe = Stripe("pk_live_51Pab8rAL393JGrO9bTUitYflDKlHGpLiqZCCBp0dCzBEV3ZFxARFfK6MgWraehq7i79tJHPIEzlpMwPiT2K3HsiZ00gJ1TQ71Y");
@@ -186,6 +187,7 @@ async function finalizeVippsReturn() {
         showMessage(getVippsStateMessage(data.state));
 
         if (data.state === "CAPTURED") {
+            trackConfirmedDonation("vipps", data);
             alert("Vipps-betalingen er fullført. Takk for gaven.");
         }
     } catch (error) {
@@ -261,6 +263,7 @@ async function checkStatus() {
 
     switch (paymentIntent.status) {
         case "succeeded":
+            trackConfirmedDonation("stripe", paymentIntent);
             if (window.showResultModal) {
                 window.showResultModal(true, "Betalingen var vellykket! Tusen takk for at du blir fast giver.");
             } else {
