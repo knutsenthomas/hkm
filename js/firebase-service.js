@@ -269,6 +269,31 @@ class FirebaseService {
 
             if (typeof firebase.firestore === 'function') {
                 this.db = firebase.firestore();
+            // Improve Firestore reliability in local/dev environments where WebChannel can hang.
+            // Must be set before first Firestore operation.
+            try {
+                const localDev = this._isLocalDevHost();
+                const primarySettings = localDev
+                    ? {
+                        experimentalForceLongPolling: true,
+                        useFetchStreams: false,
+                        merge: true
+                    }
+                    : {
+                        experimentalAutoDetectLongPolling: true,
+                        useFetchStreams: false,
+                        merge: true
+                    };
+                this.db.settings(primarySettings);
+            } catch (settingsError) {
+                try {
+                    // Fallback for SDK variants that reject one of the options above.
+                    this.db.settings({ experimentalAutoDetectLongPolling: true, merge: true });
+                } catch (fallbackSettingsError) {
+                    console.warn("[FirebaseService] Could not apply Firestore transport settings:", fallbackSettingsError || settingsError);
+                }
+            }
+
                 // Enable offline persistence for faster subsequent loads (bypassed on Safari/iOS to prevent IndexedDB hangs)
                 const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
                 if (!isSafari && this.db) {
@@ -298,31 +323,6 @@ class FirebaseService {
                 this.auth = null;
             }
             this.storage = typeof firebase.storage === 'function' ? firebase.storage() : null;
-
-            // Improve Firestore reliability in local/dev environments where WebChannel can hang.
-            // Must be set before first Firestore operation.
-            try {
-                const localDev = this._isLocalDevHost();
-                const primarySettings = localDev
-                    ? {
-                        experimentalForceLongPolling: true,
-                        useFetchStreams: false,
-                        merge: true
-                    }
-                    : {
-                        experimentalAutoDetectLongPolling: true,
-                        useFetchStreams: false,
-                        merge: true
-                    };
-                this.db.settings(primarySettings);
-            } catch (settingsError) {
-                try {
-                    // Fallback for SDK variants that reject one of the options above.
-                    this.db.settings({ experimentalAutoDetectLongPolling: true, merge: true });
-                } catch (fallbackSettingsError) {
-                    console.warn("[FirebaseService] Could not apply Firestore transport settings:", fallbackSettingsError || settingsError);
-                }
-            }
 
             this.isInitialized = true;
             console.log("✅ Firebase initialized (Compat)");
