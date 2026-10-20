@@ -826,7 +826,6 @@ class AdminManager {
             translation.geminiApiKey
             || settings.googleAI?.apiKey
             || settings.googleAi?.apiKey
-            || settings.googleCalendar?.apiKey
             || ''
         ).trim();
 
@@ -1028,7 +1027,7 @@ class AdminManager {
                     ? translated
                     : raw;
             } catch (error) {
-                if (attempt >= maxAttempts) {
+                if (Number(this._myMemoryBlockedUntil || 0) > Date.now() || attempt >= maxAttempts) {
                     throw error;
                 }
                 const retryDelay = Math.min(10000, 800 * attempt);
@@ -1041,6 +1040,9 @@ class AdminManager {
 
     async _translateTextChunkWithGemini(text, targetLang, sourceLang = 'no') {
         const settings = await this._getTranslationSettings();
+        if (this._geminiRejectedKey === settings.geminiApiKey) {
+            throw new Error('Gemini-tilgangen er avvist. Kontroller API-nøkkelen i integrasjonsinnstillinger.');
+        }
         if (!settings.geminiApiKey) {
             throw new Error('Gemini API key mangler i integrasjonsinnstillinger.');
         }
@@ -1082,6 +1084,7 @@ class AdminManager {
 
         if (!res.ok) {
             const errorBody = await res.text().catch(() => '');
+            if ([401, 403].includes(res.status)) this._geminiRejectedKey = settings.geminiApiKey;
             throw new Error(`Gemini request failed (${res.status}): ${errorBody || 'Unknown error'}`);
         }
 
@@ -7711,9 +7714,8 @@ class AdminManager {
         try {
             const safeDays = [7, 14, 30, 60, 90, 180, 365].includes(Number(days)) ? Number(days) : 30;
             
-            const user = firebase.auth().currentUser;
-            if (!user) throw new Error('Du er ikke logget inn.');
-            const idToken = await user.getIdToken();
+            const idToken = await this.getAdminAuthToken();
+            if (!idToken) throw new Error('Du er ikke logget inn.');
 
             // Call the Firebase Function with Authorization header
             const response = await fetch(`https://getanalyticsoverview-42bhgdjkcq-uc.a.run.app?days=${safeDays}`, {
