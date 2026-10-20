@@ -2306,10 +2306,7 @@ class AdminManager {
                 (async () => {
                     try {
                         const msg = firebase.messaging();
-                        const registration = await Promise.race([
-                            navigator.serviceWorker.ready,
-                            new Promise((_, reject) => setTimeout(() => reject(new Error("Service Worker ready-tilstand tidsavbrutt (4s)")), 4000))
-                        ]);
+                        const registration = await this._getAdminPushRegistration();
                         const token = await msg.getToken({
                             vapidKey: 'BI2k24dp-3eJWtLSPvGWQkD00A_duNRCIMY_2ozLFI0-anJDamFBALaTdtzGYQEkoFz8X0JxTcCX6tn3P_i0YrA',
                             serviceWorkerRegistration: registration
@@ -23497,6 +23494,26 @@ class AdminManager {
         };
     }
 
+    async _getAdminPushRegistration() {
+        const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+            scope: '/firebase-cloud-messaging-push-scope/'
+        });
+        if (registration.active) return registration;
+        const worker = registration.installing || registration.waiting;
+        if (!worker) throw new Error('Push-tjenesten kunne ikke startes.');
+        await new Promise((resolve, reject) => {
+            const cleanup = () => { clearTimeout(timer); worker.removeEventListener('statechange', check); };
+            const check = () => {
+                if (worker.state === 'activated') { cleanup(); resolve(); }
+                else if (worker.state === 'redundant') { cleanup(); reject(new Error('Push-tjenesten kunne ikke aktiveres.')); }
+            };
+            const timer = setTimeout(() => { cleanup(); reject(new Error('Oppstart av push-tjenesten tok for lang tid.')); }, 10000);
+            worker.addEventListener('statechange', check);
+            check();
+        });
+        return registration;
+    }
+
     async _requestAdminPushPermission(uid) {
         try {
             if (!('Notification' in window)) return;
@@ -23505,10 +23522,7 @@ class AdminManager {
             if (perm !== 'granted') return;
             const msg = firebase.messaging();
             // Use the existing admin PWA service worker registration to avoid collisions
-            const registration = await Promise.race([
-                navigator.serviceWorker.ready,
-                new Promise((_, reject) => setTimeout(() => reject(new Error("Service Worker ready-tilstand tidsavbrutt (4s)")), 4000))
-            ]);
+            const registration = await this._getAdminPushRegistration();
             const token = await msg.getToken({
                 vapidKey: 'BI2k24dp-3eJWtLSPvGWQkD00A_duNRCIMY_2ozLFI0-anJDamFBALaTdtzGYQEkoFz8X0JxTcCX6tn3P_i0YrA',
                 serviceWorkerRegistration: registration
