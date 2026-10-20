@@ -20,7 +20,7 @@
     },
     {
       "source": "/en/prayer-1",
-      "destination": "/en/bnn",
+      "destination": "/en/contact",
       "permanent": true
     },
     {
@@ -35,7 +35,7 @@
     },
     {
       "source": "/es/videoer",
-      "destination": "/es/youtube",
+      "destination": "/es/media",
       "permanent": true
     },
     {
