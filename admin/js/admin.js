@@ -829,9 +829,9 @@ class AdminManager {
             || ''
         ).trim();
 
-        const provider = String(translation.provider || 'mymemory').toLowerCase() === 'gemini'
+        const provider = String(translation.provider || 'google').toLowerCase() === 'gemini'
             ? 'gemini'
-            : 'mymemory';
+            : 'google';
 
         this._translationSettingsCache = {
             provider,
@@ -930,45 +930,14 @@ class AdminManager {
     }
 
     async _diagnoseTranslationProviders() {
-        const sample = 'Gud er god';
-        const out = {
-            hasGeminiKey: false,
-            gemini: 'not-configured',
-            myMemory: 'unknown'
-        };
-
+        const settings = await this._getTranslationSettings();
+        const out = {hasGeminiKey: !!settings.geminiApiKey, gemini: 'not-tested', myMemory: 'disabled', google: 'unknown'};
         try {
-            const settings = await this._getTranslationSettings();
-            out.hasGeminiKey = !!settings?.geminiApiKey;
-
-            if (out.hasGeminiKey) {
-                try {
-                    const g = await this._translateTextChunkWithGemini(sample, 'en', 'no');
-                    out.gemini = this._isMeaningfullyTranslatedField(sample, g) ? 'ok' : 'no-op';
-                } catch (error) {
-                    out.gemini = `error:${error?.message || 'unknown'}`;
-                }
-            }
-
-            try {
-                const m = await this._translateTextChunkWithMyMemory(sample, 'en', 'no');
-                if (this._isTranslationQuotaExceededMessage(m)) {
-                    out.myMemory = 'quota';
-                } else {
-                    out.myMemory = this._isMeaningfullyTranslatedField(sample, m) ? 'ok' : 'no-op';
-                }
-            } catch (error) {
-                const msg = String(error?.message || '');
-                if (this._isTranslationQuotaExceededMessage(msg)) {
-                    out.myMemory = 'quota';
-                } else {
-                    out.myMemory = `error:${msg}`;
-                }
-            }
+            const result = await this._translateTextChunkWithGoogleTranslate('Gud er god', 'en', 'no');
+            out.google = this._isMeaningfullyTranslatedField('Gud er god', result) ? 'ok' : 'no-op';
         } catch (error) {
-            out.myMemory = `error:${error?.message || 'unknown'}`;
+            out.google = 'error:' + error.message;
         }
-
         return out;
     }
 
@@ -1151,102 +1120,27 @@ class AdminManager {
 
     async _translateTextChunk(text, targetLang, sourceLang = 'no', strict = false) {
         const raw = String(text || '');
-        if (!raw.trim()) return raw;
-        if (this._isLikelyNonTranslatableToken(raw)) return raw;
-
-        const cacheKey = `${sourceLang}:${targetLang}:${raw}`;
+        if (!raw.trim() || this._isLikelyNonTranslatableToken(raw)) return raw;
+        const settings = await this._getTranslationSettings();
+        const cacheKey = `${settings.provider}:${sourceLang}:${targetLang}:${raw}`;
         this._translationCache = this._translationCache || new Map();
-        if (this._translationCache.has(cacheKey)) {
-            return this._translationCache.get(cacheKey);
-        }
-
-        const translationSettings = await this._getTranslationSettings();
-        const hasGeminiKey = !!translationSettings.geminiApiKey;
-
-        if (translationSettings.provider === 'gemini' && hasGeminiKey) {
+        if (this._translationCache.has(cacheKey)) return this._translationCache.get(cacheKey);
+        let translated;
+        if (settings.provider === 'gemini' && settings.geminiApiKey) {
             try {
-                const translatedByGemini = await this._translateTextChunkWithGemini(raw, targetLang, sourceLang);
-                const finalGeminiText = (typeof translatedByGemini === 'string' && translatedByGemini.trim())
-                    ? translatedByGemini
-                    : raw;
-                this._translationCache.set(cacheKey, finalGeminiText);
-                return finalGeminiText;
+                translated = await this._translateTextChunkWithGemini(raw, targetLang, sourceLang);
             } catch (error) {
-                console.warn(`[AdminManager] Gemini translation failed, falling back to MyMemory (${targetLang})`, error);
+                console.warn('[AdminManager] Gemini unavailable; using Google Translate.');
             }
         }
-
-        try {
-            const translatedByMyMemory = await this._translateTextChunkWithMyMemory(raw, targetLang, sourceLang);
-            const finalText = (typeof translatedByMyMemory === 'string' && translatedByMyMemory.trim())
-                ? translatedByMyMemory
-                : raw;
-
-            // MyMemory can return unchanged source text without an explicit error.
-            // If Gemini is configured, retry with Gemini so no-op responses do not block translation.
-            const isMyMemoryNoOp = !this._isMeaningfullyTranslatedField(raw, finalText);
-            if (translationSettings.provider === 'mymemory' && isMyMemoryNoOp && hasGeminiKey) {
-                try {
-                    const translatedByGemini = await this._translateTextChunkWithGemini(raw, targetLang, sourceLang);
-                    const finalGeminiText = (typeof translatedByGemini === 'string' && translatedByGemini.trim())
-                        ? translatedByGemini
-                        : raw;
-                    this._translationCache.set(cacheKey, finalGeminiText);
-                    return finalGeminiText;
-                } catch (geminiError) {
-                    console.warn(`[AdminManager] Gemini no-op fallback failed (${targetLang})`, geminiError);
-                }
-            }
-
-            if (!this._isMeaningfullyTranslatedField(raw, finalText)) {
-                try {
-                    const translatedByGoogle = await this._translateTextChunkWithGoogleTranslate(raw, targetLang, sourceLang);
-                    const finalGoogleText = (typeof translatedByGoogle === 'string' && translatedByGoogle.trim())
-                        ? translatedByGoogle
-                        : raw;
-                    this._translationCache.set(cacheKey, finalGoogleText);
-                    return finalGoogleText;
-                } catch (googleError) {
-                    console.warn(`[AdminManager] Google fallback failed after MyMemory no-op (${targetLang})`, googleError);
-                }
-            }
-
-            this._translationCache.set(cacheKey, finalText);
-            return finalText;
-        } catch (error) {
-            const quotaExceeded = this._isTranslationQuotaExceededMessage(error?.message);
-            if (quotaExceeded && hasGeminiKey) {
-                try {
-                    const translatedByGemini = await this._translateTextChunkWithGemini(raw, targetLang, sourceLang);
-                    const finalGeminiText = (typeof translatedByGemini === 'string' && translatedByGemini.trim())
-                        ? translatedByGemini
-                        : raw;
-                    this._translationCache.set(cacheKey, finalGeminiText);
-                    return finalGeminiText;
-                } catch (geminiError) {
-                    console.warn(`[AdminManager] Gemini fallback failed after MyMemory quota hit (${targetLang})`, geminiError);
-                }
-            }
-
-            try {
-                const translatedByGoogle = await this._translateTextChunkWithGoogleTranslate(raw, targetLang, sourceLang);
-                const finalGoogleText = (typeof translatedByGoogle === 'string' && translatedByGoogle.trim())
-                    ? translatedByGoogle
-                    : raw;
-                this._translationCache.set(cacheKey, finalGoogleText);
-                return finalGoogleText;
-            } catch (googleError) {
-                console.warn(`[AdminManager] Google fallback failed (${targetLang})`, googleError);
-            }
-
-            if (quotaExceeded) {
-                throw error;
-            }
-
-            console.warn(`[AdminManager] Translation failed (${targetLang})`, error);
-            if (strict) throw error;
-            return raw;
+        if (!translated || !this._isMeaningfullyTranslatedField(raw, translated)) {
+            translated = await this._translateTextChunkWithGoogleTranslate(raw, targetLang, sourceLang);
         }
+        if (typeof translated !== 'string' || !translated.trim()) {
+            throw new Error('Google Oversettelse svarte uten oversatt tekst.');
+        }
+        this._translationCache.set(cacheKey, translated);
+        return translated;
     }
 
     async _translateRichText(value, targetLang, sourceLang = 'no') {
@@ -7951,7 +7845,7 @@ class AdminManager {
                             <div class="form-group" style="margin-bottom: 15px;">
                                 <label>Leverandør</label>
                                 <select id="translation-provider" class="form-control">
-                                    <option value="mymemory">MyMemory (gratis)</option>
+                                    <option value="google">Google Oversettelse</option>
                                     <option value="gemini">Gemini (Google AI)</option>
                                 </select>
                             </div>
@@ -9737,7 +9631,7 @@ class AdminManager {
             // AI Settings
             const translation = settings.translation || {};
             const provEl = document.getElementById('translation-provider');
-            if (provEl) provEl.value = translation.provider || 'mymemory';
+            if (provEl) provEl.value = translation.provider === 'gemini' ? 'gemini' : 'google';
             
             const geminiKeyEl = document.getElementById('gemini-api-key');
             if (geminiKeyEl) geminiKeyEl.value = translation.geminiApiKey || '';
@@ -9842,7 +9736,7 @@ class AdminManager {
             const currentSettings = await firebaseService.getPageContent('settings_integrations') || {};
             
             const gcalApiKey = document.getElementById('gcal-api-key')?.value.trim() || '';
-            const translationProvider = document.getElementById('translation-provider')?.value || 'mymemory';
+            const translationProvider = document.getElementById('translation-provider')?.value || 'google';
             const geminiApiKey = document.getElementById('gemini-api-key')?.value.trim() || '';
             const geminiModel = document.getElementById('gemini-model')?.value.trim() || 'gemini-1.5-flash';
 
