@@ -65,11 +65,11 @@ function getContentItemStableId(item) {
 function findContentItemById(items = [], itemId) {
   if (!itemId) return null;
   const targetId = String(itemId).trim().toLowerCase();
-  
+
   const found = items.find(item => {
     const stableId = getContentItemStableId(item);
-    if (stableId && stableId.trim().toLowerCase() === targetId) return true;
-    
+    if (stableId && String(stableId).trim().toLowerCase() === targetId) return true;
+
     const possibleKeys = [
       item.id,
       item.postId,
@@ -80,8 +80,28 @@ function findContentItemById(items = [], itemId) {
     ];
     return possibleKeys.some(val => val && String(val).trim().toLowerCase() === targetId);
   });
-  
+
   return found;
+}
+
+function articleContentText(value) {
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value)) return value.map(articleContentText).filter(Boolean).join(' ');
+  if (!value || typeof value !== 'object') return '';
+  if (value.blocks) return articleContentText(value.blocks);
+  if (value.data) return articleContentText(value.data);
+  return ['text', 'html', 'content', 'items', 'caption'].map(key => articleContentText(value[key])).filter(Boolean).join(' ');
+}
+
+function errorPage(res, status, message) {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-store');
+  if (status === 503) res.setHeader('Retry-After', '300');
+  return res.status(status).send(`<!doctype html><html lang="no"><head><meta name="robots" content="noindex"><title>${message}</title></head><body><h1>${message}</h1><a href="/">His Kingdom Ministry</a></body></html>`);
+}
+
+function requireReadable(response) {
+  if (!response.ok && response.status !== 404) throw new Error('Content service unavailable');
 }
 
 export default async function handler(req, res) {
@@ -100,10 +120,13 @@ export default async function handler(req, res) {
 
   const id = req.query.id || req.query.courseId || req.query.course;
   const { lang = 'no', type = 'plan' } = req.query;
+  if (id != null && typeof id !== 'string') return errorPage(res, 404, 'Siden finnes ikke');
+  res.setHeader('Cache-Control', 'no-store');
+  if (!['no', 'en', 'es'].includes(lang) || !['plan', 'blog', 'event', 'course'].includes(type)) return errorPage(res, 404, 'Siden finnes ikke');
 
   // Resolve the HTML template file name based on type and lang
   let templatePath = 'dist/leseplan-detaljer-template.html';
-  
+
   if (type === 'plan') {
     if (lang === 'en') {
       templatePath = 'dist/en/reading-plan-details-template.html';
@@ -149,15 +172,17 @@ export default async function handler(req, res) {
     return;
   }
 
-  // If no ID is provided (and type is not 'course'), just return the template as-is
+  // Detail routes require a content identity; empty templates are not indexable pages.
   if (!id && type !== 'course') {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.status(200).send(html);
-    return;
+    return errorPage(res, 404, 'Siden finnes ikke');
   }
 
   try {
     let title = 'His Kingdom Ministry';
+    let found = false;
+    let articleText = '';
+    let canonicalId = id;
     let description = 'Deling fra His Kingdom Ministry';
     let imageUrl = 'https://www.hiskingdomministry.no/img/logo-hkm.png';
 
@@ -165,11 +190,13 @@ export default async function handler(req, res) {
       // Fetch plan details from Firestore via REST API
       const url = `${BASE_URL}/reading_plans/${encodeURIComponent(id)}?key=${API_KEY}`;
       const response = await fetch(url);
-      
+
+      requireReadable(response);
       if (response.ok) {
         const payload = await response.json();
         if (payload && payload.fields) {
           const plan = decodeFirestoreFields(payload.fields);
+          found = true;
           title = plan.title || 'Leseplan';
           description = plan.description || plan.subtitle || 'Bibeleseplan fra His Kingdom Ministry';
           imageUrl = plan.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=600&q=80';
@@ -182,6 +209,8 @@ export default async function handler(req, res) {
         fetch(`${BASE_URL}/content/collection_teaching?key=${API_KEY}`)
       ]);
 
+      requireReadable(blogRes);
+      requireReadable(teachingRes);
       let blogItems = [];
       if (blogRes.ok) {
         const payload = await blogRes.json();
@@ -200,6 +229,9 @@ export default async function handler(req, res) {
       const post = findContentItemById(allItems, id);
 
       if (post) {
+        found = true;
+        canonicalId = getContentItemStableId(post);
+        articleText = post.content || post.description || '';
         title = post.title || 'Blogginnlegg';
         description = post.seoDescription || post.description || 'Les mer på His Kingdom Ministry';
         imageUrl = post.imageUrl || post.image || 'https://images.unsplash.com/photo-1499750310159-5b600aaf0320?auto=format&fit=crop&w=600&q=80';
@@ -207,6 +239,7 @@ export default async function handler(req, res) {
         // Translate if lang !== 'no'
         if (lang !== 'no' && post.translations && post.translations[lang]) {
           const t = post.translations[lang];
+          articleText = t.content || t.description || articleText;
           title = t.seoTitle || t.title || title;
           description = t.seoDescription || t.description || description;
           if (t.imageUrl || t.image) {
@@ -217,6 +250,7 @@ export default async function handler(req, res) {
     } else if (type === 'event') {
       // Check if it's a static/local event containing a pipe
       if (id.includes('|')) {
+        found = true;
         const parts = id.split('|');
         title = parts[0].trim();
         const dateStr = parts[1]?.trim();
@@ -229,7 +263,10 @@ export default async function handler(req, res) {
           fetch(`${BASE_URL}/content/collection_events?key=${API_KEY}`)
         ]);
 
+        requireReadable(integrationsRes);
+        requireReadable(overridesRes);
         let apiKey = '';
+        let calendarUnavailable = false;
         let calendars = [];
         if (integrationsRes.ok) {
           const payload = await integrationsRes.json();
@@ -264,12 +301,14 @@ export default async function handler(req, res) {
               const gcalUrl = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(id)}?key=${apiKey}`;
               const gcalRes = await fetch(gcalUrl);
               if (gcalRes.ok) {
+                found = true;
                 const eventData = await gcalRes.json();
                 title = eventData.summary || title;
                 description = eventData.description || description;
                 break;
-              }
+              } else if (![404, 410].includes(gcalRes.status)) { calendarUnavailable = true; }
             } catch (e) {
+              calendarUnavailable = true;
               console.warn(`Failed to fetch event ${id} from calendar ${calendarId}`, e);
             }
           }
@@ -278,19 +317,24 @@ export default async function handler(req, res) {
         // Apply overrides if any
         const override = overrides[id] || overrides[encodeURIComponent(id)];
         if (override) {
+          found = true;
           title = override.title || title;
           description = override.description || description;
           imageUrl = override.imageUrl || override.image || imageUrl;
         }
+        if (!found && calendarUnavailable) throw new Error('Calendar unavailable');
       }
     } else if (type === 'course') {
       const response = await fetch(`${BASE_URL}/siteContent/collection_courses?key=${API_KEY}`);
+      requireReadable(response);
       if (response.ok) {
         const payload = await response.json();
         const doc = decodeFirestoreFields(payload.fields);
         const courses = Array.isArray(doc.items) ? doc.items : (doc.items ? Object.values(doc.items) : []);
         const targetId = id || (courses[0] ? courses[0].id : null);
         const course = courses.find(c => String(c.id) === String(targetId));
+        // The course listing is a real page even when there are no courses.
+        found = !id || !!course;
         if (course) {
           title = course.title || 'Kurs';
           description = course.description || 'Nettkurs fra His Kingdom Ministry';
@@ -299,31 +343,33 @@ export default async function handler(req, res) {
       }
     }
 
-    // Get the request host to format absolute page & image URLs
-    const host = req.headers.host || 'hiskingdomministry.no';
-    const protocol = req.headers['x-forwarded-proto'] || 'https';
+    if (!found) return errorPage(res, 404, 'Siden finnes ikke');
+    // Use one canonical origin, independent of the incoming host or proxy headers.
+    const host = 'hiskingdomministry.no';
+    const protocol = 'https';
+    const safeId = encodeURIComponent(canonicalId || '');
 
     // Construct clean user-facing canonical page URL
     let cleanPath = '';
     if (type === 'plan') {
-      cleanPath = lang === 'en' 
-        ? `/en/reading-plan-details?id=${id}` 
-        : (lang === 'es' ? `/es/detalles-plan-lectura?id=${id}` : `/leseplan-detaljer?id=${id}`);
+      cleanPath = lang === 'en'
+        ? `/en/reading-plan-details?id=${safeId}`
+        : (lang === 'es' ? `/es/detalles-plan-lectura?id=${safeId}` : `/leseplan-detaljer?id=${safeId}`);
     } else if (type === 'blog') {
       cleanPath = lang === 'en'
-        ? `/en/blog-post?id=${id}`
-        : (lang === 'es' ? `/es/blog-post?id=${id}` : `/blogg-post?id=${id}`);
+        ? `/en/blog-post?id=${safeId}`
+        : (lang === 'es' ? `/es/blog-post?id=${safeId}` : `/blogg-post?id=${safeId}`);
     } else if (type === 'event') {
       cleanPath = lang === 'en'
-        ? `/en/event-details?id=${id}`
-        : (lang === 'es' ? `/es/detalles-evento?id=${id}` : `/arrangement-detaljer?id=${id}`);
+        ? `/en/event-details?id=${safeId}`
+        : (lang === 'es' ? `/es/detalles-evento?id=${safeId}` : `/arrangement-detaljer?id=${safeId}`);
     } else if (type === 'course') {
       if (lang === 'en') {
-        cleanPath = id ? `/en/courses.html?courseId=${id}` : `/en/courses`;
+        cleanPath = id ? `/en/courses?courseId=${safeId}` : `/en/courses`;
       } else if (lang === 'es') {
-        cleanPath = id ? `/es/cursos.html?courseId=${id}` : `/es/cursos`;
+        cleanPath = id ? `/es/cursos?courseId=${safeId}` : `/es/cursos`;
       } else {
-        cleanPath = id ? `/kurs.html?courseId=${id}` : `/kurs`;
+        cleanPath = id ? `/kurs?courseId=${safeId}` : `/kurs`;
       }
     }
     const absolutePageUrl = `${protocol}://${host}${cleanPath}`;
@@ -372,6 +418,15 @@ export default async function handler(req, res) {
     // 5. Remove existing canonical tag to prevent duplicates
     html = html.replace(/<link\s+rel="canonical"\s+href="[\s\S]*?"\s*\/?>/gi, '');
 
+    html = html.replace(/<link\s+rel="alternate"[^>]*>/gi, '');
+
+    if (type === 'blog') {
+      const text = articleContentText(articleText).replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      html = html.replace(/(<h1\b[^>]*id="single-post-title"[^>]*>)[\s\S]*?<\/h1>/i, (_, tag) => tag.replace('opacity:0', 'opacity:1') + escapeHtml(title) + '</h1>');
+      html = html.replace(/(<article\b[^>]*id="single-post-content"[^>]*>)[\s\S]*?<\/article>/i, (_, tag) => tag.replace('display:none', 'display:block') + '<p>' + escapeHtml(text) + '</p></article>');
+      html = html.replace(/(<div\b[^>]*id="post-skeleton"[^>]*style=")/i, '$1display:none;');
+    }
+
     // 6. Inject new tags right before </head>
     html = html.replace('</head>', `${ogTags}\n</head>`);
 
@@ -380,9 +435,7 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error(`Error processing sharing preview for type ${type}, id ${id}:`, error);
-    // Return original HTML if anything goes wrong
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.status(200).send(html);
+    return errorPage(res, 503, 'Midlertidig utilgjengelig');
   }
 }
 

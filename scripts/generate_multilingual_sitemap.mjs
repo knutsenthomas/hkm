@@ -106,22 +106,10 @@ const routes = [
         changefreq: 'weekly'
     },
     {
-        no: '/kurs-detaljer',
-        priority: '0.8',
-        changefreq: 'weekly'
-    },
-    {
         no: '/arrangementer',
         en: '/en/events',
         es: '/es/eventos',
         priority: '0.8',
-        changefreq: 'weekly'
-    },
-    {
-        no: '/arrangement-detaljer',
-        en: '/en/event-details',
-        es: '/es/detalles-evento',
-        priority: '0.7',
         changefreq: 'weekly'
     },
     {
@@ -223,13 +211,6 @@ const routes = [
         en: '/en/leseplaner',
         es: '/es/leseplaner',
         priority: '0.9',
-        changefreq: 'weekly'
-    },
-    {
-        no: '/leseplan-detaljer',
-        en: '/en/reading-plan-details',
-        es: '/es/detalles-plan-lectura',
-        priority: '0.8',
         changefreq: 'weekly'
     },
     {
