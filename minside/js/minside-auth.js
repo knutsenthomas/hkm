@@ -247,6 +247,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (feedbackBox) feedbackBox.style.display = 'none';
     }
 
+    if (new URLSearchParams(window.location.search).get('mode') === 'register') {
+        setMode('register');
+    }
+
     async function waitForFirebaseReady(timeoutMs = 5000) {
         const startedAt = Date.now();
 

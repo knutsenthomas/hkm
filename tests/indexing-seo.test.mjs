@@ -19,3 +19,14 @@ test('ID-less detail pages are 404 without reading content',async()=>{const r=aw
 test('course list stays indexable; course canonical has no html extension',async()=>{const fetcher=async()=>response([{id:'one',title:'Kurs'}]);const r=await run({type:'course',id:'one'},fetcher);assert.equal(r.code,200);assert.match(r.body,/href="https:\/\/hiskingdomministry.no\/kurs\?courseId=one"/);assert.equal((await run({type:'course'},async()=>response())).code,200);assert.match((await run({type:'course',lang:'en'},fetcher)).body,/<title>Online courses \| His Kingdom Ministry<\/title>/)});
 test('missing plan is 404 and inaccessible plan is 503',async()=>{assert.equal((await run({type:'plan',id:'no'},async()=>response([],404))).code,404);assert.equal((await run({type:'plan',id:'no'},async()=>response([],403))).code,503)});
 test('redirects consolidate hosts and preserve migrated product identity',()=>{const v=JSON.parse(fs.readFileSync('vercel.json','utf8'));const host=v.redirects[0];assert.equal(host.has[0].value,'www.hiskingdomministry.no');assert.equal(host.destination,'https://hiskingdomministry.no/:path*');for(const prefix of ['', '/en','/es'])assert.equal(v.redirects.find(x=>x.source===prefix+'/product-page/:slug*').destination,'https://hiskingdomdesigns.no/produkt/:slug*');assert.equal(v.redirects.find(x=>x.source==='/en/reading-plans').destination,'/en/leseplaner');});
+test('encoded legacy paths and extensionless privacy links have matching redirects',()=>{
+ const rules=JSON.parse(fs.readFileSync('vercel.json','utf8')).redirects;
+ for(const source of ['/es/category/tilbeh%C3%B8r','/es/category/kl%C3%A6r','/es/category/p%C3%A5ske','/en/personvern','/es/personvern','/ressurser/personvern'])assert.ok(rules.find(r=>r.source===source),source);
+ for(const source of ['/registrer','/en/register','/es/registro'])assert.equal(rules.find(r=>r.source===source).destination,'/minside/login?mode=register');
+});
+test('translated timelines and home pages declare their own canonical URLs',()=>{
+ for(const lang of ['en','es'])for(const route of ['', '/ressurser/bibelsk-tidslinje','/ressurser/tidslinje-imperier']){
+  const file=route?`${lang}${route}.html`:`${lang}/index.html`;
+  assert.ok(fs.readFileSync(file,'utf8').includes(`rel="canonical" href="https://hiskingdomministry.no/${lang}${route}"`),file);
+ }
+});

@@ -71,13 +71,6 @@ const routes = [
         changefreq: 'weekly'
     },
     {
-        no: '/bli-fast-giver',
-        en: '/en/regular-donors',
-        es: '/es/donantes-regulares',
-        priority: '0.9',
-        changefreq: 'weekly'
-    },
-    {
         no: '/for-menigheter',
         en: '/en/for-churches',
         es: '/es/para-iglesias',
@@ -277,13 +270,6 @@ const routes = [
         priority: '0.4',
         changefreq: 'yearly'
     },
-    {
-        no: '/registrer',
-        en: '/en/register',
-        es: '/es/registro',
-        priority: '0.6',
-        changefreq: 'monthly'
-    }
 ];
 
 // Generate XML
