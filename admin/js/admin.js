@@ -907,6 +907,28 @@ class AdminManager {
         return fallbackMessage;
     }
 
+    async testTranslation() {
+        const button = document.getElementById('test-translation');
+        const output = document.getElementById('translation-test-result');
+        button.disabled = true;
+        output.textContent = 'Tester oversettelse …';
+        try {
+            const results = [];
+            for (const lang of ['en', 'es']) {
+                const translated = await this._translateTextChunk('Gud er god', lang, 'no', true);
+                if (!this._isMeaningfullyTranslatedField('Gud er god', translated)) {
+                    throw new Error('Oversettelsestjenesten returnerte originalteksten.');
+                }
+                results.push(`${lang}: ${translated}`);
+            }
+            output.textContent = results.join(' · ');
+        } catch (error) {
+            output.textContent = `Oversettelse utilgjengelig: ${error.message}`;
+        } finally {
+            button.disabled = false;
+        }
+    }
+
     async _diagnoseTranslationProviders() {
         const sample = 'Gud er god';
         const out = {
@@ -7946,6 +7968,7 @@ class AdminManager {
                             </div>
                         </div>
                         <div style="margin-top: 24px;">
+                            <button type="button" id="test-translation" class="btn-secondary">Test oversettelse</button><p id="translation-test-result" role="status"></p>
                             <button class="btn-primary" id="save-ai-settings" style="width: 100%; background: #7c3aed;">Lagre AI-innstillinger</button>
                         </div>
                     </div>
@@ -8040,6 +8063,7 @@ class AdminManager {
         }
 
         section.addEventListener('click', (event) => {
+            if (event.target.id === 'test-translation') this.testTranslation();
             if (event.target.id === 'save-youtube-settings') this.saveMediaSettings('save-youtube-settings');
             if (event.target.id === 'save-ai-settings' || event.target.id === 'save-ga-settings') this.saveIntegrationsSettings();
             if (event.target.id === 'save-integ-podcast-settings') this.savePodcastSettings('save-integ-podcast-settings');
