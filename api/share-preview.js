@@ -335,7 +335,10 @@ export default async function handler(req, res) {
         const course = courses.find(c => String(c.id) === String(targetId));
         // The course listing is a real page even when there are no courses.
         found = !id || !!course;
-        if (course) {
+        if (!id) {
+          title = lang === 'en' ? 'Online courses' : (lang === 'es' ? 'Cursos en línea' : 'Nettkurs');
+          description = lang === 'en' ? 'Explore Bible courses from His Kingdom Ministry.' : (lang === 'es' ? 'Descubre los cursos bíblicos de His Kingdom Ministry.' : 'Utforsk bibelkurs fra His Kingdom Ministry.');
+        } else if (course) {
           title = course.title || 'Kurs';
           description = course.description || 'Nettkurs fra His Kingdom Ministry';
           imageUrl = course.imageUrl || 'https://www.hiskingdomministry.no/img/logo-hkm.png';
