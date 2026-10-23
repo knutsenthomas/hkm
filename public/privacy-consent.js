@@ -156,6 +156,8 @@
     banner.style.cssText = 'position:fixed;inset:auto 12px 12px 12px;max-width:720px;margin:auto;z-index:2147483646;background:' + palette.background + ';color:' + palette.text + ';border:1px solid ' + palette.border + ';border-top:4px solid ' + palette.accent + ';border-radius:16px;padding:22px;box-shadow:0 12px 48px #0003;font:15px/1.5 system-ui,sans-serif;max-height:80vh;overflow:auto;text-align:left';
     var title = document.createElement('h2'); title.textContent = words[0]; title.style.cssText = 'font:bold 21px/1.3 system-ui;margin:0 0 10px;color:' + palette.text; title.style.setProperty('color', palette.text, 'important'); banner.appendChild(title);
     var text = document.createElement('p'); text.textContent = words[1]; text.style.cssText = 'margin:0 0 12px;color:' + palette.text; banner.appendChild(text);
+    var customizing = false;
+    var choices = document.createElement('div'); choices.id = 'site-privacy-choices'; choices.hidden = true;
     words[2] += ' (Google Analytics' + (config.vercel === 'true' ? ', Vercel Analytics / Speed Insights' : '') + ')';
     if (config.affiliate) words[3] += ' (GoAffPro)';
     var toggles = {};
@@ -164,29 +166,38 @@
       var label = document.createElement('label'); label.style.cssText = 'display:flex;align-items:center;gap:12px;margin:10px 0;cursor:pointer';
       var input = document.createElement('input'); input.type = 'checkbox'; input.checked = valid(memory) && memory[category] === true; input.disabled = navigator.globalPrivacyControl === true; input.style.cssText = 'width:20px;height:20px;accent-color:' + palette.focus;
       if (input.disabled) input.checked = false;
-      toggles[category] = input; label.append(input, document.createTextNode(words[2 + index])); banner.appendChild(label);
+      toggles[category] = input; label.append(input, document.createTextNode(words[2 + index])); choices.appendChild(label);
     });
     if (mediaEnabled) {
       var necessary = document.createElement('p');
       necessary.textContent = spanish ? 'Funciones solicitadas: inicio de sesión (Firebase), chat al abrirlo (Wix Inbox), idioma, tema y progreso/notas bíblicas. No se usan para publicidad.' : english ? 'Requested features: sign-in (Firebase), chat when opened (Wix Inbox), language, theme and Bible progress/notes. These are not used for advertising.' : 'Funksjoner du ber om: innlogging (Firebase), chat når du åpner den (Wix Inbox), språk, tema og bibelprogresjon/notater. Disse brukes ikke til reklame.';
-      necessary.style.cssText = 'font-size:13px;color:' + palette.muted; banner.appendChild(necessary);
+      necessary.style.cssText = 'font-size:13px;color:' + palette.muted; choices.appendChild(necessary);
       var mediaLabel = document.createElement('label'); mediaLabel.style.cssText = 'display:flex;align-items:center;gap:12px;margin:10px 0;cursor:pointer';
       var mediaInput = document.createElement('input'); mediaInput.type = 'checkbox'; mediaInput.checked = valid(memory) && memory.media === true;
       mediaInput.style.cssText = 'width:20px;height:20px;accent-color:' + palette.focus;
       toggles.media = mediaInput;
       mediaLabel.append(mediaInput, document.createTextNode(spanish ? 'Contenido externo (YouTube, Vimeo y otros proveedores)' : english ? 'External content (YouTube, Vimeo and other providers)' : 'Eksternt innhold (YouTube, Vimeo og andre leverandører)'));
-      banner.appendChild(mediaLabel);
+      choices.appendChild(mediaLabel);
       var mediaNote = document.createElement('p'); mediaNote.textContent = spanish ? 'Al permitir contenido externo, el proveedor recibe datos técnicos y puede usar su propio almacenamiento.' : english ? 'When external content is allowed, the provider receives technical data and may use its own storage.' : 'Når du tillater eksternt innhold, mottar leverandøren tekniske opplysninger og kan bruke egen lagring.';
-      mediaNote.style.cssText = 'font-size:13px;color:' + palette.muted; banner.appendChild(mediaNote);
+      mediaNote.style.cssText = 'font-size:13px;color:' + palette.muted; choices.appendChild(mediaNote);
     }
     if (navigator.globalPrivacyControl === true) {
-      var gpc = document.createElement('p'); gpc.textContent = english ? 'Global Privacy Control is enabled. Optional tracking stays off.' : spanish ? 'Global Privacy Control está activado. El seguimiento opcional permanece desactivado.' : 'Global Privacy Control er aktivert. Valgfri sporing holdes avslått.'; banner.appendChild(gpc);
+      var gpc = document.createElement('p'); gpc.textContent = english ? 'Global Privacy Control is enabled. Optional tracking stays off.' : spanish ? 'Global Privacy Control está activado. El seguimiento opcional permanece desactivado.' : 'Global Privacy Control er aktivert. Valgfri sporing holdes avslått.'; choices.appendChild(gpc);
     }
+    banner.appendChild(choices);
     var note = document.createElement('p'); note.textContent = words[8]; note.style.cssText = 'font-size:13px;margin:12px 0;color:' + palette.muted; banner.appendChild(note);
     if (config.privacy) { var link = document.createElement('a'); link.href = config.privacy; link.textContent = words[7]; link.style.cssText = 'color:' + palette.focus + ';text-decoration:underline'; banner.appendChild(link); }
     var buttons = document.createElement('div'); buttons.style.cssText = 'display:flex;flex-wrap:wrap;gap:10px;margin-top:16px';
     [function () { choose(false, false, false); }, function () { choose(true, !!config.affiliate, mediaEnabled); }, function () { choose(toggles.analytics.checked, !!toggles.marketing && toggles.marketing.checked, !!toggles.media && toggles.media.checked); }].forEach(function (action, index) {
-      var button = document.createElement('button'); button.type = 'button'; button.textContent = words[4 + index]; button.style.cssText = 'flex:1 1 150px;min-height:44px;border:1px solid ' + palette.buttonBorder + ';border-radius:9px;padding:10px 14px;background:' + palette.button + ';color:' + palette.buttonText + ';font:600 14px system-ui;cursor:pointer'; button.onclick = action; buttons.appendChild(button);
+      var button = document.createElement('button'); button.type = 'button'; button.textContent = words[4 + index];
+      if (index === 2) { button.textContent = spanish ? 'Personalizar' : english ? 'Customize' : 'Tilpass'; button.setAttribute('aria-controls', choices.id); button.setAttribute('aria-expanded', 'false'); } button.style.cssText = 'flex:1 1 150px;min-height:44px;border:1px solid ' + palette.buttonBorder + ';border-radius:9px;padding:10px 14px;background:' + palette.button + ';color:' + palette.buttonText + ';font:600 14px system-ui;cursor:pointer'; button.onclick = function () {
+        if (index === 2 && !customizing) {
+          customizing = true; choices.hidden = false; button.textContent = words[6]; button.setAttribute('aria-expanded', 'true');
+          var first = choices.querySelector('input:not(:disabled)'); if (first) first.focus();
+          return;
+        }
+        action();
+      }; buttons.appendChild(button);
     });
     if (!document.getElementById('site-privacy-theme')) {
       var themeStyle = document.createElement('style'); themeStyle.id = 'site-privacy-theme';
