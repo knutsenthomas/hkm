@@ -48,7 +48,7 @@
     <link rel="preload" href="../css/cookie-consent.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="../css/cookie-consent.css"></noscript>
 
     <!-- Stripe.js (Required for payments) -->
-    <script src="https://js.stripe.com/v3/"></script>
+    
 
     <!-- Firebase Config & Service (Moved to head for early loading) -->
     <script type="module" src="../js/firebase-config.js"></script>
@@ -1905,7 +1905,7 @@
                                 throw new Error(data.error || "Mangler clientSecret");
                             }
 
-                            const stripe = Stripe("pk_live_51Pab8rAL393JGrO9bTUitYflDKlHGpLiqZCCBp0dCzBEV3ZFxARFfK6MgWraehq7i79tJHPIEzlpMwPiT2K3HsiZ00gJ1TQ71Y");
+                            const stripe = (await window.SitePrivacy.loadStripe())("pk_live_51Pab8rAL393JGrO9bTUitYflDKlHGpLiqZCCBp0dCzBEV3ZFxARFfK6MgWraehq7i79tJHPIEzlpMwPiT2K3HsiZ00gJ1TQ71Y");
                             const appearance = {
                                 theme: 'stripe',
                                 variables: {

@@ -20,23 +20,3 @@ window.firebaseConfig = {
     measurementId: "G-28GVKTMCZE"
 };
 
-// Clear stale event data to force immediate calendar sync for new events.
-// This runs before content-manager.js and forces a fresh calendar fetch.
-(function invalidateEventCache() {
-    const cacheVersion = '2026-09-30-events-v8';
-    const versionKey = 'hkm_events_cache_version';
-
-    try {
-        if (localStorage.getItem(versionKey) === cacheVersion) return;
-
-        Object.keys(localStorage).forEach((key) => {
-            if (key.startsWith('hkm_events_')) {
-                localStorage.removeItem(key);
-            }
-        });
-
-        localStorage.setItem(versionKey, cacheVersion);
-    } catch (error) {
-        console.warn('[HKM] Kunne ikke nullstille arrangement-cache:', error);
-    }
-})();

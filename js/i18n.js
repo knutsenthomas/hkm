@@ -213,7 +213,6 @@ const i18nManager = {
 
         if (hasExplicitLang) {
             currentLang = hasExplicitLang;
-            localStorage.setItem(this.storageKey, currentLang);
         } else if (/\/minside(\/|$)/.test(path)) {
             currentLang = localStorage.getItem(this.storageKey) || 'no';
         } else {
@@ -229,7 +228,6 @@ const i18nManager = {
                     const autoLang = this.getBrowserOrGeoLanguage();
                     if (autoLang && autoLang !== 'no') {
                         currentLang = autoLang;
-                        localStorage.setItem(this.storageKey, currentLang);
                         document.documentElement.lang = currentLang;
                         window.location.replace(currentLang === 'en' ? '/en/' : '/es/');
                         return currentLang;

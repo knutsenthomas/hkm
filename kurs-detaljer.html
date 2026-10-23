@@ -2639,9 +2639,9 @@
                     const videoSource = parseVideoSource(lesson.videoUrl);
 
                     if (videoSource && videoSource.type === 'youtube') {
-                        videoContainer.innerHTML = `<iframe src="${videoSource.embedUrl}" title="${lesson.title || 'Leksjonsvideo'}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="width:100%;height:100%;border:none;border-radius:16px;"></iframe>`;
+                        videoContainer.innerHTML = `<iframe data-privacy-src="${videoSource.embedUrl}" title="${lesson.title || 'Leksjonsvideo'}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="width:100%;height:100%;border:none;border-radius:16px;"></iframe>`;
                     } else if (videoSource && videoSource.type === 'vimeo') {
-                        videoContainer.innerHTML = `<iframe src="${videoSource.embedUrl}" title="${lesson.title || 'Leksjonsvideo'}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="width:100%;height:100%;border:none;border-radius:16px;"></iframe>`;
+                        videoContainer.innerHTML = `<iframe data-privacy-src="${videoSource.embedUrl}" title="${lesson.title || 'Leksjonsvideo'}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="width:100%;height:100%;border:none;border-radius:16px;"></iframe>`;
                     } else if (videoSource && videoSource.type === 'direct') {
                         videoContainer.innerHTML = `<video src="${videoSource.url}" controls playsinline style="width:100%;height:100%;border-radius:16px;"></video>`;
                     } else {

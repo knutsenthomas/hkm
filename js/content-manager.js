@@ -4,6 +4,24 @@
 
 import { InteractionsManager } from './interactions.js';
 
+const pageCache = new Map();
+const protectMediaHtml = (html) => {
+    if (window.SitePrivacy?.protectMediaHtml) return window.SitePrivacy.protectMediaHtml(html);
+    if (typeof html !== 'string' || !/<iframe\b/i.test(html)) return html;
+    // Fail closed if the early consent controller could not load.
+    const template = document.createElement('template');
+    template.innerHTML = html;
+    template.content.querySelectorAll('iframe').forEach(frame => {
+        for (const attribute of ['src', 'srcdoc']) {
+            if (frame.hasAttribute(attribute)) {
+                frame.setAttribute(`data-privacy-${attribute}`, frame.getAttribute(attribute));
+                frame.removeAttribute(attribute);
+            }
+        }
+    });
+    return template.innerHTML;
+};
+
 
 class ContentManager {
     constructor() {
@@ -683,7 +701,7 @@ class ContentManager {
     cacheLocalJson(key, value) {
         if (!key) return;
         try {
-            localStorage.setItem(key, JSON.stringify(value));
+            pageCache.set(key, JSON.stringify(value));
         } catch (error) {
             console.warn(`[ContentManager] Failed local cache write for ${key}`, error);
         }
@@ -698,7 +716,7 @@ class ContentManager {
         }
         this._renderHtmlSignatures.set(signatureKey, signature);
         if (container.innerHTML !== html) {
-            container.innerHTML = html;
+            container.innerHTML = protectMediaHtml(html);
         }
         return true;
     }
@@ -715,14 +733,14 @@ class ContentManager {
 
         // 1. Try to apply cached global settings INSTANTLY (pre-Firebase)
         try {
-            const cachedDesign = localStorage.getItem('hkm_cache_settings_design');
+            const cachedDesign = pageCache.get('hkm_cache_settings_design');
             if (cachedDesign) {
                 const parsedDesign = JSON.parse(cachedDesign);
                 if (parsedDesign && typeof parsedDesign === 'object') {
                     this.applyGlobalSettings(parsedDesign);
                 }
             }
-            const cachedSEO = localStorage.getItem('hkm_cache_settings_seo');
+            const cachedSEO = pageCache.get('hkm_cache_settings_seo');
             if (cachedSEO) {
                 const parsedSeo = JSON.parse(cachedSEO);
                 if (parsedSeo && typeof parsedSeo === 'object') {
@@ -732,7 +750,7 @@ class ContentManager {
             // Do not hydrate text content from cache to avoid visible text switching.
             // We only apply fresh Firestore content below.
 
-            const cachedHero = localStorage.getItem('hkm_cache_hero_slides');
+            const cachedHero = pageCache.get('hkm_cache_hero_slides');
             if (cachedHero) {
                 const heroData = JSON.parse(cachedHero);
                 if (heroData && heroData.slides) this.renderHeroSlides(heroData.slides);
@@ -1619,7 +1637,7 @@ class ContentManager {
         if (container) {
             try {
                 const finalHtml = this.cleanLegacyHtml(articleHtml);
-                container.innerHTML = finalHtml || '<p>Dette innlegget har foreløpig ikke noe innhold.</p>';
+                container.innerHTML = protectMediaHtml(finalHtml) || '<p>Dette innlegget har foreløpig ikke noe innhold.</p>';
             } catch (err) {
                 console.error('[ContentManager] Render error:', err);
             }
@@ -1823,10 +1841,10 @@ class ContentManager {
             const integrations = await this.getContentDoc('settings_integrations', { silent: true }) || {};
             let finalEvents = [];
 
-            // 1. Check Cache (Use localStorage with Stale-While-Revalidate)
+            // 1. Check this page’s in-memory cache with Stale-While-Revalidate
             if (!forceRefresh && !isLocalDev) {
                 try {
-                    const cached = localStorage.getItem(cacheKey);
+                    const cached = pageCache.get(cacheKey);
                     if (cached) {
                         const { timestamp, events } = JSON.parse(cached);
                         // Fast 2-minute TTL for fresh event calendar data
@@ -2062,7 +2080,7 @@ class ContentManager {
             // Save to Cache
             if (!isLocalDev && finalEvents.some(event => !event.isHoliday && !this.isEventPast(event))) {
                 try {
-                    localStorage.setItem(cacheKey, JSON.stringify({
+                    pageCache.set(cacheKey, JSON.stringify({
                         timestamp: Date.now(),
                         events: finalEvents
                     }));
@@ -2532,7 +2550,7 @@ class ContentManager {
                 }
             }).join('');
 
-            container.innerHTML = html;
+            container.innerHTML = protectMediaHtml(html);
 
         } catch (err) {
             if (window.cmsLog) window.cmsLog('CRASH i renderEvents: ' + err.message);
@@ -2801,6 +2819,13 @@ class ContentManager {
 
         // Juicer.io Integration (parsed on client side into custom cards)
         if (config.feedSource === 'juicer' && config.juicerFeedId) {
+            if (!window.SitePrivacy?.allows('media')) {
+                if (!this._juicerPrivacyListener) {
+                    this._juicerPrivacyListener = () => { if (!this._juicerPrivacyLoaded && window.SitePrivacy?.allows('media')) { this._juicerPrivacyLoaded = true; this.loadFacebookFeed(); } };
+                    window.addEventListener('siteprivacychange', this._juicerPrivacyListener);
+                }
+                return; // Keep the site's existing static cards until external content is allowed.
+            }
             try {
                 // Use JSONP to bypass CORS restrictions in the browser
                 const callbackName = 'juicer_jsonp_' + Date.now() + Math.round(Math.random() * 1000);
@@ -3328,7 +3353,7 @@ class ContentManager {
             safe = safe.replace(/\n/g, '<br>');
         }
 
-        return safe.trim();
+        return protectMediaHtml(safe.trim());
     }
 
     parseEventDate(value) {
@@ -4086,7 +4111,7 @@ class ContentManager {
                                 <iframe 
                                     class="hero-youtube-iframe"
                                     data-youtube-id="${youtubeId}"
-                                    src="https://www.youtube.com/embed/${youtubeId}?autoplay=${index === 0 ? 1 : 0}&mute=1&controls=0&loop=1&playlist=${youtubeId}&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1&enablejsapi=1" 
+                                    data-privacy-src="https://www.youtube.com/embed/${youtubeId}?autoplay=${index === 0 ? 1 : 0}&mute=1&controls=0&loop=1&playlist=${youtubeId}&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1&enablejsapi=1" 
                                     frameborder="0" 
                                     allow="autoplay; encrypted-media" 
                                     allowfullscreen
@@ -4755,14 +4780,13 @@ class ContentManager {
             return;
         }
 
-        // 1. Check localStorage CACHE first for instant render
+        // 1. Check this page’s in-memory cache first for instant render
         let event = null;
         try {
             // Try to find in ANY cached month range
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
+            for (const key of pageCache.keys()) {
                 if (key.startsWith('hkm_events_')) {
-                    const { events } = JSON.parse(localStorage.getItem(key));
+                    const { events } = JSON.parse(pageCache.get(key));
                     const found = events.find(e => this.getEventKey(e) === eventKey || encodeURIComponent(this.getEventKey(e)) === eventKey);
                     if (found) {
                         event = found;
@@ -5601,7 +5625,7 @@ class ContentManager {
     renderRichIframe(url, title = 'Innebygd innhold') {
         const embedUrl = this.getYoutubeEmbedUrl(url) || this.getVimeoEmbedUrl(url);
         if (!embedUrl) return '';
-        return `<div class="cms-embed"><iframe src="${this.escapeHtml(embedUrl)}" title="${this.escapeHtml(title)}" loading="lazy" allowfullscreen></iframe></div>`;
+        return `<div class="cms-embed"><iframe data-privacy-src="${this.escapeHtml(embedUrl)}" title="${this.escapeHtml(title)}" loading="lazy" allowfullscreen></iframe></div>`;
     }
 
     getRichTextStyleAttr(data = {}) {
@@ -5790,7 +5814,7 @@ class ContentManager {
                             if (!url) return '';
                             const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
                             const embedUrl = ytMatch ? `https://www.youtube.com/embed/${ytMatch[1]}` : url;
-                            return `<div class="block-embed"><iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe></div>`;
+                            return `<div class="block-embed"><iframe data-privacy-src="${embedUrl}" frameborder="0" allowfullscreen></iframe></div>`;
                         }
                         default:
                             return '';

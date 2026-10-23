@@ -4,7 +4,8 @@ export class InteractionsManager {
     constructor(containerId, postId) {
         this.containerId = containerId;
         this.postId = postId;
-        this.userId = this._getOrGenerateUserId();
+        this.userId = null;
+        try { this.userId = localStorage.getItem('hkm_anon_user_id'); } catch (_) {}
         
         this.likesCount = 0;
         this.isLiked = false;
@@ -115,7 +116,7 @@ export class InteractionsManager {
         // Restore name from localStorage if exists
         let savedName = null;
         try {
-            savedName = localStorage.getItem('hkm_comment_name');
+            savedName = sessionStorage.getItem('hkm_comment_name');
         } catch (e) {
             console.warn('[Interactions] Failed to read from localStorage:', e);
         }
@@ -146,6 +147,8 @@ export class InteractionsManager {
         
         console.log(`[Interactions] Toggling like for post: ${this.postId}`);
         
+        this.userId ||= this._getOrGenerateUserId();
+
         // Optimistic UI update
         this.isLiked = !this.isLiked;
         this.likesCount += this.isLiked ? 1 : -1;
@@ -188,9 +191,11 @@ export class InteractionsManager {
         
         if (!name || !text) return;
         
+        this.userId ||= this._getOrGenerateUserId();
+
         // Save name for next time
         try {
-            localStorage.setItem('hkm_comment_name', name);
+            sessionStorage.setItem('hkm_comment_name', name);
         } catch (e) {
             console.warn('[Interactions] Failed to write to localStorage:', e);
         }

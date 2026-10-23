@@ -525,15 +525,26 @@
                     <li data-content-key="content.sec2_item4">Å opprettholde sikkerheten på din brukerkonto.</li>
                 </ul>
 
-                <h2 data-content-key="content.sec3_title">3. Informasjonskapsler (Cookies)</h2>
-                <p data-content-key="content.sec3_text1">Vi bruker informasjonskapsler for at nettsiden skal fungere optimalt.</p>
-                <p data-content-key="content.sec3_text2"><strong>Nødvendige cookies:</strong> Disse er strengt nødvendige for at du skal kunne logge inn og
-                    navigere
-                    trygt på "Min Side". Disse kan ikke velges bort.</p>
-                <p data-content-key="content.sec3_text3"><strong>Statistikk og analyse:</strong> Vi kan bruke verktøy for å forstå hvordan nettsiden brukes,
-                    slik at
-                    vi kan gjøre den bedre. Du kan velge å takke nei til disse.</p>
-                <p data-content-key="content.sec3_text4">Du kan når som helst endre dine cookie-innstillinger via lenken nederst på nettsiden.</p>
+                <section id="informasjonskapsler" aria-labelledby="cookie-information-title">
+                    <h2 id="cookie-information-title">3. Informasjonskapsler og lokal lagring</h2>
+                    <p>Sist oppdatert 23. oktober 2026. Oversikten gjelder hiskingdomministry.no. Vi bruker både informasjonskapsler, localStorage og sessionStorage. Valgfrie tjenester starter først når du godtar dem. Du kan endre valget via «Cookies» i bunnteksten.</p>
+                    <h3>Valgfrie tjenester</h3>
+                    <ul>
+                        <li><strong>Besøksstatistikk – Google Analytics:</strong> Brukes bare etter samtykke. Google kan lagre blant annet <code>_ga</code> og <code>_ga_*</code>. Statistikken sender sidens adresse uten søkeparametere eller fragment. Samtykke og Analytics-lagring er satt til 180 dager. Tilbaketrekking stanser målingen og sletter tilgjengelige Analytics-cookies på vårt domene.</li>
+                        <li><strong>Eksternt innhold – YouTube, Vimeo og eventuelt Juicer:</strong> Videoavspillere og Juicer-skript blokkeres inntil du tillater eksternt innhold. Når innholdet lastes, mottar leverandøren blant annet IP-adresse og nettleseropplysninger og kan bruke egne informasjonskapsler eller annen lagring. Leverandørens lagringstid og øvrige behandling følger deres informasjon. Les <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google/YouTube</a>, <a href="https://vimeo.com/privacy" target="_blank" rel="noopener noreferrer">Vimeo</a> og <a href="https://www.juicer.io/privacy" target="_blank" rel="noopener noreferrer">Juicer</a>. Tilbaketrekking laster siden på nytt og blokkerer nye innlastinger. Vi kan ikke slette leverandørenes egne tredjepartscookies fra vårt domene.</li>
+                    </ul>
+                    <h3>Lagring knyttet til funksjoner du ber om</h3>
+                    <ul>
+                        <li><strong>Personvernvalg:</strong> <code>hkm-privacy-v1</code> lagrer kategorier, versjon og tidspunkt i localStorage i inntil 180 dager. Det brukes for å respektere valgene dine.</li>
+                        <li><strong>Innlogging – Google Firebase:</strong> Firebase lagrer innloggingstilstand, og nettstedet kan mellomlagre konto- og tilgangsopplysninger, blant annet <code>hkm_public_user_cache</code>. Dette brukes til kontoen, ikke til besøksstatistikk. Utlogging og sletting av nettleserdata påvirker lokal lagring; sletting av kontoen er en separat handling.</li>
+                        <li><strong>Chat – Wix Inbox:</strong> Lokal samtalelagring starter når du åpner chatten. Samtale-ID, en tilfeldig chat-ID og navn/e-post du oppgir, lagres i sessionStorage i den aktuelle fanen, med nøkler som <code>hkm_wix_conv_id</code> og <code>hkm_chat_*</code>. Disse brukes til å sende meldinger og hente svar. SessionStorage tømmes normalt når fanens økt avsluttes; nettlesergjenoppretting kan gjenopprette økten. Selve meldingene sendes til vår tjeneste/Wix Inbox og slettes ikke ved å lukke fanen. Kontakt oss for innsyn eller sletting. Unngå sensitive opplysninger i chatten.</li>
+                        <li><strong>Språk, tema og valgt visning:</strong> Valgene dine kan huskes i localStorage, blant annet <code>hkm_theme</code> og <code>hkm_blog_view</code>. De brukes til visningen du har valgt, ikke til sporing.</li>
+                        <li><strong>Bibel, leseplan og notater:</strong> Leseplassering, fremdrift, bokmerker, markeringer og notater lagres lokalt når du bruker disse funksjonene, blant annet med <code>hkm_bible_*</code> og <code>hkm_reading_plan_progress_*</code>. Enkelte opplysninger kan også synkroniseres med kontoen. Notater kan avsløre religiøs overbevisning eller andre personlige forhold. Lokal lagring blir normalt liggende til du fjerner den eller sletter nettleserdata.</li>
+                        <li><strong>Liker og kommentarer:</strong> En lokal <code>hkm_anon_user_id</code> opprettes først når du liker eller sender en kommentar, for å knytte handlingen til samme nettleser. Dette er en pseudonym identifikator, ikke full anonymisering. Oppgitt kommentarnavn huskes bare i fanens sessionStorage.</li>
+                        <li><strong>Betaling – Stripe, Vipps og PayPal:</strong> Betalingsfunksjoner bruker nødvendig lagring når du velger å betale eller administrere en avtale, blant annet en øktbasert forespørsels-ID for å unngå doble avtaler. Stripe-skriptet lastes ved betaling, ikke automatisk ved vanlig sidevisning. Betalingsleverandørene har egne personvernvilkår. Å avslå statistikk eller eksternt innhold hindrer ikke betaling.</li>
+                    </ul>
+                    <p>Innholds- og arrangementsbuffer brukes nå i sidens arbeidsminne og lagres ikke lenger automatisk i localStorage. Lagring i localStorage har ikke automatisk utløp med mindre dette er angitt. Du kan slette den i nettleseren; dette kan også fjerne lokale notater og leseprogresjon. Valg i cookie-banneret sletter ikke kontoen, meldinger eller opplysninger som allerede er sendt til en tjeneste.</p>
+                </section>
 
                 <h2 data-content-key="content.sec4_title">4. Lagring og sletting</h2>
                 <p data-content-key="content.sec4_text1">Dine personopplysninger lagres trygt i vår database (levert av Google Firebase). Vi beholder

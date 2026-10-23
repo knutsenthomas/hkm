@@ -2554,7 +2554,7 @@ window.addEventListener('load', () => {
         }
         
         try {
-            localStorage.setItem('hkm_theme', activeTheme);
+            if (theme) localStorage.setItem('hkm_theme', activeTheme);
         } catch (e) {}
 
         document.querySelectorAll('.theme-toggle-icon').forEach(icon => {

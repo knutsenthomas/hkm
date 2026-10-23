@@ -895,24 +895,40 @@ export function initHkmChatWidget() {
   const sendBtn = document.getElementById('hkm-chat-send-btn');
   const chipsBar = document.getElementById('hkm-chips-bar');
 
+  // Storage can be disabled by the browser; chat still works in memory for this visit.
+  const volatileChatState = new Map();
+  const chatStorage = {
+    getItem(key) { try { return sessionStorage.getItem(key) || volatileChatState.get(key) || null; } catch (_) { return volatileChatState.get(key) || null; } },
+    setItem(key, value) { volatileChatState.set(key, value); try { sessionStorage.setItem(key, value); } catch (_) {} },
+    removeItem(key) { volatileChatState.delete(key); try { sessionStorage.removeItem(key); } catch (_) {} }
+  };
+
   // State
   let isOpen = false;
   let isSending = false;
   let pollInterval = null;
   const renderedMessageIds = new Set();
 
-  let conversationId = sessionStorage.getItem('hkm_wix_conv_id') || null;
-  let anonVisitorId = localStorage.getItem('hkm_chat_anon_id') || generateUUID();
-  localStorage.setItem('hkm_chat_anon_id', anonVisitorId);
-
-  let userEmail = localStorage.getItem('hkm_chat_user_email') || '';
-  let userName = localStorage.getItem('hkm_chat_user_name') || '';
-
-  // Purge stale anonymous conversations that locked the Wix Owner App
-  const isContactConv = localStorage.getItem('hkm_chat_is_contact_conv') === 'true';
-  if (!isContactConv && !userEmail) {
-    sessionStorage.removeItem('hkm_wix_conv_id');
-    conversationId = null;
+  let conversationId = null;
+  let anonVisitorId = null;
+  let userEmail = '';
+  let userName = '';
+  let chatInitialized = false;
+  function initializeChatSession() {
+    if (chatInitialized) return;
+    chatInitialized = true;
+    conversationId = chatStorage.getItem('hkm_wix_conv_id') || null;
+    anonVisitorId = chatStorage.getItem('hkm_chat_anon_id') || generateUUID();
+    chatStorage.setItem('hkm_chat_anon_id', anonVisitorId);
+    userEmail = chatStorage.getItem('hkm_chat_user_email') || '';
+    userName = chatStorage.getItem('hkm_chat_user_name') || '';
+    // Discard the old persistent chat identifiers/contact details; new conversations use this tab only.
+    ['hkm_chat_anon_id', 'hkm_chat_user_email', 'hkm_chat_user_name', 'hkm_chat_is_contact_conv'].forEach(key => { try { localStorage.removeItem(key); } catch (_) {} });
+    if (chatStorage.getItem('hkm_chat_is_contact_conv') !== 'true' && !userEmail) {
+      chatStorage.removeItem('hkm_wix_conv_id');
+      conversationId = null;
+    }
+    renderPrechatUI();
   }
 
   function renderPrechatUI() {
@@ -969,8 +985,8 @@ export function initHkmChatWidget() {
       if (changeBtn) {
         changeBtn.addEventListener('click', () => {
           userEmail = '';
-          localStorage.removeItem('hkm_chat_user_email');
-          localStorage.removeItem('hkm_chat_is_contact_conv');
+          chatStorage.removeItem('hkm_chat_user_email');
+          chatStorage.removeItem('hkm_chat_is_contact_conv');
           renderPrechatUI();
           const emailIn = document.getElementById('hkm-email-input');
           if (emailIn) emailIn.focus();
@@ -984,6 +1000,7 @@ export function initHkmChatWidget() {
   function toggleChat(open) {
     isOpen = typeof open === 'boolean' ? open : !isOpen;
     if (isOpen) {
+      initializeChatSession();
       box.classList.add('open');
       launcher.innerHTML = '<span class="material-symbols-outlined">close</span>';
       setTimeout(() => inputEl.focus(), 150);
@@ -1000,8 +1017,8 @@ export function initHkmChatWidget() {
 
   if (refreshBtn) {
     refreshBtn.addEventListener('click', () => {
-      sessionStorage.removeItem('hkm_wix_conv_id');
-      localStorage.removeItem('hkm_chat_is_contact_conv');
+      chatStorage.removeItem('hkm_wix_conv_id');
+      chatStorage.removeItem('hkm_chat_is_contact_conv');
       conversationId = null;
       renderedMessageIds.clear();
       messagesContainer.innerHTML = `
@@ -1096,7 +1113,7 @@ export function initHkmChatWidget() {
     const emailToUse = explicitEmail || userEmail;
     const nameToUse = explicitName || userName || (emailToUse ? emailToUse.split('@')[0] : null);
 
-    const hasContactConv = localStorage.getItem('hkm_chat_is_contact_conv') === 'true';
+    const hasContactConv = chatStorage.getItem('hkm_chat_is_contact_conv') === 'true';
     if (conversationId && hasContactConv && !explicitEmail) {
       return conversationId;
     }
@@ -1121,9 +1138,9 @@ export function initHkmChatWidget() {
         const convId = data.conversation?._id || data.conversation?.id;
         if (convId) {
           conversationId = convId;
-          sessionStorage.setItem('hkm_wix_conv_id', convId);
+          chatStorage.setItem('hkm_wix_conv_id', convId);
           if (emailToUse) {
-            localStorage.setItem('hkm_chat_is_contact_conv', 'true');
+            chatStorage.setItem('hkm_chat_is_contact_conv', 'true');
           }
           return convId;
         }
@@ -1135,6 +1152,7 @@ export function initHkmChatWidget() {
   }
 
   async function handleSendMessage(customText, options = {}) {
+    initializeChatSession();
     const text = (typeof customText === 'string' ? customText : inputEl.value).trim();
     if (!text || isSending) return;
 
@@ -1165,8 +1183,8 @@ export function initHkmChatWidget() {
 
       senderEmail = inputMail;
       senderName = (nameEl ? nameEl.value.trim() : '') || senderEmail.split('@')[0];
-      localStorage.setItem('hkm_chat_user_email', senderEmail);
-      if (senderName) localStorage.setItem('hkm_chat_user_name', senderName);
+      chatStorage.setItem('hkm_chat_user_email', senderEmail);
+      if (senderName) chatStorage.setItem('hkm_chat_user_name', senderName);
       userEmail = senderEmail;
       userName = senderName;
       renderPrechatUI();

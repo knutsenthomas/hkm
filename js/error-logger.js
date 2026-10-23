@@ -26,28 +26,15 @@
                     severity,
                     level: severity.toLowerCase(), // For compatibility with admin-logger
                     source: 'Nettside',           // So you know where it came from
-                    url: window.location.href,
+                    url: window.location.origin + window.location.pathname,
                     userAgent: navigator.userAgent,
-                    userId: getUserId(),
+                    userId: 'anonymous',
                     additionalData
                 })
             });
         } catch (e) {
             console.error('Failed to send system log:', e);
         }
-    }
-
-    // Helper to get diverse user ID
-    function getUserId() {
-        try {
-            // Check Firebase Auth (if available in localStorage)
-            const firebaseUser = Object.keys(localStorage).find(key => key.startsWith('firebase:authUser'));
-            if (firebaseUser) {
-                const user = JSON.parse(localStorage.getItem(firebaseUser));
-                return user.uid;
-            }
-        } catch (e) { }
-        return 'anonymous';
     }
 
     // 1. Catch Global Script Errors

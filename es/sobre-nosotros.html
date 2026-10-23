@@ -814,7 +814,7 @@
 
                     playButton.addEventListener('click', (e) => {
                         e.preventDefault();
-                        iframe.setAttribute('src', embedUrl);
+                        iframe.setAttribute('data-privacy-src', embedUrl);
                         lightbox.classList.add('active');
                         lightbox.setAttribute('aria-hidden', 'false');
                         document.body.style.overflow = 'hidden';
@@ -826,7 +826,8 @@
                 if (lightbox && iframe) {
                     lightbox.classList.remove('active');
                     lightbox.setAttribute('aria-hidden', 'true');
-                    iframe.setAttribute('src', '');
+                    iframe.setAttribute('data-privacy-src', '');
+                    iframe.removeAttribute('src');
                     document.body.style.overflow = '';
                 }
             };

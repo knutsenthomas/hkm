@@ -30,7 +30,7 @@ if (typeof window !== 'undefined') {
         }
         
         try {
-            if (typeof localStorage !== 'undefined') localStorage.setItem('hkm_theme', activeTheme);
+            if (theme && typeof localStorage !== 'undefined') localStorage.setItem('hkm_theme', activeTheme);
         } catch (e) {}
 
         document.querySelectorAll('.theme-toggle-icon').forEach(icon => {

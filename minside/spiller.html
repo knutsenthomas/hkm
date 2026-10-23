@@ -803,11 +803,11 @@
 
                 if (ytId) {
                     playerMediaContent.innerHTML = `
-                        <iframe class="w-full h-full rounded-xl" src="https://www.youtube.com/embed/${ytId}?rel=0" title="${lesson.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                        <iframe class="w-full h-full rounded-xl" data-privacy-src="https://www.youtube.com/embed/${ytId}?rel=0" title="${lesson.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                     `;
                 } else if (vimId) {
                     playerMediaContent.innerHTML = `
-                        <iframe class="w-full h-full rounded-xl" src="https://player.vimeo.com/video/${vimId}" title="${lesson.title}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+                        <iframe class="w-full h-full rounded-xl" data-privacy-src="https://player.vimeo.com/video/${vimId}" title="${lesson.title}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
                     `;
                 } else {
                     playerMediaContent.innerHTML = `
