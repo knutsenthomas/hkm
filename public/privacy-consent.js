@@ -4,6 +4,18 @@
   if (window.SitePrivacy) return;
   var config = document.currentScript ? document.currentScript.dataset : {};
   var key = config.key || 'site-privacy-v1';
+  // Site-specific presentation only. Consent keys, expiry and tracking rules stay shared.
+  var palettes = {
+    tk: { background: '#ffffff', text: '#162d3a', muted: '#4b5563', border: '#e3e8ed', accent: '#ff6a1b', button: '#fff2e9', buttonText: '#9a3a00', buttonBorder: '#b64b00', focus: '#9a3a00' },
+    hkm: { background: '#ffffff', text: '#2c3e50', muted: '#4b5563', border: '#d8e2e9', accent: '#d17d39', button: '#eaf1f5', buttonText: '#1b4965', buttonBorder: '#1b4965', focus: '#1b4965' },
+    hkd: { background: '#f5f5ed', text: '#151a21', muted: '#5a5f67', border: '#dbc2b3', accent: '#cc712b', button: '#f3e5d7', buttonText: '#723600', buttonBorder: '#934700', focus: '#934700' },
+    mandal: { background: '#ffffff', text: '#162d3a', muted: '#4b5563', border: '#d8e2e9', accent: '#1d4359', button: '#1d4359', buttonText: '#ffffff', buttonBorder: '#1d4359', focus: '#1d4359' },
+    stevner: { background: '#fafaf8', text: '#203e43', muted: '#476167', border: '#cfdad5', accent: '#426c5b', button: '#203e43', buttonText: '#ffffff', buttonBorder: '#203e43', focus: '#203e43' },
+    'hkp-app': { background: '#faf7ff', text: '#2d183f', muted: '#655472', border: '#e3d8ef', accent: '#d4b56e', button: '#561291', buttonText: '#ffffff', buttonBorder: '#561291', focus: '#561291' }
+  };
+  var themeName = key.replace(/-privacy-v\d+$/, '');
+  var palette = palettes[themeName] || palettes.hkm;
+
   var maxAge = 180 * 24 * 60 * 60 * 1000;
   var measurementId = validId(config.ga) ? config.ga : '';
   var loadedIds = [];
@@ -136,28 +148,34 @@
     banner = document.createElement('section');
     banner.id = 'site-privacy-banner';
     banner.setAttribute('aria-label', words[0]);
-    banner.style.cssText = 'position:fixed;inset:auto 12px 12px 12px;max-width:720px;margin:auto;z-index:2147483646;background:#fff;color:#17212b;border:1px solid #aeb7bf;border-radius:16px;padding:22px;box-shadow:0 12px 48px #0003;font:15px/1.5 system-ui,sans-serif;max-height:80vh;overflow:auto;text-align:left';
-    var title = document.createElement('h2'); title.textContent = words[0]; title.style.cssText = 'font:bold 21px/1.3 system-ui;margin:0 0 10px;color:#17212b'; banner.appendChild(title);
-    var text = document.createElement('p'); text.textContent = words[1]; text.style.margin = '0 0 12px'; banner.appendChild(text);
+    banner.setAttribute('data-privacy-theme', palettes[themeName] ? themeName : 'hkm');
+    banner.style.cssText = 'position:fixed;inset:auto 12px 12px 12px;max-width:720px;margin:auto;z-index:2147483646;background:' + palette.background + ';color:' + palette.text + ';border:1px solid ' + palette.border + ';border-top:4px solid ' + palette.accent + ';border-radius:16px;padding:22px;box-shadow:0 12px 48px #0003;font:15px/1.5 system-ui,sans-serif;max-height:80vh;overflow:auto;text-align:left';
+    var title = document.createElement('h2'); title.textContent = words[0]; title.style.cssText = 'font:bold 21px/1.3 system-ui;margin:0 0 10px;color:' + palette.text; banner.appendChild(title);
+    var text = document.createElement('p'); text.textContent = words[1]; text.style.cssText = 'margin:0 0 12px;color:' + palette.text; banner.appendChild(text);
     words[2] += ' (Google Analytics' + (config.vercel === 'true' ? ', Vercel Analytics / Speed Insights' : '') + ')';
     if (config.affiliate) words[3] += ' (GoAffPro)';
     var toggles = {};
     ['analytics', 'marketing'].forEach(function (category, index) {
       if (category === 'marketing' && !config.affiliate) return;
       var label = document.createElement('label'); label.style.cssText = 'display:flex;align-items:center;gap:12px;margin:10px 0;cursor:pointer';
-      var input = document.createElement('input'); input.type = 'checkbox'; input.checked = valid(memory) && memory[category] === true; input.disabled = navigator.globalPrivacyControl === true; input.style.cssText = 'width:20px;height:20px;accent-color:#284a66';
+      var input = document.createElement('input'); input.type = 'checkbox'; input.checked = valid(memory) && memory[category] === true; input.disabled = navigator.globalPrivacyControl === true; input.style.cssText = 'width:20px;height:20px;accent-color:' + palette.focus;
       if (input.disabled) input.checked = false;
       toggles[category] = input; label.append(input, document.createTextNode(words[2 + index])); banner.appendChild(label);
     });
     if (navigator.globalPrivacyControl === true) {
       var gpc = document.createElement('p'); gpc.textContent = english ? 'Global Privacy Control is enabled. Optional tracking stays off.' : spanish ? 'Global Privacy Control está activado. El seguimiento opcional permanece desactivado.' : 'Global Privacy Control er aktivert. Valgfri sporing holdes avslått.'; banner.appendChild(gpc);
     }
-    var note = document.createElement('p'); note.textContent = words[8]; note.style.cssText = 'font-size:13px;margin:12px 0'; banner.appendChild(note);
-    if (config.privacy) { var link = document.createElement('a'); link.href = config.privacy; link.textContent = words[7]; link.style.cssText = 'color:#234e70;text-decoration:underline'; banner.appendChild(link); }
+    var note = document.createElement('p'); note.textContent = words[8]; note.style.cssText = 'font-size:13px;margin:12px 0;color:' + palette.muted; banner.appendChild(note);
+    if (config.privacy) { var link = document.createElement('a'); link.href = config.privacy; link.textContent = words[7]; link.style.cssText = 'color:' + palette.focus + ';text-decoration:underline'; banner.appendChild(link); }
     var buttons = document.createElement('div'); buttons.style.cssText = 'display:flex;flex-wrap:wrap;gap:10px;margin-top:16px';
     [function () { choose(false, false); }, function () { choose(true, !!config.affiliate); }, function () { choose(toggles.analytics.checked, !!toggles.marketing && toggles.marketing.checked); }].forEach(function (action, index) {
-      var button = document.createElement('button'); button.type = 'button'; button.textContent = words[4 + index]; button.style.cssText = 'flex:1 1 150px;min-height:44px;border:1px solid #284a66;border-radius:9px;padding:10px 14px;background:#fff;color:#17374f;font:600 14px system-ui;cursor:pointer'; button.onclick = action; buttons.appendChild(button);
+      var button = document.createElement('button'); button.type = 'button'; button.textContent = words[4 + index]; button.style.cssText = 'flex:1 1 150px;min-height:44px;border:1px solid ' + palette.buttonBorder + ';border-radius:9px;padding:10px 14px;background:' + palette.button + ';color:' + palette.buttonText + ';font:600 14px system-ui;cursor:pointer'; button.onclick = action; buttons.appendChild(button);
     });
+    if (!document.getElementById('site-privacy-theme')) {
+      var themeStyle = document.createElement('style'); themeStyle.id = 'site-privacy-theme';
+      themeStyle.textContent = '#site-privacy-banner button:focus-visible,#site-privacy-banner a:focus-visible,#site-privacy-banner input:focus-visible{outline:3px solid ' + palette.focus + ';outline-offset:3px}#site-privacy-banner button:hover{filter:brightness(.96)}';
+      document.head.appendChild(themeStyle);
+    }
     banner.appendChild(buttons); document.body.appendChild(banner);
   }
   function mount() {

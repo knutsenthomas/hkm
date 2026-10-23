@@ -20,7 +20,7 @@ const sharedSiteShellPlugin = {
         handler(html, context) {
             if (!shouldUseSharedSiteShell(context.path, html)) return html;
 
-            const tags = [{ tag: 'script', attrs: { src: '/privacy-consent.js?v=20261023-inline', 'data-key': 'hkm-privacy-v1', 'data-ga': 'G-5CH82CHQ0B', 'data-privacy': '/personvern.html' }, injectTo: 'head-prepend' }, {
+            const tags = [{ tag: 'script', attrs: { src: '/privacy-consent.js?v=20261023-brand', 'data-key': 'hkm-privacy-v1', 'data-ga': 'G-5CH82CHQ0B', 'data-privacy': '/personvern.html' }, injectTo: 'head-prepend' }, {
                 tag: 'script',
                 attrs: {
                     type: 'module',
