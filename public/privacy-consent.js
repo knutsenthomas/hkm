@@ -173,6 +173,12 @@
     function placeSettings() {
       // Shared shells and React routes can replace or mount their footer later.
       var footer = document.querySelector('footer:not(#site-privacy-footer),[role="contentinfo"]:not(#site-privacy-footer)');
+      // Reuse the existing HKM footer control rather than adding another entry.
+      if (footer && footer.querySelector('[data-cookie-settings-link]')) {
+        if (links.isConnected) links.remove();
+        if (fallback && fallback.isConnected) fallback.remove();
+        return;
+      }
       if (!footer) {
         if (!fallback) { fallback = document.createElement('footer'); fallback.id = 'site-privacy-footer'; }
         if (!fallback.isConnected) document.body.appendChild(fallback);
