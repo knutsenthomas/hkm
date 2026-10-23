@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {trackConfirmedDonation,flushDonationAnalytics} from '../js/donation-analytics.js';
 test('requires payment confirmation and analytics consent, then deduplicates',()=>{
  const values=new Map(); const calls=[];
- const environment={localStorage:{getItem:key=>values.get(key),setItem:(key,value)=>values.set(key,value)},gtag:(...args)=>calls.push(args),location:{origin:'https://example.test',pathname:'/donasjoner'}};
+ const environment={SitePrivacy:{allows:()=>JSON.parse(values.get('hkm_cookie_consent')||'null')?.analytics === true},localStorage:{getItem:key=>values.get(key),setItem:(key,value)=>values.set(key,value)},gtag:(...args)=>calls.push(args),location:{origin:'https://example.test',pathname:'/donasjoner'}};
  assert.equal(trackConfirmedDonation('stripe',{id:'failed',status:'processing'},environment),false);
  assert.equal(trackConfirmedDonation('vipps',{reference:'agreement',state:'ACTIVE'},environment),false);
  const payment={id:'pi_test',status:'succeeded',currency:'nok',amount_received:50000,receipt_email:'private@example.test'};

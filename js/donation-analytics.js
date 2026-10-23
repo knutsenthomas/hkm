@@ -22,8 +22,7 @@ export function trackConfirmedDonation(provider, payment, environment = window) 
 }
 export function flushDonationAnalytics(environment = window) {
     try {
-        const consent = JSON.parse(environment.localStorage.getItem('hkm_cookie_consent') || 'null');
-        if (!consent?.analytics || typeof environment.gtag !== 'function') return false;
+        if (!environment.SitePrivacy?.allows('analytics') || typeof environment.gtag !== 'function') return false;
         let sent = false;
         for (const [id, payload] of pending) {
             const key = `hkm-ga-donation:${id}`;
