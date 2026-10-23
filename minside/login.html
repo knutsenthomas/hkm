@@ -126,20 +126,60 @@
             font-family: 'Inter', sans-serif;
             background-color: var(--main-bg);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 24px;
             min-height: 100vh;
-            padding: 20px;
+            min-height: 100svh;
+            padding: 80px 20px 32px;
         }
 
         .login-card {
             background-color: var(--card-bg);
-            padding: 40px;
+            padding: clamp(24px, 5vw, 40px);
             border-radius: 20px;
             box-shadow: var(--shadow);
             width: 100%;
             max-width: 420px;
             text-align: center;
+        }
+
+        /* Consent controls added to the body must sit below the card. */
+        body > #site-privacy-footer {
+            width: 100%;
+            max-width: 420px;
+            flex: 0 0 auto;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        body > #site-privacy-footer button {
+            font: inherit;
+            color: var(--text-muted);
+            background: transparent;
+            border: 0;
+            padding: 10px 12px;
+            min-height: 44px;
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .auth-mode-tabs {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .auth-mode-tabs .btn {
+            min-width: 0;
+            min-height: 44px;
+            padding: 10px 6px !important;
+            margin-bottom: 0;
+            white-space: normal;
+            overflow-wrap: break-word;
         }
 
         .logo-icon {
@@ -159,7 +199,7 @@
 
         .login-subtitle {
             color: var(--text-muted);
-            font-size: 15px;
+            font-size: 16px;
             margin-bottom: 30px;
             line-height: 1.5;
         }
@@ -183,7 +223,7 @@
             border: 1px solid var(--border-color);
             border-radius: 10px;
             font-family: inherit;
-            font-size: 15px;
+            font-size: 16px;
             outline: none;
             transition: all 0.2s ease;
         }
@@ -475,7 +515,7 @@
         <div class="divider" style="margin-bottom: 24px;"><span data-i18n="login.divider">eller logg inn med</span></div>
 
         <!-- Mode Buttons -->
-        <div style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: center;">
+        <div class="auth-mode-tabs">
             <button id="mode-login" class="btn btn-google btn-mode active"
                 style="font-size: 14px; padding: 8px 16px; width: auto; border-color: var(--primary-orange); color: var(--primary-orange);" data-i18n="login.modeLogin">Logg inn</button>
             <button id="mode-register" class="btn btn-google btn-mode"
