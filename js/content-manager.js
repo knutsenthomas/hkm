@@ -898,6 +898,12 @@ class ContentManager {
 
     async loadSpecializedContent() {
         if (this.pageId === 'index') {
+            // Campaigns are visible early on the homepage; do not tie them to
+            // event loading, the activity observer or large teaching/blog collections.
+            this.loadCauses()
+                .then(causes => this.renderCauses(causes))
+                .catch(error => this.reportError('loadCauses:index', error));
+
             const [heroData, events] = await Promise.all([
                 this._initialHeroLoaded ? Promise.resolve(null) : this.getContentDoc('hero_slides', { silent: true }),
                 this.loadEvents()
@@ -930,10 +936,9 @@ class ContentManager {
                 window.deferredContentLoaded = true;
                 
                 try {
-                    const [blogData, teachingData, causes, testimonialsData, events] = await Promise.all([
+                    const [blogData, teachingData, testimonialsData, events] = await Promise.all([
                         this.getContentDoc('collection_blog', { silent: true }),
                         this.getContentDoc('collection_teaching', { silent: true }),
-                        this.loadCauses(),
                         this.getContentDoc('collection_testimonials', { silent: true }),
                         this.loadEvents()
                     ]);
@@ -958,7 +963,6 @@ class ContentManager {
                         }
                     }
 
-                    this.renderCauses(causes);
                 } catch (err) {
                     console.error('[ContentManager] Failed to load deferred content:', err);
                 }
