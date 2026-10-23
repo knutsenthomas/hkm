@@ -142,6 +142,12 @@
     <link rel="stylesheet" href="../css/regular-donor.css">
     <link rel="stylesheet" href="../css/home-giving.css">
     
+    <style>
+        /* Keep fallback slides out of the first paint, including on slow connections. */
+        body.page-index:not(.cms-content-ready) .hero-slider > * {
+            visibility: hidden;
+        }
+    </style>
 </head>
 
 <body class="page-index header-dark-start cms-loading">

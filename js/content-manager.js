@@ -749,13 +749,6 @@ class ContentManager {
             }
             // Do not hydrate text content from cache to avoid visible text switching.
             // We only apply fresh Firestore content below.
-
-            const cachedHero = pageCache.get('hkm_cache_hero_slides');
-            if (cachedHero) {
-                const heroData = JSON.parse(cachedHero);
-                if (heroData && heroData.slides) this.renderHeroSlides(heroData.slides);
-            }
-
         } catch (e) {
             console.warn("[ContentManager] Early cache read failed", e);
         }
@@ -788,7 +781,7 @@ class ContentManager {
             // 1. Parallel Initial Load (Firestore defaults to cache if enabled)
             const docIds = [this.pageId, 'settings_design', 'settings_seo', 'settings_global'].filter(Boolean);
             if (this.pageId === 'index') {
-                docIds.push('settings_facebook_feed');
+                docIds.push('settings_facebook_feed', 'hero_slides');
             }
             const docs = service && (service.isInitialized || canReadPublicContent())
                 ? await this.getContentDocs(docIds)
@@ -819,6 +812,16 @@ class ContentManager {
                 this.updateDOM(facebookFeedSettings, { docId: 'settings_facebook_feed' });
             }
 
+            // Above-the-fold content must be installed before revealing the homepage.
+            if (this.pageId === 'index') {
+                const heroData = docs.hero_slides ?? null;
+                if (heroData && Array.isArray(heroData.slides)) {
+                    this.cacheLocalJson('hkm_cache_hero_slides', heroData);
+                    this.renderHeroSlides(heroData.slides);
+                }
+                this._initialHeroLoaded = true;
+            }
+
             revealIfHydrated();
 
             // 2. SEO & Meta (Non-blocking)
@@ -837,9 +840,8 @@ class ContentManager {
                 userMessage: 'Noe innhold kunne ikke lastes. Siden kan være delvis oppdatert.'
             });
         } finally {
-            if (pageContentHydrated) {
-                this.setContentReady(true);
-            }
+            // A settled failure may reveal the static fallback, but never before the request settles.
+            this.setContentReady(true);
             this.setLoading(false);
             window.dispatchEvent(new CustomEvent('cmsContentLoaded'));
         }
@@ -897,7 +899,7 @@ class ContentManager {
     async loadSpecializedContent() {
         if (this.pageId === 'index') {
             const [heroData, events] = await Promise.all([
-                this.getContentDoc('hero_slides', { silent: true }),
+                this._initialHeroLoaded ? Promise.resolve(null) : this.getContentDoc('hero_slides', { silent: true }),
                 this.loadEvents()
             ]);
 
