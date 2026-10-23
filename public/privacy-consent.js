@@ -136,7 +136,7 @@
     banner = document.createElement('section');
     banner.id = 'site-privacy-banner';
     banner.setAttribute('aria-label', words[0]);
-    banner.style.cssText = 'position:fixed;inset:auto 12px 58px 12px;max-width:720px;margin:auto;z-index:2147483646;background:#fff;color:#17212b;border:1px solid #aeb7bf;border-radius:16px;padding:22px;box-shadow:0 12px 48px #0003;font:15px/1.5 system-ui,sans-serif;max-height:80vh;overflow:auto;text-align:left';
+    banner.style.cssText = 'position:fixed;inset:auto 12px 12px 12px;max-width:720px;margin:auto;z-index:2147483646;background:#fff;color:#17212b;border:1px solid #aeb7bf;border-radius:16px;padding:22px;box-shadow:0 12px 48px #0003;font:15px/1.5 system-ui,sans-serif;max-height:80vh;overflow:auto;text-align:left';
     var title = document.createElement('h2'); title.textContent = words[0]; title.style.cssText = 'font:bold 21px/1.3 system-ui;margin:0 0 10px;color:#17212b'; banner.appendChild(title);
     var text = document.createElement('p'); text.textContent = words[1]; text.style.margin = '0 0 12px'; banner.appendChild(text);
     words[2] += ' (Google Analytics' + (config.vercel === 'true' ? ', Vercel Analytics / Speed Insights' : '') + ')';
@@ -164,8 +164,25 @@
     if (settings) return;
     settings = document.createElement('button'); settings.type = 'button'; settings.id = 'site-privacy-settings';
     settings.textContent = (document.documentElement.lang || '').startsWith('en') ? 'Cookie settings' : (document.documentElement.lang || '').startsWith('es') ? 'Cookies' : 'Informasjonskapsler';
-    settings.style.cssText = 'position:fixed;bottom:10px;left:12px;z-index:2147483645;padding:8px 12px;border:1px solid #aeb7bf;border-radius:20px;background:#fff;color:#17374f;font:13px system-ui;cursor:pointer;min-height:40px';
-    settings.onclick = show; document.body.appendChild(settings);
+    settings.style.cssText = 'position:static;display:inline-flex;align-items:center;justify-content:center;padding:6px 0;border:0;background:transparent;color:inherit;font:inherit;font-size:13px;text-decoration:underline;cursor:pointer;min-height:44px';
+    settings.onclick = show;
+    var links = document.createElement('div'); links.id = 'site-privacy-links';
+    links.style.cssText = 'width:100%;box-sizing:border-box;flex-basis:100%;padding:12px 20px;text-align:center';
+    links.appendChild(settings);
+    var fallback;
+    function placeSettings() {
+      // Shared shells and React routes can replace or mount their footer later.
+      var footer = document.querySelector('footer:not(#site-privacy-footer),[role="contentinfo"]:not(#site-privacy-footer)');
+      if (!footer) {
+        if (!fallback) { fallback = document.createElement('footer'); fallback.id = 'site-privacy-footer'; }
+        if (!fallback.isConnected) document.body.appendChild(fallback);
+        footer = fallback;
+      }
+      if (links.parentNode !== footer) footer.appendChild(links);
+      if (fallback && footer !== fallback && fallback.isConnected) fallback.remove();
+    }
+    placeSettings();
+    if (window.MutationObserver) new window.MutationObserver(placeSettings).observe(document.body, { childList: true, subtree: true });
     if (!valid(memory)) show();
   }
   window.SitePrivacy = { allows: allows, choose: choose, show: show, cleanEvent: cleanEvent, pageView: pageView,
