@@ -1,5 +1,5 @@
 // content editor methods for AdminManager.
-export function createMethods10({ firebaseService, adminUtils, showErrorUI }) {
+export function createContentEditor2Methods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     async editCollectionItem(collectionId, index) {
       this.isEditorOpen = true;

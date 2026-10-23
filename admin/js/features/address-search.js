@@ -1,5 +1,5 @@
 // address search methods for AdminManager.
-export function createMethods34({ firebaseService, adminUtils, showErrorUI }) {
+export function createAddressSearchMethods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     injectAddressSearchStyles() {
       if (document.getElementById("admin-address-search-styles")) return;

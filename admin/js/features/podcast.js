@@ -1,5 +1,5 @@
 // podcast methods for AdminManager.
-export function createMethods21({ firebaseService, adminUtils, showErrorUI }) {
+export function createPodcastMethods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     async renderPodcastSection() {
       const section = document.getElementById("podcast-section");

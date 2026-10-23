@@ -1,5 +1,5 @@
 // media library methods for AdminManager.
-export function createMethods6({ firebaseService, adminUtils, showErrorUI }) {
+export function createMediaLibrary2Methods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     /**
      * Opens a modal to select an image from the media library

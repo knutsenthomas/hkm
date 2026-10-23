@@ -1,5 +1,5 @@
 // integrations methods for AdminManager.
-export function createMethods4({ firebaseService, adminUtils, showErrorUI }) {
+export function createIntegrationsMethods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     async performWixDatabaseCleanup() {
       // Auto-confirm if hash is present, otherwise ask

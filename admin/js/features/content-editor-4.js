@@ -1,5 +1,5 @@
 // content editor methods for AdminManager.
-export function createMethods12({ firebaseService, adminUtils, showErrorUI }) {
+export function createContentEditor4Methods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     async loadFacebookFeedSettingsLivePreview(container, config = {}) {
       if (!container) return;

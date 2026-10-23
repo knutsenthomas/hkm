@@ -1,5 +1,5 @@
 // collections methods for AdminManager.
-export function createMethods20({ firebaseService, adminUtils, showErrorUI }) {
+export function createCollectionsMethods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     async renderCommentsSection() {
       const section = document.getElementById("comments-section");

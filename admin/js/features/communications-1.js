@@ -1,5 +1,5 @@
 // communications methods for AdminManager.
-export function createMethods18({ firebaseService, adminUtils, showErrorUI }) {
+export function createCommunications1Methods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     initMessageListener() {
       const bell = document.getElementById("messages-bell");

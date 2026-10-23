@@ -1,5 +1,5 @@
 // rich text methods for AdminManager.
-export function createMethods31({ firebaseService, adminUtils, showErrorUI }) {
+export function createRichTextMethods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     _updatePricingModelUI(model = null) {
       const courseRadio = document.getElementById("pricing-model-course");

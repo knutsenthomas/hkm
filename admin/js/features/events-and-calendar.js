@@ -1,5 +1,5 @@
 // events and calendar methods for AdminManager.
-export function createMethods17({ firebaseService, adminUtils, showErrorUI }) {
+export function createEventsAndCalendarMethods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     /**
      * Clear the public site's event cache in localStorage.

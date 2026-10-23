@@ -1,5 +1,5 @@
 // shop manager methods for AdminManager.
-export function createMethods29({ firebaseService, adminUtils, showErrorUI }) {
+export function createShopManagerMethods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     async navigateToShopTab(targetTab = "kurs") {
       if (typeof window.handleSectionSwitch === "function") {

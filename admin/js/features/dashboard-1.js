@@ -1,5 +1,5 @@
 // dashboard methods for AdminManager.
-export function createMethods7({ firebaseService, adminUtils, showErrorUI }) {
+export function createDashboard1Methods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     renderOverviewLoadingState() {
       const section = document.getElementById("overview-section");

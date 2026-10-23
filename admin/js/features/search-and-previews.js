@@ -1,5 +1,5 @@
 // search and previews methods for AdminManager.
-export function createMethods22({ firebaseService, adminUtils, showErrorUI }) {
+export function createSearchAndPreviewsMethods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     initSearch() {
       const searchModal = document.getElementById("search-modal");

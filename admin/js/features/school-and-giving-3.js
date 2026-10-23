@@ -1,5 +1,5 @@
 // school and giving methods for AdminManager.
-export function createMethods16({ firebaseService, adminUtils, showErrorUI }) {
+export function createSchoolAndGiving3Methods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     _renderEnrollmentsList() {
       const list = document.getElementById("enrollments-list");

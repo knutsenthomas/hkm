@@ -1,5 +1,5 @@
 // giving causes methods for AdminManager.
-export function createMethods27({ firebaseService, adminUtils, showErrorUI }) {
+export function createGivingCausesMethods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     bindCausesTabs() {
       const tabs = document.querySelectorAll(

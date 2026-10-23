@@ -1,5 +1,5 @@
 // school and giving methods for AdminManager.
-export function createMethods14({ firebaseService, adminUtils, showErrorUI }) {
+export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     _ensureCoursesRealtimeSubscription() {
       if (this._siteContentRealtimeUnsubs.collection_courses) return;

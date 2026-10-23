@@ -1,37 +1,37 @@
-import { createMethods1 } from "./features/users-and-access-1.js";
-import { createMethods2 } from "./features/users-and-access-2.js";
-import { createMethods3 } from "./features/core-interaction.js";
-import { createMethods4 } from "./features/integrations.js";
-import { createMethods5 } from "./features/media-library-1.js";
-import { createMethods6 } from "./features/media-library-2.js";
-import { createMethods7 } from "./features/dashboard-1.js";
-import { createMethods8 } from "./features/dashboard-2.js";
-import { createMethods9 } from "./features/content-editor-1.js";
-import { createMethods10 } from "./features/content-editor-2.js";
-import { createMethods11 } from "./features/content-editor-3.js";
-import { createMethods12 } from "./features/content-editor-4.js";
-import { createMethods13 } from "./features/translation.js";
-import { createMethods14 } from "./features/school-and-giving-1.js";
-import { createMethods15 } from "./features/school-and-giving-2.js";
-import { createMethods16 } from "./features/school-and-giving-3.js";
-import { createMethods17 } from "./features/events-and-calendar.js";
-import { createMethods18 } from "./features/communications-1.js";
-import { createMethods19 } from "./features/communications-2.js";
-import { createMethods20 } from "./features/collections.js";
-import { createMethods21 } from "./features/podcast.js";
-import { createMethods22 } from "./features/search-and-previews.js";
-import { createMethods23 } from "./features/workspace.js";
-import { createMethods24 } from "./features/site-design.js";
-import { createMethods25 } from "./features/shop-records.js";
-import { createMethods26 } from "./features/donor-records.js";
-import { createMethods27 } from "./features/giving-causes.js";
-import { createMethods28 } from "./features/bank-import.js";
-import { createMethods29 } from "./features/shop-manager.js";
-import { createMethods30 } from "./features/teaching-and-reading.js";
-import { createMethods31 } from "./features/rich-text.js";
-import { createMethods32 } from "./features/site-settings.js";
-import { createMethods33 } from "./features/automation.js";
-import { createMethods34 } from "./features/address-search.js";
+import { createUsersAndAccess1Methods } from "./features/users-and-access-1.js";
+import { createUsersAndAccess2Methods } from "./features/users-and-access-2.js";
+import { createCoreInteractionMethods } from "./features/core-interaction.js";
+import { createIntegrationsMethods } from "./features/integrations.js";
+import { createMediaLibrary1Methods } from "./features/media-library-1.js";
+import { createMediaLibrary2Methods } from "./features/media-library-2.js";
+import { createDashboard1Methods } from "./features/dashboard-1.js";
+import { createDashboard2Methods } from "./features/dashboard-2.js";
+import { createContentEditor1Methods } from "./features/content-editor-1.js";
+import { createContentEditor2Methods } from "./features/content-editor-2.js";
+import { createContentEditor3Methods } from "./features/content-editor-3.js";
+import { createContentEditor4Methods } from "./features/content-editor-4.js";
+import { createTranslationMethods } from "./features/translation.js";
+import { createSchoolAndGiving1Methods } from "./features/school-and-giving-1.js";
+import { createSchoolAndGiving2Methods } from "./features/school-and-giving-2.js";
+import { createSchoolAndGiving3Methods } from "./features/school-and-giving-3.js";
+import { createEventsAndCalendarMethods } from "./features/events-and-calendar.js";
+import { createCommunications1Methods } from "./features/communications-1.js";
+import { createCommunications2Methods } from "./features/communications-2.js";
+import { createCollectionsMethods } from "./features/collections.js";
+import { createPodcastMethods } from "./features/podcast.js";
+import { createSearchAndPreviewsMethods } from "./features/search-and-previews.js";
+import { createWorkspaceMethods } from "./features/workspace.js";
+import { createSiteDesignMethods } from "./features/site-design.js";
+import { createShopRecordsMethods } from "./features/shop-records.js";
+import { createDonorRecordsMethods } from "./features/donor-records.js";
+import { createGivingCausesMethods } from "./features/giving-causes.js";
+import { createBankImportMethods } from "./features/bank-import.js";
+import { createShopManagerMethods } from "./features/shop-manager.js";
+import { createTeachingAndReadingMethods } from "./features/teaching-and-reading.js";
+import { createRichTextMethods } from "./features/rich-text.js";
+import { createSiteSettingsMethods } from "./features/site-settings.js";
+import { createAutomationMethods } from "./features/automation.js";
+import { createAddressSearchMethods } from "./features/address-search.js";
 
 // [DEBUG] File re-parsed to check for hidden syntax/encoding issues
 // ===================================
@@ -305,40 +305,40 @@ class AdminManager {
 
 const dependencies = { firebaseService, adminUtils, showErrorUI };
 for (const methods of [
-  createMethods1(dependencies),
-  createMethods2(dependencies),
-  createMethods3(dependencies),
-  createMethods4(dependencies),
-  createMethods5(dependencies),
-  createMethods6(dependencies),
-  createMethods7(dependencies),
-  createMethods8(dependencies),
-  createMethods9(dependencies),
-  createMethods10(dependencies),
-  createMethods11(dependencies),
-  createMethods12(dependencies),
-  createMethods13(dependencies),
-  createMethods14(dependencies),
-  createMethods15(dependencies),
-  createMethods16(dependencies),
-  createMethods17(dependencies),
-  createMethods18(dependencies),
-  createMethods19(dependencies),
-  createMethods20(dependencies),
-  createMethods21(dependencies),
-  createMethods22(dependencies),
-  createMethods23(dependencies),
-  createMethods24(dependencies),
-  createMethods25(dependencies),
-  createMethods26(dependencies),
-  createMethods27(dependencies),
-  createMethods28(dependencies),
-  createMethods29(dependencies),
-  createMethods30(dependencies),
-  createMethods31(dependencies),
-  createMethods32(dependencies),
-  createMethods33(dependencies),
-  createMethods34(dependencies),
+  createUsersAndAccess1Methods(dependencies),
+  createUsersAndAccess2Methods(dependencies),
+  createCoreInteractionMethods(dependencies),
+  createIntegrationsMethods(dependencies),
+  createMediaLibrary1Methods(dependencies),
+  createMediaLibrary2Methods(dependencies),
+  createDashboard1Methods(dependencies),
+  createDashboard2Methods(dependencies),
+  createContentEditor1Methods(dependencies),
+  createContentEditor2Methods(dependencies),
+  createContentEditor3Methods(dependencies),
+  createContentEditor4Methods(dependencies),
+  createTranslationMethods(dependencies),
+  createSchoolAndGiving1Methods(dependencies),
+  createSchoolAndGiving2Methods(dependencies),
+  createSchoolAndGiving3Methods(dependencies),
+  createEventsAndCalendarMethods(dependencies),
+  createCommunications1Methods(dependencies),
+  createCommunications2Methods(dependencies),
+  createCollectionsMethods(dependencies),
+  createPodcastMethods(dependencies),
+  createSearchAndPreviewsMethods(dependencies),
+  createWorkspaceMethods(dependencies),
+  createSiteDesignMethods(dependencies),
+  createShopRecordsMethods(dependencies),
+  createDonorRecordsMethods(dependencies),
+  createGivingCausesMethods(dependencies),
+  createBankImportMethods(dependencies),
+  createShopManagerMethods(dependencies),
+  createTeachingAndReadingMethods(dependencies),
+  createRichTextMethods(dependencies),
+  createSiteSettingsMethods(dependencies),
+  createAutomationMethods(dependencies),
+  createAddressSearchMethods(dependencies),
 ]) {
   const descriptors = Object.getOwnPropertyDescriptors(methods);
   for (const descriptor of Object.values(descriptors))

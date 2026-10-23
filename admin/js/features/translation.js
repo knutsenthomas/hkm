@@ -1,5 +1,5 @@
 // translation methods for AdminManager.
-export function createMethods13({ firebaseService, adminUtils, showErrorUI }) {
+export function createTranslationMethods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     _buildBlogTranslationSourceHash(post) {
       if (!post || typeof post !== "object") return this._hashString("");

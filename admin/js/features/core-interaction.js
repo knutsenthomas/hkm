@@ -1,5 +1,5 @@
 // core interaction methods for AdminManager.
-export function createMethods3({ firebaseService, adminUtils, showErrorUI }) {
+export function createCoreInteractionMethods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     init() {
       console.log("Initializing AdminManager...");

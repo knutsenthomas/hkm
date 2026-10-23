@@ -1,5 +1,5 @@
 // users and access methods for AdminManager.
-export function createMethods2({ firebaseService, adminUtils, showErrorUI }) {
+export function createUsersAndAccess2Methods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     async saveUser(userId, data) {
       // Remove undefined/null fields to prevent Firestore errors and clean up data

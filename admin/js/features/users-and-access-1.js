@@ -1,5 +1,5 @@
 // users and access methods for AdminManager.
-export function createMethods1({ firebaseService, adminUtils, showErrorUI }) {
+export function createUsersAndAccess1Methods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     async getAdminAuthToken() {
       try {

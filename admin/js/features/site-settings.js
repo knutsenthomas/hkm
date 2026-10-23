@@ -1,5 +1,5 @@
 // site settings methods for AdminManager.
-export function createMethods32({ firebaseService, adminUtils, showErrorUI }) {
+export function createSiteSettingsMethods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     async renderSEOSection() {
       const section = document.getElementById("seo-section");

@@ -1,5 +1,5 @@
 // shop records methods for AdminManager.
-export function createMethods25({ firebaseService, adminUtils, showErrorUI }) {
+export function createShopRecordsMethods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     getFilteredShopRecords() {
       const records = Array.isArray(this.allDonationRecords)

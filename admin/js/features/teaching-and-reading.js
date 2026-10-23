@@ -1,5 +1,5 @@
 // teaching and reading methods for AdminManager.
-export function createMethods30({ firebaseService, adminUtils, showErrorUI }) {
+export function createTeachingAndReadingMethods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     async renderTeachingManager() {
       this.renderCollectionEditor("teaching", "Undervisning");

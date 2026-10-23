@@ -1,5 +1,5 @@
 // bank import methods for AdminManager.
-export function createMethods28({ firebaseService, adminUtils, showErrorUI }) {
+export function createBankImportMethods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     openBankImportModal() {
       const modal = document.getElementById("bank-import-modal");

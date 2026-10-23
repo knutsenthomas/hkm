@@ -1,5 +1,5 @@
 // site design methods for AdminManager.
-export function createMethods24({ firebaseService, adminUtils, showErrorUI }) {
+export function createSiteDesignMethods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     async renderDesignSection() {
       const section = document.getElementById("design-section");

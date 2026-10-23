@@ -1,5 +1,5 @@
 // communications methods for AdminManager.
-export function createMethods19({ firebaseService, adminUtils, showErrorUI }) {
+export function createCommunications2Methods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     initTemplateEditorModal() {
       const modal = document.getElementById("template-editor-modal");

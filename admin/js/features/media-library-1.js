@@ -1,5 +1,5 @@
 // media library methods for AdminManager.
-export function createMethods5({ firebaseService, adminUtils, showErrorUI }) {
+export function createMediaLibrary1Methods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     /**
      * Komprimerer bilde før opplasting

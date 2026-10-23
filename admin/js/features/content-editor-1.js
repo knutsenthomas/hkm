@@ -1,5 +1,5 @@
 // content editor methods for AdminManager.
-export function createMethods9({ firebaseService, adminUtils, showErrorUI }) {
+export function createContentEditor1Methods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     _persistOpenEditorState(collectionId, item) {
       try {

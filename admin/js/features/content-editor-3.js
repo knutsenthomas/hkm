@@ -1,5 +1,5 @@
 // content editor methods for AdminManager.
-export function createMethods11({ firebaseService, adminUtils, showErrorUI }) {
+export function createContentEditor3Methods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     toggleCauseGivingFields() {
       const mode = document.getElementById("cause-amount-mode").value;

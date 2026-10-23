@@ -1,5 +1,5 @@
 // workspace methods for AdminManager.
-export function createMethods23({ firebaseService, adminUtils, showErrorUI }) {
+export function createWorkspaceMethods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     drawPremiumChart(ga, days = 30) {
       const container = document.getElementById(

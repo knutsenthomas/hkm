@@ -1,5 +1,5 @@
 // school and giving methods for AdminManager.
-export function createMethods15({ firebaseService, adminUtils, showErrorUI }) {
+export function createSchoolAndGiving2Methods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     bindDonationAdminFilters() {
       const addFilteredListener = (id, eventType, callback) => {

@@ -1,5 +1,5 @@
 // automation methods for AdminManager.
-export function createMethods33({ firebaseService, adminUtils, showErrorUI }) {
+export function createAutomationMethods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     async renderAutomationSection() {
       const section = document.getElementById("automation-section");

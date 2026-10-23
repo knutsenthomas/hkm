@@ -1,5 +1,5 @@
 // donor records methods for AdminManager.
-export function createMethods26({ firebaseService, adminUtils, showErrorUI }) {
+export function createDonorRecordsMethods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     getFilteredDonorRecords() {
       const records = Array.isArray(this.allDonationRecords)

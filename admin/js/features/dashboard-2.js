@@ -1,5 +1,5 @@
 // dashboard methods for AdminManager.
-export function createMethods8({ firebaseService, adminUtils, showErrorUI }) {
+export function createDashboard2Methods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     renderGiftsDashboard() {
       const container = document.getElementById("causes-dashboard-container");
