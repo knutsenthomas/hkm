@@ -19,11 +19,11 @@ const sharedSiteShellPlugin = {
         order: 'pre',
         handler(html, context) {
             if (!shouldUseSharedSiteShell(context.path, html)) {
-                if (/\/minside\//.test(context.path)) return [{ tag: 'script', attrs: { src: '/privacy-consent.js?v=20261023-media', 'data-key': 'hkm-privacy-v1', 'data-media': 'true', 'data-privacy': '/personvern.html' }, injectTo: 'head-prepend' }];
+                if (/\/minside\//.test(context.path)) return [{ tag: 'script', attrs: { src: '/privacy-consent.js?v=20261023-media2', 'data-key': 'hkm-privacy-v1', 'data-media': 'true', 'data-privacy': '/personvern.html' }, injectTo: 'head-prepend' }];
                 return html;
             }
 
-            const tags = [{ tag: 'script', attrs: { src: '/privacy-consent.js?v=20261023-media', 'data-key': 'hkm-privacy-v1', 'data-ga': 'G-5CH82CHQ0B', 'data-media': 'true', 'data-privacy': '/personvern.html' }, injectTo: 'head-prepend' }, {
+            const tags = [{ tag: 'script', attrs: { src: '/privacy-consent.js?v=20261023-media2', 'data-key': 'hkm-privacy-v1', 'data-ga': 'G-5CH82CHQ0B', 'data-media': 'true', 'data-privacy': '/personvern.html' }, injectTo: 'head-prepend' }, {
                 tag: 'script',
                 attrs: {
                     type: 'module',

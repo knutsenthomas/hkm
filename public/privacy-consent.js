@@ -154,7 +154,7 @@
     banner.setAttribute('aria-label', words[0]);
     banner.setAttribute('data-privacy-theme', palettes[themeName] ? themeName : 'hkm');
     banner.style.cssText = 'position:fixed;inset:auto 12px 12px 12px;max-width:720px;margin:auto;z-index:2147483646;background:' + palette.background + ';color:' + palette.text + ';border:1px solid ' + palette.border + ';border-top:4px solid ' + palette.accent + ';border-radius:16px;padding:22px;box-shadow:0 12px 48px #0003;font:15px/1.5 system-ui,sans-serif;max-height:80vh;overflow:auto;text-align:left';
-    var title = document.createElement('h2'); title.textContent = words[0]; title.style.cssText = 'font:bold 21px/1.3 system-ui;margin:0 0 10px;color:' + palette.text; banner.appendChild(title);
+    var title = document.createElement('h2'); title.textContent = words[0]; title.style.cssText = 'font:bold 21px/1.3 system-ui;margin:0 0 10px;color:' + palette.text; title.style.setProperty('color', palette.text, 'important'); banner.appendChild(title);
     var text = document.createElement('p'); text.textContent = words[1]; text.style.cssText = 'margin:0 0 12px;color:' + palette.text; banner.appendChild(text);
     words[2] += ' (Google Analytics' + (config.vercel === 'true' ? ', Vercel Analytics / Speed Insights' : '') + ')';
     if (config.affiliate) words[3] += ' (GoAffPro)';
