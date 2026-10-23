@@ -164,27 +164,42 @@
     if (settings) return;
     settings = document.createElement('button'); settings.type = 'button'; settings.id = 'site-privacy-settings';
     settings.textContent = (document.documentElement.lang || '').startsWith('en') ? 'Cookie settings' : (document.documentElement.lang || '').startsWith('es') ? 'Cookies' : 'Informasjonskapsler';
-    settings.style.cssText = 'position:static;display:inline-flex;align-items:center;justify-content:center;padding:6px 0;border:0;background:transparent;color:inherit;font:inherit;font-size:13px;text-decoration:underline;cursor:pointer;min-height:44px';
+    settings.style.cssText = 'position:static;display:inline;padding:0;border:0;background:transparent;color:inherit;font:inherit;text-align:inherit;cursor:pointer';
     settings.onclick = show;
-    var links = document.createElement('div'); links.id = 'site-privacy-links';
-    links.style.cssText = 'width:100%;box-sizing:border-box;flex-basis:100%;padding:12px 20px;text-align:center';
-    links.appendChild(settings);
-    var fallback;
+    var fallback, listItem;
     function placeSettings() {
-      // Shared shells and React routes can replace or mount their footer later.
+      // Mount beside the existing privacy link, inside the site's own footer navigation.
       var footer = document.querySelector('footer:not(#site-privacy-footer),[role="contentinfo"]:not(#site-privacy-footer)');
-      // Reuse the existing HKM footer control rather than adding another entry.
       if (footer && footer.querySelector('[data-cookie-settings-link]')) {
-        if (links.isConnected) links.remove();
+        if (settings.isConnected) settings.remove();
+        if (listItem && listItem.isConnected) listItem.remove();
         if (fallback && fallback.isConnected) fallback.remove();
         return;
       }
       if (!footer) {
-        if (!fallback) { fallback = document.createElement('footer'); fallback.id = 'site-privacy-footer'; }
+        if (!fallback) {
+          fallback = document.createElement('footer'); fallback.id = 'site-privacy-footer';
+          fallback.style.cssText = 'display:flex;flex-wrap:wrap;justify-content:center;gap:16px;padding:16px;font-size:13px';
+        }
         if (!fallback.isConnected) document.body.appendChild(fallback);
         footer = fallback;
       }
-      if (links.parentNode !== footer) footer.appendChild(links);
+      var privacy = Array.prototype.find.call(footer.querySelectorAll('a[href],button'), function (item) {
+        if (item === settings) return false;
+        return /(?:^|\/)(?:privacy(?:-policy)?|personvern)(?:[\/#?]|$)/i.test(item.getAttribute('href') || '') ||
+          /^(?:personvern(?:erklæring)?|privacy(?: policy)?|privacidad)$/i.test(item.textContent.trim());
+      });
+      var target = footer.querySelector('[data-cookie-settings-slot]') || (privacy && privacy.parentElement) || footer;
+      settings.className = privacy ? privacy.className : '';
+      if (target.tagName === 'LI') {
+        if (!listItem) listItem = document.createElement('li');
+        if (settings.parentNode !== listItem) listItem.appendChild(settings);
+        if (listItem.parentNode !== target.parentNode || target.nextElementSibling !== listItem) target.after(listItem);
+      } else {
+        if (settings.parentNode !== target) target.appendChild(settings);
+        if (listItem && listItem.isConnected) listItem.remove();
+        target.style.flexWrap = 'wrap';
+      }
       if (fallback && footer !== fallback && fallback.isConnected) fallback.remove();
     }
     placeSettings();
