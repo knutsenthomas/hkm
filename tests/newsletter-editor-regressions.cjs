@@ -209,6 +209,25 @@ const runSaveTimer = () => {
     timers.delete(id); return timer.fn();
 };
 (async () => {
+    // Exercise the real inspector renderer AND its binding scope, not stubs.
+    const inspector=context.document.createElement('div');inspector.id='sidebar-inspector-view';context.document.body.append(inspector);
+    const imageEditor=Object.create(context.Builder.prototype);
+    Object.assign(imageEditor,{setPropertiesPanel(){},deselectBlock(){},syncUnifiedBlocks(){},triggerAutosave(){},showConfirm:async()=>true});
+    box.innerHTML=imageEditor.buildCollageHtml([{url:'https://example.com/a.jpg'},{url:'https://example.com/b.jpg'}]);
+    const collageNode=box.firstElementChild;
+    assert.doesNotThrow(()=>imageEditor.showImageInspector(collageNode.querySelector('img'),collageNode));
+    const styleSelector=inspector.querySelector('#existing-collage-style');
+    assert.ok(styleSelector);
+    styleSelector.value='landscape';styleSelector.onchange();
+    assert.equal(collageNode.dataset.collageStyle,'landscape');
+    inspector.querySelector('[id="btn-img-delete"]').click();
+    await new Promise(setImmediate);
+    assert.equal(collageNode.querySelectorAll('img').length,1);
+    assert.equal(collageNode.querySelector('img').src,'https://example.com/b.jpg');
+    box.innerHTML='<p><img src="https://example.com/regular.jpg"></p>';
+    assert.doesNotThrow(()=>imageEditor.showImageInspector(box.querySelector('img'),box.firstElementChild));
+    assert.equal(inspector.querySelector('#existing-collage-style'),null);
+    inspector.remove();box.innerHTML='<p>First</p>';
     const campaignEditor=Object.create(context.Builder.prototype);
     let campaignHtml='';
     campaignEditor.mountEditorModal=modal=>context.document.body.append(modal);

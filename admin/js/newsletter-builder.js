@@ -6766,6 +6766,8 @@ class NewsletterBuilder {
     }
 
     bindImageInspectorEvents(img, node) {
+        const inspectorView = document.getElementById('sidebar-inspector-view');
+        if (!inspectorView) return;
         const inputAlt = document.getElementById('img-inspector-alt');
         const checkLink = document.getElementById('img-inspector-has-link');
         const inputLinkUrl = document.getElementById('img-inspector-link-url');
