@@ -465,3 +465,14 @@ html[data-workspace-design="unified"] .sidebar .nav-badge {
 @media (max-width:768px) {
   html[data-workspace-design="unified"] .school-payments-link-body { padding: 20px; }
 }
+/* Reserve the same label area in metric cards, including across wrapped rows.
+   Longer labels may grow naturally; values and labels are never clipped. */
+html[data-workspace-design="unified"] :is(
+  .workspace-metrics > div > span,
+  .stat-card > .stat-label,
+  .bento-stat-card .bento-card-label,
+  .stat-card-premium .stat-card-header
+) {
+  line-height: 1.4 !important;
+  min-height: 4.2em;
+}
