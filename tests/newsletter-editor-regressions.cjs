@@ -198,6 +198,36 @@ const box = context.document.getElementById('blocks-container');
     assert.ok(email.querySelector('a[href*="fund=active"]'));
     box.innerHTML='<p>First</p>';
 }
+// Switching a saved paragraph to a heading must replace its frozen inline style.
+{
+    const formatter=Object.create(context.Builder.prototype);
+    Object.assign(formatter,{captureEditorStep(){},restoreSelection(){},saveSelection(){},syncUnifiedBlocks(){},updateDocumentTools(){}});
+    box.innerHTML='<p style="font-size:16px;font-weight:400;text-align:center;color:rgb(27,73,101)"><span style="font-size:16px;font-weight:400;line-height:1.6">Overskrift</span></p>';
+    const selectText=()=>{const range=context.document.createRange();range.selectNodeContents(box.firstElementChild);dom.window.getSelection().removeAllRanges();dom.window.getSelection().addRange(range);};
+    selectText();
+    const previousCommand=context.document.execCommand;
+    context.document.execCommand=(command,unused,tag)=>{
+        assert.equal(command,'formatBlock');
+        const previous=box.firstElementChild,next=context.document.createElement(tag);
+        for(const attribute of [...previous.attributes])next.setAttribute(attribute.name,attribute.value);
+        while(previous.firstChild)next.appendChild(previous.firstChild);
+        previous.replaceWith(next);selectText();return true;
+    };
+    formatter.exec('formatBlock','h2');
+    assert.equal(box.firstElementChild.tagName,'H2');
+    assert.equal(box.firstElementChild.style.fontSize,'24px');
+    assert.equal(box.firstElementChild.style.fontWeight,'800');
+    assert.equal(box.querySelector('span').style.fontSize,'');
+    assert.equal(box.firstElementChild.style.textAlign,'center');
+    const saved=formatter.getCleanCanvasHtml();box.innerHTML=saved;selectText();
+    formatter.exec('formatBlock','p');
+    assert.equal(box.firstElementChild.tagName,'P');
+    assert.equal(box.firstElementChild.style.fontSize,'16px');
+    assert.equal(box.firstElementChild.style.fontWeight,'400');
+    assert.equal(box.textContent,'Overskrift');
+    context.document.execCommand=previousCommand;
+    box.innerHTML='<p>First</p>';
+}
 // Exercise the actual selection callback after clicking outside the document.
 const selectionSection = source.slice(source.indexOf('// Inspector controls retain'), source.indexOf('// Clear pending delete'));
 const selectionBody = selectionSection.slice(selectionSection.indexOf("() => {") + 7, selectionSection.lastIndexOf('});'));

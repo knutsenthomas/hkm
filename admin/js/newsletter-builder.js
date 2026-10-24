@@ -1877,7 +1877,41 @@ class NewsletterBuilder {
         this.restoreSelection();
         if (!document.getElementById('blocks-container')?.contains(window.getSelection()?.anchorNode)) return;
         document.execCommand(command, false, value);
+        if (command === 'formatBlock') {
+            this.applySelectedBlockFormat(value);
+            this.saveSelection();
+        }
         this.syncUnifiedBlocks();
+    }
+
+    applySelectedBlockFormat(value) {
+        const tag = String(value || '').replace(/[<>]/g, '').toLowerCase();
+        const sizes = {p:16,h1:32,h2:24,h3:20,h4:18,h5:16,h6:14};
+        if (!(tag in sizes)) return;
+        const container = document.getElementById('blocks-container');
+        const selection = window.getSelection();
+        if (!container || !selection?.rangeCount || !container.contains(selection.anchorNode)) return;
+        const range = selection.getRangeAt(0);
+        const anchor = selection.anchorNode.nodeType === Node.TEXT_NODE ? selection.anchorNode.parentElement : selection.anchorNode;
+        const targets = Array.from(container.querySelectorAll(tag)).filter(node =>
+            selection.isCollapsed ? node === anchor?.closest(tag) : range.intersectsNode(node));
+        targets.forEach(node => {
+            node.style.fontSize = `${sizes[tag]}px`;
+            node.style.fontWeight = tag === 'p' ? '400' : tag === 'h1' ? '900' : '800';
+            node.style.lineHeight = tag === 'p' ? '1.6' : '1.3';
+            node.style.letterSpacing = tag === 'p' ? 'normal' : '-0.01em';
+            node.style.marginTop = tag === 'p' ? '0px' : '24px';
+            node.style.marginBottom = tag === 'p' ? '0px' : '16px';
+            node.querySelectorAll('*').forEach(child => {
+                // Saved inherited sizes/weights must not freeze the old paragraph format.
+                child.style.removeProperty('font-size');
+                child.style.removeProperty('line-height');
+                child.style.removeProperty('letter-spacing');
+                if (!['B','STRONG'].includes(child.tagName)) child.style.removeProperty('font-weight');
+                if (child.tagName === 'FONT') child.removeAttribute('size');
+            });
+        });
+        if (targets.length) this.updateDocumentTools(targets[0]);
     }
 
     sanitizePastedHtml(html, fallbackText) {
