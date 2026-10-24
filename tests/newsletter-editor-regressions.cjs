@@ -228,6 +228,24 @@ const box = context.document.getElementById('blocks-container');
     context.document.execCommand=previousCommand;
     box.innerHTML='<p>First</p>';
 }
+// The column tool inserts editable paragraphs and exports two email columns.
+{
+    const columnEditor=Object.create(context.Builder.prototype);
+    let markup='';columnEditor.insertHtmlAtCursorOrEnd=html=>{markup=html;};
+    columnEditor.addBlock('columns');
+    box.innerHTML=markup;
+    const columns=box.querySelectorAll('.newsletter-columns-block [contenteditable="true"]');
+    assert.equal(columns.length,2);
+    assert.ok(columns[0].querySelector('p'));
+    columns[0].querySelector('p').textContent='Venstre innhold';
+    columns[1].querySelector('p').textContent='Høyre innhold';
+    const exported=context.document.createElement('div');exported.innerHTML=columnEditor.compileEmailHtml();
+    assert.equal(exported.querySelectorAll('td.email-column').length,2);
+    assert.match(exported.textContent,/Venstre innhold/);
+    assert.match(exported.textContent,/Høyre innhold/);
+    assert.match(exported.innerHTML,/email-column/);
+    box.innerHTML='<p>First</p>';
+}
 // Exercise the actual selection callback after clicking outside the document.
 const selectionSection = source.slice(source.indexOf('// Inspector controls retain'), source.indexOf('// Clear pending delete'));
 const selectionBody = selectionSection.slice(selectionSection.indexOf("() => {") + 7, selectionSection.lastIndexOf('});'));

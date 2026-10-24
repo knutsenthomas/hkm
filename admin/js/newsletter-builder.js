@@ -2961,8 +2961,8 @@ class NewsletterBuilder {
                 html = `
                     <div class="newsletter-columns-block" contenteditable="false" style="position: relative; margin: 24px 0; padding: 8px; border: 1px dashed #cbd5e1; border-radius: 12px;">
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-                            <div contenteditable="true" style="min-height: 50px; padding: 12px; border: 1px dashed #e2e8f0; border-radius: 8px; background: white;">Venstre kolonne...</div>
-                            <div contenteditable="true" style="min-height: 50px; padding: 12px; border: 1px dashed #e2e8f0; border-radius: 8px; background: white;">Høyre kolonne...</div>
+                            <div contenteditable="true" style="min-height: 50px; padding: 12px; border: 1px dashed #e2e8f0; border-radius: 8px; background: white;"><p style="margin:0;">Venstre kolonne...</p></div>
+                            <div contenteditable="true" style="min-height: 50px; padding: 12px; border: 1px dashed #e2e8f0; border-radius: 8px; background: white;"><p style="margin:0;">Høyre kolonne...</p></div>
                         </div>
                     </div><p><br></p>`;
                 break;
@@ -4665,8 +4665,8 @@ class NewsletterBuilder {
                 html = `
                     <div class="newsletter-columns-block" contenteditable="false" style="position: relative; margin: 24px 0; padding: 8px; border: 1px dashed #cbd5e1; border-radius: 12px;">
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-                            <div contenteditable="true" style="min-height: 50px; padding: 12px; border: 1px dashed #e2e8f0; border-radius: 8px; background: white;">Venstre kolonne...</div>
-                            <div contenteditable="true" style="min-height: 50px; padding: 12px; border: 1px dashed #e2e8f0; border-radius: 8px; background: white;">Høyre kolonne...</div>
+                            <div contenteditable="true" style="min-height: 50px; padding: 12px; border: 1px dashed #e2e8f0; border-radius: 8px; background: white;"><p style="margin:0;">Venstre kolonne...</p></div>
+                            <div contenteditable="true" style="min-height: 50px; padding: 12px; border: 1px dashed #e2e8f0; border-radius: 8px; background: white;"><p style="margin:0;">Høyre kolonne...</p></div>
                         </div>
                     </div><p><br></p>`;
                 break;
