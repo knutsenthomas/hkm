@@ -216,7 +216,7 @@
     function placeSettings() {
       // Mount beside the existing privacy link, inside the site's own footer navigation.
       var footer = document.querySelector('footer:not(#site-privacy-footer),[role="contentinfo"]:not(#site-privacy-footer)');
-      if (footer && footer.querySelector('[data-cookie-settings-link]')) {
+      if (document.querySelector('[data-cookie-settings-link]')) {
         if (settings.isConnected) settings.remove();
         if (listItem && listItem.isConnected) listItem.remove();
         if (fallback && fallback.isConnected) fallback.remove();
