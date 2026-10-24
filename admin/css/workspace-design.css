@@ -82,9 +82,10 @@ html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-li
   color: inherit !important;
 }
 html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-category-header {
-  padding: 22px 14px 10px !important;
-  font-size: 10px !important;
-  letter-spacing: 1.2px;
+  padding: 14px !important;
+  font-size: 14px !important;
+  line-height: 1.4;
+  letter-spacing: 0;
   font-weight: 700 !important;
   color: var(--workspace-muted) !important;
 }
@@ -370,4 +371,30 @@ html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-li
 html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-link {
   justify-content: flex-start !important;
   text-align: left !important;
+}
+/* Portal pages have a flex workspace rather than a public footer. Keep the
+   consent fallback out of that flex row so it cannot steal content width. */
+html[data-workspace-design="unified"] body > #site-privacy-footer {
+  position: fixed !important;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1000;
+  padding: 8px 12px !important;
+  margin: 0 !important;
+  max-width: calc(100vw - 32px);
+  border: 1px solid var(--workspace-border);
+  border-radius: 7px;
+  background: var(--workspace-surface);
+  color: var(--workspace-muted);
+  font: 11px/1.5 Inter, sans-serif !important;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 4%);
+}
+@media (max-width: 768px) {
+  html[data-workspace-design="unified"] body.minside-body > #site-privacy-footer {
+    bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-category-header .expand-icon {
+  font-size: 20px !important;
 }
