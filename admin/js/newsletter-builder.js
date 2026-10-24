@@ -3769,25 +3769,37 @@ class NewsletterBuilder {
         loadEvents();
     }
 
-    buildCollageHtml(images, columns = 2) {
+    buildCollageHtml(images, columns = 2, style = 'square') {
         if (!Array.isArray(images) || images.length < 2 || images.length > 6) throw new Error('Velg mellom 2 og 6 bilder.');
         const count = Number(columns) === 3 ? 3 : 2;
         const safe = images.map((image, index) => {
             const url = new URL(image.url);
-            if (!['https:', 'http:'].includes(url.protocol)) throw new Error('Bildelenker må begynne med https:// eller http://.');
-            return { url: escapeHtml(url.href), alt: escapeHtml(image.alt || `Bilde ${index + 1}`) };
+            if (!['https:', 'http:'].includes(url.protocol)) throw new Error('Lenker må begynne med https:// eller http://.');
+            const host = url.hostname.replace(/^www\./, '').toLowerCase();
+            let videoId = '';
+            const isYoutube = ['youtube.com', 'm.youtube.com', 'youtube-nocookie.com', 'youtu.be'].includes(host);
+            if (isYoutube) {
+                const parts = url.pathname.split('/').filter(Boolean);
+                videoId = host === 'youtu.be' ? parts[0] : url.searchParams.get('v') || (['embed', 'shorts', 'live'].includes(parts[0]) ? parts[1] : '');
+                if (!/^[A-Za-z0-9_-]{11}$/.test(videoId || '')) throw new Error('Bruk en gyldig YouTube-videolenke.');
+            }
+            return { url: escapeHtml(videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : url.href),
+                alt: escapeHtml(image.alt || (videoId ? 'Se video' : `Bilde ${index + 1}`)),
+                video: videoId ? escapeHtml(url.href) : '' };
         });
         let rows = '';
         for (let i = 0; i < safe.length; i += count) {
             let cells = '';
             for (let j = 0; j < count; j++) {
                 const image = safe[i + j];
-                cells += `<td width="${Math.floor(100 / count)}%" valign="top" style="width:${100 / count}%;padding:6px;vertical-align:top;">${image ? `<img src="${image.url}" alt="${image.alt}" width="${Math.floor(600 / count) - 12}" style="display:block;width:100%;max-width:100%;height:auto;border-radius:8px;">` : ''}</td>`;
+                cells += `<td width="${Math.floor(100 / count)}%" valign="top" style="width:${100 / count}%;padding:6px;vertical-align:top;">${image ? `${image.video ? `<a href="${image.video}" target="_blank" rel="noopener noreferrer" data-collage-video="true" style="display:block;text-decoration:none;">` : ''}<img src="${image.url}" alt="${image.alt}" width="${Math.floor(600 / count) - 12}" style="display:block;width:100%;max-width:100%;height:auto;border-radius:8px;">${image.video ? '<span style="display:block;padding:8px 0;font:600 13px Arial,sans-serif;color:#1b4965;">▶ Se video</span></a>' : ''}` : ''}</td>`;
             }
             rows += `<tr>${cells}</tr>`;
         }
         const holder = document.createElement('div');
         holder.innerHTML = `<div class="newsletter-collage-block" contenteditable="false" style="margin:20px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;table-layout:fixed;"><tbody>${rows}</tbody></table></div><p><br></p>`;
+        holder.firstElementChild.dataset.collageStyle = ['square','landscape','portrait'].includes(style) ? style : 'square';
+        holder.firstElementChild.dataset.collageColumns = String(count);
         this.normalizeCollageImages(holder);
         return holder.innerHTML;
     }
@@ -3796,17 +3808,19 @@ class NewsletterBuilder {
         root?.querySelectorAll('.newsletter-collage-block').forEach(collage => {
             const columns = collage.querySelector('tr')?.children.length || 2;
             const size = Math.floor(600 / columns) - 12;
+            const ratio = ({square:1,landscape:4/3,portrait:3/4})[collage.dataset.collageStyle] || 1;
+            const height = Math.round(size / ratio);
             collage.querySelectorAll('td').forEach(cell => {
                 cell.style.padding = '6px';
                 cell.style.verticalAlign = 'top';
             });
             collage.querySelectorAll('img').forEach(image => {
                 image.setAttribute('width', String(size));
-                image.setAttribute('height', String(size));
+                image.setAttribute('height', String(height));
                 image.style.setProperty('width', '100%', 'important');
                 image.style.setProperty('max-width', '100%', 'important');
-                image.style.setProperty('height', forEmail ? `${size}px` : 'auto', 'important');
-                image.style.setProperty('aspect-ratio', '1 / 1');
+                image.style.setProperty('height', forEmail ? `${height}px` : 'auto', 'important');
+                image.style.setProperty('aspect-ratio', ({square:'1 / 1',landscape:'4 / 3',portrait:'3 / 4'})[collage.dataset.collageStyle] || '1 / 1');
                 image.style.setProperty('object-fit', 'cover');
                 image.style.setProperty('object-position', 'center');
                 image.style.setProperty('display', 'block');
@@ -3816,7 +3830,40 @@ class NewsletterBuilder {
         });
     }
 
-    openCollageInsertionFlowAt(afterElement) {
+    reflowCollage(collage, columns, style) {
+        const cells = Array.from(collage.querySelectorAll('td')).filter(cell => cell.querySelector('img'));
+        if (!cells.length) { collage.remove(); return; }
+        const count = Math.min(Math.max(1, Number(columns) || 2), cells.length);
+        const body = collage.querySelector('tbody');
+        body.replaceChildren();
+        cells.forEach((cell, index) => {
+            if (index % count === 0) body.appendChild(document.createElement('tr'));
+            cell.setAttribute('width', `${100 / count}%`);
+            cell.style.width = `${100 / count}%`;
+            body.lastElementChild.appendChild(cell);
+        });
+        while (body.lastElementChild.children.length < count) {
+            const empty = document.createElement('td'); empty.style.width = `${100 / count}%`;
+            body.lastElementChild.appendChild(empty);
+        }
+        collage.dataset.collageColumns = String(count);
+        collage.dataset.collageStyle = ['square','landscape','portrait'].includes(style) ? style : 'square';
+        this.normalizeCollageImages(collage.parentElement);
+    }
+
+    removeCollageImage(image) {
+        const collage = image?.closest('.newsletter-collage-block');
+        if (!collage) return false;
+        const columns = collage.dataset.collageColumns || collage.querySelector('tr')?.children.length || 2;
+        image.closest('td').remove();
+        this.reflowCollage(collage, columns, collage.dataset.collageStyle);
+        this.deselectBlock();
+        this.syncUnifiedBlocks();
+        this.triggerAutosave();
+        return true;
+    }
+
+    openCollageInsertionFlowAt(afterElement, collageToEdit = null) {
         document.getElementById('hkm-collage-modal')?.remove();
         const modal = document.createElement('div');
         modal.id = 'hkm-collage-modal';
@@ -3824,14 +3871,16 @@ class NewsletterBuilder {
         modal.style.cssText = 'display:flex;position:fixed;inset:0;background:#0f172a99;align-items:center;justify-content:center;padding:16px;';
         modal.innerHTML = `<form class="hkm-collage-form" style="background:var(--admin-surface,#fff);color:var(--admin-text,#1e293b);border-radius:12px;padding:24px;width:100%;max-width:560px;max-height:85vh;overflow:auto;box-sizing:border-box;">
             <h2 style="margin:0 0 12px;font-size:21px;">Bildekollasj</h2>
-            <p style="font-size:13px;line-height:1.6;">Velg 2–6 bilder. Etter innsetting kan du klikke på hvert bilde for å bytte bilde eller endre alternativ tekst.</p>
+            <p style="font-size:13px;line-height:1.6;">Velg 2–6 bilder eller YouTube-videoer. Etter innsetting kan du klikke på hvert bilde for å bytte bilde eller endre alternativ tekst.</p>
+            <label for="collage-style">Bildeformat</label>
+            <select id="collage-style" class="form-control" style="margin:8px 0 16px;"><option value="square">Kvadratisk</option><option value="landscape">Liggende</option><option value="portrait">Stående</option></select>
             <label for="collage-columns">Kolonner</label>
             <select id="collage-columns" class="form-control" style="margin:8px 0 16px;"><option value="2">2 kolonner</option><option value="3">3 kolonner</option></select>
-            <label for="collage-urls">Bildelenker – én per linje</label>
+            <label for="collage-urls">Bilde- eller YouTube-lenker – én per linje</label>
             <textarea id="collage-urls" class="form-control" rows="4" placeholder="https://eksempel.no/bilde.jpg" style="width:100%;box-sizing:border-box;margin:8px 0 16px;"></textarea>
             <label for="collage-files">Eller last opp bilder</label>
             <input id="collage-files" type="file" accept="image/*" multiple style="display:block;max-width:100%;margin:8px 0;">
-            <p style="font-size:12px;">Valgte filer brukes i stedet for bildelenkene.</p>
+            <p style="font-size:12px;">Valgte filer legges til etter lenkene.</p>
             <p role="alert" id="collage-error" style="color:#b91c1c;"></p>
             <div style="display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;margin-top:20px;">
                 <button type="button" class="btn btn-secondary" data-collage-cancel>Avbryt</button>
@@ -3839,6 +3888,12 @@ class NewsletterBuilder {
             </div>
         </form>`;
         this.mountEditorModal(modal, 'Sett inn bildekollasj');
+        if (collageToEdit) {
+            modal.querySelector('#collage-urls').value = Array.from(collageToEdit.querySelectorAll('img')).map(image => image.closest('[data-collage-video]')?.href || image.src).join('\n');
+            modal.querySelector('#collage-style').value = collageToEdit.dataset.collageStyle || 'square';
+            modal.querySelector('#collage-columns').value = collageToEdit.dataset.collageColumns || String(collageToEdit.querySelector('tr')?.children.length || 2);
+            modal.querySelector('[type="submit"]').textContent = 'Oppdater kollasj';
+        }
         const close = () => modal.remove();
         modal.querySelector('[data-collage-cancel]').onclick = close;
         modal.addEventListener('click', event => { if (event.target === modal) close(); });
@@ -3851,7 +3906,7 @@ class NewsletterBuilder {
             try {
                 const files = [...modal.querySelector('#collage-files').files];
                 let images = modal.querySelector('#collage-urls').value.split(/\r?\n/).map(url => url.trim()).filter(Boolean).map(url => ({ url }));
-                const count = files.length || images.length;
+                const count = files.length + images.length;
                 if (count < 2 || count > 6) throw new Error('Velg mellom 2 og 6 bilder.');
                 if (files.some(file => !file.type.startsWith('image/'))) throw new Error('Velg bare bildefiler.');
                 button.disabled = true;
@@ -3859,13 +3914,20 @@ class NewsletterBuilder {
                 if (files.length) {
                     if (!window.firebaseService?.uploadImage) throw new Error('Bildeopplasting er ikke tilgjengelig. Prøv bildelenker.');
                     const batch = Date.now();
-                    images = await Promise.all(files.map(async (file, index) => ({
+                    const uploaded = await Promise.all(files.map(async (file, index) => ({
                         url: await window.firebaseService.uploadImage(file, `newsletter/images/${batch}_${index}_${file.name}`),
                         alt: file.name.replace(/\.[^.]+$/, '')
                     })));
+                    images = images.concat(uploaded);
                 }
-                const html = this.buildCollageHtml(images, modal.querySelector('#collage-columns').value);
-                this.insertHtmlAtCursorOrEndAt(html, afterElement);
+                const html = this.buildCollageHtml(images, modal.querySelector('#collage-columns').value, modal.querySelector('#collage-style').value);
+                if (collageToEdit?.isConnected) {
+                    const holder = document.createElement('div'); holder.innerHTML = html;
+                    collageToEdit.replaceWith(holder.firstElementChild);
+                    this.deselectBlock(); this.syncUnifiedBlocks(); this.triggerAutosave();
+                } else {
+                    this.insertHtmlAtCursorOrEndAt(html, afterElement);
+                }
                 close();
             } catch (failure) {
                 error.textContent = failure.message || 'Kunne ikke sette inn bildekollasj.';
@@ -6704,7 +6766,31 @@ class NewsletterBuilder {
         document.getElementById('btn-img-move-up')?.addEventListener('click', () => this.moveActiveBlock(-1));
         document.getElementById('btn-img-move-down')?.addEventListener('click', () => this.moveActiveBlock(1));
         document.getElementById('btn-img-duplicate')?.addEventListener('click', () => this.duplicateActiveBlock());
-        document.getElementById('btn-img-delete')?.addEventListener('click', () => this.deleteActiveBlock());
+        const collage = img.closest('.newsletter-collage-block');
+        inspectorView.querySelectorAll('[id="btn-img-delete"]').forEach(button => {
+            if (collage) { button.title = 'Slett dette bildet fra kollasjen'; button.querySelector('span:last-child').textContent = 'Slett bilde'; }
+            button.addEventListener('click', async () => {
+                if (!collage) { this.deleteActiveBlock(); return; }
+                if (await this.showConfirm('Slett bilde fra kollasjen', 'Fjerne dette bildet? Resten av kollasjen beholdes.', 'Slett bilde')) this.removeCollageImage(img);
+            });
+        });
+        if (collage) {
+            const controls = document.createElement('div');
+            controls.className = 'inspector-group';
+            controls.innerHTML = `<label for="existing-collage-style">Kollasjformat</label><select id="existing-collage-style" class="form-control"><option value="square">Kvadratisk</option><option value="landscape">Liggende</option><option value="portrait">Stående</option></select><label for="existing-collage-columns">Kolonner</label><select id="existing-collage-columns" class="form-control"><option value="1">1 kolonne</option><option value="2">2 kolonner</option><option value="3">3 kolonner</option></select>`;
+            inspectorView.querySelector('#inspector-tab-content').prepend(controls);
+            const style = controls.querySelector('#existing-collage-style');
+            const columns = controls.querySelector('#existing-collage-columns');
+            style.value = collage.dataset.collageStyle || 'square';
+            columns.value = collage.dataset.collageColumns || String(collage.querySelector('tr')?.children.length || 2);
+            const update = () => { this.reflowCollage(collage, columns.value, style.value); this.syncUnifiedBlocks(); this.triggerAutosave(); };
+            style.onchange = update; columns.onchange = update;
+            const media = document.createElement('button'); media.type = 'button';
+            media.className = 'btn btn-secondary'; media.textContent = 'Legg til bilder eller video';
+            media.style.marginTop = '12px';
+            media.onclick = () => this.openCollageInsertionFlowAt(null, collage);
+            controls.appendChild(media);
+        }
     }
 
     showButtonInspector(btn, node) {
@@ -9337,6 +9423,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             } else if (typeof this.showConfirm === 'function') {
                 const confirmed = await this.showConfirm('Slett bilde', 'Er du sikker på at du vil slette dette bildet?', 'Slett');
                 if (confirmed) {
+                    if (this.removeCollageImage(img)) return;
                     const p = img.parentNode;
                     img.remove();
                     if (p && p.tagName === 'P' && p.innerHTML.trim() === '') p.remove();
@@ -9799,6 +9886,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             closeOverlay();
             const confirmed = await this.showConfirm('Slett bilde', "Er du sikker på at du vil slette dette bildet?", 'Slett');
             if (confirmed) {
+                if (this.removeCollageImage(imgElement)) return;
                 const parent = imgElement.parentNode;
                 imgElement.remove();
                 if (parent && parent.tagName === 'P' && parent.innerHTML.trim() === '') {

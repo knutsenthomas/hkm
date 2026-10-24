@@ -122,6 +122,41 @@ const box = context.document.getElementById('blocks-container');
     assert.equal(outputParagraph.querySelector('span').style.fontStyle,'italic');
     box.innerHTML='<p>First</p>';
 }
+// Existing collages support format changes, per-image deletion and video links.
+{
+    const collageEditor=Object.create(context.Builder.prototype);
+    let saves=0;
+    Object.assign(collageEditor,{deselectBlock(){},syncUnifiedBlocks(){},triggerAutosave(){saves++;}});
+    box.innerHTML=collageEditor.buildCollageHtml([
+        {url:'https://example.com/a.jpg'},
+        {url:'https://youtu.be/dQw4w9WgXcQ'},
+        {url:'https://example.com/b.jpg'}
+    ],2,'landscape');
+    const collage=box.querySelector('.newsletter-collage-block');
+    assert.equal(collage.querySelector('img').style.aspectRatio,'4 / 3');
+    assert.equal(collage.querySelector('[data-collage-video]').getAttribute('href'),'https://youtu.be/dQw4w9WgXcQ');
+    assert.match(collage.querySelector('[data-collage-video] img').src,/img.youtube.com/);
+    const video=collage.querySelector('[data-collage-video]');
+    collageEditor.reflowCollage(collage,3,'portrait');
+    assert.equal(collage.querySelectorAll('tr').length,1);
+    assert.equal(collage.querySelector('img').style.aspectRatio,'3 / 4');
+    assert.equal(collage.querySelector('[data-collage-video]'),video);
+    const email=context.document.createElement('div');email.innerHTML=collageEditor.compileEmailHtml();
+    assert.equal(email.querySelector('[data-collage-video]').href,'https://youtu.be/dQw4w9WgXcQ');
+    assert.equal(email.querySelector('iframe,video'),null);
+    const first=collage.querySelector('img');
+    assert.equal(collageEditor.removeCollageImage(first),true);
+    assert.equal(collage.querySelectorAll('img').length,2);
+    assert.equal(collage.querySelectorAll('tr').length,1);
+    assert.equal(collage.querySelectorAll('td').length,2);
+    assert.equal(collage.querySelector('[data-collage-video]'),video);
+    collageEditor.removeCollageImage(collage.querySelector('img'));
+    assert.equal(collage.querySelectorAll('img').length,1);
+    collageEditor.removeCollageImage(collage.querySelector('img'));
+    assert.equal(box.querySelector('.newsletter-collage-block'),null);
+    assert.equal(saves,3);
+    box.innerHTML='<p>First</p>';
+}
 // Exercise the actual selection callback after clicking outside the document.
 const selectionSection = source.slice(source.indexOf('// Inspector controls retain'), source.indexOf('// Clear pending delete'));
 const selectionBody = selectionSection.slice(selectionSection.indexOf("() => {") + 7, selectionSection.lastIndexOf('});'));
