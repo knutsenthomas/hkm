@@ -398,3 +398,21 @@ html[data-workspace-design="unified"] body > #site-privacy-footer {
 html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-category-header .expand-icon {
   font-size: 20px !important;
 }
+/* Podcast actions wrap within the workspace; preserve save-button visibility. */
+html[data-workspace-design="unified"] #podcast-section .podcast-toolbar > .btn {
+  min-width: 0 !important;
+  max-width: 100%;
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+  height: auto !important;
+  min-height: 44px;
+}
+@media (max-width: 768px) {
+  html[data-workspace-design="unified"] #podcast-section .podcast-toolbar {
+    justify-content: flex-start !important;
+  }
+  html[data-workspace-design="unified"] #podcast-section .podcast-toolbar > .btn {
+    flex: 1 1 150px;
+    padding: 12px 16px !important;
+  }
+}

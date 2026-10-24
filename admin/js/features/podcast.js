@@ -8,7 +8,7 @@ export function createPodcastMethods({ firebaseService, adminUtils, showErrorUI 
       section.setAttribute("data-rendered", "true");
 
       section.innerHTML = `
-            <div style="display:flex; justify-content:flex-end; gap:10px; align-items:center; margin-top: 4px; padding-top: 8px; margin-bottom:16px;">
+            <div class="podcast-toolbar" style="display:flex; flex-wrap:wrap; justify-content:flex-end; gap:10px; align-items:center; min-width:0; max-width:100%; margin-top: 4px; padding-top: 8px; margin-bottom:16px;">
                 <button class="btn btn-secondary" id="toggle-podcast-settings-btn" type="button" style="display:inline-flex; align-items:center; gap:6px;">
                     <span class="material-symbols-outlined">settings</span>
                     Innstillinger
