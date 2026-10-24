@@ -219,7 +219,7 @@ body.builder-recipients-open #newsletter-builder-layout .hkm-newsletter-text-too
 @media(min-width:992px) {
     #newsletter-builder-layout #elements-panel { width:280px!important; min-width:0!important; max-width:280px!important; flex:0 0 auto!important; overflow:hidden auto; transition:width 200ms ease,max-width 200ms ease,opacity 160ms ease; }
     body.elements-panel-collapsed #newsletter-builder-layout #elements-panel { width:0!important; max-width:0!important; padding:0!important; border:0!important; opacity:0; pointer-events:none; }
-    #newsletter-builder-layout #elements-panel > * { min-width:260px; }
+    #newsletter-builder-layout #elements-panel > * { min-width:0; max-width:100%; box-sizing:border-box; }
     #newsletter-builder-layout #elements-panel .mobile-panel-header { display:none!important; }
 }
 @media(max-width:991px) { .desktop-elements-header { display:none; } }
@@ -395,3 +395,30 @@ body.builder-active #newsletter-builder-layout #blocks-container p.selected-bloc
 .newsletter-engagement-choice input { accent-color:var(--admin-accent,#d17d39); width:18px; height:18px; }
 .newsletter-engagement-choice p { margin:8px 0 0; color:var(--admin-text-muted,#64748b); font-size:13px; }
 .newsletter-workspace [data-analytics-campaigns] button { margin:2px; white-space:nowrap; }
+
+/* Panel content must fit inside its own insets. An oversized search field can
+   make focus scroll the panel sideways and clip the heading and first column. */
+@media (min-width:992px) {
+    #newsletter-builder-layout #elements-panel .elements-search-container {
+        width:auto!important;
+        min-width:0!important;
+        max-width:calc(100% - 48px)!important;
+        flex-shrink:0;
+    }
+    #newsletter-builder-layout #elements-panel .elements-search-input {
+        width:100%!important;
+        min-width:0!important;
+        max-width:100%!important;
+        box-sizing:border-box!important;
+    }
+    #newsletter-builder-layout #elements-panel .desktop-elements-header,
+    #newsletter-builder-layout #elements-panel .elements-panel-body {
+        min-width:0!important;
+        width:100%;
+        box-sizing:border-box!important;
+    }
+    #newsletter-builder-layout #elements-panel .basic-blocks-grid {
+        grid-template-columns:repeat(2,minmax(0,1fr))!important;
+        min-width:0;
+    }
+}
