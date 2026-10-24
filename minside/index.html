@@ -33,10 +33,7 @@
             // Font loading detector to prevent Material Symbols FOUT (icon names flashing as text)
             document.documentElement.classList.add('prevent-fout');
             
-            // Safety timeout in case network request hangs or fails
-            setTimeout(function() {
-                document.documentElement.classList.add('fonts-loaded');
-            }, 2500);
+            // workspace-icons.js reveals icons only once the font has loaded.
         })();
     </script>
     <link rel="canonical" href="https://www.hiskingdomministry.no/minside/index">
@@ -119,7 +116,8 @@
             border-image: none !important;
         }
     </style>
-    <link rel="stylesheet" href="/admin/css/workspace-design.css?v=20261024_6">
+    <link rel="stylesheet" href="/admin/css/workspace-design.css?v=20261024_7">
+    <script defer src="/admin/js/workspace-icons.js?v=20261024_1"></script>
 </head>
 
 <body class="admin-body minside-body">
