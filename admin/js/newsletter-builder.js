@@ -2914,6 +2914,9 @@ class NewsletterBuilder {
             case 'collage':
                 this.openCollageInsertionFlowAt(null);
                 return;
+            case 'cause':
+                this.openCauseInsertionFlowAt(null);
+                return;
             case 'donation':
                 this.openButtonInsertionFlowAt(null, { donation: true });
                 return;
@@ -3769,6 +3772,98 @@ class NewsletterBuilder {
         loadEvents();
     }
 
+    getActiveNewsletterCauses(data) {
+        const items = Array.isArray(data) ? data : data?.items;
+        if (!Array.isArray(items)) throw new Error('Kunne ikke lese innsamlingsaksjonene.');
+        return items.filter(cause => cause && cause.active !== false &&
+            !['draft', 'archived', 'completed', 'cancelled'].includes(cause.status) && (cause.id || cause.link));
+    }
+
+    buildCauseNewsletterHtml(cause, values = {}) {
+        const title = values.title ?? cause.title ?? 'Innsamlingsaksjon';
+        const description = values.description ?? cause.description ?? '';
+        const url = new URL(cause.link || `/donasjoner?fund=${encodeURIComponent(cause.id)}`, 'https://www.hiskingdomministry.no');
+        if (!['http:', 'https:'].includes(url.protocol)) throw new Error('Aksjonen har en ugyldig lenke.');
+        let image = cause.imageUrl || cause.image || '';
+        if (image) {
+            const parsed = new URL(image, 'https://www.hiskingdomministry.no');
+            image = ['http:', 'https:'].includes(parsed.protocol) ? parsed.href : '';
+        }
+        return `<div class="newsletter-cause-block" data-cause-id="${escapeHtml(cause.id || '')}" data-cause-image="${escapeHtml(image)}" contenteditable="false" style="margin:24px 0;padding:24px;border:1px solid #e2e8f0;border-radius:12px;">
+            ${image && values.showImage !== false ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" style="display:block;width:100%;height:auto;border-radius:8px;margin-bottom:20px;">` : ''}
+            <h2 contenteditable="true" style="margin:0 0 12px;font-family:Inter,Arial,sans-serif;font-size:24px;font-weight:700;line-height:1.3;color:#1b4965;">${escapeHtml(title)}</h2>
+            <p contenteditable="true" style="margin:0 0 20px;font-family:Inter,Arial,sans-serif;font-size:15px;line-height:1.6;color:#334155;white-space:pre-line;">${escapeHtml(description)}</p>
+            <a class="block-btn" href="${escapeHtml(url.href)}" contenteditable="true" style="display:inline-block;padding:12px 24px;background:#d17d39;color:#fff;border-radius:8px;text-decoration:none;font:700 15px Inter,Arial,sans-serif;">${escapeHtml(values.buttonText || 'Støtt aksjonen')}</a>
+        </div><p><br></p>`;
+    }
+
+    async openCauseInsertionFlowAt(afterElement, existing = null) {
+        document.getElementById('hkm-cause-modal')?.remove();
+        const modal = document.createElement('div'); modal.id = 'hkm-cause-modal';
+        modal.className = 'profile-modal';
+        modal.style.cssText = 'display:flex;position:fixed;inset:0;background:#0f172a99;align-items:center;justify-content:center;padding:16px;';
+        modal.innerHTML = `<form style="background:var(--admin-surface,#fff);color:var(--admin-text,#1e293b);border-radius:12px;padding:24px;width:100%;max-width:600px;max-height:85vh;overflow:auto;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;">
+            <h2 style="margin:0;font-size:21px;">${existing ? 'Rediger innsamlingsaksjon' : 'Sett inn innsamlingsaksjon'}</h2>
+            <p style="margin:0;font-size:13px;line-height:1.6;">Teksten fylles inn fra aksjonen. Endringer gjelder bare dette nyhetsbrevet.</p>
+            ${existing ? '' : '<label for="newsletter-cause-select">Aktiv innsamlingsaksjon</label><select id="newsletter-cause-select" class="form-control" disabled><option>Henter aksjoner…</option></select>'}
+            <label for="newsletter-cause-title">Tittel</label><input id="newsletter-cause-title" class="form-control" required>
+            <label for="newsletter-cause-description">Tekst i nyhetsbrevet</label><textarea id="newsletter-cause-description" class="form-control" rows="5"></textarea>
+            <label for="newsletter-cause-button">Knappetekst</label><input id="newsletter-cause-button" class="form-control" required value="Støtt aksjonen">
+            <label><input id="newsletter-cause-image" type="checkbox" checked> Ta med aksjonens bilde</label>
+            <p role="alert" id="newsletter-cause-error" style="color:#b91c1c;margin:0;"></p>
+            <div style="display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;"><button type="button" class="btn btn-secondary" data-cause-cancel>Avbryt</button><button type="submit" class="btn btn-primary" disabled>${existing ? 'Oppdater aksjon' : 'Sett inn aksjon'}</button></div>
+        </form>`;
+        this.mountEditorModal(modal, existing ? 'Rediger innsamlingsaksjon' : 'Sett inn innsamlingsaksjon');
+        const field = name => modal.querySelector('#newsletter-cause-' + name);
+        const submit = modal.querySelector('[type="submit"]');
+        const plainText = value => { const text = document.createElement('div'); text.innerHTML = value || ''; return text.textContent; };
+        let selected;
+        const fill = cause => {
+            selected = cause;
+            field('title').value = cause.title || '';
+            field('description').value = plainText(cause.description);
+            field('button').value = cause.buttonText || 'Støtt aksjonen';
+            field('image').checked = cause.showImage !== false;
+            submit.disabled = false;
+        };
+        const close = () => modal.remove();
+        modal.querySelector('[data-cause-cancel]').onclick = close;
+        modal.onclick = event => { if (event.target === modal) close(); };
+        modal.onkeydown = event => { if (event.key === 'Escape') { event.stopPropagation(); close(); } };
+        modal.querySelector('form').onsubmit = event => {
+            event.preventDefault(); if (!selected) return;
+            try {
+                const html = this.buildCauseNewsletterHtml(selected, {title:field('title').value, description:field('description').value, buttonText:field('button').value, showImage:field('image').checked});
+                if (existing?.isConnected) {
+                    const holder = document.createElement('div'); holder.innerHTML = html;
+                    existing.replaceWith(holder.firstElementChild);
+                    this.deselectBlock(); this.syncUnifiedBlocks(); this.triggerAutosave();
+                } else this.insertHtmlAtCursorOrEndAt(html, afterElement);
+                close();
+            } catch (error) { field('error').textContent = error.message; }
+        };
+        if (existing) {
+            fill({id:existing.dataset.causeId, title:existing.querySelector('h2')?.textContent, description:existing.querySelector('p')?.textContent,
+                link:existing.querySelector('a[href]')?.href, imageUrl:existing.dataset.causeImage || existing.querySelector('img')?.src,
+                buttonText:existing.querySelector('a[href]')?.textContent, showImage:!!existing.querySelector('img')});
+            // Existing newsletter text is plain text, not source HTML.
+            field('description').value = existing.querySelector('p')?.textContent || '';
+            return;
+        }
+        try {
+            if (!window.firebaseService?.getPageContent) throw new Error('Innholdstjenesten er ikke tilgjengelig.');
+            const data = await window.firebaseService.getPageContent('collection_causes');
+            if (!modal.isConnected) return;
+            const causes = this.getActiveNewsletterCauses(data);
+            const select = field('select'); select.replaceChildren();
+            if (!causes.length) throw new Error('Det finnes ingen aktive innsamlingsaksjoner.');
+            causes.forEach((cause, index) => { const option = document.createElement('option'); option.value=String(index); option.textContent=cause.title || 'Innsamlingsaksjon'; select.appendChild(option); });
+            select.disabled = false;
+            select.onchange = () => fill(causes[Number(select.value)]);
+            fill(causes[0]);
+        } catch (error) { field('error').textContent = error.message || 'Kunne ikke hente innsamlingsaksjoner.'; }
+    }
+
     buildCollageHtml(images, columns = 2, style = 'square') {
         if (!Array.isArray(images) || images.length < 2 || images.length > 6) throw new Error('Velg mellom 2 og 6 bilder.');
         const count = Number(columns) === 3 ? 3 : 2;
@@ -4203,6 +4298,10 @@ class NewsletterBuilder {
                             <option value="hkd">His Kingdom Designs</option>
                         </select>
                     </div>
+                    <div>
+                        <label for="social-icon-size" style="display:block;font-size:13px;font-weight:700;margin-bottom:8px;">Størrelse på ikonknapper (28–80 px)</label>
+                        <input id="social-icon-size" type="number" min="28" max="80" value="${isEditing ? Number(afterElement.dataset.socialSize) || 54 : 54}" class="form-control">
+                    </div>
                     <!-- Platforms and URLs -->
                     <div>
                         <label style="display: block; font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Velg plattformer & lenker</label>
@@ -4340,7 +4439,7 @@ class NewsletterBuilder {
             }
 
             const isTiles = selectedStyle === 'tiles';
-            const fullBlockHtml = `
+            let fullBlockHtml = `
                 <div class="newsletter-social-block" contenteditable="false" data-style="${selectedStyle}" style="position: relative; text-align: center; margin: 28px 0; padding: ${isTiles ? '0' : '16px'}; background: ${isTiles ? 'transparent' : '#ffffff'}; border: ${isTiles ? 'none' : '1px solid #e2e8f0'}; border-radius: 16px; display: flex; flex-direction: ${isTiles ? 'column' : 'row'}; flex-wrap: wrap; justify-content: center; gap: ${selectedStyle === 'text_only' ? '12px' : '14px'}; align-items: center; box-shadow: ${isTiles ? 'none' : '0 2px 4px rgba(0,0,0,0.02)'};">
                     <button class="card-delete-btn" style="position: absolute; top: -10px; right: -10px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Slett sosial blokk">×</button>
                     <button class="card-edit-btn" style="position: absolute; top: -10px; right: 20px; width: 24px; height: 24px; border-radius: 50%; background: #1B4965; border: 2px solid white; color: white; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Endre stil & lenker"><span class="material-symbols-outlined" style="font-size:14px;">edit</span></button>
@@ -4348,6 +4447,9 @@ class NewsletterBuilder {
                 </div>
             `;
 
+            const sizedBlock = document.createElement('div'); sizedBlock.innerHTML = fullBlockHtml;
+            this.applySocialIconSize(sizedBlock.firstElementChild, modal.querySelector('#social-icon-size').value);
+            fullBlockHtml = sizedBlock.innerHTML;
             const container = document.getElementById('blocks-container');
             if (isEditing && container && container.contains(afterElement)) {
                 const tempDiv = document.createElement('div');
@@ -4515,6 +4617,9 @@ class NewsletterBuilder {
                 break;
             case 'collage':
                 this.openCollageInsertionFlowAt(afterElement);
+                return;
+            case 'cause':
+                this.openCauseInsertionFlowAt(afterElement);
                 return;
             case 'donation':
                 this.openButtonInsertionFlowAt(afterElement, { donation: true });
@@ -5216,7 +5321,7 @@ class NewsletterBuilder {
         // Determine block type
         const isSocial = (node.classList && node.classList.contains('newsletter-social-block')) || (node.closest && node.closest('.newsletter-social-block'));
         const clickedImage = element?.closest?.('img');
-        const img = (clickedImage && node.contains(clickedImage) ? clickedImage : null) || (editNode === node ? node.querySelector('img') : null) || (node.tagName === 'IMG' ? node : null);
+        const img = (clickedImage && node.contains(clickedImage) ? clickedImage : null) || (editNode === node && !element?.closest?.('a[href],button') ? node.querySelector('img') : null) || (node.tagName === 'IMG' ? node : null);
         const btn = (editNode === node ? node.querySelector('.block-btn, .product-cta-btn, .newsletter-btn, .btn, a[href], button') : null) ||
                     ((node.classList && (node.classList.contains('block-btn') || node.classList.contains('product-cta-btn') || node.classList.contains('newsletter-btn') || node.classList.contains('btn'))) || node.tagName === 'A' || node.tagName === 'BUTTON' ? node : null);
 
@@ -5224,7 +5329,17 @@ class NewsletterBuilder {
         // type. Otherwise those editor-only buttons make ordinary text look
         // like a button block to the inspector.
         this.attachBlockQuickToolbar(node);
-        
+        if (node.classList.contains('newsletter-cause-block')) {
+            const toolbar = node.querySelector('#block-quick-toolbar, .block-quick-toolbar');
+            if (toolbar && !toolbar.querySelector('[data-edit-cause]')) {
+                const edit = document.createElement('button'); edit.type = 'button';
+                edit.className = 'quick-tb-btn'; edit.dataset.editCause = 'true';
+                edit.textContent = 'Rediger aksjon';
+                edit.onclick = event => { event.preventDefault(); event.stopPropagation(); this.openCauseInsertionFlowAt(null, node); };
+                toolbar.appendChild(edit);
+            }
+        }
+
         if (isSocial) {
             const socialNode = node.classList && node.classList.contains('newsletter-social-block') ? node : node.closest('.newsletter-social-block');
             console.log('[HKM Inspector] Loading SOCIAL inspector');
@@ -5253,6 +5368,7 @@ class NewsletterBuilder {
 
         if (/^H[1-6]$/.test(tagName)) return 'Overskrift';
         if (tagName === 'HR' || classList?.contains('newsletter-divider-block')) return 'Skillelinje';
+        if (classList?.contains('newsletter-cause-block')) return 'Innsamlingsaksjon';
         if (classList?.contains('newsletter-collage-block')) return 'Bildekollasj';
         if (tagName === 'DIV' && node.querySelector('h1,h2,h3,p') && node.querySelector('a[href],button')) return 'Seksjon';
         if (classList?.contains('newsletter-social-block') || node.querySelector?.('.newsletter-social-block')) return 'Sosialt';
@@ -5876,6 +5992,23 @@ class NewsletterBuilder {
         });
     }
 
+    applySocialIconSize(block, requestedSize) {
+        const size = Math.min(80, Math.max(28, Number(requestedSize) || 54));
+        block.dataset.socialSize = String(size);
+        const icon = Math.round(size * 0.45);
+        const style = block.dataset.style || 'tiles';
+        block.querySelectorAll('a[href]').forEach(link => {
+            if (['tiles', 'icon_only'].includes(style)) {
+                ['width', 'height', 'min-width', 'min-height'].forEach(property => link.style.setProperty(property, `${size}px`, 'important'));
+                link.style.setProperty('padding', '0', 'important');
+                link.style.setProperty('border-radius', style === 'icon_only' ? '50%' : `${Math.round(size * 0.3)}px`);
+            }
+            link.querySelectorAll('svg,img').forEach(image => {
+                ['width', 'height', 'max-width', 'max-height'].forEach(property => image.style.setProperty(property, `${icon}px`, 'important'));
+            });
+        });
+    }
+
     showSocialInspector(socialNode) {
         this.setPropertiesPanel(true);
         const defaultView = document.getElementById('sidebar-default-view');
@@ -5910,6 +6043,16 @@ class NewsletterBuilder {
                 </button>
             </div>
         `;
+
+        const sizeControl = document.createElement('div');
+        sizeControl.style.cssText = 'padding:0 16px 16px;';
+        sizeControl.innerHTML = `<label for="inspector-social-size">Størrelse på ikonknapper (px)</label><input id="inspector-social-size" class="form-control" type="number" min="28" max="80" value="${Number(socialNode.dataset.socialSize) || 54}">`;
+        contentEl.prepend(sizeControl);
+        sizeControl.querySelector('input').addEventListener('change', event => {
+            this.applySocialIconSize(socialNode, event.target.value);
+            event.target.value = socialNode.dataset.socialSize;
+            this.syncUnifiedBlocks(); this.triggerAutosave();
+        });
 
         contentEl.querySelector('#inspector-edit-social-btn')?.addEventListener('click', () => {
             this.openSocialInsertionFlowAt(socialNode);
@@ -7746,6 +7889,8 @@ class NewsletterBuilder {
             }
         });
 
+        container.querySelectorAll('.newsletter-social-block[data-social-size]').forEach(block => this.applySocialIconSize(block, block.dataset.socialSize));
+
         // 5. Keep product cards on the store's real ID-based product routes.
         container.querySelectorAll('.newsletter-product-card').forEach(card => {
             let productId = card.dataset.productId || '';
@@ -8212,6 +8357,8 @@ class NewsletterBuilder {
         });
 
         const selectedStyle = block.dataset.style || 'tiles';
+        const tileSize = Math.min(80, Math.max(28, Number(block.dataset.socialSize) || 54));
+        const iconSize = Math.round(tileSize * 0.45);
         let linksMarkup = '';
 
         if (selectedStyle === 'text_only') {
@@ -8240,14 +8387,14 @@ class NewsletterBuilder {
 
             linksMarkup = platforms.map(platform => {
                 const iconSrc = platformIconMap[platform.id] || platform.image || 'https://img.icons8.com/ios-filled/96/1B4965/domain.png';
-                const borderRadius = selectedStyle === 'icon_only' ? '50%' : '16px';
+                const borderRadius = selectedStyle === 'icon_only' ? '50%' : `${Math.round(tileSize * 0.3)}px`;
                 return `
                     <td align="center" valign="middle" style="padding: 4px 7px;">
-                        <a href="${platform.href}" target="_blank" title="${platform.label}" aria-label="${platform.label}" style="display: inline-block; width: 54px; height: 54px; border: 1px solid #e2e8f0; border-radius: ${borderRadius}; background-color: #ffffff; text-align: center; text-decoration: none; box-shadow: 0 4px 10px rgba(0,0,0,0.06);">
-                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="54" height="54" style="width: 54px; height: 54px; border-collapse: collapse;">
+                        <a href="${platform.href}" target="_blank" title="${platform.label}" aria-label="${platform.label}" style="display: inline-block; width: ${tileSize}px; height: ${tileSize}px; border: 1px solid #e2e8f0; border-radius: ${borderRadius}; background-color: #ffffff; text-align: center; text-decoration: none; box-shadow: 0 4px 10px rgba(0,0,0,0.06);">
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="${tileSize}" height="${tileSize}" style="width: ${tileSize}px; height: ${tileSize}px; border-collapse: collapse;">
                                 <tr>
-                                    <td align="center" valign="middle" style="text-align: center; vertical-align: middle; width: 54px; height: 54px; padding: 0;">
-                                        <img src="${iconSrc}" width="26" height="26" alt="${platform.label}" style="display: block; margin: 0 auto; width: 26px; height: 26px; border: 0; outline: none; text-decoration: none;">
+                                    <td align="center" valign="middle" style="text-align: center; vertical-align: middle; width: ${tileSize}px; height: ${tileSize}px; padding: 0;">
+                                        <img src="${iconSrc}" width="${iconSize}" height="${iconSize}" alt="${platform.label}" style="display: block; margin: 0 auto; width: ${iconSize}px; height: ${iconSize}px; border: 0; outline: none; text-decoration: none;">
                                     </td>
                                 </tr>
                             </table>

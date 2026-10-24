@@ -157,6 +157,47 @@ const box = context.document.getElementById('blocks-container');
     assert.equal(saves,3);
     box.innerHTML='<p>First</p>';
 }
+// Optional social tile sizing is saved and used by the email tables too.
+{
+    box.innerHTML='<div class="newsletter-social-block" data-style="tiles"><a href="https://facebook.com/example"><svg></svg></a></div>';
+    const social=box.firstElementChild;
+    assert.match(editor.compileSocialBlockForEmail(social),/width="54"/);
+    editor.applySocialIconSize(social,32);
+    assert.equal(social.dataset.socialSize,'32');
+    assert.equal(social.querySelector('a').style.width,'32px');
+    assert.equal(social.querySelector('svg').style.width,'14px');
+    box.innerHTML=editor.getCleanCanvasHtml();
+    const email=editor.compileSocialBlockForEmail(box.firstElementChild);
+    assert.match(email,/width="32"/);
+    assert.match(email,/width="14"/);
+    assert.doesNotMatch(email,/width="54"/);
+    editor.applySocialIconSize(box.firstElementChild,300);
+    assert.equal(box.firstElementChild.dataset.socialSize,'80');
+    box.innerHTML='<p>First</p>';
+}
+// Campaign insertion uses active source data but edits only the newsletter copy.
+{
+    const causes=[{id:'active',title:'Skole',description:'Opprinnelig tekst',active:true},
+        {id:'hidden',active:false},{id:'draft',status:'draft'},{id:'done',status:'completed'},
+        {id:'archived',status:'archived'},{id:'cancelled',status:'cancelled'}];
+    const active=editor.getActiveNewsletterCauses({items:causes});
+    assert.equal(active.length,1);
+    const html=editor.buildCauseNewsletterHtml(active[0],{title:'Ny tittel',description:'Ny tekst',buttonText:'Gi nå'});
+    const card=context.document.createElement('div');card.innerHTML=html;
+    assert.equal(card.querySelector('h2').textContent,'Ny tittel');
+    assert.equal(card.querySelector('p').textContent,'Ny tekst');
+    assert.equal(card.querySelector('a').search,'?fund=active');
+    assert.equal(active[0].description,'Opprinnelig tekst');
+    assert.throws(()=>editor.buildCauseNewsletterHtml({id:'bad',link:'javascript:alert(1)'}));
+    box.innerHTML=html;
+    box.querySelector('p').textContent='Redigert i editoren';
+    const saved=editor.getCleanCanvasHtml();box.innerHTML=saved;
+    assert.equal(box.querySelector('p').textContent,'Redigert i editoren');
+    const email=context.document.createElement('div');email.innerHTML=editor.compileEmailHtml();
+    assert.ok(email.textContent.includes('Redigert i editoren'));
+    assert.ok(email.querySelector('a[href*="fund=active"]'));
+    box.innerHTML='<p>First</p>';
+}
 // Exercise the actual selection callback after clicking outside the document.
 const selectionSection = source.slice(source.indexOf('// Inspector controls retain'), source.indexOf('// Clear pending delete'));
 const selectionBody = selectionSection.slice(selectionSection.indexOf("() => {") + 7, selectionSection.lastIndexOf('});'));
@@ -168,6 +209,32 @@ const runSaveTimer = () => {
     timers.delete(id); return timer.fn();
 };
 (async () => {
+    const campaignEditor=Object.create(context.Builder.prototype);
+    let campaignHtml='';
+    campaignEditor.mountEditorModal=modal=>context.document.body.append(modal);
+    campaignEditor.insertHtmlAtCursorOrEndAt=html=>{campaignHtml=html;};
+    const previousGet=context.window.firebaseService.getPageContent;
+    context.window.firebaseService.getPageContent=async collection=>{
+        assert.equal(collection,'collection_causes');
+        return {items:[{id:'fund1',title:'Kildetittel',description:'Kildetekst',active:true}]};
+    };
+    await campaignEditor.openCauseInsertionFlowAt(null);
+    const campaignModal=context.document.getElementById('hkm-cause-modal');
+    assert.equal(campaignModal.querySelector('#newsletter-cause-description').value,'Kildetekst');
+    campaignModal.querySelector('#newsletter-cause-description').value='Min nyhetsbrevtekst';
+    campaignModal.querySelector('form').onsubmit({preventDefault(){}});
+    assert.match(campaignHtml,/Min nyhetsbrevtekst/);
+    box.innerHTML=campaignHtml;
+    Object.assign(campaignEditor,{deselectBlock(){},syncUnifiedBlocks(){},triggerAutosave(){}});
+    await campaignEditor.openCauseInsertionFlowAt(null,box.firstElementChild);
+    const editCampaign=context.document.getElementById('hkm-cause-modal');
+    assert.equal(editCampaign.querySelector('#newsletter-cause-description').value,'Min nyhetsbrevtekst');
+    editCampaign.querySelector('#newsletter-cause-description').value='Endret igjen';
+    editCampaign.querySelector('form').onsubmit({preventDefault(){}});
+    assert.equal(box.querySelector('p').textContent,'Endret igjen');
+    assert.equal(box.querySelectorAll('.newsletter-cause-block').length,1);
+    context.window.firebaseService.getPageContent=previousGet;
+    box.innerHTML='<p>First</p>';
     const collageEditor=Object.create(context.Builder.prototype);
     let collageInserted='';
     collageEditor.mountEditorModal=modal=>context.document.body.append(modal);
