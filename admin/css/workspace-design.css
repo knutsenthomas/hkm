@@ -1,0 +1,373 @@
+/* Shared HKM workspace design: admin, member portal, player and auth/status pages.
+   Presentation only. Keep DOM hooks, visibility, ordering and interaction geometry
+   of builders, dialogs, charts and media controls under their feature styles. */
+html[data-workspace-design="unified"] {
+  --workspace-accent: #d17d39;
+  --workspace-accent-dark: #bd4f2a;
+  --workspace-blue: #1b4965;
+  --workspace-bg: #f4f7fa;
+  --workspace-surface: #fff;
+  --workspace-border: #e2e8f0;
+  --workspace-text: #1e293b;
+  --workspace-muted: #64748b;
+  --workspace-radius: 10px;
+  --workspace-gradient: linear-gradient(115deg, #d17d39, #bd4f2a);
+  --admin-surface: var(--workspace-surface);
+  --admin-surface-muted: var(--workspace-bg);
+  --admin-border: var(--workspace-border);
+  --admin-text: var(--workspace-text);
+  --admin-text-muted: var(--workspace-muted);
+  --admin-accent: var(--workspace-accent);
+  --admin-accent-dark: var(--workspace-accent-dark);
+  --admin-orange-gradient: var(--workspace-gradient);
+  --primary-orange: var(--workspace-accent);
+  --accent-color: var(--workspace-accent);
+  --card-bg: var(--workspace-surface);
+  --main-bg: var(--workspace-bg);
+  --sidebar-bg: var(--workspace-surface);
+  --border-color: var(--workspace-border);
+  --text-main: var(--workspace-text);
+  --text-muted: var(--workspace-muted);
+  --admin-radius-lg: var(--workspace-radius);
+  --admin-radius-md: 8px;
+  --admin-radius-sm: 6px;
+}
+html[data-workspace-design="unified"][data-theme="dark"] {
+  --workspace-bg: #0f172a;
+  --workspace-surface: #1e293b;
+  --workspace-border: #334155;
+  --workspace-text: #f8fafc;
+  --workspace-muted: #94a3b8;
+  color-scheme: dark;
+}
+html[data-workspace-design="unified"] body {
+  background-color: var(--workspace-bg) !important;
+  color: var(--workspace-text);
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+/* Shell is shared by regular admin, CRM pages and Min side. Builder modes keep
+   their own shell visibility and sizing. Existing mobile open/close rules win. */
+html[data-workspace-design="unified"] body:not(.builder-active) .sidebar {
+  background: var(--workspace-surface) !important;
+  border-right: 1px solid var(--workspace-border) !important;
+  box-shadow: none !important;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) .sidebar-header {
+  border-bottom: 1px solid var(--workspace-border);
+  padding: 22px 12px !important;
+  margin-bottom: 16px !important;
+  min-height: 80px;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .logo-text {
+  color: var(--workspace-text) !important;
+  font-family: Inter, sans-serif !important;
+  font-size: 19px !important;
+  font-weight: 700 !important;
+  letter-spacing: -.6px;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-link {
+  border-radius: 7px !important;
+  padding: 11px 14px !important;
+  margin-block: 3px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  box-shadow: none !important;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-link.active {
+  background: var(--workspace-gradient) !important;
+  color: white !important;
+  border-color: transparent !important;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-link.active .material-symbols-outlined {
+  color: inherit !important;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-category-header {
+  padding: 22px 14px 10px !important;
+  font-size: 10px !important;
+  letter-spacing: 1.2px;
+  font-weight: 700 !important;
+  color: var(--workspace-muted) !important;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) :is(.main-content, .crm-main) {
+  background: var(--workspace-bg) !important;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) #dashboard-main-header {
+  background: var(--workspace-surface) !important;
+  border-bottom: 1px solid var(--workspace-border) !important;
+  box-shadow: none !important;
+}
+html[data-workspace-design="unified"] #dashboard-main-header .section-title {
+  font-family: Inter, sans-serif !important;
+  font-size: 20px !important;
+  font-weight: 600 !important;
+  letter-spacing: -.5px;
+}
+html[data-workspace-design="unified"] #dashboard-main-header .section-subtitle {
+  font-size: 11px !important;
+  color: var(--workspace-muted) !important;
+}
+/* Card surfaces for both statically authored pages and dynamically loaded views.
+   Do not target every *-card: editor canvases and payment previews own their colors. */
+html[data-workspace-design="unified"] body:not(.builder-active) :is(
+  .card, .info-card, .stat-card, .stat-card-premium, .big-card, .side-card,
+  .dashboard-course-signups-card, .bento-stat-card, .course-card,
+  .reading-plan-card, .task-card, .notification-card, .promo-card,
+  .integration-card, .tool-card
+) {
+  border: 1px solid var(--workspace-border) !important;
+  border-radius: var(--workspace-radius) !important;
+  background: var(--workspace-surface) !important;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 2%) !important;
+  color: var(--workspace-text);
+}
+html[data-workspace-design="unified"] body:not(.builder-active) :is(.card-header, .info-card-header, .dashboard-course-signups-header) {
+  border-bottom-color: var(--workspace-border) !important;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) :is(.card-title, .info-card-header h3, .big-card-title, .side-card-title) {
+  font-family: Inter, sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: -.25px;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) :is(.stat-card .stat-label, .bento-card-label) {
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  letter-spacing: .3px;
+  color: var(--workspace-muted) !important;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) :is(.stat-card .stat-value, .bento-stat-card .bento-card-value) {
+  font-family: Inter, sans-serif !important;
+  font-size: 29px !important;
+  font-weight: 700 !important;
+  letter-spacing: -1px;
+  color: var(--workspace-text) !important;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) .bento-stat-card :is(.bento-card-desc, .bento-card-label) {
+  color: var(--workspace-muted) !important;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) :is(.overview-hero-card, .ms-overview-banner) {
+  background: var(--workspace-gradient) !important;
+  border-radius: var(--workspace-radius) !important;
+  padding: 30px 32px !important;
+  box-shadow: none !important;
+  color: white !important;
+}
+html[data-workspace-design="unified"] :is(.overview-hero-title, .ms-overview-banner-title) {
+  font-family: Inter, sans-serif !important;
+  font-size: 27px !important;
+  font-weight: 700 !important;
+  letter-spacing: -.8px;
+  color: white !important;
+}
+html[data-workspace-design="unified"] :is(.overview-hero-text, .ms-overview-banner-quote) {
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  color: white !important;
+}
+html[data-workspace-design="unified"] #overview-section :is(.hkm-dashboard-grid-saas, .analytics-bottom-row) {
+  gap: 24px !important;
+}
+html[data-workspace-design="unified"] #overview-section .hkm-widgets-grid {
+  gap: 16px !important;
+}
+html[data-workspace-design="unified"] #overview-section .stat-card.modern {
+  padding: 22px !important;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) :is(.section-content, .crm-main) table th {
+  background: var(--workspace-bg) !important;
+  color: var(--workspace-muted) !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) :is(.section-content, .crm-main) :is(td, th) {
+  border-color: var(--workspace-border) !important;
+}
+/* Authentication and transition pages have no navigation shell. */
+html[data-workspace-design="unified"] body:has(> :is(.login-card, .community-access, .status-card)) {
+  background-image: none !important;
+  padding-inline: 16px;
+}
+html[data-workspace-design="unified"] :is(.login-card, .community-access, body > .status-card) {
+  background: var(--workspace-surface) !important;
+  border: 1px solid var(--workspace-border) !important;
+  border-radius: var(--workspace-radius) !important;
+  color: var(--workspace-text) !important;
+  box-shadow: 0 4px 20px rgb(0 0 0 / 4%) !important;
+}
+html[data-workspace-design="unified"] :is(.login-title, .community-access h1) {
+  color: var(--workspace-text) !important;
+  font-family: Inter, sans-serif !important;
+  letter-spacing: -.6px;
+}
+html[data-workspace-design="unified"] .login-card :is(.form-control, .btn-google) {
+  background: var(--workspace-surface) !important;
+  color: var(--workspace-text) !important;
+  border-color: var(--workspace-border) !important;
+  border-radius: 7px !important;
+}
+html[data-workspace-design="unified"] .login-card :is(.btn-primary, button[type="submit"]) {
+  background: var(--workspace-gradient) !important;
+  border-radius: 7px !important;
+  color: white !important;
+}
+/* Course player: keep video aspect ratios, progress and lesson interactions. */
+html[data-workspace-design="unified"] #SideNavBar {
+  background: var(--workspace-surface) !important;
+  border-color: var(--workspace-border) !important;
+}
+html[data-workspace-design="unified"] #SideNavBar nav a {
+  border-radius: 7px !important;
+  font-size: 13px !important;
+}
+html[data-workspace-design="unified"] #SideNavBar .sidebar-active-gradient {
+  background: var(--workspace-gradient) !important;
+  color: white !important;
+  border-color: transparent !important;
+}
+html[data-workspace-design="unified"] #TopAppBar {
+  background: var(--workspace-surface) !important;
+  border-color: var(--workspace-border) !important;
+}
+html[data-workspace-design="unified"] body:has(#SideNavBar) :is(h1, h2, h3) {
+  font-family: Inter, sans-serif !important;
+  letter-spacing: -.5px;
+}
+html[data-workspace-design="unified"] body:has(#SideNavBar) :is(.bg-surface, .bg-surface-container-low) {
+  background-color: var(--workspace-surface) !important;
+}
+html[data-workspace-design="unified"] body:has(#SideNavBar) :is(.border-outline-variant, .border-t, .border-r) {
+  border-color: var(--workspace-border) !important;
+}
+html[data-workspace-design="unified"] body:has(#SideNavBar) .rounded-xl {
+  border-radius: var(--workspace-radius) !important;
+}
+@media (max-width: 1100px) {
+  html[data-workspace-design="unified"] #overview-section .analytics-bottom-row {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+@media (max-width: 768px) {
+  html[data-workspace-design="unified"] body:not(.builder-active) .sidebar-header {
+    padding: 16px 12px !important;
+    min-height: 64px;
+  }
+  html[data-workspace-design="unified"] :is(.overview-hero-card, .ms-overview-banner) {
+    padding: 24px 20px !important;
+  }
+  html[data-workspace-design="unified"] :is(.overview-hero-title, .ms-overview-banner-title) {
+    font-size: 23px !important;
+  }
+}
+/* Match the approved compact controls without touching disabled/hidden states. */
+html[data-workspace-design="unified"] body:not(.builder-active) :is(.btn, .btn-primary, .btn-secondary, .notification-btn) {
+  border-radius: 7px !important;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) .bento-stat-card {
+  padding: 22px !important;
+  transition: box-shadow .2s, border-color .2s !important;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) .bento-stat-card:hover {
+  transform: none !important;
+  border-color: var(--workspace-accent) !important;
+}
+html[data-workspace-design="unified"] .bento-icon-wrap {
+  border-radius: 7px !important;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) .stat-card-premium :is(.stat-card-value, .stat-card-title) {
+  color: var(--workspace-text) !important;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) .stat-card-premium .stat-card-meta {
+  color: var(--workspace-muted) !important;
+}
+html[data-workspace-design="unified"] body:has(#SideNavBar) :is(.text-primary, .text-primary-container) {
+  color: var(--workspace-accent) !important;
+}
+html[data-workspace-design="unified"] body:has(#SideNavBar) :is(.text-on-surface, .text-on-background) {
+  color: var(--workspace-text) !important;
+}
+html[data-workspace-design="unified"] body:has(#SideNavBar) :is(.text-secondary, .text-on-surface-variant) {
+  color: var(--workspace-muted) !important;
+}
+html[data-workspace-design="unified"] body:has(#SideNavBar) :is(.bg-primary, .bg-primary-container) {
+  background-color: var(--workspace-accent-dark) !important;
+}
+html[data-workspace-design="unified"] body:has(#SideNavBar) :is(.bg-surface-container, .bg-surface-container-high) {
+  background-color: var(--workspace-bg) !important;
+}
+html[data-workspace-design="unified"] body:has(#SideNavBar) .border-primary {
+  border-color: var(--workspace-accent) !important;
+}
+html[data-workspace-design="unified"] #SideNavBar .sidebar-active-gradient .material-symbols-outlined {
+  color: white !important;
+}
+@media (min-width: 1200px) {
+  html[data-workspace-design="unified"] .ms-overview-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+@media (min-width: 600px) and (max-width: 1199px) {
+  html[data-workspace-design="unified"] .ms-overview-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+html[data-workspace-design="unified"] .bento-stat-card .bento-icon-wrap {
+  background: color-mix(in srgb, var(--workspace-accent) 10%, var(--workspace-surface)) !important;
+  color: var(--workspace-accent) !important;
+}
+html[data-workspace-design="unified"] .bento-stat-card .bento-card-desc {
+  font-weight: 400 !important;
+}
+/* Override the older ID-scoped overview theme as well as generated inline styles. */
+html[data-workspace-design="unified"] body.admin-body #overview-section .overview-hero-card {
+  background: var(--workspace-gradient) !important;
+  border-radius: var(--workspace-radius) !important;
+  padding: 30px 32px !important;
+  border: 0 !important;
+  color: white !important;
+  box-shadow: none !important;
+}
+html[data-workspace-design="unified"] #overview-section :is(.overview-hero-title, .overview-hero-text, .overview-hero-eyebrow) {
+  color: white !important;
+}
+html[data-workspace-design="unified"] #overview-section .overview-hero-title {
+  font-size: 27px !important;
+  font-family: Inter, sans-serif !important;
+  letter-spacing: -.8px;
+}
+html[data-workspace-design="unified"] #overview-section :is(.overview-hero-action, .overview-hero-action-secondary) {
+  border-radius: 7px !important;
+  padding: 10px 14px !important;
+  font-size: 12px !important;
+}
+html[data-workspace-design="unified"] #overview-section .overview-hero-action {
+  background: white !important;
+  color: var(--workspace-accent-dark) !important;
+  border: 1px solid white !important;
+}
+html[data-workspace-design="unified"] #overview-section .overview-hero-action-secondary {
+  background: transparent !important;
+  color: white !important;
+  border: 1px solid rgb(255 255 255 / 40%) !important;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-link {
+  width: 100% !important;
+}
+@media (max-width:768px) {
+  html[data-workspace-design="unified"] body.admin-body #overview-section .overview-hero-card {
+    padding: 24px 20px !important;
+  }
+  html[data-workspace-design="unified"] #overview-section .overview-hero-title {
+    font-size: 23px !important;
+  }
+}
+html[data-workspace-design="unified"] body:not(.builder-active) .sidebar :is(.nav-group, .nav-list, .nav-item) {
+  width: 100%;
+  text-align: left;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-list {
+  padding-inline: 0;
+  list-style: none;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-link {
+  justify-content: flex-start !important;
+  text-align: left !important;
+}

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="no">
+<html data-workspace-design="unified" lang="no">
 
 <head>
             <!-- Theme Initializer -->
@@ -276,6 +276,7 @@
             border-image: none !important;
         }
     </style>
+    <link rel="stylesheet" href="/admin/css/workspace-design.css?v=20261024_3">
 </head>
 
 <body class="cms-loading">
@@ -426,7 +427,13 @@
                                  if (typeof showToast === 'function') {
                                      let msg = 'Kunne ikke logge inn med Google. Prøv igjen.';
                                      if (err.code === 'auth/unauthorized-domain') {
-                                         msg = 'Denne domenen (vercel.app) er ikke lagt til i "Authorized Domains" i Firebase Console. Kontakt administrator.';
+                                         const host = window.location.hostname;
+                                         msg = `Domenet (${host}) er ikke godkjent for Google-innlogging i Firebase Authentication.`;
+                                         if (host === '127.0.0.1') {
+                                             msg += ' Prøv å åpne siden med localhost i stedet for 127.0.0.1. Hvis feilen fortsetter, må domenet legges til under Authorized Domains i Firebase Console.';
+                                         } else {
+                                             msg += ' Legg domenet til under Authorized Domains i Firebase Console.';
+                                         }
                                      } else if (err.code === 'auth/popup-closed-by-user') {
                                          msg = 'Innloggingsvinduet ble lukket før fullføring.';
                                      }
