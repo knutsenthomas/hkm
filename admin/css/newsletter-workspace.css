@@ -422,3 +422,16 @@ body.builder-active #newsletter-builder-layout #blocks-container p.selected-bloc
         min-width:0;
     }
 }
+/* Mixed portrait/landscape sources share one compact square collage grid. */
+#newsletter-builder-layout #blocks-container .newsletter-collage-block img {
+    width:100%!important;
+    height:auto!important;
+    aspect-ratio:1 / 1;
+    object-fit:cover;
+    object-position:center;
+    margin:0!important;
+}
+#newsletter-builder-layout #blocks-container .newsletter-collage-block td {
+    padding:6px!important;
+    vertical-align:top;
+}

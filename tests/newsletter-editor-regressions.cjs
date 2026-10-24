@@ -59,6 +59,11 @@ const box = context.document.getElementById('blocks-container');
     const holder=context.document.createElement('div');holder.innerHTML=collage;
     assert.equal(holder.querySelectorAll('table[role="presentation"] tr').length,2);
     assert.equal(holder.querySelectorAll('img').length,3);
+    holder.querySelectorAll('img').forEach(image=>{
+        assert.equal(image.style.aspectRatio,'1 / 1');
+        assert.equal(image.style.objectFit,'cover');
+        assert.equal(image.getAttribute('width'),image.getAttribute('height'));
+    });
     assert.equal(holder.querySelector('img').alt,'A "quoted" image');
     assert.equal(editor.getEditorBlockLabel(holder.firstElementChild),'Bildekollasj');
     assert.throws(()=>editor.buildCollageHtml([{url:'javascript:alert(1)'},{url:'https://example.com/b.jpg'}]));
@@ -81,6 +86,11 @@ const box = context.document.getElementById('blocks-container');
     const emailHtml=editor.compileEmailHtml();
     const email=context.document.createElement('div');email.innerHTML=emailHtml;
     assert.equal(email.querySelectorAll('.newsletter-collage-block img').length,3);
+    email.querySelectorAll('.newsletter-collage-block img').forEach(image=>{
+        assert.equal(image.style.height,'288px');
+        assert.equal(image.style.objectFit,'cover');
+        assert.equal(image.style.getPropertyPriority('height'),'important');
+    });
     assert.ok(email.querySelector('a[href="https://www.hiskingdomministry.no/donasjoner.html"]'));
     box.innerHTML='<p>First</p>';
     // Selecting a later image in a collage must inspect that image, not the first.

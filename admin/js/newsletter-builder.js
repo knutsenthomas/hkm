@@ -3786,7 +3786,34 @@ class NewsletterBuilder {
             }
             rows += `<tr>${cells}</tr>`;
         }
-        return `<div class="newsletter-collage-block" contenteditable="false" style="margin:20px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;table-layout:fixed;"><tbody>${rows}</tbody></table></div><p><br></p>`;
+        const holder = document.createElement('div');
+        holder.innerHTML = `<div class="newsletter-collage-block" contenteditable="false" style="margin:20px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;table-layout:fixed;"><tbody>${rows}</tbody></table></div><p><br></p>`;
+        this.normalizeCollageImages(holder);
+        return holder.innerHTML;
+    }
+
+    normalizeCollageImages(root, forEmail = false) {
+        root?.querySelectorAll('.newsletter-collage-block').forEach(collage => {
+            const columns = collage.querySelector('tr')?.children.length || 2;
+            const size = Math.floor(600 / columns) - 12;
+            collage.querySelectorAll('td').forEach(cell => {
+                cell.style.padding = '6px';
+                cell.style.verticalAlign = 'top';
+            });
+            collage.querySelectorAll('img').forEach(image => {
+                image.setAttribute('width', String(size));
+                image.setAttribute('height', String(size));
+                image.style.setProperty('width', '100%', 'important');
+                image.style.setProperty('max-width', '100%', 'important');
+                image.style.setProperty('height', forEmail ? `${size}px` : 'auto', 'important');
+                image.style.setProperty('aspect-ratio', '1 / 1');
+                image.style.setProperty('object-fit', 'cover');
+                image.style.setProperty('object-position', 'center');
+                image.style.setProperty('display', 'block');
+                image.style.setProperty('margin', '0');
+                image.style.setProperty('border-radius', '8px');
+            });
+        });
     }
 
     openCollageInsertionFlowAt(afterElement) {
@@ -7514,6 +7541,7 @@ class NewsletterBuilder {
 
     normalizeCanvasBlocks(container) {
         if (!container) return;
+        this.normalizeCollageImages(container);
         this.updateEmptyParagraphHints(container);
 
         // 1. Remove all pre-existing edit/delete buttons AND quick toolbar controls to prevent duplicates or leaked editor UI
@@ -8242,6 +8270,8 @@ class NewsletterBuilder {
             }
             img.setAttribute('style', 'max-width: 100% !important; height: auto !important; border: 0 !important; display: block !important;');
         });
+
+        this.normalizeCollageImages(contentClone, true);
 
         // Convert blockquotes and quote blocks to bulletproof email tables
         contentClone.querySelectorAll('blockquote, .block-quote, .quote-block, [data-type="quote"], .sitat').forEach(bq => {
