@@ -49,6 +49,69 @@ const box = context.document.getElementById('blocks-container');
     assert.doesNotThrow(() => selectionEditor.selectBlock(null));
     box.innerHTML = '<p>First</p>';
 }
+// Collages preserve email-safe table layout, escape attributes and reject unsafe URLs.
+{
+    const collage = editor.buildCollageHtml([
+        {url:'https://example.com/a.jpg',alt:'A "quoted" image'},
+        {url:'https://example.com/b.jpg'},
+        {url:'https://example.com/c.jpg'}
+    ],2);
+    const holder=context.document.createElement('div');holder.innerHTML=collage;
+    assert.equal(holder.querySelectorAll('table[role="presentation"] tr').length,2);
+    assert.equal(holder.querySelectorAll('img').length,3);
+    assert.equal(holder.querySelector('img').alt,'A "quoted" image');
+    assert.equal(editor.getEditorBlockLabel(holder.firstElementChild),'Bildekollasj');
+    assert.throws(()=>editor.buildCollageHtml([{url:'javascript:alert(1)'},{url:'https://example.com/b.jpg'}]));
+    assert.throws(()=>editor.buildCollageHtml([{url:'https://example.com/a.jpg'}]));
+    const modalEditor=Object.create(context.Builder.prototype);
+    let inserted='';
+    modalEditor.mountEditorModal=modal=>context.document.body.append(modal);
+    modalEditor.insertHtmlAtCursorOrEndAt=html=>{inserted=html;};
+    modalEditor.openButtonInsertionFlowAt(null,{donation:true});
+    assert.equal(context.document.getElementById('hkm-btn-modal-text').value,'Gi en gave');
+    assert.equal(context.document.getElementById('hkm-internal-page-select').value,'https://www.hiskingdomministry.no/donasjoner.html');
+    context.document.getElementById('hkm-btn-modal-insert').click();
+    holder.innerHTML=inserted;
+    assert.equal(holder.querySelector('a').textContent,'Gi en gave');
+    assert.equal(holder.querySelector('a').getAttribute('href'),'https://www.hiskingdomministry.no/donasjoner.html');
+    box.innerHTML=collage+inserted;
+    const saved=editor.getCleanCanvasHtml();
+    box.innerHTML=saved;
+    assert.equal(box.querySelectorAll('.newsletter-collage-block img').length,3);
+    const emailHtml=editor.compileEmailHtml();
+    const email=context.document.createElement('div');email.innerHTML=emailHtml;
+    assert.equal(email.querySelectorAll('.newsletter-collage-block img').length,3);
+    assert.ok(email.querySelector('a[href="https://www.hiskingdomministry.no/donasjoner.html"]'));
+    box.innerHTML='<p>First</p>';
+    // Selecting a later image in a collage must inspect that image, not the first.
+    const chooser=Object.create(context.Builder.prototype);
+    let inspected;
+    Object.assign(chooser,{updateDocumentTools(){},deselectBlock(){},attachBlockQuickToolbar(){},showImageInspector:img=>{inspected=img;},isMobileViewport:()=>false});
+    holder.innerHTML=collage;
+    chooser.selectBlock(holder.firstElementChild,holder.querySelectorAll('img')[1]);
+    assert.equal(inspected,holder.querySelectorAll('img')[1]);
+}
+// Text formatting survives saved HTML and email compilation, including nested styles.
+{
+    box.innerHTML='<h2 style="font-size:30px;font-weight:600;text-align:center;margin-bottom:11px;">Heading</h2><p style="font-size:17px;line-height:1.8;margin-bottom:22px;text-align:right;color:rgb(27,73,101);">Paragraph <span style="font-weight:700;font-style:italic;">emphasis</span></p>';
+    const saved=editor.getCleanCanvasHtml();
+    box.innerHTML=saved;
+    assert.equal(box.querySelector('h2').style.fontSize,'30px');
+    const paragraph=box.querySelector('p');
+    assert.equal(paragraph.style.fontSize,'17px');
+    assert.equal(paragraph.style.lineHeight,'1.8');
+    assert.equal(paragraph.style.marginBottom,'22px');
+    assert.equal(paragraph.getAttribute('align'),'right');
+    assert.equal(paragraph.querySelector('span').style.fontWeight,'700');
+    const exported=context.document.createElement('div');exported.innerHTML=editor.compileEmailHtml();
+    const outputParagraph=[...exported.querySelectorAll('p')].find(p=>p.textContent.startsWith('Paragraph'));
+    assert.equal(outputParagraph.style.fontSize,'17px');
+    assert.equal(outputParagraph.style.lineHeight,'1.8');
+    assert.equal(outputParagraph.style.marginBottom,'22px');
+    assert.equal(outputParagraph.style.textAlign,'right');
+    assert.equal(outputParagraph.querySelector('span').style.fontStyle,'italic');
+    box.innerHTML='<p>First</p>';
+}
 // Exercise the actual selection callback after clicking outside the document.
 const selectionSection = source.slice(source.indexOf('// Inspector controls retain'), source.indexOf('// Clear pending delete'));
 const selectionBody = selectionSection.slice(selectionSection.indexOf("() => {") + 7, selectionSection.lastIndexOf('});'));
@@ -60,6 +123,20 @@ const runSaveTimer = () => {
     timers.delete(id); return timer.fn();
 };
 (async () => {
+    const collageEditor=Object.create(context.Builder.prototype);
+    let collageInserted='';
+    collageEditor.mountEditorModal=modal=>context.document.body.append(modal);
+    collageEditor.insertHtmlAtCursorOrEndAt=html=>{collageInserted=html;};
+    collageEditor.openCollageInsertionFlowAt(null);
+    let collageModal=context.document.getElementById('hkm-collage-modal');
+    collageModal.querySelector('#collage-urls').value='https://example.com/a.jpg';
+    await collageModal.querySelector('form').onsubmit({preventDefault(){}});
+    assert.match(collageModal.querySelector('[role="alert"]').textContent,/2.*6/);
+    assert.equal(collageInserted,'');
+    collageModal.querySelector('#collage-urls').value='https://example.com/a.jpg\nhttps://example.com/b.jpg';
+    await collageModal.querySelector('form').onsubmit({preventDefault(){}});
+    assert.match(collageInserted,/newsletter-collage-block/);
+    assert.equal(context.document.getElementById('hkm-collage-modal'),null);
     editor.triggerAutosave(); const first = runSaveTimer();
     assert.equal(writes.length, 1);
     box.innerHTML = '<p>Latest edit</p>'; editor.triggerAutosave();

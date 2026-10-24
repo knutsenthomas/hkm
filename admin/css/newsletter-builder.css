@@ -5908,25 +5908,25 @@ body.builder-active.sidebar-collapsed .sidebar {
 .docs-rte-surface h4,
 .docs-rte-surface h5,
 .docs-rte-surface h6 {
-    margin: 1.5rem 0 1rem !important;
-    line-height: 1.3 !important;
-    color: #1a202c !important;
-    font-family: 'Inter', sans-serif !important;
-    font-weight: 800 !important;
-    letter-spacing: -0.01em !important;
+    margin: 1.5rem 0 1rem;
+    line-height: 1.3;
+    color: #1a202c;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.01em;
 }
 
 .docs-rte-surface h1 {
-    font-size: 32px !important;
-    font-weight: 900 !important;
+    font-size: 32px;
+    font-weight: 900;
 }
 
 .docs-rte-surface h2 {
-    font-size: 24px !important;
+    font-size: 24px;
 }
 
 .docs-rte-surface h3 {
-    font-size: 20px !important;
+    font-size: 20px;
 }
 
 .docs-rte-surface ul {

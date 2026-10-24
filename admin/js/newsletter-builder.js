@@ -2911,6 +2911,12 @@ class NewsletterBuilder {
                         <div style="height: 24px; display: flex; align-items: center; justify-content: center;">Avstand (24px)</div>
                     </div><p><br></p>`;
                 break;
+            case 'collage':
+                this.openCollageInsertionFlowAt(null);
+                return;
+            case 'donation':
+                this.openButtonInsertionFlowAt(null, { donation: true });
+                return;
             case 'button':
                 this.openButtonInsertionFlow();
                 return;
@@ -3763,11 +3769,91 @@ class NewsletterBuilder {
         loadEvents();
     }
 
+    buildCollageHtml(images, columns = 2) {
+        if (!Array.isArray(images) || images.length < 2 || images.length > 6) throw new Error('Velg mellom 2 og 6 bilder.');
+        const count = Number(columns) === 3 ? 3 : 2;
+        const safe = images.map((image, index) => {
+            const url = new URL(image.url);
+            if (!['https:', 'http:'].includes(url.protocol)) throw new Error('Bildelenker må begynne med https:// eller http://.');
+            return { url: escapeHtml(url.href), alt: escapeHtml(image.alt || `Bilde ${index + 1}`) };
+        });
+        let rows = '';
+        for (let i = 0; i < safe.length; i += count) {
+            let cells = '';
+            for (let j = 0; j < count; j++) {
+                const image = safe[i + j];
+                cells += `<td width="${Math.floor(100 / count)}%" valign="top" style="width:${100 / count}%;padding:6px;vertical-align:top;">${image ? `<img src="${image.url}" alt="${image.alt}" width="${Math.floor(600 / count) - 12}" style="display:block;width:100%;max-width:100%;height:auto;border-radius:8px;">` : ''}</td>`;
+            }
+            rows += `<tr>${cells}</tr>`;
+        }
+        return `<div class="newsletter-collage-block" contenteditable="false" style="margin:20px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;table-layout:fixed;"><tbody>${rows}</tbody></table></div><p><br></p>`;
+    }
+
+    openCollageInsertionFlowAt(afterElement) {
+        document.getElementById('hkm-collage-modal')?.remove();
+        const modal = document.createElement('div');
+        modal.id = 'hkm-collage-modal';
+        modal.className = 'profile-modal';
+        modal.style.cssText = 'display:flex;position:fixed;inset:0;background:#0f172a99;align-items:center;justify-content:center;padding:16px;';
+        modal.innerHTML = `<form class="hkm-collage-form" style="background:var(--admin-surface,#fff);color:var(--admin-text,#1e293b);border-radius:12px;padding:24px;width:100%;max-width:560px;max-height:85vh;overflow:auto;box-sizing:border-box;">
+            <h2 style="margin:0 0 12px;font-size:21px;">Bildekollasj</h2>
+            <p style="font-size:13px;line-height:1.6;">Velg 2–6 bilder. Etter innsetting kan du klikke på hvert bilde for å bytte bilde eller endre alternativ tekst.</p>
+            <label for="collage-columns">Kolonner</label>
+            <select id="collage-columns" class="form-control" style="margin:8px 0 16px;"><option value="2">2 kolonner</option><option value="3">3 kolonner</option></select>
+            <label for="collage-urls">Bildelenker – én per linje</label>
+            <textarea id="collage-urls" class="form-control" rows="4" placeholder="https://eksempel.no/bilde.jpg" style="width:100%;box-sizing:border-box;margin:8px 0 16px;"></textarea>
+            <label for="collage-files">Eller last opp bilder</label>
+            <input id="collage-files" type="file" accept="image/*" multiple style="display:block;max-width:100%;margin:8px 0;">
+            <p style="font-size:12px;">Valgte filer brukes i stedet for bildelenkene.</p>
+            <p role="alert" id="collage-error" style="color:#b91c1c;"></p>
+            <div style="display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;margin-top:20px;">
+                <button type="button" class="btn btn-secondary" data-collage-cancel>Avbryt</button>
+                <button type="submit" class="btn btn-primary">Sett inn kollasj</button>
+            </div>
+        </form>`;
+        this.mountEditorModal(modal, 'Sett inn bildekollasj');
+        const close = () => modal.remove();
+        modal.querySelector('[data-collage-cancel]').onclick = close;
+        modal.addEventListener('click', event => { if (event.target === modal) close(); });
+        modal.addEventListener('keydown', event => { if (event.key === 'Escape') { event.stopPropagation(); close(); } });
+        modal.querySelector('form').onsubmit = async event => {
+            event.preventDefault();
+            const button = modal.querySelector('[type="submit"]');
+            const error = modal.querySelector('#collage-error');
+            error.textContent = '';
+            try {
+                const files = [...modal.querySelector('#collage-files').files];
+                let images = modal.querySelector('#collage-urls').value.split(/\r?\n/).map(url => url.trim()).filter(Boolean).map(url => ({ url }));
+                const count = files.length || images.length;
+                if (count < 2 || count > 6) throw new Error('Velg mellom 2 og 6 bilder.');
+                if (files.some(file => !file.type.startsWith('image/'))) throw new Error('Velg bare bildefiler.');
+                button.disabled = true;
+                button.textContent = 'Setter inn…';
+                if (files.length) {
+                    if (!window.firebaseService?.uploadImage) throw new Error('Bildeopplasting er ikke tilgjengelig. Prøv bildelenker.');
+                    const batch = Date.now();
+                    images = await Promise.all(files.map(async (file, index) => ({
+                        url: await window.firebaseService.uploadImage(file, `newsletter/images/${batch}_${index}_${file.name}`),
+                        alt: file.name.replace(/\.[^.]+$/, '')
+                    })));
+                }
+                const html = this.buildCollageHtml(images, modal.querySelector('#collage-columns').value);
+                this.insertHtmlAtCursorOrEndAt(html, afterElement);
+                close();
+            } catch (failure) {
+                error.textContent = failure.message || 'Kunne ikke sette inn bildekollasj.';
+                button.disabled = false;
+                button.textContent = 'Sett inn kollasj';
+            }
+        };
+        modal.querySelector('#collage-urls').focus();
+    }
+
     openButtonInsertionFlow() {
         this.openButtonInsertionFlowAt(null);
     }
 
-    openButtonInsertionFlowAt(afterElement) {
+    openButtonInsertionFlowAt(afterElement, options = {}) {
         let modal = document.getElementById('hkm-button-selector-modal');
         if (modal) modal.remove();
 
@@ -3778,7 +3864,7 @@ class NewsletterBuilder {
             { name: "Bønnevegg & Bønneemner", url: "https://www.hiskingdomministry.no/bonnevegg.html", defaultText: "Send bønneemne" },
             { name: "Blogg & Undervisning", url: "https://www.hiskingdomministry.no/blogg.html", defaultText: "Les artikler" },
             { name: "Nettbutikk (His Kingdom Designs)", url: "https://www.hiskingdomdesigns.no/", defaultText: "Besøk nettbutikken" },
-            { name: "Gi en gave / Støtt arbeidet", url: "https://www.hiskingdomministry.no/stott-oss.html", defaultText: "Støtt arbeidet" },
+            { name: "Gi en gave / Støtt arbeidet", url: "https://www.hiskingdomministry.no/donasjoner.html", defaultText: "Støtt arbeidet" },
             { name: "ℹ️ Om oss", url: "https://www.hiskingdomministry.no/om-oss.html", defaultText: "Les om oss" },
             { name: "Kontakt oss", url: "https://www.hiskingdomministry.no/kontakt.html", defaultText: "Ta kontakt" },
             { name: "Min side (Medlem)", url: "https://www.hiskingdomministry.no/minside/", defaultText: "Gå til Min side" }
@@ -3869,6 +3955,13 @@ class NewsletterBuilder {
         const externalInput = document.getElementById('hkm-btn-modal-url');
 
         let isInternal = true;
+
+        if (options.donation) {
+            internalSelect.value = 'https://www.hiskingdomministry.no/donasjoner.html';
+            btnTextInput.value = 'Gi en gave';
+            insertBtn.textContent = 'Sett inn giverknapp';
+        }
+
 
         const closeModal = () => modal.remove();
         closeBtn.onclick = closeModal;
@@ -4331,6 +4424,12 @@ class NewsletterBuilder {
                         <div style="height: 24px; display: flex; align-items: center; justify-content: center;">Avstand (24px)</div>
                     </div><p><br></p>`;
                 break;
+            case 'collage':
+                this.openCollageInsertionFlowAt(afterElement);
+                return;
+            case 'donation':
+                this.openButtonInsertionFlowAt(afterElement, { donation: true });
+                return;
             case 'button':
                 this.openButtonInsertionFlowAt(afterElement);
                 return;
@@ -5027,7 +5126,8 @@ class NewsletterBuilder {
         });
         // Determine block type
         const isSocial = (node.classList && node.classList.contains('newsletter-social-block')) || (node.closest && node.closest('.newsletter-social-block'));
-        const img = (editNode === node ? node.querySelector('img') : null) || (node.tagName === 'IMG' ? node : null);
+        const clickedImage = element?.closest?.('img');
+        const img = (clickedImage && node.contains(clickedImage) ? clickedImage : null) || (editNode === node ? node.querySelector('img') : null) || (node.tagName === 'IMG' ? node : null);
         const btn = (editNode === node ? node.querySelector('.block-btn, .product-cta-btn, .newsletter-btn, .btn, a[href], button') : null) ||
                     ((node.classList && (node.classList.contains('block-btn') || node.classList.contains('product-cta-btn') || node.classList.contains('newsletter-btn') || node.classList.contains('btn'))) || node.tagName === 'A' || node.tagName === 'BUTTON' ? node : null);
 
@@ -5064,6 +5164,7 @@ class NewsletterBuilder {
 
         if (/^H[1-6]$/.test(tagName)) return 'Overskrift';
         if (tagName === 'HR' || classList?.contains('newsletter-divider-block')) return 'Skillelinje';
+        if (classList?.contains('newsletter-collage-block')) return 'Bildekollasj';
         if (tagName === 'DIV' && node.querySelector('h1,h2,h3,p') && node.querySelector('a[href],button')) return 'Seksjon';
         if (classList?.contains('newsletter-social-block') || node.querySelector?.('.newsletter-social-block')) return 'Sosialt';
         if (classList?.contains('newsletter-product-block') || node.querySelector?.('.newsletter-product-block, .product-card')) return 'Produkt';
@@ -7400,6 +7501,7 @@ class NewsletterBuilder {
         const container = document.getElementById('blocks-container');
         if (!container) return '';
         const clone = container.cloneNode(true);
+        this.inlineEditorTextStylesForEmail(container, clone);
         clone.querySelectorAll('.card-delete-btn, .card-edit-btn, #block-quick-toolbar, .block-quick-toolbar, .quick-tb-btn, button.quick-tb-btn').forEach(el => el.remove());
         clone.querySelectorAll('.selected-block-active, .hkm-selected-block, [data-editor-label]').forEach(el => {
             el.classList.remove('selected-block-active', 'hkm-selected-block');
@@ -8087,7 +8189,7 @@ class NewsletterBuilder {
             const blocksContainer = document.getElementById('blocks-container');
             if (!blocksContainer) return '';
             contentClone = blocksContainer.cloneNode(true);
-            this.inlineHeadingStylesForEmail(blocksContainer, contentClone);
+            this.inlineEditorTextStylesForEmail(blocksContainer, contentClone);
         }
 
         contentClone.querySelectorAll('.newsletter-columns-block').forEach(block => {
@@ -8217,6 +8319,7 @@ class NewsletterBuilder {
 <html lang="no" xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta charset="utf-8">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body, html { margin: 0 !important; padding: 0 !important; width: 100% !important; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; background-color: #f8fafc; font-family: Arial, Helvetica, sans-serif; }
@@ -8271,11 +8374,11 @@ class NewsletterBuilder {
 </html>`;
     }
 
-    inlineHeadingStylesForEmail(sourceRoot, clonedRoot) {
+    inlineEditorTextStylesForEmail(sourceRoot, clonedRoot) {
         if (!sourceRoot || !clonedRoot || typeof window.getComputedStyle !== 'function') return;
 
-        const sourceHeadings = Array.from(sourceRoot.querySelectorAll('h1, h2, h3, h4, h5, h6'));
-        const clonedHeadings = Array.from(clonedRoot.querySelectorAll('h1, h2, h3, h4, h5, h6'));
+        const sourceHeadings = Array.from(sourceRoot.querySelectorAll('h1, h2, h3, h4, h5, h6, p, ul, ol, li, blockquote'));
+        const clonedHeadings = Array.from(clonedRoot.querySelectorAll('h1, h2, h3, h4, h5, h6, p, ul, ol, li, blockquote'));
         const properties = [
             'font-family',
             'font-size',
@@ -8293,7 +8396,9 @@ class NewsletterBuilder {
             'padding-top',
             'padding-right',
             'padding-bottom',
-            'padding-left'
+            'padding-left',
+            'list-style-type',
+            'list-style-position'
         ];
 
         sourceHeadings.forEach((sourceHeading, index) => {
@@ -8314,6 +8419,19 @@ class NewsletterBuilder {
                 const direction = computed.getPropertyValue('direction') || 'ltr';
                 textAlign = direction === 'rtl' ? 'left' : 'right';
             }
+
+            const descendants = Array.from(sourceHeading.querySelectorAll('*'));
+            const clonedDescendants = Array.from(clonedHeading.querySelectorAll('*'));
+            descendants.forEach((source, childIndex) => {
+                const clone = clonedDescendants[childIndex];
+                if (!clone) return;
+                const style = window.getComputedStyle(source);
+                ['font-family', 'font-size', 'font-weight', 'font-style', 'line-height',
+                    'letter-spacing', 'color', 'text-decoration', 'text-transform'].forEach(property => {
+                    const value = style.getPropertyValue(property);
+                    if (value) clone.style.setProperty(property, value);
+                });
+            });
 
             clonedHeading.style.setProperty('text-align', textAlign);
             if (['left', 'center', 'right', 'justify'].includes(textAlign)) {
