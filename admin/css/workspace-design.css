@@ -79,7 +79,7 @@ html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-li
   border-color: transparent !important;
 }
 html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-link.active .material-symbols-outlined {
-  color: inherit !important;
+  color: #ffffff !important;
 }
 html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-category-header {
   padding: 14px !important;

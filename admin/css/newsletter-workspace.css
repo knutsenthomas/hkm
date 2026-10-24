@@ -7,9 +7,9 @@
 .newsletter-workspace button { cursor:pointer; padding:10px 16px; border:1px solid var(--admin-border,#dce1e6); border-radius:8px; color:inherit; background:var(--nw-bg); }
 .newsletter-workspace button:disabled { opacity:.6; }
 .workspace-metrics { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px; }
-.workspace-metrics > div { padding:18px; border:1px solid var(--admin-border,#e5e7eb); border-radius:12px; }
+.workspace-metrics > div { display:flex; flex-direction:column; padding:18px; border:1px solid var(--admin-border,#e5e7eb); border-radius:12px; }
 .workspace-metrics span { display:block; color:var(--nw-muted); font-size:13px; }
-.workspace-metrics strong { display:block; margin-top:6px; font-size:28px; font-weight:750; }
+.workspace-metrics strong { display:block; margin-top:auto; padding-top:6px; font-size:28px; font-weight:750; }
 .workspace-nav { display:flex; gap:8px; border-bottom:1px solid var(--admin-border,#e5e7eb); padding-bottom:16px; margin-bottom:20px; }
 .workspace-nav button[aria-pressed="true"] { color:var(--nw-accent); border-color:var(--nw-accent); }
 .workspace-tools { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:16px; }
