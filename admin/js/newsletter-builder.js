@@ -4826,7 +4826,16 @@ class NewsletterBuilder {
         let node = target;
         while (node && node !== container) {
             if (node.parentNode === container) {
-                return node;
+                // Typing/paste can leave a bare text node directly in the editor.
+                // Give it an editable paragraph before block tools inspect it.
+                if (node.nodeType === Node.TEXT_NODE) {
+                    if (!node.textContent.trim()) return null;
+                    const paragraph = document.createElement('p');
+                    container.insertBefore(paragraph, node);
+                    paragraph.appendChild(node);
+                    return paragraph;
+                }
+                return node.nodeType === Node.ELEMENT_NODE ? node : null;
             }
             node = node.parentNode;
         }
@@ -4987,6 +4996,9 @@ class NewsletterBuilder {
     }
 
     selectBlock(node, target = node) {
+        if (!node) return;
+        if (node.nodeType !== Node.ELEMENT_NODE) node = this.getCurrentBlock(node);
+        if (!node?.classList) return;
         const element = target?.nodeType === Node.TEXT_NODE ? target.parentElement : target;
         const text = element?.closest('h1,h2,h3,h4,h5,h6,p,li,blockquote');
         const directButton = element?.closest('a[href],button');

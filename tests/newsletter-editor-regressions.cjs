@@ -30,6 +30,25 @@ Object.assign(editor, { currentMode: 'builder', currentDraftId: 'draft', current
     editorDocumentKey: 'draft', blocks: [], recordNewsletterVersion: async () => {},
     normalizeCanvasBlocks() {}, isMobileViewport: () => false });
 const box = context.document.getElementById('blocks-container');
+// Bare editor text must select as a paragraph, never call classList on text.
+{
+    const selectionEditor = Object.create(context.Builder.prototype);
+    Object.assign(selectionEditor, { updateDocumentTools() {}, deselectBlock() {},
+        attachBlockQuickToolbar() {}, showTextInspector() {}, isMobileViewport: () => false });
+    box.textContent = 'Bare draft text';
+    const textNode = box.firstChild;
+    assert.doesNotThrow(() => selectionEditor.selectBlock(textNode, textNode));
+    assert.equal(box.firstElementChild.tagName, 'P');
+    assert.equal(box.textContent, 'Bare draft text');
+    assert.equal(selectionEditor.activeBlockNode, box.firstElementChild);
+    assert.ok(box.firstElementChild.classList.contains('selected-block-active'));
+    assert.doesNotThrow(() => selectionEditor.selectBlock(textNode, textNode));
+    assert.equal(box.children.length, 1);
+    box.append(context.document.createTextNode('  '));
+    assert.equal(selectionEditor.getCurrentBlock(box.lastChild), null);
+    assert.doesNotThrow(() => selectionEditor.selectBlock(null));
+    box.innerHTML = '<p>First</p>';
+}
 // Exercise the actual selection callback after clicking outside the document.
 const selectionSection = source.slice(source.indexOf('// Inspector controls retain'), source.indexOf('// Clear pending delete'));
 const selectionBody = selectionSection.slice(selectionSection.indexOf("() => {") + 7, selectionSection.lastIndexOf('});'));
