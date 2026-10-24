@@ -2857,12 +2857,14 @@ class MinSideManager {
                     <div class="info-card-header">
                         <h3 id="school-payments-link-heading">${isNo ? 'Skolebetalinger' : (isEs ? 'Pagos escolares' : 'School payments')}</h3>
                     </div>
+                    <div class="school-payments-link-body">
                     <p>${isNo ? 'Skoleavgift, trekkavtale og betalingshistorikk finner du i HKPC-appen. Gaver og støtteavtaler finner du under Gaver her på Min side.' : (isEs ? 'Consulta la matrícula, el acuerdo de pago y el historial en la app de HKPC. Las donaciones y los acuerdos de apoyo están en Donaciones en Mi página.' : 'View tuition, your payment agreement and payment history in the HKPC app. Donations and support agreements are under Giving here on My page.')}</p>
                     <a href="https://app.hkpc.no/betalinger" class="btn btn-primary">
                         <span class="material-symbols-outlined" aria-hidden="true">school</span>
                         ${isNo ? 'Se dine skolebetalinger i HKPC' : (isEs ? 'Ver tus pagos escolares en HKPC' : 'View your school payments in HKPC')}
                         <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
                     </a>
+                    </div>
                 </section>
 
                 <!-- Unified Profile Information -->

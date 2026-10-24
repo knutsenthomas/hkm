@@ -432,3 +432,36 @@ html[data-workspace-design="unified"]:not([data-workspace-icons-ready="true"]) .
   max-width: 1em !important;
   overflow: hidden !important;
 }
+/* Profile payment hand-off keeps the same inset as other card bodies. */
+html[data-workspace-design="unified"] .school-payments-link-body {
+  padding: 24px;
+}
+html[data-workspace-design="unified"] .school-payments-link-body p {
+  margin: 0 0 20px;
+  color: var(--workspace-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+html[data-workspace-design="unified"] .school-payments-link-body .btn {
+  height: auto !important;
+  min-height: 44px;
+  max-width: 100%;
+  white-space: normal !important;
+  padding: 12px 16px !important;
+  font-size: 13px !important;
+}
+html[data-workspace-design="unified"] .sidebar .nav-badge {
+  background: var(--workspace-accent-dark) !important;
+  color: white !important;
+  border: 0 !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+  outline: none;
+  font: 600 11px/1.4 Inter, sans-serif !important;
+  padding: 3px 7px !important;
+  min-width: 24px;
+  text-align: center;
+}
+@media (max-width:768px) {
+  html[data-workspace-design="unified"] .school-payments-link-body { padding: 20px; }
+}
