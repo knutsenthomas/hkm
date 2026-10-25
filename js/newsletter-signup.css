@@ -16,4 +16,14 @@
 #hkm-newsletter-signup .hkm-newsletter-status.error { color:#b91c1c; }
 #hkm-newsletter-signup .hkm-newsletter-privacy { font-size:12px; color:#526271; text-decoration:underline; }
 .hkm-open-newsletter { border:0; background:transparent; color:inherit; text-decoration:underline; cursor:pointer; font:inherit; padding:8px 0; }
+/* Match the shared site's theme, including native controls and validation UI. */
+html[data-theme="dark"] #hkm-newsletter-signup { color-scheme:dark; background:#1e293b; color:#f8fafc; border-color:#475569; box-shadow:0 24px 80px #0008; }
+html[data-theme="dark"] #hkm-newsletter-signup::backdrop { background:rgba(2,6,23,.72); }
+html[data-theme="dark"] #hkm-newsletter-signup .hkm-newsletter-eyebrow { color:#f4b078; }
+html[data-theme="dark"] #hkm-newsletter-signup :is(.hkm-newsletter-intro,.hkm-newsletter-consent,.hkm-newsletter-privacy,.hkm-newsletter-close) { color:#cbd5e1; }
+html[data-theme="dark"] #hkm-newsletter-signup input::placeholder { color:#94a3b8; opacity:1; }
+html[data-theme="dark"] #hkm-newsletter-signup .hkm-newsletter-status { color:#86efac; }
+html[data-theme="dark"] #hkm-newsletter-signup .hkm-newsletter-status.error { color:#fca5a5; }
+#hkm-newsletter-signup .hkm-newsletter-close:hover { background:#64748b1a; border-radius:8px; }
+#hkm-newsletter-signup .hkm-newsletter-submit:hover:not(:disabled) { background:#a95321; }
 @media(max-width:480px) { #hkm-newsletter-signup { padding:28px 22px 24px; } }

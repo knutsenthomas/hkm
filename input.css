@@ -9151,7 +9151,7 @@ body:not(.header-dark-start) .header #header-profile-link {
 body:not(.header-dark-start) .header #header-profile-link:hover {
     background: rgba(0, 0, 0, 0.08) !important;
 }
-html[data-theme="dark"] #header-profile-link {
+html[data-theme="dark"] body header#header #header-profile-link {
     border-color: rgba(255, 255, 255, 0.1);
     background: rgba(255, 255, 255, 0.05);
     color: #f1f5f9 !important;
@@ -9187,7 +9187,7 @@ body:not(.header-dark-start) .header #header-today-devotional-btn {
 body:not(.header-dark-start) .header #header-today-devotional-btn:hover {
     background: rgba(0, 0, 0, 0.08) !important;
 }
-html[data-theme="dark"] #header-today-devotional-btn {
+html[data-theme="dark"] body header#header #header-today-devotional-btn {
     border-color: rgba(255, 255, 255, 0.1);
     background: rgba(255, 255, 255, 0.05);
     color: #f1f5f9 !important;
