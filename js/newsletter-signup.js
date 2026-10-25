@@ -14,7 +14,7 @@ export function mountNewsletterSignup(language = 'no') {
         <p class="hkm-newsletter-eyebrow">HIS KINGDOM MINISTRY</p>
         <h2 id="hkm-newsletter-title">${copy.title}</h2><p class="hkm-newsletter-intro">${copy.intro}</p>
         <form><label for="hkm-signup-name">${copy.name}</label><input id="hkm-signup-name" name="subscriberName" type="text" autocomplete="name" maxlength="200">
-        <label for="hkm-signup-email">${copy.email}</label><input id="hkm-signup-email" name="email" type="email" autocomplete="email" maxlength="254" required placeholder="navn@eksempel.no">
+        <label for="hkm-signup-email">${copy.email} <span aria-hidden="true">*</span></label><input id="hkm-signup-email" name="email" type="email" autocomplete="email" maxlength="254" required placeholder="navn@eksempel.no">
         <label for="hkm-signup-language">${copy.language}</label><select id="hkm-signup-language" name="language"><option value="no">Norsk</option><option value="en">English</option></select>
         <label class="hkm-newsletter-consent"><input type="checkbox" name="consent" required><span>${copy.consent}</span></label>
         <button type="submit" class="hkm-newsletter-submit">${copy.submit}</button></form>
