@@ -8144,7 +8144,8 @@ class NewsletterBuilder {
         email.className = 'newsletter-email-preview';
         frame.replaceChildren(email);
         const setPreview = view => {
-            email.style.width = view === 'mobile' ? '375px' : '680px';
+            // The frame owns the device width; the iframe fills its actual viewport.
+            email.style.width = '100%';
             frame.className = 'preview-frame ' + view;
             modal.querySelectorAll('[data-preview-device]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.previewDevice === view)));
         };
