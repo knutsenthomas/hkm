@@ -2116,12 +2116,14 @@ class NewsletterBuilder {
             this.englishPayload = {
                 ...(this.englishPayload || {}),
                 subjectEn: currentSubject,
+                preheaderEn: this.getNewsletterPreheader('en'),
                 blocksEn: unifiedBlocks,
                 translatedAt: this.englishPayload?.translatedAt || new Date().toISOString()
             };
         } else {
             this.blocks = unifiedBlocks;
             this.subjectNo = currentSubject;
+            this.preheaderNo = this.getNewsletterPreheader('no');
         }
 
         try {
@@ -7460,7 +7462,17 @@ class NewsletterBuilder {
         }
 
         if (preheaderInput) {
-            preheaderInput.addEventListener('input', updatePreheaderPreview);
+            preheaderInput.addEventListener('change', updatePreheaderPreview);
+            preheaderInput.addEventListener('input', () => {
+                if (this.currentEditorLang === 'en') {
+                    this.englishPayload ||= {};
+                    this.englishPayload.preheaderEn = preheaderInput.value;
+                } else {
+                    this.preheaderNo = preheaderInput.value;
+                }
+                updatePreheaderPreview();
+                this.triggerAutosave();
+            });
             updatePreheaderPreview();
         }
 
@@ -8425,6 +8437,7 @@ class NewsletterBuilder {
             const data = {
                 name: name.trim(), blocks: this.blocks,
                 subject: this.currentEditorLang === 'en' ? (this.subjectNo || '') : (document.getElementById('newsletter-subject')?.value || ''),
+                preheader: this.getNewsletterPreheader('no'),
                 englishPayload: this.englishPayload || null,
                 headerHtml: document.querySelector('.canvas-header')?.outerHTML || '',
                 updatedAt: new Date().toISOString(), isDraft: false
@@ -8639,6 +8652,22 @@ class NewsletterBuilder {
         });
     }
 
+    getNewsletterPreheader(lang = 'no') {
+        if ((this.currentEditorLang || 'no') === lang) {
+            return document.getElementById('newsletter-preheader')?.value
+                ?? (lang === 'en' ? this.englishPayload?.preheaderEn : this.preheaderNo) ?? '';
+        }
+        return (lang === 'en' ? this.englishPayload?.preheaderEn : this.preheaderNo) || '';
+    }
+
+    compileNewsletterPreheader(lang = 'no') {
+        const text = this.getNewsletterPreheader(lang).trim();
+        if (!text) return '';
+        const escaped = document.createElement('span');
+        escaped.textContent = text;
+        return `<div data-newsletter-preheader style="display:none!important;visibility:hidden;mso-hide:all;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">${escaped.innerHTML}</div>`;
+    }
+
     compileEmailHtml(lang = 'no') {
         const isEnglish = lang === 'en';
         let contentClone;
@@ -8827,6 +8856,7 @@ class NewsletterBuilder {
   </style>
 </head>
 <body style="margin: 0; padding: 0; background-color: #f8fafc;">
+  ${this.compileNewsletterPreheader(lang)}
   <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; background-color: #f8fafc;">
     <tr>
       <td align="center" style="padding: 20px 10px;">
@@ -9009,6 +9039,12 @@ class NewsletterBuilder {
     resetEditorLanguageState(data = {}) {
         this.currentEditorLang = 'no';
         this.subjectNo = data.subject || this.subjectNo || '';
+        this.preheaderNo = data.preheader || '';
+        const preheaderInput = document.getElementById('newsletter-preheader');
+        if (preheaderInput) {
+            preheaderInput.value = this.preheaderNo;
+            preheaderInput.dispatchEvent(new window.Event('change'));
+        }
         if (data.englishPayload && data.englishPayload.blocksEn && data.englishPayload.blocksEn.length) {
             this.englishPayload = JSON.parse(JSON.stringify(data.englishPayload));
             this.saveEnglishPayloadToLocalStorage();
@@ -9082,6 +9118,11 @@ class NewsletterBuilder {
                 : (this.subjectNo || '');
         }
 
+        const preheaderInput = document.getElementById('newsletter-preheader');
+        if (preheaderInput) {
+            preheaderInput.value = isEnglish ? (this.englishPayload?.preheaderEn || '') : (this.preheaderNo || '');
+            preheaderInput.dispatchEvent(new window.Event('change'));
+        }
         this.normalizeCanvasBlocks(container);
     }
 
@@ -9099,7 +9140,8 @@ class NewsletterBuilder {
             // Save the currently visible language before replacing the canvas.
             this.syncUnifiedBlocks();
 
-            if (targetLanguage === 'en' && (forceTranslate || !this.englishPayload?.blocksEn?.length)) {
+            if (targetLanguage === 'en' && (forceTranslate || !this.englishPayload?.blocksEn?.length
+                || (this.getNewsletterPreheader('no').trim() && this.englishPayload?.sourcePreheader !== this.getNewsletterPreheader('no').trim()))) {
                 const translated = await this.translateCurrentNewsletterToEnglish();
                 if (!translated) {
                     this.updateEditorLanguageButtons(this.currentEditorLang);
@@ -9227,7 +9269,8 @@ class NewsletterBuilder {
             while (walker.nextNode()) {
                 if (walker.currentNode.textContent.trim()) textNodes.push(walker.currentNode);
             }
-            const texts = [String(norwegianSubject), ...textNodes.map(node => node.textContent)];
+            const norwegianPreheader = this.getNewsletterPreheader('no').trim();
+            const texts = [String(norwegianSubject), ...(norwegianPreheader ? [norwegianPreheader] : []), ...textNodes.map(node => node.textContent)];
             const callable = functionsObj.httpsCallable('aiProcess', { timeout: 170000 });
             let timeoutId;
             const response = await Promise.race([
@@ -9240,7 +9283,8 @@ class NewsletterBuilder {
             }
             this.syncUnifiedBlocks();
             if (translationDocumentKey !== (this.editorDocumentKey || this.currentDraftId)
-                || this.getLanguageBlocksHtml(this.blocks || []) !== sourceHtml) {
+                || this.getLanguageBlocksHtml(this.blocks || []) !== sourceHtml
+                || this.getNewsletterPreheader('no').trim() !== norwegianPreheader) {
                 throw new Error('Nyhetsbrevet ble endret mens oversettelsen pågikk. Prøv igjen for å oversette siste versjon.');
             }
             const decode = text => {
@@ -9250,7 +9294,7 @@ class NewsletterBuilder {
                 return textarea.value;
             };
             const translatedSubject = decode(translated[0]);
-            textNodes.forEach((node, index) => { node.textContent = decode(translated[index + 1]); });
+            textNodes.forEach((node, index) => { node.textContent = decode(translated[index + (norwegianPreheader ? 2 : 1)]); });
             // Retain deliberately chosen English artwork when only the text is retranslated.
             const previousEnglish = document.createElement('div');
             previousEnglish.innerHTML = this.getLanguageBlocksHtml(this.englishPayload?.blocksEn || []);
@@ -9279,6 +9323,8 @@ class NewsletterBuilder {
 
             this.englishPayload = {
                 subjectEn: String(translatedSubject).trim(),
+                preheaderEn: norwegianPreheader ? decode(translated[1]).trim() : '',
+                sourcePreheader: norwegianPreheader,
                 blocksEn: translatedBlocks,
                 translatedAt: new Date().toISOString()
             };
@@ -9526,7 +9572,9 @@ class NewsletterBuilder {
 
             const englishCount = recipients.filter(rec => this.isEnglishRecipient(rec)).length;
             const englishText = this.getLanguageBlocksHtml(this.englishPayload?.blocksEn || []).replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim();
-            if (englishCount && (!this.englishPayload?.subjectEn?.trim() || !englishText)) {
+            if (englishCount && (!this.englishPayload?.subjectEn?.trim() || !englishText
+                || (this.getNewsletterPreheader('no').trim() && (!this.englishPayload?.preheaderEn?.trim()
+                    || this.englishPayload.sourcePreheader !== this.getNewsletterPreheader('no').trim())))) {
                 showToast('Lag og se over engelsk oversettelse før du sender til engelske mottakere.', 'warning');
                 if (finalBtn) { finalBtn.disabled = false; finalBtn.innerHTML = originalText; }
                 return;
@@ -9568,6 +9616,7 @@ class NewsletterBuilder {
                 blocks: this.blocks,
                 html: norwegianHtml,
                 englishHtml,
+                preheader: this.getNewsletterPreheader('no'),
                 englishPayload: this.englishPayload || null,
                 recipients: recipients
                     .filter(recipient => recipient?.email)
@@ -10765,6 +10814,7 @@ class NewsletterBuilder {
                         blocks: this.blocks,
                         headerHtml: headerNode ? headerNode.outerHTML : '',
                         subject: canonicalSubject,
+                        preheader: this.getNewsletterPreheader('no'),
                         englishPayload: this.englishPayload || null,
                         updatedAt: new Date().toISOString(),
                         isDraft: true
@@ -12904,12 +12954,14 @@ class NewsletterBuilder {
                     this.englishPayload = {
                         ...(this.englishPayload || {}),
                         subjectEn: subject,
+                        preheaderEn: this.getNewsletterPreheader('en'),
                         blocksEn: freshBlocks,
                         translatedAt: this.englishPayload?.translatedAt || new Date().toISOString()
                     };
                 } else {
                     this.blocks = freshBlocks;
                     this.subjectNo = subject;
+                    this.preheaderNo = this.getNewsletterPreheader('no');
                 }
 
                 const canonicalBlocks = isEnglishEditor ? this.blocks : freshBlocks;
@@ -12936,6 +12988,7 @@ class NewsletterBuilder {
                     blocks: canonicalBlocks,
                     headerHtml: headerNode ? headerNode.outerHTML : '',
                     subject: canonicalSubject,
+                    preheader: this.getNewsletterPreheader('no'),
                     englishPayload: this.englishPayload || null,
                     updatedAt: new Date().toISOString(),
                     isDraft: !this.currentDocumentIsTemplate
