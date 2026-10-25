@@ -11375,7 +11375,13 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                 </div>
 
                 <div style="margin-bottom: 16px;">
-                    <label for="add-sub-language">Språk</label><select id="add-sub-language"><option value="no">Norsk</option><option value="en">Engelsk</option></select>
+                    <div style="margin-bottom: 18px;">
+                        <label for="edit-sub-language" style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Språk</label>
+                        <select id="edit-sub-language" style="display: block; width: 100%; min-height: 44px; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; background-color: #ffffff; color: #0f172a; font: 14px 'Inter', sans-serif; box-sizing: border-box; cursor: pointer;">
+                            <option value="no">Norsk</option>
+                            <option value="en">Engelsk</option>
+                        </select>
+                    </div>
                     <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Segmenter</label>
                     <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                         ${['Nyhetsbrev', 'Fastgiver', 'Frivillig', 'Leder', 'Ungdom', 'Bønneteam'].map(seg => `
@@ -11418,6 +11424,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             };
         });
 
+        modal.querySelector('#edit-sub-language').value = this.isEnglishRecipient(sub) ? 'en' : 'no';
         modal.querySelector('#close-edit-sub').onclick = () => modal.remove();
         modal.querySelector('#cancel-edit-sub').onclick = () => modal.remove();
 
@@ -11427,6 +11434,13 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             const newPhone = modal.querySelector('#edit-sub-phone').value.trim();
             const newTags = modal.querySelector('#edit-sub-tags').value.split(',').map(t => t.trim()).filter(Boolean);
             const newSegments = Array.from(modal.querySelectorAll('.edit-sub-seg-cb:checked')).map(cb => cb.value);
+            const englishMarkers = ['en', 'english', 'engelsk'];
+            for (const values of [newTags, newSegments]) {
+                for (let i = values.length - 1; i >= 0; i--) {
+                    if (englishMarkers.includes(values[i].trim().toLowerCase())) values.splice(i, 1);
+                }
+            }
+            if (modal.querySelector('#edit-sub-language').value === 'en') newTags.push('engelsk');
 
             if (!newEmail || !newEmail.includes('@')) {
                 if (typeof showToast === 'function') showToast("Vennligst oppgi en gyldig e-postadresse.", "warning");
@@ -11505,7 +11519,13 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                 </div>
 
                 <div style="margin-bottom: 16px;">
-                    <label for="add-sub-language">Språk</label><select id="add-sub-language"><option value="no">Norsk</option><option value="en">Engelsk</option></select>
+                    <div style="margin-bottom: 18px;">
+                        <label for="add-sub-language" style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Språk</label>
+                        <select id="add-sub-language" style="display: block; width: 100%; min-height: 44px; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; background-color: #ffffff; color: #0f172a; font: 14px 'Inter', sans-serif; box-sizing: border-box; cursor: pointer;">
+                            <option value="no">Norsk</option>
+                            <option value="en">Engelsk</option>
+                        </select>
+                    </div>
                     <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Segmenter</label>
                     <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                         ${['Nyhetsbrev', 'Fastgiver', 'Frivillig', 'Leder', 'Ungdom', 'Bønneteam'].map(seg => `
