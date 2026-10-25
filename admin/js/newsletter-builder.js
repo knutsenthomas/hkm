@@ -1,4 +1,5 @@
 import { HKD_PRODUCT_TEMPLATE } from './newsletter-product-template.js';
+import { openNewsletterCanvaLink } from './newsletter-canva-link.js';
 
 function escapeHtml(str) {
     if (!str && str !== 0) return '';
@@ -610,6 +611,7 @@ class NewsletterBuilder {
         if (editorLangEn) {
             editorLangEn.addEventListener('click', () => this.switchEditorLanguage('en'));
         }
+        document.getElementById('newsletter-review-english-images')?.addEventListener('click', () => this.reviewEnglishImages());
         document.getElementById('newsletter-translation-retry')?.addEventListener('click', () => this.switchEditorLanguage('en', true));
         const editorRetranslate = document.getElementById('editor-retranslate-btn');
         if (editorRetranslate) {
@@ -2679,6 +2681,14 @@ class NewsletterBuilder {
             </div>
         `;
         
+        if (imageToReplace) {
+            const canvaButton = document.createElement('button');
+            canvaButton.type = 'button';
+            canvaButton.textContent = 'Canva-lenke og ferdig bilde';
+            canvaButton.style.cssText = 'width:100%;padding:14px 18px;margin-bottom:16px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;color:#1B4965;font:700 14px Inter,sans-serif;cursor:pointer;';
+            canvaButton.onclick = () => { modal.remove(); openNewsletterCanvaLink(this, imageToReplace); };
+            card.querySelector('#hkm-url-input-container').before(canvaButton);
+        }
         modal.appendChild(card);
         this.mountEditorModal(modal, imageToReplace ? 'Endre bilde' : 'Sett inn bilde');
         
@@ -2781,6 +2791,10 @@ class NewsletterBuilder {
 
     replaceEditorImageSource(image, url) {
         if (!image || !url) return;
+        if (this.currentEditorLang === 'en') {
+            if (!image.dataset.newsletterOriginalSrc) image.dataset.newsletterOriginalSrc = image.getAttribute('src') || image.src;
+            image.dataset.newsletterImageVariant = 'en';
+        }
         image.src = url;
         image.setAttribute('src', url);
         const preview = document.querySelector('.inspector-image-preview');
@@ -2791,6 +2805,8 @@ class NewsletterBuilder {
 
     async replaceEditorImageFromFile(image, file) {
         if (!image || !file) return;
+        const imageLanguage = this.currentEditorLang;
+        const imageDocumentKey = this.editorDocumentKey || this.currentDraftId;
         if (typeof showToast === 'function') showToast("Laster opp...", "info");
 
         try {
@@ -2807,8 +2823,10 @@ class NewsletterBuilder {
                 });
             }
 
+            if (!image.isConnected || this.currentEditorLang !== imageLanguage || (this.editorDocumentKey || this.currentDraftId) !== imageDocumentKey) return false;
             this.replaceEditorImageSource(image, url);
             if (typeof showToast === 'function') showToast("Bilde erstattet!", "success");
+            return true;
         } catch (error) {
             console.error("Image replacement failed:", error);
             if (typeof showToast === 'function') showToast("Opplasting feilet.", "error");
@@ -8656,6 +8674,7 @@ class NewsletterBuilder {
         // Remove editor-specific attributes and active selection styles
         contentClone.querySelectorAll('[contenteditable]').forEach(e => e.removeAttribute('contenteditable'));
         contentClone.querySelectorAll('*').forEach(el => {
+            ['data-canva-design-url', 'data-canva-design-id', 'data-newsletter-original-src', 'data-newsletter-image-variant'].forEach(attribute => el.removeAttribute(attribute));
             el.classList.remove('selected', 'active', 'focused', 'editing');
             if (el.style.outline) el.style.outline = '';
             if (el.style.boxShadow) el.style.boxShadow = '';
@@ -8935,6 +8954,8 @@ class NewsletterBuilder {
     }
 
     updateEditorLanguageButtons(lang = this.currentEditorLang) {
+        const imageHelp = document.getElementById('newsletter-english-images');
+        if (imageHelp) imageHelp.hidden = lang !== 'en';
         const btnNo = document.getElementById('editor-lang-btn-no');
         const btnEn = document.getElementById('editor-lang-btn-en');
         const btnRetranslate = document.getElementById('editor-retranslate-btn');
@@ -9079,6 +9100,47 @@ class NewsletterBuilder {
         }
     }
 
+    reviewEnglishImages() {
+        if (this.currentEditorLang !== 'en') return;
+        document.getElementById('newsletter-image-language-modal')?.remove();
+        const modal = document.createElement('div');
+        modal.id = 'newsletter-image-language-modal';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-labelledby', 'english-images-title');
+        modal.style.cssText = 'position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(15,23,42,.65);';
+        modal.innerHTML = `<div style="width:100%;max-width:640px;max-height:85vh;overflow:auto;background:white;padding:24px;border-radius:16px;box-sizing:border-box;">
+            <h3 id="english-images-title" style="margin-top:0;">Bilder i engelsk versjon</h3>
+            <p style="font-size:14px;line-height:1.6;color:#475569;">Velg bildet du vil erstatte med en engelsk variant. Endringen gjelder bare engelskversjonen. Vanlige fotografier kan beholdes.</p>
+            <div id="english-image-list" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;"></div>
+            <button type="button" id="close-english-images" style="margin-top:20px;padding:10px 18px;border:1px solid #cbd5e1;border-radius:9px;background:white;cursor:pointer;">Lukk</button>
+        </div>`;
+        const images = [...document.querySelectorAll('#blocks-container img')];
+        const list = modal.querySelector('#english-image-list');
+        if (!images.length) list.textContent = 'Nyhetsbrevet inneholder ingen bilder.';
+        images.forEach((image, index) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.style.cssText = 'padding:12px;border:1px solid #cbd5e1;border-radius:10px;background:white;cursor:pointer;color:#1B4965;';
+            const preview = document.createElement('img');
+            preview.src = image.src;
+            preview.alt = image.alt || `Bilde ${index + 1}`;
+            preview.style.cssText = 'display:block;width:100%;height:120px;object-fit:contain;margin-bottom:10px;';
+            button.append(preview, document.createTextNode(`Bytt bilde ${index + 1}`));
+            button.onclick = () => {
+                modal.remove();
+                this.openImageInsertionFlowAt(null, image);
+            };
+            list.append(button);
+        });
+        const previousFocus = document.activeElement;
+        const close = () => { modal.remove(); previousFocus?.focus(); };
+        modal.querySelector('#close-english-images').onclick = close;
+        modal.onkeydown = event => { if (event.key === 'Escape') close(); };
+        document.body.append(modal);
+        modal.querySelector('#close-english-images').focus();
+    }
+
     setTranslationStatus(message, error = false) {
         const status = document.getElementById('newsletter-translation-status');
         if (!status) return;
@@ -9159,6 +9221,23 @@ class NewsletterBuilder {
             };
             const translatedSubject = decode(translated[0]);
             textNodes.forEach((node, index) => { node.textContent = decode(translated[index + 1]); });
+            // Retain deliberately chosen English artwork when only the text is retranslated.
+            const previousEnglish = document.createElement('div');
+            previousEnglish.innerHTML = this.getLanguageBlocksHtml(this.englishPayload?.blocksEn || []);
+            const availableImages = [...source.querySelectorAll('img')];
+            previousEnglish.querySelectorAll('img[data-newsletter-image-variant="en"]').forEach(previous => {
+                const originalSrc = previous.dataset.newsletterOriginalSrc;
+                const match = availableImages.find(image => !image.dataset.newsletterImageVariant
+                    && image.getAttribute('src') === originalSrc
+                    && (!previous.id || image.id === previous.id));
+                if (match) {
+                    match.setAttribute('src', previous.getAttribute('src'));
+                    match.setAttribute('alt', previous.getAttribute('alt') || '');
+                    match.dataset.newsletterOriginalSrc = originalSrc;
+                    match.dataset.newsletterImageVariant = 'en';
+                    if (previous.dataset.canvaDesignUrl) match.dataset.canvaDesignUrl = previous.dataset.canvaDesignUrl;
+                }
+            });
             const translatedHtml = source.innerHTML;
 
             const translatedBlocks = [{

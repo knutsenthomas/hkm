@@ -103,7 +103,10 @@ const box = context.document.getElementById('blocks-container');
     const saved=editor.getCleanCanvasHtml();
     box.innerHTML=saved;
     assert.equal(box.querySelectorAll('.newsletter-collage-block img').length,3);
+    box.querySelector('img').dataset.canvaDesignUrl='https://www.canva.com/design/PRIVATE/edit';
+    assert.match(editor.getCleanCanvasHtml(), /data-canva-design-url/);
     const emailHtml=editor.compileEmailHtml();
+    assert.doesNotMatch(emailHtml, /data-canva-design-url|canva.com\/design\/PRIVATE/);
     const email=context.document.createElement('div');email.innerHTML=emailHtml;
     assert.equal(email.querySelectorAll('.newsletter-collage-block img').length,3);
     email.querySelectorAll('.newsletter-collage-block img').forEach(image=>{

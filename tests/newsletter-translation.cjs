@@ -31,12 +31,19 @@ const { JSDOM } = require('jsdom');
     assert.equal(translated.querySelector('img').alt, 'Original');
     assert.equal(translated.querySelector('p').getAttribute('style'), 'color:red');
     assert.equal(editor.blocks[0].content.text, html);
+    // A custom English image survives retranslation while the Norwegian image remains intact.
+    editor.englishPayload.blocksEn[0].content.text = editor.englishPayload.blocksEn[0].content.text.replace(
+        'src="https://example.com/photo.jpg"',
+        'src="https://example.com/english.jpg" data-newsletter-original-src="https://example.com/photo.jpg" data-newsletter-image-variant="en"');
+    assert.equal(await editor.translateCurrentNewsletterToEnglish(), true);
+    assert.match(editor.englishPayload.blocksEn[0].content.text, /src="https:\/\/example.com\/english.jpg"/);
+    assert.equal(editor.blocks[0].content.text, html);
     const prior = JSON.stringify(editor.englishPayload);
     fail = true;
     assert.equal(await editor.translateCurrentNewsletterToEnglish(), false);
     assert.equal(JSON.stringify(editor.englishPayload), prior);
     assert.equal(context.document.getElementById('editor-lang-btn-en').disabled, false);
     assert.equal(context.document.getElementById('newsletter-translation-retry').hidden, false);
-    assert.equal(saves, 1);
+    assert.equal(saves, 2);
     console.log('Passed: Google fallback, complete-response validation, original layout/links/images preserved, failed retranslation preserves prior version and re-enables retry.');
 })().catch(error => { console.error(error); process.exitCode = 1; });
