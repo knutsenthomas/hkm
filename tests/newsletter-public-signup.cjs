@@ -19,8 +19,9 @@ function setup(path='/',dismissed=false) {
  fixture.timers[0]();const dialog=document.querySelector('dialog');assert.equal(dialog.open,true);
  const form=dialog.querySelector('form');form.elements.email.value='person@example.com';
  await form.onsubmit({preventDefault(){}});assert.equal(fixture.writes.length,0,'Consent is required');
+ assert.equal(form.elements.subscriberName.required,false);form.elements.subscriberName.value='  Jane Doe  ';
  form.elements.consent.checked=true;await form.onsubmit({preventDefault(){}});
- assert.equal(fixture.writes.length,1);assert.equal(fixture.writes[0].options.language,'en');assert.equal(fixture.writes[0].options.source,'website_popup');
+ assert.equal(fixture.writes.length,1);assert.equal(fixture.writes[0].options.name,'Jane Doe');assert.equal(fixture.writes[0].options.language,'en');assert.equal(fixture.writes[0].options.source,'website_popup');
  assert.equal(form.hidden,true);assert.equal(fixture.dom.window.localStorage.getItem('hkm_newsletter_subscribed'),'1');
  assert.match(dialog.querySelector('[role=status]').textContent,/saved/);
  dialog.querySelector('.hkm-newsletter-close').click();assert.equal(dialog.open,false);
@@ -36,8 +37,9 @@ function setup(path='/',dismissed=false) {
  let saved;
  const context={document:fixture.dom.window.document,firebase:{firestore:{FieldValue:{serverTimestamp:()=> 'server-time'}}}};
  vm.createContext(context);vm.runInContext('globalThis.service={isInitialized:true,db:{collection:name=>({add:async data=>{globalThis.saved={name,data};}})},'+method+'};',context);
- await context.service.subscribeNewsletter(' PERSON@Example.com ',{language:'en',source:'website_popup'});
- assert.equal(context.saved.data.email,'person@example.com');assert.equal(context.saved.data.tags[0],'engelsk');assert.equal(context.saved.name,'newsletter_subscriptions');
+ await context.service.subscribeNewsletter(' PERSON@Example.com ',{name:'  Jane Doe  ',language:'en',source:'website_popup'});
+ assert.equal(context.saved.data.name,'Jane Doe');assert.equal(context.saved.data.email,'person@example.com');assert.equal(context.saved.data.tags[0],'engelsk');assert.equal(context.saved.name,'newsletter_subscriptions');
+ await context.service.subscribeNewsletter('noname@example.com');assert.equal('name' in context.saved.data,false);
  await assert.rejects(context.service.subscribeNewsletter('invalid'));
  console.log('Passed: popup timing, reopen/dismiss, consent, English routing metadata, successful/failed submissions and normalized Firestore writes. No real subscriptions or emails created.');
 })().catch(error=>{console.error(error);process.exitCode=1;});

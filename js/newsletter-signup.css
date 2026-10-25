@@ -6,7 +6,7 @@
 #hkm-newsletter-signup h2 { margin:0 0 12px; font-size:28px; line-height:1.2; }
 #hkm-newsletter-signup .hkm-newsletter-intro { margin:0 0 24px; color:#526271; font-size:15px; line-height:1.6; }
 #hkm-newsletter-signup label { display:block; margin:14px 0 6px; font-size:13px; font-weight:600; }
-#hkm-newsletter-signup input[type=email],#hkm-newsletter-signup select { width:100%; min-height:46px; box-sizing:border-box; padding:11px 12px; border:1px solid #cbd5e1; border-radius:10px; background:white; color:#203447; font:16px Inter,Arial,sans-serif; }
+#hkm-newsletter-signup input[type=text],#hkm-newsletter-signup input[type=email],#hkm-newsletter-signup select { width:100%; min-height:46px; box-sizing:border-box; padding:11px 12px; border:1px solid #cbd5e1; border-radius:10px; background:white; color:#203447; font:16px Inter,Arial,sans-serif; }
 #hkm-newsletter-signup .hkm-newsletter-consent { display:flex; align-items:flex-start; gap:10px; margin:18px 0; font-size:12px; line-height:1.6; font-weight:400; color:#526271; }
 #hkm-newsletter-signup input[type=checkbox] { flex:0 0 auto; width:18px; height:18px; margin:1px 0 0; accent-color:#bd652a; }
 #hkm-newsletter-signup .hkm-newsletter-submit { width:100%; min-height:46px; padding:12px; border:0; border-radius:10px; background:#bd652a; color:white; font:700 15px Inter,Arial,sans-serif; cursor:pointer; }

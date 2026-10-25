@@ -1064,6 +1064,7 @@ class FirebaseService {
         return this.db.collection('newsletter_subscriptions').add({
             email: normalizedEmail,
             emailLower: normalizedEmail,
+            ...(String(options.name || '').trim() ? { name: String(options.name).trim().slice(0, 200) } : {}),
             subscribedAt: firebase.firestore.FieldValue.serverTimestamp(),
             source: options.source === 'website_popup' ? 'website_popup' : 'website_footer',
             tags: language === 'en' ? ['engelsk'] : [],
