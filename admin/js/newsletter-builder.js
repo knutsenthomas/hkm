@@ -7554,7 +7554,14 @@ class NewsletterBuilder {
                 else this.excludedRecipientEmails.add(rec.email);
                 this.calculateEstimated();
             };
-            label.append(checkbox, document.createTextNode(` ${rec.name || ''} (${rec.email})`));
+            const identity = document.createElement('span');
+            identity.className = 'recipient-review-identity';
+            const name = document.createElement('strong');
+            name.textContent = rec.name || rec.email;
+            const email = document.createElement('span');
+            email.textContent = rec.email;
+            identity.append(name, email);
+            label.append(checkbox, identity);
             const language = document.createElement('select');
             language.setAttribute('aria-label', `Språk for ${rec.email}`);
             language.add(new Option('Norsk', 'no'));

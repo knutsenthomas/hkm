@@ -8837,3 +8837,73 @@ body.builder-active .sidebar .mobile-sidebar-close-btn {
     .hkd-workbook-card td { display: block !important; width: 100% !important; box-sizing: border-box; }
     .hkd-workbook-card .hkd-workbook-image { padding: 0 0 18px !important; }
 }
+
+/* Recipient review uses the same controls and spacing as the workspace. */
+#recipient-language-review {
+    color: var(--workspace-text, #1e293b);
+    font: 14px/1.5 Inter, sans-serif;
+}
+#recipient-language-review > p {
+    margin: 0 0 16px;
+    color: var(--workspace-muted, #64748b);
+    font-size: 13px;
+    font-weight: 500;
+}
+#recipient-language-review input[type="search"],
+#recipient-language-review select {
+    appearance: none;
+    font: inherit;
+    color: var(--workspace-text, #1e293b);
+    background-color: var(--workspace-surface, #fff);
+    border: 1px solid var(--workspace-border, #e2e8f0);
+    border-radius: var(--workspace-radius, 10px);
+    min-height: 42px;
+    transition: border-color .15s, box-shadow .15s;
+}
+#recipient-language-review input[type="search"]::placeholder {
+    color: var(--workspace-muted, #64748b);
+}
+#recipient-language-review select {
+    width: 120px;
+    padding: 9px 32px 9px 12px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2364748b' stroke-width='1.8'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    flex-shrink: 0;
+}
+#recipient-language-review input:focus-visible,
+#recipient-language-review select:focus-visible {
+    outline: 2px solid var(--workspace-accent, #d17d39);
+    outline-offset: 2px;
+}
+#recipient-language-review label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+#recipient-language-review input[type="checkbox"] {
+    appearance: auto;
+    width: 17px;
+    height: 17px;
+    margin: 0;
+    flex-shrink: 0;
+    accent-color: var(--workspace-accent, #d17d39);
+}
+#recipient-language-review .recipient-review-identity {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+#recipient-language-review .recipient-review-identity strong {
+    font-size: 14px;
+    font-weight: 600;
+}
+#recipient-language-review .recipient-review-identity > span {
+    color: var(--workspace-muted, #64748b);
+    font-size: 12px;
+}
+#recipient-language-review select:disabled {
+    opacity: .6;
+    cursor: wait;
+}
