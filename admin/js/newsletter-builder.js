@@ -610,6 +610,7 @@ class NewsletterBuilder {
         if (editorLangEn) {
             editorLangEn.addEventListener('click', () => this.switchEditorLanguage('en'));
         }
+        document.getElementById('newsletter-translation-retry')?.addEventListener('click', () => this.switchEditorLanguage('en', true));
         const editorRetranslate = document.getElementById('editor-retranslate-btn');
         if (editorRetranslate) {
             editorRetranslate.addEventListener('click', () => this.switchEditorLanguage('en', true));
@@ -9049,7 +9050,7 @@ class NewsletterBuilder {
 
             if (targetLanguage === 'en' && (forceTranslate || !this.englishPayload?.blocksEn?.length)) {
                 const translated = await this.translateCurrentNewsletterToEnglish();
-                if (!translated && !this.englishPayload?.blocksEn?.length) {
+                if (!translated) {
                     this.updateEditorLanguageButtons(this.currentEditorLang);
                     return;
                 }
@@ -9078,11 +9079,22 @@ class NewsletterBuilder {
         }
     }
 
+    setTranslationStatus(message, error = false) {
+        const status = document.getElementById('newsletter-translation-status');
+        if (!status) return;
+        status.hidden = false;
+        status.textContent = message;
+        status.style.color = error ? '#b91c1c' : '#475569';
+        const retry = document.getElementById('newsletter-translation-retry');
+        if (retry) retry.hidden = !error;
+    }
+
     async translateCurrentNewsletterToEnglish() {
         this.syncUnifiedBlocks();
         const norwegianSubject = this.subjectNo
             || document.getElementById('newsletter-subject')?.value
             || 'Nyhetsbrev';
+        const translationDocumentKey = this.editorDocumentKey || this.currentDraftId;
         const norwegianBlocks = JSON.parse(JSON.stringify(this.blocks || []));
         const sourceHtml = this.getLanguageBlocksHtml(norwegianBlocks);
         const plainText = sourceHtml.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
@@ -9094,6 +9106,7 @@ class NewsletterBuilder {
             return false;
         }
 
+        this.setTranslationStatus('Oversetter til engelsk. Dette kan ta opptil et par minutter. Norsk innhold beholdes.', false);
         const translateButton = document.getElementById('editor-lang-btn-en');
         const retranslateButton = document.getElementById('editor-retranslate-btn');
         const originalButtonHtml = translateButton?.innerHTML || '';
@@ -9114,72 +9127,39 @@ class NewsletterBuilder {
                 throw new Error('AI-oversettelsen er ikke tilgjengelig akkurat nå. Sjekk at Firebase er tilkoblet.');
             }
 
-            const prompt = `
-Du er en profesjonell oversetter for His Kingdom Ministry.
-Oversett følgende e-post nyhetsbrev fra norsk til naturlig, varmt, engasjerende og korrekt engelsk.
-Behold all HTML-struktur, ID-er, klasser, style-attributter, lenker (href), og bilder (src/alt) 100% uendret.
-Oversett «Basar» til «Raffle» og «Sommerbasar» til «Summer Raffle».
-Oversett «Kjøp lodd» til «Buy raffle tickets».
-
-NORSK EMNELINJE:
-${norwegianSubject}
-
-NORSK INNHOLD (HTML):
-${sourceHtml}
-
-Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, svar kun med ren tekst/JSON) i dette formatet:
-{
-  "subject": "Oversatt engelsk emnelinje",
-  "html": "Oversatt engelsk HTML-innhold"
-}
-            `.trim();
-
-            const callable = functionsObj.httpsCallable('aiProcess');
-            const response = await callable({ prompt });
-            let rawResult = response?.data?.text || response?.data?.result || response?.data || '';
-            if (typeof rawResult === 'object' && rawResult !== null) {
-                rawResult = JSON.stringify(rawResult);
+            const source = document.createElement('div');
+            source.innerHTML = sourceHtml;
+            source.querySelectorAll('script,style,[contenteditable="false"] button,.block-quick-toolbar').forEach(node => node.remove());
+            const walker = document.createTreeWalker(source, NodeFilter.SHOW_TEXT);
+            const textNodes = [];
+            while (walker.nextNode()) {
+                if (walker.currentNode.textContent.trim()) textNodes.push(walker.currentNode);
             }
-            rawResult = String(rawResult)
-                .trim()
-                .replace(/^```(?:json)?\s*/i, '')
-                .replace(/\s*```$/, '')
-                .trim();
-
-            let parsed = null;
-            try {
-                parsed = JSON.parse(rawResult);
-            } catch (e) {
-                const jsonMatch = rawResult.match(/\{[\s\S]*\}/);
-                if (jsonMatch) {
-                    try {
-                        parsed = JSON.parse(jsonMatch[0]);
-                    } catch (e2) {
-                        console.warn('Fant JSON-lignende streng, men kunne ikke parse den:', e2);
-                    }
-                }
+            const texts = [String(norwegianSubject), ...textNodes.map(node => node.textContent)];
+            const callable = functionsObj.httpsCallable('aiProcess', { timeout: 170000 });
+            let timeoutId;
+            const response = await Promise.race([
+                callable({ task: 'translate_newsletter', texts, provider: document.getElementById('newsletter-translation-provider')?.value || 'auto' }),
+                new Promise((_, reject) => { timeoutId = setTimeout(() => reject(new Error('Oversettelsen tok for lang tid. Prøv igjen, eller velg Google Translate.')), 175000); })
+            ]).finally(() => clearTimeout(timeoutId));
+            const translated = response?.data?.texts;
+            if (!Array.isArray(translated) || translated.length !== texts.length || translated.some(text => typeof text !== 'string' || !text.trim())) {
+                throw new Error('Oversettelsen var ufullstendig. Prøv igjen.');
             }
-
-            let translatedSubject = parsed?.subject || `${norwegianSubject} – English`;
-            let translatedHtml = parsed?.html || parsed?.blocks?.[0]?.content?.text || '';
-
-            if (!translatedHtml && Array.isArray(parsed?.blocks)) {
-                translatedHtml = this.getLanguageBlocksHtml(parsed.blocks);
+            this.syncUnifiedBlocks();
+            if (translationDocumentKey !== (this.editorDocumentKey || this.currentDraftId)
+                || this.getLanguageBlocksHtml(this.blocks || []) !== sourceHtml) {
+                throw new Error('Nyhetsbrevet ble endret mens oversettelsen pågikk. Prøv igjen for å oversette siste versjon.');
             }
-
-            if (!translatedHtml) {
-                if (rawResult && (rawResult.includes('<') || rawResult.length > 50)) {
-                    translatedHtml = rawResult;
-                } else {
-                    throw new Error('AI-oversettelsen returnerte ikke gyldig innhold.');
-                }
-            }
-
-            translatedHtml = translatedHtml
-                .replace(/>\s*Følg oss\s*</gi, '>Follow us<')
-                .replace(/Følg oss/g, 'Follow us')
-                .replace(/Abonner på vårt nyhetsbrev/gi, 'Subscribe to our newsletter')
-                .replace(/Meld deg av nyhetsbrev/gi, 'Unsubscribe from newsletter');
+            const decode = text => {
+                if (response.data.provider !== 'google') return text;
+                const textarea = document.createElement('textarea');
+                textarea.innerHTML = text;
+                return textarea.value;
+            };
+            const translatedSubject = decode(translated[0]);
+            textNodes.forEach((node, index) => { node.textContent = decode(translated[index + 1]); });
+            const translatedHtml = source.innerHTML;
 
             const translatedBlocks = [{
                 id: 'unified_content',
@@ -9197,11 +9177,13 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             this.triggerAutosave();
 
             if (typeof showToast === 'function') {
-                showToast('Engelsk versjon er opprettet og lagret!', 'success');
+                this.setTranslationStatus('Engelsk versjon er klar. Se over teksten før sending.', false);
+                showToast('Engelsk versjon er klar. Se over teksten før sending.', 'success');
             }
             return true;
         } catch (error) {
             console.error('Oversettelse av nyhetsbrev feilet:', error);
+            this.setTranslationStatus(error.message || 'Kunne ikke oversette. Prøv igjen.', true);
             if (typeof showToast === 'function') {
                 showToast(`Kunne ikke lage engelsk versjon: ${error.message}`, 'error');
             }

@@ -1072,12 +1072,21 @@
                         </button>
                         <button type="button" id="editor-lang-btn-en" class="editor-lang-btn" style="display: flex; align-items: center; gap: 6px; padding: 5px 12px; border: none; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; background: transparent; color: #64748b; transition: all 0.2s;">
                             <span class="material-symbols-outlined lang-translate-icon" style="font-size: 16px; color: #2563eb;">translate</span>
-                            <span class="lang-text">English</span>
+                            <span class="lang-text">Engelsk</span>
                         </button>
-                        <button type="button" id="editor-retranslate-btn" title="Re-oversett fra norsk med AI" style="display: none; align-items: center; gap: 4px; padding: 5px 10px; border: none; border-radius: 9px; font-size: 12px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af; transition: all 0.2s;">
+                        <button type="button" id="editor-retranslate-btn" title="Oversett på nytt fra norsk" style="display: none; align-items: center; gap: 4px; padding: 5px 10px; border: none; border-radius: 9px; font-size: 12px; font-weight: 700; cursor: pointer; background: #dbeafe; color: #1e40af; transition: all 0.2s;">
                             <span class="material-symbols-outlined" style="font-size: 15px;">sync</span>
-                            <span>Re-oversett</span>
+                            <span>Oversett på nytt</span>
                         </button>
+                    </div>
+                    <div style="padding: 4px 8px 12px;">
+                        <label for="newsletter-translation-provider" style="display:block;font-size:12px;font-weight:600;color:#475569;margin-bottom:6px;">Oversett med</label>
+                        <select id="newsletter-translation-provider" style="width:100%;min-height:40px;padding:8px 12px;border:1px solid #cbd5e1;border-radius:9px;background:white;color:#0f172a;font:13px 'Inter',sans-serif;">
+                            <option value="auto">Automatisk – med Google som reserve</option>
+                            <option value="google">Google Translate</option>
+                        </select>
+                        <p id="newsletter-translation-status" role="status" aria-live="polite" hidden style="font-size:12px;line-height:1.5;margin:8px 0;"></p>
+                        <button type="button" id="newsletter-translation-retry" hidden style="padding:8px 12px;border:1px solid #cbd5e1;border-radius:8px;background:white;cursor:pointer;">Prøv oversettelsen igjen</button>
                     </div>
                     <div class="newsletter-menu-divider" role="separator"></div>
                     <button id="save-template-btn" class="newsletter-more-item" role="menuitem" title="Lagre som …">
