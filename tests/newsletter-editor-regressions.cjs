@@ -295,6 +295,26 @@ const runSaveTimer = () => {
     box.innerHTML='<p><img src="https://example.com/regular.jpg"></p>';
     assert.doesNotThrow(()=>imageEditor.showImageInspector(box.querySelector('img'),box.firstElementChild));
     assert.equal(inspector.querySelector('#existing-collage-style'),null);
+    // Button placement controls change only the button row, including inside a campaign.
+    const buttonEditor=Object.create(context.Builder.prototype);
+    let buttonSyncs=0;
+    Object.assign(buttonEditor,{setPropertiesPanel(){},captureEditorStep(){},syncUnifiedBlocks(){buttonSyncs++;}});
+    box.innerHTML='<div><h2>Campaign</h2><p>Keep this text</p><a class="block-btn" href="https://example.com">Support</a></div>';
+    const campaignButton=box.querySelector('a');
+    buttonEditor.showButtonInspector(campaignButton,box.firstElementChild);
+    const alignment=inspector.querySelector('#btn-inspector-alignment');
+    assert.ok(alignment);
+    for (const value of ['center','right','left']) {
+        alignment.value=value; alignment.dispatchEvent(new dom.window.Event('change'));
+        assert.equal(campaignButton.parentElement.style.textAlign,value);
+        assert.equal(campaignButton.parentElement.getAttribute('align'),value);
+        assert.equal(box.firstElementChild.style.textAlign,'');
+        const clean=buttonEditor.getCleanCanvasHtml();
+        assert.match(clean,new RegExp('text-align: '+value));
+        assert.match(clean,/Keep this text/);
+    }
+    assert.equal(buttonSyncs,3);
+    assert.equal(box.querySelectorAll('.block-btn-wrap').length,1);
     inspector.remove();box.innerHTML='<p>First</p>';
     const campaignEditor=Object.create(context.Builder.prototype);
     let campaignHtml='';

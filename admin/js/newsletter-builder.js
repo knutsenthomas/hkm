@@ -6993,6 +6993,34 @@ class NewsletterBuilder {
         }
     }
 
+    getButtonAlignmentContainer(btn) {
+        const parent = btn.parentElement;
+        if (parent && parent.id !== 'blocks-container' &&
+            Array.from(parent.childNodes).every(child => child === btn ||
+                (child.nodeType === Node.TEXT_NODE && !child.textContent.trim()) ||
+                (child.nodeType === Node.ELEMENT_NODE && child.matches('#block-quick-toolbar, .block-quick-toolbar')))) return parent;
+        return null;
+    }
+
+    setButtonAlignment(btn, alignment) {
+        if (!['left', 'center', 'right'].includes(alignment)) return;
+        this.captureEditorStep();
+        let wrapper = this.getButtonAlignmentContainer(btn);
+        if (!wrapper) {
+            wrapper = document.createElement('span');
+            wrapper.className = 'block-btn-wrap';
+            wrapper.style.display = 'block';
+            btn.before(wrapper); wrapper.append(btn);
+        }
+        wrapper.style.textAlign = alignment;
+        wrapper.setAttribute('align', alignment);
+        // Keep the button at its own width so its container can position it.
+        btn.style.display = 'inline-block';
+        btn.style.float = 'none';
+        btn.style.marginLeft = '0'; btn.style.marginRight = '0';
+        this.syncUnifiedBlocks();
+    }
+
     showButtonInspector(btn, node) {
         this.setPropertiesPanel(true);
         const defaultView = document.getElementById('sidebar-default-view');
@@ -7007,6 +7035,8 @@ class NewsletterBuilder {
         
         const computed = window.getComputedStyle(btn);
         const currentRadius = computed.borderRadius;
+        const alignmentContainer = this.getButtonAlignmentContainer(btn);
+        const currentAlignment = alignmentContainer ? window.getComputedStyle(alignmentContainer).textAlign : 'left';
 
         const isDesktopOnly = node.classList.contains('hkm-desktop-only');
         const isMobileOnly = node.classList.contains('hkm-mobile-only');
@@ -7059,6 +7089,14 @@ class NewsletterBuilder {
                             <span>Slett</span>
                         </button>
                     </div>
+                </div>
+                <div class="inspector-group">
+                    <label class="inspector-group-label" for="btn-inspector-alignment">Plassering av knapp</label>
+                    <select class="inspector-select" id="btn-inspector-alignment">
+                        <option value="left" ${['left', 'start'].includes(currentAlignment) ? 'selected' : ''}>Venstre</option>
+                        <option value="center" ${currentAlignment === 'center' ? 'selected' : ''}>Midtstilt</option>
+                        <option value="right" ${['right', 'end'].includes(currentAlignment) ? 'selected' : ''}>Høyre</option>
+                    </select>
                 </div>
                 <div class="inspector-group">
                     <label class="inspector-group-label">Knappetekst</label>
@@ -7166,6 +7204,9 @@ class NewsletterBuilder {
     }
 
     bindButtonInspectorEvents(btn, node) {
+        document.getElementById('btn-inspector-alignment')?.addEventListener('change', event => {
+            this.setButtonAlignment(btn, event.target.value);
+        });
         const inputText = document.getElementById('btn-inspector-text');
         const inputUrl = document.getElementById('btn-inspector-url');
         const designColor = document.getElementById('btn-design-color');
