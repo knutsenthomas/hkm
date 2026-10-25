@@ -484,8 +484,8 @@ html[data-workspace-design="unified"] .workspace-metrics > div > span {
 }
 
 /* Newsletter navigation shares the active state used across the workspace. */
-html[data-workspace-design="unified"] #newsletter-builder-layout .builder-dark-sidebar .sidebar-nav-menu .nav-item.active,
-html[data-workspace-design="unified"] #newsletter-builder-layout .builder-dark-sidebar .sidebar-bottom-settings .nav-item.active {
+html[data-workspace-design="unified"] body.builder-active #newsletter-builder-layout .builder-dark-sidebar .sidebar-nav-menu .nav-item.active,
+html[data-workspace-design="unified"] body.builder-active #newsletter-builder-layout .builder-dark-sidebar .sidebar-bottom-settings .nav-item.active {
   background: var(--workspace-gradient) !important;
   color: #fff !important;
   border-left: 0 !important;
