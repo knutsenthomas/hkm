@@ -7461,6 +7461,7 @@ class NewsletterBuilder {
             });
         });
 
+        document.getElementById('review-add-subscriber')?.addEventListener('click', () => this.addNewSubscriberPrompt());
         const subCheckbox = document.getElementById('select-subscribers');
         if (subCheckbox) {
             subCheckbox.addEventListener('change', () => this.calculateEstimated());
@@ -7495,11 +7496,81 @@ class NewsletterBuilder {
         }
     }
 
+    isEnglishRecipient(recipient) {
+        return [...(recipient.tags || []), ...(recipient.segments || [])]
+            .some(value => ['en', 'english', 'engelsk'].includes(String(value).trim().toLowerCase()));
+    }
+
+    renderRecipientReview(subscribers) {
+        const host = document.getElementById('recipient-language-review');
+        if (!host) return;
+        this.excludedRecipientEmails ||= new Set();
+        const candidates = this.filterRecipientsBySelection(subscribers, true);
+        const selected = candidates.filter(rec => !this.excludedRecipientEmails.has(rec.email));
+        const english = selected.filter(rec => this.isEnglishRecipient(rec)).length;
+        host.replaceChildren();
+        const summary = document.createElement('p');
+        summary.setAttribute('role', 'status');
+        summary.textContent = `Norsk: ${selected.length - english} · Engelsk: ${english} · Totalt: ${selected.length}`;
+        host.append(summary);
+        const search = document.createElement('input');
+        search.type = 'search';
+        search.placeholder = 'Søk etter navn eller e-post';
+        search.setAttribute('aria-label', 'Søk i mottakere');
+        search.style.cssText = 'width:100%;padding:12px;box-sizing:border-box;margin-bottom:12px';
+        host.append(search);
+        const list = document.createElement('div');
+        list.style.cssText = 'max-height:360px;overflow:auto';
+        host.append(list);
+        candidates.forEach(rec => {
+            const row = document.createElement('div');
+            row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #e2e8f0;flex-wrap:wrap';
+            const label = document.createElement('label');
+            label.style.cssText = 'flex:1;min-width:180px;overflow-wrap:anywhere';
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = !this.excludedRecipientEmails.has(rec.email);
+            checkbox.onchange = () => {
+                if (checkbox.checked) this.excludedRecipientEmails.delete(rec.email);
+                else this.excludedRecipientEmails.add(rec.email);
+                this.calculateEstimated();
+            };
+            label.append(checkbox, document.createTextNode(` ${rec.name || ''} (${rec.email})`));
+            const language = document.createElement('select');
+            language.setAttribute('aria-label', `Språk for ${rec.email}`);
+            language.add(new Option('Norsk', 'no'));
+            language.add(new Option('Engelsk', 'en'));
+            language.value = this.isEnglishRecipient(rec) ? 'en' : 'no';
+            language.onchange = async () => {
+                const previous = this.isEnglishRecipient(rec) ? 'en' : 'no';
+                const tags = (rec.tags || []).filter(value => !['en', 'english', 'engelsk'].includes(String(value).trim().toLowerCase()));
+                const segments = (rec.segments || []).filter(value => !['en', 'english', 'engelsk'].includes(String(value).trim().toLowerCase()));
+                if (language.value === 'en') tags.push('engelsk');
+                language.disabled = true;
+                try {
+                    await window.firebaseService.db.collection(rec.collection).doc(rec.id).update({ tags, segments });
+                    await this.calculateEstimated();
+                    showToast('Språkvalget er lagret på abonnenten.', 'success');
+                } catch (error) {
+                    language.value = previous;
+                    showToast('Kunne ikke lagre språkvalget. Prøv igjen.', 'error');
+                } finally { language.disabled = false; }
+            };
+            row.append(label, language);
+            list.append(row);
+        });
+        search.oninput = () => {
+            const query = search.value.trim().toLowerCase();
+            [...list.children].forEach(row => { row.style.display = row.textContent.toLowerCase().includes(query) ? 'flex' : 'none'; });
+        };
+    }
+
     async calculateEstimated() {
         try {
             const allSubscribers = await this.fetchSubscribersList();
             const filtered = this.filterRecipientsBySelection(allSubscribers);
             const count = filtered.length;
+            this.renderRecipientReview(allSubscribers);
 
             const estEl = document.getElementById('estimated-count');
             if (estEl) estEl.innerText = count;
@@ -9267,7 +9338,10 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
         }
     }
 
-    filterRecipientsBySelection(allRecipients) {
+    filterRecipientsBySelection(allRecipients, includeExcluded = false) {
+        if (!includeExcluded && this.excludedRecipientEmails?.size) {
+            allRecipients = allRecipients.filter(rec => !this.excludedRecipientEmails.has(rec.email));
+        }
         if (!Array.isArray(allRecipients)) return [];
 
         const hasSelectedLabels = this.selectedLabels && this.selectedLabels.size > 0;
@@ -9358,9 +9432,16 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                 return;
             }
 
+            const englishCount = recipients.filter(rec => this.isEnglishRecipient(rec)).length;
+            const englishText = this.getLanguageBlocksHtml(this.englishPayload?.blocksEn || []).replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim();
+            if (englishCount && (!this.englishPayload?.subjectEn?.trim() || !englishText)) {
+                showToast('Lag og se over engelsk oversettelse før du sender til engelske mottakere.', 'warning');
+                if (finalBtn) { finalBtn.disabled = false; finalBtn.innerHTML = originalText; }
+                return;
+            }
             const confirmSend = await this.showConfirm(
-                'Send kampanje nå',
-                `Er du sikker på at du vil sende "${subject}" til ${recipients.length} mottakere?`,
+                'Send til alle valgte',
+                `Send "${subject}" til ${recipients.length} mottakere? Norsk: ${recipients.length - englishCount} · Engelsk: ${englishCount}.`,
                 'Send nå'
             );
             if (!confirmSend) {
@@ -11294,6 +11375,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                 </div>
 
                 <div style="margin-bottom: 16px;">
+                    <label for="add-sub-language">Språk</label><select id="add-sub-language"><option value="no">Norsk</option><option value="en">Engelsk</option></select>
                     <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Segmenter</label>
                     <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                         ${['Nyhetsbrev', 'Fastgiver', 'Frivillig', 'Leder', 'Ungdom', 'Bønneteam'].map(seg => `
@@ -11423,6 +11505,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                 </div>
 
                 <div style="margin-bottom: 16px;">
+                    <label for="add-sub-language">Språk</label><select id="add-sub-language"><option value="no">Norsk</option><option value="en">Engelsk</option></select>
                     <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Segmenter</label>
                     <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                         ${['Nyhetsbrev', 'Fastgiver', 'Frivillig', 'Leder', 'Ungdom', 'Bønneteam'].map(seg => `
@@ -11473,6 +11556,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             const phone = modal.querySelector('#add-sub-phone').value.trim();
             const tags = modal.querySelector('#add-sub-tags').value.split(',').map(t => t.trim()).filter(Boolean);
             const segments = Array.from(modal.querySelectorAll('.add-sub-seg-cb:checked')).map(cb => cb.value);
+            if (modal.querySelector('#add-sub-language').value === 'en') tags.push('engelsk');
 
             if (!email || !email.includes('@')) {
                 if (typeof showToast === 'function') showToast("Vennligst oppgi en gyldig e-postadresse.", "warning");
@@ -11504,7 +11588,13 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                 });
 
                 if (typeof showToast === 'function') showToast(`Abonnent ${email} ble lagt til!`, "success");
+                if (this.selectedLabels?.size || this.selectedSegments?.size || this.selectedUserEmails?.size) {
+                    this.selectedUserEmails ||= new Set();
+                    this.selectedUserEmails.add(email);
+                }
+                this.excludedRecipientEmails?.delete(email);
                 this.loadSubscribers();
+                this.calculateEstimated();
             } catch(e) {
                 console.error("Add subscriber failed:", e);
                 if (typeof showToast === 'function') showToast("Kunne ikke legge til abonnent.", "error");

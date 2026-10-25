@@ -5237,7 +5237,7 @@ exports.onNewsletterCampaignCreate = onDocumentCreated({
   const checkIsEnglishRecipient = (tags = [], segments = []) => {
     const tagArray = Array.isArray(tags) ? tags : (typeof tags === 'string' ? tags.split(',').map(t => t.trim().toLowerCase()) : []);
     const segArray = Array.isArray(segments) ? segments : (typeof segments === 'string' ? segments.split(',').map(s => s.trim().toLowerCase()) : []);
-    const allKeywords = [...tagArray, ...segArray];
+    const allKeywords = [...tagArray, ...segArray].map(value => String(value).trim().toLowerCase());
     return englishTagKeywords.some(kw => allKeywords.includes(kw));
   };
 
