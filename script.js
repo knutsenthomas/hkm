@@ -2151,12 +2151,14 @@ if (newsletterForm) {
             submitBtn.disabled = true;
             submitBtn.innerText = 'Sender...';
 
+            if (!window.firebaseService?.isInitialized) throw new Error('Påmeldingen er ikke tilgjengelig. Prøv igjen om litt.');
             if (window.firebaseService) {
                 await window.firebaseService.subscribeNewsletter(email);
+                try { localStorage.setItem('hkm_newsletter_subscribed', '1'); } catch { /* Browser storage is optional. */ }
                 if (window.notifications) {
                     window.notifications.show(`Takk! Du er nå påmeldt med ${email}`, 'success');
                 } else {
-                    alert(`Takk for at du meldte deg på! Vi har sendt en bekreftelse til ${email}`);
+                    alert(`Takk! Påmeldingen med ${email} er lagret.`);
                 }
                 newsletterForm.reset();
             }
@@ -2181,12 +2183,14 @@ if (footerNewsletterForm) {
         const email = emailInput.value;
 
         try {
+            if (!window.firebaseService?.isInitialized) throw new Error('Påmeldingen er ikke tilgjengelig. Prøv igjen om litt.');
             if (window.firebaseService) {
                 await window.firebaseService.subscribeNewsletter(email);
+                try { localStorage.setItem('hkm_newsletter_subscribed', '1'); } catch { /* Browser storage is optional. */ }
                 if (window.notifications) {
                     window.notifications.show(`Takk for påmeldingen!`, 'success');
                 } else {
-                    alert(`Takk for at du meldte deg på! Vi har sendt en bekreftelse til ${email}`);
+                    alert(`Takk! Påmeldingen med ${email} er lagret.`);
                 }
                 footerNewsletterForm.reset();
             }

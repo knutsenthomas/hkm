@@ -1,4 +1,5 @@
 import { initHkmChatWidget } from './hkm-chat-widget.js';
+import { mountNewsletterSignup } from './newsletter-signup.js';
 
 if (typeof document !== 'undefined' && document.head) {
     if (!document.querySelector('link[rel="preload"][href="/img/logo-hkm.png"]')) {
@@ -854,6 +855,7 @@ export function mountSiteShell() {
 
     document.documentElement.dataset.hkmSiteShell = 'mounted';
     initCookieSettingsLink();
+    mountNewsletterSignup(language);
     bindSiteShellMenu(header, megaMenu);
     if (typeof window.hkmApplyTheme === 'function') window.hkmApplyTheme();
     try {

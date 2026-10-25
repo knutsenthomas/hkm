@@ -1055,14 +1055,20 @@ class FirebaseService {
         return userCredential;
     }
 
-    async subscribeNewsletter(email) {
+    async subscribeNewsletter(email, options = {}) {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
         const normalizedEmail = String(email || '').trim().toLowerCase();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) || normalizedEmail.length > 254) throw new Error('Ugyldig e-postadresse.');
+        const language = options.language || (document.documentElement.lang?.startsWith('en') ? 'en' : 'no');
+
         return this.db.collection('newsletter_subscriptions').add({
             email: normalizedEmail,
             emailLower: normalizedEmail,
             subscribedAt: firebase.firestore.FieldValue.serverTimestamp(),
-            source: 'website_footer'
+            source: options.source === 'website_popup' ? 'website_popup' : 'website_footer',
+            tags: language === 'en' ? ['engelsk'] : [],
+            newsletterLanguage: language === 'en' ? 'en' : 'no',
+            newsletterConsent: true
         });
     }
 
