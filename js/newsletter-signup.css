@@ -1,4 +1,4 @@
-#hkm-newsletter-signup { width:min(460px,calc(100vw - 32px)); max-height:calc(100dvh - 32px); overflow:auto; box-sizing:border-box; padding:32px; border:1px solid #e6dfd7; border-radius:20px; background:#fffdf9; color:#203447; box-shadow:0 24px 80px #0f172a40; font-family:Inter,Arial,sans-serif; }
+#hkm-newsletter-signup { position:fixed; inset:0; margin:auto; width:min(460px,calc(100vw - 32px)); max-height:calc(100dvh - 32px); overflow:auto; box-sizing:border-box; padding:32px; border:1px solid #e6dfd7; border-radius:20px; background:#fffdf9; color:#203447; box-shadow:0 24px 80px #0f172a40; font-family:Inter,Arial,sans-serif; }
 #hkm-newsletter-signup::backdrop { background:rgba(15,23,42,.55); }
 #hkm-newsletter-signup [hidden] { display:none!important; }
 #hkm-newsletter-signup .hkm-newsletter-close { position:absolute; right:12px; top:10px; width:40px; height:40px; border:0; background:transparent; color:#475569; cursor:pointer; font-size:28px; }
