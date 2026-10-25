@@ -121,6 +121,25 @@ const box = context.document.getElementById('blocks-container');
     chooser.selectBlock(holder.firstElementChild,holder.querySelectorAll('img')[1]);
     assert.equal(inspected,holder.querySelectorAll('img')[1]);
 }
+// Email image constraints must preserve copied editor margins and rounded corners.
+{
+    const style=context.document.createElement('style');
+    style.textContent='#blocks-container img { margin:24px 0; border-radius:8px; display:block; }';
+    context.document.head.append(style);
+    box.innerHTML='<p><img src="https://example.com/students.jpg" alt="Students"></p><h2 style="margin-top:24px">School</h2>';
+    for (const reload of [false,true]) {
+        if (reload) box.innerHTML=editor.getCleanCanvasHtml();
+        const compiled=context.document.createElement('div'); compiled.innerHTML=editor.compileEmailHtml();
+        const image=compiled.querySelector('img[alt="Students"]');
+        assert.equal(image.style.marginTop,'24px');
+        assert.equal(image.style.marginBottom,'24px');
+        assert.equal(image.style.borderRadius,'8px');
+        assert.equal(image.style.maxWidth,'100%');
+        assert.equal(image.style.getPropertyPriority('max-width'),'important');
+        assert.equal(compiled.querySelector('.email-body h2').style.marginTop,'24px');
+    }
+    style.remove();box.innerHTML='<p>First</p>';
+}
 // Text formatting survives saved HTML and email compilation, including nested styles.
 {
     box.innerHTML='<h2 style="font-size:30px;font-weight:600;text-align:center;margin-bottom:11px;">Heading</h2><p style="font-size:17px;line-height:1.8;margin-bottom:22px;text-align:right;color:rgb(27,73,101);">Paragraph <span style="font-weight:700;font-style:italic;">emphasis</span></p>';

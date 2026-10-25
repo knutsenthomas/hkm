@@ -8599,7 +8599,11 @@ class NewsletterBuilder {
                     img.setAttribute('src', src);
                 }
             }
-            img.setAttribute('style', 'max-width: 100% !important; height: auto !important; border: 0 !important; display: block !important;');
+            // Apply email constraints without discarding the editor's spacing and corners.
+            img.style.setProperty('max-width', '100%', 'important');
+            img.style.setProperty('height', 'auto', 'important');
+            img.style.setProperty('border', '0', 'important');
+            img.style.setProperty('display', 'block', 'important');
         });
 
         this.normalizeCollageImages(contentClone, true);
@@ -8745,7 +8749,7 @@ class NewsletterBuilder {
             const clone = clonedImages[index];
             if (!clone) return;
             const computed = window.getComputedStyle(source);
-            ['display', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left'].forEach(property => {
+            ['display', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'border-radius'].forEach(property => {
                 const value = computed.getPropertyValue(property);
                 if (value) clone.style.setProperty(property, value);
             });
