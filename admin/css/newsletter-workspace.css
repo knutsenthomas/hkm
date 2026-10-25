@@ -467,3 +467,23 @@ body.builder-active #newsletter-builder-layout #blocks-container p.selected-bloc
     color: var(--admin-text-muted, #64748b) !important;
     font-weight: 600 !important;
 }
+
+/* Help and translation status must not inherit the toolbar's single-line layout. */
+#newsletter-builder-layout #newsletter-more-menu {
+    white-space: normal;
+}
+#newsletter-builder-layout #newsletter-more-menu #newsletter-english-images,
+#newsletter-builder-layout #newsletter-more-menu #newsletter-translation-status {
+    min-width: 0;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    box-sizing: border-box;
+}
+#newsletter-builder-layout #newsletter-more-menu #newsletter-review-english-images {
+    white-space: normal;
+    line-height: 1.4;
+    min-height: 40px;
+    max-width: 100%;
+    box-sizing: border-box;
+}
