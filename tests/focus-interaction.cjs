@@ -1,0 +1,13 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const {JSDOM}=require('jsdom');
+const dom=new JSDOM('<button>First</button><select><option>Norsk</option></select>');
+const context={document:dom.window.document,window:dom.window};vm.createContext(context);
+const source=fs.readFileSync('js/focus-interaction.js','utf8').replace("import '../css/focus-interaction.css';",'');
+vm.runInContext(source,context);
+assert.equal(dom.window.document.documentElement.dataset.hkmFocus,'keyboard');
+dom.window.dispatchEvent(new dom.window.Event('pointerdown'));assert.equal(dom.window.document.documentElement.dataset.hkmFocus,'pointer');
+dom.window.dispatchEvent(new dom.window.KeyboardEvent('keydown',{key:'Shift'}));assert.equal(dom.window.document.documentElement.dataset.hkmFocus,'pointer');
+dom.window.dispatchEvent(new dom.window.KeyboardEvent('keydown',{key:'Tab'}));assert.equal(dom.window.document.documentElement.dataset.hkmFocus,'keyboard');
+dom.window.dispatchEvent(new dom.window.Event('pointerdown'));assert.equal(dom.window.document.documentElement.dataset.hkmFocus,'pointer');
+vm.runInContext(source,context);assert.equal(dom.window.document.documentElement.dataset.hkmFocus,'pointer','Reinitialization must preserve current input method');
+console.log('Passed: keyboard focus, pointer focus, modifier keys and repeated initialization.');

@@ -1723,14 +1723,7 @@
                     </select>
                 </div>
 
-                <div class="subscriber-extra-filters" role="group" aria-label="Filtrer abonnenter">
-                    <label>Språk<select id="subscriber-language-filter"><option value="">Alle språk</option><option value="no">Norsk</option><option value="en">Engelsk</option></select></label>
-                    <label>Status<select id="subscriber-status-filter"><option value="">Alle statuser</option></select></label>
-                    <label>Registrert fra<input type="date" id="subscriber-date-from"></label>
-                    <label>Registrert til<input type="date" id="subscriber-date-to"></label>
-                    <button type="button" id="subscriber-reset-filters">Nullstill filtre</button>
-                    <span id="subscriber-filter-count" role="status" aria-live="polite"></span>
-                </div>
+                <p id="subscriber-filter-count" role="status" aria-live="polite" style="font-size:13px;color:#64748b;margin:0 0 12px;"></p>
 
                 <!-- Bulk Edit Action Bar (shown when contacts are checked) -->
                 <div id="subscribers-bulk-bar" style="display: none; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px 18px; border-radius: 14px; margin-bottom: 16px; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
@@ -1768,12 +1761,12 @@
                                 <th style="width: 40px; text-align: center;">
                                     <input type="checkbox" id="subscribers-select-all" style="width: 17px; height: 17px; cursor: pointer;">
                                 </th>
-                                <th>Navn</th>
-                                <th>E-postadresse</th>
-                                <th>Kilde / Segmenter</th>
-                                <th>Etiketter (Tags)</th>
-                                <th>Status</th>
-                                <th>Dato</th>
+                                <th scope="col" aria-sort="none"><button type="button" class="subscriber-sort-button" data-subscriber-sort="name" title="Sorter etter navn">Navn<span aria-hidden="true" class="subscriber-sort-indicator">↕</span></button></th>
+                                <th scope="col" aria-sort="none"><button type="button" class="subscriber-sort-button" data-subscriber-sort="email" title="Sorter etter e-postadresse">E-postadresse<span aria-hidden="true" class="subscriber-sort-indicator">↕</span></button></th>
+                                <th scope="col" aria-sort="none"><button type="button" class="subscriber-sort-button" data-subscriber-sort="source" title="Sorter etter kilde / segmenter">Kilde / Segmenter<span aria-hidden="true" class="subscriber-sort-indicator">↕</span></button></th>
+                                <th scope="col" aria-sort="none"><button type="button" class="subscriber-sort-button" data-subscriber-sort="tags" title="Sorter etter etiketter (tags)">Etiketter (Tags)<span aria-hidden="true" class="subscriber-sort-indicator">↕</span></button></th>
+                                <th scope="col" aria-sort="none"><button type="button" class="subscriber-sort-button" data-subscriber-sort="status" title="Sorter etter status">Status<span aria-hidden="true" class="subscriber-sort-indicator">↕</span></button></th>
+                                <th scope="col" aria-sort="none"><button type="button" class="subscriber-sort-button" data-subscriber-sort="date" title="Sorter etter dato">Dato<span aria-hidden="true" class="subscriber-sort-indicator">↕</span></button></th>
                                 <th>Handling</th>
                             </tr>
                         </thead>

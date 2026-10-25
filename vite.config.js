@@ -13,6 +13,17 @@ function shouldUseSharedSiteShell(pathname, html) {
     return !excludedDirectory && !excludedUtilityPage && !optedOut;
 }
 
+const focusInteractionPlugin = {
+    name: 'hkm-shared-focus-interaction',
+    transformIndexHtml: {
+        order: 'pre',
+        handler(html) {
+            if (html.includes('/js/focus-interaction.js')) return html;
+            return [{ tag: 'script', attrs: { type: 'module', src: '/js/focus-interaction.js' }, injectTo: 'head-prepend' }];
+        }
+    }
+};
+
 const sharedSiteShellPlugin = {
     name: 'hkm-shared-site-shell',
     transformIndexHtml: {
@@ -89,7 +100,7 @@ function getHtmlEntries(dir, entries = {}) {
 }
 
 export default defineConfig({
-    plugins: [sharedSiteShellPlugin, react()],
+    plugins: [focusInteractionPlugin, sharedSiteShellPlugin, react()],
     resolve: {
         alias: {
             '@': resolve(__dirname, 'admin/js')

@@ -11178,6 +11178,21 @@ class NewsletterBuilder {
         return matchesQuery && matchesSegment && matchesTag && matchesLanguage && matchesStatus && matchesDate;
     }
 
+    sortSubscribers(subscribers, field, direction = 'asc') {
+        if (!field) return subscribers.slice();
+        const collator = new Intl.Collator('nb', { sensitivity: 'base', numeric: true });
+        const value = subscriber => field === 'date' ? subscriber.registeredAt
+            : field === 'source' ? [subscriber.source, ...(subscriber.segments || [])].filter(Boolean).join(' ')
+            : field === 'tags' ? (subscriber.tags || []).join(' ') : subscriber[field];
+        return subscribers.slice().sort((a, b) => {
+            const first = value(a), second = value(b);
+            const missingFirst = first == null || first === '', missingSecond = second == null || second === '';
+            if (missingFirst !== missingSecond) return missingFirst ? 1 : -1;
+            const comparison = field === 'date' ? Number(first || 0) - Number(second || 0) : collator.compare(String(first || ''), String(second || ''));
+            return comparison * (direction === 'desc' ? -1 : 1);
+        });
+    }
+
     async loadSubscribers() {
         if (!window.firebaseService || !window.firebaseService.isInitialized) return;
         const tbody = document.getElementById('subscribers-table-body') || document.querySelector('#view-subscribers-panel tbody');
@@ -11224,25 +11239,21 @@ class NewsletterBuilder {
             const searchInput = document.getElementById('subscriber-search-input');
             const segmentFilterSelect = document.getElementById('subscriber-segment-filter');
 
-            const languageFilter = document.getElementById('subscriber-language-filter');
-            const statusFilter = document.getElementById('subscriber-status-filter');
-            const dateFrom = document.getElementById('subscriber-date-from');
-            const dateTo = document.getElementById('subscriber-date-to');
-            if (statusFilter) {
-                const previous = statusFilter.value;
-                statusFilter.replaceChildren(new Option('Alle statuser', ''));
-                [...new Set(subscribersList.map(sub => sub.status || 'Aktiv'))].sort().forEach(status => statusFilter.add(new Option(status, status)));
-                statusFilter.value = previous;
-            }
-
-            const renderRows = () => {
+            const renderRows = (preserveSelection = false) => {
+                const selectedBeforeSort = new Set(preserveSelection ? Array.from(tbody.querySelectorAll('.sub-row-cb:checked')).map(input => input.dataset.email) : []);
                 const q = (searchInput?.value || '').trim().toLowerCase();
                 const seg = (segmentFilterSelect?.value || '').trim().toLowerCase();
                 const tag = (tagFilterSelect?.value || '').trim().toLowerCase();
 
-                const filtered = subscribersList.filter(subscriber => this.matchesSubscriberFilters(subscriber, q, seg, tag, {
-                    language: languageFilter?.value, status: statusFilter?.value, from: dateFrom?.value, to: dateTo?.value
-                }));
+                const filtered = this.sortSubscribers(
+                    subscribersList.filter(subscriber => this.matchesSubscriberFilters(subscriber, q, seg, tag)),
+                    this.subscriberSortField, this.subscriberSortDirection
+                );
+                document.querySelectorAll('[data-subscriber-sort]').forEach(button => {
+                    const active = button.dataset.subscriberSort === this.subscriberSortField;
+                    button.closest('th').setAttribute('aria-sort', active ? (this.subscriberSortDirection === 'desc' ? 'descending' : 'ascending') : 'none');
+                    button.querySelector('.subscriber-sort-indicator').textContent = active ? (this.subscriberSortDirection === 'desc' ? '↓' : '↑') : '↕';
+                });
                 const count = document.getElementById('subscriber-filter-count');
                 if (count) count.textContent = `Viser ${filtered.length} av ${subscribersList.length} kontakter`;
                 const bulk = document.getElementById('subscribers-bulk-bar');
@@ -11309,6 +11320,7 @@ class NewsletterBuilder {
                     tbody.appendChild(tr);
                 });
 
+                tbody.querySelectorAll('.sub-row-cb').forEach(input => { input.checked = selectedBeforeSort.has(input.dataset.email); });
                 // Update bulk selection UI state
                 updateBulkUI();
 
@@ -11476,12 +11488,14 @@ class NewsletterBuilder {
             if (searchInput) searchInput.oninput = () => renderRows();
             if (segmentFilterSelect) segmentFilterSelect.onchange = () => renderRows();
             if (tagFilterSelect) tagFilterSelect.onchange = () => renderRows();
-            [languageFilter, statusFilter, dateFrom, dateTo].forEach(filter => { if (filter) filter.onchange = () => renderRows(); });
-            const resetFilters = document.getElementById('subscriber-reset-filters');
-            if (resetFilters) resetFilters.onclick = () => {
-                [searchInput, segmentFilterSelect, tagFilterSelect, languageFilter, statusFilter, dateFrom, dateTo].forEach(filter => { if (filter) filter.value = ''; });
-                renderRows();
-            };
+            document.querySelectorAll('[data-subscriber-sort]').forEach(button => {
+                button.onclick = () => {
+                    const field = button.dataset.subscriberSort;
+                    this.subscriberSortDirection = this.subscriberSortField === field && this.subscriberSortDirection !== 'desc' ? 'desc' : 'asc';
+                    this.subscriberSortField = field;
+                    renderRows(true);
+                };
+            });
 
         } catch (e) {
             console.error("Load subscribers failed:", e);

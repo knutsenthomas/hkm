@@ -1,0 +1,16 @@
+/* Important rules in this named layer override legacy page-specific focus rings,
+   without altering borders, selected states or image-editing handles. */
+@layer hkm-focus-interaction {
+    html { --hkm-focus-color: #475569; }
+    html[data-theme="dark"], html.dark { --hkm-focus-color: #cbd5e1; }
+    html[data-hkm-focus="pointer"] :is(a,button,input,select,textarea,summary,[tabindex],[contenteditable="true"]):focus {
+        outline: none !important;
+        outline-offset: 0 !important;
+        box-shadow: none !important;
+    }
+    html[data-hkm-focus="keyboard"] :is(a,button,input,select,textarea,summary,[tabindex],[contenteditable="true"]):focus-visible {
+        outline: 2px solid var(--hkm-focus-color) !important;
+        outline-offset: 2px !important;
+        box-shadow: none !important;
+    }
+}
