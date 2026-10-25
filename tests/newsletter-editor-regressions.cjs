@@ -30,6 +30,26 @@ Object.assign(editor, { currentMode: 'builder', currentDraftId: 'draft', current
     editorDocumentKey: 'draft', blocks: [], recordNewsletterVersion: async () => {},
     normalizeCanvasBlocks() {}, isMobileViewport: () => false });
 const box = context.document.getElementById('blocks-container');
+// Clicking an image exposes replacement and Canva actions on the actual image toolbar.
+{
+    context.getComputedStyle = dom.window.getComputedStyle.bind(dom.window);
+    let replacement, canvaImage;
+    context.openNewsletterCanvaLink = (builder, image) => { canvaImage = image; };
+    const imageEditor = Object.create(context.Builder.prototype);
+    imageEditor.openImageInsertionFlowAt = (after, image) => { replacement = image; };
+    const image = context.document.createElement('img');
+    box.append(image);
+    imageEditor.activateImageResizer(image);
+    context.document.querySelector('#hkm-img-resizer button[aria-label="Bytt dette bildet"]').click();
+    assert.equal(replacement, image);
+    assert.equal(context.document.getElementById('hkm-img-resizer'), null);
+    imageEditor.activateImageResizer(image);
+    context.document.querySelector('#hkm-img-resizer button[aria-label="Åpne Canva-lenke og last opp ferdig bilde"]').click();
+    assert.equal(canvaImage, image);
+    assert.equal(context.document.getElementById('hkm-img-resizer'), null);
+    image.remove();
+}
+
 // Bare editor text must select as a paragraph, never call classList on text.
 {
     const selectionEditor = Object.create(context.Builder.prototype);

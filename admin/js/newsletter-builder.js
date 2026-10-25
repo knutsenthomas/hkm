@@ -9768,7 +9768,12 @@ class NewsletterBuilder {
         const toolbar = document.createElement('div');
         toolbar.style.cssText = `
             position: absolute;
-            top: -42px;
+            bottom: calc(100% + 12px);
+            width: max-content;
+            max-width: calc(100vw - 32px);
+            box-sizing: border-box;
+            flex-wrap: wrap;
+            justify-content: center;
             left: 50%;
             transform: translateX(-50%);
             background: #0f172a;
@@ -9799,6 +9804,22 @@ class NewsletterBuilder {
             document.removeEventListener('mousedown', outsideClickListener);
         };
         overlay.cleanup = cleanupResizer;
+
+        const imageAction = (label, title, action) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.textContent = label;
+            button.title = title;
+            button.setAttribute('aria-label', title);
+            button.style.cssText = 'background:none;border:none;color:#fff;cursor:pointer;font-size:12px;font-weight:700;padding:4px 6px;font-family:inherit;white-space:nowrap;';
+            button.onclick = event => {
+                event.preventDefault(); event.stopPropagation();
+                cleanupResizer(); overlay.remove(); action();
+            };
+            return button;
+        };
+        const replaceBtn = imageAction('Bytt bilde', 'Bytt dette bildet', () => this.openImageInsertionFlowAt(null, img));
+        const canvaBtn = imageAction('Canva', 'Åpne Canva-lenke og last opp ferdig bilde', () => openNewsletterCanvaLink(this, img));
 
         const settingsBtn = document.createElement('button');
         settingsBtn.type = 'button';
@@ -9839,6 +9860,8 @@ class NewsletterBuilder {
 
         toolbar.appendChild(sizeText);
         toolbar.appendChild(document.createTextNode(' • '));
+        toolbar.appendChild(replaceBtn);
+        toolbar.appendChild(canvaBtn);
         toolbar.appendChild(settingsBtn);
         toolbar.appendChild(document.createTextNode(' • '));
         toolbar.appendChild(deleteBtn);
