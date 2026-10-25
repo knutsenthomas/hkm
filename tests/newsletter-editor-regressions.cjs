@@ -30,6 +30,18 @@ Object.assign(editor, { currentMode: 'builder', currentDraftId: 'draft', current
     editorDocumentKey: 'draft', blocks: [], recordNewsletterVersion: async () => {},
     normalizeCanvasBlocks() {}, isMobileViewport: () => false });
 const box = context.document.getElementById('blocks-container');
+// Subscriber filters combine language, tags, status and inclusive registration dates.
+{
+    const subscriber = { name:'Jane', email:'jane@example.com', tags:[' English ', 'VIP'], segments:['Prayer'], status:'Aktiv', registeredAt:new Date('2026-10-25T12:00:00').getTime() };
+    assert.equal(editor.matchesSubscriberFilters(subscriber, 'jane', 'prayer', 'vip', { language:'en', status:'aktiv', from:'2026-10-25', to:'2026-10-25' }), true);
+    assert.equal(editor.matchesSubscriberFilters(subscriber, '', '', '', { language:'no' }), false);
+    assert.equal(editor.matchesSubscriberFilters(subscriber, '', '', '', { status:'Inaktiv' }), false);
+    assert.equal(editor.matchesSubscriberFilters(subscriber, '', '', '', { to:'2026-10-24' }), false);
+    assert.equal(editor.matchesSubscriberFilters({...subscriber,registeredAt:null}, '', '', '', { from:'2026-10-01' }), false);
+    assert.equal(editor.matchesSubscriberFilters({...subscriber,registeredAt:null}), true);
+    assert.equal(editor.subscriberDateValue({toDate:()=>new Date('2026-10-25T12:00:00')}), subscriber.registeredAt);
+    assert.equal(editor.subscriberDateValue('invalid'), null);
+}
 // English donation links are localized without changing campaign choices or Norwegian/source links.
 {
     const links = context.document.createElement('div');

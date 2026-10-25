@@ -11044,6 +11044,7 @@ class NewsletterBuilder {
                         phone,
                         source: 'Kontaktliste (CRM)',
                         status: data.status || 'Aktiv',
+                        registeredAt: this.subscriberDateValue(data.createdAt || data.subscribedAt),
                         dateStr,
                         tags,
                         segments
@@ -11087,6 +11088,7 @@ class NewsletterBuilder {
                             phone,
                             source: data.source === 'website_footer' ? 'Nettsted' : (data.source || 'Direkte påmeldt'),
                             status: data.status || 'Aktiv',
+                            registeredAt: this.subscriberDateValue(data.subscribedAt || data.createdAt),
                             dateStr,
                             tags,
                             segments
@@ -11132,6 +11134,7 @@ class NewsletterBuilder {
                             phone,
                             source: 'Brukerkonto',
                             status: 'Aktiv',
+                            registeredAt: this.subscriberDateValue(data.createdAt || data.subscribedAt),
                             dateStr,
                             tags,
                             segments
@@ -11147,7 +11150,13 @@ class NewsletterBuilder {
         return Array.from(subscribersMap.values());
     }
 
-    matchesSubscriberFilters(subscriber, query = '', segment = '', tag = '') {
+    subscriberDateValue(value) {
+        if (!value) return null;
+        const date = value.toDate ? value.toDate() : new Date(value);
+        return Number.isFinite(date.getTime()) ? date.getTime() : null;
+    }
+
+    matchesSubscriberFilters(subscriber, query = '', segment = '', tag = '', extra = {}) {
         const normalize = value => String(value || '').trim().toLowerCase();
         const label = value => normalize(value) === 'ny' ? 'nyhetsbrev' : normalize(value);
         const tags = (subscriber.tags || []).map(label);
@@ -11160,7 +11169,13 @@ class NewsletterBuilder {
         const matchesQuery = !q || [subscriber.name, subscriber.email, subscriber.phone, ...tags, ...segments].some(value => normalize(value).includes(q));
         const matchesSegment = !seg || (seg === 'nyhetsbrev' ? newsletterMember : source.includes(seg) || segments.some(value => value.includes(seg)));
         const matchesTag = !selectedTag || (selectedTag === 'nyhetsbrev' ? newsletterMember : tags.includes(selectedTag));
-        return matchesQuery && matchesSegment && matchesTag;
+        const matchesLanguage = !extra.language || (this.isEnglishRecipient(subscriber) ? 'en' : 'no') === extra.language;
+        const matchesStatus = !extra.status || normalize(subscriber.status) === normalize(extra.status);
+        const timestamp = subscriber.registeredAt;
+        const from = extra.from ? new Date(extra.from + 'T00:00:00').getTime() : null;
+        const until = extra.to ? new Date(extra.to + 'T23:59:59.999').getTime() : null;
+        const matchesDate = (!extra.from && !extra.to) || (timestamp != null && (from == null || timestamp >= from) && (until == null || timestamp <= until));
+        return matchesQuery && matchesSegment && matchesTag && matchesLanguage && matchesStatus && matchesDate;
     }
 
     async loadSubscribers() {
@@ -11209,12 +11224,33 @@ class NewsletterBuilder {
             const searchInput = document.getElementById('subscriber-search-input');
             const segmentFilterSelect = document.getElementById('subscriber-segment-filter');
 
+            const languageFilter = document.getElementById('subscriber-language-filter');
+            const statusFilter = document.getElementById('subscriber-status-filter');
+            const dateFrom = document.getElementById('subscriber-date-from');
+            const dateTo = document.getElementById('subscriber-date-to');
+            if (statusFilter) {
+                const previous = statusFilter.value;
+                statusFilter.replaceChildren(new Option('Alle statuser', ''));
+                [...new Set(subscribersList.map(sub => sub.status || 'Aktiv'))].sort().forEach(status => statusFilter.add(new Option(status, status)));
+                statusFilter.value = previous;
+            }
+
             const renderRows = () => {
                 const q = (searchInput?.value || '').trim().toLowerCase();
                 const seg = (segmentFilterSelect?.value || '').trim().toLowerCase();
                 const tag = (tagFilterSelect?.value || '').trim().toLowerCase();
 
-                const filtered = subscribersList.filter(subscriber => this.matchesSubscriberFilters(subscriber, q, seg, tag));
+                const filtered = subscribersList.filter(subscriber => this.matchesSubscriberFilters(subscriber, q, seg, tag, {
+                    language: languageFilter?.value, status: statusFilter?.value, from: dateFrom?.value, to: dateTo?.value
+                }));
+                const count = document.getElementById('subscriber-filter-count');
+                if (count) count.textContent = `Viser ${filtered.length} av ${subscribersList.length} kontakter`;
+                const bulk = document.getElementById('subscribers-bulk-bar');
+                if (bulk) bulk.style.display = 'none';
+                const selectedCount = document.getElementById('subscribers-selected-count');
+                if (selectedCount) selectedCount.textContent = '0';
+                const selectAll = document.getElementById('subscribers-select-all');
+                if (selectAll) { selectAll.checked = false; selectAll.indeterminate = false; }
 
                 tbody.innerHTML = '';
                 if (filtered.length === 0) {
@@ -11440,6 +11476,12 @@ class NewsletterBuilder {
             if (searchInput) searchInput.oninput = () => renderRows();
             if (segmentFilterSelect) segmentFilterSelect.onchange = () => renderRows();
             if (tagFilterSelect) tagFilterSelect.onchange = () => renderRows();
+            [languageFilter, statusFilter, dateFrom, dateTo].forEach(filter => { if (filter) filter.onchange = () => renderRows(); });
+            const resetFilters = document.getElementById('subscriber-reset-filters');
+            if (resetFilters) resetFilters.onclick = () => {
+                [searchInput, segmentFilterSelect, tagFilterSelect, languageFilter, statusFilter, dateFrom, dateTo].forEach(filter => { if (filter) filter.value = ''; });
+                renderRows();
+            };
 
         } catch (e) {
             console.error("Load subscribers failed:", e);

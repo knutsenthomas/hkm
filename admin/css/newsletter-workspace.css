@@ -487,3 +487,12 @@ body.builder-active #newsletter-builder-layout #blocks-container p.selected-bloc
     max-width: 100%;
     box-sizing: border-box;
 }
+
+.subscriber-extra-filters { display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px; margin-bottom:16px; }
+.subscriber-extra-filters label { display:flex; flex-direction:column; gap:6px; font-size:12px; font-weight:600; color:var(--admin-text-muted,#64748b); }
+.subscriber-extra-filters select,
+.subscriber-extra-filters input,
+.subscriber-extra-filters button { min-height:40px; max-width:100%; padding:9px 12px; border:1px solid var(--admin-border,#cbd5e1); border-radius:10px; background:var(--admin-surface,#fff); color:var(--admin-text,#334155); font:14px Inter,sans-serif; box-sizing:border-box; }
+.subscriber-extra-filters button { cursor:pointer; }
+#subscriber-filter-count { align-self:center; font-size:13px; color:var(--admin-text-muted,#64748b); }
+@media(max-width:600px) { .subscriber-extra-filters label { flex:1 1 140px; min-width:0; } .subscriber-extra-filters select,.subscriber-extra-filters input { width:100%; } }
