@@ -1547,6 +1547,27 @@ class NewsletterBuilder {
         if (edge.toString().length) return;
         const neighbour = event.key === 'Backspace' ? paragraph.previousElementSibling : paragraph.nextElementSibling;
         if (!neighbour) return;
+        // A blank writing line beside media can be removed without touching the media.
+        const isEmptyLine = node => node.tagName === 'P' &&
+            !node.textContent.replace(/[\u200B\uFEFF]/g, '').trim() &&
+            !node.querySelector('img,iframe,video,svg,button,input,[contenteditable="false"]');
+        const emptyLine = isEmptyLine(paragraph) ? paragraph : isEmptyLine(neighbour) ? neighbour : null;
+        if (emptyLine) {
+            event.preventDefault(); this.captureEditorStep();
+            const target = emptyLine === paragraph ? neighbour : paragraph;
+            emptyLine.remove();
+            const caret = document.createRange();
+            if (/^(P|H[1-6])$/.test(target.tagName) && !target.querySelector('img,iframe,video')) {
+                caret.selectNodeContents(target); caret.collapse(event.key === 'Delete');
+            } else {
+                if (event.key === 'Backspace') caret.setStartAfter(target);
+                else caret.setStartBefore(target);
+                caret.collapse(true);
+            }
+            selection.removeAllRanges(); selection.addRange(caret);
+            this.saveSelection(); this.selectBlock(this.getCurrentBlock(target), target); this.syncUnifiedBlocks();
+            return;
+        }
         // Never merge text into a media card or delete a whole layout at its boundary.
         if (!/^(P|H[1-6])$/.test(neighbour.tagName) || neighbour.querySelector('img,iframe,video,[contenteditable="false"]') || paragraph.querySelector('img,iframe,video')) {
             event.preventDefault(); return;
@@ -8676,6 +8697,19 @@ class NewsletterBuilder {
     inlineEditorTextStylesForEmail(sourceRoot, clonedRoot) {
         if (!sourceRoot || !clonedRoot || typeof window.getComputedStyle !== 'function') return;
 
+        // Media spacing comes from editor CSS too, not only from inline template styles.
+        const sourceImages = sourceRoot.querySelectorAll('img');
+        const clonedImages = clonedRoot.querySelectorAll('img');
+        sourceImages.forEach((source, index) => {
+            const clone = clonedImages[index];
+            if (!clone) return;
+            const computed = window.getComputedStyle(source);
+            ['display', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left'].forEach(property => {
+                const value = computed.getPropertyValue(property);
+                if (value) clone.style.setProperty(property, value);
+            });
+        });
+
         const sourceHeadings = Array.from(sourceRoot.querySelectorAll('h1, h2, h3, h4, h5, h6, p, ul, ol, li, blockquote'));
         const clonedHeadings = Array.from(clonedRoot.querySelectorAll('h1, h2, h3, h4, h5, h6, p, ul, ol, li, blockquote'));
         const properties = [
@@ -8684,6 +8718,7 @@ class NewsletterBuilder {
             'font-weight',
             'font-style',
             'line-height',
+            'min-height',
             'letter-spacing',
             'color',
             'text-decoration',

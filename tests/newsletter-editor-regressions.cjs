@@ -49,6 +49,26 @@ const box = context.document.getElementById('blocks-container');
     assert.doesNotThrow(() => selectionEditor.selectBlock(null));
     box.innerHTML = '<p>First</p>';
 }
+// Removing blank lines beside media must preserve the image in both directions.
+{
+    const deletionEditor = Object.create(context.Builder.prototype);
+    Object.assign(deletionEditor, { captureEditorStep() {}, saveSelection() {}, selectBlock() {}, syncUnifiedBlocks() {} });
+    for (const key of ['Backspace', 'Delete']) {
+        box.innerHTML = key === 'Backspace'
+            ? '<p><img src="https://example.com/image.jpg"></p><p><br></p><h2>Heading</h2>'
+            : '<p><br></p><p><img src="https://example.com/image.jpg"></p><h2>Heading</h2>';
+        const blank = Array.from(box.children).find(node => node.innerHTML === '<br>');
+        const caret = context.document.createRange(); caret.selectNodeContents(blank); caret.collapse(true);
+        dom.window.getSelection().removeAllRanges(); dom.window.getSelection().addRange(caret);
+        let prevented = false;
+        deletionEditor.handleDocumentDelete({ key, preventDefault() { prevented = true; } });
+        assert.equal(prevented, true);
+        assert.equal(blank.isConnected, false);
+        assert.equal(box.querySelectorAll('img').length, 1);
+        assert.equal(box.querySelector('h2').textContent, 'Heading');
+    }
+    box.innerHTML = '<p>First</p>';
+}
 // Collages preserve email-safe table layout, escape attributes and reject unsafe URLs.
 {
     const collage = editor.buildCollageHtml([
