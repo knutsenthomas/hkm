@@ -11278,6 +11278,12 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                 };
             }
 
+            const btnBulkLanguage = document.getElementById('btn-bulk-language');
+            if (btnBulkLanguage) btnBulkLanguage.onclick = () => {
+                const emails = getSelectedEmails();
+                if (emails.length) this.openBulkLanguageModal(emails);
+            };
+
             // Bulk Edit Segments
             const btnBulkSegments = document.getElementById('btn-bulk-segments');
             if (btnBulkSegments) {
@@ -11618,6 +11624,87 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             } catch(e) {
                 console.error("Add subscriber failed:", e);
                 if (typeof showToast === 'function') showToast("Kunne ikke legge til abonnent.", "error");
+            }
+        };
+    }
+
+    async updateSubscriberLanguages(selectedEmails, language) {
+        if (!['no', 'en'].includes(language)) throw new Error('Ugyldig språk.');
+        const emails = [...new Set(selectedEmails.map(email => String(email).trim().toLowerCase()).filter(Boolean))];
+        const db = window.firebaseService.db;
+        const updates = [];
+        // Update existing records only; never create subscriptions or trigger welcome emails.
+        for (const email of emails) {
+            let found = false;
+            for (const collection of ['contacts', 'newsletter_subscriptions', 'users']) {
+                const snapshot = await db.collection(collection).where('email', '==', email).get();
+                snapshot.forEach(doc => {
+                    found = true;
+                    const data = doc.data();
+                    const clean = value => (Array.isArray(value) ? value : String(value || '').split(','))
+                        .map(value => String(value).trim()).filter(value => value && !['en', 'english', 'engelsk'].includes(value.toLowerCase()));
+                    const tags = clean(data.tags);
+                    const segments = clean(data.segments);
+                    if (language === 'en') tags.push('engelsk');
+                    updates.push({ ref: doc.ref, data: { tags, segments } });
+                });
+            }
+            if (!found) throw new Error(`Fant ikke abonnenten ${email}. Last inn listen på nytt.`);
+        }
+        for (let offset = 0; offset < updates.length; offset += 400) {
+            const batch = db.batch();
+            updates.slice(offset, offset + 400).forEach(update => batch.update(update.ref, update.data));
+            await batch.commit();
+        }
+        return emails.length;
+    }
+
+    openBulkLanguageModal(selectedEmails) {
+        document.getElementById('hkm-bulk-language-modal')?.remove();
+        const modal = document.createElement('div');
+        modal.id = 'hkm-bulk-language-modal';
+        modal.className = 'profile-modal';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-labelledby', 'bulk-language-title');
+        modal.style.cssText = 'display:flex!important;position:fixed;inset:0;z-index:999999;background:rgba(15,23,42,.7);align-items:center;justify-content:center;padding:20px;';
+        modal.innerHTML = `
+            <div style="background:white;width:100%;max-width:480px;padding:28px;border-radius:20px;box-sizing:border-box;max-height:90vh;overflow:auto;">
+                <h3 id="bulk-language-title" style="margin:0 0 12px;color:#0f172a;">Endre språk for ${selectedEmails.length} valgte kontakter</h3>
+                <p style="font-size:14px;color:#475569;line-height:1.6;">Språkvalget lagres og brukes ved fremtidige nyhetsbrev. Ingen e-post sendes når du endrer språk.</p>
+                <label for="bulk-subscriber-language" style="display:block;font-size:13px;font-weight:600;color:#475569;margin-bottom:6px;">Nytt språk</label>
+                <select id="bulk-subscriber-language" style="display:block;width:100%;min-height:44px;padding:10px 14px;border:1px solid #cbd5e1;border-radius:10px;background:white;color:#0f172a;font:14px 'Inter',sans-serif;box-sizing:border-box;">
+                    <option value="">Velg språk …</option><option value="no">Norsk</option><option value="en">Engelsk</option>
+                </select>
+                <p id="bulk-language-status" role="status" style="font-size:14px;color:#b91c1c;"></p>
+                <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:24px;flex-wrap:wrap;">
+                    <button type="button" id="cancel-bulk-language" style="padding:10px 20px;border:1px solid #cbd5e1;background:white;border-radius:10px;cursor:pointer;">Avbryt</button>
+                    <button type="button" id="save-bulk-language" style="padding:10px 20px;border:0;background:#1B4965;color:white;border-radius:10px;cursor:pointer;">Lagre språk</button>
+                </div>
+            </div>`;
+        const previousFocus = document.activeElement;
+        document.body.append(modal);
+        const select = modal.querySelector('select');
+        const save = modal.querySelector('#save-bulk-language');
+        const cancel = modal.querySelector('#cancel-bulk-language');
+        cancel.onclick = () => { modal.remove(); previousFocus?.focus(); };
+        modal.onkeydown = event => { if (event.key === 'Escape' && !cancel.disabled) cancel.click(); };
+        select.focus();
+        save.onclick = async () => {
+            if (!select.value) { modal.querySelector('#bulk-language-status').textContent = 'Velg norsk eller engelsk først.'; select.focus(); return; }
+            save.disabled = cancel.disabled = select.disabled = true;
+            save.textContent = 'Lagrer …';
+            try {
+                const count = await this.updateSubscriberLanguages(selectedEmails, select.value);
+                modal.remove();
+                showToast(`Språk oppdatert til ${select.value === 'en' ? 'engelsk' : 'norsk'} for ${count} kontakter.`, 'success');
+                await this.loadSubscribers();
+                if (this.isRecipientsDrawerOpen) await this.calculateEstimated();
+                previousFocus?.focus();
+            } catch (error) {
+                modal.querySelector('#bulk-language-status').textContent = `Kunne ikke fullføre endringen. ${error.message} Du kan prøve igjen.`;
+                save.disabled = cancel.disabled = select.disabled = false;
+                save.textContent = 'Prøv igjen';
             }
         };
     }
