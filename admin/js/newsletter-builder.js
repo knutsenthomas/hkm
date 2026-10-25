@@ -8612,6 +8612,25 @@ class NewsletterBuilder {
         `;
     }
 
+    localizeNewsletterDonationLinks(container, lang) {
+        if (lang !== 'en' || !container) return;
+        container.querySelectorAll('a[href]').forEach(link => {
+            const href = link.getAttribute('href');
+            if (!href || href.startsWith('#')) return;
+            try {
+                const url = new URL(href, 'https://hiskingdomministry.no/');
+                if (url.protocol !== 'https:' && url.protocol !== 'http:') return;
+                if (!['hiskingdomministry.no', 'www.hiskingdomministry.no'].includes(url.hostname) || url.username || url.password || url.port) return;
+                const path = url.pathname.replace(/\/$/, '').replace(/\.html$/, '');
+                if (path !== '/donasjoner') return;
+                url.protocol = 'https:';
+                url.hostname = 'hiskingdomministry.no';
+                url.pathname = '/en/donations';
+                link.setAttribute('href', url.href);
+            } catch { /* Leave unknown and external links unchanged. */ }
+        });
+    }
+
     compileEmailHtml(lang = 'no') {
         const isEnglish = lang === 'en';
         let contentClone;
@@ -8640,6 +8659,8 @@ class NewsletterBuilder {
             contentClone = blocksContainer.cloneNode(true);
             this.inlineEditorTextStylesForEmail(blocksContainer, contentClone);
         }
+
+        this.localizeNewsletterDonationLinks(contentClone, lang);
 
         contentClone.querySelectorAll('.newsletter-columns-block').forEach(block => {
             const columns = block.firstElementChild;
@@ -9045,6 +9066,7 @@ class NewsletterBuilder {
         }
 
         container.innerHTML = html;
+        this.localizeNewsletterDonationLinks(container, lang);
 
         if (subjectInput) {
             subjectInput.value = isEnglish
@@ -9238,6 +9260,7 @@ class NewsletterBuilder {
                     if (previous.dataset.canvaDesignUrl) match.dataset.canvaDesignUrl = previous.dataset.canvaDesignUrl;
                 }
             });
+            this.localizeNewsletterDonationLinks(source, 'en');
             const translatedHtml = source.innerHTML;
 
             const translatedBlocks = [{

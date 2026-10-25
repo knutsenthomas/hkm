@@ -434,3 +434,31 @@ body.builder-active #newsletter-builder-layout #blocks-container p.selected-bloc
     padding:6px!important;
     vertical-align:top;
 }
+
+/* Keep language selection separate from the translation action. */
+#newsletter-builder-layout #newsletter-more-menu #editor-language-switcher {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    margin: 8px 0 !important;
+}
+#newsletter-builder-layout #newsletter-more-menu #editor-language-switcher .editor-lang-btn {
+    width: 100%;
+    gap: 6px;
+    white-space: nowrap;
+}
+#newsletter-builder-layout #newsletter-more-menu #editor-language-switcher .lang-text {
+    display: inline !important;
+}
+#newsletter-builder-layout #newsletter-more-menu #editor-retranslate-btn {
+    width: 100%;
+    min-height: 36px;
+    justify-content: center;
+    gap: 6px !important;
+    margin: 0 0 10px;
+    padding: 8px 12px !important;
+    box-sizing: border-box;
+    border: 1px solid var(--admin-border, #e2e8f0) !important;
+    background: var(--admin-surface, #fff) !important;
+    color: var(--admin-text-muted, #64748b) !important;
+    font-weight: 600 !important;
+}

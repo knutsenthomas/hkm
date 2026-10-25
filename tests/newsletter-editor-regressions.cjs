@@ -30,6 +30,21 @@ Object.assign(editor, { currentMode: 'builder', currentDraftId: 'draft', current
     editorDocumentKey: 'draft', blocks: [], recordNewsletterVersion: async () => {},
     normalizeCanvasBlocks() {}, isMobileViewport: () => false });
 const box = context.document.getElementById('blocks-container');
+// English donation links are localized without changing campaign choices or Norwegian/source links.
+{
+    const links = context.document.createElement('div');
+    links.innerHTML = '<a href="/donasjoner.html?fund=school&amp;utm_source=newsletter#gi-gave">Give</a><a href="https://www.hiskingdomministry.no/donasjoner/">Give</a><a href="https://example.com/donasjoner">External</a><a href="/en/donations?fund=other">English</a><a href="#gi-gave">Anchor</a>';
+    const norwegian = links.innerHTML;
+    editor.localizeNewsletterDonationLinks(links, 'no');
+    assert.equal(links.innerHTML, norwegian);
+    editor.localizeNewsletterDonationLinks(links, 'en');
+    const items = links.querySelectorAll('a');
+    assert.equal(items[0].getAttribute('href'), 'https://hiskingdomministry.no/en/donations?fund=school&utm_source=newsletter#gi-gave');
+    assert.equal(items[1].getAttribute('href'), 'https://hiskingdomministry.no/en/donations');
+    assert.equal(items[2].getAttribute('href'), 'https://example.com/donasjoner');
+    assert.equal(items[3].getAttribute('href'), '/en/donations?fund=other');
+    assert.equal(items[4].getAttribute('href'), '#gi-gave');
+}
 // Clicking an image exposes replacement and Canva actions on the actual image toolbar.
 {
     context.getComputedStyle = dom.window.getComputedStyle.bind(dom.window);
