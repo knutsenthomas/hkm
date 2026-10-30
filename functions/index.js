@@ -13,6 +13,8 @@ const vippsClientIdParam = defineSecret('VIPPS_CLIENT_ID');
 const vippsClientSecretParam = defineSecret('VIPPS_CLIENT_SECRET');
 const vippsSubscriptionKeyParam = defineSecret('VIPPS_SUBSCRIPTION_KEY');
 const vippsMsnParam = defineSecret('VIPPS_MSN');
+const vippsDonationsClientId = defineSecret('VIPPS_DONATIONS_CLIENT_ID');
+const vippsDonationsClientSecret = defineSecret('VIPPS_DONATIONS_CLIENT_SECRET');
 const vippsRecurringClientId = defineSecret('VIPPS_RECURRING_CLIENT_ID');
 const vippsRecurringClientSecret = defineSecret('VIPPS_RECURRING_CLIENT_SECRET');
 const vippsRecurringSubscriptionKey = defineSecret('VIPPS_RECURRING_SUBSCRIPTION_KEY');
@@ -9702,6 +9704,12 @@ exports.schoolPaymentAccount = onRequest({ timeoutSeconds: 300, invoker: ['57829
   try {
     const { schoolAccountService } = require('./student-payment-account.cjs');
     if (req.body?.mode === 'checkout') return res.status(200).send(await require('./school-checkout.cjs').schoolCheckout({body:req.body,db,timestamp:Timestamp.now()}));
+    if (req.body?.mode === 'read' && req.body.includeGifts === true && /^[A-Za-z0-9_-]{1,128}$/.test(req.body.centralUid || '')) {
+      try {
+        const user = await admin.auth().getUser(req.body.centralUid);
+        await require('./vipps-donations.cjs').linkOwnDonations({ db, auth: admin.auth(), user });
+      } catch { console.warn('Vipps Donations linking unavailable for school account'); }
+    }
     const result = await schoolAccountService({ body: req.body || {}, db, timestamp: Timestamp.now(), getAgreement: async record => {
       if (record.provider === 'vipps') {
         const api = await recurringVippsApi();
@@ -9826,4 +9834,35 @@ exports.updateCauseActivity = onDocumentWritten({document:'donations/{donationId
 });
 exports.updateCauseActivitySettings = onDocumentWritten({document:'content/collection_causes',region:'us-central1',retry:true}, async () => {
   await refreshCauseActivity(db);
+});
+
+// Read-only at Vipps: importing gifts never initiates or changes a payment.
+exports.syncVippsDonations = onSchedule({
+  schedule: 'every 60 minutes', region: 'us-central1', timeoutSeconds: 540,
+  maxInstances: 1,
+  secrets: [vippsDonationsClientId, vippsDonationsClientSecret],
+}, async () => {
+  const donations = require('./vipps-donations.cjs');
+  const api = await donations.createApi({ clientId: vippsDonationsClientId.value(), clientSecret: vippsDonationsClientSecret.value() });
+  const result = await donations.sync({ db, auth: admin.auth(), api, Timestamp });
+  console.info('Vipps Donations sync completed', result.imported);
+});
+
+// Match existing imported gifts using Firebase Auth's verified identity only.
+exports.linkMyVippsDonations = onRequest({
+  cors: ['https://hiskingdomministry.no', 'https://www.hiskingdomministry.no', 'https://hkpc.no', 'https://www.hkpc.no', 'https://app.hkpc.no'],
+  invoker: 'public', region: 'us-central1', timeoutSeconds: 60, maxInstances: 3,
+}, async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  if (req.method !== 'POST') return res.status(405).send({ error: 'method-not-allowed' });
+  const bearer = /^Bearer (\S+)$/.exec(req.get('Authorization') || '');
+  if (!bearer) return res.status(401).send({ error: 'sign-in-required' });
+  let token;
+  try { token = await admin.auth().verifyIdToken(bearer[1], true); }
+  catch { return res.status(401).send({ error: 'sign-in-required' }); }
+  try {
+    const user = await admin.auth().getUser(token.uid);
+    const result = await require('./vipps-donations.cjs').linkOwnDonations({ db, auth: admin.auth(), user });
+    return res.send(result);
+  } catch { return res.status(503).send({ error: 'donation-link-unavailable' }); }
 });
