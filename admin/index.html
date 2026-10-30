@@ -1616,7 +1616,8 @@
                 // Update Active Link UI
                 document.querySelectorAll('.nav-link, .mobile-nav-item').forEach(l => {
                     if (l && l.classList) {
-                        const isMatch = l.getAttribute('data-section') === targetSectionId;
+                        const sidebarSection = targetSectionId === 'school-payments' ? 'causes' : targetSectionId;
+                        const isMatch = l.getAttribute('data-section') === sidebarSection;
                         l.classList.toggle('active', isMatch);
                     }
                 });
@@ -1642,6 +1643,9 @@
                 if (link) {
                     e.preventDefault();
                     const targetSectionId = link.getAttribute('data-section');
+                    if (link.dataset.givingTab && window.adminManager) {
+                        window.adminManager.pendingGivingTab = link.dataset.givingTab;
+                    }
                     handleSectionSwitch(targetSectionId, link);
                 }
             });
