@@ -30,6 +30,7 @@ const { onRequest, onCall, HttpsError } = require('firebase-functions/v2/https')
 const { onDocumentCreated, onDocumentUpdated, onDocumentWritten } = require('firebase-functions/v2/firestore');
 const { onSchedule } = require('firebase-functions/v2/scheduler');
 const admin = require('firebase-admin');
+const { getAuth } = require('firebase-admin/auth');
 const { getFirestore, FieldValue, Timestamp, FieldPath } = require('firebase-admin/firestore');
 const { getStorage } = require('firebase-admin/storage');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
@@ -9706,8 +9707,8 @@ exports.schoolPaymentAccount = onRequest({ timeoutSeconds: 300, invoker: ['57829
     if (req.body?.mode === 'checkout') return res.status(200).send(await require('./school-checkout.cjs').schoolCheckout({body:req.body,db,timestamp:Timestamp.now()}));
     if (req.body?.mode === 'read' && req.body.includeGifts === true && /^[A-Za-z0-9_-]{1,128}$/.test(req.body.centralUid || '')) {
       try {
-        const user = await admin.auth().getUser(req.body.centralUid);
-        await require('./vipps-donations.cjs').linkOwnDonations({ db, auth: admin.auth(), user });
+        const user = await getAuth().getUser(req.body.centralUid);
+        await require('./vipps-donations.cjs').linkOwnDonations({ db, auth: getAuth(), user });
       } catch { console.warn('Vipps Donations linking unavailable for school account'); }
     }
     const result = await schoolAccountService({ body: req.body || {}, db, timestamp: Timestamp.now(), getAgreement: async record => {
@@ -9844,7 +9845,7 @@ exports.syncVippsDonations = onSchedule({
 }, async () => {
   const donations = require('./vipps-donations.cjs');
   const api = await donations.createApi({ clientId: vippsDonationsClientId.value(), clientSecret: vippsDonationsClientSecret.value() });
-  const result = await donations.sync({ db, auth: admin.auth(), api, Timestamp });
+  const result = await donations.sync({ db, auth: getAuth(), api, Timestamp });
   console.info('Vipps Donations sync completed', result.imported);
 });
 
@@ -9858,11 +9859,11 @@ exports.linkMyVippsDonations = onRequest({
   const bearer = /^Bearer (\S+)$/.exec(req.get('Authorization') || '');
   if (!bearer) return res.status(401).send({ error: 'sign-in-required' });
   let token;
-  try { token = await admin.auth().verifyIdToken(bearer[1], true); }
+  try { token = await getAuth().verifyIdToken(bearer[1], true); }
   catch { return res.status(401).send({ error: 'sign-in-required' }); }
   try {
-    const user = await admin.auth().getUser(token.uid);
-    const result = await require('./vipps-donations.cjs').linkOwnDonations({ db, auth: admin.auth(), user });
+    const user = await getAuth().getUser(token.uid);
+    const result = await require('./vipps-donations.cjs').linkOwnDonations({ db, auth: getAuth(), user });
     return res.send(result);
   } catch { return res.status(503).send({ error: 'donation-link-unavailable' }); }
 });
