@@ -1,3 +1,4 @@
+import { givingTabLinks } from './giving-navigation.js';
 // giving causes methods for AdminManager.
 export function createGivingCausesMethods({ firebaseService, adminUtils, showErrorUI }) {
   return {
@@ -40,6 +41,11 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
       });
 
       this.renderGiftsDashboard();
+      if (this.pendingGivingTab) {
+        const requested = this.pendingGivingTab;
+        delete this.pendingGivingTab;
+        document.querySelector(`#causes-section .automation-tab[data-tab="${requested}"]`)?.click();
+      }
     },
 
     async renderCausesManager() {
@@ -199,14 +205,7 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
             <!-- Tabs Navigation -->
             <div class="causes-tabs-container" style="margin-bottom: 24px;">
                 <div class="automation-tabs" style="border-bottom: 2px solid #e2e8f0; background: #fff; border-radius: 12px 12px 0 0; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-                    <div class="causes-tab-links" style="display: flex; gap: 8px; align-items: center;">
-                        <button class="automation-tab active" data-tab="dashboard">Dashboard</button>
-                        <button class="automation-tab" data-tab="causes">Innsamlinger</button>
-                        <button class="automation-tab" data-tab="donations">Pr. gave</button>
-                        <button class="automation-tab" data-tab="donors">Pr. giver</button>
-                        <button class="automation-tab" data-tab="inkind">Fysiske gaver</button>
-                        <a class="automation-tab" data-section="school-payments" href="/admin/index.html#school-payments">Skolebetalinger</a>
-                    </div>
+                    ${givingTabLinks()}
                     
                     <div class="causes-toolbar" style="display: flex; align-items: center; gap: 12px; padding: 8px 0; flex-wrap: wrap;">
                         <!-- Global Period Selector -->
