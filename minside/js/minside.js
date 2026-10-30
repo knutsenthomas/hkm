@@ -1781,6 +1781,18 @@ class MinSideManager {
 
         const db = firebase.firestore();
         const byId = new Map();
+        // New Donations gifts are linked server-side using verified Auth identities.
+        // A missing/unavailable import service must not hide existing gifts.
+        const authUser = firebase.auth().currentUser;
+        if (authUser && this._vippsDonationsLinkedUid !== authUser.uid) {
+            try {
+                const response = await fetch('https://us-central1-his-kingdom-ministry.cloudfunctions.net/linkMyVippsDonations', {
+                    method: 'POST', headers: { Authorization: `Bearer ${await authUser.getIdToken()}` },
+                    signal: AbortSignal.timeout(10000),
+                });
+                if (response.ok) this._vippsDonationsLinkedUid = authUser.uid;
+            } catch { /* Existing gift history remains available. */ }
+        }
         const addSnap = (snap) => {
             snap.forEach(doc => byId.set(doc.id, { id: doc.id, ...doc.data() }));
         };
