@@ -377,6 +377,7 @@ const initAdminHeader = () => {
         const isActive = (item) => {
             if (item.studioArea) return path.includes('admin-nyhetsbrev') && item.studioArea === (new URLSearchParams(window.location.search).get('section') === 'newsletter' || new URLSearchParams(window.location.search).has('draftId') ? 'newsletter' : 'studio');
             if (item.path && path.includes(item.path)) return true;
+            if (currentSection === 'school-payments' && item.section === 'causes') return true;
             if (item.section && currentSection === item.section) return true;
             return false;
         };
