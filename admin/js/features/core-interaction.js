@@ -1,3 +1,4 @@
+import { mountSchoolGivingNavigation } from './giving-navigation.js';
 // core interaction methods for AdminManager.
 export function createCoreInteractionMethods({ firebaseService, adminUtils, showErrorUI }) {
   return {
@@ -431,6 +432,7 @@ export function createCoreInteractionMethods({ firebaseService, adminUtils, show
             this.renderAppSection();
             break;
           case "school-payments":
+            mountSchoolGivingNavigation(section);
             import("../skolebetalinger.js")
               .then((module) =>
                 module.mountSchoolPayments(
@@ -494,6 +496,12 @@ export function createCoreInteractionMethods({ firebaseService, adminUtils, show
             this.renderReadingPlansManager();
             break;
         }
+      }
+
+      if (sectionId === 'causes' && alreadyRendered && this.pendingGivingTab) {
+        const requested = this.pendingGivingTab;
+        delete this.pendingGivingTab;
+        section.querySelector(`.automation-tab[data-tab="${requested}"]`)?.click();
       }
 
       // Check for pending AI Drafts
