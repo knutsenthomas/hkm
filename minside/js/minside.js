@@ -1,4 +1,5 @@
 import { biblicalCharacters } from '../../js/bibelske-personer-data.js';
+import { uniquePurchaseRecords } from '../../js/shop-history.js';
 
 // Safely wrap any promise in a timeout to prevent hanging on Safari/iOS browsers
 function withTimeout(promise, ms = 3000) {
@@ -1666,6 +1667,7 @@ class MinSideManager {
 
     _donationStatusIsVisible(donation) {
         const status = String(donation?.status || '').trim().toLowerCase();
+        if (donation?.source === 'wix_store') return ['completed', 'pending', 'refunded', 'cancelled'].includes(status);
         return !status || ['completed', 'succeeded', 'captured', 'pending', 'processing'].includes(status);
     }
 
@@ -1679,7 +1681,8 @@ class MinSideManager {
             processing: t('giving.statusProcessing'),
             failed: t('giving.statusFailed'),
             canceled: t('giving.statusCanceled'),
-            cancelled: t('giving.statusCanceled')
+            cancelled: t('giving.statusCanceled'),
+            refunded: document.documentElement.lang === 'en' ? 'Refunded' : document.documentElement.lang === 'es' ? 'Reembolsado' : 'Refundert'
         };
         return labels[normalized] || (status || t('giving.statusUnknown'));
     }
@@ -1817,7 +1820,7 @@ class MinSideManager {
             if (result.status === 'rejected') console.warn('Kunne ikke hente gave-spørring:', result.reason);
         });
 
-        const donations = Array.from(byId.values()).filter(donation => this._donationStatusIsVisible(donation));
+        const donations = uniquePurchaseRecords(Array.from(byId.values())).filter(donation => this._donationStatusIsVisible(donation));
         donations.sort((a, b) => {
             const at = this._getDonationDate(a)?.getTime?.() || 0;
             const bt = this._getDonationDate(b)?.getTime?.() || 0;

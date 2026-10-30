@@ -1,9 +1,10 @@
+import { uniquePurchaseRecords } from '../../../js/shop-history.js';
 // shop records methods for AdminManager.
 export function createShopRecordsMethods({ firebaseService, adminUtils, showErrorUI }) {
   return {
     getFilteredShopRecords() {
       const records = Array.isArray(this.allDonationRecords)
-        ? this.allDonationRecords
+        ? uniquePurchaseRecords(this.allDonationRecords)
         : [];
       const filters = this.donationFilters || {};
       const { start, end } = this.buildDonationDateRange(
@@ -1120,7 +1121,7 @@ export function createShopRecordsMethods({ firebaseService, adminUtils, showErro
           ["completed", "succeeded", "captured"].includes(
             String(record.status || "").toLowerCase(),
           );
-        const manualShopOrders = (this.allDonationRecords || []).filter((r) => {
+        const manualShopOrders = uniquePurchaseRecords(this.allDonationRecords || [], orders).filter((r) => {
           if (r.isInKind) return false;
           if (String(r.type || "").toLowerCase() !== "butikk") return false;
           if (!isCompleted(r)) return false;
@@ -1144,7 +1145,8 @@ export function createShopRecordsMethods({ firebaseService, adminUtils, showErro
 
         // 1. Process Wix Orders
         filteredOrders.forEach((o) => {
-          const price = parseFloat(o.priceSummary?.total?.amount || 0);
+          const refunded = parseFloat(o.balanceSummary?.refunded?.amount || 0);
+          const price = Math.max(0, parseFloat(o.priceSummary?.total?.amount || 0) - refunded);
           const pStatus = o.paymentStatus || "UNKNOWN";
           const isRefundedOrCanceled =
             pStatus === "FULLY_REFUNDED" ||
@@ -1160,8 +1162,8 @@ export function createShopRecordsMethods({ firebaseService, adminUtils, showErro
           totalSales += price;
           validOrderCount++;
 
-          if (pStatus === "PAID") {
-            paidSales += price;
+          if (["PAID", "PARTIALLY_REFUNDED", "PARTIALLY_PAID"].includes(pStatus)) {
+            paidSales += Math.max(0, parseFloat(o.balanceSummary?.paid?.amount ?? o.priceSummary?.total?.amount ?? 0) - refunded);
             paidCount++;
           }
 
