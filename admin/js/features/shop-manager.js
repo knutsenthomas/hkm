@@ -134,7 +134,7 @@ export function createShopManagerMethods({ firebaseService, adminUtils, showErro
                                 <option value="90">Siste 90 dager</option>
                                 <option value="365">Siste 365 dager</option>
                                 <option value="year">Dette året</option>
-                                <option value="all">Alt tid</option>
+                                <option value="all">Alltid</option>
                                 <option value="custom">Egendefinert...</option>
                             </select>
                         </div>
