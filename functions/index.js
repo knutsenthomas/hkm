@@ -9863,7 +9863,17 @@ exports.linkMyVippsDonations = onRequest({
   catch { return res.status(401).send({ error: 'sign-in-required' }); }
   try {
     const user = await getAuth().getUser(token.uid);
+    await require('./store-order-sync.cjs').linkOwnOrders({ db, user });
     const result = await require('./vipps-donations.cjs').linkOwnDonations({ db, auth: getAuth(), user });
     return res.send(result);
   } catch { return res.status(503).send({ error: 'donation-link-unavailable' }); }
+});
+
+exports.syncStoreOrderHistory = onSchedule({
+  schedule: 'every 15 minutes', region: 'us-central1', timeoutSeconds: 540,
+  maxInstances: 1, concurrency: 1,
+}, async () => {
+  const store = require('./store-order-sync.cjs');
+  const result = await store.sync({ db, auth: getAuth(), api: await store.sourceApi(), Timestamp });
+  console.info('Store order history sync completed', result);
 });
