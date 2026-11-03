@@ -272,3 +272,10 @@
 
 #accounting-section .accounting-bank[hidden] { display: none; }
 #accounting-section .accounting-bank small { color: var(--report-muted); }
+
+#accounting-section .accounting-comparison :is(th, td):first-child:not([colspan]) {
+  white-space: nowrap;
+  word-break: normal;
+  overflow-wrap: normal;
+  hyphens: none;
+}
