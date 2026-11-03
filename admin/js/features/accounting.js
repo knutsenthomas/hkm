@@ -147,10 +147,12 @@ export function mountAccounting(section, firebaseService) {
     <dl class="accounting-summary accounting-bank" hidden>
       <div><dt>Bokført banksaldo · konto 1920</dt><dd data-bank-balance></dd>
         <small data-bank-date></small></div>
-      <div data-prepaid-card hidden><dt>Forskuddsbetalte kostnader · konto 1749</dt>
+      <div data-prepaid-card hidden><dt>Forskuddsbetalte kostnader</dt>
         <dd data-prepaid-balance></dd><small data-prepaid-date></small>
-        <p data-prepaid-description hidden></p>
-        <p>Betalingene har redusert banksaldoen. Kostnadene påvirker resultatet i perioden de gjelder.</p>
+        <div class="accounting-prepaid-detail" hidden>
+          <strong data-prepaid-description></strong><small data-prepaid-reference></small>
+        </div>
+        <p>Betalt på forskudd. Kostnadsføres i perioden det gjelder.</p>
       </div>
     </dl>
     <div data-report hidden>
@@ -245,10 +247,14 @@ export function mountAccounting(section, firebaseService) {
       bankCard.querySelector('[data-prepaid-card]').hidden = !prepaid;
       if (prepaid) {
         const description = bankCard.querySelector('[data-prepaid-description]');
-        description.textContent = prepaid.description || '';
-        description.hidden = !description.textContent;
+        const [title, ...reference] = (prepaid.description || '').split(' · ');
+        description.textContent = title;
+        description.parentElement.hidden = !title;
+        const referenceLabel = bankCard.querySelector('[data-prepaid-reference]');
+        referenceLabel.textContent = reference.join(' · ');
+        referenceLabel.hidden = !reference.length;
         bankCard.querySelector('[data-prepaid-balance]').textContent = currency.format(prepaid.balance);
-        bankCard.querySelector('[data-prepaid-date]').textContent = 'Per ' + prepaid.asOf.split('-').reverse().join('.') + ' · Tripletex';
+        bankCard.querySelector('[data-prepaid-date]').textContent = 'Konto 1749 · Tripletex · ' + prepaid.asOf.split('-').reverse().join('.');
       }
       if (bank) {
         bankCard.querySelector('[data-bank-balance]').textContent = currency.format(bank.balance);

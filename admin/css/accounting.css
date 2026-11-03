@@ -351,3 +351,13 @@
 #accounting-section .accounting-period[open] .accounting-period-chevron {
   transform: rotate(180deg);
 }
+
+#accounting-section .accounting-prepaid-detail {
+  margin-block-start: .75rem;
+  padding-block-start: .75rem;
+  border-block-start: 1px solid var(--report-border);
+}
+#accounting-section .accounting-prepaid-detail strong,
+#accounting-section .accounting-prepaid-detail small:not([hidden]) {
+  display: block;
+}
