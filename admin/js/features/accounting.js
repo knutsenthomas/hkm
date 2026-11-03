@@ -139,7 +139,7 @@ export function mountAccounting(section, firebaseService) {
         <form class="accounting-toolbar">
           <label>År <input name="year" type="number" min="2000" max="2100" required></label>
           <label>Periode <select name="month"><option value="0">Årsoversikt</option></select></label>
-          <button class="accounting-refresh" type="submit">Oppdater visning</button>
+          <button class="accounting-refresh" type="submit">Oppdater</button>
         </form>
       </details>
     </header>
