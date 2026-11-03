@@ -4,6 +4,52 @@ const currency = new Intl.NumberFormat('nb-NO', { style: 'currency', currency: '
 const months = new Intl.DateTimeFormat('nb-NO', { month: 'long', timeZone: 'UTC' });
 const refreshInterval = 5 * 60 * 1000;
 
+async function renderTrend(container, settings, year, month, data, signal) {
+  container.replaceChildren();
+  const endMonth = Number(month) || new Date(Date.parse(data.dateTo) - 86400000).getUTCMonth() + 1;
+  const snapshots = await Promise.allSettled(Array.from({ length: endMonth }, (_, index) =>
+    settings.doc('tripletex-accounting-' + year + '-' + String(index + 1).padStart(2, '0')).get({ source: 'server' })
+  ));
+  if (signal.aborted) return;
+  const points = snapshots.map((snapshot, index) => ({
+    label: months.format(new Date(Date.UTC(2026, index, 1))),
+    report: snapshot.status === 'fulfilled' ? snapshot.value.data() : undefined,
+  })).filter(point => point.report);
+  const scale = Math.max(1, ...points.flatMap(({ report }) => [report.revenue, report.expenses, report.result].map(Math.abs)));
+  const fragment = document.createDocumentFragment();
+  for (const { label, report } of points) {
+    const row = document.createElement('div');
+    row.className = 'accounting-trend-row';
+    const heading = document.createElement('strong');
+    heading.textContent = label;
+    row.append(heading);
+    for (const [key, title] of [['revenue', 'Inntekter'], ['expenses', 'Kostnader'], ['result', 'Resultat']]) {
+      const value = report[key];
+      const metric = document.createElement('div');
+      metric.className = 'accounting-trend-metric';
+      metric.dataset.series = key;
+      const amount = document.createElement('span');
+      amount.textContent = title + ' ' + currency.format(value);
+      const track = document.createElement('div');
+      track.className = 'accounting-trend-track';
+      track.setAttribute('aria-hidden', 'true');
+      const bar = document.createElement('div');
+      bar.style.width = Math.abs(value) / scale * 100 + '%';
+      bar.classList.toggle('is-negative', value < 0);
+      track.append(bar);
+      metric.append(amount, track);
+      row.append(metric);
+    }
+    fragment.append(row);
+  }
+  if (points.length < endMonth) {
+    const note = document.createElement('p');
+    note.textContent = points.length ? 'Viser måneder med lagrede tall.' : 'Ingen månedstall tilgjengelig.';
+    fragment.append(note);
+  }
+  container.replaceChildren(fragment);
+}
+
 export function mountAccounting(section, firebaseService) {
   if (section.querySelector('form')) return;
   section.innerHTML = `
@@ -24,6 +70,10 @@ export function mountAccounting(section, firebaseService) {
         <div><dt>Netto finans</dt><dd data-amount="financial"></dd></div>
         <div><dt>Resultat</dt><dd data-amount="result"></dd></div>
       </dl>
+      <section class="accounting-chart" aria-label="Utvikling per måned">
+        <h3>Utvikling per måned</h3>
+        <div data-trend></div>
+      </section>
       <div class="accounting-table">
         <table>
           <caption>Resultat per konto</caption>
@@ -67,7 +117,8 @@ export function mountAccounting(section, firebaseService) {
     status.textContent = 'Henter siste lagrede regnskapstall …';
     try {
       const period = year.value + '-' + month.value.padStart(2, '0');
-      const snapshot = await firebaseService.db.collection('settings').doc('tripletex-accounting-' + period).get({ source: 'server' });
+      const settings = firebaseService.db.collection('settings');
+      const snapshot = await settings.doc('tripletex-accounting-' + period).get({ source: 'server' });
       if (!snapshot.exists) throw new Error('Ingen regnskapstall er hentet for denne perioden ennå.');
       const data = snapshot.data();
       if (request.signal.aborted) return;
@@ -101,6 +152,8 @@ export function mountAccounting(section, firebaseService) {
       }
       table.replaceChildren(...rows);
       report.hidden = false;
+      await renderTrend(section.querySelector('[data-trend]'), settings, year.value, month.value, data, request.signal);
+      if (request.signal.aborted) return;
       lastSuccess = Date.parse(data.fetchedAt);
       const updated = new Date(data.fetchedAt).toLocaleString('nb-NO', { timeZone: 'Europe/Oslo' });
       const periodStatus = rows.length ? '' : 'Ingen posteringer i perioden. ';

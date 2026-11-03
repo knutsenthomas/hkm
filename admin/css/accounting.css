@@ -102,3 +102,34 @@
   #accounting-section thead th:first-child { width: auto; }
   #accounting-section .accounting-refresh { margin-inline-start: 0; }
 }
+
+#accounting-section .accounting-chart {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--report-border);
+  border-radius: .75rem;
+  background: var(--report-surface);
+}
+
+#accounting-section .accounting-chart h3 { margin: 0 0 .7rem; font-size: 1rem; font-weight: 700; }
+#accounting-section .accounting-trend-row {
+  display: grid;
+  grid-template-columns: minmax(5.5rem, .6fr) repeat(3, minmax(0, 1fr));
+  align-items: center;
+  gap: .5rem 1rem;
+  padding: .65rem 0;
+  border-top: 1px solid var(--report-border);
+  font-size: .8rem;
+}
+#accounting-section .accounting-trend-row strong { text-transform: capitalize; }
+#accounting-section .accounting-trend-metric { min-width: 0; font-variant-numeric: tabular-nums; }
+#accounting-section .accounting-trend-track { height: .4rem; margin-top: .25rem; background: var(--report-subtle); border-radius: 1rem; }
+#accounting-section .accounting-trend-track > div { height: 100%; border-radius: inherit; background: #258569; }
+#accounting-section [data-series="expenses"] .accounting-trend-track > div { background: #bd632d; }
+#accounting-section [data-series="result"] .accounting-trend-track > div { background: #4979b2; }
+#accounting-section [data-series="result"] .accounting-trend-track > .is-negative { background: #bb535b; }
+
+@media (max-width: 650px) {
+  #accounting-section .accounting-trend-row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .4rem .65rem; }
+  #accounting-section .accounting-trend-row strong { grid-column: 1 / -1; }
+}
