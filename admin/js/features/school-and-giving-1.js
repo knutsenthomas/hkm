@@ -454,6 +454,7 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
         "donation-transactions-body",
       );
       if (transactionsBody) {
+        const editableTypes = ["butikk"];
         const editableMethods = ["bank", "vipps_manual", "cash", "manual", "other"];
         const editableStatuses = ["completed", "pending", "processing"];
         const visibleRecords = records.slice(0, 100);
@@ -505,6 +506,10 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
                             <div style="display:flex; align-items:center; gap:6px;">
                                 <strong>${name}</strong>
                                 ${typeBadge}
+                                <select class="form-control donation-type-select" aria-label="Klassifisering for ${name}">
+                                    <option value="" selected disabled>Endre kategori</option>
+                                    <option value="butikk">Nettbutikksalg</option>
+                                </select>
                             </div>
                             <div style="font-size:12px;color:#64748b;">${email}</div>
                         </td>
@@ -583,6 +588,32 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
                 console.error("Kunne ikke oppdatere betalingsmåte", error);
                 select.value = editableMethods.includes(record.method) ? record.method : "";
                 this.showToast("Kunne ikke oppdatere betalingsmåte.", "error");
+              } finally {
+                select.disabled = false;
+              }
+            });
+          });
+
+        transactionsBody
+          .querySelectorAll(".donation-type-select")
+          .forEach((select, index) => {
+            const record = visibleRecords[index];
+            select.addEventListener("change", async () => {
+              const type = select.value;
+              if (!editableTypes.includes(type)) return;
+              select.disabled = true;
+              try {
+                await firebaseService.db.collection("donations").doc(record.id).update({
+                  type,
+                  updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                });
+                record.type = type;
+                this.renderDonationAdminViews();
+                this.showToast("Kategori oppdatert.", "success");
+              } catch (error) {
+                console.error("Kunne ikke oppdatere kategori", error);
+                select.value = "";
+                this.showToast("Kunne ikke oppdatere kategori.", "error");
               } finally {
                 select.disabled = false;
               }
