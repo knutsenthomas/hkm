@@ -135,7 +135,7 @@ export function mountAccounting(section, firebaseService) {
     <header class="accounting-heading">
       <div><h2>Resultatrapport</h2><p>His Kingdom Ministry · Tripletex</p></div>
       <details class="accounting-period">
-        <summary><span data-period-label>Årsoversikt</span><span aria-hidden="true">⌄</span></summary>
+        <summary><span data-period-label>Årsoversikt</span><span class="material-symbols-outlined accounting-period-chevron" aria-hidden="true">expand_more</span></summary>
         <form class="accounting-toolbar">
           <label>År <input name="year" type="number" min="2000" max="2100" required></label>
           <label>Periode <select name="month"><option value="0">Årsoversikt</option></select></label>

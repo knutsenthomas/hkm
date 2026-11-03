@@ -342,3 +342,12 @@
 
 #accounting-section .accounting-bank > [hidden] { display: none; }
 #accounting-section [data-prepaid-card] p { margin: .5rem 0 0; color: var(--report-muted); font-size: .85rem; }
+
+#accounting-section .accounting-period-chevron {
+  color: var(--report-muted);
+  font-size: 1.125rem;
+  line-height: 1;
+}
+#accounting-section .accounting-period[open] .accounting-period-chevron {
+  transform: rotate(180deg);
+}
