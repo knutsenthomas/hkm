@@ -61,7 +61,11 @@
 }
 
 #accounting-section .accounting-toolbar :is(input, select, button) {
-  min-height: 2.5rem;
+  box-sizing: border-box;
+  height: 2.75rem;
+  min-height: 2.75rem;
+  margin: 0;
+  line-height: 1.25;
   padding: .4rem .65rem;
   border: 1px solid var(--report-border);
   border-radius: .4rem;
