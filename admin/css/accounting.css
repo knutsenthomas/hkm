@@ -210,8 +210,7 @@
   background: transparent;
   color: inherit;
   text-align: start;
-  text-decoration: underline;
-  text-underline-offset: .18em;
+  text-decoration: none;
   cursor: pointer;
 }
 #accounting-section .accounting-postings {
