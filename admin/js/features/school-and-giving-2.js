@@ -343,7 +343,19 @@ export function createSchoolAndGiving2Methods({ firebaseService, adminUtils, sho
         this.renderWixStats();
       };
 
-      addFilteredListener("donation-clear-filters", "click", clearFilters);
+      for (const prefix of ["donation", "donor"]) {
+        addFilteredListener(`${prefix}-filter-toggle`, "click", (event) => {
+          const panel = document.getElementById(`${prefix}-filter-panel`);
+          if (!panel) return;
+          panel.hidden = !panel.hidden;
+          event.currentTarget.setAttribute("aria-expanded", String(!panel.hidden));
+        });
+      }
+      addFilteredListener("donation-clear-filters", "click", () => {
+        const reconciliation = document.getElementById("donation-reconciliation-filter");
+        if (reconciliation) reconciliation.value = "";
+        clearFilters();
+      });
       addFilteredListener("donor-clear-filters", "click", clearFilters);
       addFilteredListener("shop-clear-filters", "click", clearFilters);
 

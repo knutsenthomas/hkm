@@ -1,7 +1,8 @@
 const givingTabs = [
-  ['dashboard', 'Dashboard'], ['causes', 'Innsamlinger'],
-  ['donations', 'Pr. gave'], ['donors', 'Pr. giver'],
-  ['inkind', 'Fysiske gaver'], ['school-payments', 'Skolebetalinger'],
+  ['dashboard', 'Oversikt'], ['donations', 'Gaver'], ['donors', 'Givere'],
+  ['recurring', 'Faste avtaler'], ['settlements', 'Oppgjør'], ['reports', 'Rapporter'],
+  ['causes', 'Innsamlinger'], ['inkind', 'Fysiske gaver'],
+  ['school-payments', 'Skolebetalinger'],
 ];
 
 export function givingTabLinks(active = 'dashboard') {

@@ -535,8 +535,7 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
       if (!panel || panel.dataset.bound) return;
       panel.dataset.bound = "true";
       const list = panel.querySelector("#donation-recurring-agreements");
-      panel.addEventListener("toggle", async () => {
-        if (!panel.open) return;
+      panel.addEventListener("giving:open", async () => {
         list.textContent = "Henter faste giveravtaler …";
         try {
           const collection = firebaseService.db.collection("recurring_payment_agreements");
@@ -580,7 +579,15 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
             const button = document.createElement("button");
             button.type = "button";
             button.className = "btn-secondary";
-            button.textContent = `${provider} · ${key}`;
+            const row = document.createElement("div");
+            row.style.cssText = "display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:.5rem;padding:.5rem 0";
+            const description = document.createElement("span");
+            const names = { vipps: "Vipps", stripe: "Stripe", paypal: "PayPal" };
+            const date = report.date;
+            description.textContent = `${names[provider] || provider} · ${date ? new Date(date + "T00:00:00Z").toLocaleDateString("nb-NO", { dateStyle: "long", timeZone: "UTC" }) : key}`;
+            description.title = key;
+            button.textContent = "Last ned rapport";
+            button.setAttribute("aria-label", `Last ned rapport: ${description.textContent}`);
             button.addEventListener("click", () => {
               const url = URL.createObjectURL(new Blob([JSON.stringify(report, null, 2)], { type: "application/json" }));
               const link = document.createElement("a");
@@ -589,7 +596,8 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
               link.click();
               setTimeout(() => URL.revokeObjectURL(url), 1000);
             });
-            list.append(button);
+            row.append(description, button);
+            list.append(row);
           }
         } catch {
           list.textContent = "Kunne ikke hente synkroniserte rapporter.";
@@ -769,9 +777,9 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
       if (donorCountEl)
         donorCountEl.textContent =
           donationDonors.length.toLocaleString("no-NO");
-      if (pendingEl) pendingEl.textContent = `${pendingCount} venter`;
+      if (pendingEl) pendingEl.innerHTML = `${pendingCount}<span class="giving-donor-meta"> venter</span>`;
       if (unmatchedEl)
-        unmatchedEl.textContent = `${unmatchedCount} uten profilkobling`;
+        unmatchedEl.innerHTML = `${unmatchedCount}<span class="giving-donor-meta"> uten profilkobling</span>`;
 
       // Render donation transactions table
       const transactionsBody = document.getElementById(
@@ -829,10 +837,10 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
                         <td style="white-space: nowrap;">
                             <div style="display:flex; align-items:center; gap:6px;">
                                 <strong>${name}</strong>
-                                ${typeBadge}
+                                <span class="giving-donor-meta">${typeBadge}</span>
 
                             </div>
-                            <div style="font-size:12px;color:#64748b;">${email}</div>
+                            <div class="giving-donor-meta" style="font-size:12px;color:#64748b;">${email}</div>
                         </td>
                         <td>
                             ${method}
@@ -850,7 +858,8 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
                             <dialog class="donation-detail-panel" aria-label="Gavedetaljer for ${name}" style="position:fixed; inset:0 0 0 auto; margin:0; width:min(100%, 26rem); height:100%; max-height:100%; box-sizing:border-box; padding:1.5rem; text-align:left;">
                                 <form method="dialog"><button class="btn-secondary" autofocus>Lukk</button></form>
                                 <h3>${name}</h3>
-                                <p>${amount} · ${email}</p>
+                                <p>${amount} · ${email} ${typeBadge}</p>
+                                <p>Giverprofil: ${profileStatus}</p>
                                 <div style="display:grid; gap:1rem;">
                                     <label>Betalingsmåte
                                         <select class="form-control donation-method-select" aria-label="Betalingsmåte for ${name}">
@@ -936,8 +945,13 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
         });
 
         transactionsBody.querySelectorAll(".donation-detail-open").forEach((button) => {
-          button.addEventListener("click", () => {
-            button.closest("td").querySelector(".donation-detail-panel").showModal();
+          const row = button.closest("tr");
+          const panel = row.querySelector(".donation-detail-panel");
+          row.style.cursor = "pointer";
+          row.addEventListener("click", (event) => {
+            if (event.target.closest("dialog, a, input, select, label")) return;
+            const action = event.target.closest("button");
+            if ((!action || action === button) && !panel.open) panel.showModal();
           });
         });
 
@@ -1038,6 +1052,7 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
               e.stopPropagation();
               const donationId = btn.dataset.id;
               const currentUserId = btn.dataset.userid || "";
+              btn.closest("dialog")?.close();
               this.openLinkProfileModal(donationId, currentUserId);
             });
           });

@@ -34,6 +34,9 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
             this.loadCauses();
           } else if (target === "wix") {
             this.renderWixStats();
+          } else if (target === "recurring") {
+            this.bindDonationRecurringAgreements();
+            document.getElementById("donation-recurring-panel")?.dispatchEvent(new Event("giving:open"));
           } else if (target === "inkind") {
             this.renderInKindDonations();
           }
@@ -161,7 +164,7 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
       section.innerHTML = `
             <!-- Style overrides to fix Terminal Layout conflict on Gifts Page -->
             <style>
-                body.admin-body .causes-stats-grid {
+                body.admin-body #causes-section .causes-stats-grid {
                     display: grid !important;
                     grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
                     grid-auto-flow: row !important;
@@ -170,11 +173,11 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
                     max-width: 100% !important;
                     align-items: stretch !important;
                 }
-                @media (max-width: 1024px) {
-                    body.admin-body .causes-stats-grid {
+                @media (max-width: 700px) {
+                    body.admin-body #causes-section .causes-stats-grid {
                         grid-template-columns: 1fr !important;
                     }
-                    body.admin-body .causes-stats-grid > * {
+                    body.admin-body #causes-section .causes-stats-grid > * {
                         grid-column: 1 / -1 !important;
                     }
                 }
@@ -278,16 +281,127 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
             </div>
 
             <!-- Tab 2: By Donation Content -->
+            <style>
+                body.admin-body #causes-section .giving-period-grid > .stat-card.modern {
+                    grid-area:auto !important;
+                    width:auto !important;
+                    grid-column:auto !important;
+                    min-width:0 !important;
+                    min-height:0 !important;
+                    margin:0 !important;
+                    padding:16px !important;
+                }
+                body.admin-body #causes-section .giving-period-grid .stat-icon-wrap {
+                    width:36px !important;
+                    height:36px !important;
+                    margin-bottom:8px !important;
+                }
+                body.admin-body #causes-section .giving-period-grid .stat-value {
+                    font-size:clamp(1rem,2vw,1.5rem) !important;
+                    font-variant-numeric:tabular-nums;
+                }
+                body.admin-body #causes-section #cause-tab-content-donations .giving-period-grid {
+                    margin-bottom:16px !important;
+                    padding:8px;
+                    border:1px solid var(--border-color, #e2e8f0);
+                    border-radius:12px;
+                }
+                body.admin-body #causes-section #cause-tab-content-donations .giving-period-grid > .stat-card.modern {
+                    display:flex !important;
+                    flex-direction:row !important;
+                    align-items:flex-start !important;
+                    gap:10px !important;
+                    padding:10px !important;
+                    min-height:0 !important;
+                    box-shadow:none !important;
+                }
+                body.admin-body #causes-section .giving-period-grid .stat-icon-wrap {
+                    flex:0 0 28px;
+                    width:28px !important;
+                    height:28px !important;
+                    margin:0 !important;
+                }
+                body.admin-body #causes-section .giving-period-grid .stat-icon-wrap span {
+                    font-size:18px;
+                }
+                body.admin-body #causes-section .giving-period-grid :is(.stat-label, .stat-trend) {
+                    font-size:.75rem !important;
+                    overflow-wrap:normal;
+                    hyphens:none;
+                }
+                body.admin-body #causes-section .giving-period-grid .stat-value {
+                    white-space:normal !important;
+                    text-overflow:clip !important;
+                    overflow:visible !important;
+                    word-break:normal !important;
+                }
+                @media (min-width: 701px) {
+                    body.admin-body #causes-section #cause-tab-content-donations .giving-period-grid {
+                        display:grid !important;
+                        grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+                        grid-auto-flow:row !important;
+                        gap:12px !important;
+                    }
+                    body.admin-body #causes-section .donation-metrics-grid .stat-card.modern {
+                        padding:16px !important;
+                        border-radius:12px;
+                    }
+                    body.admin-body #causes-section #cause-tab-content-donations .giving-period-grid .stat-value {
+                        font-variant-numeric:tabular-nums;
+                        white-space:nowrap;
+                    }
+                    .giving-period-grid .giving-donor-meta { display:none; }
+                }
+                @media (max-width: 700px) {
+                    body.admin-body #causes-section :is(.donation-metrics-grid, .giving-period-grid) {
+                        grid-template-columns:repeat(auto-fit,minmax(min(100%, 8rem),1fr)) !important;
+                        gap:8px !important;
+                    }
+                    body.admin-body #causes-section .donation-metrics-grid .stat-card.modern {
+                        padding:10px 12px !important;
+                    }
+                    #cause-tab-content-donations .giving-transactions { display:block; min-width:0 !important; }
+                    .giving-transactions thead { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+                    #donation-transactions-body { display:grid; gap:12px; }
+                    #donation-transactions-body > tr {
+                        display:grid; grid-template-columns:minmax(0,1fr) auto;
+                        grid-template-areas:"giver giver" "dato dato" "metode status" "profil profil" "belop belop";
+                        gap:8px 12px; padding:14px; border:1px solid #e2e8f0; border-radius:12px;
+                    }
+                    #donation-transactions-body > tr > td {
+                        min-width:0; padding:0 !important; border:0 !important; box-shadow:none !important;
+                        white-space:normal !important; overflow-wrap:anywhere;
+                    }
+                    #donation-transactions-body > tr > td:nth-child(1) { grid-area:dato; font-size:.8rem; }
+                    #donation-transactions-body > tr > td:nth-child(2) { grid-area:giver; }
+                    #donation-transactions-body > tr > td:nth-child(2) > div:first-child { flex-wrap:wrap; }
+                    #donation-transactions-body > tr > td:nth-child(2) span { white-space:nowrap; }
+                    #donation-transactions-body > tr > td:nth-child(3) { grid-area:metode; }
+                    #donation-transactions-body > tr > td:nth-child(4) { grid-area:status; text-align:right; }
+                    #donation-transactions-body > tr > td:nth-child(5) { grid-area:profil; }
+                    #donation-transactions-body > tr > td:nth-child(6) { grid-area:belop; }
+                    #donation-transactions-body > tr > td:nth-child(6) > div { flex-direction:row; justify-content:space-between !important; align-items:center !important; }
+                    .giving-period-grid .giving-donor-meta,
+                    #donation-transactions-body .giving-donor-meta,
+                    #donation-transactions-body > tr > td:nth-child(5) { display:none; }
+                    #donation-transactions-body > tr {
+                        grid-template-areas:"giver belop" "dato dato" "metode status";
+                    }
+                    #donation-transactions-body .donation-detail-open {
+                        padding:4px 8px; min-height:32px;
+                    }
+                    #donation-transactions-body > tr > td[colspan] { grid-column:1/-1; }
+                }
+            </style>
             <div id="cause-tab-content-donations" class="cause-tab-pane" style="display: none;">
-                <div class="stats-grid causes-stats-grid" style="margin-bottom: 32px;">
-                    <div class="stat-card modern">
+                <div class="stats-grid giving-period-grid" style="margin-bottom: 32px;">
+                    <div class="stat-card modern" title="Fullførte gaver i perioden">
                         <div class="stat-icon-wrap green">
                             <span class="material-symbols-outlined">payments</span>
                         </div>
                         <div class="stat-content">
-                            <h3 class="stat-label">Fullført i perioden</h3>
+                            <h3 class="stat-label">Mottatt</h3>
                             <p class="stat-value" id="donation-total-amount">${formattedTotal}</p>
-                            <p class="stat-trend" id="donation-total-subtitle" style="padding-left: 0 !important; margin-left: 0 !important;">Fullførte gaver i perioden</p>
                         </div>
                     </div>
 
@@ -296,7 +410,7 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
                             <span class="material-symbols-outlined">volunteer_activism</span>
                         </div>
                         <div class="stat-content">
-                            <h3 class="stat-label">Antall gaver i perioden</h3>
+                            <h3 class="stat-label">Gaver</h3>
                             <p class="stat-value" id="donation-total-count">${donationCount}</p>
                             <span class="stat-meta" id="donation-count-subtitle">Transaksjoner i perioden</span>
                         </div>
@@ -307,7 +421,7 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
                             <span class="material-symbols-outlined">trending_up</span>
                         </div>
                         <div class="stat-content">
-                            <h3 class="stat-label">Snittgave i perioden</h3>
+                            <h3 class="stat-label">Snittgave</h3>
                             <p class="stat-value" id="donation-average-amount">${formattedAverage}</p>
                             <span class="stat-meta" id="donation-average-subtitle">Snitt per donasjon i perioden</span>
                         </div>
@@ -323,6 +437,30 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
                             <span class="stat-meta" id="donation-today-count">Laster...</span>
                         </div>
                     </div>
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap blue"><span class="material-symbols-outlined" aria-hidden="true">group</span></div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Givere</h3>
+                            <p class="stat-value" id="donation-donor-count">--</p>
+                            <span class="stat-meta">I valgt periode</span>
+                        </div>
+                    </div>
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap purple"><span class="material-symbols-outlined" aria-hidden="true">schedule</span></div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Til behandling</h3>
+                            <p class="stat-value" id="donation-pending-count">--</p>
+                            <span class="stat-meta">Ikke fullført</span>
+                        </div>
+                    </div>
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap blue"><span class="material-symbols-outlined" aria-hidden="true">link_off</span></div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Ukoblede gaver</h3>
+                            <p class="stat-value" id="donation-unmatched-count">--</p>
+                            <span class="stat-meta">Uten giverprofil</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="card" style="margin-bottom: 24px;">
@@ -331,19 +469,28 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
                             <h3 class="card-title">Gaveoversikt</h3>
                             <p class="section-subtitle" style="margin-bottom: 0;">Filtrer på status, metode, transaksjonstype eller giver.</p>
                         </div>
-                        <div style="display:flex; align-items:center; gap:12px;">
-                            <div style="position:relative; width:220px;">
-                                <span class="material-symbols-outlined" style="position:absolute; left:10px; top:50%; transform:translateY(-50%) !important; font-size:18px; color:#64748b; pointer-events:none;">search</span>
-                                <input id="donation-search" class="form-control" type="search" placeholder="Søk..." style="padding-left:36px !important; height:40px; font-size:13px; border-radius:8px; border:1px solid #cbd5e1; width:100%; margin:0;">
-                            </div>
-                            <button type="button" class="btn-secondary" id="print-donations-report-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px;">
-                                <span class="material-symbols-outlined" style="font-size:20px;">print</span>
-                                Skriv ut rapport
-                            </button>
-                        </div>
+                        <button type="button" id="donation-filter-toggle" class="btn-secondary" aria-label="Filtre for gaver" title="Filtre for gaver" aria-expanded="false" aria-controls="donation-filter-panel" style="margin-left:auto;padding:6px 10px;">
+                            <span class="material-symbols-outlined" aria-hidden="true">more_horiz</span>
+                        </button>
                     </div>
                     <div class="card-body">
-                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%, 130px), 1fr));gap:12px;margin-bottom:16px;">
+                        <div id="donation-filter-panel" hidden style="margin-bottom:16px;">
+                        <div style="text-align:left;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%, 130px), 1fr));gap:12px;margin-top:12px;">
+                        <label style="display:block;">
+                            Avstemmingsstatus
+                            <select id="donation-reconciliation-filter" class="form-control">
+                                <option value="">Alle avstemmingsstatuser</option>
+                                <option value="settlement">Mangler oppgjør</option>
+                                <option value="voucher">Mangler bilag</option>
+                                <option value="review">Til kontroll</option>
+                                <option value="verified">Avstemt</option>
+                                <option value="waiting">Venter på betaling</option>
+                            </select>
+                        </label>
+                            <div style="position:relative; min-width:0;">
+                                <label for="donation-search">Giver</label>
+                                <input id="donation-search" class="form-control" type="search" placeholder="Søk etter giver…">
+                            </div>
                             <div class="form-group" style="margin:0;">
                                 <label>Status</label>
                                 <select id="donation-status-filter" class="form-control">
@@ -385,65 +532,10 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
                                 </button>
                             </div>
                         </div>
-
-                        <div class="stats-grid donation-metrics-grid causes-stats-grid" style="margin-bottom: 20px;">
-                            <div class="stat-card modern">
-                                <div class="stat-content">
-                                    <h3 class="stat-label">Valgt periode</h3>
-                                    <p class="stat-value" id="donation-period-amount">--</p>
-                                    <span class="stat-meta" id="donation-period-count">Laster...</span>
-                                </div>
-                            </div>
-                            <div class="stat-card modern">
-                                <div class="stat-content">
-                                    <h3 class="stat-label">Givere</h3>
-                                    <p class="stat-value" id="donation-donor-count">--</p>
-                                    <span class="stat-meta">Unike givere i filteret</span>
-                                </div>
-                            </div>
-                            <div class="stat-card modern">
-                                <div class="stat-content">
-                                    <h3 class="stat-label">Under behandling</h3>
-                                    <p class="stat-value" id="donation-pending-count">--</p>
-                                    <span class="stat-meta">Ikke fullført ennå</span>
-                                </div>
-                            </div>
-                            <div class="stat-card modern">
-                                <div class="stat-content">
-                                    <h3 class="stat-label">Ukoblede</h3>
-                                    <p class="stat-value" id="donation-unmatched-count">--</p>
-                                    <span class="stat-meta">Mangler profilkobling</span>
-                                </div>
-                            </div>
                         </div>
 
-                        <label style="display:block; margin-bottom:1rem;">
-                            Avstemmingsstatus
-                            <select id="donation-reconciliation-filter" class="form-control">
-                                <option value="">Alle avstemmingsstatuser</option>
-                                <option value="settlement">Mangler oppgjør</option>
-                                <option value="voucher">Mangler bilag</option>
-                                <option value="review">Til kontroll</option>
-                                <option value="verified">Avstemt</option>
-                                <option value="waiting">Venter på betaling</option>
-                            </select>
-                        </label>
-                        <details style="margin-bottom:1rem;">
-                            <summary>Oppgjør og avstemming</summary>
-                            <details id="giving-synced-reports"><summary>Automatisk hentede rapporter</summary><div aria-live="polite"></div></details>
-                            <form id="donation-source-report" style="display:grid; gap:.75rem; margin:1rem 0;">
-                                <label>Kilde <select name="provider" class="form-control"><option value="stripe">Stripe</option><option value="vipps">Vipps</option><option value="paypal">PayPal</option></select></label>
-                                <label>Stripe-oppgjørs-ID eller Vipps-ledger-ID <input name="reference" class="form-control" maxlength="100"></label>
-                                <label>Rapportdato (Vipps) / Fra og med (PayPal, UTC) <input name="date" type="date" class="form-control"></label>
-                                <label>Til og med (PayPal, UTC) <input name="endDate" type="date" class="form-control"></label>
-                                <button type="submit" class="btn-secondary">Hent rapportfil</button>
-                                <output aria-live="polite"></output>
-                            </form>
-                            <div id="donation-settlement-summary"></div>
-                        </details>
-
                         <div style="overflow-x:auto;">
-                            <table class="data-table" style="width:100%; min-width:48rem; table-layout:auto;">
+                            <table class="data-table giving-transactions" role="table" style="width:100%; min-width:48rem; table-layout:auto;">
                                 <thead>
                                     <tr>
                                         <th>Dato</th>
@@ -463,6 +555,49 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
                 </div>
             </div>
 
+            <div id="cause-tab-content-recurring" class="cause-tab-pane" style="display:none;">
+                <div class="card" id="donation-recurring-panel">
+                    <div class="card-header"><h3 class="card-title">Faste giveravtaler</h3></div>
+                    <div class="card-body" id="donation-recurring-agreements" aria-live="polite"></div>
+                </div>
+            </div>
+
+            <div id="cause-tab-content-reports" class="cause-tab-pane" style="display:none;">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title">Rapporter</h3></div>
+                    <div class="card-body" style="display:flex;flex-wrap:wrap;gap:12px;">
+                        <button type="button" class="btn-secondary" id="print-donations-report-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px;">
+                                <span class="material-symbols-outlined" style="font-size:20px;">print</span>
+                                Skriv ut gaver
+                            </button>
+                        <button type="button" class="btn-secondary" id="print-donors-report-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px;">
+                                <span class="material-symbols-outlined" style="font-size:20px;">print</span>
+                                Skriv ut givere
+                            </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="cause-tab-content-settlements" class="cause-tab-pane" style="display:none;">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title">Oppgjør og avstemming</h3></div>
+                    <div class="card-body">
+                            <details id="giving-synced-reports"><summary>Automatisk hentede rapporter</summary><div aria-live="polite"></div></details>
+                            <details style="margin:1rem 0;"><summary>Hent rapport manuelt</summary>
+                            <form id="donation-source-report" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr)); gap:.75rem; margin:1rem 0;">
+                                <label>Kilde <select name="provider" class="form-control"><option value="stripe">Stripe</option><option value="vipps">Vipps</option><option value="paypal">PayPal</option></select></label>
+                                <label>Stripe-oppgjørs-ID eller Vipps-ledger-ID <input name="reference" class="form-control" maxlength="100"></label>
+                                <label>Rapportdato (Vipps) / Fra og med (PayPal, UTC) <input name="date" type="date" class="form-control"></label>
+                                <label>Til og med (PayPal, UTC) <input name="endDate" type="date" class="form-control"></label>
+                                <button type="submit" class="btn-secondary">Hent rapportfil</button>
+                                <output aria-live="polite"></output>
+                            </form>
+                            </details>
+                            <div id="donation-settlement-summary"></div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Tab 3: By Donor Content -->
             <div id="cause-tab-content-donors" class="cause-tab-pane" style="display: none;">
                 <div class="card" style="margin-bottom: 24px;">
@@ -471,22 +606,15 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
                             <h3 class="card-title">Givere</h3>
                             <p class="section-subtitle" style="margin-bottom: 0;">Aggregert oversikt per giver i valgt periode.</p>
                         </div>
-                        <div style="display:flex; align-items:center; gap:12px;">
-                            <div style="position:relative; width:220px;">
-                                <span class="material-symbols-outlined" style="position:absolute; left:10px; top:50%; transform:translateY(-50%) !important; font-size:18px; color:#64748b; pointer-events:none;">search</span>
-                                <input id="donor-search" class="form-control" type="search" placeholder="Søk etter giver..." style="padding-left:36px !important; height:40px; font-size:13px; border-radius:8px; border:1px solid #cbd5e1; width:100%; margin:0;">
-                            </div>
-                            <button type="button" class="btn-secondary" id="print-donors-report-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px;">
-                                <span class="material-symbols-outlined" style="font-size:20px;">print</span>
-                                Skriv ut rapport
+                        <div style="display:flex;align-items:center;gap:8px;width:min(17rem,100%);margin-left:auto;">
+                            <input id="donor-search" class="form-control" type="search" aria-label="Søk etter giver" placeholder="Søk etter giver…" style="flex:1;min-width:0;width:0;height:40px;margin:0;">
+                            <button type="button" id="donor-filter-toggle" class="btn-secondary" aria-label="Filtre for givere" title="Filtre for givere" aria-expanded="false" aria-controls="donor-filter-panel" style="display:grid;place-items:center;flex:0 0 40px;width:40px;height:40px;margin:0;padding:0;font-size:20px;">
+                                <span aria-hidden="true">⋯</span>
                             </button>
                         </div>
                     </div>
                     <div class="card-body">
-                        <details id="donation-recurring-panel" style="margin-bottom:1rem;">
-                            <summary>Faste giveravtaler</summary>
-                            <div id="donation-recurring-agreements" aria-live="polite"></div>
-                        </details>
+                        <div id="donor-filter-panel" hidden>
                         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%, 130px), 1fr));gap:12px;margin-bottom:16px;">
                             <div class="form-group" style="margin:0;">
                                 <label>Status</label>
@@ -541,6 +669,7 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
                                     Nullstill
                                 </button>
                             </div>
+                        </div>
                         </div>
                         <div style="overflow-x:auto;">
                             <table class="data-table" style="width:100%;">
