@@ -171,6 +171,7 @@ async function finalizeVippsReturn() {
     }
 
     const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.get("vipps_flow") === "agreement") return;
     const reference = searchParams.get("vipps_reference");
     const isVippsReturn = searchParams.get("vipps_return") === "1";
 
@@ -200,6 +201,7 @@ async function finalizeVippsReturn() {
         const cleanedParams = new URLSearchParams(window.location.search);
         cleanedParams.delete("vipps_reference");
         cleanedParams.delete("vipps_return");
+        cleanedParams.delete("vipps_flow");
         const cleanedUrl = `${window.location.pathname}${cleanedParams.toString() ? `?${cleanedParams.toString()}` : ""}${window.location.hash}`;
         window.history.replaceState({}, document.title, cleanedUrl);
     }

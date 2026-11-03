@@ -3071,7 +3071,7 @@ function buildVippsReference() {
   return `hkm-${timestampPart}-${randomPart}`;
 }
 
-function buildVippsReturnUrl(returnUrl, reference) {
+function buildVippsReturnUrl(returnUrl, reference, flow) {
   const defaultUrl = "https://www.hiskingdomministry.no/donasjoner.html";
   let parsedUrl;
 
@@ -3087,6 +3087,7 @@ function buildVippsReturnUrl(returnUrl, reference) {
 
   parsedUrl.searchParams.set("vipps_reference", reference);
   parsedUrl.searchParams.set("vipps_return", "1");
+  parsedUrl.searchParams.set("vipps_flow", flow);
   return parsedUrl.toString();
 }
 
@@ -4076,7 +4077,7 @@ exports.createVippsPayment = onRequest({
     const vippsAuth = await getVippsAccessToken(config);
     const { accessToken, baseUrl } = vippsAuth;
     const reference = buildVippsReference();
-    const paymentReturnUrl = buildVippsReturnUrl(returnUrl, reference);
+    const paymentReturnUrl = buildVippsReturnUrl(returnUrl, reference, "payment");
     const phoneNumber = normalizeVippsPhoneNumber(customerDetails.phone);
 
     const isCourse = (customerDetails.type === 'Course' || customerDetails.courseId);
@@ -4288,7 +4289,7 @@ exports.createVippsAgreement = onRequest({
     const vippsAuth = await getVippsAccessToken(config);
     const { accessToken, baseUrl } = vippsAuth;
     const reference = buildVippsReference();
-    const agreementReturnUrl = buildVippsReturnUrl(returnUrl, reference);
+    const agreementReturnUrl = buildVippsReturnUrl(returnUrl, reference, "agreement");
     const phoneNumber = normalizeVippsPhoneNumber(customerDetails.phone);
 
     const agreementRequest = {

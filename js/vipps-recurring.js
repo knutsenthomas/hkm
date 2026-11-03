@@ -937,6 +937,7 @@ async function handlePayPalRecurringReturn() {
 // Check URL and handle agreement validation
 async function handleVippsReturn() {
     const params = new URLSearchParams(window.location.search);
+    if (params.get("vipps_flow") === "payment") return;
     const reference = params.get("vipps_reference");
     const isReturn = params.get("vipps_return") === "1";
 
@@ -964,6 +965,7 @@ async function handleVippsReturn() {
         const url = new URL(window.location.href);
         url.searchParams.delete("vipps_reference");
         url.searchParams.delete("vipps_return");
+        url.searchParams.delete("vipps_flow");
         window.history.replaceState({}, document.title, url.toString());
 
         if (response.ok && data.status === "ACTIVE") {
