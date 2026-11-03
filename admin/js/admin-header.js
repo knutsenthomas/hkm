@@ -461,6 +461,7 @@ const initAdminHeader = () => {
             { label: 'Automatisering', icon: 'auto_awesome', section: 'automation', category: 'administrasjon' },
             { label: 'SEO & Meta', icon: 'search_insights', section: 'seo', category: 'administrasjon' },
             { label: 'Innstillinger', icon: 'settings', section: 'settings', category: 'administrasjon' },
+            { label: 'Regnskap', icon: 'account_balance', section: 'accounting', category: 'administrasjon' },
             { label: 'Integrasjoner', icon: 'hub', section: 'integrations', category: 'administrasjon' },
             { label: 'Analyse', icon: 'analytics', href: '/admin/admin-analytics.html', path: 'admin-analytics', category: 'administrasjon', alwaysVisible: true },
             { label: 'Systemlogger', icon: 'assignment', href: '/admin/admin-logger.html', path: 'admin-logger', category: 'administrasjon', alwaysVisible: true }
