@@ -153,12 +153,12 @@ export function mountAccounting(section, firebaseService) {
         <h3>Utvikling per måned</h3>
         <div data-trend></div>
       </section>
-      <div class="accounting-table">
+      <div class="accounting-table accounting-comparison">
         <table>
           <caption>Resultat per konto</caption>
-          <thead><tr><th scope="col">Konto</th><th scope="col">Kontonavn</th><th scope="col">Beløp</th></tr></thead>
+          <thead><tr><th scope="col">Konto</th><th scope="col">Kontonavn</th><th scope="col" data-current-year>Beløp</th><th scope="col" data-prior-year>Fjoråret</th></tr></thead>
           <tbody></tbody>
-          <tfoot><tr><th colspan="2" scope="row">Resultat</th><td data-amount="result"></td></tr></tfoot>
+          <tfoot><tr><th colspan="2" scope="row">Resultat</th><td data-amount="result"></td><td data-prior-result></td></tr></tfoot>
         </table>
       </div>
     </div>
@@ -210,7 +210,16 @@ export function mountAccounting(section, firebaseService) {
       const snapshot = await settings.doc('tripletex-accounting-' + period).get({ source: 'server' });
       if (!snapshot.exists) throw new Error('Ingen regnskapstall er hentet for denne perioden ennå.');
       const data = snapshot.data();
+      const priorYear = Number(period.slice(0, 4)) - 1;
+      const priorPeriod = priorYear + period.slice(4);
+      const previous = await settings.doc('tripletex-accounting-' + priorPeriod)
+        .get({ source: 'server' }).then(doc => doc.data(), () => undefined);
+      const previousAccounts = new Map((previous?.accounts || []).map(account => [account.number, account]));
+      const priorAmount = amount => previous ? currency.format(amount ?? 0) : '–';
       if (request.signal.aborted) return;
+      report.querySelector('[data-current-year]').textContent = period.slice(0, 4);
+      report.querySelector('[data-prior-year]').textContent = priorYear + (period.endsWith('-00') ? ' · hele året' : '');
+      report.querySelector('[data-prior-result]').textContent = priorAmount(previous?.result);
       for (const field of report.querySelectorAll('[data-amount]')) {
         field.textContent = currency.format(data[field.dataset.amount]);
       }
@@ -220,8 +229,11 @@ export function mountAccounting(section, firebaseService) {
         ['Finansposter', /^8/],
       ];
       const rows = [];
+      const currentAccounts = new Map(data.accounts.map(account => [account.number, account]));
+      const accountsByNumber = [...new Map([...previousAccounts, ...currentAccounts]).values()]
+        .sort((a, b) => a.number.localeCompare(b.number));
       for (const [title, prefix] of groups) {
-        const accounts = data.accounts.filter(account => prefix.test(account.number));
+        const accounts = accountsByNumber.filter(account => prefix.test(account.number));
         if (!accounts.length) continue;
         const heading = document.createElement('tr');
         heading.className = 'accounting-group';
@@ -229,7 +241,8 @@ export function mountAccounting(section, firebaseService) {
         label.colSpan = 2;
         label.textContent = title;
         heading.append(label);
-        heading.insertCell().textContent = currency.format(accounts.reduce((sum, account) => sum + account.amount, 0));
+        heading.insertCell().textContent = currency.format(accounts.reduce((sum, account) => sum + (currentAccounts.get(account.number)?.amount ?? 0), 0));
+        heading.insertCell().textContent = priorAmount(accounts.reduce((sum, account) => sum + (previousAccounts.get(account.number)?.amount ?? 0), 0));
         rows.push(heading);
         for (const account of accounts) {
           const row = document.createElement('tr');
@@ -238,9 +251,10 @@ export function mountAccounting(section, firebaseService) {
           link.type = 'button';
           link.className = 'accounting-account-link';
           link.textContent = account.name;
-          link.addEventListener('click', () => showAccount(dialog, settings, account, data));
+          link.addEventListener('click', () => showAccount(dialog, settings, account, currentAccounts.has(account.number) ? data : previous));
           row.insertCell().append(link);
-          row.insertCell().textContent = currency.format(account.amount);
+          row.insertCell().textContent = currency.format(currentAccounts.get(account.number)?.amount ?? 0);
+          row.insertCell().textContent = priorAmount(previousAccounts.get(account.number)?.amount);
           rows.push(row);
         }
       }

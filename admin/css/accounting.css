@@ -260,3 +260,8 @@
   min-width: 0;
   margin: 0;
 }
+
+#accounting-section .accounting-comparison :is(th, td):nth-last-child(2):not([colspan]) {
+  text-align: right;
+  white-space: nowrap;
+}
