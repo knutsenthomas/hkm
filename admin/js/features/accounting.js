@@ -147,6 +147,10 @@ export function mountAccounting(section, firebaseService) {
     <dl class="accounting-summary accounting-bank" hidden>
       <div><dt>Bokført banksaldo · konto 1920</dt><dd data-bank-balance></dd>
         <small data-bank-date></small></div>
+      <div data-prepaid-card hidden><dt>Forskuddsbetalte kostnader · konto 1749</dt>
+        <dd data-prepaid-balance></dd><small data-prepaid-date></small>
+        <p>Betalingene har redusert banksaldoen. Kostnadene påvirker resultatet i perioden de gjelder.</p>
+      </div>
     </dl>
     <div data-report hidden>
       <dl class="accounting-summary">
@@ -228,13 +232,20 @@ export function mountAccounting(section, firebaseService) {
     try {
       const period = year.value + '-' + month.value.padStart(2, '0');
       const settings = firebaseService.db.collection('settings');
-      const [snapshot, bank] = await Promise.all([
+      const [snapshot, bank, prepaid] = await Promise.all([
         settings.doc('tripletex-accounting-' + period).get({ source: 'server' }),
         settings.doc('tripletex-bank-balance').get({ source: 'server' }).then(doc => doc.data(), () => undefined),
+        settings.doc('tripletex-prepaid-costs').get({ source: 'server' }).then(doc => doc.data(), () => undefined),
       ]);
       if (request.signal.aborted) return;
       const bankCard = section.querySelector('.accounting-bank');
-      bankCard.hidden = !bank;
+      bankCard.hidden = !bank && !prepaid;
+      bankCard.querySelector('[data-bank-balance]').closest('div').hidden = !bank;
+      bankCard.querySelector('[data-prepaid-card]').hidden = !prepaid;
+      if (prepaid) {
+        bankCard.querySelector('[data-prepaid-balance]').textContent = currency.format(prepaid.balance);
+        bankCard.querySelector('[data-prepaid-date]').textContent = 'Per ' + prepaid.asOf.split('-').reverse().join('.') + ' · Tripletex';
+      }
       if (bank) {
         bankCard.querySelector('[data-bank-balance]').textContent = currency.format(bank.balance);
         const date = bank.asOf.split('-').reverse().join('.');
