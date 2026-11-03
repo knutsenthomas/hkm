@@ -55,7 +55,8 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
       return (Number(amount) || 0).toLocaleString("no-NO", {
         style: "currency",
         currency: "NOK",
-        maximumFractionDigits: 0,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
       });
     },
 
