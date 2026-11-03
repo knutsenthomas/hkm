@@ -265,3 +265,7 @@
   text-align: right;
   white-space: nowrap;
 }
+
+#accounting-section .accounting-comparison thead th {
+  font-size: .95rem;
+}
