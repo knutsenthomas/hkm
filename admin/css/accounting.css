@@ -325,3 +325,17 @@
     font-size: clamp(.9rem, 4vw, 1.1rem);
   }
 }
+
+@media (max-width: 600px) {
+  #accounting-section .accounting-heading > .accounting-period {
+    flex-basis: 100%;
+    margin-inline-start: 0;
+  }
+  #accounting-section .accounting-period summary {
+    width: fit-content;
+  }
+  #accounting-section .accounting-period .accounting-toolbar {
+    inset-inline: 0 auto;
+    max-width: 100%;
+  }
+}
