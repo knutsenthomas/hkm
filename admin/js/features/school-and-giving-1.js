@@ -454,6 +454,7 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
         "donation-transactions-body",
       );
       if (transactionsBody) {
+        const editableMethods = ["bank", "vipps_manual", "cash", "manual", "other"];
         const editableStatuses = ["completed", "pending", "processing"];
         const visibleRecords = records.slice(0, 100);
         transactionsBody.innerHTML = visibleRecords.length
@@ -507,7 +508,12 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
                             </div>
                             <div style="font-size:12px;color:#64748b;">${email}</div>
                         </td>
-                        <td><span class="method-tag">${method}</span></td>
+                        <td>
+                            <select class="form-control donation-method-select" aria-label="Betalingsmåte for ${name}">
+                                ${editableMethods.includes(record.method) ? "" : `<option value="" selected disabled>${method}</option>`}
+                                ${editableMethods.map((value) => `<option value="${value}" ${value === record.method ? "selected" : ""}>${this.escapeHtml(this.getDonationMethodLabel(value))}</option>`).join("")}
+                            </select>
+                        </td>
                         <td>
                             <select class="form-control donation-status-select" aria-label="Gavestatus for ${name}" style="min-width:9rem;">
                                 ${editableStatuses.includes(record.status) ? "" : `<option value="" selected disabled>${status}</option>`}
@@ -551,6 +557,32 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
                 console.error("Kunne ikke oppdatere gavestatus", error);
                 select.value = editableStatuses.includes(record.status) ? record.status : "";
                 this.showToast("Kunne ikke oppdatere gavestatus.", "error");
+              } finally {
+                select.disabled = false;
+              }
+            });
+          });
+
+        transactionsBody
+          .querySelectorAll(".donation-method-select")
+          .forEach((select, index) => {
+            const record = visibleRecords[index];
+            select.addEventListener("change", async () => {
+              const method = select.value;
+              if (!editableMethods.includes(method)) return;
+              select.disabled = true;
+              try {
+                await firebaseService.db.collection("donations").doc(record.id).update({
+                  method,
+                  updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                });
+                record.method = method;
+                this.renderDonationAdminViews();
+                this.showToast("Betalingsmåte oppdatert.", "success");
+              } catch (error) {
+                console.error("Kunne ikke oppdatere betalingsmåte", error);
+                select.value = editableMethods.includes(record.method) ? record.method : "";
+                this.showToast("Kunne ikke oppdatere betalingsmåte.", "error");
               } finally {
                 select.disabled = false;
               }
