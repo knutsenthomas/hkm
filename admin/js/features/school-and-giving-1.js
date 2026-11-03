@@ -453,6 +453,7 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
         "donation-transactions-body",
       );
       if (transactionsBody) {
+        const editableStatuses = ["completed", "pending", "processing"];
         const visibleRecords = records.slice(0, 100);
         transactionsBody.innerHTML = visibleRecords.length
           ? visibleRecords
@@ -506,11 +507,16 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
                             <div style="font-size:12px;color:#64748b;">${email}</div>
                         </td>
                         <td><span class="method-tag">${method}</span></td>
-                        <td><span class="method-tag">${status}</span></td>
+                        <td>
+                            <select class="form-control donation-status-select" aria-label="Gavestatus for ${name}" style="min-width:9rem;">
+                                ${editableStatuses.includes(record.status) ? "" : `<option value="" selected disabled>${status}</option>`}
+                                ${editableStatuses.map((value) => `<option value="${value}" ${value === record.status ? "selected" : ""}>${this.escapeHtml(this.getDonationStatusLabel(value))}</option>`).join("")}
+                            </select>
+                        </td>
                         <td>${profileStatus}</td>
                         <td class="text-right">
                             <div style="display:flex; justify-content:flex-end; align-items:center; gap:8px;">
-                                <strong>${amount}</strong>
+                                <strong style="white-space:nowrap; flex-shrink:0;">${amount}</strong>
                                 <button type="button" class="action-btn delete-donation-btn" data-id="${record.id}" title="Slett gave" style="color: #ef4444; background: none; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: background 0.2s;">
                                     <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
                                 </button>
@@ -523,6 +529,32 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
           : `
                 <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Ingen gaver matcher filteret.</td></tr>
             `;
+
+        transactionsBody
+          .querySelectorAll(".donation-status-select")
+          .forEach((select, index) => {
+            const record = visibleRecords[index];
+            select.addEventListener("change", async () => {
+              const status = select.value;
+              if (!editableStatuses.includes(status)) return;
+              select.disabled = true;
+              try {
+                await firebaseService.db.collection("donations").doc(record.id).update({
+                  status,
+                  updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                });
+                record.status = status;
+                this.renderDonationAdminViews();
+                this.showToast("Gavestatus oppdatert.", "success");
+              } catch (error) {
+                console.error("Kunne ikke oppdatere gavestatus", error);
+                select.value = editableStatuses.includes(record.status) ? record.status : "";
+                this.showToast("Kunne ikke oppdatere gavestatus.", "error");
+              } finally {
+                select.disabled = false;
+              }
+            });
+          });
 
         // Bind click events to delete buttons
         transactionsBody

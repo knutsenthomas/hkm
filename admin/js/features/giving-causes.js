@@ -418,7 +418,7 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
                         </div>
 
                         <div style="overflow-x:auto;">
-                            <table class="data-table" style="width:100%;">
+                            <table class="data-table" style="width:100%; min-width:48rem; table-layout:auto;">
                                 <thead>
                                     <tr>
                                         <th>Dato</th>
