@@ -1,0 +1,104 @@
+#accounting-section {
+  --report-border: var(--workspace-border, #e2e8f0);
+  --report-surface: var(--workspace-surface, #fff);
+  --report-muted: var(--workspace-muted, #64748b);
+  --report-subtle: var(--workspace-bg, #f1f5f9);
+}
+
+#accounting-section .accounting-heading,
+#accounting-section .accounting-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .75rem 1rem;
+}
+
+#accounting-section .accounting-heading {
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+#accounting-section .accounting-heading h2 {
+  margin: 0;
+  font-size: 1.45rem;
+  font-weight: 700;
+}
+
+#accounting-section .accounting-heading p,
+#accounting-section [role="status"] {
+  margin: .25rem 0 0;
+  color: var(--report-muted);
+  font-size: .875rem;
+}
+
+#accounting-section .accounting-source {
+  border: 1px solid var(--report-border);
+  border-radius: 999px;
+  background: var(--report-surface);
+  padding: .3rem .75rem;
+  color: var(--report-muted);
+  font-size: .8rem;
+}
+
+#accounting-section .accounting-toolbar,
+#accounting-section .accounting-summary > div,
+#accounting-section .accounting-table {
+  border: 1px solid var(--report-border);
+  border-radius: .75rem;
+  background: var(--report-surface);
+}
+
+#accounting-section .accounting-toolbar {
+  align-items: end;
+  padding: .75rem 1rem;
+}
+
+#accounting-section .accounting-toolbar label {
+  display: grid;
+  gap: .3rem;
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+#accounting-section .accounting-toolbar :is(input, select, button) {
+  min-height: 2.5rem;
+  padding: .4rem .65rem;
+  border: 1px solid var(--report-border);
+  border-radius: .4rem;
+  background-color: var(--report-surface);
+  color: inherit;
+}
+
+#accounting-section .accounting-toolbar input { width: 6rem; }
+#accounting-section .accounting-refresh { margin-inline-start: auto; }
+#accounting-section .accounting-refresh:disabled { opacity: .6; }
+#accounting-section [role="status"] { margin: .6rem 0 1rem; }
+
+#accounting-section .accounting-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: .75rem;
+  margin: 0 0 1rem;
+}
+
+#accounting-section .accounting-summary > div { padding: .85rem 1rem; }
+#accounting-section .accounting-summary dt { color: var(--report-muted); font-size: .85rem; }
+#accounting-section .accounting-summary dd { margin: .25rem 0 0; font-size: 1.2rem; font-weight: 700; }
+#accounting-section .accounting-summary > div:last-child { border-inline-start: 3px solid var(--primary-color, #bd632d); }
+
+#accounting-section .accounting-table { overflow-x: auto; }
+#accounting-section table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+#accounting-section caption { padding: .9rem 1rem; text-align: left; font-size: 1rem; font-weight: 700; }
+#accounting-section :is(th, td) { padding: .6rem 1rem; border-top: 1px solid var(--report-border); text-align: left; }
+#accounting-section thead th:first-child { width: 6rem; }
+#accounting-section :is(th, td):last-child { text-align: right; white-space: nowrap; }
+#accounting-section :is(thead, tfoot, .accounting-group) { background: var(--report-subtle); font-weight: 700; }
+#accounting-section :is(dd, td) { font-variant-numeric: tabular-nums; }
+#accounting-section tbody tr:not(.accounting-group) td:first-child { color: var(--report-muted); }
+#accounting-section [data-report][hidden] { display: none; }
+
+@media (max-width: 600px) {
+  #accounting-section :is(th, td) { padding: .55rem .65rem; }
+  #accounting-section thead th:first-child { width: auto; }
+  #accounting-section .accounting-refresh { margin-inline-start: 0; }
+}

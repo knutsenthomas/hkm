@@ -1,3 +1,5 @@
+import "../../css/accounting.css";
+
 const currency = new Intl.NumberFormat('nb-NO', { style: 'currency', currency: 'NOK' });
 const months = new Intl.DateTimeFormat('nb-NO', { month: 'long', timeZone: 'UTC' });
 const refreshInterval = 5 * 60 * 1000;
@@ -5,25 +7,29 @@ const refreshInterval = 5 * 60 * 1000;
 export function mountAccounting(section, firebaseService) {
   if (section.querySelector('form')) return;
   section.innerHTML = `
-    <div class="section-header"><h2 class="section-title">Resultat</h2></div>
-    <form style="display:flex;flex-wrap:wrap;align-items:end;gap:1rem">
+    <header class="accounting-heading">
+      <div><h2>Resultatrapport</h2><p>His Kingdom Ministry · Tripletex</p></div>
+      <span class="accounting-source">Daglig oppdatering</span>
+    </header>
+    <form class="accounting-toolbar">
       <label>År <input name="year" type="number" min="2000" max="2100" required></label>
       <label>Periode <select name="month"><option value="0">Årsoversikt</option></select></label>
-      <button class="btn btn-primary" type="submit">Hent lagrede tall</button>
+      <button class="accounting-refresh" type="submit">Oppdater visning</button>
     </form>
     <p role="status" aria-live="polite"></p>
     <div data-report hidden>
-      <dl style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem">
+      <dl class="accounting-summary">
         <div><dt>Driftsinntekter</dt><dd data-amount="revenue"></dd></div>
         <div><dt>Driftskostnader</dt><dd data-amount="expenses"></dd></div>
         <div><dt>Netto finans</dt><dd data-amount="financial"></dd></div>
         <div><dt>Resultat</dt><dd data-amount="result"></dd></div>
       </dl>
-      <div style="overflow-x:auto">
-        <table class="admin-table">
+      <div class="accounting-table">
+        <table>
           <caption>Resultat per konto</caption>
           <thead><tr><th scope="col">Konto</th><th scope="col">Kontonavn</th><th scope="col">Beløp</th></tr></thead>
           <tbody></tbody>
+          <tfoot><tr><th colspan="2" scope="row">Resultat</th><td data-amount="result"></td></tr></tfoot>
         </table>
       </div>
     </div>`;
@@ -68,20 +74,38 @@ export function mountAccounting(section, firebaseService) {
       for (const field of report.querySelectorAll('[data-amount]')) {
         field.textContent = currency.format(data[field.dataset.amount]);
       }
-      const rows = data.accounts.map(account => {
-        const row = document.createElement('tr');
-        for (const value of [account.number, account.name, currency.format(account.amount)]) {
-          row.insertCell().textContent = value;
+      const groups = [
+        ['Driftsinntekter', /^3/],
+        ['Driftskostnader', /^[4-7]/],
+        ['Finansposter', /^8/],
+      ];
+      const rows = [];
+      for (const [title, prefix] of groups) {
+        const accounts = data.accounts.filter(account => prefix.test(account.number));
+        if (!accounts.length) continue;
+        const heading = document.createElement('tr');
+        heading.className = 'accounting-group';
+        const label = document.createElement('th');
+        label.colSpan = 2;
+        label.textContent = title;
+        heading.append(label);
+        heading.insertCell().textContent = currency.format(accounts.reduce((sum, account) => sum + account.amount, 0));
+        rows.push(heading);
+        for (const account of accounts) {
+          const row = document.createElement('tr');
+          for (const value of [account.number, account.name, currency.format(account.amount)]) {
+            row.insertCell().textContent = value;
+          }
+          rows.push(row);
         }
-        return row;
-      });
+      }
       table.replaceChildren(...rows);
       report.hidden = false;
       lastSuccess = Date.parse(data.fetchedAt);
       const updated = new Date(data.fetchedAt).toLocaleString('nb-NO', { timeZone: 'Europe/Oslo' });
       const periodStatus = rows.length ? '' : 'Ingen posteringer i perioden. ';
       const through = new Date(Date.parse(data.dateTo) - 86400000).toLocaleDateString('nb-NO', { timeZone: 'UTC' });
-      status.textContent = periodStatus + 'Tall til og med ' + through + ' · Kilde Tripletex · Oppdatert ' + updated + ' · Hentes daglig fra Tripletex';
+      status.textContent = periodStatus + 'Tall til og med ' + through + ' · Oppdatert ' + updated;
     } catch (error) {
       if (request.signal.aborted) return;
       status.textContent = (error instanceof TypeError ? 'Kunne ikke nå regnskapstjenesten.' : error.message) +
