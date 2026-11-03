@@ -335,6 +335,67 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
                     overflow:visible !important;
                     word-break:normal !important;
                 }
+                body.admin-body #causes-section .giving-overview-header {
+                    display:flex !important;
+                    flex-direction:row !important;
+                    flex-wrap:nowrap !important;
+                    align-items:center !important;
+                    justify-content:space-between !important;
+                    gap:12px !important;
+                    padding:10px 16px !important;
+                }
+                body.admin-body #causes-section .giving-overview-header .card-title {
+                    margin:0 !important;
+                }
+                body.admin-body #causes-section #donation-filter-toggle {
+                    flex:0 0 44px;
+                    width:44px !important;
+                    min-width:44px !important;
+                    min-height:44px;
+                    justify-content:center;
+                }
+                .donor-search-control {
+                    position:relative;
+                    min-width:40px;
+                    display:flex;
+                    align-items:center;
+                }
+                .donor-search-control .btn-secondary {
+                    position:absolute;
+                    inset-inline-start:0;
+                    z-index:1;
+                    width:40px;
+                    height:40px;
+                    padding:0;
+                    display:grid;
+                    place-items:center;
+                }
+                #causes-section .donor-search-field {
+                    width:0;
+                    min-width:0;
+                    overflow:hidden;
+                    opacity:0;
+                    visibility:hidden;
+                    transition:width .24s ease, opacity .18s ease, visibility .24s;
+                }
+                #causes-section .donor-search-control:focus-within .donor-search-field,
+                #causes-section .donor-search-control:has(input:not(:placeholder-shown)) .donor-search-field {
+                    width:min(12rem, 32vw);
+                    opacity:1;
+                    visibility:visible;
+                }
+                #causes-section .donor-search-control:focus-within #donor-search-toggle,
+                #causes-section .donor-search-control:has(input:not(:placeholder-shown)) #donor-search-toggle {
+                    background:transparent !important;
+                    border-color:transparent !important;
+                    box-shadow:none !important;
+                }
+                #causes-section #donor-search {
+                    padding-inline-start:40px !important;
+                }
+                @media (prefers-reduced-motion: reduce) {
+                    #causes-section .donor-search-field { transition:none; }
+                }
                 @media (min-width: 701px) {
                     body.admin-body #causes-section #cause-tab-content-donations .giving-period-grid {
                         display:grid !important;
@@ -464,11 +525,8 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
                 </div>
 
                 <div class="card" style="margin-bottom: 24px;">
-                    <div class="card-header flex-between">
-                        <div>
-                            <h3 class="card-title">Gaveoversikt</h3>
-                            <p class="section-subtitle" style="margin-bottom: 0;">Filtrer på status, metode, transaksjonstype eller giver.</p>
-                        </div>
+                    <div class="card-header giving-overview-header">
+                        <h3 class="card-title">Gaveoversikt</h3>
                         <button type="button" id="donation-filter-toggle" class="btn-secondary" aria-label="Filtre for gaver" title="Filtre for gaver" aria-expanded="false" aria-controls="donation-filter-panel" style="margin-left:auto;padding:6px 10px;">
                             <span class="material-symbols-outlined" aria-hidden="true">more_horiz</span>
                         </button>
@@ -489,7 +547,7 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
                         </label>
                             <div style="position:relative; min-width:0;">
                                 <label for="donation-search">Giver</label>
-                                <input id="donation-search" class="form-control" type="search" placeholder="Søk etter giver…">
+                                <input id="donation-search" class="form-control" type="search" placeholder="Søk…">
                             </div>
                             <div class="form-group" style="margin:0;">
                                 <label>Status</label>
@@ -601,13 +659,17 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
             <!-- Tab 3: By Donor Content -->
             <div id="cause-tab-content-donors" class="cause-tab-pane" style="display: none;">
                 <div class="card" style="margin-bottom: 24px;">
-                    <div class="card-header flex-between">
-                        <div>
-                            <h3 class="card-title">Givere</h3>
-                            <p class="section-subtitle" style="margin-bottom: 0;">Aggregert oversikt per giver i valgt periode.</p>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:8px;width:min(17rem,100%);margin-left:auto;">
-                            <input id="donor-search" class="form-control" type="search" aria-label="Søk etter giver" placeholder="Søk etter giver…" style="flex:1;min-width:0;width:0;height:40px;margin:0;">
+                    <div class="card-header giving-overview-header">
+                        <h3 class="card-title">Givere</h3>
+                        <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+                            <div class="donor-search-control">
+                                <button type="button" id="donor-search-toggle" class="btn-secondary" aria-label="Søk etter giver" aria-controls="donor-search">
+                                    <span class="material-symbols-outlined" aria-hidden="true">search</span>
+                                </button>
+                                <div class="donor-search-field">
+                                    <input id="donor-search" class="form-control" type="search" aria-label="Søk etter giver" placeholder="Søk…" style="width:100%;min-width:0;height:40px;margin:0;">
+                                </div>
+                            </div>
                             <button type="button" id="donor-filter-toggle" class="btn-secondary" aria-label="Filtre for givere" title="Filtre for givere" aria-expanded="false" aria-controls="donor-filter-panel" style="display:grid;place-items:center;flex:0 0 40px;width:40px;height:40px;margin:0;padding:0;font-size:20px;">
                                 <span aria-hidden="true">⋯</span>
                             </button>
@@ -1004,6 +1066,12 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
       document
         .getElementById("cancel-manual-inkind-btn")
         ?.addEventListener("click", () => this.closeManualInKindModal());
+
+      const donorSearchToggle = section.querySelector("#donor-search-toggle");
+      donorSearchToggle.addEventListener("click", () => {
+        donorSearchToggle.focus();
+        section.querySelector("#donor-search").focus();
+      });
 
       document.getElementById("add-cause-btn").addEventListener("click", () => {
         document.getElementById("form-title").textContent =
