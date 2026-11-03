@@ -279,3 +279,38 @@
   overflow-wrap: normal;
   hyphens: none;
 }
+
+#accounting-section .accounting-period { position: relative; }
+#accounting-section .accounting-period summary {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  padding: .5rem .75rem;
+  border: 1px solid var(--report-border);
+  border-radius: .45rem;
+  background: var(--report-surface);
+  cursor: pointer;
+  list-style: none;
+  font-size: .875rem;
+  font-weight: 600;
+}
+#accounting-section .accounting-period summary::-webkit-details-marker { display: none; }
+#accounting-section .accounting-period .accounting-toolbar {
+  position: absolute;
+  inset-block-start: calc(100% + .4rem);
+  inset-inline-end: 0;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  width: min(19rem, calc(100vw - 2rem));
+  box-sizing: border-box;
+  box-shadow: 0 8px 24px rgb(15 23 42 / 15%);
+}
+#accounting-section .accounting-period .accounting-refresh {
+  grid-column: 1 / -1;
+  justify-self: start;
+  margin: 0;
+}
+@media (max-width: 600px) {
+  #accounting-section .accounting-period .accounting-toolbar { inset-inline: 0 auto; }
+}

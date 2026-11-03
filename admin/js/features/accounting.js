@@ -134,13 +134,15 @@ export function mountAccounting(section, firebaseService) {
   section.innerHTML = `
     <header class="accounting-heading">
       <div><h2>Resultatrapport</h2><p>His Kingdom Ministry · Tripletex</p></div>
-      <span class="accounting-source">Daglig oppdatering</span>
+      <details class="accounting-period">
+        <summary><span data-period-label>Årsoversikt</span><span aria-hidden="true">⌄</span></summary>
+        <form class="accounting-toolbar">
+          <label>År <input name="year" type="number" min="2000" max="2100" required></label>
+          <label>Periode <select name="month"><option value="0">Årsoversikt</option></select></label>
+          <button class="accounting-refresh" type="submit">Oppdater visning</button>
+        </form>
+      </details>
     </header>
-    <form class="accounting-toolbar">
-      <label>År <input name="year" type="number" min="2000" max="2100" required></label>
-      <label>Periode <select name="month"><option value="0">Årsoversikt</option></select></label>
-      <button class="accounting-refresh" type="submit">Oppdater visning</button>
-    </form>
     <p role="status" aria-live="polite"></p>
     <dl class="accounting-summary accounting-bank" hidden>
       <div><dt>Bokført banksaldo · konto 1920</dt><dd data-bank-balance></dd>
@@ -185,6 +187,21 @@ export function mountAccounting(section, firebaseService) {
   const dialog = section.querySelector('dialog');
   year.value = new Intl.DateTimeFormat('nb-NO', { year: 'numeric', timeZone: 'Europe/Oslo' }).format(new Date());
   for (let m = 1; m <= 12; m++) month.add(new Option(months.format(new Date(Date.UTC(2026, m - 1, 1))), m));
+
+  const periodPicker = section.querySelector('.accounting-period');
+  const periodLabel = periodPicker.querySelector('[data-period-label]');
+  const updatePeriodLabel = () => {
+    periodLabel.textContent = month.selectedOptions[0].textContent + ' · ' + year.value;
+  };
+  updatePeriodLabel();
+  document.addEventListener('click', event => {
+    if (periodPicker.open && !periodPicker.contains(event.target)) periodPicker.open = false;
+  });
+  periodPicker.addEventListener('keydown', event => {
+    if (event.key !== 'Escape' || !periodPicker.open) return;
+    periodPicker.open = false;
+    periodPicker.querySelector('summary').focus();
+  });
 
   let activeRequest;
   let lastSuccess = 0;
@@ -296,9 +313,15 @@ export function mountAccounting(section, firebaseService) {
 
   form.addEventListener('submit', event => {
     event.preventDefault();
+    periodPicker.open = false;
+    periodPicker.querySelector("summary").focus();
     refresh();
   });
-  form.addEventListener('change', () => refresh({ reset: true }));
+  form.addEventListener('change', () => {
+    if (!form.checkValidity()) return;
+    updatePeriodLabel();
+    refresh({ reset: true });
+  });
   const refreshIfDue = () => {
     if (Date.now() - lastCheck >= refreshInterval) refresh();
   };
