@@ -269,3 +269,6 @@
 #accounting-section .accounting-comparison thead th {
   font-size: .95rem;
 }
+
+#accounting-section .accounting-bank[hidden] { display: none; }
+#accounting-section .accounting-bank small { color: var(--report-muted); }

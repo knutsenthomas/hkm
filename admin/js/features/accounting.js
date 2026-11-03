@@ -142,6 +142,10 @@ export function mountAccounting(section, firebaseService) {
       <button class="accounting-refresh" type="submit">Oppdater visning</button>
     </form>
     <p role="status" aria-live="polite"></p>
+    <dl class="accounting-summary accounting-bank" hidden>
+      <div><dt>Bokført banksaldo · konto 1920</dt><dd data-bank-balance></dd>
+        <small data-bank-date></small></div>
+    </dl>
     <div data-report hidden>
       <dl class="accounting-summary">
         <div><dt>Driftsinntekter</dt><dd data-amount="revenue"></dd></div>
@@ -207,7 +211,18 @@ export function mountAccounting(section, firebaseService) {
     try {
       const period = year.value + '-' + month.value.padStart(2, '0');
       const settings = firebaseService.db.collection('settings');
-      const snapshot = await settings.doc('tripletex-accounting-' + period).get({ source: 'server' });
+      const [snapshot, bank] = await Promise.all([
+        settings.doc('tripletex-accounting-' + period).get({ source: 'server' }),
+        settings.doc('tripletex-bank-balance').get({ source: 'server' }).then(doc => doc.data(), () => undefined),
+      ]);
+      if (request.signal.aborted) return;
+      const bankCard = section.querySelector('.accounting-bank');
+      bankCard.hidden = !bank;
+      if (bank) {
+        bankCard.querySelector('[data-bank-balance]').textContent = currency.format(bank.balance);
+        const date = bank.asOf.split('-').reverse().join('.');
+        bankCard.querySelector('[data-bank-date]').textContent = 'Per ' + date + ' · Tripletex';
+      }
       if (!snapshot.exists) throw new Error('Ingen regnskapstall er hentet for denne perioden ennå.');
       const data = snapshot.data();
       const priorYear = Number(period.slice(0, 4)) - 1;

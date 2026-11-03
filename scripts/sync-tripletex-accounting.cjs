@@ -80,9 +80,19 @@ function postingWrites({ period, postings, dateTo }) {
   return { update: { name: root + '/settings/tripletex-postings-' + period, fields } };
 }
 
+function bankWrite({ bank }) {
+  if (bank.account !== 1920 || !Number.isFinite(bank.balance) ||
+      !/^20\d{2}-\d{2}-\d{2}$/.test(bank.asOf)) throw new Error('Invalid bank balance');
+  return { update: {
+    name: root + '/settings/tripletex-bank-balance',
+    fields: encode({ ...bank, fetchedAt: new Date().toISOString() }).mapValue.fields,
+  } };
+}
+
 async function main() {
   const writes = fs.readFileSync(0, 'utf8').trim().split('\n').map(line => {
     const record = JSON.parse(line);
+    if (record.bank) return bankWrite(record);
     return record.postings ? postingWrites(record) : toWrite(record);
   });
   if (writes.length > 13 || new Set(writes.map(write => write.update.name)).size !== writes.length) {
