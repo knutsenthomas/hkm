@@ -319,8 +319,332 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
       });
     },
 
+    getDonationReconciliationState(record) {
+      if (!["completed", "succeeded", "captured"].includes(String(record.status).toLowerCase())) return "waiting";
+      const reconciliation = record.reconciliation;
+      if (reconciliation?.verified && reconciliation.voucher) return "verified";
+      if (!reconciliation?.settlement && /^(vipps|stripe|paypal)/i.test(record.method || "")) return "settlement";
+      return reconciliation?.voucher ? "review" : "voucher";
+    },
+
+    renderDonationSettlements(records) {
+      const container = document.getElementById("donation-settlement-summary");
+      if (!container) return;
+
+      const groups = new Map();
+      let unlinked = 0;
+      for (const record of records) {
+        if (!["completed", "succeeded", "captured"].includes(String(record.status).toLowerCase())) continue;
+        const settlement = record.reconciliation?.settlement?.trim();
+        if (!settlement) {
+          unlinked += 1;
+          continue;
+        }
+        const method = this.getDonationMethodLabel(record.method);
+        const key = JSON.stringify([method, settlement]);
+        if (!groups.has(key)) groups.set(key, { method, settlement, gifts: [] });
+        groups.get(key).gifts.push(record);
+      }
+
+      const settlements = Array.from(groups.values());
+      container.innerHTML = `
+        <p>${unlinked} mottatte gaver i valgt visning mangler oppgjørsreferanse.</p>
+        <p>Summene viser registrerte gaver i valgt visning. Gebyr og nettoutbetaling kontrolleres i oppgjørsrapporten.</p>
+        ${settlements.map(({ method, settlement, gifts }) => {
+          const total = gifts.reduce((sum, gift) => sum + this.normalizeDonationAmountNok(gift), 0);
+          const verified = gifts.filter((gift) => gift.reconciliation.verified && gift.reconciliation.voucher).length;
+          return `<details style="margin:.75rem 0;">
+            <summary>${this.escapeHtml(method)} · ${this.escapeHtml(settlement)} · ${this.formatDonationCurrency(total)} · ${verified}/${gifts.length} avstemt</summary>
+            <form class="settlement-report" style="display:grid; gap:.75rem; grid-template-columns:repeat(auto-fit,minmax(10rem,1fr));">
+              ${[["gifts", "Gaver"], ["bazaar", "Basarinntekter"], ["sales", "Salg"], ["fees", "Gebyr"], ["net", "Nettoutbetaling"]].map(([key, label]) =>
+                `<label>${label} (kr)<input class="form-control" name="${key}" type="number" step="0.01" min="0" required></label>`
+              ).join("")}
+              <label style="grid-column:1/-1;">Transaksjoner fra rapporten
+                <textarea class="form-control" name="transactions" rows="4" placeholder="Referanse; kategori; beløp"></textarea>
+                <small>Én linje per betaling. Bruk kategoriene gave, basar eller salg og beløp i kroner.</small>
+              </label>
+              <label>Last inn betalingslinjer (.csv eller .txt)
+                <input class="form-control" name="transactionFile" type="file" accept=".csv,.txt">
+                <small>Bruk semikolonseparerte kolonner i rekkefølgen referanse, kategori og beløp.</small>
+              </label>
+              <output aria-live="polite">Oppgi beløp fra oppgjørsrapporten.</output>
+              <button class="btn-secondary" type="submit">Lagre rapportbeløp</button>
+            </form>
+            <form class="settlement-reconciliation">
+            <ul>${gifts.map((gift, index) => {
+              const donor = this.getDonationDonorName(gift, new Map());
+              const voucher = gift.reconciliation.voucher;
+              return `<li><label><input type="checkbox" name="gift" value="${index}" ${gift.reconciliation.verified ? "disabled" : ""}> ${this.escapeHtml(donor)} · ${this.formatDonationCurrency(this.normalizeDonationAmountNok(gift))} · ${voucher ? this.escapeHtml(voucher) : "Mangler bilagsnummer"}</label></li>`;
+            }).join("")}</ul>
+            <label>Felles Tripletex-bilag <input class="form-control" name="voucher" required></label>
+            <button class="btn-secondary" type="submit">Avstem valgte gaver</button>
+            </form>
+          </details>`;
+        }).join("")}
+      `;
+      container.querySelectorAll(".settlement-report").forEach((form, index) => {
+        const { method, settlement } = settlements[index];
+        const key = encodeURIComponent(JSON.stringify([method, settlement]));
+        const fields = ["gifts", "bazaar", "sales", "fees", "net"];
+        const output = form.querySelector("output");
+        const button = form.querySelector("button");
+        const categories = { gave: "gifts", basar: "bazaar", salg: "sales" };
+        const showTotals = (amounts, transactions = []) => {
+          const gross = amounts.gifts + amounts.bazaar + amounts.sales;
+          const difference = gross - amounts.fees - amounts.net;
+          output.textContent = `Brutto ${this.formatDonationCurrency(gross / 100)} · Differanse ${this.formatDonationCurrency(difference / 100)}`;
+          if (transactions.length) {
+            const itemTotals = { gifts: 0, bazaar: 0, sales: 0 };
+            for (const item of transactions) itemTotals[categories[item.category]] += item.amount;
+            const matches = Object.keys(itemTotals).every((field) => itemTotals[field] === amounts[field]);
+            output.textContent += matches
+              ? ` · ${transactions.length} betalinger stemmer med rapportbeløpene`
+              : " · Enkeltbetalingene avviker fra rapportbeløpene";
+          }
+        };
+        if (key.length > 1400) {
+          button.disabled = true;
+          output.textContent = "Oppgjørsreferansen er for lang.";
+          return;
+        }
+        const ref = firebaseService.db.collection("donation_settlement_reports").doc(key);
+        const details = form.closest("details");
+        details.addEventListener("toggle", async () => {
+          if (!details.open || form.dataset.loaded) return;
+          form.dataset.loaded = "true";
+          button.disabled = true;
+          try {
+            const snapshot = await ref.get();
+            if (snapshot.exists) {
+              const { amounts, transactions = [] } = snapshot.data();
+              fields.forEach((field) => { form.elements.namedItem(field).value = amounts[field] / 100; });
+              form.elements.namedItem("transactions").value = transactions.map(
+                ({ reference, category, amount }) => `${reference}; ${category}; ${(amount / 100).toFixed(2)}`,
+              ).join("\n");
+              showTotals(amounts, transactions);
+            }
+          } catch (error) {
+            delete form.dataset.loaded;
+            output.textContent = "Kunne ikke hente rapportbeløp. Åpne oppgjøret på nytt.";
+          } finally {
+            button.disabled = !form.dataset.loaded;
+          }
+        });
+        const fileInput = form.elements.namedItem("transactionFile");
+        fileInput.addEventListener("change", async () => {
+          const file = fileInput.files[0];
+          if (!file) return;
+          if (file.size > 256_000) {
+            output.textContent = "Filen er for stor. Maks 256 kB.";
+            fileInput.value = "";
+            return;
+          }
+          button.disabled = true;
+          try {
+            const contents = await file.text();
+            form.elements.namedItem("transactions").value = contents.replace(
+              /^(?:\uFEFF)?(?:referanse|reference);\s*(?:kategori|category);\s*(?:beløp|amount)\s*\r?\n/i,
+              "",
+            );
+            output.textContent = "Betalingslinjer lastet inn. Kontroller dem og lagre rapportbeløpene.";
+          } catch (error) {
+            output.textContent = "Kunne ikke lese filen.";
+          } finally {
+            fileInput.value = "";
+            button.disabled = !form.dataset.loaded;
+          }
+        });
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          if (button.disabled) return;
+          const data = new FormData(form);
+          const amounts = Object.fromEntries(fields.map((field) => [field, Math.round(Number(data.get(field)) * 100)]));
+          const lines = String(data.get("transactions") || "").split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+          const transactions = [];
+          const references = new Set();
+          for (const [index, line] of lines.entries()) {
+            const [reference, rawCategory, rawAmount, extra] = line.split(";").map((part) => part.trim());
+            const category = rawCategory?.toLowerCase();
+            const amount = Math.round(Number(rawAmount?.replace(",", ".")) * 100);
+            if (!reference || reference.length > 200 || references.has(reference) || !Object.hasOwn(categories, category) ||
+                !/^\d+(?:[,.]\d{1,2})?$/.test(rawAmount || "") || !Number.isSafeInteger(amount) || extra !== undefined || lines.length > 1000) {
+              output.textContent = `Kontroller linje ${index + 1}. Bruk unik referanse, kategori og beløp. Maks 1 000 linjer.`;
+              return;
+            }
+            references.add(reference);
+            transactions.push({ reference, category, amount });
+          }
+          button.disabled = true;
+          try {
+            await ref.set({ method, settlement, amounts, transactions, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+            showTotals(amounts, transactions);
+          } catch (error) {
+            output.textContent = "Kunne ikke lagre rapportbeløp.";
+          } finally {
+            button.disabled = false;
+          }
+        });
+      });
+      container.querySelectorAll(".settlement-reconciliation").forEach((form, index) => {
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const data = new FormData(form);
+          const voucher = String(data.get("voucher") || "").trim();
+          const gifts = data.getAll("gift").map((key) => settlements[index].gifts[Number(key)]);
+          const admin = firebase.auth().currentUser;
+          if (!voucher || !gifts.length || !admin || gifts.length > 500) {
+            this.showToast("Velg 1–500 gaver og oppgi bilagsnummer.", "error");
+            return;
+          }
+          const button = form.querySelector('button[type="submit"]');
+          button.disabled = true;
+          try {
+            const db = firebaseService.db;
+            const batch = db.batch();
+            const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+            const updates = gifts.map((gift) => ({
+              ...gift.reconciliation,
+              voucher,
+              verified: true,
+              verifiedBy: admin.uid,
+            }));
+            gifts.forEach((gift, giftIndex) => {
+              batch.update(db.collection("donations").doc(gift.id), {
+                reconciliation: { ...updates[giftIndex], verifiedAt: timestamp },
+                updatedAt: timestamp,
+              });
+            });
+            await batch.commit();
+            gifts.forEach((gift, giftIndex) => {
+              gift.reconciliation = { ...updates[giftIndex], verifiedAt: new Date() };
+            });
+            this.renderDonationAdminViews();
+            this.showToast("Valgte gaver er avstemt.", "success");
+          } catch (error) {
+            console.error("Kunne ikke avstemme oppgjøret", error);
+            this.showToast("Kunne ikke avstemme oppgjøret.", "error");
+          } finally {
+            button.disabled = false;
+          }
+        });
+      });
+    },
+
+    bindDonationRecurringAgreements() {
+      const panel = document.getElementById("donation-recurring-panel");
+      if (!panel || panel.dataset.bound) return;
+      panel.dataset.bound = "true";
+      const list = panel.querySelector("#donation-recurring-agreements");
+      panel.addEventListener("toggle", async () => {
+        if (!panel.open) return;
+        list.textContent = "Henter faste giveravtaler …";
+        try {
+          const collection = firebaseService.db.collection("recurring_payment_agreements");
+          const snapshots = await Promise.all([
+            collection.where("gift", "==", true).get(),
+            collection.where("provider", "==", "stripe").get(),
+            collection.where("cycles", "==", 0).get(),
+          ]);
+          const agreements = Array.from(new Map(snapshots.flatMap(
+            (snapshot) => snapshot.docs.map((doc) => [doc.id, doc.data()]),
+          )).values());
+          list.innerHTML = agreements.length ? `<ul>${agreements.map((agreement) =>
+            `<li><strong>${this.escapeHtml(agreement.name || "Ukjent giver")}</strong> ·
+              ${this.formatDonationCurrency(agreement.amount)} per måned ·
+              ${this.escapeHtml(this.getDonationMethodLabel(agreement.provider))} ·
+              ${this.escapeHtml(agreement.status || "Ukjent status")}</li>`
+          ).join("")}</ul>` : "Ingen faste giveravtaler funnet.";
+        } catch (error) {
+          console.error("Kunne ikke hente faste giveravtaler", error);
+          list.textContent = "Kunne ikke hente faste giveravtaler.";
+        }
+      });
+    },
+
+    bindDonationSourceReport() {
+      const form = document.getElementById("donation-source-report");
+      if (!form || form.dataset.bound) return;
+      form.dataset.bound = "true";
+      const synced = document.getElementById("giving-synced-reports");
+      synced.addEventListener("toggle", async () => {
+        if (!synced.open) return;
+        const list = synced.querySelector("div");
+        list.textContent = "Henter synkroniserte rapporter …";
+        try {
+          const snapshot = await firebaseService.db.collection("giving_source_reports")
+            .orderBy("fetchedAt", "desc").limit(20).get();
+          list.replaceChildren();
+          if (snapshot.empty) list.textContent = "Ingen rapporter er synkronisert ennå.";
+          for (const doc of snapshot.docs) {
+            const { provider, key, report } = doc.data();
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "btn-secondary";
+            button.textContent = `${provider} · ${key}`;
+            button.addEventListener("click", () => {
+              const url = URL.createObjectURL(new Blob([JSON.stringify(report, null, 2)], { type: "application/json" }));
+              const link = document.createElement("a");
+              link.href = url;
+              link.download = `${provider}-rapport-${key.replace(/[^a-z0-9_-]/gi, "-")}.json`;
+              link.click();
+              setTimeout(() => URL.revokeObjectURL(url), 1000);
+            });
+            list.append(button);
+          }
+        } catch {
+          list.textContent = "Kunne ikke hente synkroniserte rapporter.";
+        }
+      });
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const { provider, reference, date, endDate } = Object.fromEntries(new FormData(form));
+        const output = form.querySelector("output");
+        const button = form.querySelector("button");
+        button.disabled = true;
+        output.textContent = "Henter rapport …";
+        try {
+          const token = await firebase.auth().currentUser.getIdToken();
+          const response = await fetch("https://us-central1-his-kingdom-ministry.cloudfunctions.net/fetchGivingSettlementReport", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ data: { provider, reference: reference.trim(), date, endDate } }),
+          });
+          const payload = await response.json();
+          if (!response.ok || !payload.result) throw new Error(payload.error?.message || "Rapporten er utilgjengelig.");
+          const url = URL.createObjectURL(new Blob([JSON.stringify(payload.result, null, 2)], { type: "application/json" }));
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `${provider}-rapport-${provider === "paypal" ? date : reference.trim()}.json`;
+          link.click();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+          output.textContent = "Rapportfilen er hentet.";
+        } catch (error) {
+          output.textContent = error.message || "Kunne ikke hente rapport.";
+        } finally {
+          button.disabled = false;
+        }
+      });
+    },
+
     renderDonationAdminViews() {
-      const records = this.getFilteredDonationRecords();
+      this.bindDonationRecurringAgreements();
+      this.bindDonationSourceReport();
+      const allFilteredRecords = this.getFilteredDonationRecords();
+      this.renderDonationSettlements(allFilteredRecords);
+      const reconciliationFilter = document.getElementById("donation-reconciliation-filter");
+      const selectedState = reconciliationFilter?.value || "";
+      if (reconciliationFilter) reconciliationFilter.onchange = () => this.renderDonationAdminViews();
+      const records = selectedState
+        ? allFilteredRecords.filter((record) => this.getDonationReconciliationState(record) === selectedState)
+        : allFilteredRecords;
+      const reconciliationLabels = {
+        waiting: "Venter på betaling",
+        settlement: "Mangler oppgjør",
+        voucher: "Mangler bilag",
+        review: "Til kontroll",
+        verified: "Avstemt",
+      };
+
       const userMap = this.adminUserMap || new Map();
 
       // Apply sorting to donation records
@@ -515,6 +839,7 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
                         </td>
                         <td>
                             ${status}
+                            <small class="donation-reconciliation-label" style="display:block;">${reconciliationLabels[this.getDonationReconciliationState(record)]}</small>
                         </td>
                         <td>${profileStatus}</td>
                         <td class="text-right">
@@ -547,6 +872,17 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
                                     </label>
                                     <p>Referanse: ${this.escapeHtml(String(record.transactionId || record.reference || "Ingen referanse"))}</p>
                                 </div>
+                                <form class="donation-reconciliation" style="display:grid; gap:.75rem; margin:1rem 0;">
+                                    <h4>Avstemming mot Tripletex</h4>
+                                    <label>Oppgjørsreferanse
+                                        <input class="form-control" name="settlement" value="${this.escapeHtml(String(record.reconciliation?.settlement || ""))}">
+                                    </label>
+                                    <label>Bilagsnummer
+                                        <input class="form-control" name="voucher" value="${this.escapeHtml(String(record.reconciliation?.voucher || ""))}">
+                                    </label>
+                                    <label><input type="checkbox" name="verified" ${record.reconciliation?.verified ? "checked" : ""}> Avstemt mot Tripletex</label>
+                                    <button class="btn-secondary" type="submit">Lagre avstemming</button>
+                                </form>
                                 <button type="button" class="action-btn delete-donation-btn" data-id="${record.id}" title="Slett gave" style="color: #ef4444; background: none; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: background 0.2s;">
                                     <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
                                 </button>
@@ -559,6 +895,45 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
           : `
                 <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Ingen gaver matcher filteret.</td></tr>
             `;
+
+        transactionsBody.querySelectorAll(".donation-reconciliation").forEach((form, index) => {
+          const record = visibleRecords[index];
+          form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const data = new FormData(form);
+            const reconciliation = {
+              settlement: String(data.get("settlement") || "").trim(),
+              voucher: String(data.get("voucher") || "").trim(),
+              verified: data.has("verified"),
+            };
+            if (reconciliation.verified && !reconciliation.voucher) {
+              this.showToast("Oppgi bilagsnummer før du markerer gaven som avstemt.", "error");
+              return;
+            }
+            const button = form.querySelector('button[type="submit"]');
+            button.disabled = true;
+            try {
+              await firebaseService.db.collection("donations").doc(record.id).update({
+                reconciliation: {
+                  ...reconciliation,
+                  verifiedBy: reconciliation.verified ? firebase.auth().currentUser?.uid || null : null,
+                  verifiedAt: reconciliation.verified ? firebase.firestore.FieldValue.serverTimestamp() : null,
+                },
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+              });
+              record.reconciliation = reconciliation;
+              const label = form.closest("tr").querySelector(".donation-reconciliation-label");
+              if (label) label.textContent = reconciliationLabels[this.getDonationReconciliationState(record)];
+              this.renderDonationSettlements(this.getFilteredDonationRecords());
+              this.showToast("Avstemming lagret.", "success");
+            } catch (error) {
+              console.error("Kunne ikke lagre avstemming", error);
+              this.showToast("Kunne ikke lagre avstemming.", "error");
+            } finally {
+              button.disabled = false;
+            }
+          });
+        });
 
         transactionsBody.querySelectorAll(".donation-detail-open").forEach((button) => {
           button.addEventListener("click", () => {

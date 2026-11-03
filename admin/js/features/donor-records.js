@@ -460,7 +460,12 @@ export function createDonorRecordsMethods({ firebaseService, adminUtils, showErr
           const statusLabel = this.escapeHtml(
             this.getDonationStatusLabel(d.status),
           );
-          const statusBadge = `<span class="method-tag">${statusLabel}</span>`;
+          const reconciliation = d.reconciliation;
+          const voucher = reconciliation?.voucher;
+          const reconciliationLabel = reconciliation?.verified && voucher
+            ? `Avstemt · ${this.escapeHtml(voucher)}`
+            : voucher ? `Til kontroll · ${this.escapeHtml(voucher)}` : "";
+          const statusBadge = `<span class="method-tag">${statusLabel}</span>${reconciliationLabel ? `<small style="display:block;">${reconciliationLabel}</small>` : ""}`;
 
           const amountVal = this.normalizeDonationAmountNok(d);
           const amountStr =

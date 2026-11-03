@@ -9877,3 +9877,128 @@ exports.syncStoreOrderHistory = onSchedule({
   const result = await store.sync({ db, auth: getAuth(), api: await store.sourceApi(), Timestamp });
   console.info('Store order history sync completed', result);
 });
+
+const givingReportSecrets = [stripeSecretKeyParam, vippsClientIdParam, vippsClientSecretParam,
+    vippsSubscriptionKeyParam, vippsMsnParam, paypalClientIdParam, paypalClientSecretParam];
+
+// Fetch source reports for HKM reconciliation. No ledger writes.
+exports.fetchGivingSettlementReport = onCall({
+  region: 'us-central1',
+  timeoutSeconds: 60,
+  secrets: givingReportSecrets,
+}, async ({ auth, data }) => {
+  if (!auth) throw new HttpsError('unauthenticated', 'Logg inn først.');
+  const user = await db.collection('users').doc(auth.uid).get();
+  if (!['admin', 'superadmin'].includes(user.get('role'))) {
+    throw new HttpsError('permission-denied', 'Krever administratortilgang.');
+  }
+
+  return fetchGivingReport(data);
+});
+
+async function fetchGivingReport(data) {
+  const reference = String(data?.reference || '');
+  if (data?.provider === 'stripe' && /^po_[a-zA-Z0-9]+$/.test(reference)) {
+    const stripe = require('stripe')(stripeSecretKeyParam.value(), { apiVersion: '2023-10-16' });
+    const payout = await stripe.payouts.retrieve(reference);
+    const transactions = await stripe.balanceTransactions.list({ payout: reference, limit: 100 }).autoPagingToArray({ limit: 1001 });
+    if (transactions.length > 1000) throw new HttpsError('resource-exhausted', 'Oppgjøret har over 1 000 linjer.');
+    return { reference, currency: payout.currency, net: payout.amount, transactions: transactions.map(
+      ({ id, source, amount, fee, net, currency, type }) => ({ id, source, amount, fee, net, currency, type }),
+    ) };
+  }
+
+  const date = String(data?.date || '');
+  if (data?.provider === 'paypal') {
+    const endDate = String(data?.endDate || date);
+    const start = Date.parse(date);
+    const end = Date.parse(endDate);
+    if (![date, endDate].every((value) => /^\d{4}-\d{2}-\d{2}$/.test(value)) ||
+        !Number.isFinite(start) || !Number.isFinite(end) || end < start || end - start >= 31 * 86400000) {
+      throw new HttpsError('invalid-argument', 'Velg en PayPal-periode på opptil 31 dager.');
+    }
+    const config = getPayPalConfig();
+    const token = await getPayPalAccessToken(config);
+    const transactions = [];
+    for (let page = 1; page <= 2; page++) {
+      const query = new URLSearchParams({
+        start_date: `${date}T00:00:00Z`,
+        end_date: `${endDate}T23:59:59Z`,
+        fields: 'transaction_info',
+        page_size: '500',
+        page: String(page),
+      });
+      const response = await fetch(`${config.apiBase}/v1/reporting/transactions?${query}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        signal: AbortSignal.timeout(15000),
+      });
+      if (!response.ok) throw new HttpsError('failed-precondition', `PayPal avviste rapportoppslaget (${response.status}).`);
+      const report = await response.json();
+      if (report.total_pages > 2) throw new HttpsError('resource-exhausted', 'Velg en kortere PayPal-periode.');
+      transactions.push(...(report.transaction_details || []).map(({ transaction_info }) => transaction_info));
+      if (page >= report.total_pages || !report.total_pages) break;
+    }
+    return { date, endDate, timezone: 'UTC', transactions };
+  }
+  if (data?.provider === 'vipps' && /^[a-zA-Z0-9_-]{1,100}$/.test(reference) && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    const config = getVippsConfig();
+    config.baseUrls = ['https://api.vipps.no'];
+    const { accessToken, baseUrl } = await getVippsAccessToken(config);
+    const reports = await Promise.all(['funds', 'fees'].map(async (topic) => {
+      const response = await fetch(`${baseUrl}/report/v2/ledgers/${reference}/${topic}/dates/${date}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Ocp-Apim-Subscription-Key': config.subscriptionKey,
+          'Merchant-Serial-Number': config.merchantSerialNumber,
+        },
+        signal: AbortSignal.timeout(20000),
+      });
+      if (!response.ok) throw new HttpsError('failed-precondition', `Vipps avviste rapportoppslaget (${response.status}).`);
+      return response.json();
+    }));
+    return { reference, date, funds: reports[0], fees: reports[1] };
+  }
+  throw new HttpsError('invalid-argument', 'Oppgi Stripe-oppgjørs-ID eller Vipps-ledger-ID og dato.');
+}
+
+exports.syncGivingSettlementReports = onSchedule({
+  schedule: 'every day 07:00', timeZone: 'Europe/Oslo', region: 'us-central1',
+  timeoutSeconds: 540, maxInstances: 1, concurrency: 1, secrets: givingReportSecrets,
+}, async (event) => {
+  const now = new Date(event.scheduleTime || Date.now());
+  const days = Array.from({ length: 3 }, (_, index) =>
+    new Date(now.getTime() - (index + 1) * 86400000).toISOString().slice(0, 10));
+  const store = async (provider, key, report) => {
+    const id = require('node:crypto').createHash('sha256').update(JSON.stringify([provider, key])).digest('hex');
+    await db.collection('giving_source_reports').doc(id).set({
+      provider, key, report, fetchedAt: Timestamp.now(),
+    });
+  };
+  const tasks = [
+    async () => {
+      const stripe = require('stripe')(stripeSecretKeyParam.value(), { apiVersion: '2023-10-16' });
+      const payouts = stripe.payouts.list({ arrival_date: { gte: Date.parse(days.at(-1)) / 1000 }, limit: 100 });
+      for await (const payout of payouts) {
+        if (payout.status !== 'paid') continue;
+        await store('stripe', payout.id, await fetchGivingReport({ provider: 'stripe', reference: payout.id }));
+      }
+    },
+    async () => {
+      for (const date of days) {
+        await store('paypal', date, await fetchGivingReport({ provider: 'paypal', date }));
+      }
+    },
+    async () => {
+      const ledgers = new Set((process.env.VIPPS_REPORT_LEDGER_IDS || '').split(',').map((id) => id.trim()).filter(Boolean));
+      if (!ledgers.size) throw new Error('VIPPS_REPORT_LEDGER_IDS is missing');
+      for (const reference of ledgers) {
+        for (const date of days) {
+          await store('vipps', `${reference}:${date}`, await fetchGivingReport({ provider: 'vipps', reference, date }));
+        }
+      }
+    },
+  ];
+  const results = await Promise.allSettled(tasks.map((task) => task()));
+  const failed = ['stripe', 'paypal', 'vipps'].filter((_, index) => results[index].status === 'rejected');
+  if (failed.length) throw new Error(`Giving report sync failed for: ${failed.join(', ')}`);
+});

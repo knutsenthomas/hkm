@@ -497,6 +497,22 @@ service cloud.firestore {
     }
 
     // Donations recorded client-side after successful Stripe confirmation.
+    match /giving_source_reports/{reportId} {
+      allow read: if isAdmin();
+    }
+
+    match /donation_settlement_reports/{reportId} {
+      allow read, create, update: if isAdmin();
+    }
+
+    match /recurring_payment_agreements/{agreementId} {
+      allow read: if isAdmin() && (
+        resource.data.get('gift', false) == true ||
+        resource.data.get('provider', '') == 'stripe' ||
+        resource.data.get('cycles', -1) == 0
+      );
+    }
+
     match /donations/{donationId} {
       allow create: if isAdmin() || validDonationCreate(donationId);
       allow read: if isAdmin() || canReadOwnDonation();

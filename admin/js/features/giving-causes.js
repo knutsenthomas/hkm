@@ -417,6 +417,31 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
                             </div>
                         </div>
 
+                        <label style="display:block; margin-bottom:1rem;">
+                            Avstemmingsstatus
+                            <select id="donation-reconciliation-filter" class="form-control">
+                                <option value="">Alle avstemmingsstatuser</option>
+                                <option value="settlement">Mangler oppgjør</option>
+                                <option value="voucher">Mangler bilag</option>
+                                <option value="review">Til kontroll</option>
+                                <option value="verified">Avstemt</option>
+                                <option value="waiting">Venter på betaling</option>
+                            </select>
+                        </label>
+                        <details style="margin-bottom:1rem;">
+                            <summary>Oppgjør og avstemming</summary>
+                            <details id="giving-synced-reports"><summary>Automatisk hentede rapporter</summary><div aria-live="polite"></div></details>
+                            <form id="donation-source-report" style="display:grid; gap:.75rem; margin:1rem 0;">
+                                <label>Kilde <select name="provider" class="form-control"><option value="stripe">Stripe</option><option value="vipps">Vipps</option><option value="paypal">PayPal</option></select></label>
+                                <label>Stripe-oppgjørs-ID eller Vipps-ledger-ID <input name="reference" class="form-control" maxlength="100"></label>
+                                <label>Rapportdato (Vipps) / Fra og med (PayPal, UTC) <input name="date" type="date" class="form-control"></label>
+                                <label>Til og med (PayPal, UTC) <input name="endDate" type="date" class="form-control"></label>
+                                <button type="submit" class="btn-secondary">Hent rapportfil</button>
+                                <output aria-live="polite"></output>
+                            </form>
+                            <div id="donation-settlement-summary"></div>
+                        </details>
+
                         <div style="overflow-x:auto;">
                             <table class="data-table" style="width:100%; min-width:48rem; table-layout:auto;">
                                 <thead>
@@ -458,6 +483,10 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
                         </div>
                     </div>
                     <div class="card-body">
+                        <details id="donation-recurring-panel" style="margin-bottom:1rem;">
+                            <summary>Faste giveravtaler</summary>
+                            <div id="donation-recurring-agreements" aria-live="polite"></div>
+                        </details>
                         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%, 130px), 1fr));gap:12px;margin-bottom:16px;">
                             <div class="form-group" style="margin:0;">
                                 <label>Status</label>
