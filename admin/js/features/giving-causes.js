@@ -385,12 +385,12 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
                     visibility:visible;
                 }
                 #causes-section .donor-search-control:focus-within #donor-search-toggle,
-                #causes-section .donor-search-control:has(input:not(:placeholder-shown)) #donor-search-toggle {
+                #causes-section .donor-search-control:has(input:not(:placeholder-shown)) .donor-search-control button {
                     background:transparent !important;
                     border-color:transparent !important;
                     box-shadow:none !important;
                 }
-                #causes-section #donor-search {
+                #causes-section .donor-search-field input {
                     padding-inline-start:40px !important;
                 }
                 @media (prefers-reduced-motion: reduce) {
@@ -531,9 +531,19 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
                 <div class="card" style="margin-bottom: 24px;">
                     <div class="card-header giving-overview-header">
                         <h3 class="card-title">Gaveoversikt</h3>
-                        <button type="button" id="donation-filter-toggle" class="btn-secondary" aria-label="Filtre for gaver" title="Filtre for gaver" aria-expanded="false" aria-controls="donation-filter-panel" style="margin-left:auto;padding:6px 10px;">
-                            <span class="material-symbols-outlined" aria-hidden="true">more_horiz</span>
-                        </button>
+                        <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+                            <div class="donor-search-control">
+                                <button type="button" id="donation-search-toggle" class="btn-secondary" aria-label="Søk etter giver" aria-controls="donation-search">
+                                    <span class="material-symbols-outlined" aria-hidden="true">search</span>
+                                </button>
+                                <div class="donor-search-field">
+                                    <input id="donation-search" class="form-control" type="search" aria-label="Søk etter giver" placeholder="Søk…" style="width:100%;min-width:0;height:40px;margin:0;">
+                                </div>
+                            </div>
+                            <button type="button" id="donation-filter-toggle" class="btn-secondary" aria-label="Filtre for gaver" title="Filtre for gaver" aria-expanded="false" aria-controls="donation-filter-panel" style="display:grid;place-items:center;flex:0 0 40px;width:40px;height:40px;margin:0;padding:0;font-size:20px;">
+                                <span aria-hidden="true">⋯</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div id="donation-filter-panel" hidden style="margin-bottom:16px;">
@@ -549,10 +559,6 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
                                 <option value="waiting">Venter på betaling</option>
                             </select>
                         </label>
-                            <div style="position:relative; min-width:0;">
-                                <label for="donation-search">Giver</label>
-                                <input id="donation-search" class="form-control" type="search" placeholder="Søk…">
-                            </div>
                             <div class="form-group" style="margin:0;">
                                 <label>Status</label>
                                 <select id="donation-status-filter" class="form-control">
@@ -1072,10 +1078,11 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
         .getElementById("cancel-manual-inkind-btn")
         ?.addEventListener("click", () => this.closeManualInKindModal());
 
-      const donorSearchToggle = section.querySelector("#donor-search-toggle");
-      donorSearchToggle.addEventListener("click", () => {
-        donorSearchToggle.focus();
-        section.querySelector("#donor-search").focus();
+      section.querySelectorAll(".donor-search-control button").forEach((button) => {
+        button.addEventListener("click", () => {
+          button.focus();
+          document.getElementById(button.getAttribute("aria-controls")).focus();
+        });
       });
 
       document.getElementById("add-cause-btn").addEventListener("click", () => {
