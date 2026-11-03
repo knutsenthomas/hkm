@@ -149,6 +149,7 @@ export function mountAccounting(section, firebaseService) {
         <small data-bank-date></small></div>
       <div data-prepaid-card hidden><dt>Forskuddsbetalte kostnader · konto 1749</dt>
         <dd data-prepaid-balance></dd><small data-prepaid-date></small>
+        <p data-prepaid-description hidden></p>
         <p>Betalingene har redusert banksaldoen. Kostnadene påvirker resultatet i perioden de gjelder.</p>
       </div>
     </dl>
@@ -243,6 +244,9 @@ export function mountAccounting(section, firebaseService) {
       bankCard.querySelector('[data-bank-balance]').closest('div').hidden = !bank;
       bankCard.querySelector('[data-prepaid-card]').hidden = !prepaid;
       if (prepaid) {
+        const description = bankCard.querySelector('[data-prepaid-description]');
+        description.textContent = prepaid.description || '';
+        description.hidden = !description.textContent;
         bankCard.querySelector('[data-prepaid-balance]').textContent = currency.format(prepaid.balance);
         bankCard.querySelector('[data-prepaid-date]').textContent = 'Per ' + prepaid.asOf.split('-').reverse().join('.') + ' · Tripletex';
       }
