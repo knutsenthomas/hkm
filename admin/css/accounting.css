@@ -204,3 +204,31 @@
 #accounting-section .accounting-chart-detail strong { text-transform: capitalize; }
 #accounting-section .accounting-chart-detail span { color: var(--report-muted); }
 #accounting-section .accounting-chart-detail b { color: var(--workspace-text, inherit); white-space: nowrap; }
+
+#accounting-section .accounting-account-link {
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  text-align: start;
+  text-decoration: underline;
+  text-underline-offset: .18em;
+  cursor: pointer;
+}
+#accounting-section .accounting-postings {
+  width: min(54rem, calc(100% - 2rem));
+  max-height: 85vh;
+  padding: 1.25rem;
+  border: 1px solid var(--report-border);
+  border-radius: .75rem;
+  background: var(--report-surface);
+  color: inherit;
+}
+#accounting-section .accounting-postings::backdrop { background: rgb(15 23 42 / 55%); }
+#accounting-section .accounting-postings form { margin: 0; }
+#accounting-section .accounting-postings button {
+  padding: .4rem .75rem;
+  border: 1px solid var(--report-border);
+  border-radius: .4rem;
+  background: var(--report-subtle);
+  color: inherit;
+}

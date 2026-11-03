@@ -62,8 +62,29 @@ function toWrite({ period, ledger }) {
   } };
 }
 
+function postingWrites({ period, postings, dateTo }) {
+  if (!/^20\d{2}-(0[1-9]|1[0-2])$/.test(period) || !Array.isArray(postings) ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(dateTo)) throw new Error('Invalid posting report');
+  const rows = postings.map(row => {
+    const { date, accountNumber, voucherNumber, description, amount } = row;
+    if (!date.startsWith(period + '-') || date >= dateTo ||
+        !/^[3-8]\d{3,}$/.test(String(accountNumber)) || !Number.isFinite(amount)) {
+      throw new Error('Invalid posting row');
+    }
+    return { date, account: String(accountNumber), voucher: String(voucherNumber ?? ''),
+      description: String(description ?? ''), amount: -amount };
+  });
+  const fetchedAt = new Date().toISOString();
+  const fields = encode({ rows, fetchedAt, dateTo }).mapValue.fields;
+  if (Buffer.byteLength(JSON.stringify(fields)) > 850000) throw new Error('Monthly posting report is too large');
+  return { update: { name: root + '/settings/tripletex-postings-' + period, fields } };
+}
+
 async function main() {
-  const writes = fs.readFileSync(0, 'utf8').trim().split('\n').map(line => toWrite(JSON.parse(line)));
+  const writes = fs.readFileSync(0, 'utf8').trim().split('\n').map(line => {
+    const record = JSON.parse(line);
+    return record.postings ? postingWrites(record) : toWrite(record);
+  });
   if (writes.length > 13 || new Set(writes.map(write => write.update.name)).size !== writes.length) {
     throw new Error('Expected at most thirteen unique periods');
   }

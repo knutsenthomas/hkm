@@ -93,6 +93,42 @@ async function renderTrend(container, settings, year, month, data, signal) {
   container.replaceChildren(fragment);
 }
 
+async function showAccount(dialog, settings, account, report) {
+  const heading = dialog.querySelector('h3');
+  const status = dialog.querySelector('[data-posting-status]');
+  const body = dialog.querySelector('tbody');
+  const request = Symbol();
+  dialog.postingRequest = request;
+  heading.textContent = account.number + ' ' + account.name;
+  body.replaceChildren();
+  status.textContent = 'Henter posteringer …';
+  if (!dialog.open) dialog.showModal();
+
+  const date = new Date(report.dateFrom + 'T00:00:00Z');
+  const months = [];
+  while (date.toISOString().slice(0, 10) < report.dateTo) {
+    months.push(date.toISOString().slice(0, 7));
+    date.setUTCMonth(date.getUTCMonth() + 1);
+  }
+  const reports = await Promise.allSettled(months.map(month =>
+    settings.doc('tripletex-postings-' + month).get({ source: 'server' })
+  ));
+  if (dialog.postingRequest !== request || !dialog.open) return;
+  const complete = reports.every((item, index) => item.status === 'fulfilled' && item.value.exists &&
+    item.value.data().dateTo >= (months[index + 1] ? months[index + 1] + '-01' : report.dateTo));
+  const rows = reports.flatMap(item => item.status === 'fulfilled' ? item.value.data()?.rows || [] : [])
+    .filter(row => row.account === account.number && row.date >= report.dateFrom && row.date < report.dateTo)
+    .sort((a, b) => a.date.localeCompare(b.date) || Number(a.voucher) - Number(b.voucher));
+  for (const row of rows) {
+    const tr = body.insertRow();
+    for (const value of [row.date.split('-').reverse().join('.'), row.voucher || '–', row.description, currency.format(row.amount)]) {
+      tr.insertCell().textContent = value;
+    }
+  }
+  const message = rows.length ? rows.length + ' posteringer' : 'Ingen posteringer funnet';
+  status.textContent = complete ? message : message + ' · Det mangler bilagslinjer for deler av perioden.';
+}
+
 export function mountAccounting(section, firebaseService) {
   if (section.querySelector('form')) return;
   section.innerHTML = `
@@ -125,14 +161,24 @@ export function mountAccounting(section, firebaseService) {
           <tfoot><tr><th colspan="2" scope="row">Resultat</th><td data-amount="result"></td></tr></tfoot>
         </table>
       </div>
-    </div>`;
+    </div>
+    <dialog class="accounting-postings" aria-labelledby="accounting-postings-title">
+      <div class="accounting-heading"><h3 id="accounting-postings-title"></h3>
+      <form method="dialog"><button type="submit">Lukk</button></form></div>
+      <p data-posting-status role="status"></p>
+      <div class="accounting-table"><table>
+        <thead><tr><th>Dato</th><th>Bilag</th><th>Tekst</th><th>Beløp</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </dialog>`;
   const form = section.querySelector('form');
   const year = form.elements.year;
   const month = form.elements.month;
   const button = form.querySelector('button');
   const status = section.querySelector('[role="status"]');
   const report = section.querySelector('[data-report]');
-  const table = section.querySelector('tbody');
+  const table = section.querySelector('[data-report] tbody');
+  const dialog = section.querySelector('dialog');
   year.value = new Intl.DateTimeFormat('nb-NO', { year: 'numeric', timeZone: 'Europe/Oslo' }).format(new Date());
   for (let m = 1; m <= 12; m++) month.add(new Option(months.format(new Date(Date.UTC(2026, m - 1, 1))), m));
 
@@ -187,9 +233,14 @@ export function mountAccounting(section, firebaseService) {
         rows.push(heading);
         for (const account of accounts) {
           const row = document.createElement('tr');
-          for (const value of [account.number, account.name, currency.format(account.amount)]) {
-            row.insertCell().textContent = value;
-          }
+          row.insertCell().textContent = account.number;
+          const link = document.createElement('button');
+          link.type = 'button';
+          link.className = 'accounting-account-link';
+          link.textContent = account.name;
+          link.addEventListener('click', () => showAccount(dialog, settings, account, data));
+          row.insertCell().append(link);
+          row.insertCell().textContent = currency.format(account.amount);
           rows.push(row);
         }
       }
