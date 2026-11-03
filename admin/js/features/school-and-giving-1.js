@@ -994,7 +994,12 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
           row.addEventListener("click", (event) => {
             if (event.target.closest("dialog, a, input, select, label")) return;
             const action = event.target.closest("button");
-            if ((!action || action === button) && !panel.open) panel.showModal();
+            if ((!action || action === button) && !panel.open) {
+              panel.showModal();
+              if (!panel.querySelector('[name="verified"]')?.checked) {
+                panel.querySelector("[data-find-tripletex]")?.click();
+              }
+            }
           });
         });
 
