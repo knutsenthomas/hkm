@@ -280,7 +280,7 @@
   hyphens: none;
 }
 
-#accounting-section .accounting-period { position: relative; }
+#accounting-section .accounting-period { position: relative; margin-inline-start: auto; }
 #accounting-section .accounting-period summary {
   display: flex;
   align-items: center;
@@ -310,7 +310,4 @@
   grid-column: 1 / -1;
   justify-self: start;
   margin: 0;
-}
-@media (max-width: 600px) {
-  #accounting-section .accounting-period .accounting-toolbar { inset-inline: 0 auto; }
 }
