@@ -396,6 +396,10 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
                 @media (prefers-reduced-motion: reduce) {
                     #causes-section .donor-search-field { transition:none; }
                 }
+                #causes-section .giving-transactions thead th:nth-child(3),
+                #causes-section .giving-transactions tbody td:nth-child(3) {
+                    text-align:right !important;
+                }
                 @media (min-width: 701px) {
                     body.admin-body #causes-section #cause-tab-content-donations .giving-period-grid {
                         display:grid !important;
@@ -437,16 +441,16 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
                     #donation-transactions-body > tr > td:nth-child(2) { grid-area:giver; }
                     #donation-transactions-body > tr > td:nth-child(2) > div:first-child { flex-wrap:wrap; }
                     #donation-transactions-body > tr > td:nth-child(2) span { white-space:nowrap; }
-                    #donation-transactions-body > tr > td:nth-child(3) { grid-area:metode; }
-                    #donation-transactions-body > tr > td:nth-child(4) { grid-area:status; text-align:right; }
-                    #donation-transactions-body > tr > td:nth-child(5) { grid-area:profil; }
-                    #donation-transactions-body > tr > td:nth-child(6) { grid-area:belop; }
-                    #donation-transactions-body > tr > td:nth-child(6) > div { flex-direction:row; justify-content:space-between !important; align-items:center !important; }
+                    #donation-transactions-body > tr > td:nth-child(4) { grid-area:metode; }
+                    #donation-transactions-body > tr > td:nth-child(5) { grid-area:status; text-align:right; }
+                    #donation-transactions-body > tr > td:nth-child(6) { grid-area:profil; }
+                    #donation-transactions-body > tr > td:nth-child(3) { grid-area:belop; }
+                    #donation-transactions-body > tr > td:nth-child(7) { grid-area:detaljer; text-align:right; }
                     .giving-period-grid .giving-donor-meta,
                     #donation-transactions-body .giving-donor-meta,
-                    #donation-transactions-body > tr > td:nth-child(5) { display:none; }
+                    #donation-transactions-body > tr > td:nth-child(6) { display:none; }
                     #donation-transactions-body > tr {
-                        grid-template-areas:"giver belop" "dato dato" "metode status";
+                        grid-template-areas:"giver belop" "dato dato" "metode status" "detaljer detaljer";
                     }
                     #donation-transactions-body .donation-detail-open {
                         padding:4px 8px; min-height:32px;
@@ -598,14 +602,15 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
                                     <tr>
                                         <th>Dato</th>
                                         <th>Giver</th>
+                                        <th class="text-right">Beløp</th>
                                         <th>Metode</th>
                                         <th>Status</th>
                                         <th>Profil</th>
-                                        <th class="text-right">Beløp</th>
+                                        <th aria-label="Handlinger"></th>
                                     </tr>
                                 </thead>
                                 <tbody id="donation-transactions-body">
-                                    <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Laster gaver...</td></tr>
+                                    <tr><td colspan="7" style="padding:28px;text-align:center;color:#64748b;">Laster gaver...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -743,13 +748,19 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
                                             <span class="material-symbols-outlined sort-icon" style="font-size:14px; display:none; vertical-align:middle; line-height:1; position:relative; top:-1px;">arrow_upward</span>
                                         </div>
                                     </th>
+                                    <th class="sortable-header text-right" data-sort="totalGifts" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s; text-align:right;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
+                                        <div class="sort-header-wrapper" style="display:inline-flex; align-items:center; justify-content:flex-end; gap:6px; width:100%;">
+                                            Gave-sum
+                                            <span class="material-symbols-outlined sort-icon" style="font-size:14px; display:none; vertical-align:middle; line-height:1; position:relative; top:-1px;">arrow_upward</span>
+                                        </div>
+                                    </th>
                                     <th class="sortable-header" data-sort="giftCount" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
                                         <div class="sort-header-wrapper" style="display:inline-flex; align-items:center; gap:6px;">
                                             Fullført / totalt
                                             <span class="material-symbols-outlined sort-icon" style="font-size:14px; display:none; vertical-align:middle; line-height:1; position:relative; top:-1px;">arrow_upward</span>
                                         </div>
                                     </th>
-                                    <th>Metoder</th>
+                                    <th>Betalingsmåter</th>
                                     <th class="sortable-header" data-sort="latestDate" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
                                         <div class="sort-header-wrapper" style="display:inline-flex; align-items:center; gap:6px;">
                                             Siste gave
@@ -757,12 +768,6 @@ export function createGivingCausesMethods({ firebaseService, adminUtils, showErr
                                         </div>
                                     </th>
                                     <th>Profil</th>
-                                    <th class="sortable-header text-right" data-sort="totalGifts" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s; text-align:right;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
-                                        <div class="sort-header-wrapper" style="display:inline-flex; align-items:center; justify-content:flex-end; gap:6px; width:100%;">
-                                            Gave-sum
-                                            <span class="material-symbols-outlined sort-icon" style="font-size:14px; display:none; vertical-align:middle; line-height:1; position:relative; top:-1px;">arrow_upward</span>
-                                        </div>
-                                    </th>
                                     <th class="sortable-header text-right" data-sort="totalShop" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s; text-align:right;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
                                         <div class="sort-header-wrapper" style="display:inline-flex; align-items:center; justify-content:flex-end; gap:6px; width:100%;">
                                             Butikk-sum

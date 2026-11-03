@@ -837,11 +837,11 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
                         <td style="white-space: nowrap;">
                             <div style="display:flex; align-items:center; gap:6px;">
                                 <strong>${name}</strong>
-                                <span class="giving-donor-meta">${typeBadge}</span>
 
                             </div>
                             <div class="giving-donor-meta" style="font-size:12px;color:#64748b;">${email}</div>
                         </td>
+                        <td class="text-right"><strong style="white-space:nowrap;">${amount}</strong></td>
                         <td>
                             ${method}
                         </td>
@@ -851,10 +851,7 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
                         </td>
                         <td>${profileStatus}</td>
                         <td class="text-right">
-                            <div style="display:flex; justify-content:flex-end; align-items:center; gap:8px;">
-                                <strong style="white-space:nowrap; flex-shrink:0;">${amount}</strong>
-                                <button type="button" class="btn-secondary donation-detail-open">Detaljer</button>
-                            </div>
+                            <button type="button" class="btn-secondary donation-detail-open">Detaljer</button>
                             <dialog class="donation-detail-panel" aria-label="Gavedetaljer for ${name}" style="position:fixed; inset:0 0 0 auto; margin:0; width:min(100%, 26rem); height:100%; max-height:100%; box-sizing:border-box; padding:1.5rem; text-align:left;">
                                 <form method="dialog"><button class="btn-secondary" autofocus>Lukk</button></form>
                                 <h3>${name}</h3>
@@ -902,7 +899,7 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
               })
               .join("")
           : `
-                <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Ingen gaver matcher filteret.</td></tr>
+                <tr><td colspan="7" style="padding:28px;text-align:center;color:#64748b;">Ingen gaver matcher filteret.</td></tr>
             `;
 
         transactionsBody.querySelectorAll(".donation-reconciliation").forEach((form, index) => {
@@ -1410,13 +1407,14 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
         donorsBody.innerHTML = visibleDonors.length
           ? visibleDonors
               .map((donor) => {
-                const methodList = Array.from(donor.methods).map((m) =>
-                  this.getDonationMethodLabel(m),
+                const methodLabels = new Set(
+                  Array.from(donor.methods, (method) =>
+                    this.getDonationMethodLabel(method),
+                  ),
                 );
-                if (donor.types && donor.types.has("butikk")) {
-                  methodList.push("Butikk");
-                }
-                const methodText = methodList.join(", ") || "Ukjent";
+                const methodText = Array.from(methodLabels, (label) =>
+                  `<span style="display:inline-block;white-space:nowrap;hyphens:none;">${this.escapeHtml(label)}</span>`,
+                ).join(", ") || "Ukjent";
 
                 const mainName = donor.name || "Ukjent giver";
                 const otherNames = Array.from(donor.names).filter(
@@ -1434,8 +1432,9 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
                             ${otherNamesStr}
                             <div style="font-size:12px;color:#64748b;">${this.escapeHtml(donor.email || "Ingen e-post")}</div>
                         </td>
+                        <td class="text-right"><strong>${this.formatDonationCurrency(donor.totalGifts)}</strong></td>
                         <td>${donor.completedCount} / ${donor.giftCount}</td>
-                        <td>${this.escapeHtml(methodText)}</td>
+                        <td>${methodText}</td>
                         <td>${donor.latestDate ? donor.latestDate.toLocaleDateString("no-NO") : "Ukjent"}</td>
                         <td>${
                           donor.userId
@@ -1448,7 +1447,6 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
                                 Ukoblet
                                </button>`
                         }</td>
-                        <td class="text-right"><strong>${this.formatDonationCurrency(donor.totalGifts)}</strong></td>
                         <td class="text-right"><strong>${this.formatDonationCurrency(donor.totalShop)}</strong></td>
                         <td class="text-right" style="text-align:right; width:1px; white-space:nowrap;">
                             <button type="button" class="action-btn view-donor-details-btn" data-key="${this.escapeHtml(donor.key)}" title="Vis historikk" style="color:#1B4965; background:none; border:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; padding:4px; border-radius:4px; transition:background 0.2s;">
