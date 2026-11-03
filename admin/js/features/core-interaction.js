@@ -1,3 +1,4 @@
+import { mountAccounting } from "./accounting.js";
 import { mountSchoolGivingNavigation } from './giving-navigation.js';
 // core interaction methods for AdminManager.
 export function createCoreInteractionMethods({ firebaseService, adminUtils, showErrorUI }) {
@@ -424,6 +425,9 @@ export function createCoreInteractionMethods({ firebaseService, adminUtils, show
 
           case "media":
             this.renderMediaLibrarySection();
+            break;
+          case "accounting":
+            mountAccounting(section, firebaseService);
             break;
           case "integrations":
             this.renderIntegrationsSection();
