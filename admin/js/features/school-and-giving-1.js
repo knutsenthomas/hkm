@@ -880,6 +880,8 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
                                 </div>
                                 <form class="donation-reconciliation" style="display:grid; gap:.75rem; margin:1rem 0;">
                                     <h4>Avstemming mot Tripletex</h4>
+                                    <button class="btn-secondary" type="button" data-find-tripletex>Finn bilag i Tripletex</button>
+                                    <div data-tripletex-match role="status"></div>
                                     <label>Oppgjørsreferanse
                                         <input class="form-control" name="settlement" value="${this.escapeHtml(String(record.reconciliation?.settlement || ""))}">
                                     </label>
@@ -904,6 +906,50 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
 
         transactionsBody.querySelectorAll(".donation-reconciliation").forEach((form, index) => {
           const record = visibleRecords[index];
+          const matchButton = form.querySelector("[data-find-tripletex]");
+          const matchStatus = form.querySelector("[data-tripletex-match]");
+          matchButton.onclick = async () => {
+            const date = this.getDonationDate(record);
+            const cents = Math.round(this.normalizeDonationAmountNok(record) * 100);
+            if (!date || !Number.isFinite(date.getTime()) || cents <= 0) {
+              matchStatus.textContent = "Gaven mangler en gyldig dato eller et beløp.";
+              return;
+            }
+            const day = date.toLocaleDateString("sv-SE", { timeZone: "Europe/Oslo" });
+            matchButton.disabled = true;
+            matchStatus.textContent = "Søker i lagrede Tripletex-posteringer …";
+            try {
+              const snapshot = await firebaseService.db.collection("settings")
+                .doc("tripletex-postings-" + day.slice(0, 7)).get({ source: "server" });
+              const report = snapshot.data();
+              if (!report || report.dateTo <= day) {
+                matchStatus.textContent = "Tripletex-tall mangler for denne datoen.";
+                return;
+              }
+              const matches = report.rows.filter(row => row.account === "3110" && row.date === day &&
+                row.voucher && Math.round(row.amount * 100) === cents);
+              matchStatus.textContent = matches.length
+                ? "Mulig treff på dato og beløp. Kontroller bilaget før du markerer gaven som avstemt."
+                : "Mangler treff på konto 3110 for samme dato og beløp.";
+              for (const row of matches) {
+                const item = document.createElement("p");
+                item.textContent = "Bilag " + row.voucher + " · " + row.description;
+                if (matches.length === 1 && !record.reconciliation?.verified && !form.elements.voucher.value) {
+                  const use = document.createElement("button");
+                  use.type = "button";
+                  use.className = "btn-secondary";
+                  use.textContent = "Bruk bilagsnummer";
+                  use.onclick = () => { form.elements.voucher.value = row.voucher; };
+                  item.append(" ", use);
+                }
+                matchStatus.append(item);
+              }
+            } catch {
+              matchStatus.textContent = "Kunne ikke hente Tripletex-posteringene.";
+            } finally {
+              matchButton.disabled = false;
+            }
+          };
           form.addEventListener("submit", async (event) => {
             event.preventDefault();
             const data = new FormData(form);
