@@ -15,32 +15,75 @@ async function renderTrend(container, settings, year, month, data, signal) {
     label: months.format(new Date(Date.UTC(2026, index, 1))),
     report: snapshot.status === 'fulfilled' ? snapshot.value.data() : undefined,
   })).filter(point => point.report);
-  const scale = Math.max(1, ...points.flatMap(({ report }) => [report.revenue, report.expenses, report.result].map(Math.abs)));
+  const series = [['revenue', 'Inntekter'], ['expenses', 'Kostnader'], ['result', 'Resultat']];
+  const values = points.flatMap(({ report }) => series.map(([key]) => report[key]));
+  const high = Math.max(1, ...values);
+  const low = Math.min(0, ...values);
+  const range = high - low;
+  const zero = high / range * 100;
   const fragment = document.createDocumentFragment();
-  for (const { label, report } of points) {
-    const row = document.createElement('div');
-    row.className = 'accounting-trend-row';
-    const heading = document.createElement('strong');
-    heading.textContent = label;
-    row.append(heading);
-    for (const [key, title] of [['revenue', 'Inntekter'], ['expenses', 'Kostnader'], ['result', 'Resultat']]) {
-      const value = report[key];
-      const metric = document.createElement('div');
-      metric.className = 'accounting-trend-metric';
-      metric.dataset.series = key;
-      const amount = document.createElement('span');
-      amount.textContent = title + ' ' + currency.format(value);
-      const track = document.createElement('div');
-      track.className = 'accounting-trend-track';
-      track.setAttribute('aria-hidden', 'true');
-      const bar = document.createElement('div');
-      bar.style.width = Math.abs(value) / scale * 100 + '%';
-      bar.classList.toggle('is-negative', value < 0);
-      track.append(bar);
-      metric.append(amount, track);
-      row.append(metric);
+  if (points.length) {
+    const legend = document.createElement('div');
+    legend.className = 'accounting-chart-legend';
+    for (const [key, title] of series) {
+      const item = document.createElement('span');
+      item.dataset.series = key;
+      item.textContent = title;
+      legend.append(item);
     }
-    fragment.append(row);
+    const viewport = document.createElement('div');
+    viewport.className = 'accounting-chart-viewport';
+    const plot = document.createElement('div');
+    plot.className = 'accounting-chart-plot';
+    plot.style.setProperty('--months', points.length);
+    plot.style.setProperty('--zero', zero + '%');
+    const detail = document.createElement('div');
+    detail.className = 'accounting-chart-detail';
+    detail.setAttribute('aria-live', 'polite');
+
+    const buttons = points.map(({ label, report }) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.setAttribute('aria-label', label);
+      const bars = document.createElement('span');
+      bars.className = 'accounting-chart-bars';
+      bars.setAttribute('aria-hidden', 'true');
+      for (const [key] of series) {
+        const value = report[key];
+        const bar = document.createElement('span');
+        bar.dataset.series = key;
+        bar.style.height = Math.abs(value) / range * 100 + '%';
+        bar.style.top = (high - Math.max(0, value)) / range * 100 + '%';
+        bars.append(bar);
+      }
+      const name = document.createElement('span');
+      name.className = 'accounting-chart-month';
+      name.textContent = label.slice(0, 3);
+      button.append(bars, name);
+      button.addEventListener('click', () => select(button, label, report));
+      plot.append(button);
+      return button;
+    });
+
+    function select(button, label, report) {
+      for (const item of buttons) item.setAttribute('aria-pressed', String(item === button));
+      const heading = document.createElement('strong');
+      heading.textContent = label;
+      const metrics = series.map(([key, title]) => {
+        const metric = document.createElement('span');
+        metric.textContent = title + ' ';
+        const amount = document.createElement('b');
+        amount.textContent = currency.format(report[key]);
+        metric.append(amount);
+        return metric;
+      });
+      detail.replaceChildren(heading, ...metrics);
+    }
+
+    const last = points.at(-1);
+    select(buttons.at(-1), last.label, last.report);
+    viewport.append(plot);
+    fragment.append(legend, viewport, detail);
   }
   if (points.length < endMonth) {
     const note = document.createElement('p');

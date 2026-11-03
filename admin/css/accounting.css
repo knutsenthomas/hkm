@@ -112,24 +112,91 @@
 }
 
 #accounting-section .accounting-chart h3 { margin: 0 0 .7rem; font-size: 1rem; font-weight: 700; }
-#accounting-section .accounting-trend-row {
-  display: grid;
-  grid-template-columns: minmax(5.5rem, .6fr) repeat(3, minmax(0, 1fr));
-  align-items: center;
-  gap: .5rem 1rem;
-  padding: .65rem 0;
-  border-top: 1px solid var(--report-border);
+#accounting-section .accounting-chart {
+  --chart-revenue: #21836c;
+  --chart-expenses: #bd632d;
+  --chart-result: #537bbb;
+  padding: clamp(1rem, 2vw, 1.6rem);
+}
+#accounting-section .accounting-chart [data-series="revenue"] { --series-color: var(--chart-revenue); }
+#accounting-section .accounting-chart [data-series="expenses"] { --series-color: var(--chart-expenses); }
+#accounting-section .accounting-chart [data-series="result"] { --series-color: var(--chart-result); }
+#accounting-section .accounting-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem 1.15rem;
+  margin-bottom: 1rem;
+  color: var(--report-muted);
   font-size: .8rem;
 }
-#accounting-section .accounting-trend-row strong { text-transform: capitalize; }
-#accounting-section .accounting-trend-metric { min-width: 0; font-variant-numeric: tabular-nums; }
-#accounting-section .accounting-trend-track { height: .4rem; margin-top: .25rem; background: var(--report-subtle); border-radius: 1rem; }
-#accounting-section .accounting-trend-track > div { height: 100%; border-radius: inherit; background: #258569; }
-#accounting-section [data-series="expenses"] .accounting-trend-track > div { background: #bd632d; }
-#accounting-section [data-series="result"] .accounting-trend-track > div { background: #4979b2; }
-#accounting-section [data-series="result"] .accounting-trend-track > .is-negative { background: #bb535b; }
-
-@media (max-width: 650px) {
-  #accounting-section .accounting-trend-row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .4rem .65rem; }
-  #accounting-section .accounting-trend-row strong { grid-column: 1 / -1; }
+#accounting-section .accounting-chart-legend span::before {
+  display: inline-block;
+  width: .55rem;
+  height: .55rem;
+  margin-inline-end: .4rem;
+  border-radius: 50%;
+  background: var(--series-color);
+  content: '';
 }
+#accounting-section .accounting-chart-viewport { overflow-x: auto; }
+#accounting-section .accounting-chart-plot {
+  --plot-height: 12rem;
+  display: grid;
+  grid-template-columns: repeat(var(--months), minmax(2.8rem, 1fr));
+  background: repeating-linear-gradient(to bottom, var(--report-border) 0 1px, transparent 1px 25%) top / 100% var(--plot-height) no-repeat;
+}
+#accounting-section .accounting-chart-plot button {
+  position: relative;
+  display: grid;
+  grid-template-rows: var(--plot-height) 2.2rem;
+  padding: 0;
+  border: 0;
+  border-radius: .4rem;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+#accounting-section .accounting-chart-plot button:hover,
+#accounting-section .accounting-chart-plot button[aria-pressed="true"] { background: color-mix(in srgb, var(--chart-result) 11%, transparent); }
+#accounting-section .accounting-chart-plot button:focus-visible { outline: 2px solid var(--chart-result); outline-offset: -2px; }
+#accounting-section .accounting-chart-bars {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  justify-self: center;
+  width: min(78%, 3.8rem);
+}
+#accounting-section .accounting-chart-plot button::before {
+  position: absolute;
+  top: 0;
+  inset-inline: 0;
+  height: var(--plot-height);
+  background: linear-gradient(to bottom, transparent var(--zero), var(--report-muted) var(--zero), transparent calc(var(--zero) + 1px));
+  content: '';
+}
+#accounting-section .accounting-chart-bars span {
+  position: relative;
+  margin-inline: 1px;
+  border-radius: .2rem;
+  background: var(--series-color);
+}
+#accounting-section .accounting-chart-month {
+  align-self: center;
+  color: var(--report-muted);
+  font-size: .8rem;
+  text-transform: capitalize;
+}
+#accounting-section .accounting-chart-detail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .45rem 1.25rem;
+  margin-top: .85rem;
+  padding: .7rem .9rem;
+  border-radius: .5rem;
+  background: var(--report-subtle);
+  font-size: .85rem;
+  font-variant-numeric: tabular-nums;
+}
+#accounting-section .accounting-chart-detail strong { text-transform: capitalize; }
+#accounting-section .accounting-chart-detail span { color: var(--report-muted); }
+#accounting-section .accounting-chart-detail b { color: var(--workspace-text, inherit); white-space: nowrap; }
