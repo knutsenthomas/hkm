@@ -302,7 +302,7 @@
   z-index: 3;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  width: min(19rem, calc(100vw - 2rem));
+  width: 100%;
   box-sizing: border-box;
   box-shadow: 0 8px 24px rgb(15 23 42 / 15%);
 }
@@ -328,8 +328,8 @@
 
 @media (max-width: 600px) {
   #accounting-section .accounting-heading > .accounting-period {
-    flex-basis: 100%;
     margin-inline-start: 0;
+    margin-inline-end: auto;
   }
   #accounting-section .accounting-period summary {
     width: fit-content;
@@ -363,3 +363,5 @@
 }
 
 #accounting-section .accounting-period .accounting-toolbar :is(input, select) { width: 100%; }
+
+#accounting-section .accounting-period .accounting-refresh { white-space: normal; }
