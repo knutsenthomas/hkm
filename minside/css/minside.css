@@ -6356,3 +6356,75 @@ html[data-theme="dark"] .ms-help-hero p {
 .school-payments-link-card .material-symbols-outlined {
     flex-shrink: 0;
 }
+
+@media (max-width: 768px) {
+    #dashboard-main-header .section-header-icon {
+        display: none !important;
+    }
+}
+
+@media (max-width: 768px) {
+    #dashboard-main-header #global-search-btn,
+    #dashboard-main-header #theme-toggle-btn {
+        flex: 0 0 44px !important;
+        width: 44px !important;
+        height: 44px !important;
+        box-sizing: border-box;
+        padding: 0 !important;
+        border-radius: 12px !important;
+        display: grid !important;
+        place-items: center;
+    }
+}
+
+@media (max-width: 768px) {
+    #dashboard-main-header #actions-btn {
+        padding: 0 !important;
+        overflow: hidden;
+    }
+
+    #dashboard-main-header #ph-avatar,
+    #dashboard-main-header #ph-avatar img {
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: inherit;
+        object-fit: cover;
+    }
+}
+
+@media (max-width: 768px) {
+    #dashboard-main-header #actions-btn:has(#ph-avatar img) {
+        position: relative;
+    }
+
+    #dashboard-main-header #actions-btn #ph-avatar:has(img) {
+        position: absolute;
+        inset: 0;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        max-width: none !important;
+        max-height: none !important;
+    }
+
+    #dashboard-main-header #actions-btn #ph-avatar img {
+        display: block;
+        max-width: none !important;
+        max-height: none !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .data-table.gift-history-table {
+        min-width: 0 !important;
+    }
+
+    .gift-history-table :is(th, td) {
+        padding-inline: 8px !important;
+        white-space: normal !important;
+    }
+
+    .gift-history-table td:last-child {
+        white-space: nowrap !important;
+    }
+}

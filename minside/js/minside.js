@@ -5248,13 +5248,13 @@ class MinSideManager {
                 } else {
                     tableContainer.innerHTML = `
                         <div class="table-responsive">
-                            <table class="data-table" style="width: 100%; border-collapse: collapse;">
+                            <table class="data-table gift-history-table" style="width: 100%; border-collapse: collapse;">
                                 <thead>
                                     <tr>
                                         <th>${t('giving.colDate')}</th>
                                         <th>${t('giving.colType')}</th>
                                         <th>${t('giving.colMethod')}</th>
-                                        <th class="text-right">${t('giving.colAmount')}</th>
+                                        <th>${t('giving.colAmount')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -5267,7 +5267,7 @@ class MinSideManager {
                                             <td>${date.toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : document.documentElement.lang === 'es' ? 'es-ES' : 'no-NO', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
                                             <td>${this._escapeHtml(typeLabel)}</td>
                                             <td><span class="method-tag">${this._escapeHtml(this._getDonationMethodLabel(d.method || 'Kort'))}</span></td>
-                                            <td class="text-right"><strong>kr ${amountNok.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</strong></td>
+                                            <td><strong>kr ${amountNok.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</strong></td>
                                         </tr>`;
                                     }).join('')}
                                 </tbody>
