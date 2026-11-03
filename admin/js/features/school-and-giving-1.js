@@ -506,33 +506,51 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
                             <div style="display:flex; align-items:center; gap:6px;">
                                 <strong>${name}</strong>
                                 ${typeBadge}
-                                <select class="form-control donation-type-select" aria-label="Klassifisering for ${name}">
-                                    <option value="" selected disabled>Endre kategori</option>
-                                    <option value="butikk">Nettbutikksalg</option>
-                                </select>
+
                             </div>
                             <div style="font-size:12px;color:#64748b;">${email}</div>
                         </td>
                         <td>
-                            <select class="form-control donation-method-select" aria-label="Betalingsmåte for ${name}">
-                                ${editableMethods.includes(record.method) ? "" : `<option value="" selected disabled>${method}</option>`}
-                                ${editableMethods.map((value) => `<option value="${value}" ${value === record.method ? "selected" : ""}>${this.escapeHtml(this.getDonationMethodLabel(value))}</option>`).join("")}
-                            </select>
+                            ${method}
                         </td>
                         <td>
-                            <select class="form-control donation-status-select" aria-label="Gavestatus for ${name}" style="min-width:9rem;">
-                                ${editableStatuses.includes(record.status) ? "" : `<option value="" selected disabled>${status}</option>`}
-                                ${editableStatuses.map((value) => `<option value="${value}" ${value === record.status ? "selected" : ""}>${this.escapeHtml(this.getDonationStatusLabel(value))}</option>`).join("")}
-                            </select>
+                            ${status}
                         </td>
                         <td>${profileStatus}</td>
                         <td class="text-right">
                             <div style="display:flex; justify-content:flex-end; align-items:center; gap:8px;">
                                 <strong style="white-space:nowrap; flex-shrink:0;">${amount}</strong>
+                                <button type="button" class="btn-secondary donation-detail-open">Detaljer</button>
+                            </div>
+                            <dialog class="donation-detail-panel" aria-label="Gavedetaljer for ${name}" style="position:fixed; inset:0 0 0 auto; margin:0; width:min(100%, 26rem); height:100%; max-height:100%; box-sizing:border-box; padding:1.5rem; text-align:left;">
+                                <form method="dialog"><button class="btn-secondary" autofocus>Lukk</button></form>
+                                <h3>${name}</h3>
+                                <p>${amount} · ${email}</p>
+                                <div style="display:grid; gap:1rem;">
+                                    <label>Betalingsmåte
+                                        <select class="form-control donation-method-select" aria-label="Betalingsmåte for ${name}">
+                                ${editableMethods.includes(record.method) ? "" : `<option value="" selected disabled>${method}</option>`}
+                                ${editableMethods.map((value) => `<option value="${value}" ${value === record.method ? "selected" : ""}>${this.escapeHtml(this.getDonationMethodLabel(value))}</option>`).join("")}
+                            </select>
+                                    </label>
+                                    <label>Betalingsstatus
+                                        <select class="form-control donation-status-select" aria-label="Gavestatus for ${name}" style="min-width:9rem;">
+                                ${editableStatuses.includes(record.status) ? "" : `<option value="" selected disabled>${status}</option>`}
+                                ${editableStatuses.map((value) => `<option value="${value}" ${value === record.status ? "selected" : ""}>${this.escapeHtml(this.getDonationStatusLabel(value))}</option>`).join("")}
+                            </select>
+                                    </label>
+                                    <label>Kategori
+                                        <select class="form-control donation-type-select" aria-label="Klassifisering for ${name}">
+                                    <option value="" selected disabled>Endre kategori</option>
+                                    <option value="butikk">Nettbutikksalg</option>
+                                </select>
+                                    </label>
+                                    <p>Referanse: ${this.escapeHtml(String(record.transactionId || record.reference || "Ingen referanse"))}</p>
+                                </div>
                                 <button type="button" class="action-btn delete-donation-btn" data-id="${record.id}" title="Slett gave" style="color: #ef4444; background: none; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: background 0.2s;">
                                     <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
                                 </button>
-                            </div>
+                            </dialog>
                         </td>
                     </tr>
                 `;
@@ -541,6 +559,12 @@ export function createSchoolAndGiving1Methods({ firebaseService, adminUtils, sho
           : `
                 <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Ingen gaver matcher filteret.</td></tr>
             `;
+
+        transactionsBody.querySelectorAll(".donation-detail-open").forEach((button) => {
+          button.addEventListener("click", () => {
+            button.closest("td").querySelector(".donation-detail-panel").showModal();
+          });
+        });
 
         transactionsBody
           .querySelectorAll(".donation-status-select")
