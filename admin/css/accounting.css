@@ -301,14 +301,14 @@
   inset-inline-end: 0;
   z-index: 3;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   width: min(19rem, calc(100vw - 2rem));
   box-sizing: border-box;
   box-shadow: 0 8px 24px rgb(15 23 42 / 15%);
 }
 #accounting-section .accounting-period .accounting-refresh {
   grid-column: 1 / -1;
-  justify-self: start;
+  justify-self: stretch;
   margin: 0;
 }
 
@@ -361,3 +361,5 @@
 #accounting-section .accounting-prepaid-detail small:not([hidden]) {
   display: block;
 }
+
+#accounting-section .accounting-period .accounting-toolbar :is(input, select) { width: 100%; }
