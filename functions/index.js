@@ -5257,6 +5257,7 @@ exports.newsletterTracking = onRequest({ region: 'us-central1', maxInstances: 10
 
 exports.onNewsletterCampaignCreate = onDocumentCreated({
   document: "newsletter_campaigns/{id}",
+  timeoutSeconds: 540,
   secrets: [emailUserParam, emailPassParam],
 }, async (event) => {
   const snapshot = event.data;
@@ -5265,7 +5266,14 @@ exports.onNewsletterCampaignCreate = onDocumentCreated({
   if (!campaign || campaign.processedByServer) return;
 
   const campaignRef = snapshot.ref;
-  await campaignRef.update({ processedByServer: true, dispatchStartedAt: new Date().toISOString() });
+  const claimed = await campaignRef.firestore.runTransaction(async transaction => {
+    const current = await transaction.get(campaignRef);
+    if (!current.exists || current.data().processedByServer) return false;
+    transaction.update(campaignRef, { processedByServer: true, dispatchStartedAt: new Date().toISOString() });
+    return true;
+  });
+  if (!claimed) return;
+  let sentCount = 0;
 
   const subject = campaign.subject || "Nyhetsbrev fra His Kingdom Ministry";
   const englishPayload = campaign.englishPayload;
@@ -5344,7 +5352,6 @@ exports.onNewsletterCampaignCreate = onDocumentCreated({
       });
     }
 
-    let sentCount = 0;
     let englishCount = 0;
     let norwegianCount = 0;
 
@@ -5423,6 +5430,11 @@ exports.onNewsletterCampaignCreate = onDocumentCreated({
     console.log(`[onNewsletterCampaignCreate] Campaign ${event.params.id} completed. Total: ${sentCount} (NO: ${norwegianCount}, EN: ${englishCount})`);
   } catch (err) {
     console.error("[onNewsletterCampaignCreate] Dispatch error:", err);
+    await campaignRef.update({
+      dispatchCompletedAt: new Date().toISOString(),
+      sentCount,
+      status: 'failed'
+    });
   }
 });
 
