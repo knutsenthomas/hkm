@@ -244,11 +244,6 @@
       "permanent": true
     },
     {
-      "source": "/nyhetsbrev",
-      "destination": "/#newsletter-form",
-      "permanent": true
-    },
-    {
       "source": "/category/abonnement",
       "destination": "https://hiskingdomdesigns.no/category/abonnement",
       "permanent": true
