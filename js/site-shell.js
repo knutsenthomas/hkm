@@ -1,3 +1,4 @@
+import './site-language.css';
 import { initHkmChatWidget } from './hkm-chat-widget.js';
 
 if (typeof document !== 'undefined' && document.head) {

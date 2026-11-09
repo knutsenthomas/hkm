@@ -1,0 +1,21 @@
+@media (min-width: 992px) {
+    #header .header-actions > .lang-switcher {
+        flex-shrink: 0;
+    }
+
+    #header .header-actions-dock:hover,
+    #header .header-actions-dock:focus-within,
+    #header .header-actions-dock.expanded {
+        width: 144px;
+    }
+}
+
+html[data-theme="dark"] #header .lang-dropdown a {
+    background: transparent !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] #header .lang-dropdown a:is(:hover, :focus-visible, .font-bold) {
+    background: #334155 !important;
+    color: #f8fafc !important;
+}

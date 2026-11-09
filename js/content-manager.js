@@ -4394,7 +4394,7 @@ class ContentManager {
                 const ep = episodes[0];
                 const epTitle = ep.title?._text || ep.title || '';
                 const epDesc = ep.description?._text || ep.description || ep["itunes:summary"]?._text || ep["itunes:summary"] || '';
-                let epThumb = '';
+                let epThumb = ep.thumbnail || '';
                 const img = ep["itunes:image"];
                 if (Array.isArray(img)) {
                     epThumb = img[0]?.$?.href || img[0]?.href || '';
@@ -4410,7 +4410,7 @@ class ContentManager {
                     }
                 }
                 if (!epThumb) {
-                    epThumb = 'https://images.unsplash.com/photo-1478737270239-2f02b77ac6d5?auto=format&fit=crop&w=300&q=80';
+                    epThumb = '/img/tro-og-liv-podcast.jpg';
                 }
                 
                 const epId = ep.guid?._text || ep.guid || ep.link?._text || ep.link || epTitle;
@@ -4434,7 +4434,7 @@ class ContentManager {
             podcastHtml = `
                 <a href="${this.getLocalizedLink('podcast.html')}" class="flex items-start gap-4 p-4 rounded-2xl hover:bg-slate-50 active:scale-[0.99] transition-all duration-200 group" style="text-decoration:none; color:inherit;">
                     <div class="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden shrink-0 shadow-sm relative bg-slate-100">
-                        <img src="https://images.unsplash.com/photo-1478737270239-2f02b77ac6d5?auto=format&fit=crop&w=300&q=80" alt="Podcast" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
+                        <img src="/img/tro-og-liv-podcast.jpg" alt="Podcast" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
                     </div>
                     <div class="flex-grow min-w-0">
                         <span class="text-[10px] font-extrabold text-[#d17d39] uppercase tracking-wider mb-1 block">${t.podcast}</span>

@@ -279,6 +279,18 @@ onDOMReady(() => {
     const searchBtn = document.getElementById('global-search-opener');
     const langBtn = dock.querySelector('.lang-btn');
     const langSwitcher = dock.querySelector('.lang-switcher');
+    const desktop = window.matchMedia('(min-width: 992px)');
+    if (langSwitcher && dock.parentElement?.classList.contains('header-actions')) {
+        const mobileSlot = langSwitcher.parentElement;
+        const placeLanguageSwitcher = () => {
+            langSwitcher.classList.remove('active');
+            if (desktop.matches) dock.after(langSwitcher);
+            else mobileSlot.append(langSwitcher);
+        };
+        placeLanguageSwitcher();
+        desktop.addEventListener('change', placeLanguageSwitcher);
+    }
+
 
     // Handle search button click/tap
     if (searchBtn) {
@@ -300,7 +312,7 @@ onDOMReady(() => {
             e.preventDefault();
             e.stopPropagation();
             langSwitcher.classList.toggle('active');
-            dock.classList.add('expanded'); // Keep dock open
+            if (dock.contains(langSwitcher)) dock.classList.add('expanded');
         });
     }
 
@@ -308,7 +320,9 @@ onDOMReady(() => {
     document.addEventListener('click', (e) => {
         if (!dock.contains(e.target)) {
             dock.classList.remove('expanded');
-            if (langSwitcher) langSwitcher.classList.remove('active');
+        }
+        if (langSwitcher && !langSwitcher.contains(e.target)) {
+            langSwitcher.classList.remove('active');
         }
     });
 
