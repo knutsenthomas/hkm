@@ -76,6 +76,7 @@ const ROUTES = {
         network: '/bnn',
         about: '/om-oss',
         contact: '/kontakt',
+        newsletter: '/nyhetsbrev',
         bible: '/bibel',
         media: '/media',
         podcast: '/podcast',
@@ -96,6 +97,7 @@ const ROUTES = {
         network: '/en/bnn',
         about: '/en/about',
         contact: '/en/contact',
+        newsletter: '/en/#newsletter',
         bible: '/en/bibel',
         media: '/en/media',
         podcast: '/en/podcast',
@@ -116,6 +118,7 @@ const ROUTES = {
         network: '/es/bnn',
         about: '/es/sobre-nosotros',
         contact: '/es/contacto',
+        newsletter: '/es/#newsletter',
         bible: '/es/bibel',
         media: '/es/media',
         podcast: '/es/podcast',
@@ -159,7 +162,8 @@ const COPY = {
                 title: 'Bli kjent med oss',
                 items: [
                     ['info', 'Om oss', 'Lær mer om vår visjon, tro og verdier.', 'about', 'menu.sections.about.about'],
-                    ['mail', 'Kontakt oss', 'Send oss en melding eller still spørsmål.', 'contact', 'menu.sections.about.contact']
+                    ['mail', 'Kontakt oss', 'Send oss en melding eller still spørsmål.', 'contact', 'menu.sections.about.contact'],
+                    ['mark_email_unread', 'Nyhetsbrev', 'Få oppdateringer fra His Kingdom Ministry.', 'newsletter', 'menu.sections.about.newsletter']
                 ]
             },
             resources: {
@@ -246,7 +250,8 @@ const COPY = {
                 title: 'Get to Know Us',
                 items: [
                     ['info', 'About Us', 'Learn about our vision, faith, and values.', 'about', 'menu.sections.about.about'],
-                    ['mail', 'Contact Us', 'Send us a message or reach out.', 'contact', 'menu.sections.about.contact']
+                    ['mail', 'Contact Us', 'Send us a message or reach out.', 'contact', 'menu.sections.about.contact'],
+                    ['mark_email_unread', 'Newsletter', 'Get updates from His Kingdom Ministry.', 'newsletter', 'menu.sections.about.newsletter']
                 ]
             },
             resources: {
@@ -333,7 +338,8 @@ const COPY = {
                 title: 'Conócenos',
                 items: [
                     ['info', 'Sobre nosotros', 'Conoce nuestra visión, fe y valores.', 'about', 'menu.sections.about.about'],
-                    ['mail', 'Contacto', 'Envíanos un mensaje o una pregunta.', 'contact', 'menu.sections.about.contact']
+                    ['mail', 'Contacto', 'Envíanos un mensaje o una pregunta.', 'contact', 'menu.sections.about.contact'],
+                    ['mark_email_unread', 'Boletín', 'Recibe novedades de His Kingdom Ministry.', 'newsletter', 'menu.sections.about.newsletter']
                 ]
             },
             resources: {
