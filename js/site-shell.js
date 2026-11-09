@@ -76,7 +76,7 @@ const ROUTES = {
         network: '/bnn',
         about: '/om-oss',
         contact: '/kontakt',
-        newsletter: '/nyhetsbrev',
+        newsletter: '/#newsletter',
         bible: '/bibel',
         media: '/media',
         podcast: '/podcast',
