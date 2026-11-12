@@ -8994,3 +8994,153 @@ body.newsletter-html-active :is(#mobile-add-element-btn, .form-group-v2:has(#new
     border: 1px solid #94a3b8;
     border-radius: 6px;
 }
+
+#newsletter-ai-dialog {
+    --ai-surface: var(--admin-surface, #fff);
+    --ai-text: var(--admin-text, #2c3e50);
+    --ai-muted: var(--admin-text-muted, #536579);
+    --ai-border: var(--admin-border, #dce3e9);
+    --ai-accent: #c56828;
+    position: fixed !important;
+    inset: 0 !important;
+    margin: auto !important;
+    height: fit-content;
+    width: min(760px, calc(100% - 32px));
+    max-height: calc(100dvh - 32px);
+    padding: clamp(18px, 4vw, 30px);
+    border-color: var(--ai-border);
+    border-radius: 20px;
+    background: var(--ai-surface);
+    color: var(--ai-text);
+    box-shadow: 0 24px 72px rgb(15 23 42 / 25%);
+    font-size: 14px;
+    line-height: 1.5;
+    overscroll-behavior: contain;
+}
+
+#newsletter-ai-dialog:has([data-ai-review][hidden]) {
+    width: min(560px, calc(100% - 32px));
+}
+
+#newsletter-ai-dialog::backdrop {
+    background: rgb(15 23 42 / 56%);
+}
+
+.newsletter-ai-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 16px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--ai-border);
+}
+
+#newsletter-ai-title {
+    margin: 0;
+    font-size: clamp(19px, 4.5vw, 24px);
+    font-weight: 750;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+
+.newsletter-ai-close {
+    display: grid;
+    place-items: center;
+    flex: 0 0 36px;
+    height: 36px;
+    border: 1px solid var(--ai-border);
+    border-radius: 10px;
+    background: var(--ai-surface);
+    color: var(--ai-text);
+    cursor: pointer;
+}
+
+.newsletter-ai-close .material-symbols-outlined {
+    font-size: 20px;
+}
+
+.newsletter-ai-connection {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    padding: 14px 16px;
+    border: 1px solid var(--ai-border);
+    border-left: 3px solid var(--ai-accent);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--ai-accent) 5%, var(--ai-surface));
+}
+
+.newsletter-ai-connection h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+#newsletter-ai-dialog p {
+    margin: 0;
+    color: var(--ai-muted);
+}
+
+.newsletter-ai-connection-help {
+    flex-basis: 100%;
+}
+
+.newsletter-ai-address {
+    margin-block: 16px;
+}
+
+#newsletter-ai-dialog label {
+    margin: 0 0 5px;
+    font-weight: 650;
+}
+
+#newsletter-ai-dialog input {
+    min-width: 0;
+    min-height: 42px;
+    padding: 9px 11px;
+    border: 1px solid var(--ai-border);
+    border-radius: 9px;
+    background: var(--ai-surface);
+    color: var(--ai-text);
+    font: inherit;
+}
+
+.newsletter-ai-other {
+    border: 1px solid var(--ai-border);
+    border-radius: 12px;
+}
+
+.newsletter-ai-other summary {
+    padding: 12px 14px;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.newsletter-ai-other-content {
+    padding: 0 14px 14px;
+}
+
+#newsletter-ai-dialog :is(.newsletter-ai-other-content, [data-ai-consent]) p {
+    margin-bottom: 10px;
+}
+
+#newsletter-ai-dialog [data-ai-schema] {
+    color: var(--ai-text);
+    text-underline-offset: 3px;
+}
+
+#newsletter-ai-dialog [role="status"]:not(:empty) {
+    margin-top: 12px;
+}
+
+#newsletter-ai-dialog :is(button, summary, input, a):focus-visible {
+    outline: 2px solid var(--ai-accent);
+    outline-offset: 3px;
+}
+
+#newsletter-ai-dialog [hidden] {
+    display: none !important;
+}
