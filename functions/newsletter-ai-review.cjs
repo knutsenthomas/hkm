@@ -1,5 +1,6 @@
 const { createHash } = require('node:crypto');
 
+const HKD_SUBSCRIBERS = 'hkd_newsletter_subscriptions';
 const subscriberCollections = ['newsletter_subscriptions', 'contacts', 'users'];
 const unsubscribedStatuses = new Set(['unsubscribed', 'avmeldt']);
 const englishTags = new Set(['english', 'engelsk', 'en']);
@@ -12,7 +13,12 @@ function list(value) {
     .filter(Boolean);
 }
 
+function isHkdNewsletterGroup(group) {
+  return normalize(group) === 'hkd nyhetsbrev';
+}
+
 function selectNewsletterAudience(records, group) {
+  const eligibleCollection = isHkdNewsletterGroup(group) ? HKD_SUBSCRIBERS : 'newsletter_subscriptions';
   const suppressed = new Set();
   const recipients = new Map();
   for (const { collection, data } of records) {
@@ -24,7 +30,7 @@ function selectNewsletterAudience(records, group) {
     }
     // A newsletter subscription is the eligibility record. CRM and user records
     // participate in suppression even when they are not newsletter subscribers.
-    if (collection !== 'newsletter_subscriptions' || email.length > 254 || !/^[^\s@<>,;]+@[^\s@<>,;]+\.[^\s@<>,;]+$/.test(email)) continue;
+    if (collection !== eligibleCollection || email.length > 254 || !/^[^\s@<>,;]+@[^\s@<>,;]+\.[^\s@<>,;]+$/.test(email)) continue;
     const tags = [...new Set([...list(data.tags), ...list(data.labels)])];
     const segments = [...new Set([...list(data.segments), ...list(data.segment), ...list(data.source)])];
     if (![...tags, ...segments].some(value => normalize(value) === normalize(group))) continue;
@@ -42,14 +48,15 @@ function selectNewsletterAudience(records, group) {
 }
 
 async function loadNewsletterAudience(db, group) {
-  const snapshots = await Promise.all(subscriberCollections.map(collection =>
+  const collections = isHkdNewsletterGroup(group) ? [HKD_SUBSCRIBERS, ...subscriberCollections] : subscriberCollections;
+  const snapshots = await Promise.all(collections.map(collection =>
     db.collection(collection).select(
       'email', 'emailLower', 'newsletterUnsubscribed', 'newsletterStatus', 'status',
-      ...(collection === 'newsletter_subscriptions' ? ['tags', 'labels', 'segments', 'segment', 'source', 'firstName', 'name', 'displayName'] : [])
+      ...(['newsletter_subscriptions', HKD_SUBSCRIBERS].includes(collection) ? ['tags', 'labels', 'segments', 'segment', 'source', 'firstName', 'name', 'displayName'] : [])
     ).get()
   ));
   return selectNewsletterAudience(snapshots.flatMap((snapshot, index) => snapshot.docs.map(doc => ({
-    collection: subscriberCollections[index], data: doc.data()
+    collection: collections[index], data: doc.data()
   }))), group);
 }
 
@@ -64,4 +71,4 @@ function audienceFingerprint(recipients) {
   return createHash('sha256').update(JSON.stringify(recipients)).digest('hex');
 }
 
-module.exports = { selectNewsletterAudience, loadNewsletterAudience, audienceSummary, audienceFingerprint };
+module.exports = { HKD_SUBSCRIBERS, isHkdNewsletterGroup, selectNewsletterAudience, loadNewsletterAudience, audienceSummary, audienceFingerprint };

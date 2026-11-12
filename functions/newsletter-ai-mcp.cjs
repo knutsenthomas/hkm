@@ -3,7 +3,7 @@ const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js');
 const { StreamableHTTPServerTransport } = require('@modelcontextprotocol/sdk/server/streamableHttp.js');
 const { z } = require('zod');
 const { CSP, sanitizeImportedNewsletter, renderImportedNewsletter } = require('./newsletter-html.cjs');
-const { loadNewsletterAudience, audienceSummary, audienceFingerprint } = require('./newsletter-ai-review.cjs');
+const { isHkdNewsletterGroup, loadNewsletterAudience, audienceSummary, audienceFingerprint } = require('./newsletter-ai-review.cjs');
 
 const reviewPage = 'https://www.hiskingdomministry.no/admin/admin-nyhetsbrev.html';
 const reviewIdPattern = /^[A-Za-z0-9]{20}$/;
@@ -84,6 +84,7 @@ function createNewsletterAiService({ db, Timestamp, HttpsError, requireNewslette
     if (!saved.approvedAt) throw new HttpsError('failed-precondition', 'Åpne forhåndsvisningen i admin HKM og godkjenn utsendingen først.');
     const recipients = await checkAudience(saved);
     const campaign = buildImportedNewsletterCampaign(account, sanitizeImportedNewsletter(saved.html), saved.subject, { recipients });
+    if (isHkdNewsletterGroup(saved.group)) campaign.audienceGroup = 'HKD Nyhetsbrev';
     const campaignRef = db.collection('newsletter_campaigns').doc(ref.id);
     return db.runTransaction(async transaction => {
       const current = ownedReview(await transaction.get(ref), account);
@@ -113,7 +114,7 @@ function createNewsletterAiService({ db, Timestamp, HttpsError, requireNewslette
   const id = z.string().regex(reviewIdPattern);
   const tools = {
     prepare_newsletter: {
-      description: 'Kontroller HTML og finn antall aktive abonnenter med den eksakte etiketten eller segmentet. Vis emne, gruppe, antall, advarsler og lenken til forhåndsvisning. Ingen utsending.',
+      description: 'Kontroller HTML og finn antall aktive abonnenter med den eksakte etiketten eller segmentet. For His Kingdom Designs, bruk gruppen «HKD Nyhetsbrev». Vis emne, gruppe, antall, advarsler og lenken til forhåndsvisning. Ingen utsending.',
       schema: z.object({
         subject: z.string().trim().min(1).max(300).regex(/^[^\r\n]+$/),
         html: z.string().min(1).max(400_000),

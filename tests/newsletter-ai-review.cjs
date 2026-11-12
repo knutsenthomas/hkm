@@ -27,6 +27,11 @@ async function run() {
             ['d', { email: 'unsub@example.org', tags: ['HKD'] }],
             ['e', { email: 'other@example.org', tags: ['HKD ekstra'] }]
         ])],
+        ['hkd_newsletter_subscriptions', new Map([
+            ['a', { email: 'hkd@example.org', segments: ['HKD Nyhetsbrev'], tags: ['engelsk'] }],
+            ['b', { email: 'unsub@example.org', segments: ['HKD Nyhetsbrev'] }],
+            ['c', { email: 'inactive@example.org', segments: ['HKD Nyhetsbrev'], status: 'unsubscribed' }]
+        ])],
         ['contacts', new Map([
             ['a', { email: 'UNSUB@example.org', newsletterStatus: 'Avmeldt' }],
             ['b', { email: 'crm-only@example.org', tags: ['HKD'] }]
@@ -130,6 +135,13 @@ async function run() {
             params: { name: 'prepare_newsletter', arguments: { subject: 'Prøve', html: '<p>Hei {{fornavn}}</p>', group: 'HKD' } }
         });
         const result = (await prepared.json()).result.structuredContent;
+        const hkd = await post('/actions/prepare_newsletter', {
+            subject: 'HKD test', html: '<p>Hei</p>', group: 'HKD Nyhetsbrev'
+        });
+        const hkdReview = await hkd.json();
+        assert.equal(hkdReview.count, 1);
+        assert.equal(hkdReview.englishCount, 1);
+        assert.equal(store.get('newsletter_campaigns')?.size || 0, 0);
         assert.equal(result.count, 2);
         assert.equal(result.englishCount, 1);
         assert.ok(result.warnings.includes('unsubscribe'));

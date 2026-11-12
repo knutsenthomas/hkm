@@ -1,3 +1,4 @@
+const { HKD_SUBSCRIBERS, isHkdNewsletterGroup } = require('./newsletter-ai-review.cjs');
 const { prepareTracking, trackingHandler } = require('./newsletter-tracking.cjs');
 const { validateRecurring, createStripeGift, createPayPalAgreement, reconcilePayPalAgreement } = require('./recurring-payments.cjs');
 const { createSchoolPaymentPlan, schoolMetadataForIntent } = require('./school-payment-plan.cjs');
@@ -1754,10 +1755,12 @@ async function findNewsletterSubscriberReferences(email) {
   const normalizedEmail = normalizeNewsletterEmail(email);
   const collectionNames = [
     "newsletter_subscriptions",
+    HKD_SUBSCRIBERS,
     "contacts",
     "users",
   ];
   const queries = [
+    [HKD_SUBSCRIBERS, "email"],
     ["newsletter_subscriptions", "email"],
     ["newsletter_subscriptions", "emailLower"],
     ["contacts", "email"],
@@ -5529,7 +5532,9 @@ exports.onNewsletterCampaignCreate = onDocumentCreated({
     let norwegianCount = 0;
     let browserUrl;
     if (importedTemplate) {
-      const collections = await Promise.all(['newsletter_subscriptions', 'contacts', 'users'].map(name =>
+      const sources = ['newsletter_subscriptions', 'contacts', 'users'];
+      if (isHkdNewsletterGroup(campaign.audienceGroup)) sources.push(HKD_SUBSCRIBERS);
+      const collections = await Promise.all(sources.map(name =>
         db.collection(name).select('email', 'emailLower', 'newsletterUnsubscribed', 'newsletterStatus', 'status').get()
       ));
       for (const collection of collections) {
@@ -5686,7 +5691,7 @@ exports.unsubscribeNewsletter = onRequest({
       for (let offset = 0; offset < subscriberReferences.length; offset += 400) {
         const batch = db.batch();
         subscriberReferences.slice(offset, offset + 400).forEach(({ref, collectionName}) => {
-          if (collectionName === "newsletter_subscriptions") {
+          if (collectionName === "newsletter_subscriptions" || collectionName === HKD_SUBSCRIBERS) {
             batch.set(ref, {
               status: "unsubscribed",
               isSubscribed: false,
