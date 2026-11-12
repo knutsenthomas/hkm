@@ -9144,3 +9144,7 @@ body.newsletter-html-active :is(#mobile-add-element-btn, .form-group-v2:has(#new
 #newsletter-ai-dialog [hidden] {
     display: none !important;
 }
+
+#newsletter-ai-dialog [data-ai-edit] input + label {
+    margin-top: 10px;
+}

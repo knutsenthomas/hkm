@@ -28,6 +28,12 @@ export function setupNewsletterAiReview() {
     const testEmail = document.getElementById('newsletter-ai-test-email');
     const testSend = dialog.querySelector('[data-ai-test-send]');
     const testStatus = dialog.querySelector('[data-ai-test-status]');
+    const editPanel = dialog.querySelector('[data-ai-edit]');
+    const editForm = dialog.querySelector('[data-ai-edit-form]');
+    const subjectInput = document.getElementById('newsletter-ai-subject');
+    const headingInput = document.getElementById('newsletter-ai-heading');
+    const editSave = dialog.querySelector('[data-ai-edit-save]');
+    const editStatus = dialog.querySelector('[data-ai-edit-status]');
     let generation = 0;
 
     function open(panel) {
@@ -109,19 +115,38 @@ export function setupNewsletterAiReview() {
         testPanel.open = false;
         testForm.reset();
         testStatus.textContent = '';
+        editPanel.hidden = true;
+        editPanel.open = false;
+        editStatus.textContent = '';
         warnings.replaceChildren();
         status.textContent = 'Henter forhåndsvisning og mottakerantall …';
         try {
-            const result = await newsletterHtmlRequest({ action: 'aiReview', reviewId });
+            let result = await newsletterHtmlRequest({ action: 'aiReview', reviewId });
             if (request !== generation) return;
             let selectedLanguage = 'no';
+            let saving = false;
+            let sendingTest = false;
+            let approving = false;
+            const drafts = new Map();
+            const fieldsFor = language => language === 'en'
+                ? { subject: result.subjectEn, title: result.titleEn || '' }
+                : { subject: result.subject, title: result.title || '' };
+            function updateActions() {
+                editSave.disabled = saving || approving || !drafts.has(selectedLanguage);
+                testSend.disabled = sendingTest || saving || drafts.has(selectedLanguage);
+                approve.disabled = approving || saving || result.approved || result.queued || drafts.size > 0;
+            }
             const showLanguage = language => {
                 const english = language === 'en' && Boolean(result.previewHtmlEn);
                 selectedLanguage = english ? 'en' : 'no';
+                const fields = drafts.get(selectedLanguage) || fieldsFor(selectedLanguage);
+                subjectInput.value = fields.subject;
+                headingInput.value = fields.title;
                 testSend.textContent = english ? 'Send engelsk test' : 'Send norsk test';
                 title.textContent = english ? result.subjectEn : result.subject;
                 languageButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.aiLanguage === (english ? 'en' : 'no'))));
                 showHtmlFrame(frame, { ...result, previewHtml: english ? result.previewHtmlEn : result.previewHtml });
+                updateActions();
             };
             languages.hidden = !result.previewHtmlEn;
             languageButtons.forEach(button => { button.onclick = () => showLanguage(button.dataset.aiLanguage); });
@@ -133,15 +158,53 @@ export function setupNewsletterAiReview() {
             }
             showLanguage('no');
             testPanel.hidden = false;
-            testSend.disabled = false;
+            editPanel.hidden = result.approved || result.queued;
+            editForm.oninput = () => {
+                const original = fieldsFor(selectedLanguage);
+                const fields = { subject: subjectInput.value, title: headingInput.value };
+                if (fields.subject === original.subject && fields.title === original.title) drafts.delete(selectedLanguage);
+                else drafts.set(selectedLanguage, fields);
+                editStatus.textContent = drafts.size ? 'Lagre endringene før du sender test eller godkjenner.' : '';
+                updateActions();
+            };
+            editForm.onsubmit = async event => {
+                event.preventDefault();
+                if (editSave.disabled) return;
+                const language = selectedLanguage;
+                const fields = drafts.get(language);
+                saving = true;
+                subjectInput.disabled = true;
+                headingInput.disabled = true;
+                updateActions();
+                try {
+                    const updated = await newsletterHtmlRequest({ action: 'aiReviewEdit', reviewId, language, revision: result.revision, ...fields });
+                    if (request !== generation) return;
+                    result = updated;
+                    drafts.delete(language);
+                    showLanguage(selectedLanguage);
+                    editStatus.textContent = drafts.size ? 'Lagret. Det andre språket har ulagrede endringer.' : 'Lagret. Forhåndsvisningen er oppdatert.';
+                } catch (error) {
+                    if (request === generation) editStatus.textContent = error.message;
+                } finally {
+                    if (request === generation) {
+                        saving = false;
+                        subjectInput.disabled = false;
+                        headingInput.disabled = false;
+                        updateActions();
+                    }
+                }
+            };
+            subjectInput.disabled = false;
+            headingInput.disabled = false;
             testForm.onsubmit = async event => {
                 event.preventDefault();
                 if (testSend.disabled) return;
-                testSend.disabled = true;
+                sendingTest = true;
+                updateActions();
                 testStatus.textContent = 'Sender test …';
                 try {
                     const sent = await newsletterHtmlRequest({
-                        action: 'aiReviewTest', reviewId, email: testEmail.value.trim(), language: selectedLanguage
+                        action: 'aiReviewTest', reviewId, email: testEmail.value.trim(), language: selectedLanguage, revision: result.revision
                     });
                     if (request === generation) {
                         const language = sent.language === 'en' ? 'Engelsk' : 'Norsk';
@@ -150,22 +213,32 @@ export function setupNewsletterAiReview() {
                 } catch (error) {
                     if (request === generation) testStatus.textContent = error.message;
                 } finally {
-                    if (request === generation) testSend.disabled = false;
+                    if (request === generation) {
+                        sendingTest = false;
+                        updateActions();
+                    }
                 }
             };
             status.textContent = result.queued ? 'Utsendingen er lagt i kø.' : result.approved
                 ? 'Godkjent. Gå tilbake til AI-klienten for å starte utsendingen.'
                 : 'Sjekk innholdet og målgruppen før du godkjenner.';
-            approve.disabled = result.approved || result.queued;
+            updateActions();
             approve.onclick = async () => {
-                approve.disabled = true;
+                if (approve.disabled) return;
+                approving = true;
+                updateActions();
                 try {
-                    await newsletterHtmlRequest({ action: 'aiApprove', reviewId });
-                    if (request === generation) status.textContent = 'Godkjent. Gå tilbake til AI-klienten for å starte utsendingen.';
-                } catch (error) {
+                    result = await newsletterHtmlRequest({ action: 'aiApprove', reviewId, revision: result.revision });
                     if (request === generation) {
-                        status.textContent = error.message;
-                        approve.disabled = false;
+                        editPanel.hidden = true;
+                        status.textContent = 'Godkjent. Gå tilbake til AI-klienten for å starte utsendingen.';
+                    }
+                } catch (error) {
+                    if (request === generation) status.textContent = error.message;
+                } finally {
+                    if (request === generation) {
+                        approving = false;
+                        updateActions();
                     }
                 }
             };

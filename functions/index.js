@@ -5339,8 +5339,9 @@ exports.newsletterHtmlAdmin = onCall({
     return { token, url: newsletterFunctionsBase + '/newsletterMcp', expiresAt: expiresAt.toDate().toISOString() };
   }
   if (action === 'aiReviewTest') return newsletterAi.testReview(account, data);
+  if (action === 'aiReviewEdit') return newsletterAi.editReview(account, data);
   if (action === 'aiReview' || action === 'aiApprove') {
-    return newsletterAi.review(account, data.reviewId, action === 'aiApprove');
+    return newsletterAi.review(account, data.reviewId, action === 'aiApprove', data.revision);
   }
   if (!['preview', 'test', 'queue'].includes(action)) throw new HttpsError('invalid-argument', 'Ukjent HTML-handling.');
   let template;

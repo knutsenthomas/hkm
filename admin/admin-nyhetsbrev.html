@@ -113,7 +113,7 @@
     <link rel="stylesheet" href="css/dashboard.css?v=20261015_paragraph_spacing">
     <link rel="stylesheet" href="../css/notifications.css?v=1.18">
     <link rel="stylesheet" href="css/admin-unified.css?v=20261015_paragraph_spacing">
-    <link rel="stylesheet" href="css/newsletter-builder.css?v=20261112_ai_dialog">
+    <link rel="stylesheet" href="css/newsletter-builder.css?v=20261112_ai_review_fields">
     <link rel="stylesheet" href="css/version-history.css?v=20260728_V1">
 
     <!-- Firebase SDK (Compat) -->
@@ -2072,6 +2072,19 @@
                 <button type="button" class="btn-secondary-outline" data-ai-language="no" aria-pressed="true">Norsk</button>
                 <button type="button" class="btn-secondary-outline" data-ai-language="en" aria-pressed="false">Engelsk</button>
             </div>
+            <details class="newsletter-ai-other" data-ai-edit hidden>
+                <summary>Rediger emne og tittel</summary>
+                <form class="newsletter-ai-other-content" data-ai-edit-form>
+                    <label for="newsletter-ai-subject">E-postemne</label>
+                    <input id="newsletter-ai-subject" type="text" maxlength="300" required>
+                    <label for="newsletter-ai-heading">Tittel i nyhetsbrevet</label>
+                    <input id="newsletter-ai-heading" type="text" maxlength="300">
+                    <div class="newsletter-html-actions">
+                        <button type="submit" class="btn-secondary-outline" data-ai-edit-save disabled>Lagre endringer</button>
+                    </div>
+                    <p data-ai-edit-status aria-live="polite"></p>
+                </form>
+            </details>
             <ul data-ai-warnings></ul>
             <div class="newsletter-html-actions" role="group" aria-label="Bredde på forhåndsvisning">
                 <button type="button" class="btn-secondary-outline" data-html-width="600" aria-pressed="true">Skrivebord · 600 px</button>
@@ -2097,7 +2110,7 @@
         </div>
         <p role="status"></p>
     </dialog>
-    <script type="module" src="js/newsletter-builder.js?v=20261112_ai_test_recipient"></script>
+    <script type="module" src="js/newsletter-builder.js?v=20261112_ai_review_fields"></script>
 <script type="module" src="js/newsletter-workspace.js"></script>
 </body>
 

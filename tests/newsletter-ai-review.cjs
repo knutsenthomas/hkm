@@ -154,6 +154,17 @@ async function run() {
         assert.equal(testMessages[0].subject, 'HKD English test');
         assert.match(testMessages[0].template.html, /Hello/);
         assert.equal((await service.review(admin, hkdReview.reviewId, false)).approved, false);
+        const editInput = { reviewId: hkdReview.reviewId, language: 'en', revision: 0, subject: 'New English subject', title: 'New & <heading>' };
+        await assert.rejects(service.editReview({ uid: 'other' }, editInput), { code: 'not-found' });
+        const edited = await service.editReview(admin, editInput);
+        assert.equal(edited.subjectEn, 'New English subject');
+        assert.equal(edited.titleEn, 'New & <heading>');
+        assert.match(edited.previewHtmlEn, /New &amp; &lt;heading&gt;/);
+        assert.equal(edited.previewHtml, hkdPreview.previewHtml);
+        assert.equal(edited.revision, 1);
+        await assert.rejects(service.editReview(admin, editInput), { code: 'aborted' });
+        await assert.rejects(service.review(admin, hkdReview.reviewId, true, 0), { code: 'aborted' });
+
 
         assert.equal(store.get('newsletter_campaigns')?.size || 0, 0);
         assert.equal(result.count, 2);

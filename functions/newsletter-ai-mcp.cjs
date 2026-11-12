@@ -2,7 +2,7 @@ const { createHash } = require('node:crypto');
 const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js');
 const { StreamableHTTPServerTransport } = require('@modelcontextprotocol/sdk/server/streamableHttp.js');
 const { z } = require('zod');
-const { CSP, sanitizeImportedNewsletter, renderImportedNewsletter } = require('./newsletter-html.cjs');
+const { CSP, sanitizeImportedNewsletter, renderImportedNewsletter, importedNewsletterTitle, setImportedNewsletterTitle } = require('./newsletter-html.cjs');
 const { isHkdNewsletterGroup, loadNewsletterAudience, audienceSummary, audienceFingerprint } = require('./newsletter-ai-review.cjs');
 
 const reviewPage = 'https://www.hiskingdomministry.no/admin/admin-nyhetsbrev.html';
@@ -78,16 +78,22 @@ function createNewsletterAiService({ db, Timestamp, HttpsError, requireNewslette
     };
   }
 
-  async function review(account, id, approve) {
+  async function review(account, id, approve, expectedRevision) {
     const ref = reviewRef(id);
     const saved = ownedReview(await ref.get(), account);
     checkExpiry(saved);
     if (approve && !saved.approvedAt && !saved.campaignId) {
+      if ((saved.revision || 0) !== (expectedRevision ?? 0)) {
+        throw new HttpsError('aborted', 'Brevet er endret. Last inn forhåndsvisningen på nytt før du godkjenner.');
+      }
       const recipients = await checkAudience(saved);
       buildReviewedCampaign(account, saved, recipients);
       await db.runTransaction(async transaction => {
         const current = ownedReview(await transaction.get(ref), account);
         checkExpiry(current);
+        if ((current.revision || 0) !== (saved.revision || 0)) {
+          throw new HttpsError('aborted', 'Brevet er endret. Last inn forhåndsvisningen på nytt før du godkjenner.');
+        }
         if (!current.approvedAt && !current.campaignId) transaction.update(ref, { approvedAt: Timestamp.now() });
       });
     }
@@ -95,14 +101,40 @@ function createNewsletterAiService({ db, Timestamp, HttpsError, requireNewslette
       firstName: 'Ola', unsubscribeUrl: unsubscribePage, browserUrl: reviewPage, preview: true, language
     });
     return {
-      subject: saved.subject, group: saved.group, ...saved.summary, warnings: saved.warnings,
+      subject: saved.subject, title: importedNewsletterTitle(saved.html), revision: saved.revision || 0,
+      group: saved.group, ...saved.summary, warnings: saved.warnings,
       approved: approve || Boolean(saved.approvedAt), queued: Boolean(saved.campaignId),
       csp: CSP, previewHtml: preview(saved.html, 'no'),
-      ...(saved.htmlEn ? { subjectEn: saved.subjectEn, previewHtmlEn: preview(saved.htmlEn, 'en') } : {})
+      ...(saved.htmlEn ? { subjectEn: saved.subjectEn, titleEn: importedNewsletterTitle(saved.htmlEn), previewHtmlEn: preview(saved.htmlEn, 'en') } : {})
     };
   }
 
-  async function testReview(account, { reviewId, email: address, language } = {}) {
+  async function editReview(account, { reviewId, language, subject, title, revision } = {}) {
+    if (!['no', 'en'].includes(language) || !Number.isSafeInteger(revision) || revision < 0 ||
+        typeof subject !== 'string' || !subject.trim() || subject.length > 300 || /[\r\n]/.test(subject) ||
+        typeof title !== 'string' || title.length > 300 || /[\r\n]/.test(title)) {
+      throw new HttpsError('invalid-argument', 'Oppgi et gyldig emne og en tittel på opptil 300 tegn.');
+    }
+    const ref = reviewRef(reviewId);
+    const htmlField = language === 'en' ? 'htmlEn' : 'html';
+    const subjectField = language === 'en' ? 'subjectEn' : 'subject';
+    await db.runTransaction(async transaction => {
+      const saved = ownedReview(await transaction.get(ref), account);
+      checkExpiry(saved);
+      if (saved.approvedAt || saved.campaignId) {
+        throw new HttpsError('failed-precondition', 'Emne og tittel kan redigeres fram til godkjenning.');
+      }
+      if ((saved.revision || 0) !== revision) {
+        throw new HttpsError('aborted', 'Brevet er endret. Last inn forhåndsvisningen på nytt.');
+      }
+      if (!saved[htmlField]) throw new HttpsError('failed-precondition', 'Denne språkversjonen er ikke tilgjengelig.');
+      const html = sanitizeImportedNewsletter(setImportedNewsletterTitle(saved[htmlField], title.trim())).html;
+      transaction.update(ref, { [subjectField]: subject.trim(), [htmlField]: html, revision: revision + 1 });
+    });
+    return review(account, reviewId, false);
+  }
+
+  async function testReview(account, { reviewId, email: address, language, revision } = {}) {
     const email = typeof address === 'string' ? address.trim().toLowerCase() : '';
     if (email.length > 254 || !/^[^\s@<>,;:"()\\]+@[^\s@<>,;:"()\\]+\.[^\s@<>,;:"()\\]+$/.test(email)) {
       throw new HttpsError('invalid-argument', 'Skriv inn én gyldig e-postadresse.');
@@ -110,6 +142,9 @@ function createNewsletterAiService({ db, Timestamp, HttpsError, requireNewslette
     if (!['no', 'en'].includes(language)) throw new HttpsError('invalid-argument', 'Velg norsk eller engelsk.');
     const saved = ownedReview(await reviewRef(reviewId).get(), account);
     checkExpiry(saved);
+    if (revision !== undefined && (saved.revision || 0) !== revision) {
+      throw new HttpsError('aborted', 'Brevet er endret. Last inn forhåndsvisningen på nytt før du sender test.');
+    }
     const html = language === 'en' ? saved.htmlEn : saved.html;
     const subject = language === 'en' ? saved.subjectEn : saved.subject;
     if (!html || !subject) throw new HttpsError('failed-precondition', 'Denne språkversjonen er ikke tilgjengelig.');
@@ -269,7 +304,7 @@ function createNewsletterAiService({ db, Timestamp, HttpsError, requireNewslette
     await transport.handleRequest(req, res, req.body);
   }
 
-  return { review, testReview, handleMcp, buildMcpServer };
+  return { review, editReview, testReview, handleMcp, buildMcpServer };
 }
 
 module.exports = { createNewsletterAiService };

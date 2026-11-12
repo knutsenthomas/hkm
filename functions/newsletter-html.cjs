@@ -123,6 +123,42 @@ function sanitizeImportedNewsletter(source) {
   return { html, warnings: [...warnings], unsubscribe, webVersion };
 }
 
+function newsletterHeading(document) {
+  let heading;
+  walk(document, node => {
+    if (!heading && node.name === 'h1') heading = node;
+  });
+  return heading;
+}
+
+function importedNewsletterTitle(html) {
+  const heading = newsletterHeading(parseDocument(html));
+  let title = '';
+  if (heading) walk(heading, node => {
+    if (node.type === 'text') title += node.data;
+    if (node.name === 'br') title += ' ';
+  });
+  return title.replace(/\s+/g, ' ').trim();
+}
+
+function setImportedNewsletterTitle(html, title) {
+  if (importedNewsletterTitle(html) === title) return html;
+  const document = parseDocument(html);
+  let heading = newsletterHeading(document);
+  if (!title && heading) {
+    heading.parent.children = heading.parent.children.filter(node => node !== heading);
+    return serialize(document, { encodeEntities: 'utf8' });
+  }
+  if (!heading) {
+    let body = document;
+    walk(document, node => { if (node.name === 'body') body = node; });
+    heading = parseDocument('<h1 style="margin:0;padding:24px;font:700 28px Arial,sans-serif"></h1>').children[0];
+    body.children.unshift(heading);
+  }
+  heading.children = [{ type: 'text', data: title, parent: heading }];
+  return serialize(document, { encodeEntities: 'utf8' });
+}
+
 function renderImportedNewsletter(template, { firstName = '', unsubscribeUrl, browserUrl, preview = false, language = 'no' }) {
   const document = parseDocument(template.html);
   let body = document;
@@ -166,4 +202,4 @@ function plainNewsletterText(html) {
   });
 }
 
-module.exports = { CSP, sanitizeImportedNewsletter, renderImportedNewsletter, plainNewsletterText };
+module.exports = { CSP, sanitizeImportedNewsletter, renderImportedNewsletter, plainNewsletterText, importedNewsletterTitle, setImportedNewsletterTitle };
