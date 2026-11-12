@@ -363,10 +363,15 @@
                         adminUtils.pushFlashNotice('Access Denied: Du har ikke administratorrettigheter til adminpanelet.', 'error', 6000);
                     }
 
-                    const reviewId = new URLSearchParams(window.location.search).get('aiReview');
-                    const adminDestination = /^[a-zA-Z0-9]{20}$/.test(reviewId || '')
-                        ? `/admin/admin-nyhetsbrev.html?aiReview=${reviewId}`
-                        : '/admin/index.html';
+                    const params = new URLSearchParams(window.location.search);
+                    const oauthRequest = params.get('aiOAuth');
+                    const reviewId = params.get('aiReview');
+                    let adminDestination = '/admin/index.html';
+                    if (/^[a-zA-Z0-9]{20}$/.test(oauthRequest || '')) {
+                        adminDestination = `/admin/admin-nyhetsbrev?aiOAuth=${oauthRequest}`;
+                    } else if (/^[a-zA-Z0-9]{20}$/.test(reviewId || '')) {
+                        adminDestination = `/admin/admin-nyhetsbrev?aiReview=${reviewId}`;
+                    }
                     window.location.href = canAccessAdmin ? adminDestination : '/minside/index.html';
                 }
 

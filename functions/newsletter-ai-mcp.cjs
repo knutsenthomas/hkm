@@ -8,7 +8,7 @@ const { loadNewsletterAudience, audienceSummary, audienceFingerprint } = require
 const reviewPage = 'https://www.hiskingdomministry.no/admin/admin-nyhetsbrev.html';
 const reviewIdPattern = /^[A-Za-z0-9]{20}$/;
 
-function createNewsletterAiService({ db, Timestamp, HttpsError, requireNewsletterAdmin, buildImportedNewsletterCampaign, unsubscribePage, endpoint }) {
+function createNewsletterAiService({ db, Timestamp, HttpsError, requireNewsletterAdmin, buildImportedNewsletterCampaign, unsubscribePage, endpoint, oauth }) {
   function reviewRef(id) {
     if (typeof id !== 'string' || !reviewIdPattern.test(id)) throw new HttpsError('invalid-argument', 'Ugyldig kontroll-ID.');
     return db.collection('newsletter_ai_reviews').doc(id);
@@ -183,21 +183,24 @@ function createNewsletterAiService({ db, Timestamp, HttpsError, requireNewslette
     res.set('Cache-Control', 'no-store');
     const path = req.path.replace(/^\/newsletterMcp(?=\/|$)/, '');
     if (req.method === 'GET' && path === '/openapi.json') return res.json(gptActionSchema());
-    if (req.method !== 'POST') return res.set('Allow', 'POST').status(405).end();
+    if (path.startsWith('/oauth/') && oauth) return oauth.handle(req, res, path);
+    const deny = () => res.set('WWW-Authenticate', oauth?.challenge || 'Bearer').status(401).end();
     const token = req.get('Authorization')?.match(/^Bearer ([A-Za-z0-9_-]{43})$/i)?.[1];
-    if (!token) return res.set('WWW-Authenticate', 'Bearer').status(401).end();
-    const hash = createHash('sha256').update(token).digest('hex');
-    const keys = await db.collection('newsletter_ai_access').where('hash', '==', hash).limit(1).get();
-    const key = keys.docs[0];
-    if (!key || key.data().expiresAt.toMillis() <= Date.now()) {
-      return res.set('WWW-Authenticate', 'Bearer').status(401).end();
-    }
+    if (!token) return deny();
     let account;
     try {
-      account = await requireNewsletterAdmin(key.id);
+      if (oauth && !path.startsWith('/actions/')) account = await oauth.accountForToken(token);
+      if (!account) {
+        const hash = createHash('sha256').update(token).digest('hex');
+        const keys = await db.collection('newsletter_ai_access').where('hash', '==', hash).limit(1).get();
+        const key = keys.docs[0];
+        if (!key || key.data().expiresAt.toMillis() <= Date.now()) return deny();
+        account = await requireNewsletterAdmin(key.id);
+      }
     } catch {
       return res.status(403).end();
     }
+    if (req.method !== 'POST') return res.set('Allow', 'POST').status(405).end();
     if (path.startsWith('/actions/')) {
       const name = path.slice('/actions/'.length);
       const action = Object.hasOwn(tools, name) ? tools[name] : null;

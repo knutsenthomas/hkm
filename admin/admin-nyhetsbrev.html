@@ -113,7 +113,7 @@
     <link rel="stylesheet" href="css/dashboard.css?v=20261015_paragraph_spacing">
     <link rel="stylesheet" href="../css/notifications.css?v=1.18">
     <link rel="stylesheet" href="css/admin-unified.css?v=20261015_paragraph_spacing">
-    <link rel="stylesheet" href="css/newsletter-builder.css?v=20261112_html_ai">
+    <link rel="stylesheet" href="css/newsletter-builder.css?v=20261112_claude_oauth">
     <link rel="stylesheet" href="css/version-history.css?v=20260728_V1">
 
     <!-- Firebase SDK (Compat) -->
@@ -2030,15 +2030,27 @@
             <button type="button" class="btn-secondary-outline" data-ai-close>Lukk</button>
         </header>
         <div data-ai-access hidden>
+            <p>Claude bruker OAuth og fornyer tilgangen automatisk. Legg til MCP-adressen i Claude og velg Koble til.</p>
+            <p data-ai-connection></p>
+            <button type="button" class="btn-secondary-outline" data-ai-revoke hidden>Koble fra Claude</button>
+            <p>For andre klienter kan du bruke en midlertidig nøkkel.</p>
             <p>Bruk adressen og nøkkelen i AI-klientens MCP-innstillinger. Nøkkelen varer i åtte timer og erstatter den forrige nøkkelen din.</p>
             <label for="newsletter-ai-url">MCP-adresse</label>
-            <input id="newsletter-ai-url" type="url" readonly>
+            <input id="newsletter-ai-url" type="url" value="https://us-central1-his-kingdom-ministry.cloudfunctions.net/newsletterMcp" readonly>
             <a data-ai-schema hidden target="_blank" rel="noopener">Åpne skjema for GPT Actions</a>
             <label for="newsletter-ai-token">Tilgangsnøkkel</label>
             <input id="newsletter-ai-token" type="password" autocomplete="off" readonly>
             <div class="newsletter-html-actions">
                 <button type="button" class="btn-secondary-outline" data-ai-key>Opprett tilgangsnøkkel</button>
                 <button type="button" class="btn-secondary-outline" data-ai-copy disabled>Kopier nøkkel</button>
+            </div>
+        </div>
+        <div data-ai-consent hidden>
+            <p data-ai-consent-account></p>
+            <p>Claude får klargjøre nyhetsbrev, se mottakerantall og legge godkjente kampanjer i utsendingskøen. Hver utsending krever fortsatt godkjenning i admin HKM.</p>
+            <div class="newsletter-html-actions">
+                <button type="button" class="btn-secondary-outline" data-ai-deny disabled>Avslå</button>
+                <button type="button" class="btn-primary-publish" data-ai-allow disabled>Koble Claude til HKM</button>
             </div>
         </div>
         <div data-ai-review hidden>
@@ -2057,7 +2069,7 @@
         </div>
         <p role="status"></p>
     </dialog>
-    <script type="module" src="js/newsletter-builder.js?v=20261112_html_ai"></script>
+    <script type="module" src="js/newsletter-builder.js?v=20261112_claude_oauth"></script>
 <script type="module" src="js/newsletter-workspace.js"></script>
 </body>
 

@@ -274,7 +274,7 @@ class NewsletterBuilder {
 
     async init() {
         console.log("Nyhetsbrevbygger Initializing...");
-        this.openNewsletterAiReview = setupNewsletterAiReview();
+        this.newsletterAi = setupNewsletterAiReview();
 
         const urlParams = new URLSearchParams(window.location.search);
         const urlDraftId = urlParams.get('draftId');
@@ -449,16 +449,20 @@ class NewsletterBuilder {
 
     startAuthListener() {
         window.firebaseService.onAuthChange(async (user) => {
-            const reviewId = new URLSearchParams(window.location.search).get('aiReview');
+            const params = new URLSearchParams(window.location.search);
+            const oauthRequest = params.get('aiOAuth');
+            const reviewId = params.get('aiReview');
             if (!user) {
                 const loginUrl = new URL('/admin/login.html', window.location.origin);
-                if (/^[a-zA-Z0-9]{20}$/.test(reviewId || '')) loginUrl.searchParams.set('aiReview', reviewId);
+                if (/^[a-zA-Z0-9]{20}$/.test(oauthRequest || '')) loginUrl.searchParams.set('aiOAuth', oauthRequest);
+                else if (/^[a-zA-Z0-9]{20}$/.test(reviewId || '')) loginUrl.searchParams.set('aiReview', reviewId);
                 window.location.href = loginUrl.toString();
             } else {
                 console.log("[newsletter-builder] User is authenticated. Loading data...");
-                if (reviewId && !this.openedNewsletterAiReview) {
+                if (!this.openedNewsletterAiReview && (oauthRequest || reviewId)) {
                     this.openedNewsletterAiReview = true;
-                    void this.openNewsletterAiReview?.(reviewId);
+                    if (oauthRequest) void this.newsletterAi?.consent(oauthRequest);
+                    else void this.newsletterAi?.review(reviewId);
                 }
                 await this.loadTemplates();
                 await this.loadDrafts();

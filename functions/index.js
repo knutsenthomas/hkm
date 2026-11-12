@@ -5317,6 +5317,16 @@ exports.newsletterHtmlAdmin = onCall({
   const account = await requireNewsletterAdmin(auth?.uid);
 
   const action = data?.action;
+  if (action === 'aiOAuthConsent') {
+    const decision = data.decision;
+    if (decision !== undefined && !['allow', 'deny'].includes(decision)) {
+      throw new HttpsError('invalid-argument', 'Ugyldig valg.');
+    }
+    return newsletterOAuth.consent(account, data.requestId, decision);
+  }
+  if (action === 'aiOAuthConnection' || action === 'aiOAuthRevoke') {
+    return newsletterOAuth.connection(account, action === 'aiOAuthRevoke');
+  }
   if (action === 'aiAccess') {
     const token = crypto.randomBytes(32).toString('base64url');
     const expiresAt = Timestamp.fromMillis(Date.now() + 8 * 3600_000);
@@ -5403,10 +5413,14 @@ function buildImportedNewsletterCampaign(account, template, subject, data) {
   return campaign;
 }
 
+const newsletterMcpEndpoint = newsletterFunctionsBase + '/newsletterMcp';
+const newsletterOAuth = require('./newsletter-oauth.cjs').createNewsletterOAuth({
+  db, Timestamp, HttpsError, requireNewsletterAdmin, endpoint: newsletterMcpEndpoint
+});
 const newsletterAi = require('./newsletter-ai-mcp.cjs').createNewsletterAiService({
   db, Timestamp, HttpsError, requireNewsletterAdmin, buildImportedNewsletterCampaign,
   unsubscribePage: NEWSLETTER_UNSUBSCRIBE_PAGE,
-  endpoint: newsletterFunctionsBase + '/newsletterMcp'
+  endpoint: newsletterMcpEndpoint, oauth: newsletterOAuth
 });
 
 exports.newsletterMcp = onRequest({ region: 'us-central1' }, newsletterAi.handleMcp);

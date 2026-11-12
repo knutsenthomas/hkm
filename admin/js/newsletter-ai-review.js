@@ -8,6 +8,11 @@ export function setupNewsletterAiReview() {
     const token = document.getElementById('newsletter-ai-token');
     const accessPanel = dialog.querySelector('[data-ai-access]');
     const reviewPanel = dialog.querySelector('[data-ai-review]');
+    const consentPanel = dialog.querySelector('[data-ai-consent]');
+    const connection = dialog.querySelector('[data-ai-connection]');
+    const revoke = dialog.querySelector('[data-ai-revoke]');
+    const allow = dialog.querySelector('[data-ai-allow]');
+    const deny = dialog.querySelector('[data-ai-deny]');
     const frame = dialog.querySelector('iframe');
     const status = dialog.querySelector('[role=status]');
     const key = dialog.querySelector('[data-ai-key]');
@@ -18,20 +23,35 @@ export function setupNewsletterAiReview() {
     const warnings = dialog.querySelector('[data-ai-warnings]');
     let generation = 0;
 
-    function open(access) {
+    function open(panel) {
         generation++;
-        accessPanel.hidden = !access;
-        reviewPanel.hidden = access;
+        accessPanel.hidden = panel !== 'access';
+        reviewPanel.hidden = panel !== 'review';
+        consentPanel.hidden = panel !== 'consent';
         status.textContent = '';
         if (!dialog.open) dialog.showModal();
         return generation;
     }
 
+    async function loadConnection(request, action = 'aiOAuthConnection') {
+        revoke.hidden = true;
+        connection.textContent = 'Sjekker Claude-tilkoblingen …';
+        try {
+            const result = await newsletterHtmlRequest({ action });
+            if (request !== generation) return;
+            connection.textContent = result.connected ? 'Claude er koblet til.' : 'Claude er frakoblet.';
+            revoke.hidden = !result.connected;
+        } catch (error) {
+            if (request === generation) connection.textContent = error.message;
+        }
+    }
+
     document.getElementById('newsletter-ai-connect').onclick = () => {
         title.textContent = 'Koble AI til nyhetsbrev';
         key.disabled = false;
-        open(true);
+        void loadConnection(open('access'));
     };
+    revoke.onclick = () => loadConnection(generation, 'aiOAuthRevoke');
     dialog.querySelector('[data-ai-close]').onclick = () => dialog.close();
     dialog.addEventListener('close', () => {
         generation++;
@@ -72,8 +92,8 @@ export function setupNewsletterAiReview() {
     };
 
     setupHtmlFrameWidths(dialog, frame);
-    return async reviewId => {
-        const request = open(false);
+    async function review(reviewId) {
+        const request = open('review');
         title.textContent = 'Kontroller nyhetsbrev fra AI';
         approve.disabled = true;
         summary.textContent = '';
@@ -109,5 +129,44 @@ export function setupNewsletterAiReview() {
         } catch (error) {
             if (request === generation) status.textContent = error.message;
         }
-    };
+    }
+
+    async function consent(requestId) {
+        const request = open('consent');
+        const account = dialog.querySelector('[data-ai-consent-account]');
+        title.textContent = 'Koble Claude til nyhetsbrev';
+        account.textContent = '';
+        allow.disabled = true;
+        deny.disabled = true;
+        status.textContent = 'Sjekker tilkoblingen …';
+        try {
+            const result = await newsletterHtmlRequest({ action: 'aiOAuthConsent', requestId });
+            if (request !== generation) return;
+            account.textContent = `Du er logget inn som ${result.email}.`;
+            status.textContent = '';
+            allow.disabled = false;
+            deny.disabled = false;
+        } catch (error) {
+            if (request === generation) status.textContent = error.message;
+            return;
+        }
+        for (const [button, decision] of [[allow, 'allow'], [deny, 'deny']]) {
+            button.onclick = async () => {
+                allow.disabled = true;
+                deny.disabled = true;
+                try {
+                    const result = await newsletterHtmlRequest({ action: 'aiOAuthConsent', requestId, decision });
+                    if (request === generation) window.location.assign(result.redirect);
+                } catch (error) {
+                    if (request === generation) {
+                        status.textContent = error.message;
+                        allow.disabled = false;
+                        deny.disabled = false;
+                    }
+                }
+            };
+        }
+    }
+
+    return { review, consent };
 }
