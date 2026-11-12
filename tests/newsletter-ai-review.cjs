@@ -132,15 +132,19 @@ async function run() {
         assert.deepEqual((await list.json()).result.tools.map(tool => tool.name), ['prepare_newsletter', 'queue_newsletter', 'newsletter_status']);
         const prepared = await post('/', {
             jsonrpc: '2.0', id: 3, method: 'tools/call',
-            params: { name: 'prepare_newsletter', arguments: { subject: 'Prøve', html: '<p>Hei {{fornavn}}</p>', group: 'HKD' } }
+            params: { name: 'prepare_newsletter', arguments: { subject: 'Prøve', html: '<p>Hei {{fornavn}}</p>', subjectEn: 'Test', htmlEn: '<p>Hello {{fornavn}}</p>', group: 'HKD' } }
         });
         const result = (await prepared.json()).result.structuredContent;
-        const hkd = await post('/actions/prepare_newsletter', {
-            subject: 'HKD test', html: '<p>Hei</p>', group: 'HKD Nyhetsbrev'
-        });
+        const hkdInput = { subject: 'HKD test', html: '<p>Hei</p>', group: 'HKD Nyhetsbrev' };
+        assert.equal((await post('/actions/prepare_newsletter', hkdInput)).status, 409);
+        const hkd = await post('/actions/prepare_newsletter', { ...hkdInput, subjectEn: 'HKD English test', htmlEn: '<p>Hello</p>' });
         const hkdReview = await hkd.json();
         assert.equal(hkdReview.count, 1);
         assert.equal(hkdReview.englishCount, 1);
+        const hkdPreview = await service.review(admin, hkdReview.reviewId, false);
+        assert.match(hkdPreview.previewHtml, /Hei/);
+        assert.match(hkdPreview.previewHtmlEn, /Hello.*Unsubscribe/s);
+        assert.equal(hkdPreview.subjectEn, 'HKD English test');
         assert.equal(store.get('newsletter_campaigns')?.size || 0, 0);
         assert.equal(result.count, 2);
         assert.equal(result.englishCount, 1);
@@ -164,6 +168,9 @@ async function run() {
         const confirmations = await Promise.all(simultaneous.map(response => response.json()));
         assert.equal(confirmations[0].campaignId, confirmations[1].campaignId);
         assert.equal(store.get('newsletter_campaigns').size, 1);
+        const queuedCampaign = store.get('newsletter_campaigns').get(confirmations[0].campaignId);
+        assert.equal(queuedCampaign.subjectEn, 'Test');
+        assert.match(queuedCampaign.htmlBodyEn, /Hello/);
         const status = await post('/actions/newsletter_status', { reviewId: result.reviewId });
         assert.equal((await status.json()).status, 'queued');
 

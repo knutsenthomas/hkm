@@ -123,7 +123,7 @@ function sanitizeImportedNewsletter(source) {
   return { html, warnings: [...warnings], unsubscribe, webVersion };
 }
 
-function renderImportedNewsletter(template, { firstName = '', unsubscribeUrl, browserUrl, preview = false }) {
+function renderImportedNewsletter(template, { firstName = '', unsubscribeUrl, browserUrl, preview = false, language = 'no' }) {
   const document = parseDocument(template.html);
   let body = document;
   walk(document, node => {
@@ -142,7 +142,8 @@ function renderImportedNewsletter(template, { firstName = '', unsubscribeUrl, br
 
   if (!template.unsubscribe) {
     const link = preview ? '' : ` href="${escapeAttribute(unsubscribeUrl)}"`;
-    const footer = parseDocument(`<p style="margin:24px 0;text-align:center;font:12px Arial,sans-serif"><a${link}>Meld deg av nyhetsbrevet</a></p>`);
+    const unsubscribeLabel = language === 'en' ? 'Unsubscribe from the newsletter' : 'Meld deg av nyhetsbrevet';
+    const footer = parseDocument(`<p style="margin:24px 0;text-align:center;font:12px Arial,sans-serif"><a${link}>${unsubscribeLabel}</a></p>`);
     body.children.push(...footer.children);
   }
   const rendered = serialize(document, { encodeEntities: 'utf8' });

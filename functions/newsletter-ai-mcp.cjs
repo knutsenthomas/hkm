@@ -34,19 +34,45 @@ function createNewsletterAiService({ db, Timestamp, HttpsError, requireNewslette
     return recipients;
   }
 
-  async function prepare(account, { subject, html, group }) {
+  function buildReviewedCampaign(account, saved, recipients) {
+    const template = sanitizeImportedNewsletter(saved.html);
+    const campaign = buildImportedNewsletterCampaign(account, template, saved.subject, { recipients });
+    if (saved.summary.englishCount && (!saved.subjectEn || !saved.htmlEn)) {
+      throw new HttpsError('failed-precondition', `Gruppen har ${saved.summary.englishCount} engelske mottakere. Legg ved engelsk emne og oversatt HTML.`);
+    }
+    if (saved.htmlEn) {
+      campaign.subjectEn = saved.subjectEn;
+      campaign.htmlBodyEn = saved.htmlEn;
+    }
+    if (Buffer.byteLength(JSON.stringify(campaign), 'utf8') > 380_000) {
+      throw new HttpsError('invalid-argument', 'De to HTML-versjonene og mottakerlisten er for store for én utsending.');
+    }
+    if (isHkdNewsletterGroup(saved.group)) campaign.audienceGroup = 'HKD Nyhetsbrev';
+    return campaign;
+  }
+
+  async function prepare(account, { subject, html, group, subjectEn, htmlEn }) {
+    if (Boolean(subjectEn) !== Boolean(htmlEn)) {
+      throw new HttpsError('invalid-argument', 'Legg ved både engelsk emne og engelsk HTML.');
+    }
     const template = sanitizeImportedNewsletter(html);
+    const englishTemplate = htmlEn ? sanitizeImportedNewsletter(htmlEn) : null;
     const recipients = await loadNewsletterAudience(db, group);
-    buildImportedNewsletterCampaign(account, template, subject, { recipients });
+    const summary = audienceSummary(recipients);
+    const draft = { subject, group, html: template.html, summary };
+    if (englishTemplate) {
+      draft.subjectEn = subjectEn;
+      draft.htmlEn = englishTemplate.html;
+    }
+    buildReviewedCampaign(account, draft, recipients);
     const expiresAt = Timestamp.fromMillis(Date.now() + 30 * 60_000);
     const ref = db.collection('newsletter_ai_reviews').doc();
-    const summary = audienceSummary(recipients);
+    const warnings = [...new Set([...template.warnings, ...(englishTemplate?.warnings || [])])];
     await ref.create({
-      owner: account.uid, subject, group, html: template.html, warnings: template.warnings,
-      fingerprint: audienceFingerprint(recipients), summary, expiresAt
+      ...draft, owner: account.uid, warnings, fingerprint: audienceFingerprint(recipients), expiresAt
     });
     return {
-      reviewId: ref.id, subject, group, ...summary, warnings: template.warnings,
+      reviewId: ref.id, subject, group, ...(subjectEn ? { subjectEn } : {}), ...summary, warnings,
       previewUrl: `${reviewPage}?aiReview=${ref.id}`, expiresAt: expiresAt.toDate().toISOString(),
       status: 'awaiting_admin_approval'
     };
@@ -57,21 +83,22 @@ function createNewsletterAiService({ db, Timestamp, HttpsError, requireNewslette
     const saved = ownedReview(await ref.get(), account);
     checkExpiry(saved);
     if (approve && !saved.approvedAt && !saved.campaignId) {
-      await checkAudience(saved);
+      const recipients = await checkAudience(saved);
+      buildReviewedCampaign(account, saved, recipients);
       await db.runTransaction(async transaction => {
         const current = ownedReview(await transaction.get(ref), account);
         checkExpiry(current);
         if (!current.approvedAt && !current.campaignId) transaction.update(ref, { approvedAt: Timestamp.now() });
       });
     }
-    const template = sanitizeImportedNewsletter(saved.html);
+    const preview = (html, language) => renderImportedNewsletter(sanitizeImportedNewsletter(html), {
+      firstName: 'Ola', unsubscribeUrl: unsubscribePage, browserUrl: reviewPage, preview: true, language
+    });
     return {
       subject: saved.subject, group: saved.group, ...saved.summary, warnings: saved.warnings,
       approved: approve || Boolean(saved.approvedAt), queued: Boolean(saved.campaignId),
-      csp: CSP,
-      previewHtml: renderImportedNewsletter(template, {
-        firstName: 'Ola', unsubscribeUrl: unsubscribePage, browserUrl: reviewPage, preview: true
-      })
+      csp: CSP, previewHtml: preview(saved.html, 'no'),
+      ...(saved.htmlEn ? { subjectEn: saved.subjectEn, previewHtmlEn: preview(saved.htmlEn, 'en') } : {})
     };
   }
 
@@ -83,8 +110,7 @@ function createNewsletterAiService({ db, Timestamp, HttpsError, requireNewslette
     checkExpiry(saved);
     if (!saved.approvedAt) throw new HttpsError('failed-precondition', 'Åpne forhåndsvisningen i admin HKM og godkjenn utsendingen først.');
     const recipients = await checkAudience(saved);
-    const campaign = buildImportedNewsletterCampaign(account, sanitizeImportedNewsletter(saved.html), saved.subject, { recipients });
-    if (isHkdNewsletterGroup(saved.group)) campaign.audienceGroup = 'HKD Nyhetsbrev';
+    const campaign = buildReviewedCampaign(account, saved, recipients);
     const campaignRef = db.collection('newsletter_campaigns').doc(ref.id);
     return db.runTransaction(async transaction => {
       const current = ownedReview(await transaction.get(ref), account);
@@ -112,12 +138,16 @@ function createNewsletterAiService({ db, Timestamp, HttpsError, requireNewslette
   }
 
   const id = z.string().regex(reviewIdPattern);
+  const subjectField = z.string().trim().min(1).max(300).regex(/^[^\r\n]+$/);
+  const htmlField = z.string().min(1).max(400_000);
   const tools = {
     prepare_newsletter: {
-      description: 'Kontroller HTML og finn antall aktive abonnenter med den eksakte etiketten eller segmentet. For His Kingdom Designs, bruk gruppen «HKD Nyhetsbrev». Vis emne, gruppe, antall, advarsler og lenken til forhåndsvisning. Ingen utsending.',
+      description: 'Kontroller HTML og finn antall aktive abonnenter med den eksakte etiketten eller segmentet. For His Kingdom Designs, bruk gruppen «HKD Nyhetsbrev». Oversett emnet og hele HTML-innholdet til engelsk for engelske mottakere, og behold flettefeltene. Vis emne, gruppe, antall, advarsler og lenken til forhåndsvisning. Ingen utsending.',
       schema: z.object({
-        subject: z.string().trim().min(1).max(300).regex(/^[^\r\n]+$/),
-        html: z.string().min(1).max(400_000),
+        subject: subjectField,
+        html: htmlField,
+        subjectEn: subjectField.optional().describe('Engelsk emne, påkrevd ved engelske mottakere.'),
+        htmlEn: htmlField.optional().describe('Engelsk oversettelse av hele HTML-brevet, påkrevd ved engelske mottakere.'),
         group: z.string().trim().min(1).max(150)
       }),
       annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },

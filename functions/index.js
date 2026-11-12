@@ -5264,22 +5264,22 @@ const {
 
 const newsletterFunctionsBase = 'https://us-central1-his-kingdom-ministry.cloudfunctions.net';
 
-async function createNewsletterWebEdition(template, { id, expiresAt } = {}) {
+async function createNewsletterWebEdition(template, { id, expiresAt, language } = {}) {
   if (!template.webVersion) return NEWSLETTER_UNSUBSCRIBE_PAGE;
   const collection = db.collection('newsletter_web_editions');
   const ref = id ? collection.doc(id) : collection.doc();
   const url = `${newsletterFunctionsBase}/newsletterWebEdition?id=${ref.id}`;
   const html = renderImportedNewsletter(template, {
-    unsubscribeUrl: NEWSLETTER_UNSUBSCRIBE_PAGE, browserUrl: url
+    unsubscribeUrl: NEWSLETTER_UNSUBSCRIBE_PAGE, browserUrl: url, language
   });
   await ref.set({ html, ...(expiresAt ? { expiresAt } : {}) });
   return url;
 }
 
-function importedNewsletterMessage(template, recipient, browserUrl) {
+function importedNewsletterMessage(template, recipient, browserUrl, language) {
   const unsubscribeUrl = buildNewsletterUnsubscribeUrl(recipient.email);
   const html = renderImportedNewsletter(template, {
-    firstName: recipient.firstName, unsubscribeUrl, browserUrl
+    firstName: recipient.firstName, unsubscribeUrl, browserUrl, language
   });
   return {
     html,
@@ -5483,6 +5483,8 @@ exports.onNewsletterCampaignCreate = onDocumentCreated({
 
   try {
     const importedTemplate = campaign.contentType === 'html' ? sanitizeImportedNewsletter(campaign.htmlBody) : null;
+    const importedEnglishTemplate = importedTemplate && campaign.htmlBodyEn
+      ? sanitizeImportedNewsletter(campaign.htmlBodyEn) : null;
     if (Array.isArray(campaign.recipients) && campaign.recipients.length > 0) {
       campaign.recipients.forEach(r => {
         if (r && r.email) {
@@ -5531,6 +5533,7 @@ exports.onNewsletterCampaignCreate = onDocumentCreated({
     let englishCount = 0;
     let norwegianCount = 0;
     let browserUrl;
+    let englishBrowserUrl;
     if (importedTemplate) {
       const sources = ['newsletter_subscriptions', 'contacts', 'users'];
       if (isHkdNewsletterGroup(campaign.audienceGroup)) sources.push(HKD_SUBSCRIBERS);
@@ -5547,7 +5550,12 @@ exports.onNewsletterCampaignCreate = onDocumentCreated({
           }
         });
       }
-      if (recipientsMap.size) browserUrl = await createNewsletterWebEdition(importedTemplate, { id: snapshot.id });
+      if (recipientsMap.size) {
+        browserUrl = await createNewsletterWebEdition(importedTemplate, { id: snapshot.id });
+        if (importedEnglishTemplate) {
+          englishBrowserUrl = await createNewsletterWebEdition(importedEnglishTemplate, { language: 'en' });
+        }
+      }
     }
 
     for (const recipient of recipientsMap.values()) {
@@ -5578,9 +5586,15 @@ exports.onNewsletterCampaignCreate = onDocumentCreated({
 
       try {
         if (importedTemplate) {
-          const message = importedNewsletterMessage(importedTemplate, recipient, browserUrl);
+          const useEnglish = isEnglish && Boolean(importedEnglishTemplate);
+          const message = importedNewsletterMessage(
+            useEnglish ? importedEnglishTemplate : importedTemplate,
+            recipient, useEnglish ? englishBrowserUrl : browserUrl, useEnglish ? 'en' : 'no'
+          );
           if (campaign.trackingEnabled === true) message.html = await prepareTracking(db, snapshot.id, message.html);
-          const result = await sendEmail({ ...message, to: recipient.email, subject, type: 'newsletter' });
+          const result = await sendEmail({
+            ...message, to: recipient.email, subject: useEnglish ? campaign.subjectEn : subject, type: 'newsletter'
+          });
           if (!result?.success) throw new Error(result?.error || 'Sending failed');
           sentCount++;
           continue;

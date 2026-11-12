@@ -18,7 +18,18 @@ function isHkdNewsletterGroup(group) {
 }
 
 function selectNewsletterAudience(records, group) {
-  const eligibleCollection = isHkdNewsletterGroup(group) ? HKD_SUBSCRIBERS : 'newsletter_subscriptions';
+  const hkd = isHkdNewsletterGroup(group);
+  const eligibleCollection = hkd ? HKD_SUBSCRIBERS : 'newsletter_subscriptions';
+  const crmLanguages = new Map();
+  if (hkd) {
+    for (const { collection, data } of records) {
+      if (collection !== 'contacts') continue;
+      const email = normalize(data.email);
+      const taggedEnglish = [...list(data.tags), ...list(data.labels), ...list(data.segments)]
+        .some(value => englishTags.has(normalize(value)));
+      crmLanguages.set(email, taggedEnglish || crmLanguages.get(email) === true);
+    }
+  }
   const suppressed = new Set();
   const recipients = new Map();
   for (const { collection, data } of records) {
@@ -44,6 +55,12 @@ function selectNewsletterAudience(records, group) {
     });
   }
   for (const email of suppressed) recipients.delete(email);
+  for (const [email, recipient] of recipients) {
+    if (!crmLanguages.has(email)) continue;
+    recipient.tags = recipient.tags.filter(value => !englishTags.has(normalize(value)));
+    recipient.segments = recipient.segments.filter(value => !englishTags.has(normalize(value)));
+    if (crmLanguages.get(email)) recipient.tags.push('engelsk');
+  }
   return [...recipients.values()].sort((a, b) => a.email.localeCompare(b.email, 'en'));
 }
 
@@ -52,7 +69,8 @@ async function loadNewsletterAudience(db, group) {
   const snapshots = await Promise.all(collections.map(collection =>
     db.collection(collection).select(
       'email', 'emailLower', 'newsletterUnsubscribed', 'newsletterStatus', 'status',
-      ...(['newsletter_subscriptions', HKD_SUBSCRIBERS].includes(collection) ? ['tags', 'labels', 'segments', 'segment', 'source', 'firstName', 'name', 'displayName'] : [])
+      ...(['newsletter_subscriptions', HKD_SUBSCRIBERS].includes(collection) ? ['tags', 'labels', 'segments', 'segment', 'source', 'firstName', 'name', 'displayName'] : []),
+      ...(collection === 'contacts' && isHkdNewsletterGroup(group) ? ['tags', 'labels', 'segments'] : [])
     ).get()
   ));
   return selectNewsletterAudience(snapshots.flatMap((snapshot, index) => snapshot.docs.map(doc => ({

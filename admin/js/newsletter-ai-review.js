@@ -21,6 +21,8 @@ export function setupNewsletterAiReview() {
     const approve = dialog.querySelector('[data-ai-approve]');
     const summary = dialog.querySelector('[data-ai-summary]');
     const warnings = dialog.querySelector('[data-ai-warnings]');
+    const languages = dialog.querySelector('[data-ai-languages]');
+    const languageButtons = [...languages.querySelectorAll('[data-ai-language]')];
     let generation = 0;
 
     function open(panel) {
@@ -97,19 +99,27 @@ export function setupNewsletterAiReview() {
         title.textContent = 'Kontroller nyhetsbrev fra AI';
         approve.disabled = true;
         summary.textContent = '';
+        languages.hidden = true;
         warnings.replaceChildren();
         status.textContent = 'Henter forhåndsvisning og mottakerantall …';
         try {
             const result = await newsletterHtmlRequest({ action: 'aiReview', reviewId });
             if (request !== generation) return;
-            title.textContent = result.subject;
+            const showLanguage = language => {
+                const english = language === 'en' && Boolean(result.previewHtmlEn);
+                title.textContent = english ? result.subjectEn : result.subject;
+                languageButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.aiLanguage === (english ? 'en' : 'no'))));
+                showHtmlFrame(frame, { ...result, previewHtml: english ? result.previewHtmlEn : result.previewHtml });
+            };
+            languages.hidden = !result.previewHtmlEn;
+            languageButtons.forEach(button => { button.onclick = () => showLanguage(button.dataset.aiLanguage); });
             summary.textContent = `${result.group} · ${result.count} mottakere · Norsk: ${result.norwegianCount} · Engelsk: ${result.englishCount}`;
             for (const warning of result.warnings) {
                 const item = document.createElement('li');
                 item.textContent = warningMessages[warning];
                 warnings.append(item);
             }
-            showHtmlFrame(frame, result);
+            showLanguage('no');
             status.textContent = result.queued ? 'Utsendingen er lagt i kø.' : result.approved
                 ? 'Godkjent. Gå tilbake til AI-klienten for å starte utsendingen.'
                 : 'Sjekk innholdet og målgruppen før du godkjenner.';
