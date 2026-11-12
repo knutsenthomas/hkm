@@ -5338,6 +5338,7 @@ exports.newsletterHtmlAdmin = onCall({
     });
     return { token, url: newsletterFunctionsBase + '/newsletterMcp', expiresAt: expiresAt.toDate().toISOString() };
   }
+  if (action === 'aiReviewTest') return newsletterAi.testReview(account, data);
   if (action === 'aiReview' || action === 'aiApprove') {
     return newsletterAi.review(account, data.reviewId, action === 'aiApprove');
   }
@@ -5420,10 +5421,24 @@ const newsletterMcpEndpoint = newsletterFunctionsBase + '/newsletterMcp';
 const newsletterOAuth = require('./newsletter-oauth.cjs').createNewsletterOAuth({
   db, Timestamp, HttpsError, requireNewsletterAdmin, endpoint: newsletterMcpEndpoint
 });
+async function sendNewsletterReviewTest({ email, language, subject, template }) {
+  const browserUrl = await createNewsletterWebEdition(template, {
+    expiresAt: Timestamp.fromMillis(Date.now() + 7 * 86400_000), language
+  });
+  const html = renderImportedNewsletter(template, {
+    firstName: 'Ola', unsubscribeUrl: NEWSLETTER_UNSUBSCRIBE_PAGE, browserUrl, language
+  });
+  const result = await sendEmail({
+    to: email, subject: `[Test] ${subject}`, html, text: plainNewsletterText(html),
+    type: 'newsletter_html_test'
+  });
+  if (!result?.success) throw new HttpsError('unavailable', 'Testsendingen feilet.');
+}
+
 const newsletterAi = require('./newsletter-ai-mcp.cjs').createNewsletterAiService({
   db, Timestamp, HttpsError, requireNewsletterAdmin, buildImportedNewsletterCampaign,
   unsubscribePage: NEWSLETTER_UNSUBSCRIBE_PAGE,
-  endpoint: newsletterMcpEndpoint, oauth: newsletterOAuth
+  endpoint: newsletterMcpEndpoint, oauth: newsletterOAuth, sendReviewTest: sendNewsletterReviewTest
 });
 
 exports.newsletterMcp = onRequest({ region: 'us-central1' }, newsletterAi.handleMcp);

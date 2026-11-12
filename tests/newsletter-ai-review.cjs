@@ -80,8 +80,9 @@ async function run() {
         requireNewsletterAdmin: async uid => { assert.equal(uid, admin.uid); return admin; }
     };
     const oauth = createNewsletterOAuth(common);
+    const testMessages = [];
     const service = createNewsletterAiService({
-        ...common, oauth, unsubscribePage: 'https://example.org/avmeld',
+        ...common, oauth, sendReviewTest: async message => { testMessages.push(message); }, unsubscribePage: 'https://example.org/avmeld',
         buildImportedNewsletterCampaign: (account, template, subject, { recipients }) => {
             if (!recipients.length) throw new HttpsError('invalid-argument', 'Ingen mottakere.');
             return { subject, html: template.html, recipientCount: recipients.length, recipients, status: 'queued' };
@@ -145,6 +146,15 @@ async function run() {
         assert.match(hkdPreview.previewHtml, /Hei/);
         assert.match(hkdPreview.previewHtmlEn, /Hello.*Unsubscribe/s);
         assert.equal(hkdPreview.subjectEn, 'HKD English test');
+        const testInput = { reviewId: hkdReview.reviewId, language: 'en', email: ' outsider@example.net ' };
+        await assert.rejects(service.testReview({ uid: 'other' }, testInput), { code: 'not-found' });
+        await assert.rejects(service.testReview(admin, { ...testInput, email: 'one@example.net, two@example.net' }), { code: 'invalid-argument' });
+        assert.deepEqual(await service.testReview(admin, testInput), { email: 'outsider@example.net', language: 'en' });
+        assert.equal(testMessages.length, 1);
+        assert.equal(testMessages[0].subject, 'HKD English test');
+        assert.match(testMessages[0].template.html, /Hello/);
+        assert.equal((await service.review(admin, hkdReview.reviewId, false)).approved, false);
+
         assert.equal(store.get('newsletter_campaigns')?.size || 0, 0);
         assert.equal(result.count, 2);
         assert.equal(result.englishCount, 1);

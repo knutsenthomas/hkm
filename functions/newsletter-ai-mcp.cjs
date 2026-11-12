@@ -8,7 +8,7 @@ const { isHkdNewsletterGroup, loadNewsletterAudience, audienceSummary, audienceF
 const reviewPage = 'https://www.hiskingdomministry.no/admin/admin-nyhetsbrev.html';
 const reviewIdPattern = /^[A-Za-z0-9]{20}$/;
 
-function createNewsletterAiService({ db, Timestamp, HttpsError, requireNewsletterAdmin, buildImportedNewsletterCampaign, unsubscribePage, endpoint, oauth }) {
+function createNewsletterAiService({ db, Timestamp, HttpsError, requireNewsletterAdmin, buildImportedNewsletterCampaign, unsubscribePage, endpoint, oauth, sendReviewTest }) {
   function reviewRef(id) {
     if (typeof id !== 'string' || !reviewIdPattern.test(id)) throw new HttpsError('invalid-argument', 'Ugyldig kontroll-ID.');
     return db.collection('newsletter_ai_reviews').doc(id);
@@ -100,6 +100,21 @@ function createNewsletterAiService({ db, Timestamp, HttpsError, requireNewslette
       csp: CSP, previewHtml: preview(saved.html, 'no'),
       ...(saved.htmlEn ? { subjectEn: saved.subjectEn, previewHtmlEn: preview(saved.htmlEn, 'en') } : {})
     };
+  }
+
+  async function testReview(account, { reviewId, email: address, language } = {}) {
+    const email = typeof address === 'string' ? address.trim().toLowerCase() : '';
+    if (email.length > 254 || !/^[^\s@<>,;:"()\\]+@[^\s@<>,;:"()\\]+\.[^\s@<>,;:"()\\]+$/.test(email)) {
+      throw new HttpsError('invalid-argument', 'Skriv inn én gyldig e-postadresse.');
+    }
+    if (!['no', 'en'].includes(language)) throw new HttpsError('invalid-argument', 'Velg norsk eller engelsk.');
+    const saved = ownedReview(await reviewRef(reviewId).get(), account);
+    checkExpiry(saved);
+    const html = language === 'en' ? saved.htmlEn : saved.html;
+    const subject = language === 'en' ? saved.subjectEn : saved.subject;
+    if (!html || !subject) throw new HttpsError('failed-precondition', 'Denne språkversjonen er ikke tilgjengelig.');
+    await sendReviewTest({ email, language, subject, template: sanitizeImportedNewsletter(html) });
+    return { email, language };
   }
 
   async function queue(account, { reviewId, expectedCount }) {
@@ -254,7 +269,7 @@ function createNewsletterAiService({ db, Timestamp, HttpsError, requireNewslette
     await transport.handleRequest(req, res, req.body);
   }
 
-  return { review, handleMcp, buildMcpServer };
+  return { review, testReview, handleMcp, buildMcpServer };
 }
 
 module.exports = { createNewsletterAiService };

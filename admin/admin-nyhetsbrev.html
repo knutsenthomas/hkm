@@ -2080,13 +2080,24 @@
             <div class="newsletter-html-frame-scroll">
                 <iframe title="Forhåndsvisning før godkjenning" sandbox="" referrerpolicy="no-referrer" width="600" height="500" hidden></iframe>
             </div>
+            <details class="newsletter-ai-other" data-ai-test hidden>
+                <summary>Send test-e-post</summary>
+                <form class="newsletter-ai-other-content" data-ai-test-form>
+                    <label for="newsletter-ai-test-email">Testmottaker</label>
+                    <input id="newsletter-ai-test-email" type="email" maxlength="254" autocomplete="email" placeholder="navn@eksempel.no" required>
+                    <div class="newsletter-html-actions">
+                        <button type="submit" class="btn-secondary-outline" data-ai-test-send>Send norsk test</button>
+                    </div>
+                    <p data-ai-test-status aria-live="polite"></p>
+                </form>
+            </details>
             <div class="newsletter-html-actions">
                 <button type="button" class="btn-primary-publish" data-ai-approve disabled>Godkjenn utsending fra AI</button>
             </div>
         </div>
         <p role="status"></p>
     </dialog>
-    <script type="module" src="js/newsletter-builder.js?v=20261112_ai_languages"></script>
+    <script type="module" src="js/newsletter-builder.js?v=20261112_ai_test_recipient"></script>
 <script type="module" src="js/newsletter-workspace.js"></script>
 </body>
 

@@ -23,6 +23,11 @@ export function setupNewsletterAiReview() {
     const warnings = dialog.querySelector('[data-ai-warnings]');
     const languages = dialog.querySelector('[data-ai-languages]');
     const languageButtons = [...languages.querySelectorAll('[data-ai-language]')];
+    const testPanel = dialog.querySelector('[data-ai-test]');
+    const testForm = dialog.querySelector('[data-ai-test-form]');
+    const testEmail = document.getElementById('newsletter-ai-test-email');
+    const testSend = dialog.querySelector('[data-ai-test-send]');
+    const testStatus = dialog.querySelector('[data-ai-test-status]');
     let generation = 0;
 
     function open(panel) {
@@ -100,13 +105,20 @@ export function setupNewsletterAiReview() {
         approve.disabled = true;
         summary.textContent = '';
         languages.hidden = true;
+        testPanel.hidden = true;
+        testPanel.open = false;
+        testForm.reset();
+        testStatus.textContent = '';
         warnings.replaceChildren();
         status.textContent = 'Henter forhåndsvisning og mottakerantall …';
         try {
             const result = await newsletterHtmlRequest({ action: 'aiReview', reviewId });
             if (request !== generation) return;
+            let selectedLanguage = 'no';
             const showLanguage = language => {
                 const english = language === 'en' && Boolean(result.previewHtmlEn);
+                selectedLanguage = english ? 'en' : 'no';
+                testSend.textContent = english ? 'Send engelsk test' : 'Send norsk test';
                 title.textContent = english ? result.subjectEn : result.subject;
                 languageButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.aiLanguage === (english ? 'en' : 'no'))));
                 showHtmlFrame(frame, { ...result, previewHtml: english ? result.previewHtmlEn : result.previewHtml });
@@ -120,6 +132,27 @@ export function setupNewsletterAiReview() {
                 warnings.append(item);
             }
             showLanguage('no');
+            testPanel.hidden = false;
+            testSend.disabled = false;
+            testForm.onsubmit = async event => {
+                event.preventDefault();
+                if (testSend.disabled) return;
+                testSend.disabled = true;
+                testStatus.textContent = 'Sender test …';
+                try {
+                    const sent = await newsletterHtmlRequest({
+                        action: 'aiReviewTest', reviewId, email: testEmail.value.trim(), language: selectedLanguage
+                    });
+                    if (request === generation) {
+                        const language = sent.language === 'en' ? 'Engelsk' : 'Norsk';
+                        testStatus.textContent = `${language} test sendt til ${sent.email}.`;
+                    }
+                } catch (error) {
+                    if (request === generation) testStatus.textContent = error.message;
+                } finally {
+                    if (request === generation) testSend.disabled = false;
+                }
+            };
             status.textContent = result.queued ? 'Utsendingen er lagt i kø.' : result.approved
                 ? 'Godkjent. Gå tilbake til AI-klienten for å starte utsendingen.'
                 : 'Sjekk innholdet og målgruppen før du godkjenner.';
