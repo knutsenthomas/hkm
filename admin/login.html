@@ -363,7 +363,11 @@
                         adminUtils.pushFlashNotice('Access Denied: Du har ikke administratorrettigheter til adminpanelet.', 'error', 6000);
                     }
 
-                    window.location.href = canAccessAdmin ? '/admin/index.html' : '/minside/index.html';
+                    const reviewId = new URLSearchParams(window.location.search).get('aiReview');
+                    const adminDestination = /^[a-zA-Z0-9]{20}$/.test(reviewId || '')
+                        ? `/admin/admin-nyhetsbrev.html?aiReview=${reviewId}`
+                        : '/admin/index.html';
+                    window.location.href = canAccessAdmin ? adminDestination : '/minside/index.html';
                 }
 
                 const loginForm = document.getElementById('login-form');

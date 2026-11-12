@@ -1,3 +1,5 @@
+import { setupNewsletterAiReview } from './newsletter-ai-review.js';
+import { newsletterHtmlRequest, setupNewsletterHtmlImport } from './newsletter-html-import.js';
 import { HKD_PRODUCT_TEMPLATE } from './newsletter-product-template.js';
 import { openNewsletterCanvaLink } from './newsletter-canva-link.js';
 
@@ -272,6 +274,7 @@ class NewsletterBuilder {
 
     async init() {
         console.log("Nyhetsbrevbygger Initializing...");
+        this.openNewsletterAiReview = setupNewsletterAiReview();
 
         const urlParams = new URLSearchParams(window.location.search);
         const urlDraftId = urlParams.get('draftId');
@@ -446,10 +449,17 @@ class NewsletterBuilder {
 
     startAuthListener() {
         window.firebaseService.onAuthChange(async (user) => {
+            const reviewId = new URLSearchParams(window.location.search).get('aiReview');
             if (!user) {
-                window.location.href = '/admin/login.html';
+                const loginUrl = new URL('/admin/login.html', window.location.origin);
+                if (/^[a-zA-Z0-9]{20}$/.test(reviewId || '')) loginUrl.searchParams.set('aiReview', reviewId);
+                window.location.href = loginUrl.toString();
             } else {
                 console.log("[newsletter-builder] User is authenticated. Loading data...");
+                if (reviewId && !this.openedNewsletterAiReview) {
+                    this.openedNewsletterAiReview = true;
+                    void this.openNewsletterAiReview?.(reviewId);
+                }
                 await this.loadTemplates();
                 await this.loadDrafts();
                 this.loadAiSuggestions();
@@ -1374,6 +1384,7 @@ class NewsletterBuilder {
         });
 
         // Actions
+        setupNewsletterHtmlImport(this);
         const previewBtn = document.getElementById('preview-btn');
         if (previewBtn) {
             previewBtn.addEventListener('click', () => this.showPreview());
@@ -8151,6 +8162,7 @@ class NewsletterBuilder {
     }
 
     showPreview() {
+        if (this.importedNewsletterHtml) return this.openHtmlImport(true);
         const modal = document.getElementById('preview-modal');
         const frame = document.getElementById('preview-frame');
         if (!modal || !frame) return;
@@ -8435,6 +8447,7 @@ class NewsletterBuilder {
             this.syncUnifiedBlocks();
             const savingRevision = this.editRevision;
             const data = {
+                ...this.newsletterContentFields(),
                 name: name.trim(), blocks: this.blocks,
                 subject: this.currentEditorLang === 'en' ? (this.subjectNo || '') : (document.getElementById('newsletter-subject')?.value || ''),
                 preheader: this.getNewsletterPreheader('no'),
@@ -9036,7 +9049,22 @@ class NewsletterBuilder {
         }
     }
 
+    setImportedNewsletterHtml(html, { edited = false } = {}) {
+        this.importedNewsletterHtml = html;
+        document.body.classList.toggle('newsletter-html-active', Boolean(html));
+        const panel = document.getElementById('newsletter-html-active-panel');
+        if (panel) panel.hidden = !html;
+        if (edited) this.triggerAutosave();
+    }
+
+    newsletterContentFields() {
+        return this.importedNewsletterHtml
+            ? { contentType: 'html', htmlBody: this.importedNewsletterHtml }
+            : { contentType: 'blocks', htmlBody: null };
+    }
+
     resetEditorLanguageState(data = {}) {
+        this.setImportedNewsletterHtml(data.contentType === 'html' && typeof data.htmlBody === 'string' ? data.htmlBody : '');
         this.currentEditorLang = 'no';
         this.subjectNo = data.subject || this.subjectNo || '';
         this.preheaderNo = data.preheader || '';
@@ -9377,6 +9405,12 @@ class NewsletterBuilder {
         return '';
     }
 
+    async sendImportedNewsletterTest(html, subject = document.getElementById('newsletter-subject')?.value?.trim()) {
+        if (!subject) throw new Error('Skriv et emne for nyhetsbrevet først.');
+        const result = await newsletterHtmlRequest({ action: 'test', html, subject });
+        return result.email;
+    }
+
     async sendTestEmail(targetEmail) {
         if (typeof showToast === 'function') {
             showToast("Starter test-utsendelse...", "info");
@@ -9384,6 +9418,20 @@ class NewsletterBuilder {
         
         const publishDropdown = document.getElementById('publish-options-dropdown');
         if (publishDropdown) publishDropdown.style.setProperty('display', 'none', 'important');
+
+        if (this.importedNewsletterHtml) {
+            if (this.sendingImportedNewsletterTest) return;
+            this.sendingImportedNewsletterTest = true;
+            try {
+                const email = await this.sendImportedNewsletterTest(this.importedNewsletterHtml);
+                showToast(`Test sendt til ${email}.`, 'success');
+            } catch (error) {
+                showToast(error.message, 'error');
+            } finally {
+                this.sendingImportedNewsletterTest = false;
+            }
+            return;
+        }
 
         const user = await this.getAuthUser();
         const recipientEmail = (typeof targetEmail === 'string' && targetEmail.includes('@')) ? targetEmail : 'knutsenthomas@gmail.com';
@@ -9524,6 +9572,7 @@ class NewsletterBuilder {
     }
 
     async sendCampaign() {
+        const importedHtml = this.importedNewsletterHtml;
         const user = await this.getAuthUser();
 
         const visibleSubject = document.getElementById('newsletter-subject')?.value?.trim() || '';
@@ -9541,12 +9590,13 @@ class NewsletterBuilder {
             return;
         }
 
-        if (this.blocks.length === 0 || plainText === '') {
+        if (!importedHtml && (this.blocks.length === 0 || plainText === '')) {
             if (typeof showToast === 'function') showToast("Du kan ikke sende et tomt nyhetsbrev. Legg til innhold først.", "error");
             return;
         }
 
         const finalBtn = document.getElementById('final-send-btn');
+        if (importedHtml && finalBtn?.disabled) return;
         const originalText = finalBtn ? finalBtn.innerHTML : '<span>Send kampanje nå</span><span class="material-symbols-outlined">send</span>';
 
         try {
@@ -9572,7 +9622,7 @@ class NewsletterBuilder {
 
             const englishCount = recipients.filter(rec => this.isEnglishRecipient(rec)).length;
             const englishText = this.getLanguageBlocksHtml(this.englishPayload?.blocksEn || []).replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim();
-            if (englishCount && (!this.englishPayload?.subjectEn?.trim() || !englishText
+            if (!importedHtml && englishCount && (!this.englishPayload?.subjectEn?.trim() || !englishText
                 || (this.getNewsletterPreheader('no').trim() && (!this.englishPayload?.preheaderEn?.trim()
                     || this.englishPayload.sourcePreheader !== this.getNewsletterPreheader('no').trim())))) {
                 showToast('Lag og se over engelsk oversettelse før du sender til engelske mottakere.', 'warning');
@@ -9581,7 +9631,9 @@ class NewsletterBuilder {
             }
             const confirmSend = await this.showConfirm(
                 'Send til alle valgte',
-                `Send "${subject}" til ${recipients.length} mottakere? Norsk: ${recipients.length - englishCount} · Engelsk: ${englishCount}.`,
+                importedHtml
+                    ? `Send "${subject}" til ${recipients.length} mottakere? Alle får samme importerte HTML-innhold.`
+                    : `Send "${subject}" til ${recipients.length} mottakere? Norsk: ${recipients.length - englishCount} · Engelsk: ${englishCount}.`,
                 'Send nå'
             );
             if (!confirmSend) {
@@ -9597,41 +9649,56 @@ class NewsletterBuilder {
                 finalBtn.innerHTML = `<span class="material-symbols-outlined rotating">sync</span> Legger ${recipients.length} mottakere i utsendingskø...`;
             }
 
-            // Compile both language variants before handing the campaign to the
-            // server. The server continues even if the browser is closed.
-            const norwegianHtml = this.compileEmailHtml('no');
-            const englishHtml = this.compileEmailHtml('en');
-            const subjectEn = this.englishPayload?.subjectEn || `${subject} – English`;
-
-            if (!window.firebaseService?.db) {
-                throw new Error('Databasen for utsendingskøen er ikke tilgjengelig.');
-            }
-
-            const campaignData = {
-                subject: subject,
-                subjectEn,
-                trackingEnabled: document.getElementById('newsletter-track-engagement')?.checked === true,
-                recipientCount: recipients.length,
-                blockCount: this.blocks.length,
-                blocks: this.blocks,
-                html: norwegianHtml,
-                englishHtml,
-                preheader: this.getNewsletterPreheader('no'),
-                englishPayload: this.englishPayload || null,
-                recipients: recipients
-                    .filter(recipient => recipient?.email)
-                    .map(recipient => ({
+            if (importedHtml) {
+                await newsletterHtmlRequest({
+                    action: 'queue',
+                    html: importedHtml,
+                    subject,
+                    trackingEnabled: document.getElementById('newsletter-track-engagement')?.checked === true,
+                    recipients: recipients.map(recipient => ({
                         email: String(recipient.email).trim().toLowerCase(),
+                        firstName: recipient.firstName || '',
                         tags: Array.isArray(recipient.tags) ? recipient.tags : [],
                         segments: Array.isArray(recipient.segments) ? recipient.segments : []
-                    })),
-                status: 'queued',
-                processedByServer: false,
-                queuedAt: new Date().toISOString(),
-                sentBy: user?.email || 'admin@hiskingdomministry.no'
-            };
+                    }))
+                });
+            } else {
+                // Compile both language variants before handing the campaign to the
+                // server. The server continues even if the browser is closed.
+                const norwegianHtml = this.compileEmailHtml('no');
+                const englishHtml = this.compileEmailHtml('en');
+                const subjectEn = this.englishPayload?.subjectEn || `${subject} – English`;
 
-            await window.firebaseService.db.collection('newsletter_campaigns').add(campaignData);
+                if (!window.firebaseService?.db) {
+                    throw new Error('Databasen for utsendingskøen er ikke tilgjengelig.');
+                }
+
+                const campaignData = {
+                    subject: subject,
+                    subjectEn,
+                    trackingEnabled: document.getElementById('newsletter-track-engagement')?.checked === true,
+                    recipientCount: recipients.length,
+                    blockCount: this.blocks.length,
+                    blocks: this.blocks,
+                    html: norwegianHtml,
+                    englishHtml,
+                    preheader: this.getNewsletterPreheader('no'),
+                    englishPayload: this.englishPayload || null,
+                    recipients: recipients
+                        .filter(recipient => recipient?.email)
+                        .map(recipient => ({
+                            email: String(recipient.email).trim().toLowerCase(),
+                            tags: Array.isArray(recipient.tags) ? recipient.tags : [],
+                            segments: Array.isArray(recipient.segments) ? recipient.segments : []
+                        })),
+                    status: 'queued',
+                    processedByServer: false,
+                    queuedAt: new Date().toISOString(),
+                    sentBy: user?.email || 'admin@hiskingdomministry.no'
+                };
+
+                await window.firebaseService.db.collection('newsletter_campaigns').add(campaignData);
+            }
 
             await this.recordNewsletterVersion('Kampanje lagt i utsendingskø', {
                 minIntervalMs: 0,
@@ -10677,7 +10744,7 @@ class NewsletterBuilder {
 
     exportHtmlFile() {
         this.syncUnifiedBlocks();
-        const fullHtml = this.compileEmailHtml();
+        const fullHtml = this.importedNewsletterHtml || this.compileEmailHtml();
         if (!fullHtml) return;
 
         const blob = new Blob([fullHtml], { type: 'text/html' });
@@ -10810,6 +10877,7 @@ class NewsletterBuilder {
                         : subjectVal;
                     const savingRevision = this.editRevision;
                     const data = {
+                        ...this.newsletterContentFields(),
                         name: trimmedName,
                         blocks: this.blocks,
                         headerHtml: headerNode ? headerNode.outerHTML : '',
@@ -10881,7 +10949,7 @@ class NewsletterBuilder {
                 const data = doc.data();
                 if (data.isDraft !== true) return; // Only load drafts!
 
-                const key = (data.subject || data.name || '').trim().toLowerCase();
+                const key = data.contentType === 'html' ? doc.id : (data.subject || data.name || '').trim().toLowerCase();
 
                 if (key && seenDraftsMap.has(key)) {
                     // Duplicate draft found! Keep the newest one, queue older ones for cleanup
@@ -11096,6 +11164,7 @@ class NewsletterBuilder {
                     subscribersMap.set(email, {
                         id: doc.id,
                         collection: 'contacts',
+                        firstName: String(data.firstName || data.name || '').trim().split(/\s+/)[0],
                         name,
                         email,
                         phone,
@@ -11140,6 +11209,7 @@ class NewsletterBuilder {
                         subscribersMap.set(email, {
                             id: doc.id,
                             collection: 'newsletter_subscriptions',
+                            firstName: String(data.firstName || data.name || data.displayName || '').trim().split(/\s+/)[0],
                             name,
                             email,
                             phone,
@@ -11186,6 +11256,7 @@ class NewsletterBuilder {
                         subscribersMap.set(email, {
                             id: doc.id,
                             collection: 'users',
+                            firstName: String(data.firstName || data.name || data.displayName || '').trim().split(/\s+/)[0],
                             name,
                             email,
                             phone,
@@ -12493,7 +12564,7 @@ class NewsletterBuilder {
                 draftSnap.forEach(doc => {
                     const data = doc.data();
                     const rawKey = (data.subject || data.name || '').trim().toLowerCase();
-                    const key = rawKey || doc.id;
+                    const key = data.contentType === 'html' ? doc.id : rawKey || doc.id;
                     const timeStamp = data.updatedAt ? new Date(data.updatedAt).getTime() : (data.createdAt ? new Date(data.createdAt).getTime() : 0);
 
                     if (draftsBySubjectMap.has(key)) {
@@ -12670,7 +12741,7 @@ class NewsletterBuilder {
         });
     }
 
-    editStudioItem(item) {
+    async editStudioItem(item) {
         if (item.type === 'blog' || item.type === 'teaching') {
             const state = {
                 collectionId: item.type,
@@ -12680,7 +12751,15 @@ class NewsletterBuilder {
             sessionStorage.setItem('hkm_admin_open_editor_state', JSON.stringify(state));
             window.location.href = `/admin/index.html#${item.type}`;
         } else if (item.type === 'newsletter_draft') {
-            this.loadDraftIntoBuilder(item.id, item.title, JSON.stringify(item.blocks), item.subject);
+            const confirmed = await this.showConfirm('Last inn kladd', `Last inn kladden "${item.title}"?`, 'Last inn');
+            if (confirmed) {
+                await this.loadDraftFromUrl(item.id);
+                if (this.currentDraftId === item.id) {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('draftId', item.id);
+                    window.history.pushState({}, '', url.toString());
+                }
+            }
         } else if (item.type === 'newsletter') {
             this.loadTemplateIntoBuilder(item.id, item.title, JSON.stringify(item.blocks), item.subject);
         }
@@ -12984,6 +13063,7 @@ class NewsletterBuilder {
 
                 const headerNode = document.querySelector('.canvas-header');
                 const data = {
+                    ...this.newsletterContentFields(),
                     name: draftName,
                     blocks: canonicalBlocks,
                     headerHtml: headerNode ? headerNode.outerHTML : '',

@@ -5255,6 +5255,162 @@ exports.onNewsletterSubscribe = onDocumentCreated({
  */
 exports.newsletterTracking = onRequest({ region: 'us-central1', maxInstances: 10 }, trackingHandler(admin.firestore(), FieldValue.increment));
 
+const {
+  CSP: newsletterHtmlCsp, sanitizeImportedNewsletter, renderImportedNewsletter, plainNewsletterText
+} = require('./newsletter-html.cjs');
+
+const newsletterFunctionsBase = 'https://us-central1-his-kingdom-ministry.cloudfunctions.net';
+
+async function createNewsletterWebEdition(template, { id, expiresAt } = {}) {
+  if (!template.webVersion) return NEWSLETTER_UNSUBSCRIBE_PAGE;
+  const collection = db.collection('newsletter_web_editions');
+  const ref = id ? collection.doc(id) : collection.doc();
+  const url = `${newsletterFunctionsBase}/newsletterWebEdition?id=${ref.id}`;
+  const html = renderImportedNewsletter(template, {
+    unsubscribeUrl: NEWSLETTER_UNSUBSCRIBE_PAGE, browserUrl: url
+  });
+  await ref.set({ html, ...(expiresAt ? { expiresAt } : {}) });
+  return url;
+}
+
+function importedNewsletterMessage(template, recipient, browserUrl) {
+  const unsubscribeUrl = buildNewsletterUnsubscribeUrl(recipient.email);
+  const html = renderImportedNewsletter(template, {
+    firstName: recipient.firstName, unsubscribeUrl, browserUrl
+  });
+  return {
+    html,
+    text: plainNewsletterText(html),
+    headers: { 'List-Unsubscribe': `<${unsubscribeUrl}>`, Precedence: 'bulk' }
+  };
+}
+
+exports.newsletterWebEdition = onRequest({ region: 'us-central1' }, async (req, res) => {
+  res.set({
+    'Content-Security-Policy': newsletterHtmlCsp + "; frame-ancestors 'none'",
+    'Referrer-Policy': 'no-referrer',
+    'X-Content-Type-Options': 'nosniff',
+    'X-Robots-Tag': 'noindex, nofollow',
+    'Cache-Control': 'no-store'
+  });
+  if (!['GET', 'HEAD'].includes(req.method)) return res.status(405).end();
+  if (typeof req.query.id !== 'string' || !/^[a-zA-Z0-9]{20}$/.test(req.query.id)) return res.status(404).end();
+  const edition = (await db.collection('newsletter_web_editions').doc(req.query.id).get()).data();
+  if (!edition || (edition.expiresAt && edition.expiresAt.toMillis() <= Date.now())) return res.status(404).end();
+  return res.type('html').send(edition.html);
+});
+
+async function requireNewsletterAdmin(uid) {
+  if (!uid) throw new HttpsError('unauthenticated', 'Logg inn i admin HKM.');
+  const account = await getAuth().getUser(uid);
+  const profile = (await db.collection('users').doc(uid).get()).data();
+  const bootstrap = ['thomas@hiskingdomministry.no', 'knutsenthomas@gmail.com', 'thomas@tk-design.no'].includes(account.email);
+  if (account.disabled || !account.emailVerified || !(bootstrap || ['admin', 'superadmin'].includes(profile?.role))) {
+    throw new HttpsError('permission-denied', 'Nyhetsbrev krever en bekreftet administratorkonto.');
+  }
+  return account;
+}
+
+exports.newsletterHtmlAdmin = onCall({
+  region: 'us-central1', secrets: [emailUserParam, emailPassParam]
+}, async ({ auth, data }) => {
+  const account = await requireNewsletterAdmin(auth?.uid);
+
+  const action = data?.action;
+  if (action === 'aiAccess') {
+    const token = crypto.randomBytes(32).toString('base64url');
+    const expiresAt = Timestamp.fromMillis(Date.now() + 8 * 3600_000);
+    await db.collection('newsletter_ai_access').doc(account.uid).set({
+      hash: crypto.createHash('sha256').update(token).digest('hex'), expiresAt
+    });
+    return { token, url: newsletterFunctionsBase + '/newsletterMcp', expiresAt: expiresAt.toDate().toISOString() };
+  }
+  if (action === 'aiReview' || action === 'aiApprove') {
+    return newsletterAi.review(account, data.reviewId, action === 'aiApprove');
+  }
+  if (!['preview', 'test', 'queue'].includes(action)) throw new HttpsError('invalid-argument', 'Ukjent HTML-handling.');
+  let template;
+  try {
+    template = sanitizeImportedNewsletter(data.html);
+  } catch (error) {
+    throw new HttpsError('invalid-argument', error.message);
+  }
+
+  if (action === 'preview') {
+    const previewHtml = renderImportedNewsletter(template, {
+      firstName: 'Ola', unsubscribeUrl: NEWSLETTER_UNSUBSCRIBE_PAGE,
+      browserUrl: newsletterFunctionsBase + '/newsletterWebEdition', preview: true
+    });
+    return { html: template.html, warnings: template.warnings, previewHtml, csp: newsletterHtmlCsp };
+  }
+
+  const subject = typeof data.subject === 'string' ? data.subject.trim() : '';
+  if (!subject || subject.length > 300 || /[\r\n]/.test(subject)) {
+    throw new HttpsError('invalid-argument', 'Skriv et emne på opptil 300 tegn.');
+  }
+
+  if (action === 'test') {
+    const email = normalizeNewsletterEmail(account.email);
+    if (!isValidNewsletterEmail(email)) throw new HttpsError('failed-precondition', 'Kontoen din mangler e-postadresse.');
+    const browserUrl = await createNewsletterWebEdition(template, {
+      expiresAt: Timestamp.fromMillis(Date.now() + 7 * 86400_000)
+    });
+    const message = importedNewsletterMessage(template, {
+      email, firstName: account.displayName?.trim().split(/\s+/)[0] || 'Ola'
+    }, browserUrl);
+    const result = await sendEmail({
+      ...message, to: email, subject: `[Test] ${subject}`, type: 'newsletter_html_test'
+    });
+    if (!result?.success) throw new HttpsError('unavailable', 'Testsendingen feilet.');
+    return { email };
+  }
+
+  const campaign = buildImportedNewsletterCampaign(account, template, subject, data);
+  const { id } = await db.collection('newsletter_campaigns').add(campaign);
+  return { id };
+});
+
+function buildImportedNewsletterCampaign(account, template, subject, data) {
+  const recipients = Array.isArray(data.recipients) ? data.recipients : [];
+  if (!recipients.length || recipients.some(recipient =>
+    typeof recipient?.email !== 'string' || !/^[^\s@<>,;]+@[^\s@<>,;]+\.[^\s@<>,;]+$/.test(recipient.email) ||
+    recipient.email.length > 254
+  )) {
+    throw new HttpsError('invalid-argument', 'Velg mottakere med gyldige e-postadresser.');
+  }
+  const campaign = {
+    contentType: 'html',
+    htmlBody: template.html,
+    subject,
+    trackingEnabled: data.trackingEnabled === true,
+    recipients: recipients.map(recipient => ({
+      email: normalizeNewsletterEmail(recipient.email),
+      firstName: typeof recipient.firstName === 'string' ? recipient.firstName.trim().slice(0, 120) : '',
+      tags: Array.isArray(recipient.tags) ? recipient.tags.filter(tag => typeof tag === 'string') : [],
+      segments: Array.isArray(recipient.segments) ? recipient.segments.filter(segment => typeof segment === 'string') : []
+    })),
+    recipientCount: new Set(recipients.map(recipient => normalizeNewsletterEmail(recipient.email))).size,
+    blockCount: 0,
+    status: 'queued',
+    processedByServer: false,
+    queuedAt: new Date().toISOString(),
+    sentBy: account.email
+  };
+  // Leave room for the Firestore event envelope and field encoding.
+  if (Buffer.byteLength(JSON.stringify(campaign), 'utf8') > 380_000) {
+    throw new HttpsError('invalid-argument', 'HTML-en og mottakerlisten er for store for én utsending.');
+  }
+  return campaign;
+}
+
+const newsletterAi = require('./newsletter-ai-mcp.cjs').createNewsletterAiService({
+  db, Timestamp, HttpsError, requireNewsletterAdmin, buildImportedNewsletterCampaign,
+  unsubscribePage: NEWSLETTER_UNSUBSCRIBE_PAGE,
+  endpoint: newsletterFunctionsBase + '/newsletterMcp'
+});
+
+exports.newsletterMcp = onRequest({ region: 'us-central1' }, newsletterAi.handleMcp);
+
 exports.onNewsletterCampaignCreate = onDocumentCreated({
   document: "newsletter_campaigns/{id}",
   timeoutSeconds: 540,
@@ -5309,12 +5465,14 @@ exports.onNewsletterCampaignCreate = onDocumentCreated({
   const db = admin.firestore();
 
   try {
+    const importedTemplate = campaign.contentType === 'html' ? sanitizeImportedNewsletter(campaign.htmlBody) : null;
     if (Array.isArray(campaign.recipients) && campaign.recipients.length > 0) {
       campaign.recipients.forEach(r => {
         if (r && r.email) {
           const email = String(r.email).trim().toLowerCase();
           recipientsMap.set(email, {
             email: String(r.email).trim(),
+            firstName: r.firstName,
             tags: Array.isArray(r.tags) ? r.tags : [],
             segments: Array.isArray(r.segments) ? r.segments : []
           });
@@ -5322,6 +5480,7 @@ exports.onNewsletterCampaignCreate = onDocumentCreated({
       });
     }
 
+    if (importedTemplate && recipientsMap.size === 0) throw new Error('HTML-kampanjen mangler mottakere.');
     if (recipientsMap.size === 0) {
       const subsSnap = await db.collection("newsletter_subscriptions").get();
       subsSnap.forEach(doc => {
@@ -5354,13 +5513,33 @@ exports.onNewsletterCampaignCreate = onDocumentCreated({
 
     let englishCount = 0;
     let norwegianCount = 0;
+    let browserUrl;
+    if (importedTemplate) {
+      const collections = await Promise.all(['newsletter_subscriptions', 'contacts', 'users'].map(name =>
+        db.collection(name).select('email', 'emailLower', 'newsletterUnsubscribed', 'newsletterStatus', 'status').get()
+      ));
+      for (const collection of collections) {
+        collection.forEach(doc => {
+          const data = doc.data();
+          const statuses = [data.newsletterStatus, data.status].map(value => String(value || '').trim().toLowerCase());
+          if (data.newsletterUnsubscribed === true || statuses.some(status => ['unsubscribed', 'avmeldt'].includes(status))) {
+            recipientsMap.delete(normalizeNewsletterEmail(data.email));
+            recipientsMap.delete(normalizeNewsletterEmail(data.emailLower));
+          }
+        });
+      }
+      if (recipientsMap.size) browserUrl = await createNewsletterWebEdition(importedTemplate, { id: snapshot.id });
+    }
 
-    for (const [emailKey, recipient] of recipientsMap.entries()) {
+    for (const recipient of recipientsMap.values()) {
       const isEnglish = checkIsEnglishRecipient(recipient.tags, recipient.segments);
       const recipientSubject = (isEnglish && subjectEn) ? subjectEn : subject;
       
       let emailHtml = '';
-      if (isEnglish) {
+      if (importedTemplate) {
+        if (isEnglish) englishCount++;
+        else norwegianCount++;
+      } else if (isEnglish) {
         englishCount++;
         if (campaign.englishHtml) {
           emailHtml = campaign.englishHtml;
@@ -5379,6 +5558,14 @@ exports.onNewsletterCampaignCreate = onDocumentCreated({
       }
 
       try {
+        if (importedTemplate) {
+          const message = importedNewsletterMessage(importedTemplate, recipient, browserUrl);
+          if (campaign.trackingEnabled === true) message.html = await prepareTracking(db, snapshot.id, message.html);
+          const result = await sendEmail({ ...message, to: recipient.email, subject, type: 'newsletter' });
+          if (!result?.success) throw new Error(result?.error || 'Sending failed');
+          sentCount++;
+          continue;
+        }
         // Generer avmeldingslenke
         const unsubscribeUrl = `https://hiskingdomministry.no/avmeld.html?email=${encodeURIComponent(recipient.email)}`;
         const listUnsubscribeHeader = `<mailto:post@hiskingdomministry.no?subject=unsubscribe-${encodeURIComponent(recipient.email)}>, <${unsubscribeUrl}>`;

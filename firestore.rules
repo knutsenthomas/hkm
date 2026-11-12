@@ -617,11 +617,23 @@ service cloud.firestore {
     }
 
     match /newsletter_templates/{docId} {
-      allow read, write: if signedIn();
+      function isHtmlNewsletter(data) {
+        return data.get('contentType', '') == 'html';
+      }
+
+      allow read: if signedIn();
+      allow create: if signedIn() && (!isHtmlNewsletter(request.resource.data) || isAdmin());
+      allow update: if signedIn() &&
+        ((!isHtmlNewsletter(resource.data) && !isHtmlNewsletter(request.resource.data)) || isAdmin());
+      allow delete: if signedIn() && (!isHtmlNewsletter(resource.data) || isAdmin());
     }
 
     match /newsletter_campaigns/{docId} {
-      allow read, write: if signedIn();
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.get('contentType', '') != 'html';
+      allow update: if signedIn() && resource.data.get('contentType', '') != 'html'
+        && request.resource.data.get('contentType', '') != 'html';
+      allow delete: if signedIn() && (resource.data.get('contentType', '') != 'html' || isAdmin());
     }
 
     // Admin-only snapshots used by the website and newsletter version history.

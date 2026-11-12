@@ -113,7 +113,7 @@
     <link rel="stylesheet" href="css/dashboard.css?v=20261015_paragraph_spacing">
     <link rel="stylesheet" href="../css/notifications.css?v=1.18">
     <link rel="stylesheet" href="css/admin-unified.css?v=20261015_paragraph_spacing">
-    <link rel="stylesheet" href="css/newsletter-builder.css?v=20261015_paragraph_spacing">
+    <link rel="stylesheet" href="css/newsletter-builder.css?v=20261112_html_ai">
     <link rel="stylesheet" href="css/version-history.css?v=20260728_V1">
 
     <!-- Firebase SDK (Compat) -->
@@ -811,7 +811,7 @@
             </div>
 
 <section class="newsletter-workspace" id="newsletter-workspace" hidden aria-labelledby="workspace-title">
-<div class="workspace-heading"><div><h3 id="workspace-title">Nyhetsbrev</h3><p>Kampanjer, kladder og maler samlet på ett sted.</p></div><div class="workspace-actions"><button type="button" data-resume-editor hidden>Tilbake til utkast</button><button type="button" data-workspace-refresh>Oppdater</button><a href="/admin/admin-nyhetsbrev.html?draftId=new" class="workspace-primary">Nytt nyhetsbrev</a></div></div>
+<div class="workspace-heading"><div><h3 id="workspace-title">Nyhetsbrev</h3><p>Kampanjer, kladder og maler samlet på ett sted.</p></div><div class="workspace-actions"><button type="button" data-resume-editor hidden>Tilbake til utkast</button><button type="button" data-workspace-refresh>Oppdater</button><button type="button" id="newsletter-ai-connect">Koble til AI</button><a href="/admin/admin-nyhetsbrev.html?draftId=new" class="workspace-primary">Nytt nyhetsbrev</a></div></div>
 <div class="workspace-metrics"><div><span>Kampanjer i utvalget</span><strong data-count-campaigns>–</strong></div><div><span>Kladder i utvalget</span><strong data-count-drafts>–</strong></div><div><span>E-poster sendt i utvalget</span><strong data-count-sent>–</strong></div></div>
 <nav class="workspace-nav" aria-label="Nyhetsbrevoversikt"><button type="button" data-workspace-view="campaigns" aria-pressed="true">Kampanjer</button><button type="button" data-workspace-view="drafts" aria-pressed="false">Kladder</button><button type="button" data-workspace-view="templates" aria-pressed="false">Maler</button><button type="button" data-workspace-view="analytics" aria-pressed="false">Analyse</button><button type="button" data-open-subscribers>Mottakere</button></nav>
 <div data-workspace-panel="campaigns"><div class="workspace-tools"><input type="search" data-campaign-search placeholder="Søk etter kampanje" aria-label="Søk etter kampanje"><select data-campaign-filter aria-label="Filtrer kampanjestatus"><option value="">Alle statuser</option><option>I kø</option><option>Sender</option><option>Uavklart</option><option>Fullført</option><option>Avvik</option><option>Feil</option></select></div><div class="workspace-table"><table><thead><tr><th>Emne</th><th>Status</th><th>Mottakere</th><th>Sendt</th><th>Dato</th><th>Logg</th></tr></thead><tbody><tr><td colspan="6">Trykk Oppdater for å hente kampanjene.</td></tr></tbody></table></div></div>
@@ -1003,6 +1003,10 @@
                     </button>
 
 
+                    <button type="button" id="newsletter-html-import-btn" class="btn-secondary-outline" title="Importer HTML" aria-label="Importer HTML">
+                        <span class="material-symbols-outlined" aria-hidden="true">code</span>
+                        <span class="btn-label-text">Importer HTML</span>
+                    </button>
                     <button id="preview-btn" class="btn-secondary-outline" title="Forhåndsvisning">
                         <span class="material-symbols-outlined" style="font-size: 18px;">visibility</span>
                         <span class="btn-label-text">Forhåndsvisning</span>
@@ -1245,6 +1249,12 @@
                     <div id="desktop-richtools" class="hkm-newsletter-text-toolbar" role="toolbar" aria-label="Tekst og avsnitt"><div class="hkm-format-group" role="group" aria-label="Format og størrelse"><select id="toolbar-text-format" aria-label="Tekstformat"><option value="p">Avsnitt</option><option value="h1">Overskrift 1</option><option value="h2">Overskrift 2</option><option value="h3">Overskrift 3</option></select><select id="toolbar-text-size" aria-label="Skriftstørrelse"><option value="12">12</option><option value="14">14</option><option value="16">16</option><option value="18" selected>18</option><option value="20">20</option><option value="24">24</option><option value="28">28</option><option value="32">32</option><option value="36">36</option><option value="40">40</option><option value="48">48</option></select></div><div class="hkm-format-group" role="group" aria-label="Tekst"><span class="hkm-format-group-label">Tekst</span><button type="button" class="desktop-richtools-btn" data-tool="bold" title="Fet" aria-label="Fet"><span class="material-symbols-outlined">format_bold</span></button><button type="button" class="desktop-richtools-btn" data-tool="italic" title="Kursiv" aria-label="Kursiv"><span class="material-symbols-outlined">format_italic</span></button><button type="button" class="desktop-richtools-btn" data-tool="underline" title="Understrek" aria-label="Understrek"><span class="material-symbols-outlined">format_underlined</span></button><button type="button" class="desktop-richtools-btn" data-tool="link" title="Lenke" aria-label="Lenke"><span class="material-symbols-outlined">link</span></button><button type="button" class="desktop-richtools-btn" data-tool="highlightColor" title="Uthevingsfarge" aria-label="Uthevingsfarge"><span class="material-symbols-outlined">format_color_fill</span></button><button type="button" class="desktop-richtools-btn" data-tool="quote" title="Sitat" aria-label="Sitat"><span class="material-symbols-outlined">format_quote</span></button><button type="button" class="desktop-richtools-btn" data-tool="strike" title="Gjennomstreking" aria-label="Gjennomstreking"><span class="material-symbols-outlined">strikethrough_s</span></button><button type="button" class="desktop-richtools-btn" data-tool="textColor" title="Tekstfarge" aria-label="Tekstfarge"><span class="material-symbols-outlined">format_color_text</span></button></div><div class="hkm-format-group" role="group" aria-label="Avsnitt"><span class="hkm-format-group-label">Avsnitt</span><button type="button" class="desktop-richtools-btn" data-tool="justifyLeft" title="Venstrejuster" aria-label="Venstrejuster"><span class="material-symbols-outlined">format_align_left</span></button><button type="button" class="desktop-richtools-btn" data-tool="justifyCenter" title="Midtstill" aria-label="Midtstill"><span class="material-symbols-outlined">format_align_center</span></button><button type="button" class="desktop-richtools-btn" data-tool="justifyRight" title="Høyrejuster" aria-label="Høyrejuster"><span class="material-symbols-outlined">format_align_right</span></button><button type="button" class="desktop-richtools-btn" data-tool="list" title="Punktliste" aria-label="Punktliste"><span class="material-symbols-outlined">format_list_bulleted</span></button><button type="button" class="desktop-richtools-btn" data-tool="orderedList" title="Nummerert liste" aria-label="Nummerert liste"><span class="material-symbols-outlined">format_list_numbered</span></button><button type="button" class="desktop-richtools-btn" data-tool="outdent" title="Reduser innrykk" aria-label="Reduser innrykk"><span class="material-symbols-outlined">format_indent_decrease</span></button><button type="button" class="desktop-richtools-btn" data-tool="indent" title="Øk innrykk" aria-label="Øk innrykk"><span class="material-symbols-outlined">format_indent_increase</span></button><button type="button" class="desktop-richtools-btn" data-tool="removeFormat" title="Fjern formatering" aria-label="Fjern formatering"><span class="material-symbols-outlined">format_clear</span></button><button type="button" class="desktop-richtools-btn" data-tool="lineHeight" title="Linjeavstand" aria-label="Linjeavstand"><span class="material-symbols-outlined">format_line_spacing</span></button></div><input type="color" data-color-input="highlight" aria-label="Velg uthevingsfarge" value="#ffe3b8" hidden><input type="color" data-color-input="text" aria-label="Velg tekstfarge" value="#2c3e50" hidden></div>
                     <!-- Visning A: E-postkanvas -->
                     <div class="canvas-viewport" id="canvas-container">
+                        <section id="newsletter-html-active-panel" hidden>
+                            <h2>Importert HTML</h2>
+                            <p>HTML-en brukes som hele e-postinnholdet for alle valgte mottakere.</p>
+                            <button type="button" id="newsletter-html-edit-btn" class="btn-secondary-outline">Rediger og forhåndsvis HTML</button>
+                            <button type="button" id="newsletter-html-editor-btn" class="btn-secondary-outline">Bruk visuell editor</button>
+                        </section>
                         <div class="canvas-paper-frame" id="newsletter-canvas">
                             <div class="canvas-header" id="canvas-header-block" title="Klikk for å redigere e-posthode">
                                 <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="newsletter-logo" id="header-logo-img" title="Klikk for å bytte logo">
@@ -1987,7 +1997,67 @@
     <script type="module" src="js/todo-drawer.js?v=20260602_V3"></script>
     <script type="module" src="js/unsplash.js?v=20260511_G1"></script>
     <script type="module" src="js/version-history.js?v=20260728_V1"></script>
-    <script type="module" src="js/newsletter-builder.js?v=20260728_V2510_RESPONSIVE_BUTTONS"></script>
+    <dialog id="newsletter-html-import" aria-labelledby="newsletter-html-import-title">
+        <header class="newsletter-html-actions">
+            <h2 id="newsletter-html-import-title">Importer HTML</h2>
+            <button type="button" data-html-close class="btn-secondary-outline">Lukk</button>
+        </header>
+        <label for="newsletter-html-subject">E-postemne</label>
+        <input id="newsletter-html-subject" type="text" maxlength="100">
+        <label for="newsletter-html-source">Lim inn HTML-koden</label>
+        <textarea id="newsletter-html-source" rows="8" spellcheck="false"></textarea>
+        <label for="newsletter-html-file">Eller velg en HTML-fil</label>
+        <input id="newsletter-html-file" type="file" accept=".html,.htm,text/html">
+        <p>Bruk <code>{{fornavn}}</code> i teksten og <code>{{avmeldingslenke}}</code> eller <code>{{nettleserlenke}}</code> som hele <code>href</code>-verdien.</p>
+        <div class="newsletter-html-actions">
+            <button type="button" data-html-validate class="btn-secondary-outline">Kontroller og forhåndsvis</button>
+            <button type="button" data-html-test class="btn-secondary-outline" disabled>Send test til meg</button>
+            <button type="button" data-html-apply class="btn-primary-publish" disabled>Bruk HTML i nyhetsbrevet</button>
+        </div>
+        <p role="status"></p>
+        <ul aria-live="polite"></ul>
+        <div class="newsletter-html-actions" role="group" aria-label="Bredde på forhåndsvisning">
+            <button type="button" class="btn-secondary-outline" data-html-width="600" aria-pressed="true">Skrivebord · 600 px</button>
+            <button type="button" class="btn-secondary-outline" data-html-width="375" aria-pressed="false">Mobil · 375 px</button>
+        </div>
+        <div class="newsletter-html-frame-scroll">
+            <iframe title="Forhåndsvisning av importert nyhetsbrev" sandbox="" referrerpolicy="no-referrer" width="600" height="500" hidden></iframe>
+        </div>
+    </dialog>
+    <dialog id="newsletter-ai-dialog" class="newsletter-html-dialog" aria-labelledby="newsletter-ai-title">
+        <header class="newsletter-html-actions">
+            <h2 id="newsletter-ai-title"></h2>
+            <button type="button" class="btn-secondary-outline" data-ai-close>Lukk</button>
+        </header>
+        <div data-ai-access hidden>
+            <p>Bruk adressen og nøkkelen i AI-klientens MCP-innstillinger. Nøkkelen varer i åtte timer og erstatter den forrige nøkkelen din.</p>
+            <label for="newsletter-ai-url">MCP-adresse</label>
+            <input id="newsletter-ai-url" type="url" readonly>
+            <a data-ai-schema hidden target="_blank" rel="noopener">Åpne skjema for GPT Actions</a>
+            <label for="newsletter-ai-token">Tilgangsnøkkel</label>
+            <input id="newsletter-ai-token" type="password" autocomplete="off" readonly>
+            <div class="newsletter-html-actions">
+                <button type="button" class="btn-secondary-outline" data-ai-key>Opprett tilgangsnøkkel</button>
+                <button type="button" class="btn-secondary-outline" data-ai-copy disabled>Kopier nøkkel</button>
+            </div>
+        </div>
+        <div data-ai-review hidden>
+            <p data-ai-summary></p>
+            <ul data-ai-warnings></ul>
+            <div class="newsletter-html-actions" role="group" aria-label="Bredde på forhåndsvisning">
+                <button type="button" class="btn-secondary-outline" data-html-width="600" aria-pressed="true">Skrivebord · 600 px</button>
+                <button type="button" class="btn-secondary-outline" data-html-width="375" aria-pressed="false">Mobil · 375 px</button>
+            </div>
+            <div class="newsletter-html-frame-scroll">
+                <iframe title="Forhåndsvisning før godkjenning" sandbox="" referrerpolicy="no-referrer" width="600" height="500" hidden></iframe>
+            </div>
+            <div class="newsletter-html-actions">
+                <button type="button" class="btn-primary-publish" data-ai-approve disabled>Godkjenn utsending fra AI</button>
+            </div>
+        </div>
+        <p role="status"></p>
+    </dialog>
+    <script type="module" src="js/newsletter-builder.js?v=20261112_html_ai"></script>
 <script type="module" src="js/newsletter-workspace.js"></script>
 </body>
 
