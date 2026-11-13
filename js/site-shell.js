@@ -43,8 +43,7 @@ const YOUTUBE_URL = 'https://www.youtube.com/@HisKingdomMinistry';
 const NETWORK_LINKS = [
     { url: 'https://hiskingdomfoundation.no/', name: 'His Kingdom Foundation' },
     { url: 'https://www.hkpc.no/', name: 'His Kingdom Prophetic Community' },
-    { url: 'https://hiskingdomdesigns.no/', name: 'His Kingdom Designs' },
-    { url: 'https://prayer.no/', name: 'Pust' }
+    { url: 'https://hiskingdomdesigns.no/', name: 'His Kingdom Designs' }
 ];
 const WEB_DESIGNER = { url: 'https://www.tk-design.no/', name: 'TK-design' };
 
