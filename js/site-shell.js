@@ -16,6 +16,13 @@ const STORE_URL = 'https://www.hiskingdomdesigns.no/';
 const FACEBOOK_URL = 'https://www.facebook.com/hiskingdomministry777?locale=nb_NO';
 const INSTAGRAM_URL = 'https://www.instagram.com/freedomisathand/';
 const YOUTUBE_URL = 'https://www.youtube.com/@HisKingdomMinistry';
+const NETWORK_LINKS = [
+    { url: 'https://hiskingdomfoundation.no/', name: 'His Kingdom Foundation' },
+    { url: 'https://www.hkpc.no/', name: 'His Kingdom Prophetic Community' },
+    { url: 'https://hiskingdomdesigns.no/', name: 'His Kingdom Designs' },
+    { url: 'https://prayer.no/', name: 'Pust' }
+];
+const WEB_DESIGNER = { url: 'https://www.tk-design.no/', name: 'TK-design' };
 
 if (typeof window !== 'undefined') {
     window.hkmApplyTheme = function (theme) {
@@ -218,6 +225,8 @@ const COPY = {
             phone: 'Telefon:',
             account: 'Konto nr.:',
             copyright: 'His Kingdom Ministry. Alle rettigheter reservert.',
+            partOf: 'Del av',
+            websiteBy: 'Nettside laget av',
             admin: 'Admin'
         }
     },
@@ -306,6 +315,8 @@ const COPY = {
             phone: 'Phone:',
             account: 'Account no.:',
             copyright: 'His Kingdom Ministry. All rights reserved.',
+            partOf: 'Part of',
+            websiteBy: 'Website by',
             admin: 'Admin'
         }
     },
@@ -394,6 +405,8 @@ const COPY = {
             phone: 'Teléfono:',
             account: 'Cuenta:',
             copyright: 'His Kingdom Ministry. Todos los derechos reservados.',
+            partOf: 'Parte de',
+            websiteBy: 'Sitio web de',
             admin: 'Admin'
         }
     }
@@ -700,6 +713,12 @@ export function renderSiteFooter(language = getLanguage()) {
                 <div class="footer-bottom">
                     <p>&copy; <span id="copyright-year">${new Date().getFullYear()}</span>
                         <span ${contentAttributes('footer.copyright')}>${footer.copyright}</span>
+                    </p>
+                    <p class="footer-network" style="margin:.5rem 0 0;font-size:.875rem;line-height:1.6">
+                        ${footer.partOf || 'Del av'} ${NETWORK_LINKS.map((site) => `<a href="${site.url}" target="_blank" rel="noopener">${site.name}</a>`).join(' · ')}
+                    </p>
+                    <p class="footer-credit" style="margin:.25rem 0 .5rem;font-size:.8125rem">
+                        ${footer.websiteBy || 'Nettside laget av'} <a href="${WEB_DESIGNER.url}" target="_blank" rel="noopener">${WEB_DESIGNER.name}</a>
                     </p>
                     <a href="/admin/login.html" class="admin-link" id="admin-link"
                         ${contentAttributes('footer.adminLink')}>${footer.admin}</a>
