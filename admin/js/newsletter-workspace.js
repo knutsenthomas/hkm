@@ -48,12 +48,39 @@ export function summarizeCampaigns(campaigns, days = 'all', now = Date.now()) {
 }
 const root = document.getElementById('newsletter-workspace');
 if (root) {
-    const isNewsletterArea = new URLSearchParams(location.search).get('section') === 'newsletter';
+    const STUDIO_SECTIONS = ['content', 'newsletter', 'ideas'];
+    const currentSection = () => {
+        const value = new URLSearchParams(location.search).get('section');
+        return STUDIO_SECTIONS.includes(value) ? value : 'content';
+    };
+    const isNewsletterArea = currentSection() === 'newsletter';
+    let workspaceLoaded = false;
     const syncArea = () => {
-        const active = new URLSearchParams(location.search).get('section') === 'newsletter';
+        const section = currentSection();
+        const active = section === 'newsletter';
         root.hidden = !active;
         document.body.classList.toggle('newsletter-area-active', active);
+        STUDIO_SECTIONS.forEach(name => document.body.classList.toggle(`studio-section-${name}`, name === section));
+        document.querySelectorAll('[data-studio-section]').forEach(link => {
+            if (link.dataset.studioSection === section) link.setAttribute('aria-current', 'page');
+            else link.removeAttribute('aria-current');
+        });
+        if (active && !workspaceLoaded && window.firebase?.auth().currentUser) {
+            workspaceLoaded = true;
+            root.querySelector('[data-workspace-refresh]')?.click();
+        }
     };
+    document.querySelectorAll('[data-studio-section]').forEach(link => link.addEventListener('click', event => {
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+        event.preventDefault();
+        const url = new URL(window.location.href);
+        const section = link.dataset.studioSection;
+        if (section === 'content') url.searchParams.delete('section'); else url.searchParams.set('section', section);
+        url.searchParams.delete('draftId');
+        window.history.pushState({}, '', url.toString());
+        syncArea();
+    }));
+    window.addEventListener('popstate', syncArea);
     syncArea();
     window.addEventListener('hkm:newsletter-modechange', syncArea);
     window.addEventListener('hkm:newsletter-overview', event => {
@@ -210,6 +237,7 @@ if (root) {
         const readyTimer = setInterval(() => {
             if (window.firebaseService?.db && window.firebase?.auth().currentUser) {
                 clearInterval(readyTimer);
+                workspaceLoaded = true;
                 root.querySelector('[data-workspace-refresh]').click();
             } else if (++attempts >= 100) {
                 clearInterval(readyTimer);

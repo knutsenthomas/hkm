@@ -43,13 +43,24 @@ dialog.newsletter-start-dialog { position:fixed!important; inset:0!important; ma
 .newsletter-start-dialog .start-templates { display:grid; gap:10px; }
 .newsletter-start-dialog button:focus-visible { outline:3px solid #d17d39; outline-offset:3px; }
 .newsletter-workspace[hidden] { display:none!important; }
-.studio-area-nav { display:flex; gap:12px; margin-bottom:24px; }
-.studio-area-nav a { color:var(--admin-text,#2c3e50); padding:10px 16px; border:1px solid var(--admin-border,#e5e7eb); border-radius:10px; text-decoration:none; }
-.newsletter-area-active .studio-creation-grid,
-.newsletter-area-active .ai-inspirasjon-hero,
-.newsletter-area-active .studio-feed-section,
-.newsletter-area-active .studio-saved-tools,
-.newsletter-area-active .dashboard-header-container { display:none!important; }
+/* HKM Studio: one place for content, newsletters and AI ideas, switched by tabs. */
+.studio-nav { display:flex; gap:4px; margin:-8px 0 28px; border-bottom:1px solid var(--admin-border,#e5e7eb); overflow-x:auto; scrollbar-width:none; }
+.studio-nav::-webkit-scrollbar { display:none; }
+.studio-nav a { display:inline-flex; align-items:center; gap:8px; min-height:48px; padding:0 16px; margin-bottom:-1px; border-bottom:2px solid transparent; color:var(--admin-text-muted,#64748b); font-size:15px; font-weight:600; text-decoration:none; white-space:nowrap; }
+.studio-nav a .material-symbols-outlined { font-size:20px; }
+.studio-nav a:hover { color:var(--admin-text,#1e293b); }
+.studio-nav a[aria-current="page"] { color:var(--admin-text,#1e293b); border-bottom-color:#c56828; }
+.studio-nav a[aria-current="page"] .material-symbols-outlined { color:#c56828; }
+.studio-nav a:focus-visible { outline:3px solid #d17d39; outline-offset:-3px; border-radius:6px; }
+.dashboard-header-container { margin-bottom:24px!important; }
+/* Innhold: create and browse. Nyhetsbrev: campaigns, drafts, templates, analytics. Ideer: the AI generator. */
+.studio-section-content :is(.ai-inspirasjon-hero, #ai-suggestions-view-area),
+.studio-section-newsletter :is(.studio-creation-grid, .ai-inspirasjon-hero, #ai-suggestions-view-area, .studio-feed-section),
+.studio-section-ideas :is(.studio-creation-grid, .studio-feed-section),
+.studio-saved-tools { display:none!important; }
+.studio-section-newsletter .newsletter-workspace { padding:0; border:0; background:transparent; }
+.studio-section-newsletter .newsletter-workspace > .workspace-heading > div:first-child { display:none; }
+.studio-section-newsletter .newsletter-workspace > .workspace-heading { justify-content:flex-end; margin-bottom:20px; }
 .studio-saved-tools { margin:24px 0; }
 .studio-saved-tools summary { cursor:pointer; font-weight:650; padding:12px 0; }
 .newsletter-hub-links { padding:24px; border:1px solid var(--admin-border,#e5e7eb); border-radius:16px; display:flex; flex-wrap:wrap; align-items:center; gap:16px; }
