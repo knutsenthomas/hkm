@@ -32,7 +32,7 @@ function injectStyles() {
 .comm-tabs a.comm-tab[aria-current="page"] .material-symbols-outlined { color:#c56828; }
 .comm-tabs .comm-badge { min-width:20px; padding:1px 7px; border-radius:99px; background:#c56828; color:#fff; font-size:12px; font-weight:700; text-align:center; box-sizing:border-box; }
 .comm-tabs .comm-badge[hidden] { display:none; }
-.comm-subnav { display:inline-flex; gap:4px; padding:3px; margin:0 0 20px; border-radius:10px; background:var(--admin-surface-muted,#e9eef3); }
+.comm-subnav { display:inline-flex; align-self:flex-start; width:auto; gap:4px; padding:3px; margin:0 0 20px; border-radius:10px; background:var(--admin-surface-muted,#e9eef3); }
 .comm-subnav a { display:inline-flex; align-items:center; min-height:38px; padding:0 16px; border-radius:8px; color:var(--admin-text-muted,#475569); font-size:14px; font-weight:600; text-decoration:none; }
 .comm-subnav a[aria-current="page"] { background:var(--admin-surface,#fff); color:#1b4965; box-shadow:0 1px 2px rgba(15,23,42,.1); }
 .comm-tabs a:focus-visible, .comm-subnav a:focus-visible { outline:3px solid #d17d39; outline-offset:-3px; border-radius:6px; }
@@ -113,6 +113,8 @@ function mount() {
         if (header) header.after(content);
         else document.querySelector('main')?.prepend(content);
     }
+    const title = document.querySelector('#dashboard-main-header .section-title');
+    if (title) title.textContent = 'Kommunikasjon';
     syncBadge();
 }
 

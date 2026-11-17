@@ -65,7 +65,9 @@ if (root) {
             if (link.dataset.studioSection === section) link.setAttribute('aria-current', 'page');
             else link.removeAttribute('aria-current');
         });
-        if (active && !workspaceLoaded && window.firebase?.auth().currentUser) {
+        let signedIn = false;
+        try { signedIn = !!(window.firebaseService?.db && window.firebase?.apps?.length && window.firebase.auth().currentUser); } catch (_) { signedIn = false; }
+        if (active && !workspaceLoaded && signedIn) {
             workspaceLoaded = true;
             root.querySelector('[data-workspace-refresh]')?.click();
         }
