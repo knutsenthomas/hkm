@@ -548,3 +548,12 @@ html[data-theme="dark"] .todo-drawer-badge.assignee { background: #0f172a !impor
 /* Logg ut og merkelapper */
 html[data-theme="dark"] :is(.logout, #logout-btn, #logout-btn span) { color: #fca5a5 !important; }
 html[data-theme="dark"] #dashboard-drafts-count { color: #f5b47e !important; }
+/* Lyse fargefelt (merkelapper, ikoner og tall) får mørke toner i mørk modus */
+html[data-theme="dark"] .cms-pill { background: #0f172a !important; color: #cbd5e1 !important; border-color: #334155 !important; }
+html[data-theme="dark"] .cms-pill--success { background: rgba(16,185,129,.15) !important; color: #6ee7b7 !important; }
+html[data-theme="dark"] .cms-pill--warning { background: rgba(249,115,22,.15) !important; color: #fdba74 !important; }
+html[data-theme="dark"] body:not(.builder-active) :is([style*="background: #eff6ff"], [style*="background: #f0f9ff"], [style*="background: #e0f2fe"]):not(#newsletter-builder-layout *) { background: rgba(59,130,246,.16) !important; }
+html[data-theme="dark"] body:not(.builder-active) :is([style*="background: #fff7ed"], [style*="background: #ffedd5"]):not(#newsletter-builder-layout *) { background: rgba(249,115,22,.16) !important; }
+html[data-theme="dark"] body:not(.builder-active) :is([style*="background: #ecfdf5"], [style*="background: #f0fdf4"], [style*="background: #dcfce7"]):not(#newsletter-builder-layout *) { background: rgba(16,185,129,.16) !important; }
+html[data-theme="dark"] body:not(.builder-active) :is([style*="background: #fef2f2"], [style*="background: #fee2e2"]):not(#newsletter-builder-layout *) { background: rgba(239,68,68,.16) !important; }
+html[data-theme="dark"] body:not(.builder-active) :is([style*="background: #e0e7ff"], [style*="background: #eef2ff"]):not(#newsletter-builder-layout *) { background: rgba(99,102,241,.18) !important; color: #c7d2fe !important; }
