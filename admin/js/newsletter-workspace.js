@@ -69,7 +69,7 @@ if (root) {
         try { signedIn = !!(window.firebaseService?.db && window.firebase?.apps?.length && window.firebase.auth().currentUser); } catch (_) { signedIn = false; }
         if (active && !workspaceLoaded && signedIn) {
             workspaceLoaded = true;
-            root.querySelector('[data-workspace-refresh]')?.click();
+            document.querySelector('[data-workspace-refresh]')?.click();
         }
     };
     document.querySelectorAll('[data-studio-section]').forEach(link => link.addEventListener('click', event => {
@@ -88,10 +88,10 @@ if (root) {
     window.addEventListener('hkm:newsletter-modechange', syncArea);
     window.addEventListener('hkm:newsletter-overview', event => {
         syncArea();
-        root.querySelector('[data-resume-editor]').hidden = !event.detail?.resumeEditor;
-        root.querySelector('[data-workspace-refresh]').click();
+        document.querySelector('[data-resume-editor]').hidden = !event.detail?.resumeEditor;
+        document.querySelector('[data-workspace-refresh]').click();
     });
-    root.querySelector('[data-resume-editor]')?.addEventListener('click', () => {
+    document.querySelector('[data-resume-editor]')?.addEventListener('click', () => {
         window.builder?.toggleMode('builder');
         window.builder?.switchSidebarView('builder');
     });
@@ -211,7 +211,7 @@ if (root) {
             if (!values.length) box.append(el('p', kind === 'drafts' ? 'Ingen lagrede kladder i dette utvalget.' : 'Ingen lagrede maler i dette utvalget.'));
         }
     };
-    root.querySelector('[data-workspace-refresh]').addEventListener('click', async event => {
+    document.querySelector('[data-workspace-refresh]').addEventListener('click', async event => {
         const db = window.firebaseService?.db;
         if (!db || !window.firebase?.auth().currentUser) { status.textContent = 'Logg inn og vent til admin er klar.'; return; }
         event.currentTarget.disabled = true;
@@ -232,7 +232,7 @@ if (root) {
             status.textContent='Oversikten er oppdatert.';
             render();
         } catch { status.textContent='Kunne ikke hente oversikten. Kontroller tilgangen og prøv igjen.'; }
-        finally { root.querySelector('[data-workspace-refresh]').disabled=false; }
+        finally { document.querySelector('[data-workspace-refresh]').disabled=false; }
     });
     search.addEventListener('input',render); filter.addEventListener('change',render);
     if (isNewsletterArea) {
@@ -241,7 +241,7 @@ if (root) {
             if (window.firebaseService?.db && window.firebase?.auth().currentUser) {
                 clearInterval(readyTimer);
                 workspaceLoaded = true;
-                root.querySelector('[data-workspace-refresh]').click();
+                document.querySelector('[data-workspace-refresh]').click();
             } else if (++attempts >= 100) {
                 clearInterval(readyTimer);
                 status.textContent = 'Trykk Oppdater når innloggingen er klar.';
