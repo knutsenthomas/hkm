@@ -502,3 +502,49 @@ html[data-workspace-design="unified"] body.builder-active #newsletter-builder-la
 html[data-workspace-design="unified"] #newsletter-builder-layout .builder-dark-sidebar .nav-item.active .material-symbols-outlined {
   color: #fff !important;
 }
+
+/* ===== Dark mode: readable text and surfaces =====
+   Many panels set light colours inline or in older stylesheets. In dark mode these
+   rules lift muted text to a readable grey and turn white panels into dark surfaces.
+   Email and page previews in the builders keep their own colours. */
+html[data-theme="dark"] {
+  --workspace-muted: #a3b1c6;
+}
+html[data-theme="dark"] body:not(.builder-active) :is(
+  .todo-quick-label, .recent-signup-date, .thread-time, #ai-suggestions-timestamp,
+  .todo-drawer-item-desc, .section-subtitle
+) { color: #a3b1c6 !important; }
+html[data-theme="dark"] body:not(.builder-active) :is(
+  [style*="color: #64748b"], [style*="color:#64748b"], [style*="color: rgb(100, 116, 139)"],
+  [style*="color: #475569"], [style*="color:#475569"], [style*="color: #94a3b8"], [style*="color:#94a3b8"]
+):not(#newsletter-builder-layout *):not(.builder-workspace-center *) { color: #a3b1c6 !important; }
+html[data-theme="dark"] body:not(.builder-active) :is(
+  [style*="color: #1e293b"], [style*="color:#1e293b"], [style*="color: #0f172a"], [style*="color:#0f172a"],
+  [style*="color: #334155"], [style*="color:#334155"]
+):not(#newsletter-builder-layout *):not(.builder-workspace-center *):not([style*="background: #fff"]):not([style*="background-color: #fff"]) { color: #e2e8f0 !important; }
+html[data-theme="dark"] body:not(.builder-active) :is(
+  [style*="color: #0369a1"], [style*="color:#0369a1"], [style*="color: #1B4965"], [style*="color: #1b4965"], [style*="color:#1B4965"]
+):not(#newsletter-builder-layout *):not(.builder-workspace-center *):not(button):not(.btn) { color: #93c5fd !important; }
+html[data-theme="dark"] body:not(.builder-active) :is(
+  [style*="background: white"], [style*="background:white"], [style*="background-color: white"],
+  [style*="background: #fff;"], [style*="background: #ffffff"], [style*="background-color: #ffffff"], [style*="background-color: #fff;"],
+  [style*="background: #f8fafc"], [style*="background-color: #f8fafc"], [style*="background: #f1f5f9"]
+):not(#newsletter-builder-layout *):not(.builder-workspace-center *):not(#google-login):not(#generate-ai-ideas-btn):not(.email-preview *) {
+  background: var(--workspace-surface, #1e293b) !important;
+  border-color: var(--workspace-border, #334155) !important;
+}
+/* Huskeliste-skuffen */
+html[data-theme="dark"] :is(.todo-drawer-quick-add, .todo-drawer-item, .todo-drawer-empty, .todo-drawer-checkbox) {
+  background: var(--workspace-surface, #1e293b) !important;
+  border-color: var(--workspace-border, #334155) !important;
+}
+html[data-theme="dark"] .todo-drawer-item.completed { background: #172033 !important; }
+html[data-theme="dark"] :is(.todo-drawer-quick-add input, .todo-drawer-quick-add select, .todo-drawer-quick-add textarea) {
+  background-color: #0f172a !important; color: #f1f5f9 !important; border-color: #334155 !important;
+}
+html[data-theme="dark"] :is(.todo-drawer-list-title, .todo-drawer-item-title, .todo-drawer-empty p) { color: #f1f5f9 !important; }
+html[data-theme="dark"] .todo-drawer-badge.due-date { color: #93c5fd !important; }
+html[data-theme="dark"] .todo-drawer-badge.assignee { background: #0f172a !important; border-color: #334155 !important; color: #e2e8f0 !important; }
+/* Logg ut og merkelapper */
+html[data-theme="dark"] :is(.logout, #logout-btn, #logout-btn span) { color: #fca5a5 !important; }
+html[data-theme="dark"] #dashboard-drafts-count { color: #f5b47e !important; }
