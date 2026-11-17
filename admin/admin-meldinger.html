@@ -257,6 +257,9 @@
     </style>
     <link rel="stylesheet" href="/admin/css/workspace-design.css?v=20261024_11">
     <script type="module" src="/admin/js/workspace-icons.js?v=20261024_1"></script>
+    <script>(function(){var p=location.pathname,s=new URLSearchParams(location.search).get('section');if(/admin-meldinger|admin-kommunikasjon|admin-segmenter/.test(p)||(/admin-nyhetsbrev/.test(p)&&s==='newsletter'&&!new URLSearchParams(location.search).has('draftId')))document.documentElement.classList.add('comm-page');})();</script>
+    <script type="speculationrules">{"prefetch":[{"source":"list","urls":["/admin/admin-meldinger.html","/admin/admin-kommunikasjon.html","/admin/admin-segmenter.html","/admin/admin-nyhetsbrev.html?section=newsletter"],"eagerness":"eager"}]}</script>
+    <link rel="stylesheet" href="css/comm.css?v=20261117_2">
 </head>
 
 <body class="crm-body">
@@ -435,7 +438,7 @@
                     </div>
                     <div class="section-header-content">
                         <div class="section-header-titles" style="display: flex !important; flex-direction: column !important; gap: 4px !important; margin: 0 !important; padding: 0 !important;">
-                            <h2 class="section-title" style="margin: 0 !important; padding: 0 !important; line-height: 1.2 !important;">Meldinger</h2>
+                            <h2 class="section-title" style="margin: 0 !important; padding: 0 !important; line-height: 1.2 !important;">Kommunikasjon</h2>
                             <p class="section-subtitle" style="margin: 0 !important; margin-top: 0 !important; padding: 0 !important; line-height: 1.45 !important;">Håndter henvendelser fra kontaktskjemaet på nettsiden.</p>
                         </div>
                         <div class="section-header-actions">
@@ -462,6 +465,11 @@
                 </div>
             </div>
 
+<div class="comm-tabs" id="comm-tabs" data-active="inbox" data-static="1"><nav aria-label="Kommunikasjon">
+<a class="comm-tab" href="/admin/admin-meldinger.html" aria-current="page"><span class="material-symbols-outlined" aria-hidden="true">inbox</span>Innboks<span class="comm-badge" id="comm-inbox-badge" hidden></span></a>
+<a class="comm-tab" href="/admin/admin-kommunikasjon.html"><span class="material-symbols-outlined" aria-hidden="true">group</span>Kontakter</a>
+<a class="comm-tab" href="/admin/admin-nyhetsbrev.html?section=newsletter"><span class="material-symbols-outlined" aria-hidden="true">mail</span>Nyhetsbrev</a>
+</nav></div>
             <div class="inbox-container">
                 <div class="unified-inbox-container" id="unified-inbox">
                     <!-- 1. Folders Sidebar -->

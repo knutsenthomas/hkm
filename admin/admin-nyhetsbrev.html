@@ -675,6 +675,9 @@
 <link rel="stylesheet" href="css/newsletter-workspace.css?v=20261015_scroll_toolbar">
     <link rel="stylesheet" href="/admin/css/workspace-design.css?v=20261024_11">
     <script type="module" src="/admin/js/workspace-icons.js?v=20261024_1"></script>
+    <script>(function(){var p=location.pathname,s=new URLSearchParams(location.search).get('section');if(/admin-meldinger|admin-kommunikasjon|admin-segmenter/.test(p)||(/admin-nyhetsbrev/.test(p)&&s==='newsletter'&&!new URLSearchParams(location.search).has('draftId')))document.documentElement.classList.add('comm-page');})();</script>
+    <script type="speculationrules">{"prefetch":[{"source":"list","urls":["/admin/admin-meldinger.html","/admin/admin-kommunikasjon.html","/admin/admin-segmenter.html","/admin/admin-nyhetsbrev.html?section=newsletter"],"eagerness":"eager"}]}</script>
+    <link rel="stylesheet" href="css/comm.css?v=20261117_2">
 </head>
 
 <body class="admin-body main-dashboard">
@@ -772,7 +775,7 @@
                     </div>
                     <div class="section-header-content">
                         <div class="section-header-titles" style="display: flex !important; flex-direction: column !important; gap: 4px !important; margin: 0 !important; padding: 0 !important;">
-                            <h2 class="section-title" style="margin: 0 !important; padding: 0 !important; line-height: 1.2 !important;">HKM Studio</h2>
+                            <h2 class="section-title" style="margin: 0 !important; padding: 0 !important; line-height: 1.2 !important;">HKM Studio</h2><script>if(document.documentElement.classList.contains('comm-page')){document.currentScript.previousElementSibling.textContent='Kommunikasjon';}</script>
                             <p class="section-subtitle" style="margin: 0 !important; margin-top: 0 !important; padding: 0 !important; line-height: 1.45 !important;">Ditt kreative innholdssenter for blogginnlegg, bibelundervisning og nyhetsbrev.</p>
                         </div>
                         <div class="section-header-actions">
@@ -798,6 +801,12 @@
             </div>
 
             <div id="newsletter-dashboard-layout" class="newsletter-dashboard-layout" style="display: block;">
+<div class="comm-tabs" id="comm-tabs" data-active="newsletter" data-static="1"><nav aria-label="Kommunikasjon">
+<a class="comm-tab" href="/admin/admin-meldinger.html"><span class="material-symbols-outlined" aria-hidden="true">inbox</span>Innboks<span class="comm-badge" id="comm-inbox-badge" hidden></span></a>
+<a class="comm-tab" href="/admin/admin-kommunikasjon.html"><span class="material-symbols-outlined" aria-hidden="true">group</span>Kontakter</a>
+<a class="comm-tab" href="/admin/admin-nyhetsbrev.html?section=newsletter" aria-current="page"><span class="material-symbols-outlined" aria-hidden="true">mail</span>Nyhetsbrev</a>
+</nav></div>
+
             <div class="dashboard-header-container" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; width: 100%; box-sizing: border-box;">
                 <div class="dashboard-header-left">
                     <h2 class="dashboard-main-title" style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 800; color: #0f172a; margin: 0 0 4px 0; letter-spacing: -0.02em;">HKM Studio</h2>
