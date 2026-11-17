@@ -37,6 +37,7 @@ function injectStyles() {
 .comm-subnav a[aria-current="page"] { background:var(--admin-surface,#fff); color:#1b4965; box-shadow:0 1px 2px rgba(15,23,42,.1); }
 .comm-tabs a:focus-visible, .comm-subnav a:focus-visible { outline:3px solid #d17d39; outline-offset:-3px; border-radius:6px; }
 html[data-theme="dark"] .comm-subnav { background:#1e293b; }
+body:has(#comm-tabs) :is(.unified-inbox-container, .inbox-container) { border-radius:0 !important; }
 html[data-theme="dark"] .comm-subnav a[aria-current="page"] { background:#0f172a; color:#f8fafc; }
 `;
     document.head.appendChild(style);
