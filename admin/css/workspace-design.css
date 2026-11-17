@@ -121,6 +121,13 @@ html[data-workspace-design="unified"] body:not(.builder-active) :is(
   box-shadow: 0 2px 4px rgb(0 0 0 / 2%) !important;
   color: var(--workspace-text);
 }
+/* The AI inspiration banner is a dark showpiece with white text: keep its own gradient. */
+html[data-workspace-design="unified"] body:not(.builder-active) .card.ai-inspirasjon-hero {
+  background: linear-gradient(135deg, #0b1a24 0%, #1B4965 100%) !important;
+  border: 1px solid rgba(209, 125, 57, .25) !important;
+  border-radius: 24px !important;
+  color: #fff;
+}
 html[data-workspace-design="unified"] body:not(.builder-active) :is(.card-header, .info-card-header, .dashboard-course-signups-header) {
   border-bottom-color: var(--workspace-border) !important;
 }
