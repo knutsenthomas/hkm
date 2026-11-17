@@ -375,6 +375,12 @@ const initAdminHeader = () => {
 
         const itemHref = (section) => `/admin/index.html#${section}`;
         const isActive = (item) => {
+            if (item.commArea) {
+                const params = new URLSearchParams(window.location.search);
+                return ['admin-meldinger', 'admin-kommunikasjon', 'admin-segmenter'].some(p => path.includes(p))
+                    || (path.includes('admin-nyhetsbrev') && (params.get('section') === 'newsletter' || params.has('draftId')))
+                    || currentSection === 'comments';
+            }
             if (item.studioArea) return path.includes('admin-nyhetsbrev') && item.studioArea === (new URLSearchParams(window.location.search).get('section') === 'newsletter' || new URLSearchParams(window.location.search).has('draftId') ? 'newsletter' : 'studio');
             if (item.path && path.includes(item.path)) return true;
             if (currentSection === 'school-payments' && item.section === 'causes') return true;
@@ -446,13 +452,9 @@ const initAdminHeader = () => {
             { label: 'Leseplaner', icon: 'auto_stories', section: 'reading-plans', category: 'nettsted' },
             { label: 'Design & Logo', icon: 'palette', section: 'design', category: 'nettsted' },
             { header: 'kommunikasjon', label: 'Kommunikasjon' },
-            { label: 'Arrangementer', icon: 'event', section: 'events', category: 'kommunikasjon' },
-            { label: 'Kontakter', icon: 'group', href: '/admin/admin-kommunikasjon.html', path: 'admin-kommunikasjon', category: 'kommunikasjon' },
-            { label: 'Segmenter', icon: 'segment', href: '/admin/admin-segmenter.html', path: 'admin-segmenter', category: 'kommunikasjon' },
-            { label: 'Meldinger', icon: 'inbox', href: '/admin/admin-meldinger.html', path: 'admin-meldinger', category: 'kommunikasjon', badgeId: 'messages-badge' },
-            { label: 'Kommentarer', icon: 'forum', section: 'comments', category: 'kommunikasjon' },
+            { label: 'Kommunikasjon', icon: 'forum', href: '/admin/admin-meldinger.html', commArea: true, category: 'kommunikasjon', badgeId: 'messages-badge' },
             { label: 'HKM Studio', icon: 'auto_awesome', href: '/admin/admin-nyhetsbrev.html', path: 'admin-nyhetsbrev', category: 'kommunikasjon', studioArea: 'studio' },
-            { label: 'Nyhetsbrev', icon: 'mail', href: '/admin/admin-nyhetsbrev.html?section=newsletter', path: 'admin-nyhetsbrev', category: 'kommunikasjon', studioArea: 'newsletter' },
+            { label: 'Arrangementer', icon: 'event', section: 'events', category: 'kommunikasjon' },
             { header: 'administrasjon', label: 'Administrasjon' },
             { label: 'Huskeliste', icon: 'playlist_add_check', section: 'todo', category: 'administrasjon', alwaysVisible: true },
             { label: 'Gaver', icon: 'volunteer_activism', section: 'causes', category: 'administrasjon' },

@@ -79,6 +79,7 @@ if (root) {
         url.searchParams.delete('draftId');
         window.history.pushState({}, '', url.toString());
         syncArea();
+        window.dispatchEvent(new CustomEvent('hkm:studio-sectionchange'));
     }));
     window.addEventListener('popstate', syncArea);
     syncArea();

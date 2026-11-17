@@ -59,6 +59,7 @@ dialog.newsletter-start-dialog { position:fixed!important; inset:0!important; ma
 .studio-section-ideas :is(.studio-creation-grid, .studio-feed-section),
 .studio-saved-tools { display:none!important; }
 .studio-section-newsletter .newsletter-workspace { padding:0; border:0; background:transparent; }
+.studio-section-newsletter :is(.dashboard-header-container, .studio-nav) { display:none!important; }
 .studio-section-newsletter .newsletter-workspace > .workspace-heading > div:first-child { display:none; }
 .studio-section-newsletter .newsletter-workspace > .workspace-heading { justify-content:flex-end; margin-bottom:20px; }
 .studio-saved-tools { margin:24px 0; }
