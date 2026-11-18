@@ -1,4 +1,5 @@
 import { HKD_PRODUCT_TEMPLATE } from './newsletter-product-template.js';
+import { showCampaignEmail } from './newsletter-campaign-preview.js';
 
 export function campaignTime(value) {
     if (!value) return 0;
@@ -165,7 +166,8 @@ if (root) {
             const state = campaignState(campaign);
             const cells = [campaign.subject || 'Uten emne', state, Number(campaign.recipientCount || 0), campaign.sentCount ?? '–', time(date(campaign)) ? new Date(time(date(campaign))).toLocaleDateString('nb-NO') : '–'];
             cells.forEach((value, index) => { const cell = el('td', value); if (index === 1) { cell.className = 'workspace-status'; if (state === 'Uavklart') cell.title = 'Uavsluttet forsøk eldre enn 24 timer, eller manglende tidspunkt. Faktisk utsending er ikke bekreftet.'; } row.append(cell); });
-            const logCell = document.createElement('td'); const logButton = el('button', 'Se logg'); logButton.type = 'button'; logButton.addEventListener('click', () => showLogs(campaign)); logCell.append(logButton); row.append(logCell);
+            const logCell = document.createElement('td'); const logButton = el('button', 'Se logg'); logButton.type = 'button'; logButton.addEventListener('click', () => showLogs(campaign)); logCell.append(logButton);
+            const emailButton = el('button', 'Se e-post'); emailButton.type = 'button'; emailButton.addEventListener('click', () => showCampaignEmail(campaign)); logCell.append(emailButton); row.append(logCell);
             table.append(row);
         }
         if (!rows.length) { const row = document.createElement('tr'); const cell = el('td', 'Ingen kampanjer passer søket.'); cell.colSpan = 6; row.append(cell); table.append(row); }
