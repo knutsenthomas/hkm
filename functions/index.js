@@ -5343,6 +5343,7 @@ exports.newsletterHtmlAdmin = onCall({
   if (action === 'aiReview' || action === 'aiApprove') {
     return newsletterAi.review(account, data.reviewId, action === 'aiApprove', data.revision);
   }
+  if (action === 'campaignPreview') return newsletterCampaignPreview(data);
   if (!['preview', 'test', 'queue'].includes(action)) throw new HttpsError('invalid-argument', 'Ukjent HTML-handling.');
   let template;
   try {
@@ -5416,6 +5417,62 @@ function buildImportedNewsletterCampaign(account, template, subject, data) {
     throw new HttpsError('invalid-argument', 'HTML-en og mottakerlisten er for store for én utsending.');
   }
   return campaign;
+}
+
+// Preview of a queued or sent campaign for admin HKM. Merge fields get sample
+// values, so no real recipient data or personal links appear in the preview.
+const NEWSLETTER_PREVIEW_CSP = "default-src 'none'; img-src https: http: data:; style-src 'unsafe-inline' https:; font-src https: data:; base-uri 'none'; form-action 'none'";
+
+function replaceNewsletterPreviewFields(html) {
+  const field = names => new RegExp(`\\{\\{\\s*(?:${names})\\s*(?:\\|[^}]*)?\\}\\}`, 'gi');
+  return html
+    .replace(field('fornavn|contact\\.name\\.first'), 'Fornavn')
+    .replace(field('contact\\.name\\.last'), 'Etternavn')
+    .replace(field('contact\\.email'), 'e-post@eksempel.no')
+    .replace(field('avmeldingslenke|nettleserlenke|website\\.url'), '#');
+}
+
+async function newsletterCampaignPreview(data) {
+  const campaignId = typeof data?.campaignId === 'string' ? data.campaignId : '';
+  if (!/^[A-Za-z0-9_-]{1,128}$/.test(campaignId)) throw new HttpsError('invalid-argument', 'Ugyldig kampanje.');
+  const snapshot = await db.collection('newsletter_campaigns').doc(campaignId).get();
+  if (!snapshot.exists) throw new HttpsError('not-found', 'Fant ikke kampanjen.');
+  const campaign = snapshot.data();
+  const imported = campaign.contentType === 'html';
+  const hasEnglish = imported
+    ? Boolean(campaign.htmlBodyEn)
+    : Boolean(campaign.englishHtml && (campaign.englishPayload?.blocksEn?.length || campaign.englishPayload?.htmlEn));
+  const language = data.language === 'en' && hasEnglish ? 'en' : 'no';
+  const subject = language === 'en'
+    ? (campaign.subjectEn || campaign.englishPayload?.subjectEn || campaign.subject || '')
+    : (campaign.subject || '');
+
+  let html;
+  if (imported) {
+    const source = language === 'en' ? campaign.htmlBodyEn : campaign.htmlBody;
+    if (!source) throw new HttpsError('failed-precondition', 'Kampanjen har ingen lagret HTML.');
+    let template;
+    try {
+      template = sanitizeImportedNewsletter(source);
+    } catch {
+      throw new HttpsError('failed-precondition', 'Kunne ikke lese HTML-en i kampanjen.');
+    }
+    html = renderImportedNewsletter(template, { firstName: 'Fornavn', unsubscribeUrl: '#', browserUrl: '#', language });
+  } else {
+    html = language === 'en' ? campaign.englishHtml : campaign.html;
+    if (!html) throw new HttpsError('failed-precondition', 'Kampanjen har ingen lagret e-post-HTML. Eldre kampanjer kan ikke vises her.');
+    // Same footer as onNewsletterCampaignCreate adds, but without the recipient's address.
+    if (!html.includes('avmeld.html')) {
+      const footerHtml = `<div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 12px; color: #64748b; font-family: sans-serif;">
+            <p>Du mottar denne e-posten fordi du abonnerer på nyhetsbrevet til His Kingdom Ministry.</p>
+            <p><a href="#" style="color: #64748b; text-decoration: underline;">Klikk her for å melde deg av nyhetsbrevet</a></p>
+          </div>`;
+      html = html.includes('</body>') ? html.replace('</body>', footerHtml + '</body>') : html + footerHtml;
+    }
+  }
+  // showHtmlFrame() puts the CSP right after a lowercase doctype, so normalise it.
+  const previewHtml = '<!doctype html>' + replaceNewsletterPreviewFields(html).replace(/^\s*<!doctype[^>]*>/i, '');
+  return { subject, language, hasEnglish, previewHtml, csp: NEWSLETTER_PREVIEW_CSP };
 }
 
 const newsletterMcpEndpoint = newsletterFunctionsBase + '/newsletterMcp';
