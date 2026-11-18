@@ -178,3 +178,8 @@ html[data-workspace-design="unified"][data-theme="dark"] body:not(.builder-activ
 html[data-workspace-design="unified"][data-theme="dark"] body:not(.builder-active) main :is(.badge, .status-badge, #reading-plans-section span[style*="background"]) {
   background: #263449 !important; color: #cbd5e1 !important; border-color: #334155 !important;
 }
+
+/* Menypunktene fyller hele bredden, så den aktive markeringen blir like bred for alle */
+html[data-workspace-design="unified"] body:not(.builder-active):not(.sidebar-mini) .sidebar .nav-link-wrap { width: 100% !important; }
+html[data-workspace-design="unified"] body:not(.builder-active):not(.sidebar-mini) .sidebar .nav-link-wrap .nav-link { flex: 1 1 auto !important; width: 100% !important; min-width: 0; }
+html[data-workspace-design="unified"] body:not(.builder-active):not(.sidebar-mini) .sidebar .nav-category-header { width: 100% !important; }
