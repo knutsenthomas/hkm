@@ -958,7 +958,7 @@
         }
     </style>
     <link rel="stylesheet" href="/admin/css/workspace-design.css?v=20261024_11">
-    <link rel="stylesheet" href="/admin/css/studio-design.css?v=20261118_4">
+    <link rel="stylesheet" href="/admin/css/studio-design.css?v=20261118_5">
     <script type="module" src="/admin/js/workspace-icons.js?v=20261024_1"></script>
 </head>
 
@@ -1648,6 +1648,7 @@
         window.addEventListener('unhandledrejection', (event) => {
             const err = event.reason;
             const msg = err?.message || String(err || "Ukjent feil");
+            if (err?.name === 'AbortError' || /Transition was|ViewTransition/.test(msg)) return;
             const stack = err?.stack ? " | Stack: " + err.stack.substring(0, 180) : "";
             showDashboardError("Det oppstod en uventet feil i en bakgrunnsprosess: " + msg + stack);
         });

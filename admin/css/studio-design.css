@@ -8,7 +8,13 @@
  */
 
 /* ---------- Felles ramme ---------- */
-html[data-workspace-design="unified"] body:not(.builder-active) .sidebar { padding: 0 16px 24px !important; }
+html[data-workspace-design="unified"] body:not(.builder-active):not(.sidebar-mini) .sidebar { padding: 0 16px 24px !important; }
+/* Nyhetsbrev-siden har egen innholdsramme: den må følge menyen når den gjøres smal eller skjules */
+@media (min-width: 1025px) {
+  body.sidebar-mini:not(.builder-active) .newsletter-dashboard-wrapper { margin-left: 72px !important; width: calc(100% - 72px) !important; }
+  body.sidebar-collapsed:not(.builder-active) .newsletter-dashboard-wrapper { margin-left: 0 !important; width: 100% !important; }
+  body.sidebar-mini :is(.crm-main, .main-content, .newsletter-dashboard-wrapper) .main-header { margin-left: 0 !important; width: 100% !important; max-width: 100% !important; }
+}
 html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-category-header {
   text-transform: none !important; letter-spacing: 0 !important;
   margin-left: 0 !important; margin-right: 0 !important; width: auto !important;

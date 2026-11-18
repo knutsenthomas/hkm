@@ -17,12 +17,10 @@ function currentTab() {
     return null;
 }
 
-function build(active) {
-    const wrap = document.createElement('div');
-    wrap.className = 'comm-tabs';
-    wrap.id = 'comm-tabs';
-    wrap.dataset.active = active;
+// Tabs live in the page header, next to the title (static in each page's HTML; built here only as a fallback).
+function buildNav(active) {
     const nav = document.createElement('nav');
+    nav.className = 'comm-header-tabs';
     nav.setAttribute('aria-label', 'Kommunikasjon');
     TABS.forEach(tab => {
         const a = document.createElement('a');
@@ -43,24 +41,22 @@ function build(active) {
         }
         nav.append(a);
     });
-    wrap.append(nav);
-    const fragment = document.createDocumentFragment();
-    fragment.append(wrap);
-    if (active === 'contacts') {
-        const sub = document.createElement('nav');
-        sub.className = 'comm-subnav';
-        sub.setAttribute('aria-label', 'Kontakter');
-        const onSegments = location.pathname.toLowerCase().includes('admin-segmenter');
-        CONTACT_VIEWS.forEach(view => {
-            const a = document.createElement('a');
-            a.href = view.href;
-            a.textContent = view.label;
-            if ((view.id === 'segments') === onSegments) a.setAttribute('aria-current', 'page');
-            sub.append(a);
-        });
-        fragment.append(sub);
+    return nav;
+}
+
+function ensureHeaderNav(active) {
+    let nav = document.querySelector('#dashboard-main-header .comm-header-tabs');
+    if (!nav) {
+        const titles = document.querySelector('#dashboard-main-header .section-header-titles');
+        if (!titles) return;
+        nav = buildNav(active);
+        titles.after(nav);
     }
-    return fragment;
+    nav.querySelectorAll('a.comm-tab').forEach(a => {
+        const tab = TABS.find(t => a.getAttribute('href') === t.href);
+        if (tab && tab.id === active) a.setAttribute('aria-current', 'page');
+        else a.removeAttribute('aria-current');
+    });
 }
 
 // Mirror the sidebar's unread count onto the Innboks tab.
@@ -114,38 +110,27 @@ function newsletterActions() {
     return actions;
 }
 
+// Newsletter: view switcher and actions share one toolbar row, above the numbers (as in the sketch).
+function newsletterToolbar() {
+    const workspace = document.getElementById('newsletter-workspace');
+    if (!workspace || workspace.querySelector('.comm-toolbar')) return;
+    const nav = workspace.querySelector('.workspace-nav');
+    const row = newsletterActions();
+    if (!nav || !row) return;
+    const bar = document.createElement('div');
+    bar.className = 'comm-toolbar';
+    const metrics = workspace.querySelector(':scope > .workspace-metrics');
+    (metrics || nav).before(bar);
+    bar.append(nav, row);
+}
+
 function mount() {
     const active = currentTab();
     document.documentElement.classList.toggle('comm-page', !!active);
     document.body.classList.toggle('comm-area', !!active);
-    const existing = document.getElementById('comm-tabs');
-    // Pages ship the tab bar in their HTML so it is there on first paint; keep it when it matches.
-    if (existing && existing.dataset.active === active && active) {
-        if (active === 'newsletter') {
-            const row = newsletterActions();
-            if (row && !existing.contains(row)) existing.append(row);
-        }
-        const title = document.querySelector('#dashboard-main-header .section-title');
-        if (title) title.textContent = 'Kommunikasjon';
-        syncBadge();
-        return;
-    }
-    const keepActions = document.getElementById('comm-actions');
-    if (keepActions) keepActions.remove();
-    document.querySelectorAll('#comm-tabs, .comm-subnav').forEach(el => el.remove());
     if (!active) return;
-    const content = build(active);
-    if (active === 'newsletter') {
-        const layout = document.getElementById('newsletter-dashboard-layout');
-        if (!layout) return;
-        const row = newsletterActions();
-        if (row) content.querySelector('#comm-tabs')?.append(row);
-        layout.prepend(content);
-    } else {
-        const header = document.getElementById('dashboard-main-header');
-        if (header) header.after(content);
-        else document.querySelector('main')?.prepend(content);
-    }
+    ensureHeaderNav(active);
+    if (active === 'newsletter') newsletterToolbar();
     const title = document.querySelector('#dashboard-main-header .section-title');
     if (title) title.textContent = 'Kommunikasjon';
     syncBadge();
