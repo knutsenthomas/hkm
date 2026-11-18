@@ -95,10 +95,9 @@ if (root) {
         window.builder?.toggleMode('builder');
         window.builder?.switchSidebarView('builder');
     });
+    // Mottakere er de samme personene som i Kontakter: vis dem der, i samme design.
     root.querySelector('[data-open-subscribers]')?.addEventListener('click', () => {
-        if (!window.builder) return;
-        window.builder.toggleMode('builder');
-        window.builder.switchSidebarView('subscribers');
+        location.href = '/admin/admin-kommunikasjon.html';
     });
     let campaigns = [];
     let drafts = [];
