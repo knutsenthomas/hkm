@@ -156,3 +156,8 @@ html:not(.comm-page) .comm-header-tabs { display: none !important; }
 @media (max-width: 1024px) {
   .comm-header-tabs a.comm-tab[aria-current="page"]::after { bottom: 6px; }
 }
+
+/* Kontakter: alle kolonner får plass uten sidelengs rulling (navn kan bryte, e-post holdes hel) */
+html.comm-page .contacts-grid table :is(th, td) { padding-left: 10px !important; padding-right: 10px !important; }
+html.comm-page .contacts-grid table :is(th, td):last-child { min-width: 52px !important; width: 52px !important; }
+html.comm-page .contacts-grid table td:nth-child(2), html.comm-page .contacts-grid table td:nth-child(2) * { white-space: normal !important; }

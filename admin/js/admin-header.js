@@ -453,7 +453,7 @@ const initAdminHeader = () => {
             { label: 'Leseplaner', icon: 'auto_stories', section: 'reading-plans', category: 'nettsted' },
             { label: 'Design & Logo', icon: 'palette', section: 'design', category: 'nettsted' },
             { header: 'kommunikasjon', label: 'Kommunikasjon' },
-            { label: 'Kommunikasjon', icon: 'forum', href: '/admin/admin-meldinger.html', commArea: true, category: 'kommunikasjon', badgeId: 'messages-badge' },
+            { label: 'Meldinger og kontakter', icon: 'forum', href: '/admin/admin-meldinger.html', commArea: true, category: 'kommunikasjon', badgeId: 'messages-badge' },
             { label: 'HKM Studio', icon: 'auto_awesome', href: '/admin/admin-nyhetsbrev.html', path: 'admin-nyhetsbrev', category: 'kommunikasjon', studioArea: 'studio' },
             { label: 'Arrangementer', icon: 'event', section: 'events', category: 'kommunikasjon' },
             { header: 'administrasjon', label: 'Administrasjon' },

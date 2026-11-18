@@ -451,7 +451,9 @@ class CRMManager {
             const safeRole = this.escapeHtml(this._roleLabel(contact.role));
             const safeEmail = this.escapeHtml(contact.email || '-');
             const safePhone = this.escapeHtml(contact.phone || '-');
-            const safeStatus = this.escapeHtml(contact.status || 'INGEN');
+            const statusLabels = { NETTSTEDSMEDLEM: 'Nettstedsmedlem', NETTSTED_MEDLEM: 'Nettstedsmedlem', MEDLEM: 'Medlem', IKKE_MEDLEM: 'Ikke medlem', BLOKKERT: 'Blokkert', INGEN: 'Ingen' };
+            const rawStatus = String(contact.status || 'INGEN');
+            const safeStatus = this.escapeHtml(statusLabels[rawStatus.toUpperCase()] || rawStatus);
             const safeLastActivity = this.escapeHtml(lastActivity);
 
             return `
