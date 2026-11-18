@@ -100,7 +100,7 @@ function newsletterActions() {
     if (resume) actions.append(resume);
     actions.append(more);
     if (primary) actions.append(primary);
-    const labels = { 'data-count-campaigns': 'kampanjer', 'data-count-drafts': 'kladder', 'data-count-sent': 'e-poster sendt' };
+    const labels = { 'data-count-campaigns': 'Kampanjer', 'data-count-drafts': 'Kladder', 'data-count-sent': 'E-poster sendt' };
     workspace.querySelectorAll('.workspace-metrics > div').forEach(item => {
         const strong = item.querySelector('strong');
         const label = item.querySelector('span');

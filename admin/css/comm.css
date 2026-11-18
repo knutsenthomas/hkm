@@ -83,7 +83,7 @@ html.comm-page .crm-stats-bar .stat-item {
   background: var(--admin-surface, #fff) !important; border: 1px solid var(--admin-border, #e2e8f0) !important; border-radius: 0 !important; box-shadow: none !important;
 }
 html.comm-page .crm-stats-bar .stat-icon { display: none !important; }
-html.comm-page .crm-stats-bar .stat-info { display: flex !important; flex-direction: column-reverse !important; gap: 4px !important; }
+html.comm-page .crm-stats-bar .stat-info { display: flex !important; flex-direction: column !important; gap: 4px !important; }
 html.comm-page .newsletter-workspace .workspace-metrics span,
 html.comm-page .crm-stats-bar .stat-label { order: 0; font-size: 13px !important; font-weight: 600 !important; color: var(--admin-text-muted, #64748b) !important; text-transform: none !important; letter-spacing: 0 !important; }
 html.comm-page .newsletter-workspace .workspace-metrics strong,
