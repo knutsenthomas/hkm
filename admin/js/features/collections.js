@@ -100,7 +100,7 @@ export function createCollectionsMethods({ firebaseService, adminUtils, showErro
                         <td style="font-size: 11px; color: #94a3b8; font-family: monospace;">${this.escapeHtml(c.postId)}</td>
                         <td class="col-actions" style="text-align:right; padding-right:20px;">
                             <button class="btn btn-icon danger delete-comment-btn" data-comment-id="${c.id}" data-post-id="${c.postId}" title="Slett kommentar" 
-                                style="color: #ef4444 !important; background: #fee2e2 !important; border-radius: 8px !important; width: 34px !important; height: 34px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; border: none !important; cursor: pointer !important; padding: 0 !important; box-shadow: none !important; outline: none !important;">
+                                style="color: #ef4444 !important; background: #fee2e2 !important; border-radius: 4px !important; width: 34px !important; height: 34px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; border: none !important; cursor: pointer !important; padding: 0 !important; box-shadow: none !important; outline: none !important;">
                                 <span class="material-symbols-outlined" style="font-size: 20px !important; line-height: 0 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; margin: 0 !important; padding: 0 !important; width: 20px !important; height: 20px !important;">delete</span>
                             </button>
                         </td>

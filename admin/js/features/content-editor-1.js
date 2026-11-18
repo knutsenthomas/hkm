@@ -452,7 +452,7 @@ export function createContentEditor1Methods({ firebaseService, adminUtils, showE
                     ${actionsHtml}
                 </div>
             </div>
-            <div class="card" style="padding: 0 !important; overflow: hidden !important; border-radius: 20px !important; border: 1px solid var(--admin-border, #f1f5f9) !important; background: var(--admin-surface, white) !important; box-shadow: 0 2px 15px rgba(0,0,0,0.03) !important; width: 100% !important; box-sizing: border-box !important;">
+            <div class="card" style="padding: 0 !important; overflow: hidden !important; border-radius: 0 !important; border: 1px solid var(--admin-border, #f1f5f9) !important; background: var(--admin-surface, white) !important; box-shadow: 0 2px 15px rgba(0,0,0,0.03) !important; width: 100% !important; box-sizing: border-box !important;">
                 <div id="${collectionId}-list" class="table-container full-bleed">
                     <div class="loader">Laster ${title.toLowerCase()}...</div>
                 </div>

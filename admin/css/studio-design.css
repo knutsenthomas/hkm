@@ -42,7 +42,8 @@ html[data-workspace-design="unified"] body:not(.builder-active) :is(
   .user-admin-panel-header, .stats-grid, .automation-tabs, .newsletter-hub-links, .profile-tabs-container,
   .history-controls, .notes-view-toggle-container, .notif-settings-footer, .section-header,
   .modal-content, .profile-modal-content, .donation-admin-dialog, .search-modal-container,
-  .search-suggestions-container, .chart-interactive-tooltip, dialog, table
+  .search-suggestions-container, .chart-interactive-tooltip, dialog, table,
+  .form-group, .card-header, .card-body, .card-footer, .rte-wrapper, .table-container, .hkm-modal-container, .ql-container, .ql-toolbar
 ):not(:is(#newsletter-builder-layout, .builder-workspace-center, .design-ui-preview-frame, .live-preview-box) *) {
   border-radius: 0 !important;
 }
@@ -79,7 +80,7 @@ html[data-workspace-design="unified"] body:not(.builder-active) :is(
   .member-remove-btn, .notif-save-btn, .delete-task-btn, .close-search-btn, .accounting-refresh,
   .task-filter-btn, .todo-quick-select, .profile-tab-btn, .notes-view-btn, .preview-toggle, .design-ui-preview-btn,
   .overview-hero-action, .overview-hero-action-secondary, .workspace-primary, .dashboard-see-all-link,
-  .page-item, .breadcrumb-item, .custom-nav-item, .notification-btn, .user-profile-link, .mobile-nav-toggle,
+  .page-item, .breadcrumb-item, .rte-btn, .custom-nav-item, .notification-btn, .user-profile-link, .mobile-nav-toggle,
   .form-control, .search-input-group, .history-search-box, .family-search-box, .analytics-range-select,
   .giving-filter-select, .notif-time-select, .premium-color-hex, .premium-range-val,
   input:not([type=checkbox]):not([type=radio]):not([type=color]):not([type=range]), select, textarea, button

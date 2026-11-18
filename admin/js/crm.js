@@ -2212,13 +2212,13 @@ class CRMManager {
                             </select>
 
                             <!-- Inline Image Button -->
-                            <button type="button" id="crm-email-insert-img-btn" title="Sett inn inline bilde i e-posten" style="width: auto !important; min-width: 32px !important; padding: 0 10px !important; border-radius: 6px !important; border: 1px solid #cbd5e1 !important; background: #ffffff !important; flex: 0 0 auto !important;">
+                            <button type="button" id="crm-email-insert-img-btn" title="Sett inn inline bilde i e-posten" style="width: auto !important; min-width: 32px !important; padding: 0 10px !important; border-radius: 4px !important; border: 1px solid #cbd5e1 !important; background: #ffffff !important; flex: 0 0 auto !important;">
                                 <span class="material-symbols-outlined" style="font-size: 18px; color: #2563eb;">image</span>
                                 <span style="font-size: 12px; font-weight: 600; color: #334155; margin-left: 4px;">Bilde</span>
                             </button>
 
                             <!-- Inline YouTube Video Button -->
-                            <button type="button" id="crm-email-insert-yt-btn" title="Sett inn YouTube-video med forhåndsvisning" style="width: auto !important; min-width: 32px !important; padding: 0 10px !important; border-radius: 6px !important; border: 1px solid #cbd5e1 !important; background: #ffffff !important; flex: 0 0 auto !important;">
+                            <button type="button" id="crm-email-insert-yt-btn" title="Sett inn YouTube-video med forhåndsvisning" style="width: auto !important; min-width: 32px !important; padding: 0 10px !important; border-radius: 4px !important; border: 1px solid #cbd5e1 !important; background: #ffffff !important; flex: 0 0 auto !important;">
                                 <span class="material-symbols-outlined" style="font-size: 18px; color: #ef4444;">smart_display</span>
                                 <span style="font-size: 12px; font-weight: 600; color: #334155; margin-left: 4px;">YouTube</span>
                             </button>
