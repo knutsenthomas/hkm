@@ -192,3 +192,13 @@ html[data-workspace-design="unified"] body.minside-body:not(.sidebar-mini) .side
   font-size: 12px !important; font-weight: 600 !important; color: #64748b !important; background: transparent !important;
 }
 html[data-workspace-design="unified"] body.minside-body .sidebar .nav-category-header:hover { background: transparent !important; color: #64748b !important; }
+
+/* Smal meny: rolig aktiv markering, 40px, 4px hjørner */
+@media (min-width: 1025px) {
+  html[data-workspace-design="unified"] body.sidebar-mini:not(.builder-active) .sidebar .nav-link {
+    width: 40px !important; height: 40px !important; min-width: 40px !important; max-width: 40px !important; min-height: 40px !important; max-height: 40px !important; flex: 0 0 40px !important; border-radius: 4px !important;
+  }
+  html[data-workspace-design="unified"] body.sidebar-mini:not(.builder-active) .sidebar .nav-link.active { background: #c56828 !important; color: #fff !important; }
+  html[data-workspace-design="unified"] body.sidebar-mini:not(.builder-active) .sidebar .nav-link:not(.active):hover { background: #f1f5f9 !important; }
+  html[data-workspace-design="unified"][data-theme="dark"] body.sidebar-mini:not(.builder-active) .sidebar .nav-link:not(.active):hover { background: #1e293b !important; }
+}
