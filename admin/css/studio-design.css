@@ -23,8 +23,8 @@ html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-li
 
 /* ---------- Menyen som i skissen: 232px, flate punkter, grupper med ikon ---------- */
 @media (min-width: 1025px) {
-  html[data-workspace-design="unified"] body.admin-body:not(.builder-active):not(.sidebar-mini) .sidebar { width: 232px !important; min-width: 232px !important; max-width: 232px !important; padding: 0 12px 20px !important; }
-  html[data-workspace-design="unified"] body.admin-body:not(.builder-active):not(.sidebar-mini):not(.sidebar-collapsed) :is(.main-content, .crm-main, .newsletter-dashboard-wrapper) {
+  html[data-workspace-design="unified"] body:not(.builder-active):not(.sidebar-mini) .sidebar { width: 232px !important; min-width: 232px !important; max-width: 232px !important; padding: 0 12px 20px !important; }
+  html[data-workspace-design="unified"] body:not(.builder-active):not(.sidebar-mini):not(.sidebar-collapsed) :is(.main-content, .crm-main, .newsletter-dashboard-wrapper) {
     margin-left: 232px !important; width: calc(100% - 232px) !important; max-width: calc(100% - 232px) !important;
   }
 }

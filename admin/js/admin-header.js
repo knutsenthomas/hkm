@@ -758,7 +758,10 @@ const initAdminHeader = () => {
                 const activeLink = document.querySelector('.nav-link.active[data-section]');
                 const activeSection = activeLink?.getAttribute('data-section') || window.location.hash.substring(1) || sessionStorage.getItem('hkm_admin_last_dashboard_section') || 'overview';
                 const matchingNavItem = document.querySelector(`.nav-item[data-nav-category] a[data-section="${activeSection}"]`);
-                const activeCat = matchingNavItem?.closest('.nav-item')?.getAttribute('data-nav-category');
+                // Pages without sections (Kommunikasjon, HKM Studio, Analyse …) open the group that holds the active link.
+                const pageActive = document.querySelector('.nav-item[data-nav-category] a.nav-link.active:not([data-section])');
+                const pageCat = pageActive?.closest('.nav-item')?.getAttribute('data-nav-category');
+                const activeCat = (pageCat && pageCat !== 'all' && pageCat !== 'favoritter') ? pageCat : matchingNavItem?.closest('.nav-item')?.getAttribute('data-nav-category');
 
                 let shouldBeOpen = (cat === 'kommunikasjon');
                 if (activeCat) {
