@@ -43,7 +43,9 @@ html[data-workspace-design="unified"] body:not(.builder-active) :is(
   .history-controls, .notes-view-toggle-container, .notif-settings-footer, .section-header,
   .modal-content, .profile-modal-content, .donation-admin-dialog, .search-modal-container,
   .search-suggestions-container, .chart-interactive-tooltip, dialog, table,
-  .form-group, .card-header, .card-body, .card-footer, .rte-wrapper, .table-container, .hkm-modal-container, .ql-container, .ql-toolbar
+  .form-group, .card-header, .card-body, .card-footer, .rte-wrapper, .table-container, .hkm-modal-container, .ql-container, .ql-toolbar,
+  .stat-card-premium, .chart-card-premium, .gsc-metric-box, .ai-alert-box, .logs-container, .folder-item,
+  .studio-create-card, .studio-tabs-container, .studio-feed-card, .status-card, .lesson-card
 ):not(:is(#newsletter-builder-layout, .builder-workspace-center, .design-ui-preview-frame, .live-preview-box) *) {
   border-radius: 0 !important;
 }
@@ -80,7 +82,7 @@ html[data-workspace-design="unified"] body:not(.builder-active) :is(
   .member-remove-btn, .notif-save-btn, .delete-task-btn, .close-search-btn, .accounting-refresh,
   .task-filter-btn, .todo-quick-select, .profile-tab-btn, .notes-view-btn, .preview-toggle, .design-ui-preview-btn,
   .overview-hero-action, .overview-hero-action-secondary, .workspace-primary, .dashboard-see-all-link,
-  .page-item, .breadcrumb-item, .rte-btn, .custom-nav-item, .notification-btn, .user-profile-link, .mobile-nav-toggle,
+  .page-item, .breadcrumb-item, .rte-btn, .stat-action-btn, .period-selector, .period-selector button, .comm-subnav, .custom-nav-item, .notification-btn, .user-profile-link, .mobile-nav-toggle,
   .form-control, .search-input-group, .history-search-box, .family-search-box, .analytics-range-select,
   .giving-filter-select, .notif-time-select, .premium-color-hex, .premium-range-val,
   input:not([type=checkbox]):not([type=radio]):not([type=color]):not([type=range]), select, textarea, button
@@ -95,7 +97,7 @@ html[data-workspace-design="unified"] body:not(.builder-active) main :is(.btn, .
 html[data-workspace-design="unified"] body:not(.builder-active) :is(
   .badge, .status-pill, .status-badge, .podcast-status-badge, .cms-pill, .category-badge, .method-tag,
   .recent-signup-course-tag, .course-category-tag, .stat-chip, .stat-trend, .cause-publication-status,
-  .ms-overview-banner-chip, .ov-event-date-badge
+  .ms-overview-banner-chip, .ov-event-date-badge, .card-type-badge, .badge-orange-gradient
 ):not(:is(#newsletter-builder-layout, .design-ui-preview-frame) *) {
   border-radius: 3px !important;
 }
