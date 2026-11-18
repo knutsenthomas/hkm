@@ -123,3 +123,21 @@ html[data-workspace-design="unified"] .sidebar { view-transition-name: hkm-sideb
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
 }
+
+/* ---------- Mørk modus: siste lyse flater ---------- */
+html[data-workspace-design="unified"][data-theme="dark"] body:not(.builder-active) main :is(
+  .user-admin-panel-header, .bento-card, .design-ui-panel-header-icon, .user-avatar-sm,
+  #todo-section form, #todo-section [style*="background"], #causes-section [style*="background: #fff"], #causes-section [style*="background:#fff"],
+  #integrations-section [style*="background: #fff"], #integrations-section [style*="background:#fff"], #integrations-section [style*="background: white"]
+):not(:is(#newsletter-builder-layout, .design-ui-preview-frame, .live-preview-box) *) {
+  background: #1e293b !important; color: #e2e8f0 !important; border-color: #263449 !important;
+}
+html[data-workspace-design="unified"][data-theme="dark"] body:not(.builder-active) main :is(.btn-outline, .btn.btn-secondary, .btn-ghost) {
+  background: #0f172a !important; color: #e2e8f0 !important; border-color: #334155 !important;
+}
+html[data-workspace-design="unified"][data-theme="dark"] body:not(.builder-active) main .form-control {
+  background: #0f172a !important; color: #f1f5f9 !important; border-color: #334155 !important;
+}
+html[data-workspace-design="unified"][data-theme="dark"] body:not(.builder-active) main :is(.badge, .status-badge, #reading-plans-section span[style*="background"]) {
+  background: #263449 !important; color: #cbd5e1 !important; border-color: #334155 !important;
+}
