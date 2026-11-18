@@ -21,6 +21,35 @@ html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-ca
 }
 html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-link { border-radius: 4px !important; }
 
+/* ---------- Menyen som i skissen: 232px, flate punkter, grupper med ikon ---------- */
+@media (min-width: 1025px) {
+  html[data-workspace-design="unified"] body.admin-body:not(.builder-active):not(.sidebar-mini) .sidebar { width: 232px !important; min-width: 232px !important; max-width: 232px !important; padding: 0 12px 20px !important; }
+  html[data-workspace-design="unified"] body.admin-body:not(.builder-active):not(.sidebar-mini):not(.sidebar-collapsed) :is(.main-content, .crm-main, .newsletter-dashboard-wrapper) {
+    margin-left: 232px !important; width: calc(100% - 232px) !important; max-width: calc(100% - 232px) !important;
+  }
+}
+html[data-workspace-design="unified"] body:not(.builder-active):not(.sidebar-mini) .sidebar-header { min-height: 72px !important; height: 72px; padding: 0 4px !important; margin-bottom: 12px !important; box-sizing: border-box; display: flex; align-items: center; }
+html[data-workspace-design="unified"] body:not(.builder-active):not(.sidebar-mini) .sidebar .logo-text { font-size: 16px !important; letter-spacing: -.01em !important; }
+html[data-workspace-design="unified"] body:not(.builder-active):not(.sidebar-mini) .sidebar :is(.nav-link, .nav-category-header) {
+  display: flex !important; align-items: center !important; gap: 10px !important;
+  padding: 10px 12px !important; margin: 1px 0 !important; min-height: 40px; box-sizing: border-box;
+  font-size: 14px !important; font-weight: 500 !important; color: #334155 !important;
+  border-radius: 4px !important; background: transparent !important; box-shadow: none !important;
+  text-transform: none !important; letter-spacing: 0 !important; width: auto !important;
+}
+html[data-workspace-design="unified"] body:not(.builder-active):not(.sidebar-mini) .sidebar :is(.nav-link, .nav-category-header) .material-symbols-outlined:not(.expand-icon) { font-size: 20px !important; color: #64748b !important; width: 20px; }
+html[data-workspace-design="unified"] body:not(.builder-active):not(.sidebar-mini) .sidebar .nav-category-header { cursor: pointer; }
+html[data-workspace-design="unified"] body:not(.builder-active):not(.sidebar-mini) .sidebar .nav-category-header .expand-icon { margin-left: auto !important; font-size: 18px !important; color: #94a3b8 !important; }
+html[data-workspace-design="unified"] body:not(.builder-active):not(.sidebar-mini) .sidebar :is(.nav-link, .nav-category-header):hover { background: #f1f5f9 !important; color: #1e293b !important; }
+html[data-workspace-design="unified"] body:not(.builder-active):not(.sidebar-mini) .sidebar .nav-item[data-nav-category]:not([data-nav-category="all"]):not([data-nav-category="favoritter"]) .nav-link { padding-left: 24px !important; font-size: 13.5px !important; }
+html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-link.active,
+html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-link.active:hover { background: #c56828 !important; color: #ffffff !important; font-weight: 600 !important; }
+html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-link.active .material-symbols-outlined { color: #ffffff !important; }
+html[data-workspace-design="unified"][data-theme="dark"] body:not(.builder-active):not(.sidebar-mini) .sidebar :is(.nav-link, .nav-category-header) { color: #cbd5e1 !important; }
+html[data-workspace-design="unified"][data-theme="dark"] body:not(.builder-active):not(.sidebar-mini) .sidebar :is(.nav-link, .nav-category-header) .material-symbols-outlined:not(.expand-icon) { color: #94a3b8 !important; }
+html[data-workspace-design="unified"][data-theme="dark"] body:not(.builder-active):not(.sidebar-mini) .sidebar :is(.nav-link, .nav-category-header):hover { background: #1e293b !important; color: #f8fafc !important; }
+html[data-workspace-design="unified"] body.sidebar-mini .sidebar .nav-category-icon { display: none !important; }
+
 /* Menyen vises først når den er ferdig ordnet (hindrer at den hopper), med sikring etter 1,2 s */
 @keyframes hkm-reveal { to { visibility: visible; } }
 html[data-workspace-design="unified"] body.admin-body:not(.minside-body):not(.builder-active) .sidebar-nav:not([data-hkm-normalized]) {

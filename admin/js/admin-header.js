@@ -432,6 +432,7 @@ const initAdminHeader = () => {
 
         const renderHeader = (category, label) => `
             <li class="nav-category-header" data-target-category="${category}">
+                <span class="material-symbols-outlined nav-category-icon" aria-hidden="true">${({ nettsted: 'web', kommunikasjon: 'forum', administrasjon: 'admin_panel_settings' })[category] || 'folder'}</span>
                 <span>${label}</span>
                 <span class="material-symbols-outlined expand-icon">expand_more</span>
             </li>

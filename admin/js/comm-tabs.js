@@ -124,6 +124,33 @@ function newsletterToolbar() {
     bar.append(nav, row);
 }
 
+// Kontakter: view switcher left, the two main actions right (as in the sketch).
+function contactsToolbar() {
+    const sub = document.querySelector('.comm-subnav');
+    if (!sub || sub.parentElement.classList.contains('comm-subnav-row')) return;
+    const row = document.createElement('div');
+    row.className = 'comm-subnav-row';
+    sub.before(row);
+    row.append(sub);
+    const acts = document.createElement('div');
+    acts.className = 'comm-actions';
+    const label = (btn, text) => {
+        if (!btn) return;
+        btn.querySelectorAll('span:not(.material-symbols-outlined)').forEach(el => el.remove());
+        const t = document.createElement('span');
+        t.textContent = text;
+        btn.append(t);
+        btn.classList.add('comm-action-btn');
+    };
+    const importBtn = document.getElementById('import-export-btn');
+    const addBtn = document.getElementById('add-contact-btn');
+    const segBtn = document.querySelector('.btn-create-segment');
+    if (importBtn) { label(importBtn, 'Importer / eksporter'); acts.append(importBtn); }
+    if (addBtn) { label(addBtn, 'Ny kontakt'); addBtn.classList.add('comm-primary'); acts.append(addBtn); }
+    if (segBtn && !addBtn) { segBtn.classList.add('comm-action-btn', 'comm-primary'); acts.append(segBtn); }
+    if (acts.children.length) row.append(acts);
+}
+
 function mount() {
     const active = currentTab();
     document.documentElement.classList.toggle('comm-page', !!active);
@@ -131,6 +158,7 @@ function mount() {
     if (!active) return;
     ensureHeaderNav(active);
     if (active === 'newsletter') newsletterToolbar();
+    if (active === 'contacts') contactsToolbar();
     const title = document.querySelector('#dashboard-main-header .section-title');
     if (title) title.textContent = 'Kommunikasjon';
     syncBadge();

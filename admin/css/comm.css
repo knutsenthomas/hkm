@@ -70,6 +70,19 @@ html[data-theme="dark"].comm-page .newsletter-workspace .workspace-nav button[ar
 .comm-more-menu button, .comm-more-menu a { all: unset; box-sizing: border-box; padding: 10px 12px; font-size: 14px; color: var(--admin-text, #1e293b); cursor: pointer; }
 .comm-more-menu button:hover, .comm-more-menu button:focus-visible, .comm-more-menu a:hover { background: var(--admin-surface-muted, #f1f5f9); outline: none; }
 
+html.comm-page .comm-subnav-row { margin: 20px 24px 14px; }
+html.comm-page .comm-subnav-row .comm-subnav { margin: 0 !important; }
+html.comm-page .comm-action-btn {
+  display: inline-flex !important; align-items: center !important; gap: 6px !important; width: auto !important; height: auto !important;
+  min-height: 40px !important; padding: 0 14px !important; border: 1px solid var(--admin-border, #e2e8f0) !important; border-radius: 4px !important;
+  background: var(--admin-surface, #fff) !important; color: var(--admin-text, #334155) !important; font-size: 14px !important; font-weight: 600 !important; cursor: pointer;
+}
+html.comm-page .comm-action-btn .material-symbols-outlined { font-size: 18px !important; }
+html.comm-page .comm-action-btn.comm-primary { background: #1b4965 !important; border-color: #1b4965 !important; color: #fff !important; font-weight: 700 !important; }
+html.comm-page .comm-action-btn.comm-primary .material-symbols-outlined { color: #fff !important; }
+html[data-theme="dark"].comm-page .comm-action-btn:not(.comm-primary) { background: #0f172a !important; border-color: #334155 !important; color: #e2e8f0 !important; }
+html[data-theme="dark"].comm-page .comm-action-btn.comm-primary { background: #c56828 !important; border-color: #c56828 !important; }
+
 /* ---------- Tallkort ---------- */
 html.comm-page .newsletter-workspace .workspace-metrics,
 html.comm-page .crm-stats-bar {
@@ -120,11 +133,10 @@ html.comm-page main :is(input:not([type=checkbox]):not([type=radio]), select, te
   html.comm-page #dashboard-main-header .comm-header-tabs { position: fixed; left: 0; right: 0; top: 72px; z-index: 999; margin: 0; height: 48px; padding: 0 8px; background: var(--admin-surface, #fff); border-bottom: 1px solid var(--admin-border, #e2e8f0); }
   html[data-theme="dark"].comm-page #dashboard-main-header .comm-header-tabs { background: #0f172a; border-color: #263449; }
   html.comm-page :is(#newsletter-dashboard-layout, .crm-content, .inbox-container) { margin-top: 48px !important; }
-  html.comm-page .comm-subnav { margin-top: 64px; }
-  html.comm-page .comm-subnav + .crm-content { margin-top: 0 !important; }
+  html.comm-page .comm-subnav-row + .crm-content { margin-top: 0 !important; }
   html.comm-page #newsletter-dashboard-layout { padding: 16px 16px 100px !important; }
   html.comm-page .crm-content { padding: 0 16px 24px !important; }
-  html.comm-page .comm-subnav { margin-left: 16px; margin-right: 16px; }
+  html.comm-page .comm-subnav-row { margin: 64px 16px 14px; }
   html.comm-page .unified-inbox-container { height: auto !important; }
 }
 
