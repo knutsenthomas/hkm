@@ -216,3 +216,8 @@ html[data-workspace-design="unified"] body.minside-body .sidebar .nav-category-h
     font-size: 22px !important; line-height: 1 !important; text-align: center !important; transform: none !important;
   }
 }
+
+/* Aktivt menypunkt: hvitt ikon på oransje (må vinne over den grå ikonfargen over) */
+html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-link.active .material-symbols-outlined:not(.expand-icon),
+html[data-workspace-design="unified"] body:not(.builder-active):not(.sidebar-mini) .sidebar .nav-item .nav-link.active .material-symbols-outlined:not(.expand-icon),
+html[data-workspace-design="unified"][data-theme="dark"] body:not(.builder-active):not(.sidebar-mini) .sidebar .nav-item .nav-link.active .material-symbols-outlined:not(.expand-icon) { color: #ffffff !important; }
