@@ -4,6 +4,7 @@ const TABS = [
     { id: 'contacts', label: 'Kontakter', icon: 'group', href: '/admin/admin-kommunikasjon.html' },
     { id: 'newsletter', label: 'Nyhetsbrev', icon: 'mail', href: '/admin/admin-nyhetsbrev.html?section=newsletter' }
 ];
+const ICONS = {"inbox": `<svg class="comm-tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>`, "group": `<svg class="comm-tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>`, "mail": `<svg class="comm-tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>`};
 const CONTACT_VIEWS = [
     { id: 'people', label: 'Alle kontakter', href: '/admin/admin-kommunikasjon.html' },
     { id: 'segments', label: 'Segmenter', href: '/admin/admin-segmenter.html' }
@@ -27,11 +28,9 @@ function buildNav(active) {
         a.className = 'comm-tab';
         a.href = tab.href;
         if (tab.id === active) a.setAttribute('aria-current', 'page');
-        const icon = document.createElement('span');
-        icon.className = 'material-symbols-outlined';
-        icon.setAttribute('aria-hidden', 'true');
-        icon.textContent = tab.icon;
-        a.append(icon, document.createTextNode(tab.label));
+        // Inline SVG: visible at once, no wait for the icon font.
+        a.insertAdjacentHTML('beforeend', ICONS[tab.icon] || '');
+        a.append(document.createTextNode(tab.label));
         if (tab.id === 'inbox') {
             const badge = document.createElement('span');
             badge.className = 'comm-badge';
