@@ -364,11 +364,12 @@ class MessagesManager {
         
         let preview = '';
         if (isEmail) {
-            preview = t.subject || t.message || '';
+            // Subject has its own line; show the start of the message here.
+            preview = String(t.message || t.text || t.body || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 140) || t.subject || '';
         } else if (isChat) {
             preview = t.lastMessage?.text || 'Ingen meldinger enda';
         } else if (isPush) {
-            preview = t.title || t.body || '';
+            preview = t.body || t.title || '';
         }
 
         const isUnread = isEmail ? t.status !== 'lest' : (isChat && t.lastMessage && t.lastMessage.sender === 'visitor');
@@ -422,7 +423,7 @@ class MessagesManager {
                         <span class="thread-time">${timeLabel}</span>
                     </div>
                     ${(isEmail || isPush) && (t.title || t.subject) ? `<div class="thread-subject">${this.escapeHtml(t.title || t.subject)}</div>` : ''}
-                    <div class="thread-preview">${this.escapeHtml(preview)}</div>
+                    ${String(preview).trim() && String(preview).trim() !== String(t.title || t.subject || '').trim() ? `<div class="thread-preview">${this.escapeHtml(preview)}</div>` : ''}
                 </div>
             </div>
         `;
