@@ -206,3 +206,13 @@ html[data-workspace-design="unified"] body.minside-body .sidebar .nav-category-h
   html[data-workspace-design="unified"] body.sidebar-mini:not(.builder-active) .sidebar .nav-link:not(.active):hover { background: #f1f5f9 !important; }
   html[data-workspace-design="unified"][data-theme="dark"] body.sidebar-mini:not(.builder-active) .sidebar .nav-link:not(.active):hover { background: #1e293b !important; }
 }
+
+/* Smal meny: ikonet står eksakt midt i knappen (ingen skjult tekst eller marg som skyver det) */
+@media (min-width: 1025px) {
+  html[data-workspace-design="unified"] body.sidebar-mini:not(.builder-active) .sidebar .nav-link > :not(.material-symbols-outlined):not(.nav-badge) { display: none !important; }
+  html[data-workspace-design="unified"] body.sidebar-mini:not(.builder-active) .sidebar .nav-link > .material-symbols-outlined {
+    display: flex !important; align-items: center !important; justify-content: center !important;
+    width: 24px !important; height: 24px !important; margin: 0 !important; padding: 0 !important;
+    font-size: 22px !important; line-height: 1 !important; text-align: center !important; transform: none !important;
+  }
+}
