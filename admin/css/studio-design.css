@@ -19,7 +19,7 @@ html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-ca
   text-transform: none !important; letter-spacing: 0 !important;
   margin-left: 0 !important; margin-right: 0 !important; width: auto !important;
 }
-html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-link { border-radius: 4px !important; }
+html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-link { border-radius: 8px !important; }
 
 /* ---------- Menyen som i skissen: 232px, flate punkter, grupper med ikon ---------- */
 @media (min-width: 1025px) {
@@ -34,7 +34,7 @@ html[data-workspace-design="unified"] body:not(.builder-active):not(.sidebar-min
   display: flex !important; align-items: center !important; gap: 10px !important;
   padding: 10px 12px !important; margin: 1px 0 !important; min-height: 40px; box-sizing: border-box;
   font-size: 14px !important; font-weight: 500 !important; color: #334155 !important;
-  border-radius: 4px !important; background: transparent !important; box-shadow: none !important;
+  border-radius: 8px !important; background: transparent !important; box-shadow: none !important;
   text-transform: none !important; letter-spacing: 0 !important; width: auto !important;
 }
 html[data-workspace-design="unified"] body:not(.builder-active):not(.sidebar-mini) .sidebar :is(.nav-link, .nav-category-header) .material-symbols-outlined:not(.expand-icon) { font-size: 20px !important; color: #64748b !important; width: 20px; }
@@ -59,7 +59,7 @@ html[data-workspace-design="unified"] body.admin-body:not(.minside-body):not(.bu
 /* Rolig topp: ingen ikonboks ved sidetittelen */
 html[data-workspace-design="unified"] body:not(.builder-active) #dashboard-main-header .section-header-icon { display: none !important; }
 html[data-workspace-design="unified"] body:not(.builder-active) #dashboard-main-header :is(.notification-btn, .mobile-nav-toggle, .user-profile-link, .theme-toggle-btn, .lang-btn, .bento-search-bar) {
-  border-radius: 4px !important; box-shadow: none !important;
+  border-radius: 8px !important; box-shadow: none !important;
 }
 html[data-workspace-design="unified"] body:not(.builder-active) #dashboard-main-header :is(.lang-dropdown, .actions-menu) { border-radius: 0 !important; }
 
@@ -107,7 +107,7 @@ html[data-workspace-design="unified"] body:not(.builder-active) :is(
   .stat-icon-wrap, .bento-icon-wrap, .history-card-icon, .history-stat-icon, .activity-icon, .notif-icon-circle,
   .notif-setting-icon-badge, .notif-header-icon-badge, .hero-icon-box, .design-ui-panel-header-icon,
   .design-ui-topbar-icon, .kinetic-header-icon-circle, .tool-icon-circle, .header-icon-badge
-) { border-radius: 4px !important; box-shadow: none !important; }
+) { border-radius: 8px !important; box-shadow: none !important; }
 
 /* ---------- Kontroller: 4px ---------- */
 html[data-workspace-design="unified"] body:not(.builder-active) :is(
@@ -122,7 +122,7 @@ html[data-workspace-design="unified"] body:not(.builder-active) :is(
   .giving-filter-select, .notif-time-select, .premium-color-hex, .premium-range-val,
   input:not([type=checkbox]):not([type=radio]):not([type=color]):not([type=range]), select, textarea, button
 ):not(:is(#newsletter-builder-layout, .builder-workspace-center, .design-ui-preview-frame, .live-preview-box, .ql-toolbar, .comm-more-menu) *):not(.ms-profile-avatar-upload-btn):not(.premium-color-picker-input) {
-  border-radius: 4px !important;
+  border-radius: 8px !important;
 }
 html[data-workspace-design="unified"] body:not(.builder-active) main :is(.btn, .btn-primary, .btn-secondary, .finance-button, .overview-hero-action, .workspace-primary) {
   box-shadow: none !important;
@@ -196,8 +196,12 @@ html[data-workspace-design="unified"] body.minside-body .sidebar .nav-category-h
 /* Smal meny: rolig aktiv markering, 40px, 4px hjørner */
 @media (min-width: 1025px) {
   html[data-workspace-design="unified"] body.sidebar-mini:not(.builder-active) .sidebar .nav-link {
-    width: 40px !important; height: 40px !important; min-width: 40px !important; max-width: 40px !important; min-height: 40px !important; max-height: 40px !important; flex: 0 0 40px !important; border-radius: 4px !important;
+    width: 44px !important; height: 44px !important; min-width: 44px !important; max-width: 44px !important; min-height: 44px !important; max-height: 44px !important; flex: 0 0 44px !important; border-radius: 10px !important; margin: 0 auto !important;
   }
+  /* Smal meny: alt midtstilt i samme kolonne */
+  html[data-workspace-design="unified"] body.sidebar-mini:not(.builder-active) .sidebar :is(.nav-item, .nav-link-wrap) { width: 100% !important; display: flex !important; justify-content: center !important; padding: 0 !important; margin-left: 0 !important; margin-right: 0 !important; }
+  html[data-workspace-design="unified"] body.sidebar-mini:not(.builder-active) .sidebar .nav-fav-toggle-btn { display: none !important; }
+  html[data-workspace-design="unified"] body.sidebar-mini:not(.builder-active) .sidebar :is(.sidebar-nav, .nav-group, .nav-list) { width: 100% !important; padding-left: 0 !important; padding-right: 0 !important; margin-left: 0 !important; margin-right: 0 !important; }
   html[data-workspace-design="unified"] body.sidebar-mini:not(.builder-active) .sidebar .nav-link.active { background: #c56828 !important; color: #fff !important; }
   html[data-workspace-design="unified"] body.sidebar-mini:not(.builder-active) .sidebar .nav-link:not(.active):hover { background: #f1f5f9 !important; }
   html[data-workspace-design="unified"][data-theme="dark"] body.sidebar-mini:not(.builder-active) .sidebar .nav-link:not(.active):hover { background: #1e293b !important; }
