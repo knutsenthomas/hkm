@@ -196,7 +196,7 @@ html[data-workspace-design="unified"] body.minside-body .sidebar .nav-category-h
 /* Smal meny: rolig aktiv markering, 40px, 4px hjørner */
 @media (min-width: 1025px) {
   html[data-workspace-design="unified"] body.sidebar-mini:not(.builder-active) .sidebar .nav-link {
-    width: 44px !important; height: 44px !important; min-width: 44px !important; max-width: 44px !important; min-height: 44px !important; max-height: 44px !important; flex: 0 0 44px !important; border-radius: 10px !important; margin: 0 auto !important;
+    width: 44px !important; height: 44px !important; min-width: 44px !important; max-width: 44px !important; min-height: 44px !important; max-height: 44px !important; flex: 0 0 44px !important; border-radius: 10px !important; margin: 0 auto !important; padding: 0 !important; gap: 0 !important; justify-content: center !important; align-items: center !important;
   }
   /* Smal meny: alt midtstilt i samme kolonne */
   html[data-workspace-design="unified"] body.sidebar-mini:not(.builder-active) .sidebar :is(.nav-item, .nav-link-wrap) { width: 100% !important; display: flex !important; justify-content: center !important; padding: 0 !important; margin-left: 0 !important; margin-right: 0 !important; }
