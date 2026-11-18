@@ -161,3 +161,6 @@ html:not(.comm-page) .comm-header-tabs { display: none !important; }
 html.comm-page .contacts-grid table :is(th, td) { padding-left: 10px !important; padding-right: 10px !important; }
 html.comm-page .contacts-grid table :is(th, td):last-child { min-width: 52px !important; width: 52px !important; }
 html.comm-page .contacts-grid table td:nth-child(2), html.comm-page .contacts-grid table td:nth-child(2) * { white-space: normal !important; }
+/* Innboks: «Skriv ny» flat oransje som de andre hovedknappene */
+html.comm-page #btn-compose-email { background: #c56828 !important; background-image: none !important; box-shadow: none !important; min-height: 44px; font-weight: 700; }
+html.comm-page #btn-compose-email:hover { background: #b45d22 !important; }
