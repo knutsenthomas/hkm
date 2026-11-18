@@ -1,0 +1,124 @@
+/*
+ * HKM Studio – felles designlag for hele admin og Min side.
+ * Kun utseende: flate flater, 4px på kontroller, rolige skygger,
+ * lik ramme (meny, topp, marger) og raske overganger mellom sider.
+ * Ingen funksjoner eller markup endres her.
+ * Unntak: nyhetsbrevbyggeren, e-post-/nettsideforhåndsvisninger,
+ * avatarer, fargevelgere og små statusprikker beholder sin form.
+ */
+
+/* ---------- Felles ramme ---------- */
+html[data-workspace-design="unified"] body:not(.builder-active) .sidebar { padding: 0 16px 24px !important; }
+html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-category-header {
+  text-transform: none !important; letter-spacing: 0 !important;
+  margin-left: 0 !important; margin-right: 0 !important; width: auto !important;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) .sidebar .nav-link { border-radius: 4px !important; }
+
+/* Menyen vises først når den er ferdig ordnet (hindrer at den hopper), med sikring etter 1,2 s */
+@keyframes hkm-reveal { to { visibility: visible; } }
+html[data-workspace-design="unified"] body.admin-body:not(.minside-body):not(.builder-active) .sidebar-nav:not([data-hkm-normalized]) {
+  visibility: hidden; animation: hkm-reveal 0s linear 1.2s forwards;
+}
+
+/* Rolig topp: ingen ikonboks ved sidetittelen */
+html[data-workspace-design="unified"] body:not(.builder-active) #dashboard-main-header .section-header-icon { display: none !important; }
+html[data-workspace-design="unified"] body:not(.builder-active) #dashboard-main-header :is(.notification-btn, .mobile-nav-toggle, .user-profile-link, .theme-toggle-btn, .lang-btn, .bento-search-bar) {
+  border-radius: 4px !important; box-shadow: none !important;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) #dashboard-main-header :is(.lang-dropdown, .actions-menu) { border-radius: 0 !important; }
+
+/* ---------- Flater: rette hjørner, tynn kant i stedet for tunge skygger ---------- */
+html[data-workspace-design="unified"] body:not(.builder-active) :is(
+  .card, .stat-card, .bento-card, .bento-stat-card, .big-card, .side-card, .finance-card,
+  .overview-hero-card, .dashboard-course-signups-card, .info-card, .table-card, .item-card, .media-card,
+  .tool-card, .cause-item, .history-card, .history-stat-card, .personal-note-card, .notif-settings-card,
+  .notif-header-banner, .ms-overview-banner, .ms-profile-hero-card, .ms-help-hero, .ms-security-danger-box,
+  .course-card-premium, .continue-course-hero, .reading-plan-card-started, .ov-event-card, .faq-item,
+  .activity-item, .notif-setting-item, .ms-overview-notif-row, .course-lesson-row, .recent-signup-item,
+  .design-ui-panel, .design-ui-upload-card, .design-ui-callout, .design-ui-topbar,
+  .content-sidebar, .media-controls-bar, .media-dropzone, .upload-area, .code-editor-container,
+  .email-logs-toolbar, .accounting-toolbar, .accounting-chart, .accounting-chart-detail, .accounting-table,
+  .user-admin-panel-header, .stats-grid, .automation-tabs, .newsletter-hub-links, .profile-tabs-container,
+  .history-controls, .notes-view-toggle-container, .notif-settings-footer, .section-header,
+  .modal-content, .profile-modal-content, .donation-admin-dialog, .search-modal-container,
+  .search-suggestions-container, .chart-interactive-tooltip, dialog, table
+):not(:is(#newsletter-builder-layout, .builder-workspace-center, .design-ui-preview-frame, .live-preview-box) *) {
+  border-radius: 0 !important;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) main :is(
+  .card, .stat-card, .bento-card, .bento-stat-card, .big-card, .side-card, .finance-card, .info-card,
+  .table-card, .item-card, .media-card, .tool-card, .history-card, .personal-note-card, .notif-settings-card,
+  .course-card-premium, .reading-plan-card-started, .ov-event-card, .design-ui-panel, .dashboard-course-signups-card
+):not(:is(#newsletter-builder-layout, .builder-workspace-center) *) {
+  box-shadow: none !important;
+  border: 1px solid var(--admin-border, #e2e8f0) !important;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) main :is(.card, .stat-card, .bento-card, .item-card, .media-card, .tool-card, .history-card):hover {
+  transform: none !important;
+}
+/* Mørk modus: kanten må synes mot mørk bakgrunn */
+html[data-workspace-design="unified"][data-theme="dark"] body:not(.builder-active) main :is(
+  .card, .stat-card, .bento-card, .bento-stat-card, .big-card, .side-card, .finance-card, .info-card,
+  .table-card, .item-card, .media-card, .tool-card, .history-card, .personal-note-card, .notif-settings-card,
+  .course-card-premium, .reading-plan-card-started, .ov-event-card, .design-ui-panel, .dashboard-course-signups-card
+) { border-color: #263449 !important; }
+
+/* Ikonbokser inne i kort: rette, mindre fremtredende */
+html[data-workspace-design="unified"] body:not(.builder-active) :is(
+  .stat-icon-wrap, .bento-icon-wrap, .history-card-icon, .history-stat-icon, .activity-icon, .notif-icon-circle,
+  .notif-setting-icon-badge, .notif-header-icon-badge, .hero-icon-box, .design-ui-panel-header-icon,
+  .design-ui-topbar-icon, .kinetic-header-icon-circle, .tool-icon-circle, .header-icon-badge
+) { border-radius: 4px !important; box-shadow: none !important; }
+
+/* ---------- Kontroller: 4px ---------- */
+html[data-workspace-design="unified"] body:not(.builder-active) :is(
+  .btn, .btn-primary, .btn-secondary, .btn-icon, .btn-icon-round, .icon-btn, .action-btn, .finance-button,
+  .btn-link-profile, .btn-link-donor-profile, .btn-suffix-chip, .btn-delete-folder, .btn-delete-file,
+  .btn-giving-print, .btn-archive-notif, .btn-delete-notif, .note-btn-edit, .note-btn-delete, .edit-icon-btn,
+  .member-remove-btn, .notif-save-btn, .delete-task-btn, .close-search-btn, .accounting-refresh,
+  .task-filter-btn, .todo-quick-select, .profile-tab-btn, .notes-view-btn, .preview-toggle, .design-ui-preview-btn,
+  .overview-hero-action, .overview-hero-action-secondary, .workspace-primary, .dashboard-see-all-link,
+  .page-item, .breadcrumb-item, .custom-nav-item, .notification-btn, .user-profile-link, .mobile-nav-toggle,
+  .form-control, .search-input-group, .history-search-box, .family-search-box, .analytics-range-select,
+  .giving-filter-select, .notif-time-select, .premium-color-hex, .premium-range-val,
+  input:not([type=checkbox]):not([type=radio]):not([type=color]):not([type=range]), select, textarea, button
+):not(:is(#newsletter-builder-layout, .builder-workspace-center, .design-ui-preview-frame, .live-preview-box, .ql-toolbar, .comm-more-menu) *):not(.ms-profile-avatar-upload-btn):not(.premium-color-picker-input) {
+  border-radius: 4px !important;
+}
+html[data-workspace-design="unified"] body:not(.builder-active) main :is(.btn, .btn-primary, .btn-secondary, .finance-button, .overview-hero-action, .workspace-primary) {
+  box-shadow: none !important;
+}
+
+/* Merkelapper og statuser: små, rette */
+html[data-workspace-design="unified"] body:not(.builder-active) :is(
+  .badge, .status-pill, .status-badge, .podcast-status-badge, .cms-pill, .category-badge, .method-tag,
+  .recent-signup-course-tag, .course-category-tag, .stat-chip, .stat-trend, .cause-publication-status,
+  .ms-overview-banner-chip, .ov-event-date-badge
+):not(:is(#newsletter-builder-layout, .design-ui-preview-frame) *) {
+  border-radius: 3px !important;
+}
+
+/* Bilder og miniatyrer i lister: rette */
+html[data-workspace-design="unified"] body:not(.builder-active) main :is(.item-thumb, .preview-img, .course-thumbnail) { border-radius: 0 !important; }
+
+/* ---------- Tall: roligere statistikkort ---------- */
+html[data-workspace-design="unified"] body:not(.builder-active) main .stat-card .stat-value { letter-spacing: -0.01em; }
+
+/* ---------- Faner i seksjoner: understrek i stedet for piller ---------- */
+html[data-workspace-design="unified"] body:not(.builder-active) main :is(.automation-tabs, .profile-tabs-container) {
+  background: transparent !important; box-shadow: none !important; padding: 0 !important;
+  border-bottom: 1px solid var(--admin-border, #e2e8f0) !important;
+}
+
+/* ---------- Raske, rolige sideoverganger ---------- */
+@view-transition { navigation: auto; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 120ms; }
+html[data-workspace-design="unified"] #dashboard-main-header { view-transition-name: hkm-topbar; }
+html[data-workspace-design="unified"] .sidebar { view-transition-name: hkm-sidebar; }
+::view-transition-group(hkm-topbar), ::view-transition-group(hkm-sidebar) { animation: none; }
+::view-transition-old(hkm-sidebar), ::view-transition-old(hkm-topbar) { display: none; }
+::view-transition-new(hkm-sidebar), ::view-transition-new(hkm-topbar) { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+}
