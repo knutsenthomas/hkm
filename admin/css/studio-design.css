@@ -183,3 +183,12 @@ html[data-workspace-design="unified"][data-theme="dark"] body:not(.builder-activ
 html[data-workspace-design="unified"] body:not(.builder-active):not(.sidebar-mini) .sidebar .nav-link-wrap { width: 100% !important; }
 html[data-workspace-design="unified"] body:not(.builder-active):not(.sidebar-mini) .sidebar .nav-link-wrap .nav-link { flex: 1 1 auto !important; width: 100% !important; min-width: 0; }
 html[data-workspace-design="unified"] body:not(.builder-active):not(.sidebar-mini) .sidebar .nav-category-header { width: 100% !important; }
+
+/* Slett valgte vises bare når noe er valgt (skriptet skjuler den med display:none) */
+#bulk-delete-btn[style*="display: none"], #bulk-delete-btn[style*="display:none"] { display: none !important; }
+/* Min side: gruppeoverskriftene er bare etiketter, ikke knapper */
+html[data-workspace-design="unified"] body.minside-body:not(.sidebar-mini) .sidebar .nav-category-header {
+  cursor: default !important; min-height: 0 !important; padding: 16px 12px 6px !important;
+  font-size: 12px !important; font-weight: 600 !important; color: #64748b !important; background: transparent !important;
+}
+html[data-workspace-design="unified"] body.minside-body .sidebar .nav-category-header:hover { background: transparent !important; color: #64748b !important; }

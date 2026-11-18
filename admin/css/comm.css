@@ -8,10 +8,13 @@
 .comm-header-tabs { display: none; }
 html.comm-page #dashboard-main-header .section-header-icon,
 html.comm-page #dashboard-main-header .section-subtitle { display: none !important; }
-html.comm-page #dashboard-main-header .section-header-content { justify-content: flex-start !important; gap: 28px !important; align-self: stretch; align-items: stretch !important; }
-html.comm-page #dashboard-main-header .section-header-titles { justify-content: center !important; flex: 0 0 auto !important; }
+html.comm-page #dashboard-main-header { padding-top: 0 !important; padding-bottom: 0 !important; min-height: 64px; box-sizing: border-box; display: flex !important; align-items: stretch !important; }
+html.comm-page #dashboard-main-header .section-header { align-self: stretch !important; align-items: stretch !important; height: auto !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; flex: 1 1 auto; }
+html.comm-page #dashboard-main-header .section-header > :not(.section-header-content) { align-self: center; }
+html.comm-page #dashboard-main-header .section-header-content { justify-content: flex-start !important; gap: 28px !important; align-self: stretch !important; align-items: stretch !important; flex: 1 1 auto; }
+html.comm-page #dashboard-main-header .section-header-titles { justify-content: center !important; flex: 0 0 auto !important; align-self: center; }
 html.comm-page #dashboard-main-header .section-header-actions { margin-left: auto !important; align-self: center; }
-html.comm-page #dashboard-main-header .comm-header-tabs { display: flex; align-items: stretch; gap: 2px; min-width: 0; overflow-x: auto; scrollbar-width: none; margin: -14px 0; }
+html.comm-page #dashboard-main-header .comm-header-tabs { display: flex; align-items: stretch; gap: 2px; min-width: 0; overflow-x: auto; scrollbar-width: none; margin: 0 0 -1px; align-self: stretch; }
 html.comm-page #dashboard-main-header .comm-header-tabs::-webkit-scrollbar { display: none; }
 .comm-header-tabs a.comm-tab {
   display: inline-flex; align-items: center; gap: 8px; padding: 0 14px; box-sizing: border-box;
@@ -128,15 +131,15 @@ html.comm-page .unified-inbox-container { border: 0 !important; border-top: 0 !i
 html.comm-page main :is(.card, .stat-item, .crm-stats-bar, .contacts-grid, .table-container, .workspace-table, .newsletter-workspace, .unified-inbox-container, .inbox-container, .inbox-folders, .modal-content, table) { border-radius: 0 !important; }
 html.comm-page main :is(input:not([type=checkbox]):not([type=radio]), select, textarea, button:not(.avatar), .btn, a.workspace-primary, .crm-btn) { border-radius: 4px !important; box-shadow: none !important; }
 
-/* ---------- Mobil ---------- */
+/* ---------- Mobil: fanene som egen rad nederst i toppen ---------- */
 @media (max-width: 1024px) {
-  html.comm-page #dashboard-main-header .comm-header-tabs { position: fixed; left: 0; right: 0; top: 72px; z-index: 999; margin: 0; height: 48px; padding: 0 8px; background: var(--admin-surface, #fff); border-bottom: 1px solid var(--admin-border, #e2e8f0); }
-  html[data-theme="dark"].comm-page #dashboard-main-header .comm-header-tabs { background: #0f172a; border-color: #263449; }
-  html.comm-page :is(#newsletter-dashboard-layout, .crm-content, .inbox-container) { margin-top: 48px !important; }
-  html.comm-page .comm-subnav-row + .crm-content { margin-top: 0 !important; }
+  html.comm-page #dashboard-main-header .section-header-content { flex-wrap: wrap !important; row-gap: 0 !important; }
+  html.comm-page #dashboard-main-header .section-header-titles,
+  html.comm-page #dashboard-main-header .section-header-actions { min-height: 56px; display: flex; align-items: center; }
+  html.comm-page #dashboard-main-header .comm-header-tabs { order: 3; flex: 0 0 100%; height: 46px; margin: 0 0 -1px; }
   html.comm-page #newsletter-dashboard-layout { padding: 16px 16px 100px !important; }
   html.comm-page .crm-content { padding: 0 16px 24px !important; }
-  html.comm-page .comm-subnav-row { margin: 64px 16px 14px; }
+  html.comm-page .comm-subnav-row { margin: 16px 16px 14px; }
   html.comm-page .unified-inbox-container { height: auto !important; }
 }
 
