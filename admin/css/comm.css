@@ -145,3 +145,12 @@ html.comm-page main :is(input:not([type=checkbox]):not([type=radio]), select, te
 
 /* Den statiske fanelinjen vises bare der den hører hjemme */
 html:not(.comm-page) .comm-header-tabs { display: none !important; }
+
+/* Aktiv fane: strek rett under teksten, like bred som ikon + tekst */
+.comm-header-tabs a.comm-tab { position: relative; border-bottom: 0 !important; }
+.comm-header-tabs a.comm-tab[aria-current="page"]::after {
+  content: ""; position: absolute; left: 14px; right: 14px; bottom: 14px; height: 2px; background: #c56828; border-radius: 0;
+}
+@media (max-width: 1024px) {
+  .comm-header-tabs a.comm-tab[aria-current="page"]::after { bottom: 6px; }
+}
