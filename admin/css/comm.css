@@ -42,7 +42,9 @@ html[data-theme="dark"].comm-page :is(body, main, .crm-main, #newsletter-dashboa
 html.comm-page #newsletter-dashboard-layout { padding: 20px 24px 48px !important; }
 html.comm-page #newsletter-dashboard-layout > * { margin-left: 0 !important; margin-right: 0 !important; }
 html.comm-page #newsletter-workspace { margin: 0 !important; padding: 0 !important; background: transparent !important; border: 0 !important; box-shadow: none !important; display: flex; flex-direction: column; gap: 14px; }
-html.comm-page #newsletter-workspace[hidden] { display: none; }
+/* Nyhetsbrev vises med en gang: HKM Studio-innholdet skjules før første tegning, og arbeidsflaten vises mens data hentes */
+html.comm-page #newsletter-dashboard-layout > :not(#newsletter-workspace) { display: none !important; }
+html.comm-page #newsletter-workspace[hidden] { display: flex !important; }
 html.comm-page .crm-content { padding: 0 24px 32px !important; }
 html.comm-page .newsletter-workspace > .workspace-heading { display: none !important; }
 
