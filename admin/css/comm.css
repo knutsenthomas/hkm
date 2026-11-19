@@ -184,3 +184,13 @@ html.comm-page #btn-compose-email:hover { background: #b45d22 !important; }
   html.comm-page .newsletter-workspace .workspace-nav::-webkit-scrollbar { display: none; }
   html.comm-page .newsletter-workspace .workspace-nav > * { flex: 0 0 auto; white-space: nowrap; }
 }
+@media (max-width: 1024px) {
+  /* The three tabs share the width instead of running off the screen. */
+  html.comm-page body.admin-body #dashboard-main-header .comm-header-tabs a.comm-tab { flex: 1 1 0 !important; min-width: 0; padding: 0 6px !important; gap: 6px; }
+  /* Menu button lines up with the title row, not the middle of the taller header. */
+  html.comm-page body.admin-body #dashboard-main-header .section-header > :not(.section-header-content) { align-self: flex-start !important; margin-top: 6px; }
+}
+@media (max-width: 380px) {
+  html.comm-page body.admin-body #dashboard-main-header .comm-header-tabs a.comm-tab { font-size: 13px !important; }
+  html.comm-page body.admin-body #dashboard-main-header .comm-header-tabs a.comm-tab .comm-tab-icon { flex-basis: 18px; width: 18px; height: 18px; }
+}
