@@ -1257,7 +1257,7 @@
                     <h3 class="sidebar-title" style="font-size: 18px; margin-bottom: 16px;">Compartir y herramientas</h3>
                     
                     <div class="tools-buttons" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
-                        <button class="btn-tool" onclick="window.hkmPrintPlan()" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; border: 1px solid #cbd5e1; background: white; border-radius: 12px; font-weight: 600; color: #1e293b; cursor: pointer; transition: all 0.2s ease;">
+                        <button class="btn-tool" id="plan-print-btn" onclick="window.hkmPrintPlan()" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; border: 1px solid #cbd5e1; background: white; border-radius: 12px; font-weight: 600; color: #1e293b; cursor: pointer; transition: all 0.2s ease;">
                             <span class="material-symbols-outlined text-lg">print</span>
                             Imprimir / Guardar PDF
                         </button>
@@ -1514,13 +1514,39 @@
                     plan = window.contentManager.getLocalizedContentItem(plan);
                 }
                 window.__hkmPlanPdf = (planData && planData.printPdf && planData.printPdf['es']) || '';
+                // Plans sold in the shop: no printing, a buy button instead.
+                const HKM_SHOP_PLANS = { '21-dager-bonn-og-faste': 'https://hiskingdomdesigns.no/produkt/78170401-2353-2a27-e3fb-527b1b2ff6ed' };
+                const hkmShopUrl = (planData && typeof planData.shopUrl === 'string' && /^https:\/\//.test(planData.shopUrl) && planData.shopUrl)
+                    || HKM_SHOP_PLANS[realPlanId] || HKM_SHOP_PLANS[planId] || '';
+                if (hkmShopUrl) {
+                    window.__hkmPlanPdf = '';
+                    window.hkmPrintPlan = () => window.open(hkmShopUrl, '_blank', 'noopener');
+                    const printBtn = document.getElementById('plan-print-btn');
+                    if (printBtn) {
+                        const buy = document.createElement('a');
+                        buy.className = printBtn.className;
+                        buy.id = 'plan-shop-btn';
+                        buy.href = hkmShopUrl;
+                        buy.target = '_blank';
+                        buy.rel = 'noopener';
+                        buy.setAttribute('style', printBtn.getAttribute('style') + ' text-decoration: none;');
+                        buy.innerHTML = '<span class="material-symbols-outlined text-lg">shopping_bag</span> Comprar en la tienda';
+                        printBtn.replaceWith(buy);
+                    }
+                    if (!document.getElementById('hkm-no-print-style')) {
+                        const style = document.createElement('style');
+                        style.id = 'hkm-no-print-style';
+                        style.textContent = '@media print { body > * { display: none !important; } body::before { content: ' + JSON.stringify('Este plan de lectura está disponible impreso o en PDF en nuestra tienda: ' + hkmShopUrl) + '; display: block; padding: 48px; font: 16px/1.5 sans-serif; color: #111; } }';
+                        document.head.appendChild(style);
+                    }
+                }
                 renderPlanDetails(plan);
 
                 // Load other reading plans to show at the bottom
                 try {
                     const rawPlans = await service.getCollection('reading_plans');
                     const plans = rawPlans.map(p => window.contentManager ? window.contentManager.getLocalizedContentItem(p) : p);
-                    const otherPlans = plans.filter(p => p.id !== planId).slice(0, 3);
+                    const otherPlans = plans.filter(p => p.id !== planId && p.published !== false).slice(0, 3);
                     renderOtherPlans(otherPlans);
                 } catch (collErr) {
                     console.error("Error loading other plans:", collErr);
