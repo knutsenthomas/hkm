@@ -81,6 +81,10 @@ window.onunhandledrejection = function (event) {
     return false;
   }
 
+  if (event.reason?.name === "AbortError" || /Transition was|ViewTransition/.test(reason)) {
+    return false;
+  }
+
   if (reason.trim() === "Script error." || reason.trim() === "Script error") {
     console.warn("Ignored opaque unhandled rejection from browser context.");
     return false;

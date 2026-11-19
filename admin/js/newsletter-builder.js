@@ -12279,6 +12279,10 @@ class NewsletterBuilder {
                 mainHeader.style.removeProperty('display');
             }
             document.body.className = 'admin-body main-dashboard';
+            // Keep the user's menu choice (narrow menu) when returning from the editor.
+            try {
+                if (window.innerWidth >= 1025 && localStorage.getItem('hkm_admin_sidebar_mini') === 'true') document.body.classList.add('sidebar-mini');
+            } catch (_) {}
 
             // Clear active draft from URL search parameter
             const url = new URL(window.location.href);

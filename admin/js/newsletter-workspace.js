@@ -50,27 +50,56 @@ export function summarizeCampaigns(campaigns, days = 'all', now = Date.now()) {
 }
 const root = document.getElementById('newsletter-workspace');
 if (root) {
-    const isNewsletterArea = new URLSearchParams(location.search).get('section') === 'newsletter';
+    const STUDIO_SECTIONS = ['content', 'newsletter', 'ideas'];
+    const currentSection = () => {
+        const value = new URLSearchParams(location.search).get('section');
+        return STUDIO_SECTIONS.includes(value) ? value : 'content';
+    };
+    const isNewsletterArea = currentSection() === 'newsletter';
+    let workspaceLoaded = false;
     const syncArea = () => {
-        const active = new URLSearchParams(location.search).get('section') === 'newsletter';
+        const section = currentSection();
+        const active = section === 'newsletter';
         root.hidden = !active;
         document.body.classList.toggle('newsletter-area-active', active);
+        STUDIO_SECTIONS.forEach(name => document.body.classList.toggle(`studio-section-${name}`, name === section));
+        document.querySelectorAll('[data-studio-section]').forEach(link => {
+            if (link.dataset.studioSection === section) link.setAttribute('aria-current', 'page');
+            else link.removeAttribute('aria-current');
+        });
+        let signedIn = false;
+        try { signedIn = !!(window.firebaseService?.db && window.firebase?.apps?.length && window.firebase.auth().currentUser); } catch (_) { signedIn = false; }
+        if (active && !workspaceLoaded && signedIn) {
+            workspaceLoaded = true;
+            document.querySelector('[data-workspace-refresh]')?.click();
+        }
     };
+    document.querySelectorAll('[data-studio-section]').forEach(link => link.addEventListener('click', event => {
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+        event.preventDefault();
+        const url = new URL(window.location.href);
+        const section = link.dataset.studioSection;
+        if (section === 'content') url.searchParams.delete('section'); else url.searchParams.set('section', section);
+        url.searchParams.delete('draftId');
+        window.history.pushState({}, '', url.toString());
+        syncArea();
+        window.dispatchEvent(new CustomEvent('hkm:studio-sectionchange'));
+    }));
+    window.addEventListener('popstate', syncArea);
     syncArea();
     window.addEventListener('hkm:newsletter-modechange', syncArea);
     window.addEventListener('hkm:newsletter-overview', event => {
         syncArea();
-        root.querySelector('[data-resume-editor]').hidden = !event.detail?.resumeEditor;
-        root.querySelector('[data-workspace-refresh]').click();
+        document.querySelector('[data-resume-editor]').hidden = !event.detail?.resumeEditor;
+        document.querySelector('[data-workspace-refresh]').click();
     });
-    root.querySelector('[data-resume-editor]')?.addEventListener('click', () => {
+    document.querySelector('[data-resume-editor]')?.addEventListener('click', () => {
         window.builder?.toggleMode('builder');
         window.builder?.switchSidebarView('builder');
     });
+    // Mottakere er de samme personene som i Kontakter: vis dem der, i samme design.
     root.querySelector('[data-open-subscribers]')?.addEventListener('click', () => {
-        if (!window.builder) return;
-        window.builder.toggleMode('builder');
-        window.builder.switchSidebarView('subscribers');
+        location.href = '/admin/admin-kommunikasjon.html';
     });
     let campaigns = [];
     let drafts = [];
@@ -255,7 +284,7 @@ if (root) {
             if (!values.length) box.append(el('p', kind === 'drafts' ? 'Ingen lagrede kladder i dette utvalget.' : 'Ingen lagrede maler i dette utvalget.'));
         }
     };
-    root.querySelector('[data-workspace-refresh]').addEventListener('click', async event => {
+    document.querySelector('[data-workspace-refresh]').addEventListener('click', async event => {
         const db = window.firebaseService?.db;
         if (!db || !window.firebase?.auth().currentUser) { status.textContent = 'Logg inn og vent til admin er klar.'; return; }
         event.currentTarget.disabled = true;
@@ -276,7 +305,7 @@ if (root) {
             status.textContent='Oversikten er oppdatert.';
             render();
         } catch { status.textContent='Kunne ikke hente oversikten. Kontroller tilgangen og prøv igjen.'; }
-        finally { root.querySelector('[data-workspace-refresh]').disabled=false; }
+        finally { document.querySelector('[data-workspace-refresh]').disabled=false; }
     });
     search.addEventListener('input',render); filter.addEventListener('change',render);
     if (isNewsletterArea) {
@@ -284,7 +313,8 @@ if (root) {
         const readyTimer = setInterval(() => {
             if (window.firebaseService?.db && window.firebase?.auth().currentUser) {
                 clearInterval(readyTimer);
-                root.querySelector('[data-workspace-refresh]').click();
+                workspaceLoaded = true;
+                document.querySelector('[data-workspace-refresh]').click();
             } else if (++attempts >= 100) {
                 clearInterval(readyTimer);
                 status.textContent = 'Trykk Oppdater når innloggingen er klar.';

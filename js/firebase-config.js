@@ -12,7 +12,11 @@ const _part2 = "AelVsZnTU5xjQsjewWG7RjYEsQSHH-bkE";
 
 window.firebaseConfig = {
     apiKey: _part1 + _part2,
-    authDomain: "hiskingdomministry.no",
+    // The test site signs in through its own domain; /__/auth is proxied to Firebase by vercel.json.
+    // Chrome blocks sign-in that has to pass through a different domain than the page.
+    authDomain: (typeof location !== 'undefined' && location.hostname === 'test.hiskingdomministry.no')
+        ? 'test.hiskingdomministry.no'
+        : "hiskingdomministry.no",
     projectId: "his-kingdom-ministry",
     storageBucket: "his-kingdom-ministry.firebasestorage.app",
     messagingSenderId: "791237361706",

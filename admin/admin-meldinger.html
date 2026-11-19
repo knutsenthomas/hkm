@@ -256,7 +256,12 @@
         }
     </style>
     <link rel="stylesheet" href="/admin/css/workspace-design.css?v=20261024_11">
+    <link rel="stylesheet" href="/admin/css/studio-design.css?v=20261118_14">
+    <script src="/admin/js/svg-icons.js?v=20261118_4"></script>
     <script type="module" src="/admin/js/workspace-icons.js?v=20261024_1"></script>
+    <script>(function(){var p=location.pathname,s=new URLSearchParams(location.search).get('section');if(/admin-meldinger|admin-kommunikasjon|admin-segmenter/.test(p)||(/admin-nyhetsbrev/.test(p)&&s==='newsletter'&&!new URLSearchParams(location.search).has('draftId')))document.documentElement.classList.add('comm-page');})();</script>
+    <script type="speculationrules">{"prefetch":[{"source":"list","urls":["/admin/admin-meldinger.html","/admin/admin-kommunikasjon.html","/admin/admin-segmenter.html","/admin/admin-nyhetsbrev.html?section=newsletter"],"eagerness":"eager"}]}</script>
+    <link rel="stylesheet" href="css/comm.css?v=20261118_10">
 </head>
 
 <body class="crm-body">
@@ -435,9 +440,14 @@
                     </div>
                     <div class="section-header-content">
                         <div class="section-header-titles" style="display: flex !important; flex-direction: column !important; gap: 4px !important; margin: 0 !important; padding: 0 !important;">
-                            <h2 class="section-title" style="margin: 0 !important; padding: 0 !important; line-height: 1.2 !important;">Meldinger</h2>
+                            <h2 class="section-title" style="margin: 0 !important; padding: 0 !important; line-height: 1.2 !important;">Kommunikasjon</h2>
                             <p class="section-subtitle" style="margin: 0 !important; margin-top: 0 !important; padding: 0 !important; line-height: 1.45 !important;">Håndter henvendelser fra kontaktskjemaet på nettsiden.</p>
                         </div>
+<nav class="comm-header-tabs" aria-label="Kommunikasjon">
+<a class="comm-tab" href="/admin/admin-meldinger.html" aria-current="page"><svg class="comm-tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>Innboks<span class="comm-badge" id="comm-inbox-badge" hidden></span></a>
+<a class="comm-tab" href="/admin/admin-kommunikasjon.html"><svg class="comm-tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Kontakter</a>
+<a class="comm-tab" href="/admin/admin-nyhetsbrev.html?section=newsletter"><svg class="comm-tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>Nyhetsbrev</a>
+</nav>
                         <div class="section-header-actions">
                         <!-- Search bar removed to match Gold Standard dashboard -->
 
@@ -462,6 +472,7 @@
                 </div>
             </div>
 
+<div class="comm-tabs" id="comm-tabs" data-active="inbox" data-static="1"></div>
             <div class="inbox-container">
                 <div class="unified-inbox-container" id="unified-inbox">
                     <!-- 1. Folders Sidebar -->
@@ -764,9 +775,10 @@
     </script>
 
     <script type="module" src="../js/admin-utils.js?v=20260714_V1"></script>
-    <script type="module" src="js/admin-header.js?v=20260602_V3"></script>
+    <script type="module" src="js/admin-header.js?v=20261118_4"></script>
+    <script type="module" src="js/comm-tabs.js?v=20261118_4"></script>
     <script type="module" src="js/todo-drawer.js?v=20260602_V3"></script>
-    <script type="module" src="js/crm-messages.js?v=20260602_V3"></script>
+    <script type="module" src="js/crm-messages.js?v=20261118_1"></script>
     
 </body>
 

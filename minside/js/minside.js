@@ -34,12 +34,12 @@ const minsideTranslations = {
         'sidebar.title': 'Min side',
         'sidebar.seNettside': 'Se nettside',
         'sidebar.oversikt': 'Oversikt',
-        'sidebar.mittMedlemskap': 'MITT MEDLEMSKAP',
+        'sidebar.mittMedlemskap': 'Mitt medlemskap',
         'sidebar.profil': 'Profil',
         'sidebar.kurs': 'Kurs',
         'sidebar.readingPlans': 'Leseplaner',
         'sidebar.gaver': 'Gaver',
-        'sidebar.aktivitet': 'AKTIVITET',
+        'sidebar.aktivitet': 'Aktivitet',
         'sidebar.historikk': 'Aktivitet',
         'sidebar.varslinger': 'Varslinger',
         'sidebar.logg': 'Logg',
@@ -340,12 +340,12 @@ const minsideTranslations = {
         'sidebar.title': 'My Page',
         'sidebar.seNettside': 'View Website',
         'sidebar.oversikt': 'Overview',
-        'sidebar.mittMedlemskap': 'MY MEMBERSHIP',
+        'sidebar.mittMedlemskap': 'My membership',
         'sidebar.profil': 'Profile',
         'sidebar.kurs': 'Courses',
         'sidebar.readingPlans': 'Reading Plans',
         'sidebar.gaver': 'Giving',
-        'sidebar.aktivitet': 'ACTIVITY',
+        'sidebar.aktivitet': 'Activity',
         'sidebar.varslinger': 'Notifications',
         'sidebar.logg': 'Log',
         'sidebar.notater': 'Notes',
@@ -645,12 +645,12 @@ const minsideTranslations = {
         'sidebar.title': 'Mi página',
         'sidebar.seNettside': 'Ver Sitio Web',
         'sidebar.oversikt': 'Resumen',
-        'sidebar.mittMedlemskap': 'MI MEMBRESÍA',
+        'sidebar.mittMedlemskap': 'Mi membresía',
         'sidebar.profil': 'Perfil',
         'sidebar.kurs': 'Cursos',
         'sidebar.readingPlans': 'Planes de Lectura',
         'sidebar.gaver': 'Ofrendas',
-        'sidebar.aktivitet': 'ACTIVIDAD',
+        'sidebar.aktivitet': 'Actividad',
         'sidebar.varslinger': 'Notificaciones',
         'sidebar.logg': 'Historial',
         'sidebar.notater': 'Notas',
@@ -4495,15 +4495,15 @@ class MinSideManager {
             <div class="ms-section-header-row" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
                 <h2 class="ms-section-title" style="margin: 0;">${t('notifications.title')}</h2>
                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                    <button class="btn btn-ghost btn-sm" id="mark-all-read-btn" style="display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 0 12px !important; height: 32px !important; min-height: 32px !important; border-radius: 12px !important;">
+                    <button class="btn btn-ghost btn-sm" id="mark-all-read-btn" style="display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 0 12px !important; height: 32px !important; min-height: 32px !important; border-radius: 4px !important;">
                         <span class="material-symbols-outlined" style="font-size: 16px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; margin: 0 !important;">done_all</span>
                         <span style="display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important;">${t('notifications.markAllRead')}</span>
                     </button>
-                    <button class="btn btn-ghost btn-sm" id="delete-selected-notifs-btn" style="display: none !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 0 12px !important; height: 32px !important; min-height: 32px !important; border-radius: 12px !important; color: #ef4444 !important; background: rgba(239, 68, 68, 0.12) !important; font-weight: 700 !important;">
+                    <button class="btn btn-ghost btn-sm" id="delete-selected-notifs-btn" style="display: none !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 0 12px !important; height: 32px !important; min-height: 32px !important; border-radius: 4px !important; color: #ef4444 !important; background: rgba(239, 68, 68, 0.12) !important; font-weight: 700 !important;">
                         <span class="material-symbols-outlined" style="font-size: 16px !important; color: #ef4444 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; margin: 0 !important;">checklist_rtl</span>
                         <span id="delete-selected-text">${isNo ? 'Slett valgte (0)' : (isEs ? 'Eliminar seleccionados (0)' : 'Delete selected (0)')}</span>
                     </button>
-                    <button class="btn btn-ghost btn-sm" id="delete-all-notifs-btn" style="display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 0 12px !important; height: 32px !important; min-height: 32px !important; border-radius: 12px !important; color: #ef4444 !important; background: rgba(239, 68, 68, 0.08) !important;">
+                    <button class="btn btn-ghost btn-sm" id="delete-all-notifs-btn" style="display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 0 12px !important; height: 32px !important; min-height: 32px !important; border-radius: 4px !important; color: #ef4444 !important; background: rgba(239, 68, 68, 0.08) !important;">
                         <span class="material-symbols-outlined" style="font-size: 16px !important; color: #ef4444 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; margin: 0 !important;">delete_sweep</span>
                         <span style="display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important;">${isNo ? 'Slett alle' : (isEs ? 'Eliminar todos' : 'Delete all')}</span>
                     </button>
@@ -7167,7 +7167,7 @@ class MinSideManager {
                                         <p style="margin: 0 0 16px; font-size: 0.88rem; font-weight: 400; color: #cbd5e1; max-width: 450px;">
                                             Kunne ikke starte den integrerte spilleren: <code>${errMsg}</code>
                                         </p>
-                                        <button id="zoom-fallback-trigger-btn" class="player-btn-zoom-app" style="background:#ef4444 !important; border-color:#ef4444 !important; font-size:0.8rem !important; height:38px !important; padding:6px 16px !important; border-radius:30px !important;">
+                                        <button id="zoom-fallback-trigger-btn" class="player-btn-zoom-app" style="background:#ef4444 !important; border-color:#ef4444 !important; font-size:0.8rem !important; height:38px !important; padding:6px 16px !important; border-radius: 4px !important;">
                                             Start reserveløsning (iframe)
                                         </button>
                                     </div>
@@ -9375,14 +9375,14 @@ class MinSideManager {
                 </div>
                 <div style="display:flex; align-items:center; gap:12px;">
                     <div class="notes-view-toggle-container" style="display:inline-flex; border: 1.5px solid var(--border-solid); border-radius: 12px; overflow:hidden; padding: 2px; background: var(--card-bg); height: 38px; box-sizing: border-box; align-items: center;">
-                        <button class="notes-view-btn" id="view-grid-btn" style="width: 34px !important; height: 34px !important; border:none !important; background: ${currentView === 'grid' ? 'var(--main-bg)' : 'transparent'} !important; border-radius: 8px !important; color: ${currentView === 'grid' ? 'var(--accent-color)' : 'var(--text-muted)'} !important; display:flex !important; align-items:center !important; justify-content:center !important; cursor:pointer !important; transition: all 0.2s !important; padding: 0 !important; margin: 0 !important; box-shadow: none !important; min-width: 0 !important;" title="Rutenett">
+                        <button class="notes-view-btn" id="view-grid-btn" style="width: 34px !important; height: 34px !important; border:none !important; background: ${currentView === 'grid' ? 'var(--main-bg)' : 'transparent'} !important; border-radius: 4px !important; color: ${currentView === 'grid' ? 'var(--accent-color)' : 'var(--text-muted)'} !important; display:flex !important; align-items:center !important; justify-content:center !important; cursor:pointer !important; transition: all 0.2s !important; padding: 0 !important; margin: 0 !important; box-shadow: none !important; min-width: 0 !important;" title="Rutenett">
                             <span class="material-symbols-outlined" style="font-size:20px;">grid_view</span>
                         </button>
-                        <button class="notes-view-btn" id="view-list-btn" style="width: 34px !important; height: 34px !important; border:none !important; background: ${currentView === 'list' ? 'var(--main-bg)' : 'transparent'} !important; border-radius: 8px !important; color: ${currentView === 'list' ? 'var(--accent-color)' : 'var(--text-muted)'} !important; display:flex !important; align-items:center !important; justify-content:center !important; cursor:pointer !important; transition: all 0.2s !important; padding: 0 !important; margin: 0 !important; box-shadow: none !important; min-width: 0 !important;" title="Liste">
+                        <button class="notes-view-btn" id="view-list-btn" style="width: 34px !important; height: 34px !important; border:none !important; background: ${currentView === 'list' ? 'var(--main-bg)' : 'transparent'} !important; border-radius: 4px !important; color: ${currentView === 'list' ? 'var(--accent-color)' : 'var(--text-muted)'} !important; display:flex !important; align-items:center !important; justify-content:center !important; cursor:pointer !important; transition: all 0.2s !important; padding: 0 !important; margin: 0 !important; box-shadow: none !important; min-width: 0 !important;" title="Liste">
                             <span class="material-symbols-outlined" style="font-size:20px;">format_list_bulleted</span>
                         </button>
                     </div>
-                    <button class="btn btn-primary" id="new-note-btn" style="height: 38px !important; padding: 0 16px !important; font-size: 13.5px !important; font-weight: 700 !important; border-radius: 10px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; margin: 0 !important; width: auto !important; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important; border: none !important; color: #ffffff !important; cursor: pointer !important; box-sizing: border-box !important;">
+                    <button class="btn btn-primary" id="new-note-btn" style="height: 38px !important; padding: 0 16px !important; font-size: 13.5px !important; font-weight: 700 !important; border-radius: 4px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; margin: 0 !important; width: auto !important; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important; border: none !important; color: #ffffff !important; cursor: pointer !important; box-sizing: border-box !important;">
                         <span class="material-symbols-outlined" style="font-size: 18px !important;">add</span>
                         ${t('notes.newNote')}
                     </button>
@@ -10035,7 +10035,7 @@ class MinSideManager {
         modal.id = 'hkm-custom-confirm-modal';
         modal.className = 'hkm-modal-overlay';
         modal.innerHTML = `
-        <div class="hkm-modal-container" style="max-width: 420px !important; padding: 24px !important; border-radius: 24px !important; text-align: center !important;">
+        <div class="hkm-modal-container" style="max-width: 420px !important; padding: 24px !important; border-radius: 0 !important; text-align: center !important;">
             <div style="width: 56px; height: 56px; border-radius: 50%; background: ${isDanger ? 'rgba(239, 68, 68, 0.12)' : 'rgba(209, 125, 57, 0.12)'}; color: ${isDanger ? '#ef4444' : '#d17d39'}; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
                 <span class="material-symbols-outlined" style="font-size: 28px !important;">${isDanger ? 'delete_forever' : 'help'}</span>
             </div>
@@ -10315,7 +10315,7 @@ class MinSideManager {
                             <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 12px; margin-top: auto;">
                                 <div style="display: flex !important; align-items: center !important; gap: 6px !important; font-size: 13px; font-weight: 700; color: #64748b; line-height: 1 !important;"><span class="material-symbols-outlined" style="font-size: 18px; color: #bd4f2a; position: relative; top: 1.5px !important; display: inline-block; line-height: 1;">volunteer_activism</span><span style="display: inline-block; line-height: 1;">${t('prayer.praysForThis', { n: count })}</span></div>
                                 
-                                <button class="${hasPrayed ? 'btn-pray-disabled' : 'btn-pray'}" ${hasPrayed ? 'disabled style="background: #f1f5f9 !important; border-color: #f1f5f9 !important; color: #94a3b8 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; padding: 8px 16px !important; font-size: 13.5px !important; font-weight: 600 !important; border: none !important; border-radius: 8px !important; cursor: not-allowed !important; line-height: 1 !important; width: auto !important; height: auto !important; box-sizing: border-box !important;"' : 'style="background: #d17d39 !important; border-color: #d17d39 !important; color: #ffffff !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; padding: 8px 16px !important; font-size: 13.5px !important; font-weight: 600 !important; border: none !important; border-radius: 8px !important; cursor: pointer !important; line-height: 1 !important; width: auto !important; height: auto !important; box-sizing: border-box !important;"'} onclick="window.minSideManager.supportPrayer('${p.id}', '${p.userId}')"><span class="material-symbols-outlined" style="font-size: 18px !important; position: relative !important; top: 1px !important; line-height: 1 !important; display: inline-block !important; margin: 0 !important; padding: 0 !important; width: auto !important; height: auto !important;">favorite</span><span style="line-height: 1 !important; display: inline-block !important; margin: 0 !important; padding: 0 !important; width: auto !important; height: auto !important;">${hasPrayed ? t('prayer.hasPrayed') : t('prayer.pray')}</span></button>
+                                <button class="${hasPrayed ? 'btn-pray-disabled' : 'btn-pray'}" ${hasPrayed ? 'disabled style="background: #f1f5f9 !important; border-color: #f1f5f9 !important; color: #94a3b8 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; padding: 8px 16px !important; font-size: 13.5px !important; font-weight: 600 !important; border: none !important; border-radius: 4px !important; cursor: not-allowed !important; line-height: 1 !important; width: auto !important; height: auto !important; box-sizing: border-box !important;"' : 'style="background: #d17d39 !important; border-color: #d17d39 !important; color: #ffffff !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; padding: 8px 16px !important; font-size: 13.5px !important; font-weight: 600 !important; border: none !important; border-radius: 4px !important; cursor: pointer !important; line-height: 1 !important; width: auto !important; height: auto !important; box-sizing: border-box !important;"'} onclick="window.minSideManager.supportPrayer('${p.id}', '${p.userId}')"><span class="material-symbols-outlined" style="font-size: 18px !important; position: relative !important; top: 1px !important; line-height: 1 !important; display: inline-block !important; margin: 0 !important; padding: 0 !important; width: auto !important; height: auto !important;">favorite</span><span style="line-height: 1 !important; display: inline-block !important; margin: 0 !important; padding: 0 !important; width: auto !important; height: auto !important;">${hasPrayed ? t('prayer.hasPrayed') : t('prayer.pray')}</span></button>
                             </div>
                         </div>
                     </div>
