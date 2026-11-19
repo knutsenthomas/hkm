@@ -631,3 +631,6 @@ html[data-theme="dark"] .campaign-report :is(.report-stat,.report-table-wrap,.re
   html .newsletter-workspace .analytics-table .analytics-row td.is-number small { display:inline; margin:0 0 0 4px; }
 }
 .newsletter-workspace .status-badge { text-transform:none !important; letter-spacing:0 !important; }
+dialog.campaign-report { margin:auto !important; width:min(860px, calc(100vw - 16px)) !important; box-sizing:border-box; }
+dialog.campaign-report .newsletter-ai-header h2 { font-size:20px !important; line-height:1.3 !important; overflow-wrap:anywhere; }
+@media (max-width:700px) { dialog.campaign-report { max-height:calc(100dvh - 16px) !important; padding:16px !important; } }
