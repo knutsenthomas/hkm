@@ -625,3 +625,9 @@ html[data-theme="dark"] .newsletter-workspace .metric-info-text { background:#0f
 .campaign-report .report-url { overflow-wrap:anywhere; }
 html[data-theme="dark"] .campaign-report :is(.report-stat,.report-table-wrap,.report-table :is(th,td)) { border-color:#263449; }
 @media (max-width:700px) { .campaign-report .report-stats { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:700px) {
+  html.comm-page .newsletter-workspace .analytics-table .analytics-row td,
+  html .newsletter-workspace .analytics-table .analytics-row td.is-number { padding:0 !important; border:0 !important; text-align:left !important; white-space:normal !important; background:none !important; }
+  html .newsletter-workspace .analytics-table .analytics-row td.is-number small { display:inline; margin:0 0 0 4px; }
+}
+.newsletter-workspace .status-badge { text-transform:none !important; letter-spacing:0 !important; }

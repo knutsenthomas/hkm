@@ -194,3 +194,6 @@ html.comm-page #btn-compose-email:hover { background: #b45d22 !important; }
   html.comm-page body.admin-body #dashboard-main-header .comm-header-tabs a.comm-tab { font-size: 13px !important; }
   html.comm-page body.admin-body #dashboard-main-header .comm-header-tabs a.comm-tab .comm-tab-icon { flex-basis: 18px; width: 18px; height: 18px; }
 }
+@media (max-width: 480px) {
+  html.comm-page body.admin-body #dashboard-main-header .comm-header-tabs a.comm-tab .comm-tab-icon { display: none; }
+}
