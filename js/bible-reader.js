@@ -5228,7 +5228,7 @@ class BibleReader {
                 const blogItems = Object.values(blogData.items);
                 blogItems.forEach(item => {
                     const title = (item.title || '').toLowerCase();
-                    const content = (item.content || '').toLowerCase();
+                    const content = (typeof item.content === 'string' ? item.content : JSON.stringify(item.content || '')).toLowerCase();
                     const category = (item.category || '').toLowerCase();
                     if (title.includes(term) || content.includes(term) || category.includes(term)) {
                         results.push({
@@ -5248,8 +5248,8 @@ class BibleReader {
                 const teachingItems = Object.values(teachingData.items);
                 teachingItems.forEach(item => {
                     const title = (item.title || '').toLowerCase();
-                    const desc = (item.description || '').toLowerCase();
-                    const content = (item.content || '').toLowerCase();
+                    const desc = (typeof item.description === 'string' ? item.description : '').toLowerCase();
+                    const content = (typeof item.content === 'string' ? item.content : JSON.stringify(item.content || '')).toLowerCase();
                     if (title.includes(term) || desc.includes(term) || content.includes(term)) {
                         results.push({
                             title: item.title,
@@ -5759,6 +5759,11 @@ class BibleReader {
                 .hkm-devotional-text-serif p { display: block !important; position: relative !important; margin-bottom: 16px !important; font-size: 18px !important; line-height: 1.8 !important; font-family: 'Merriweather', 'Georgia', serif !important; }
                 .hkm-devotional-text-serif sup.v { font-size: 0.65em !important; font-weight: 700 !important; color: #d17d39 !important; margin-right: 6px !important; vertical-align: baseline !important; position: relative !important; top: -0.3em !important; line-height: 0 !important; user-select: none !important; }
                 .hkm-devotional-prayer-box { background: #f8fafc !important; border-left: 4px solid #d17d39 !important; padding: 20px !important; border-radius: 0 12px 12px 0 !important; font-style: italic !important; font-size: 16px !important; line-height: 1.6 !important; color: #334155 !important; margin-bottom: 24px !important; }
+                .hkm-devotional-prayer-box p { margin: 0 0 0.75em !important; }
+                .hkm-devotional-prayer-box p:last-child { margin-bottom: 0 !important; }
+                .hkm-devotional-prayer-box ul, .hkm-devotional-prayer-box ol { list-style: disc outside !important; padding-left: 1.4em !important; margin: 0.25em 0 0.75em !important; }
+                .hkm-devotional-prayer-box ol { list-style-type: decimal !important; }
+                .hkm-devotional-prayer-box li { display: list-item !important; margin: 0.2em 0 !important; }
                 .hkm-devotional-reflection-textarea { display: block !important; width: 100% !important; min-height: 150px !important; padding: 16px !important; border-radius: 12px !important; border: 1px solid #cbd5e1 !important; outline: none !important; font-size: 15px !important; line-height: 1.5 !important; margin-bottom: 24px !important; resize: vertical !important; }
                 .hkm-celebration-title { font-size: 24px !important; font-weight: 700 !important; color: #1B4965 !important; text-align: center !important; margin-top: 16px !important; margin-bottom: 8px !important; }
                 .hkm-celebration-desc { font-size: 15px !important; color: #64748b !important; text-align: center !important; margin-bottom: 24px !important; }
@@ -5970,12 +5975,13 @@ class BibleReader {
                     .doc(this.currentUser.uid)
                     .collection('reading_plans')
                     .where('completed', '==', false)
-                    .orderBy('lastActiveAt', 'desc')
-                    .limit(1)
                     .get();
 
-                if (!snap.empty) {
-                    const userPlanDoc = snap.docs[0];
+                const toMillis = v => !v ? 0 : (typeof v.toMillis === 'function' ? v.toMillis() : new Date(v).getTime() || 0);
+                const latestDocs = snap.docs.slice().sort((a, b) => toMillis(b.data().lastActiveAt) - toMillis(a.data().lastActiveAt));
+
+                if (latestDocs.length) {
+                    const userPlanDoc = latestDocs[0];
                     const userPlan = userPlanDoc.data();
                     
                     // Fetch matching global plan
@@ -6028,6 +6034,7 @@ class BibleReader {
     renderUserActivePlan(userPlan, globalPlan) {
         const container = this.dom.readingPlanContent;
         if (!container) return;
+        const lang = document.documentElement.lang || 'no';
 
         const currentDayNum = this.activePlanMode ? this.activePlanDay : (userPlan.currentDay || 1);
         const totalDays = globalPlan.durationDays || globalPlan.days.length;
@@ -8209,8 +8216,37 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
         const rpTabBtn = document.getElementById('tab-btn-reading-plan');
         if (rpTabBtn) rpTabBtn.style.display = 'none';
 
-        // Reload the bible view normally
-        this.loadBibleBook(this.currentBookId || 1, this.currentChapterNum || 1);
+        // Leave the plan URL so reloads and the header link do not re-enter the plan.
+        try {
+            const url = new URL(window.location.href);
+            ['plan', 'day', 'ref'].forEach(key => url.searchParams.delete(key));
+            window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
+        } catch (e) { /* URL update is cosmetic */ }
+
+        // Reload the bible view normally (loadBibleBook never existed and threw here).
+        const chapterId = this.selectedChapterId
+            || this.safeGetLocalStorage('hkm_bible_last_chapter')
+            || `${this.selectedBookId || 'jhn'}_1`;
+        this.selectChapter(chapterId).catch(err => console.error('[BibleReader] Could not reopen Bible after plan:', err));
+    }
+
+    // Back arrow in the plan view: return to where the user came from (plan page or
+    // plan list), not into the Bible text with the plan still in the URL.
+    leaveReadingPlan() {
+        const lang = document.documentElement.lang || 'no';
+        let fallback = lang === 'en' ? '/en/leseplaner' : (lang === 'es' ? '/es/leseplaner' : '/leseplaner');
+        if (this.activePlanId) {
+            const detail = lang === 'en' ? '/en/reading-plan-details' : (lang === 'es' ? '/es/detalles-plan-lectura' : '/leseplan-detaljer');
+            fallback = `${detail}?id=${encodeURIComponent(this.activePlanId)}`;
+        }
+        try {
+            const ref = document.referrer ? new URL(document.referrer) : null;
+            if (ref && ref.origin === window.location.origin && !/\/bibel(\.html)?$/.test(ref.pathname) && window.history.length > 1) {
+                window.history.back();
+                return;
+            }
+        } catch (e) { /* use fallback */ }
+        window.location.href = fallback;
     }
 
     toggleLeftSidebarMode() {
@@ -8241,6 +8277,8 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
 
     renderLeftSidebarReadingPlan(container, globalPlan, userPlan, currentDayNum, dayConfig) {
         const lang = document.documentElement.lang || 'no';
+        userPlan = userPlan || { completedDays: [], currentDay: currentDayNum || 1, reflections: {} };
+        if (!Array.isArray(userPlan.completedDays)) userPlan.completedDays = [];
         const isPrayerApp = globalPlan.title && (
             globalPlan.title.toLowerCase().includes('bønn') ||
             globalPlan.title.toLowerCase().includes('prayer') ||
@@ -8339,7 +8377,7 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                 <div class="hkm-rp-sidebar-header-row" style="display: flex; align-items: center; justify-content: center; padding: 14px 16px; border-bottom: 1px solid var(--border-color); background: var(--bg-card); flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
                     <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 800px; box-sizing: border-box;">
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <button class="hkm-rp-back-btn" onclick="window.bibleReader.exitReadingPlanMode()" style="background: none; border: none; padding: 8px; cursor: pointer; color: var(--text-base); display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='var(--highlight-bg)'" onmouseout="this.style.backgroundColor='transparent'">
+                            <button class="hkm-rp-back-btn" aria-label="${lang === 'en' ? 'Back' : (lang === 'es' ? 'Volver' : 'Tilbake')}" onclick="window.bibleReader.leaveReadingPlan()" style="background: none; border: none; padding: 8px; cursor: pointer; color: var(--text-base); display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='var(--highlight-bg)'" onmouseout="this.style.backgroundColor='transparent'">
                                 <i class="fas fa-arrow-left" style="font-size: 24px; font-weight: 700;" aria-hidden="true"></i>
                             </button>
                             <h2 class="hkm-rp-sidebar-title" style="margin: 0; font-size: 15px; font-weight: 800; color: var(--text-base); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${displayTitle}</h2>
@@ -8348,7 +8386,7 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                             <button class="hkm-rp-action-btn" style="background: none; border: none; padding: 8px; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='var(--highlight-bg)'" onmouseout="this.style.backgroundColor='transparent'" onclick="window.bibleReader.openReadingPlanOptionsMenu('${globalPlan.id}')">
                                 <span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
                             </button>
-                            <button class="hkm-rp-close-btn-mobile" onclick="document.getElementById('bible-sidebar').classList.remove('active')">
+                            <button class="hkm-rp-close-btn-mobile" aria-label="${lang === 'en' ? 'Close plan' : (lang === 'es' ? 'Cerrar plan' : 'Lukk planen')}" onclick="window.bibleReader.exitReadingPlanMode()">
                                 <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
                             </button>
                         </div>
@@ -9644,9 +9682,14 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
         };
 
         let resultHtml = '';
-        for (const part of parts) {
+        const labelPassages = parts.length > 1;
+        for (const [index, part] of parts.entries()) {
             const parsed = parseSinglePassage(part);
             const passageHtml = await fetchPassageHtml(parsed);
+            if (labelPassages && passageHtml) {
+                const label = String(part).trim().replace(/[<>&"]/g, ch => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[ch]));
+                resultHtml += `<h4 class="hkm-plan-passage-heading" style="font-size: 1.05em; font-weight: 700; color: var(--bible-primary, #1B4965); margin: ${index === 0 ? '0' : '28px'} 0 10px; font-family: system-ui, -apple-system, sans-serif;">${label}</h4>`;
+            }
             resultHtml += passageHtml;
         }
 
@@ -9989,11 +10032,17 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
             }
         } else if (step === 2) {
             const heading = dayConfig.verses || 'BIBEL';
+            // Days with several passages (e.g. "Matteus 6:33 & Salmene 63:2") must not be
+            // headed as the first book's chapter; each passage gets its own label below.
+            const isMultiPassage = /\s(?:&|og|and|y)\s|;/i.test(heading);
 
             // Build Chapter Header (Screenshot 2)
             let bookBadgeText = 'BIBEL';
             let chapNumText = '1';
-            if (heading) {
+            if (heading && isMultiPassage) {
+                bookBadgeText = lang === 'en' ? "TODAY'S SCRIPTURES" : (lang === 'es' ? 'LECTURAS DE HOY' : 'DAGENS BIBELORD');
+                chapNumText = '';
+            } else if (heading) {
                 const match = heading.match(/^(\d+)?\s*\.?\s*([a-zæøå\s]+)\s*(\d+)/i);
                 if (match) {
                     const prefix = match[1] || '';
@@ -10021,7 +10070,7 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
             const chapterHeaderHtml = `
                 <div class="reference-header" style="display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 24px; text-align: center;">
                     <div class="book-badge" style="background: rgba(226, 232, 240, 0.7); color: #475569; font-weight: 700; font-size: 12px; padding: 6px 16px; border-radius: 20px; letter-spacing: 0.08em; text-transform: uppercase;">${bookBadgeText}</div>
-                    <h1 class="chapter-number" style="font-size: 56px; font-weight: 900; color: var(--text-base, #0f172a); margin: 0; line-height: 1;">${chapNumText}</h1>
+                    ${chapNumText ? `<h1 class="chapter-number" style="font-size: 56px; font-weight: 900; color: var(--text-base, #0f172a); margin: 0; line-height: 1;">${chapNumText}</h1>` : ''}
                     
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 8px; width: 100%;">
                         <button id="hkm-yv-btn-lookup-header" onclick="window.bibleReader.lookupWord('${escapedHeading}', '', '${escapedHeading}', true)" class="nav-btn" style="font-size: 13.5px; padding: 8px 18px; border-radius: 20px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #0f172a); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
