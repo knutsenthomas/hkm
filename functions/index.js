@@ -5549,7 +5549,11 @@ async function sendNewsletterReviewTest({ email, language, subject, template }) 
 const newsletterAi = require('./newsletter-ai-mcp.cjs').createNewsletterAiService({
   db, Timestamp, HttpsError, requireNewsletterAdmin, buildImportedNewsletterCampaign,
   unsubscribePage: NEWSLETTER_UNSUBSCRIBE_PAGE,
-  endpoint: newsletterMcpEndpoint, oauth: newsletterOAuth, sendReviewTest: sendNewsletterReviewTest
+  endpoint: newsletterMcpEndpoint, oauth: newsletterOAuth, sendReviewTest: sendNewsletterReviewTest,
+  extraTools: {
+    ...require('./content-ai-tools.cjs').createContentAiTools({ db, Timestamp, HttpsError }),
+    ...require('./admin-ai-tools.cjs').createAdminAiTools({ db, HttpsError })
+  }
 });
 
 exports.newsletterMcp = onRequest({ region: 'us-central1' }, newsletterAi.handleMcp);

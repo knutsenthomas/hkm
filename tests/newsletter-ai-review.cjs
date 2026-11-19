@@ -128,7 +128,7 @@ async function run() {
             jsonrpc: '2.0', id: 1, method: 'initialize',
             params: { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 'test', version: '1' } }
         });
-        assert.equal((await handshake.json()).result.serverInfo.name, 'HKM nyhetsbrev');
+        assert.equal((await handshake.json()).result.serverInfo.name, 'HKM');
         const list = await post('/', { jsonrpc: '2.0', id: 2, method: 'tools/list' });
         assert.deepEqual((await list.json()).result.tools.map(tool => tool.name), ['prepare_newsletter', 'queue_newsletter', 'newsletter_status']);
         const prepared = await post('/', {

@@ -6008,7 +6008,7 @@ class BibleReader {
                     .get();
 
                 const plans = [];
-                snap.forEach(d => plans.push({ id: d.id, ...d.data() }));
+                snap.forEach(d => { if (d.data().published !== false) plans.push({ id: d.id, ...d.data() }); });
 
                 const startedData = await this.getStartedPlansData();
                 this.renderAvailablePlansList(plans, startedData.startedPlanIds, startedData.planProgressData);
@@ -6713,7 +6713,7 @@ class BibleReader {
                 .get();
 
             const plans = [];
-            snap.forEach(d => plans.push({ id: d.id, ...d.data() }));
+            snap.forEach(d => { if (d.data().published !== false) plans.push({ id: d.id, ...d.data() }); });
 
             const startedData = await this.getStartedPlansData();
             this.renderAvailablePlansList(plans, startedData.startedPlanIds, startedData.planProgressData);
@@ -9114,7 +9114,7 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
             if (db) {
                 const snap = await db.collection('reading_plans').limit(10).get();
                 snap.forEach(d => {
-                    if (d.id !== currentPlanId && String(d.id).toLowerCase() !== String(currentPlanId).toLowerCase()) {
+                    if (d.data().published !== false && d.id !== currentPlanId && String(d.id).toLowerCase() !== String(currentPlanId).toLowerCase()) {
                         plans.push({ id: d.id, ...d.data() });
                     }
                 });

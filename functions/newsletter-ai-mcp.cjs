@@ -8,7 +8,7 @@ const { isHkdNewsletterGroup, loadNewsletterAudience, audienceSummary, audienceF
 const reviewPage = 'https://www.hiskingdomministry.no/admin/admin-nyhetsbrev.html';
 const reviewIdPattern = /^[A-Za-z0-9]{20}$/;
 
-function createNewsletterAiService({ db, Timestamp, HttpsError, requireNewsletterAdmin, buildImportedNewsletterCampaign, unsubscribePage, endpoint, oauth, sendReviewTest }) {
+function createNewsletterAiService({ db, Timestamp, HttpsError, requireNewsletterAdmin, buildImportedNewsletterCampaign, unsubscribePage, endpoint, oauth, sendReviewTest, extraTools = {} }) {
   function reviewRef(id) {
     if (typeof id !== 'string' || !reviewIdPattern.test(id)) throw new HttpsError('invalid-argument', 'Ugyldig kontroll-ID.');
     return db.collection('newsletter_ai_reviews').doc(id);
@@ -215,15 +215,16 @@ function createNewsletterAiService({ db, Timestamp, HttpsError, requireNewslette
       schema: z.object({ reviewId: id }),
       annotations: { readOnlyHint: true, openWorldHint: false },
       handler: status
-    }
+    },
+    ...extraTools
   };
 
   function publicError(error) {
-    return error instanceof HttpsError ? error.message : 'Kunne ikke behandle nyhetsbrevet. Kontroller HTML og prøv igjen.';
+    return error instanceof HttpsError ? error.message : 'Kunne ikke fullføre handlingen. Kontroller innholdet og prøv igjen.';
   }
 
   function buildMcpServer(account) {
-    const server = new McpServer({ name: 'HKM nyhetsbrev', version: '1.0.0' });
+    const server = new McpServer({ name: 'HKM', version: '1.1.0' });
     for (const [name, { description, schema, annotations, handler }] of Object.entries(tools)) {
       server.registerTool(name, { description, inputSchema: schema.shape, annotations }, async input => {
         try {
