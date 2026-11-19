@@ -2012,7 +2012,20 @@
                     }
 
                     // Auth Listener to fetch progress from Firestore
-                    if (window.firebase && typeof firebase.auth === 'function') {
+                    // Firebase is lazy-loaded: the SDK can exist before the app is initialized, and
+                    // firebase.auth() then throws, which stopped the page before the Start button
+                    // was wired up and left it loading. Wait for initialization instead.
+                    const hkmWhenFirebaseReady = (callback) => {
+                        const ready = () => !!(window.firebase && firebase.apps && firebase.apps.length && typeof firebase.auth === 'function');
+                        if (ready()) { try { callback(); } catch (e) { console.error('Plan progress sync failed:', e); } return; }
+                        const service = window.firebaseService;
+                        if (service && typeof service.waitForInitialization === 'function') {
+                            service.waitForInitialization(30000).then(ok => {
+                                if (ok && ready()) { try { callback(); } catch (e) { console.error('Plan progress sync failed:', e); } }
+                            }).catch(() => {});
+                        }
+                    };
+                    hkmWhenFirebaseReady(() => {
                         firebase.auth().onAuthStateChanged(async (user) => {
                             if (user) {
                                 try {
@@ -2149,7 +2162,7 @@
                                 }
                             }
                         });
-                    }
+                    });
 
                     // Save checkbox state
                     container.addEventListener('change', async (e) => {
@@ -2182,7 +2195,7 @@
                                 console.error("Error updating local PWA progress:", err);
                             }
 
-                            if (window.firebase && typeof firebase.auth === 'function') {
+                            if (window.firebase && firebase.apps && firebase.apps.length && typeof firebase.auth === 'function') {
                                 const user = firebase.auth().currentUser;
                                 if (user) {
                                     try {
