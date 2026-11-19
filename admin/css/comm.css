@@ -197,3 +197,13 @@ html.comm-page #btn-compose-email:hover { background: #b45d22 !important; }
 @media (max-width: 480px) {
   html.comm-page body.admin-body #dashboard-main-header .comm-header-tabs a.comm-tab .comm-tab-icon { display: none; }
 }
+@media (max-width: 1024px) {
+  /* Menu button centred on the title row (title row is 56 px, button 42 px). */
+  html.comm-page body.admin-body #dashboard-main-header .section-header > .mobile-nav-toggle { margin-top: 7px !important; }
+  /* The tab row starts at the left edge of the header instead of after the menu button (42 + 28 px). */
+  html.comm-page body.admin-body #dashboard-main-header .comm-header-tabs { margin-left: -70px !important; flex-basis: calc(100% + 70px) !important; width: calc(100% + 70px) !important; max-width: none !important; }
+}
+@media (max-width: 700px) {
+  /* "…" and "Nytt nyhetsbrev" sit right-aligned under the sub-tabs, like a toolbar. */
+  html.comm-page .comm-toolbar .comm-actions { flex: 1 0 100%; display: flex; justify-content: flex-end; gap: 8px; }
+}
