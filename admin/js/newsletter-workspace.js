@@ -180,7 +180,7 @@ if (root) {
     // Change against the previous period of the same length. `points` shows percentage points.
     const deltaLine = (current, previous, { points = false, label }) => {
         const line = el('em', ''); line.className = 'metric-delta';
-        if (current == null || previous == null) { line.textContent = `Ingen tall for ${label}`; line.classList.add('is-flat'); return line; }
+        if (current == null || previous == null) { line.textContent = `Ikke målt i ${label}`; line.classList.add('is-flat'); return line; }
         const diff = points ? (current - previous) * 100 : (previous ? (current - previous) / previous * 100 : null);
         if (diff == null) { line.textContent = `Ingen tall for ${label}`; line.classList.add('is-flat'); return line; }
         const rounded = Math.round(diff * 10) / 10;

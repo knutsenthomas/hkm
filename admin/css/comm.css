@@ -173,3 +173,14 @@ html.comm-page #btn-compose-email:hover { background: #b45d22 !important; }
   html.comm-page body.admin-body #dashboard-main-header .comm-header-tabs a.comm-tab { flex: 1 0 auto; justify-content: center; }
   html.comm-page #newsletter-dashboard-wrapper { overflow-x: clip; }
 }
+@media (max-width: 1024px) {
+  /* The header grows to hold the tab row instead of letting it overlap the page below. */
+  html.comm-page body.admin-body #dashboard-main-header,
+  html.comm-page body.admin-body #dashboard-main-header .section-header,
+  html.comm-page body.admin-body #dashboard-main-header .section-header-content { height: auto !important; max-height: none !important; }
+  html.comm-page body.admin-body #dashboard-main-header { min-height: 64px; }
+  /* Newsletter sub-tabs stay on one row and scroll sideways if needed. */
+  html.comm-page .newsletter-workspace .workspace-nav { flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: none; }
+  html.comm-page .newsletter-workspace .workspace-nav::-webkit-scrollbar { display: none; }
+  html.comm-page .newsletter-workspace .workspace-nav > * { flex: 0 0 auto; white-space: nowrap; }
+}
