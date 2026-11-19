@@ -8241,8 +8241,9 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
         }
         try {
             const ref = document.referrer ? new URL(document.referrer) : null;
-            if (ref && ref.origin === window.location.origin && !/\/bibel(\.html)?$/.test(ref.pathname) && window.history.length > 1) {
-                window.history.back();
+            // Navigate directly: history.back() only pops the reader's own modal states here.
+            if (ref && ref.origin === window.location.origin && !/\/bibel(\.html)?$/.test(ref.pathname)) {
+                window.location.href = ref.pathname + ref.search;
                 return;
             }
         } catch (e) { /* use fallback */ }
