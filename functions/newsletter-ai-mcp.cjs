@@ -36,7 +36,8 @@ function createNewsletterAiService({ db, Timestamp, HttpsError, requireNewslette
 
   function buildReviewedCampaign(account, saved, recipients) {
     const template = sanitizeImportedNewsletter(saved.html);
-    const campaign = buildImportedNewsletterCampaign(account, template, saved.subject, { recipients });
+    // Measure opens and clicks, as the editor does by default.
+    const campaign = buildImportedNewsletterCampaign(account, template, saved.subject, { recipients, trackingEnabled: true });
     if (saved.summary.englishCount && (!saved.subjectEn || !saved.htmlEn)) {
       throw new HttpsError('failed-precondition', `Gruppen har ${saved.summary.englishCount} engelske mottakere. Legg ved engelsk emne og oversatt HTML.`);
     }
