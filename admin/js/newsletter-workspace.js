@@ -33,10 +33,11 @@ export function summarizeCampaigns(campaigns, days = 'all', now = Date.now()) {
         return days === 'all' || (timestamp > 0 && timestamp >= now - Number(days) * 86400000 && timestamp <= now);
     });
     const months = new Map();
-    let sent = 0, unknown = 0, issues = 0, completed = 0, opens = 0, clicks = 0, trackedSent = 0;
+    let sent = 0, unknown = 0, issues = 0, completed = 0, opens = 0, clicks = 0, trackedSent = 0, recipients = 0, trackedCampaigns = 0;
     rows.forEach(c => {
         const amount = count(c.sentCount); sent += amount || 0; unknown += amount === null ? 1 : 0;
-        if (c.trackingEnabled === true) { trackedSent += amount || 0; opens += count(c.engagement?.uniqueOpens) || 0; clicks += count(c.engagement?.uniqueClicks) || 0; }
+        recipients += count(c.recipientCount) || 0;
+        if (c.trackingEnabled === true) { trackedCampaigns++; trackedSent += amount || 0; opens += count(c.engagement?.uniqueOpens) || 0; clicks += count(c.engagement?.uniqueClicks) || 0; }
         const state = campaignState(c, now);
         if (['Avvik', 'Feil', 'Uavklart'].includes(state)) issues++;
         if (state === 'Fullført') completed++;
@@ -45,7 +46,7 @@ export function summarizeCampaigns(campaigns, days = 'all', now = Date.now()) {
         const month = months.get(key) || { campaigns:0, sent:0, unknown:0 };
         month.campaigns++; month.sent += amount || 0; month.unknown += amount === null ? 1 : 0; months.set(key, month);
     });
-    return { rows, sent, unknown, issues, completed, opens, clicks, trackedSent, months: [...months].sort((a,b) => a[0].localeCompare(b[0])) };
+    return { rows, sent, unknown, issues, completed, opens, clicks, trackedSent, recipients, trackedCampaigns, months: [...months].sort((a,b) => a[0].localeCompare(b[0])) };
 }
 const root = document.getElementById('newsletter-workspace');
 if (root) {
@@ -109,20 +110,91 @@ if (root) {
         const close = el('button', 'Lukk'); close.type = 'button'; close.onclick = () => dialog.close(); dialog.append(close);
         dialog.addEventListener('close', () => dialog.remove(), {once:true}); document.body.append(dialog); dialog.showModal();
     };
+    let analyticsIssuesOnly = false;
+    const issueStates = ['Avvik', 'Feil', 'Uavklart'];
+    const stateNotes = {
+        Avvik: 'Færre registrert sendt enn mottakere. Se loggen.',
+        Feil: 'Utsendingen feilet.',
+        Uavklart: 'Uavsluttet forsøk eldre enn 24 timer. Faktisk utsending er ikke bekreftet.'
+    };
+    const number = value => Number(value).toLocaleString('nb-NO');
+    const percent = (part, whole) => whole ? (100 * part / whole).toLocaleString('nb-NO', { maximumFractionDigits: 1 }) + ' %' : '–';
+    const plural = (amount, one, many) => `${number(amount)} ${amount === 1 ? one : many}`;
+    const metricCard = (label, value, note) => {
+        const card = el('div', '');
+        card.append(el('span', label), el('strong', value));
+        if (note) card.append(el('small', note));
+        return card;
+    };
     const renderAnalytics = () => {
         const summary = summarizeCampaigns(campaigns, root.querySelector('[data-analytics-period]').value);
+        if (!summary.issues) analyticsIssuesOnly = false;
         const metrics = root.querySelector('[data-analytics-metrics]'); metrics.replaceChildren();
-        for (const [label, value] of [['Utsendelser', summary.rows.length], ['Registrert sendt', summary.sent], ['Fullført uten avvik', summary.completed], ['Avvik, feil eller uavklart', summary.issues], ['Mangler sendetall', summary.unknown], ['Antatte unike åpninger', summary.opens], ['Unike mottakereksemplar med klikk', summary.clicks], ['Antatt åpningsrate', summary.trackedSent ? (100 * summary.opens / summary.trackedSent).toFixed(1) + ' %' : '–'], ['Klikkrate', summary.trackedSent ? (100 * summary.clicks / summary.trackedSent).toFixed(1) + ' %' : '–']]) {
-            const card = el('div', ''); card.append(el('span', label), el('strong', value)); metrics.append(card);
+        const total = summary.rows.length;
+        const basis = summary.trackedCampaigns
+            ? (summary.trackedCampaigns === total ? 'Alle kampanjene i perioden ble målt' : `Bare ${summary.trackedCampaigns} av ${plural(total, 'kampanje', 'kampanjer')} ble målt`)
+            : 'Ingen kampanjer i perioden ble målt';
+        metrics.append(
+            metricCard('Sendt', number(summary.sent), `${plural(total, 'utsendelse', 'utsendelser')} · ${plural(summary.recipients, 'mottaker', 'mottakere')}${summary.unknown ? ` · ${summary.unknown} uten sendetall` : ''}`),
+            metricCard('Åpningsrate', percent(summary.opens, summary.trackedSent), basis),
+            metricCard('Klikkrate', percent(summary.clicks, summary.trackedSent), summary.trackedCampaigns ? `${plural(summary.clicks, 'mottaker', 'mottakere')} klikket på en lenke` : basis)
+        );
+        const followUp = metricCard('Trenger oppfølging', number(summary.issues), summary.issues
+            ? (analyticsIssuesOnly ? 'Viser bare disse. Trykk for å vise alle.' : 'Avvik, feil eller uavklart. Trykk for å vise.')
+            : 'Ingen avvik i perioden');
+        if (summary.issues) {
+            followUp.className = 'workspace-metric-filter';
+            followUp.tabIndex = 0;
+            followUp.setAttribute('role', 'button');
+            followUp.setAttribute('aria-pressed', String(analyticsIssuesOnly));
+            const toggle = () => {
+                analyticsIssuesOnly = !analyticsIssuesOnly;
+                renderAnalytics();
+                root.querySelector('[data-analytics-metrics] .workspace-metric-filter')?.focus();
+            };
+            followUp.onclick = toggle;
+            followUp.onkeydown = event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggle(); } };
         }
+        metrics.append(followUp);
+
         const months = root.querySelector('[data-analytics-months]'); months.replaceChildren();
         summary.months.forEach(([month, data]) => {
             const row = el('tr', ''); [month, data.campaigns, data.sent + (data.unknown ? ` (${data.unknown} ukjent)` : '')].forEach(value => row.append(el('td', value))); months.append(row);
         });
+        // A monthly table only says something once there are a few months to compare.
+        root.querySelector('[data-analytics-months-section]').hidden = summary.months.length < 3;
+
         const details = root.querySelector('[data-analytics-campaigns]'); details.replaceChildren();
-        summary.rows.forEach(campaign => {
-            const row = el('tr', ''); [campaign.subject || 'Uten emne', campaignState(campaign), `${campaign.sentCount ?? 'Ukjent'} / ${campaign.recipientCount ?? 'Ukjent'}`, campaign.trackingEnabled ? campaign.engagement?.uniqueOpens || 0 : 'Ikke målt', campaign.trackingEnabled ? campaign.engagement?.uniqueClicks || 0 : 'Ikke målt'].forEach(value => row.append(el('td', value)));
-            const cell = el('td', ''); const button = el('button', 'Se logg'); button.type = 'button'; button.onclick = () => showLogs(campaign); cell.append(button); if (campaign.trackingEnabled) { const activity = el('button', 'Se klikk'); activity.type = 'button'; activity.onclick = () => showEngagement(campaign); cell.append(activity); } row.append(cell); details.append(row);
+        summary.rows.filter(campaign => !analyticsIssuesOnly || issueStates.includes(campaignState(campaign))).forEach(campaign => {
+            const row = el('tr', '');
+            const state = campaignState(campaign);
+            const subject = el('td', campaign.subject || 'Uten emne');
+            if (state !== 'Fullført') {
+                const flag = el('span', state);
+                flag.className = issueStates.includes(state) ? 'workspace-row-flag is-issue' : 'workspace-row-flag';
+                if (stateNotes[state]) flag.title = stateNotes[state];
+                subject.append(flag);
+            }
+            const stamp = time(date(campaign));
+            row.append(subject, el('td', stamp ? new Date(stamp).toLocaleDateString('nb-NO') : '–'), el('td', `${campaign.sentCount ?? '–'} / ${campaign.recipientCount ?? '–'}`));
+            const sentBase = Number(campaign.sentCount) || 0;
+            for (const key of ['uniqueOpens', 'uniqueClicks']) {
+                if (campaign.trackingEnabled === true) {
+                    const amount = Number(campaign.engagement?.[key] || 0);
+                    row.append(el('td', sentBase ? `${percent(amount, sentBase)} (${number(amount)})` : '–'));
+                } else {
+                    const cell = el('td', 'Ikke målt');
+                    cell.className = 'workspace-muted';
+                    cell.title = 'Måling av åpninger og klikk var slått av da kampanjen ble sendt.';
+                    row.append(cell);
+                }
+            }
+            const cell = el('td', ''); cell.className = 'workspace-actions-cell';
+            const email = el('button', 'Se e-post'); email.type = 'button'; email.onclick = () => showCampaignEmail(campaign);
+            const log = el('button', 'Se logg'); log.type = 'button'; log.onclick = () => showLogs(campaign);
+            cell.append(email, log);
+            if (campaign.trackingEnabled) { const activity = el('button', 'Se klikk'); activity.type = 'button'; activity.onclick = () => showEngagement(campaign); cell.append(activity); }
+            row.append(cell); details.append(row);
         });
         for (const [body, columns] of [[months, 3], [details, 6]]) if (!body.children.length) { const row = el('tr', ''); const cell = el('td', 'Ingen kampanjer i perioden.'); cell.colSpan = columns; row.append(cell); body.append(row); }
     };
@@ -226,6 +298,8 @@ if (root) {
         root.querySelectorAll('[data-workspace-view]').forEach(tab=>tab.setAttribute('aria-pressed',String(tab===button)));
         root.querySelectorAll('[data-workspace-panel]').forEach(panel=>panel.hidden=panel.dataset.workspacePanel!==button.dataset.workspaceView);
         root.querySelector('[data-campaign-note]').hidden = button.dataset.workspaceView !== 'campaigns';
+        // The totals cover everything fetched; the analysis has its own period, so hide them there.
+        root.querySelector('[data-workspace-totals]').hidden = button.dataset.workspaceView === 'analytics';
     }));
 }
 const check = document.getElementById('newsletter-content-check');

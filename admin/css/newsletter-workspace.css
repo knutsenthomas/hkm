@@ -493,3 +493,17 @@ body.builder-active #newsletter-builder-layout #blocks-container p.selected-bloc
 .subscriber-sort-button:hover { color:var(--admin-accent-dark,#bd4f2a); }
 .subscriber-sort-indicator { flex-shrink:0; opacity:.5; font-size:14px; }
 th[aria-sort="ascending"] .subscriber-sort-indicator,th[aria-sort="descending"] .subscriber-sort-indicator { opacity:1; color:var(--admin-accent-dark,#bd4f2a); }
+/* Analysis: four key figures, campaign table first. */
+.newsletter-workspace :is(.workspace-metrics,[data-analytics-months-section])[hidden] { display:none; }
+.newsletter-workspace .workspace-metrics-analytics { grid-template-columns:repeat(4,1fr); }
+.newsletter-workspace .workspace-metrics small { display:block; margin-top:6px; color:var(--nw-muted); font-size:12px; line-height:1.4; }
+.newsletter-workspace .workspace-metric-filter { cursor:pointer; }
+.newsletter-workspace .workspace-metric-filter:hover { border-color:var(--nw-accent); }
+.newsletter-workspace .workspace-metric-filter[aria-pressed="true"] { border-color:var(--nw-accent); box-shadow:inset 0 0 0 1px var(--nw-accent); }
+.newsletter-workspace .workspace-metric-filter:focus-visible { outline:3px solid #d17d39; outline-offset:3px; }
+.newsletter-workspace .workspace-muted { color:var(--nw-muted); }
+.newsletter-workspace .workspace-row-flag { display:block; margin-top:4px; font-size:12px; font-weight:650; color:var(--nw-muted); }
+.newsletter-workspace .workspace-row-flag.is-issue { color:#b45309; }
+.newsletter-workspace .workspace-actions-cell { white-space:nowrap; }
+.newsletter-workspace .workspace-actions-cell button + button { margin-left:6px; }
+@media(max-width:900px) { .newsletter-workspace .workspace-metrics-analytics { grid-template-columns:repeat(2,1fr); } }

@@ -2,7 +2,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const {JSDOM} = require('jsdom');
-const source = fs.readFileSync('admin/js/newsletter-workspace.js','utf8').replace(/^import .*;\n/, '').replaceAll('export function','function');
+const source = fs.readFileSync('admin/js/newsletter-workspace.js','utf8').replace(/^import .*;\n/gm, '').replaceAll('export function','function');
 const dom = new JSDOM(fs.readFileSync('admin/admin-nyhetsbrev.html','utf8'),{url:'https://example.com/admin/'});
 const context = {document:dom.window.document, window:dom.window, location:dom.window.location, sessionStorage:dom.window.sessionStorage, URLSearchParams, Date, HKD_PRODUCT_TEMPLATE:{id:'test',name:'Test'}, console};
 vm.createContext(context);vm.runInContext(source+';this.summarize=summarizeCampaigns;',context);
@@ -13,5 +13,7 @@ assert.equal(summary.sent,10);assert.equal(summary.unknown,1);assert.equal(summa
 assert.equal(context.summarize(rows,'all',now).sent,14);assert.equal(context.summarize(rows,'all',now).opens,4);
 const button=dom.window.document.querySelector('[data-workspace-view="analytics"]');button.click();
 assert.equal(dom.window.document.querySelector('[data-workspace-panel="analytics"]').hidden,false);
-assert.equal(dom.window.document.querySelectorAll('[data-analytics-metrics] > div').length,9);
+assert.equal(dom.window.document.querySelectorAll('[data-analytics-metrics] > div').length,4);
+assert.equal(dom.window.document.querySelector('[data-workspace-totals]').hidden,true);
+assert.equal(summary.recipients,10);assert.equal(summary.trackedCampaigns,1);
 console.log('Passed: analytics periods, unknown counts, tracked-only denominator, unique events and tab rendering.');
