@@ -605,6 +605,14 @@
         .hero-breadcrumbs a:hover {
             color: #ffffff !important;
         }
+        .prayer-focus-rich { font-style: normal !important; }
+        .prayer-focus-rich p { margin: 0 0 10px; }
+        .prayer-focus-rich p:last-child { margin-bottom: 0; }
+        .prayer-focus-rich ul, .prayer-focus-rich ol { margin: 6px 0 0; padding-left: 20px; list-style: disc; }
+        .prayer-focus-rich ol { list-style: decimal; }
+        .prayer-focus-rich li { margin: 4px 0; }
+        .prayer-day-title-group, .prayer-day-title-group > div { min-width: 0; }
+        .prayer-day-card .day-badge-num, .prayer-day-card .day-badge-num span { white-space: normal; hyphens: manual; -webkit-hyphens: manual; }
 
         /* Bønneapp Custom Styling */
         .prayer-app-mode {
@@ -1256,7 +1264,7 @@
                     <h3 class="sidebar-title" style="font-size: 18px; margin-bottom: 16px;">Del & verktøy</h3>
                     
                     <div class="tools-buttons" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
-                        <button class="btn-tool" onclick="window.print()" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; border: 1px solid #cbd5e1; background: white; border-radius: 12px; font-weight: 600; color: #1e293b; cursor: pointer; transition: all 0.2s ease;">
+                        <button class="btn-tool" onclick="window.hkmPrintPlan()" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; border: 1px solid #cbd5e1; background: white; border-radius: 12px; font-weight: 600; color: #1e293b; cursor: pointer; transition: all 0.2s ease;">
                             <span class="material-symbols-outlined text-lg">print</span>
                             Skriv ut / Lagre PDF
                         </button>
@@ -1486,6 +1494,38 @@
 
             const urlParams = new URLSearchParams(window.location.search);
             const planId = urlParams.get('id');
+            window.hkmRenderRichFocus = window.hkmRenderRichFocus || function (text) {
+                if (!text) return '';
+                const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                if (!/<\/?[a-z][^>]*>/i.test(text)) return esc(text).replace(/\n/g, '<br>');
+                const allowed = new Set(['P', 'STRONG', 'B', 'EM', 'I', 'UL', 'OL', 'LI', 'BR', 'H3', 'H4', 'BLOCKQUOTE']);
+                const doc = new DOMParser().parseFromString('<div>' + text + '</div>', 'text/html');
+                const root = doc.body.firstChild;
+                const walk = (node) => {
+                    [...node.childNodes].forEach((ch) => {
+                        if (ch.nodeType === 1) {
+                            walk(ch);
+                            if (!allowed.has(ch.tagName)) {
+                                ch.replaceWith(...ch.childNodes);
+                            } else {
+                                [...ch.attributes].forEach((a) => ch.removeAttribute(a.name));
+                            }
+                        } else if (ch.nodeType !== 3) {
+                            ch.remove();
+                        }
+                    });
+                };
+                walk(root);
+                return root.innerHTML;
+            };
+            window.hkmPrintPlan = window.hkmPrintPlan || function () {
+                const url = window.__hkmPlanPdf;
+                if (url) {
+                    window.open(url, '_blank', 'noopener');
+                } else {
+                    window.print();
+                }
+            };
             let isPrayerApp = false;
 
             if (!planId || !service) {
@@ -1523,6 +1563,7 @@
                 if (window.contentManager) {
                     plan = window.contentManager.getLocalizedContentItem(plan);
                 }
+                window.__hkmPlanPdf = (planData && planData.printPdf && planData.printPdf['no']) || '';
                 renderPlanDetails(plan);
 
                 // Load other reading plans to show at the bottom
@@ -1608,18 +1649,18 @@
                     
                     // Update sidebar title
                     const sidebarPlanTitle = document.getElementById('sidebar-plan-title');
-                    if (sidebarPlanTitle) sidebarPlanTitle.textContent = 'Bønneapp';
+                    if (sidebarPlanTitle) sidebarPlanTitle.textContent = 'Bønneplan';
 
                     // Update sidebar category
                     const categorySpan = document.querySelector('.sidebar-info-item .fa-book-open + span') || document.querySelector('.sidebar-info-item i.fa-book-open + span');
                     if (categorySpan) {
-                        categorySpan.innerHTML = `<strong>Kategori:</strong> Bønneapp`;
+                        categorySpan.innerHTML = `<strong>Kategori:</strong> Bønneplan`;
                     }
 
                     // Update breadcrumbs parent folder name
                     const breadcrumbCategory = document.querySelector('.hero-breadcrumbs a[href="/leseplaner"]');
                     if (breadcrumbCategory) {
-                        breadcrumbCategory.textContent = 'Bønneapper';
+                        breadcrumbCategory.textContent = 'Bønneplaner';
                     }
 
                     // Update stats headings/labels in the page body
@@ -1634,7 +1675,7 @@
                     document.querySelectorAll('.card .card-title').forEach(titleEl => {
                         const txt = titleEl.textContent.trim().toLowerCase();
                         if (txt.includes('om leseplanen')) {
-                            titleEl.innerHTML = `<span class="card-title-icon"><span class="material-symbols-outlined">info</span></span> Om bønneappen`;
+                            titleEl.innerHTML = `<span class="card-title-icon"><span class="material-symbols-outlined">info</span></span> Om bønneplanen`;
                         } else if (txt.includes('leseplanens innhold') || txt.includes('innhold')) {
                             titleEl.innerHTML = `<span class="card-title-icon"><span class="material-symbols-outlined">favorite</span></span> Daglige bønner`;
                         }
@@ -1643,16 +1684,16 @@
                     // Update print layout description block
                     const printIntro = document.querySelector('.print-intro');
                     if (printIntro) {
-                        printIntro.innerHTML = `<strong>Studieguide & Bønneapp:</strong> Velkommen til denne bønneappen fra His Kingdom Ministry. Bruk denne guiden til daglig refleksjon, bibellesing og bønn. Huk av i avhukingsboksene for hver dag etter hvert som du fullfører bønnen for å følge din fremgang.`;
+                        printIntro.innerHTML = `<strong>Studieguide og bønneplan:</strong> Velkommen til denne bønneplanen fra His Kingdom Ministry. Bruk denne guiden til daglig refleksjon, bibellesing og bønn. Huk av i avhukingsboksene for hver dag etter hvert som du fullfører bønnen for å følge din fremgang.`;
                     }
 
                     // Change category in print titles if it exists
-                    if (printSubtitle) printSubtitle.textContent = plan.subtitle || 'Bønneapp';
+                    if (printSubtitle) printSubtitle.textContent = plan.subtitle || 'Bønneplan';
 
                     // Update start button text initially
                     const startBtn = document.getElementById('start-plan-btn');
                     if (startBtn) {
-                        startBtn.innerHTML = `Start denne bønneappen <i class="fas fa-arrow-right text-lg" aria-hidden="true"></i>`;
+                        startBtn.innerHTML = `Start denne bønneplanen <i class="fas fa-arrow-right text-lg" aria-hidden="true"></i>`;
                     }
                 }
 
@@ -1887,12 +1928,13 @@
                         if (isPrayerApp) {
                             focusTextHtml = `
                                 <div class="prayer-focus-quote" style="border-left-color: var(--card-accent-color); padding: 12px 16px; background: linear-gradient(135deg, var(--card-bg-gradient-start), var(--card-bg-gradient-end)); border-radius: 0 12px 12px 0;">
-                                    <p class="prayer-focus-text" style="font-size: 1rem; margin: 0;">${escapeHtml(focusText)}</p>
+                                    <div class="prayer-focus-text prayer-focus-rich" style="font-size: 1rem; margin: 0;">${window.hkmRenderRichFocus(focusText)}</div>
                                 </div>
                             `;
                         } else {
                             const formatDetailFocusText = (text) => {
                                 if (!text) return '';
+                                if (/<\/?[a-z][^>]*>/i.test(text)) return `<div class="prayer-focus-rich">${window.hkmRenderRichFocus(text)}</div>`;
                                 let escaped = escapeHtml(text);
                                 const paragraphs = escaped.split(/\n\s*\n/);
                                 return paragraphs.map(p => {
@@ -1945,7 +1987,7 @@
                                         <div style="display: flex; flex-direction: column; gap: 2px;">
                                             <span class="day-badge-num" style="font-size: 1.1rem; font-weight: 800; color: var(--text-base); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: none !important; border: none !important; padding: 0 !important; border-radius: 0 !important; box-shadow: none !important;">
                                                 Dag ${day.dayNumber}
-                                                ${versesText ? `<span style="font-weight: 500; color: var(--text-muted); font-size: 0.95rem;">• ${escapeHtml(versesText)}</span>` : ''}
+                                                ${versesText ? `<span style="font-weight: 500; color: var(--text-muted); font-size: 0.95rem; overflow-wrap: anywhere;">• ${escapeHtml(versesText).replace(/ &amp; /g, ' · ')}</span>` : ''}
                                             </span>
                                         </div>
                                     </div>
