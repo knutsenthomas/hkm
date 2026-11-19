@@ -74,6 +74,20 @@ export default function ReadingPlansAdmin() {
         setIsEditing(true);
     };
 
+    const handleTogglePublished = async (plan) => {
+        const publish = plan.published === false;
+        if (!confirm(publish ? `Publisere «${plan.title}» på nettsiden?` : `Skjule «${plan.title}» fra nettsiden og gjøre den til utkast?`)) return;
+        try {
+            await db.collection('reading_plans').doc(plan.id).update({
+                published: publish,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            fetchPlans();
+        } catch (e) {
+            alert("Kunne ikke endre status: " + e.message);
+        }
+    };
+
     const handleDeletePlan = async (planId) => {
         if (!confirm("Er du sikker på at du vil slette denne leseplanen?")) return;
         try {
@@ -630,12 +644,17 @@ export default function ReadingPlansAdmin() {
                         )}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                             <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#1B4965', margin: 0 }}>{plan.title}</h3>
-                            <span style={{ fontSize: '11px', fontWeight: 700, color: '#d17d39', background: '#fff7ed', padding: '2px 8px', borderRadius: '20px', whiteSpace: 'nowrap' }}>{plan.durationDays} dager</span>
+                            <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+                                {plan.published === false && (
+                                    <span style={{ fontSize: '11px', fontWeight: 700, color: '#475569', background: '#f1f5f9', padding: '2px 8px', borderRadius: '20px', whiteSpace: 'nowrap' }}>Utkast</span>
+                                )}
+                                <span style={{ fontSize: '11px', fontWeight: 700, color: '#d17d39', background: '#fff7ed', padding: '2px 8px', borderRadius: '20px', whiteSpace: 'nowrap' }}>{plan.durationDays} dager</span>
+                            </div>
                         </div>
                         <p style={{ fontSize: '13px', color: '#64748b', margin: 0, flexGrow: 1, lineheight: 1.5 }}>
                             {plan.description || 'Ingen beskrivelse.'}
                         </p>
-                        <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '14px', marginTop: '8px' }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '14px', marginTop: '8px' }}>
                             <button
                                 onClick={() => handleEditPlan(plan)}
                                 className="btn-secondary"
@@ -643,6 +662,22 @@ export default function ReadingPlansAdmin() {
                             >
                                 <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>edit</span> Rediger
                             </button>
+                            <button
+                                onClick={() => handleTogglePublished(plan)}
+                                className="btn-secondary"
+                                style={{ border: '1.5px solid #cbd5e1', padding: '6px 14px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, background: 'white', color: '#334155', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}
+                            >
+                                <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>{plan.published === false ? 'publish' : 'visibility_off'}</span> {plan.published === false ? 'Publiser' : 'Gjør til utkast'}
+                            </button>
+                            <a
+                                href={`/leseplan-detaljer?id=${encodeURIComponent(plan.id)}`}
+                                target="_blank"
+                                rel="noopener"
+                                className="btn-secondary"
+                                style={{ border: '1.5px solid #cbd5e1', padding: '6px 14px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, background: 'white', color: '#334155', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', textDecoration: 'none' }}
+                            >
+                                <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>visibility</span> Forhåndsvis
+                            </a>
                             <button
                                 onClick={() => handleDeletePlan(plan.id)}
                                 className="btn-secondary"

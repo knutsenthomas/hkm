@@ -731,7 +731,7 @@
             async function loadPlans() {
                 try {
                     const snap = await db.collection('reading_plans').orderBy('createdAt', 'desc').get();
-                    const rawPlans = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    const rawPlans = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(plan => plan.published !== false);
                     allPlans = rawPlans.map(plan => window.contentManager ? window.contentManager.getLocalizedContentItem(plan) : plan);
                     renderPlans(allPlans);
                 } catch (err) {

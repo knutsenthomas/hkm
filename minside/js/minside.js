@@ -11059,7 +11059,7 @@ class MinSideManager {
 
                 const coursesItems = (coursesSnap.exists ? coursesSnap.data()?.items : null) || [];
                 searchCache.courses = coursesItems.map(d => ({ id: d.id, type: 'course', title: d.title || '', desc: d.description || '' }));
-                searchCache.readingPlans = plansSnap.empty ? [] : plansSnap.docs.map(d => ({ id: d.id, type: 'reading-plan', title: d.data().title || '', desc: d.data().description || '' }));
+                searchCache.readingPlans = plansSnap.empty ? [] : plansSnap.docs.filter(d => d.data().published !== false).map(d => ({ id: d.id, type: 'reading-plan', title: d.data().title || '', desc: d.data().description || '' }));
                 searchCache.notes = (!notesSnap || notesSnap.empty) ? [] : notesSnap.docs.map(d => ({ id: d.id, type: 'note', title: d.data().title || '', desc: d.data().text || d.data().content || '' }));
                 searchCache.prayers = prayersSnap.empty ? [] : prayersSnap.docs.map(d => {
                     const data = d.data();
