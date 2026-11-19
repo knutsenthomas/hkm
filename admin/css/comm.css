@@ -164,3 +164,12 @@ html.comm-page .contacts-grid table td:nth-child(2), html.comm-page .contacts-gr
 /* Innboks: «Skriv ny» flat oransje som de andre hovedknappene */
 html.comm-page #btn-compose-email { background: #c56828 !important; background-image: none !important; box-shadow: none !important; min-height: 44px; font-weight: 700; }
 html.comm-page #btn-compose-email:hover { background: #b45d22 !important; }
+
+/* Mobil/iPad: fanene får alltid egen rad. En eldre regel (body.admin-body … nowrap under 600 px)
+   holdt dem på samme linje, så de presset siden utover skjermen. */
+@media (max-width: 1024px) {
+  html.comm-page body.admin-body #dashboard-main-header .section-header-content { flex-wrap: wrap !important; }
+  html.comm-page body.admin-body #dashboard-main-header .comm-header-tabs { order: 3; flex: 0 0 100% !important; width: 100%; max-width: 100%; }
+  html.comm-page body.admin-body #dashboard-main-header .comm-header-tabs a.comm-tab { flex: 1 0 auto; justify-content: center; }
+  html.comm-page #newsletter-dashboard-wrapper { overflow-x: clip; }
+}

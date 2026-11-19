@@ -4737,7 +4737,7 @@ async function getEmailTemplate(templateId, fallback) {
 /**
  * Helper-funksjon for å sende e-post.
  */
-async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Ministry", type = "automated", cc = "", bcc = "", replyTo = "post@hiskingdomministry.no", attachments = [], headers = {} }) {
+async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Ministry", type = "automated", cc = "", bcc = "", replyTo = "post@hiskingdomministry.no", attachments = [], headers = {}, campaignId = null }) {
   const user = getSecretOrEnv(emailUserParam, ["EMAIL_USER"]) || "post@hiskingdomministry.no";
   const pass = getSecretOrEnv(emailPassParam, ["EMAIL_PASS"]);
 
@@ -4790,6 +4790,7 @@ async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Mini
       cc: cc || null,
       bcc: bcc || null,
       replyTo: replyTo || null,
+      ...(campaignId ? { campaignId } : {}),
       timestamp: admin.firestore.FieldValue.serverTimestamp(),
       sentAt: new Date().toISOString(),
       status: "sent"
@@ -4804,6 +4805,7 @@ async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Mini
       to,
       subject,
       type,
+      ...(campaignId ? { campaignId } : {}),
       timestamp: admin.firestore.FieldValue.serverTimestamp(),
       sentAt: new Date().toISOString(),
       status: "failed",
@@ -5344,6 +5346,7 @@ exports.newsletterHtmlAdmin = onCall({
     return newsletterAi.review(account, data.reviewId, action === 'aiApprove', data.revision);
   }
   if (action === 'campaignPreview') return newsletterCampaignPreview(data);
+  if (action === 'campaignDelivery') return newsletterCampaignDelivery(data);
   if (!['preview', 'test', 'queue'].includes(action)) throw new HttpsError('invalid-argument', 'Ukjent HTML-handling.');
   let template;
   try {
@@ -5473,6 +5476,56 @@ async function newsletterCampaignPreview(data) {
   // showHtmlFrame() puts the CSP right after a lowercase doctype, so normalise it.
   const previewHtml = '<!doctype html>' + replaceNewsletterPreviewFields(html).replace(/^\s*<!doctype[^>]*>/i, '');
   return { subject, language, hasEnglish, previewHtml, csp: NEWSLETTER_PREVIEW_CSP };
+}
+
+// Delivery details for one campaign: which recipients failed, and which have no log at all.
+// Newer logs carry campaignId; older ones can only be matched by subject.
+async function newsletterCampaignDelivery(data) {
+  const campaignId = typeof data?.campaignId === 'string' ? data.campaignId : '';
+  if (!/^[A-Za-z0-9_-]{1,128}$/.test(campaignId)) throw new HttpsError('invalid-argument', 'Ugyldig kampanje.');
+  const snapshot = await db.collection('newsletter_campaigns').doc(campaignId).get();
+  if (!snapshot.exists) throw new HttpsError('not-found', 'Fant ikke kampanjen.');
+  const campaign = snapshot.data();
+  const subjects = [...new Set([campaign.subject, campaign.subjectEn, campaign.englishPayload?.subjectEn]
+    .filter(value => typeof value === 'string' && value.trim()))];
+
+  const LIMIT = 2000;
+  let logs = [];
+  let matchedBy = 'campaign';
+  const byId = await db.collection('email_logs').where('campaignId', '==', campaignId).limit(LIMIT).get();
+  byId.forEach(doc => logs.push(doc.data()));
+  if (!logs.length && subjects.length) {
+    matchedBy = 'subject';
+    const bySubject = await db.collection('email_logs').where('subject', 'in', subjects).limit(LIMIT).get();
+    bySubject.forEach(doc => {
+      const log = doc.data();
+      if (log.type === 'newsletter') logs.push(log);
+    });
+  }
+
+  const email = value => String(value || '').trim().toLowerCase();
+  const latest = new Map();
+  for (const log of logs) {
+    const key = email(log.to);
+    if (!key) continue;
+    const previous = latest.get(key);
+    if (!previous || String(log.sentAt || '') > String(previous.sentAt || '')) latest.set(key, log);
+  }
+  const failed = [...latest.entries()]
+    .filter(([, log]) => log.status === 'failed')
+    .map(([to, log]) => ({ email: to, error: String(log.error || 'Ukjent feil').slice(0, 300), at: log.sentAt || null }));
+  const recipients = Array.isArray(campaign.recipients) ? campaign.recipients.map(recipient => email(recipient?.email)).filter(Boolean) : [];
+  const missing = recipients.filter(address => !latest.has(address)).slice(0, 200);
+  return {
+    matchedBy,
+    logCount: logs.length,
+    truncated: logs.length >= LIMIT,
+    sent: [...latest.values()].filter(log => log.status === 'sent').length,
+    failed,
+    missing,
+    recipientCount: Number(campaign.recipientCount || recipients.length || 0),
+    sentCount: campaign.sentCount ?? null
+  };
 }
 
 const newsletterMcpEndpoint = newsletterFunctionsBase + '/newsletterMcp';
@@ -5666,7 +5719,8 @@ exports.onNewsletterCampaignCreate = onDocumentCreated({
           );
           if (campaign.trackingEnabled === true) message.html = await prepareTracking(db, snapshot.id, message.html);
           const result = await sendEmail({
-            ...message, to: recipient.email, subject: useEnglish ? campaign.subjectEn : subject, type: 'newsletter'
+            ...message, to: recipient.email, subject: useEnglish ? campaign.subjectEn : subject, type: 'newsletter',
+            campaignId: snapshot.id
           });
           if (!result?.success) throw new Error(result?.error || 'Sending failed');
           sentCount++;
@@ -5698,6 +5752,7 @@ exports.onNewsletterCampaignCreate = onDocumentCreated({
           html: emailHtml,
           text: recipientSubject + `\n\nMeld deg av: ${unsubscribeUrl}`,
           type: "newsletter",
+          campaignId: snapshot.id,
           headers: {
             "List-Unsubscribe": listUnsubscribeHeader,
             "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",

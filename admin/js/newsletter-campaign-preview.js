@@ -26,17 +26,10 @@ iframe{display:block;width:100%;max-width:600px;height:calc(100vh - 90px);margin
 </body></html>`;
 }
 
-export function showCampaignEmail(campaign) {
-    const dialog = document.createElement('dialog');
-    dialog.className = 'newsletter-html-dialog';
-    dialog.setAttribute('aria-labelledby', 'newsletter-campaign-email-title');
-    dialog.innerHTML = `
-        <header class="newsletter-ai-header">
-            <h2 id="newsletter-campaign-email-title"></h2>
-            <button type="button" class="newsletter-ai-close" data-close aria-label="Lukk">
-                <span class="material-symbols-outlined" aria-hidden="true">close</span>
-            </button>
-        </header>
+// Builds the e-mail view (language, width, sandboxed frame, open in new tab) inside `host`.
+// Returns { destroy } so a surrounding dialog can stop pending requests when it closes.
+export function mountCampaignEmail(host, campaign, { onSubject } = {}) {
+    host.innerHTML = `
         <p role="status" aria-live="polite">Henter e-posten …</p>
         <div class="newsletter-html-actions" data-languages role="group" aria-label="Språk i visningen" hidden>
             <button type="button" class="btn-secondary-outline" data-language="no" aria-pressed="true">Norsk</button>
@@ -52,18 +45,15 @@ export function showCampaignEmail(campaign) {
         <div class="newsletter-html-actions">
             <button type="button" class="btn-secondary-outline" data-open-tab disabled>Åpne i ny fane</button>
         </div>`;
-    const title = dialog.querySelector('h2');
-    const status = dialog.querySelector('[role=status]');
-    const languages = dialog.querySelector('[data-languages]');
+    const status = host.querySelector('[role=status]');
+    const languages = host.querySelector('[data-languages]');
     const languageButtons = [...languages.querySelectorAll('[data-language]')];
-    const frame = dialog.querySelector('iframe');
-    const openTab = dialog.querySelector('[data-open-tab]');
+    const frame = host.querySelector('iframe');
+    const openTab = host.querySelector('[data-open-tab]');
     let generation = 0;
     let current = null;
-
-    title.textContent = campaign.subject || 'Uten emne';
-    dialog.querySelector('[data-close]').onclick = () => dialog.close();
-    setupHtmlFrameWidths(dialog, frame);
+    let active = true;
+    setupHtmlFrameWidths(host, frame);
 
     const load = async language => {
         const request = ++generation;
@@ -72,31 +62,48 @@ export function showCampaignEmail(campaign) {
         status.textContent = 'Henter e-posten …';
         try {
             const result = await newsletterHtmlRequest({ action: 'campaignPreview', campaignId: campaign.id, language });
-            if (request !== generation || !dialog.open) return;
+            if (request !== generation || !active) return;
             current = result;
-            title.textContent = result.subject || 'Uten emne';
+            onSubject?.(result.subject || 'Uten emne');
             languages.hidden = !result.hasEnglish;
             languageButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.language === result.language)));
             showHtmlFrame(frame, result);
             status.textContent = 'Flettefeltene vises med eksempelverdier. Lenker til avmelding og nettleserversjon er byttet ut med #.';
             openTab.disabled = false;
         } catch (error) {
-            if (request !== generation) return;
+            if (request !== generation || !active) return;
             frame.hidden = true;
             status.textContent = error?.message || 'Kunne ikke hente e-posten. Kontroller administratortilgangen og prøv igjen.';
         }
     };
     languageButtons.forEach(button => { button.onclick = () => load(button.dataset.language); });
-
     openTab.onclick = () => {
         if (!current) return;
         const url = URL.createObjectURL(new Blob([previewPage(current)], { type: 'text/html' }));
         window.open(url, '_blank', 'noopener');
         setTimeout(() => URL.revokeObjectURL(url), 60_000);
     };
+    load('no');
+    return { destroy() { active = false; generation++; } };
+}
 
-    dialog.addEventListener('close', () => { generation++; dialog.remove(); }, { once: true });
+export function showCampaignEmail(campaign) {
+    const dialog = document.createElement('dialog');
+    dialog.className = 'newsletter-html-dialog';
+    dialog.setAttribute('aria-labelledby', 'newsletter-campaign-email-title');
+    dialog.innerHTML = `
+        <header class="newsletter-ai-header">
+            <h2 id="newsletter-campaign-email-title"></h2>
+            <button type="button" class="newsletter-ai-close" data-close aria-label="Lukk">
+                <span class="material-symbols-outlined" aria-hidden="true">close</span>
+            </button>
+        </header>
+        <div data-email></div>`;
+    const title = dialog.querySelector('h2');
+    title.textContent = campaign.subject || 'Uten emne';
+    dialog.querySelector('[data-close]').onclick = () => dialog.close();
     document.body.append(dialog);
     dialog.showModal();
-    load('no');
+    const view = mountCampaignEmail(dialog.querySelector('[data-email]'), campaign, { onSubject: subject => { title.textContent = subject; } });
+    dialog.addEventListener('close', () => { view.destroy(); dialog.remove(); }, { once: true });
 }

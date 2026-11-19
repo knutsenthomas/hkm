@@ -1,5 +1,6 @@
 import { HKD_PRODUCT_TEMPLATE } from './newsletter-product-template.js';
 import { showCampaignEmail } from './newsletter-campaign-preview.js';
+import { showCampaignReport } from './newsletter-campaign-report.js';
 
 export function campaignTime(value) {
     if (!value) return 0;
@@ -140,39 +141,146 @@ if (root) {
         dialog.addEventListener('close', () => dialog.remove(), {once:true}); document.body.append(dialog); dialog.showModal();
     };
     let analyticsIssuesOnly = false;
+    let analyticsSort = { key: 'date', dir: -1 };
     const issueStates = ['Avvik', 'Feil', 'Uavklart'];
+    const stateTone = { Fullført: 'good', Avvik: 'warning', Uavklart: 'warning', Feil: 'critical', Sender: 'info', 'I kø': 'info', Planlagt: 'info' };
     const stateNotes = {
-        Avvik: 'Færre registrert sendt enn mottakere. Se loggen.',
+        Avvik: 'Færre registrert sendt enn mottakere. Åpne kampanjen og se Levering.',
         Feil: 'Utsendingen feilet.',
         Uavklart: 'Uavsluttet forsøk eldre enn 24 timer. Faktisk utsending er ikke bekreftet.'
     };
+    const periodLabel = { 30: 'forrige 30 dager', 90: 'forrige 90 dager' };
     const number = value => Number(value).toLocaleString('nb-NO');
     const percent = (part, whole) => whole ? (100 * part / whole).toLocaleString('nb-NO', { maximumFractionDigits: 1 }) + ' %' : '–';
     const plural = (amount, one, many) => `${number(amount)} ${amount === 1 ? one : many}`;
-    const metricCard = (label, value, note) => {
+    const rate = (part, whole) => whole ? part / whole : null;
+    const metricCard = ({ label, value, note, delta, info, primary, muted }) => {
         const card = el('div', '');
-        card.append(el('span', label), el('strong', value));
+        if (primary) card.classList.add('is-primary');
+        if (muted) card.classList.add('is-muted');
+        const head = el('span', label);
+        if (info) {
+            const button = el('button', 'i'); button.type = 'button'; button.className = 'metric-info';
+            button.setAttribute('aria-label', 'Om ' + label.toLowerCase());
+            button.setAttribute('aria-expanded', 'false');
+            const text = el('p', info); text.className = 'metric-info-text'; text.hidden = true;
+            button.onclick = event => { event.stopPropagation(); text.hidden = !text.hidden; button.setAttribute('aria-expanded', String(!text.hidden)); };
+            head.append(button);
+            card.append(head, el('strong', value));
+            if (delta) card.append(delta);
+            if (note) card.append(el('small', note));
+            card.append(text);
+            return card;
+        }
+        card.append(head, el('strong', value));
+        if (delta) card.append(delta);
         if (note) card.append(el('small', note));
         return card;
     };
+    // Change against the previous period of the same length. `points` shows percentage points.
+    const deltaLine = (current, previous, { points = false, label }) => {
+        const line = el('em', ''); line.className = 'metric-delta';
+        if (current == null || previous == null) { line.textContent = `Ingen tall for ${label}`; line.classList.add('is-flat'); return line; }
+        const diff = points ? (current - previous) * 100 : (previous ? (current - previous) / previous * 100 : null);
+        if (diff == null) { line.textContent = `Ingen tall for ${label}`; line.classList.add('is-flat'); return line; }
+        const rounded = Math.round(diff * 10) / 10;
+        const arrow = rounded > 0 ? '▲' : rounded < 0 ? '▼' : '–';
+        line.classList.add(rounded > 0 ? 'is-up' : rounded < 0 ? 'is-down' : 'is-flat');
+        line.textContent = `${arrow} ${Math.abs(rounded).toLocaleString('nb-NO', { maximumFractionDigits: 1 })}${points ? ' poeng' : ' %'} mot ${label}`;
+        return line;
+    };
+    const campaignRates = campaign => {
+        const sent = Number(campaign.sentCount) || 0;
+        const tracked = campaign.trackingEnabled === true;
+        return {
+            sent,
+            tracked,
+            clicks: tracked ? Number(campaign.engagement?.uniqueClicks || 0) : null,
+            opens: tracked ? Number(campaign.engagement?.uniqueOpens || 0) : null,
+            clickRate: tracked && sent ? Number(campaign.engagement?.uniqueClicks || 0) / sent : null,
+            openRate: tracked && sent ? Number(campaign.engagement?.uniqueOpens || 0) / sent : null
+        };
+    };
+    const renderChart = rows => {
+        const section = root.querySelector('[data-analytics-chart]');
+        const body = root.querySelector('[data-analytics-chart-body]'); body.replaceChildren();
+        const points = rows.map(campaign => ({ campaign, stamp: time(date(campaign)), ...campaignRates(campaign) }))
+            .filter(point => point.clickRate != null && point.stamp).sort((a, b) => a.stamp - b.stamp).slice(-12);
+        section.hidden = points.length < 3;
+        if (section.hidden) return;
+        const max = Math.max(0.05, ...points.map(point => point.clickRate)) * 1.15;
+        const width = 640, height = 200, left = 36, bottom = 28, top = 18, gap = 2;
+        const plotW = width - left - 8, plotH = height - top - bottom;
+        const slot = plotW / points.length, barW = Math.min(44, slot - gap * 2 - 8);
+        const ns = 'http://www.w3.org/2000/svg';
+        const svg = document.createElementNS(ns, 'svg');
+        svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+        svg.setAttribute('role', 'img');
+        svg.setAttribute('aria-label', 'Klikkrate per utsending: ' + points.map(point => `${point.campaign.subject || 'Uten emne'} ${percent(point.clicks, point.sent)}`).join(', '));
+        const add = (tag, attrs, text) => { const node = document.createElementNS(ns, tag); Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, value)); if (text != null) node.textContent = text; svg.append(node); return node; };
+        [0, 0.5, 1].forEach(step => {
+            const y = top + plotH - step * plotH;
+            add('line', { x1: left, x2: width - 8, y1: y, y2: y, class: 'chart-grid' });
+            add('text', { x: left - 6, y: y + 4, 'text-anchor': 'end', class: 'chart-axis' }, (max * step * 100).toLocaleString('nb-NO', { maximumFractionDigits: 1 }) + ' %');
+        });
+        const best = points.reduce((a, b) => (b.clickRate > a.clickRate ? b : a));
+        points.forEach((point, index) => {
+            const h = Math.max(2, point.clickRate / max * plotH);
+            const x = left + index * slot + (slot - barW) / 2, y = top + plotH - h;
+            const r = Math.min(4, barW / 2, h);
+            const bar = add('path', { d: `M${x},${top + plotH} V${y + r} Q${x},${y} ${x + r},${y} H${x + barW - r} Q${x + barW},${y} ${x + barW},${y + r} V${top + plotH} Z`, class: 'chart-bar', tabindex: 0 });
+            const label = `${point.campaign.subject || 'Uten emne'}: ${percent(point.clicks, point.sent)} klikket (${number(point.clicks)} av ${number(point.sent)})`;
+            const tip = document.createElementNS(ns, 'title'); tip.textContent = label; bar.append(tip);
+            bar.addEventListener('click', () => openReport(point.campaign));
+            bar.addEventListener('keydown', event => { if (event.key === 'Enter') openReport(point.campaign); });
+            if (point === best || index === points.length - 1) add('text', { x: x + barW / 2, y: y - 5, 'text-anchor': 'middle', class: 'chart-value' }, percent(point.clicks, point.sent));
+            add('text', { x: x + barW / 2, y: height - 9, 'text-anchor': 'middle', class: 'chart-axis' }, new Date(point.stamp).toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' }));
+        });
+        body.append(svg);
+    };
+    const openReport = campaign => {
+        const stamp = time(date(campaign));
+        showCampaignReport(campaign, { state: campaignState(campaign), dateText: stamp ? 'Sendt ' + new Date(stamp).toLocaleDateString('nb-NO') : '' });
+    };
     const renderAnalytics = () => {
-        const summary = summarizeCampaigns(campaigns, root.querySelector('[data-analytics-period]').value);
+        const period = root.querySelector('[data-analytics-period]').value;
+        const summary = summarizeCampaigns(campaigns, period);
+        const previous = period === 'all' ? null : summarizeCampaigns(campaigns, period, Date.now() - Number(period) * 86400000);
+        const compare = previous && previous.rows.length ? previous : null;
+        const label = periodLabel[period];
         if (!summary.issues) analyticsIssuesOnly = false;
         const metrics = root.querySelector('[data-analytics-metrics]'); metrics.replaceChildren();
         const total = summary.rows.length;
         const basis = summary.trackedCampaigns
             ? (summary.trackedCampaigns === total ? 'Alle kampanjene i perioden ble målt' : `Bare ${summary.trackedCampaigns} av ${plural(total, 'kampanje', 'kampanjer')} ble målt`)
             : 'Ingen kampanjer i perioden ble målt';
+        const clickRate = rate(summary.clicks, summary.trackedSent);
+        const openRate = rate(summary.opens, summary.trackedSent);
         metrics.append(
-            metricCard('Sendt', number(summary.sent), `${plural(total, 'utsendelse', 'utsendelser')} · ${plural(summary.recipients, 'mottaker', 'mottakere')}${summary.unknown ? ` · ${summary.unknown} uten sendetall` : ''}`),
-            metricCard('Åpningsrate', percent(summary.opens, summary.trackedSent), basis),
-            metricCard('Klikkrate', percent(summary.clicks, summary.trackedSent), summary.trackedCampaigns ? `${plural(summary.clicks, 'mottaker', 'mottakere')} klikket på en lenke` : basis)
+            metricCard({
+                label: 'Klikkrate', value: percent(summary.clicks, summary.trackedSent), primary: true,
+                delta: compare && summary.trackedSent ? deltaLine(clickRate, compare ? rate(compare.clicks, compare.trackedSent) : null, { points: true, label }) : null,
+                note: summary.trackedCampaigns ? `${plural(summary.clicks, 'mottaker', 'mottakere')} klikket · ${basis.toLowerCase()}` : basis
+            }),
+            metricCard({
+                label: 'Sendt', value: number(summary.sent),
+                delta: compare && total ? deltaLine(summary.sent, compare ? compare.sent : null, { label }) : null,
+                note: `${plural(total, 'utsendelse', 'utsendelser')} · ${plural(summary.recipients, 'mottaker', 'mottakere')}${summary.unknown ? ` · ${summary.unknown} uten sendetall` : ''}`
+            }),
+            metricCard({
+                label: 'Åpningsrate', value: percent(summary.opens, summary.trackedSent), muted: true,
+                delta: compare && summary.trackedSent ? deltaLine(openRate, compare ? rate(compare.opens, compare.trackedSent) : null, { points: true, label }) : null,
+                note: summary.trackedCampaigns ? 'Anslag – ofte for høy' : basis,
+                info: 'Åpninger registreres med et usynlig bilde. Apple Mail og mange sikkerhetsfiltre laster det inn automatisk, så åpningsraten blir ofte for høy. Klikkrate er det mest pålitelige tallet. Bare kampanjer sendt med måling på telles.'
+            })
         );
-        const followUp = metricCard('Trenger oppfølging', number(summary.issues), summary.issues
-            ? (analyticsIssuesOnly ? 'Viser bare disse. Trykk for å vise alle.' : 'Avvik, feil eller uavklart. Trykk for å vise.')
-            : 'Ingen avvik i perioden');
+        const followUp = metricCard({
+            label: 'Trenger oppfølging', value: number(summary.issues),
+            note: summary.issues ? (analyticsIssuesOnly ? 'Viser bare disse. Trykk for å vise alle.' : 'Avvik, feil eller uavklart. Trykk for å vise.') : 'Ingen avvik i perioden'
+        });
         if (summary.issues) {
-            followUp.className = 'workspace-metric-filter';
+            followUp.classList.add('workspace-metric-filter');
+            if (!analyticsIssuesOnly) followUp.classList.add('has-issues');
             followUp.tabIndex = 0;
             followUp.setAttribute('role', 'button');
             followUp.setAttribute('aria-pressed', String(analyticsIssuesOnly));
@@ -185,48 +293,64 @@ if (root) {
             followUp.onkeydown = event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggle(); } };
         }
         metrics.append(followUp);
+        root.querySelector('[data-analytics-clear]').hidden = !analyticsIssuesOnly;
 
-        const months = root.querySelector('[data-analytics-months]'); months.replaceChildren();
-        summary.months.forEach(([month, data]) => {
-            const row = el('tr', ''); [month, data.campaigns, data.sent + (data.unknown ? ` (${data.unknown} ukjent)` : '')].forEach(value => row.append(el('td', value))); months.append(row);
+        renderChart(summary.rows);
+
+        const sortValue = campaign => {
+            const rates = campaignRates(campaign);
+            if (analyticsSort.key === 'date') return time(date(campaign));
+            if (analyticsSort.key === 'sent') return rates.sent;
+            if (analyticsSort.key === 'clicks') return rates.clickRate ?? -1;
+            return rates.openRate ?? -1;
+        };
+        root.querySelectorAll('.analytics-table th').forEach(th => {
+            const button = th.querySelector('[data-sort]');
+            if (!button) return;
+            th.setAttribute('aria-sort', button.dataset.sort === analyticsSort.key ? (analyticsSort.dir < 0 ? 'descending' : 'ascending') : 'none');
         });
-        // A monthly table only says something once there are a few months to compare.
-        root.querySelector('[data-analytics-months-section]').hidden = summary.months.length < 3;
-
         const details = root.querySelector('[data-analytics-campaigns]'); details.replaceChildren();
-        summary.rows.filter(campaign => !analyticsIssuesOnly || issueStates.includes(campaignState(campaign))).forEach(campaign => {
-            const row = el('tr', '');
-            const state = campaignState(campaign);
-            const subject = el('td', campaign.subject || 'Uten emne');
-            if (state !== 'Fullført') {
-                const flag = el('span', state);
-                flag.className = issueStates.includes(state) ? 'workspace-row-flag is-issue' : 'workspace-row-flag';
-                if (stateNotes[state]) flag.title = stateNotes[state];
-                subject.append(flag);
-            }
-            const stamp = time(date(campaign));
-            row.append(subject, el('td', stamp ? new Date(stamp).toLocaleDateString('nb-NO') : '–'), el('td', `${campaign.sentCount ?? '–'} / ${campaign.recipientCount ?? '–'}`));
-            const sentBase = Number(campaign.sentCount) || 0;
-            for (const key of ['uniqueOpens', 'uniqueClicks']) {
-                if (campaign.trackingEnabled === true) {
-                    const amount = Number(campaign.engagement?.[key] || 0);
-                    row.append(el('td', sentBase ? `${percent(amount, sentBase)} (${number(amount)})` : '–'));
-                } else {
-                    const cell = el('td', 'Ikke målt');
-                    cell.className = 'workspace-muted';
-                    cell.title = 'Måling av åpninger og klikk var slått av da kampanjen ble sendt.';
-                    row.append(cell);
-                }
-            }
-            const cell = el('td', ''); cell.className = 'workspace-actions-cell';
-            const email = el('button', 'Se e-post'); email.type = 'button'; email.onclick = () => showCampaignEmail(campaign);
-            const log = el('button', 'Se logg'); log.type = 'button'; log.onclick = () => showLogs(campaign);
-            cell.append(email, log);
-            if (campaign.trackingEnabled) { const activity = el('button', 'Se klikk'); activity.type = 'button'; activity.onclick = () => showEngagement(campaign); cell.append(activity); }
-            row.append(cell); details.append(row);
-        });
-        for (const [body, columns] of [[months, 3], [details, 6]]) if (!body.children.length) { const row = el('tr', ''); const cell = el('td', 'Ingen kampanjer i perioden.'); cell.colSpan = columns; row.append(cell); body.append(row); }
+        summary.rows
+            .filter(campaign => !analyticsIssuesOnly || issueStates.includes(campaignState(campaign)))
+            .sort((a, b) => (sortValue(a) - sortValue(b)) * analyticsSort.dir)
+            .forEach(campaign => {
+                const row = el('tr', ''); row.className = 'analytics-row'; row.tabIndex = 0;
+                const state = campaignState(campaign);
+                const rates = campaignRates(campaign);
+                const stamp = time(date(campaign));
+                const subject = el('td', campaign.subject || 'Uten emne'); subject.className = 'analytics-subject'; subject.dataset.label = 'Emne';
+                const statusCell = el('td', ''); statusCell.dataset.label = 'Status';
+                const badge = el('span', state); badge.className = 'status-badge is-' + (stateTone[state] || 'neutral');
+                if (stateNotes[state]) badge.title = stateNotes[state];
+                statusCell.append(badge);
+                const dateCell = el('td', stamp ? new Date(stamp).toLocaleDateString('nb-NO') : '–'); dateCell.dataset.label = 'Dato';
+                const figure = (main, sub, labelText, muted) => {
+                    const cell = el('td', ''); cell.className = 'is-number' + (muted ? ' workspace-muted' : ''); cell.dataset.label = labelText;
+                    cell.append(el('span', main)); if (sub) { const small = el('small', sub); cell.append(small); }
+                    return cell;
+                };
+                const notTracked = 'Måling av åpninger og klikk var slått av da kampanjen ble sendt.';
+                const sentCell = figure(`${campaign.sentCount ?? '–'} / ${campaign.recipientCount ?? '–'}`, rates.sent && campaign.recipientCount ? percent(rates.sent, campaign.recipientCount) : null, 'Sendt');
+                const clickCell = rates.tracked ? figure(percent(rates.clicks, rates.sent), plural(rates.clicks, 'klikk', 'klikk'), 'Klikket') : figure('Ikke målt', null, 'Klikket', true);
+                const openCell = rates.tracked ? figure(percent(rates.opens, rates.sent), plural(rates.opens, 'åpning', 'åpninger'), 'Åpnet') : figure('Ikke målt', null, 'Åpnet', true);
+                if (!rates.tracked) { clickCell.title = notTracked; openCell.title = notTracked; }
+                const more = el('td', ''); more.className = 'analytics-more';
+                more.innerHTML = '<span aria-hidden="true">›</span>';
+                row.setAttribute('aria-label', `${campaign.subject || 'Uten emne'}, ${state}. Åpne rapport.`);
+                row.append(subject, statusCell, dateCell, sentCell, clickCell, openCell, more);
+                row.addEventListener('click', () => openReport(campaign));
+                row.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openReport(campaign); } });
+                details.append(row);
+            });
+        if (!details.children.length) { const row = el('tr', ''); const cell = el('td', 'Ingen kampanjer i perioden.'); cell.colSpan = 7; row.append(cell); details.append(row); }
     };
+    root.querySelectorAll('.analytics-table [data-sort]').forEach(button => button.addEventListener('click', () => {
+        const key = button.dataset.sort;
+        analyticsSort = analyticsSort.key === key ? { key, dir: -analyticsSort.dir } : { key, dir: -1 };
+        renderAnalytics();
+        root.querySelector(`.analytics-table [data-sort="${key}"]`)?.focus();
+    }));
+    root.querySelector('[data-analytics-clear]').addEventListener('click', () => { analyticsIssuesOnly = false; renderAnalytics(); });
     root.querySelector('[data-analytics-period]').addEventListener('change', renderAnalytics);
     const render = () => {
         renderAnalytics();
