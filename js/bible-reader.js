@@ -10858,7 +10858,17 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                     this.stopAudioPlayback();
                     return;
                 }
-                const audioUrl = result.data ? result.data.audioUrl : null;
+                let audioUrl = result.data ? result.data.audioUrl : null;
+                if (!audioUrl && result.data && result.data.audioBase64) {
+                    try {
+                        const bin = atob(result.data.audioBase64);
+                        const bytes = new Uint8Array(bin.length);
+                        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+                        audioUrl = URL.createObjectURL(new Blob([bytes], { type: result.data.mimeType || 'audio/mpeg' }));
+                    } catch (decodeErr) {
+                        console.warn('[BibleAudio] Kunne ikke lese lyden fra serveren:', decodeErr);
+                    }
+                }
                 if (!audioUrl) throw new Error("Ingen lyd-URL mottatt fra serveren.");
 
                 console.log("Playing ChatGPT AI audio:", audioUrl);

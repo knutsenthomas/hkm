@@ -9106,14 +9106,22 @@ exports.getBibleChapterAudio = onCall({
   // Sett sammen MP3-bufferne til én fil
   const combinedBuffer = Buffer.concat(buffers);
 
-    // Lagre til Firebase Storage
-    await file.save(combinedBuffer, {
-      contentType: "audio/mpeg",
-      resumable: false,
-      metadata: {
-        cacheControl: "public, max-age=31536000"
+    // Lagre til Firebase Storage. Feiler lagringen, sendes lyden direkte tilbake så opplesningen likevel virker.
+    try {
+      await file.save(combinedBuffer, {
+        contentType: "audio/mpeg",
+        resumable: false,
+        metadata: {
+          cacheControl: "public, max-age=31536000"
+        }
+      });
+    } catch (saveError) {
+      console.error("Kunne ikke lagre lydfilen i Storage, sender lyden direkte:", saveError);
+      if (combinedBuffer.length > 7 * 1024 * 1024) {
+        throw saveError;
       }
-    });
+      return { success: true, cached: false, audioBase64: combinedBuffer.toString('base64'), mimeType: 'audio/mpeg' };
+    }
 
     try {
       await file.makePublic();
