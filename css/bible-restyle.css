@@ -85,7 +85,7 @@ body.hkr .bible-nav-right .tab-btn.active{color:var(--hkr-ink)!important;border-
   body.hkr .floating-bible-nav{border-radius:0!important;border-width:1px 0 0!important}
 }
 body.hkr #bible-reading-pane,body.hkr #bible-reading-pane p{hyphens:manual!important;-webkit-hyphens:manual!important}
-body.hkr #chapter-header-action-bar #btn-crossref-chapter-dynamic.hkr-pill{width:auto!important;height:38px!important;padding:0 16px!important;border-radius:999px!important}
+body.hkr #chapter-header-action-bar #btn-crossref-chapter-dynamic.hkr-pill{width:auto!important;aspect-ratio:auto!important;min-width:0!important;white-space:nowrap!important;height:38px!important;padding:0 16px!important;border-radius:999px!important}
 @media (max-width:768px){body.hkr #chapter-header-action-bar #btn-crossref-chapter-dynamic.hkr-pill{height:36px!important;padding:0 13px!important}}
 /* kapittelnummeret står etter boknavnet (ikke foran, så det ikke leses som «1. Romerbrev») */
 body.hkr .hkr-num{display:none!important}
