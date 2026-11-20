@@ -20,7 +20,7 @@
       myStart: 'Min startdato', week: 'Uke', dayRange: (a, b) => 'Dag ' + a + '–' + b, selected: 'Valgt dag', todayL: 'I dag', doneL: 'Fullført',
       allDays: 'Alle dager', readOf: (a, b) => a + ' av ' + b + ' fullført', dayOf: (n, m) => 'Dag ' + n + ' av ' + m,
       verses: 'Dagens bibelvers', readAll: n => n === 2 ? 'Les begge' : 'Les alle ' + (['', '', '', 'tre', 'fire', 'fem', 'seks'][n] || n), copy: 'Kopier', nextV: 'Neste vers →', firstV: 'Første vers ↺',
-      openBible: 'Les i Bibelen', step: 'Dagens steg', prayFor: 'Be for', prayer: 'Bønn', notes: n => 'Mine notater for dag ' + n,
+      openBible: 'Les i Bibelen', showAll: 'Vis hele teksten', step: 'Dagens steg', prayFor: 'Be for', prayer: 'Bønn', notes: n => 'Mine notater for dag ' + n,
       notesPh: 'Hva viser Gud deg i dag?', markDone: n => 'Merk dag ' + n + ' som fullført', undo: '✓ Fullført – angre', prev: n => '← Dag ' + n, next: n => 'Dag ' + n + ' →',
       dayDone: n => 'Dag ' + n + ' er fullført', allDone: n => 'Alle ' + n + ' dager fullført!', celebrateT: n => 'Du har fullført alle ' + n + ' dagene!',
       celebrateP: 'Takk Gud for det han har gjort. Skriv ned forandringene du har sett, og del vitnesbyrdet ditt med noen.',
@@ -46,7 +46,7 @@
       myStart: 'My start date', week: 'Week', dayRange: (a, b) => 'Day ' + a + '–' + b, selected: 'Selected day', todayL: 'Today', doneL: 'Completed',
       allDays: 'All days', readOf: (a, b) => a + ' of ' + b + ' completed', dayOf: (n, m) => 'Day ' + n + ' of ' + m,
       verses: "Today's Bible verses", readAll: n => n === 2 ? 'Read both' : 'Read all ' + n, copy: 'Copy', nextV: 'Next verse →', firstV: 'First verse ↺',
-      openBible: 'Read in the Bible', step: "Today's step", prayFor: 'Pray for', prayer: 'Prayer', notes: n => 'My notes for day ' + n,
+      openBible: 'Read in the Bible', showAll: 'Show the whole passage', step: "Today's step", prayFor: 'Pray for', prayer: 'Prayer', notes: n => 'My notes for day ' + n,
       notesPh: 'What is God showing you today?', markDone: n => 'Mark day ' + n + ' as completed', undo: '✓ Completed – undo', prev: n => '← Day ' + n, next: n => 'Day ' + n + ' →',
       dayDone: n => 'Day ' + n + ' completed', allDone: n => 'All ' + n + ' days completed!', celebrateT: n => 'You have completed all ' + n + ' days!',
       celebrateP: 'Thank God for what he has done. Write down the changes you have seen, and share your testimony with someone.',
@@ -72,7 +72,7 @@
       myStart: 'Mi fecha de inicio', week: 'Semana', dayRange: (a, b) => 'Día ' + a + '–' + b, selected: 'Día elegido', todayL: 'Hoy', doneL: 'Completado',
       allDays: 'Todos los días', readOf: (a, b) => a + ' de ' + b + ' completados', dayOf: (n, m) => 'Día ' + n + ' de ' + m,
       verses: 'Versículos del día', readAll: n => n === 2 ? 'Leer ambos' : 'Leer los ' + n, copy: 'Copiar', nextV: 'Siguiente →', firstV: 'Primero ↺',
-      openBible: 'Leer en la Biblia', step: 'Paso de hoy', prayFor: 'Ora por', prayer: 'Oración', notes: n => 'Mis notas del día ' + n,
+      openBible: 'Leer en la Biblia', showAll: 'Mostrar todo el texto', step: 'Paso de hoy', prayFor: 'Ora por', prayer: 'Oración', notes: n => 'Mis notas del día ' + n,
       notesPh: '¿Qué te muestra Dios hoy?', markDone: n => 'Marcar el día ' + n + ' como completado', undo: '✓ Completado – deshacer', prev: n => '← Día ' + n, next: n => 'Día ' + n + ' →',
       dayDone: n => 'Día ' + n + ' completado', allDone: n => '¡Los ' + n + ' días completados!', celebrateT: n => '¡Has completado los ' + n + ' días!',
       celebrateP: 'Da gracias a Dios por lo que ha hecho. Escribe los cambios que has visto y comparte tu testimonio con alguien.',
@@ -206,6 +206,10 @@
     }
     out.body = keep.join('');
     out.refs = parseRefs(out.verses);
+    // «Møte med Guds Ord (1. Mosebok 1-3 & Matteus 1)»: avsnittene står allerede i fanene under.
+    const tm = out.title.match(/^(.*\S)\s*\(([^()]*\d[^()]*)\)\s*$/);
+    out.heading = out.title;
+    if (tm && out.refs.length && parseRefs(tm[2]).some(r => r.book)) { out.heading = tm[1]; out.title = refsTitle(out.refs.filter(r => r.label)) || tm[1]; }
     if (!out.title || out.title === out.verses) out.title = refsTitle(out.refs.filter(r => r.label)) || out.verses || ('Dag ' + d.dayNumber);
     return out;
   }
@@ -523,9 +527,9 @@ ${extra ? `<a class="teach rv" href="${esc(extra.url)}"><span class="ic"><svg vi
     const d = DAYS[n - 1], s = SECTIONS[secOf(n)], dt = dayDate(n), k = 's' + n, isDone = done.has(n);
     const refs = d.refs.filter(r => r.label);
     const res = (d.resources || []).filter(r => r && r.url && /^(https?:\/\/|\/)/.test(r.url));
-    return `<div class="dhead"><span class="dnum">${String(n).padStart(2, '0')}</span><div><span class="dmeta">${esc(T.dayOf(n, N))} · ${esc(s.name)} · ${esc(T.WD[dt.getDay()])} ${esc(fmt(dt))}</span><h2>${esc(d.title)}</h2></div></div>
+    return `<div class="dhead"><span class="dnum">${String(n).padStart(2, '0')}</span><div><span class="dmeta">${esc(T.dayOf(n, N))} · ${esc(s.name)} · ${esc(T.WD[dt.getDay()])} ${esc(fmt(dt))}</span><h2>${esc(d.heading || d.title)}</h2></div></div>
   ${refs.length ? `<section class="word" aria-label="${esc(T.verses)}">
-   <div class="wtabs" role="tablist">${refs.map((r, i) => `<button type="button" class="wtab" role="tab" aria-selected="${i === 0}" data-i="${i}">${ICON_BOOK}${esc(refShow(r))}</button>`).join('')}${refs.length > 1 ? `<button type="button" class="wtab all" data-i="all">${esc(T.readAll(refs.length))}</button>` : ''}</div>
+   <div class="wtabs" role="tablist" style="--n:${Math.min(refs.length, 3)}"${refs.length < 2 ? ' hidden' : ''}>${refs.map((r, i) => `<button type="button" class="wtab" role="tab" aria-selected="${i === 0}" data-i="${i}">${ICON_BOOK}${esc(refShow(r))}</button>`).join('')}${refs.length > 1 ? `<button type="button" class="wtab all" data-i="all">${esc(T.readAll(refs.length))}</button>` : ''}</div>
    <div class="wbody" id="wbody"></div>
    <div class="wfoot"><span>${esc(BIBLE.name)}${BIBLE.lic ? ' · ' + (BIBLE.licUrl ? `<a href="${BIBLE.licUrl}" target="_blank" rel="noopener">${esc(BIBLE.lic)}</a>` : esc(BIBLE.lic)) : ''}</span><span class="wbtns"><button type="button" class="wbtn" id="wcopy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>${esc(T.copy)}</button><a class="wbtn" id="wopen" href="${esc(bibleHref(refs[0]))}">${ICON_BOOK}${esc(T.openBible)}</a>${refs.length > 1 ? `<button type="button" class="wbtn" id="wnext">${esc(T.nextV)}</button>` : ''}</span></div>
   </section>` : ''}
@@ -562,7 +566,16 @@ ${extra ? `<a class="teach rv" href="${esc(extra.url)}"><span class="ic"><svg vi
       const [html] = await Promise.all([htmlP, anim ? new Promise(r => setTimeout(r, 160)) : null]);
       if (my !== token) return;
       body.innerHTML = html;
-      body.classList.toggle('long', !!body.querySelector('.wpass.long'));
+      const isLong = !!body.querySelector('.wpass.long');
+      body.classList.toggle('long', isLong);
+      const nv = body.querySelectorAll('.wtext sup').length;
+      body.classList.toggle('clamp', nv > 10);
+      if (nv > 10) {
+        const more = document.createElement('button');
+        more.type = 'button'; more.className = 'wexpand'; more.textContent = T.showAll;
+        more.addEventListener('click', () => { body.classList.remove('clamp'); more.remove(); });
+        body.appendChild(more);
+      }
     };
     tabs.forEach(t => t.addEventListener('click', () => paint(t.dataset.i === 'all' ? 'all' : +t.dataset.i, true)));
     const nb = $('#wnext'); if (nb) nb.addEventListener('click', () => paint(sel === 'all' ? 0 : (sel + 1) % refs.length, true));

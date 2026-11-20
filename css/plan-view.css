@@ -361,3 +361,18 @@
 }
 #plan-view *{hyphens:manual;-webkit-hyphens:manual}
 #plan-view .trnote{margin:16px 0 0;padding:10px 14px;background:var(--soft);border-radius:12px;font-size:14px;color:var(--sec)}
+@media (max-width:600px){
+ #plan-view .day{margin-top:28px;padding-top:28px}
+ #plan-view .dhead{flex-direction:row;align-items:flex-start;gap:14px}
+ #plan-view .dnum{font-size:54px;line-height:.82}
+ #plan-view .dmeta{display:block;font-size:13px;line-height:1.4}
+ #plan-view .day h2{font-size:26px;line-height:1.12;margin-top:4px}
+ #plan-view .wtabs{grid-template-columns:repeat(var(--n,3),minmax(0,1fr))}
+ #plan-view .wtab.all{height:32px;background:none;box-shadow:none}
+}
+#plan-view .wtabs[hidden]{display:none}
+#plan-view .wbody{position:relative}
+#plan-view .wbody.clamp{max-height:360px;overflow:hidden}
+#plan-view .wbody.clamp::after{content:"";position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(rgba(255,255,255,0),#fff 70%);pointer-events:none}
+#plan-view .wexpand{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:2;height:40px;padding:0 18px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(21,26,33,.08)}
+#plan-view .wbody:not(.clamp) .wexpand{display:none}
