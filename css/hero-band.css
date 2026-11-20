@@ -213,3 +213,26 @@ html[data-theme="dark"] body #blog-interactions .comment-form :is(input,textarea
 html[data-theme="dark"] body #blog-interactions .comment-avatar{background:rgba(233,160,102,.14) !important;color:var(--dk-or) !important}
 html[data-theme="dark"] body .blog-post-section .blog-navigation{border-top-color:var(--dk-line) !important}
 html[data-theme="dark"] body #hkm-blog :is(.blog-page.section,.blog-filter-section,section),html[data-theme="dark"] body #hkm-tl section:not(.tl-cta){background:var(--dk-bg) !important}
+
+/* Mørk modus: bytt fargevariablene sidene bruker */
+html[data-theme="dark"] :is(#hkm-blog,#hkm-tl,#hkm-media,#hkp-head,.blog-post-section,#single-post-related,#blog-interactions){--ink:#f8fafc;--mut:#94a3b8;--line:#26344f;--or:#e9a066;--or2:#e9a066}
+html[data-theme="dark"] body .hb-band,html[data-theme="dark"] body .hb-static{--hb-ink:#f8fafc;--hb-mut:#94a3b8;--hb-line:#26344f;color:#f8fafc !important}
+html[data-theme="dark"] body .hb-band :is(a,span,li,small,nav){color:inherit}
+html[data-theme="dark"] body .hb-band .breadcrumb *,html[data-theme="dark"] body .hb-band [class*="breadcrumb"] *{color:#94a3b8 !important}
+html[data-theme="dark"] body #hero-course-desc{color:#94a3b8 !important}
+html[data-theme="dark"] body #hero-course-title{color:#f8fafc !important}
+
+/* Mørk modus: faste-siden (no/en/es) */
+html[data-theme="dark"] body #faste-guide{--ink:#f8fafc;--sec:#94a3b8;--line:#26344f;--soft:#16213b;--bg:#0b1329;--td:#e9a066;color-scheme:dark;background:#0b1329 !important;color:#f8fafc}
+html[data-theme="dark"] body #faste-guide :is(.card,.opt,.pill:not(.dark):not(.accent),.tocpanel){background:#131d36 !important}
+html[data-theme="dark"] body #faste-guide :is(.pill.dark,fieldset input:checked + span){color:#0b1329 !important}
+html[data-theme="dark"] body #faste-guide .opt.right{background:#11301f !important;border-color:#3f9f68 !important}
+html[data-theme="dark"] body #faste-guide .opt.wrong{background:#3a1a16 !important;border-color:#d76a55 !important}
+html[data-theme="dark"] body #faste-guide .fb.good{color:#5fc48a}
+html[data-theme="dark"] body #faste-guide .fb.bad{color:#ef8a76}
+html[data-theme="dark"] body #faste-guide textarea:focus{background:#0b1329 !important}
+html[data-theme="dark"] body #faste-guide :is(#pop,#toast){background:#1e293b !important;color:#f8fafc !important}
+html[data-theme="dark"] body #faste-guide .checks input{border-color:rgba(255,255,255,.3) !important}
+html[data-theme="dark"] body #faste-guide .tick{border-color:rgba(255,255,255,.3) !important}
+html[data-theme="dark"] body #faste-guide .toc a.read .tick{box-shadow:inset 0 0 0 2.5px #0b1329 !important}
+html[data-theme="dark"] body #faste-guide :is(h1,h2,h3,h4,strong,b,.q,legend,summary){color:#f8fafc}
