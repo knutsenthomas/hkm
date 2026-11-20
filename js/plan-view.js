@@ -674,7 +674,7 @@ ${shopUrl ? `<a class="teach abuy" href="${esc(shopUrl)}" target="_blank" rel="n
 ${pdfUrl ? `<a class="teach abuy" href="${esc(pdfUrl)}" target="_blank" rel="noopener"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M7 15h10v6H7z"/></svg></span><span><b>${esc(T.print)}</b></span></a>` : ''}
 ${extra ? `<a class="teach abuy" href="${esc(extra.url)}"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg></span><span><b>${esc(extra.t)}</b><span>${esc(extra.d)}</span></span></a>` : ''}
 ${aboutHTML('about-app')}
-<div style="height:96px"></div>`;
+<div style="height:40px"></div>`;
     el.querySelectorAll('.achip').forEach(b => b.addEventListener('click', () => show(+b.dataset.n, false)));
     el.querySelectorAll('.ack input').forEach(c => c.addEventListener('change', () => { toggleItem(n, +c.dataset.i, c.checked); show(n, false, true); }));
     el.querySelectorAll('.aopen').forEach(b => b.addEventListener('click', () => openReader(n, +b.dataset.i)));

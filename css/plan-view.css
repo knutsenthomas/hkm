@@ -523,3 +523,7 @@ html.pv-lock #plan-view .astart{display:none}
  #plan-view .abuy span span{font-size:13px}
  #plan-view .about-app{margin-top:16px}
 }
+@media (max-width:600px){
+ #plan-view .astart{position:static;padding:16px 0 0;background:none}
+ #plan-view .astart .pill{width:100%}
+}
