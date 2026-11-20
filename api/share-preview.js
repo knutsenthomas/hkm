@@ -1,6 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 
+const PLAN_SHARE_IMAGES = {
+  '21-dager-bonn-og-faste': '/img/og/21-dager-bonn-og-faste-{lang}.jpg'
+};
+
 // Firebase Firestore REST API configuration
 const PROJECT_ID = 'his-kingdom-ministry';
 const API_KEY = process.env.FIREBASE_API_KEY || "AIzaSyAelVsZnTU5xjQsjewWG7RjYEsQSHH-bkE";
@@ -185,6 +189,7 @@ export default async function handler(req, res) {
     let canonicalId = id;
     let description = 'Deling fra His Kingdom Ministry';
     let imageUrl = 'https://www.hiskingdomministry.no/img/logo-hkm.png';
+    let imageW = 0, imageH = 0;
 
     if (type === 'plan') {
       // Fetch plan details from Firestore via REST API
@@ -201,6 +206,9 @@ export default async function handler(req, res) {
           title = (tr && tr.title) || plan.title || (lang === 'en' ? 'Reading plan' : (lang === 'es' ? 'Plan de lectura' : 'Leseplan'));
           description = (tr && (tr.description || tr.subtitle)) || plan.description || plan.subtitle || 'Bibeleseplan fra His Kingdom Ministry';
           imageUrl = plan.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=600&q=80';
+          // Egne delingsbilder i 1200×630 (vises sikrere på Facebook enn eksterne bilder)
+          const ownShare = PLAN_SHARE_IMAGES[id];
+          if (ownShare) { imageUrl = ownShare.replace('{lang}', lang); imageW = 1200; imageH = 630; }
         }
       }
     } else if (type === 'blog') {
@@ -396,6 +404,9 @@ export default async function handler(req, res) {
     <meta property="og:title" content="${escapeHtml(title)}">
     <meta property="og:description" content="${escapeHtml(limitDesc)}">
     <meta property="og:image" content="${escapeHtml(imageUrl)}">
+    ${imageW ? `<meta property="og:image:width" content="${imageW}">
+    <meta property="og:image:height" content="${imageH}">
+    <meta property="og:image:alt" content="${escapeHtml(title)}">` : ''}
     <meta property="og:url" content="${escapeHtml(absolutePageUrl)}">
     <meta property="og:type" content="article">
     <meta name="twitter:card" content="summary_large_image">
