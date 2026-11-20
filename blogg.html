@@ -420,9 +420,13 @@ html:has(#hkm-blog),html:has(#hkm-blog) body{overflow-x:clip!important;overflow-
 #hkm-blog .featured-image img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;border-radius:0!important}
 #hkm-blog .featured-badge,#hkm-blog .blog-category{position:absolute!important;top:14px!important;left:14px!important;background:#fff!important;color:var(--ink)!important;font:600 12px/1 Inter,system-ui,sans-serif!important;padding:7px 10px!important;border-radius:999px!important;box-shadow:none!important;letter-spacing:0!important;text-transform:none!important}
 #hkm-blog .featured-content{padding:28px 30px!important;display:flex!important;flex-direction:column!important;justify-content:center!important}
-#hkm-blog .featured-meta,#hkm-blog .blog-meta{display:flex!important;flex-wrap:wrap!important;gap:4px 12px!important;font-size:13px!important;color:var(--mut)!important;margin:0 0 10px!important}
+#hkm-blog .featured-meta,#hkm-blog .blog-meta{display:flex!important;flex-wrap:wrap!important;gap:4px 0!important;font-size:13px!important;color:var(--mut)!important;margin:0 0 10px!important}
 #hkm-blog .featured-meta i,#hkm-blog .blog-meta i{display:none!important}
-#hkm-blog .featured-meta span+span::before,#hkm-blog .blog-meta span+span::before{content:"·";margin-right:12px;color:var(--mut)}
+#hkm-blog .featured-meta span+span::before,#hkm-blog .blog-meta span+span::before{content:"·";margin:0 8px;color:var(--mut)}
+#hkm-blog .blog-grid:not(.list-view) .blog-meta span:nth-child(2){display:none!important}
+#hkm-blog .blog-meta span{white-space:nowrap}
+#hkm-blog .blog-card,#hkm-blog .featured-post-card{hyphens:none!important;-webkit-hyphens:none!important}
+#hkm-blog .blog-title,#hkm-blog .blog-excerpt,#hkm-blog .featured-title,#hkm-blog .featured-excerpt{hyphens:none!important;-webkit-hyphens:none!important;word-break:normal!important;overflow-wrap:break-word}
 #hkm-blog .featured-meta span,#hkm-blog .blog-meta span{display:inline-flex!important;align-items:center!important}
 #hkm-blog .featured-title{font-size:clamp(22px,2.4vw,30px)!important;line-height:1.15!important;font-weight:800!important;letter-spacing:-.03em!important;margin:0!important}
 #hkm-blog .featured-title a{color:var(--ink)!important;text-decoration:none!important}
