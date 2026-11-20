@@ -308,9 +308,9 @@ class BibleReader {
         // UI Settings
         let settings = {
             fontSize: 18,
-            fontFamily: 'serif', // 'serif' | 'sans'
-            lineHeight: 1.8,
-            theme: 'cream', // 'light' | 'cream' | 'dark'
+            fontFamily: 'sans', // 'serif' | 'sans'
+            lineHeight: 1.75,
+            theme: 'light', // 'light' | 'cream' | 'dark'
             layout: 'verse' // 'verse' | 'paragraph' (Verse-by-verse is standard default)
         };
         try {
@@ -323,6 +323,16 @@ class BibleReader {
             console.warn("[BibleReader] Failed to parse settings:", e);
         }
         this.settings = settings;
+
+        // Migrering: samme skrift og hvit bakgrunn som leseplanene (én gang per bruker)
+        try {
+            if (!this.safeGetLocalStorage('hkm_bible_style_v4')) {
+                this.settings.fontFamily = 'sans';
+                if (this.settings.theme === 'cream') this.settings.theme = 'light';
+                this.safeSetLocalStorage('hkm_bible_settings', JSON.stringify(this.settings));
+                this.safeSetLocalStorage('hkm_bible_style_v4', 'true');
+            }
+        } catch (e) { }
 
         // Migration: Force verse layout by default once for all users
         try {
@@ -341,7 +351,7 @@ class BibleReader {
         if (activeGlobalTheme === 'dark') {
             this.settings.theme = 'dark';
         } else if (this.settings.theme === 'dark') {
-            this.settings.theme = 'cream';
+            this.settings.theme = 'light';
         }
 
         // Audio Player State
@@ -10848,7 +10858,17 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
                     this.stopAudioPlayback();
                     return;
                 }
-                const audioUrl = result.data ? result.data.audioUrl : null;
+                let audioUrl = result.data ? result.data.audioUrl : null;
+                if (!audioUrl && result.data && result.data.audioBase64) {
+                    try {
+                        const bin = atob(result.data.audioBase64);
+                        const bytes = new Uint8Array(bin.length);
+                        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+                        audioUrl = URL.createObjectURL(new Blob([bytes], { type: result.data.mimeType || 'audio/mpeg' }));
+                    } catch (decodeErr) {
+                        console.warn('[BibleAudio] Kunne ikke lese lyden fra serveren:', decodeErr);
+                    }
+                }
                 if (!audioUrl) throw new Error("Ingen lyd-URL mottatt fra serveren.");
 
                 console.log("Playing ChatGPT AI audio:", audioUrl);

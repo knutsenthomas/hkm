@@ -1,135 +1,268 @@
+/* Regnskap · HKM Studio — white surfaces, terracotta accent, rounded cards */
 #accounting-section {
   --report-border: var(--workspace-border, #e2e8f0);
   --report-surface: var(--workspace-surface, #fff);
   --report-muted: var(--workspace-muted, #64748b);
-  --report-subtle: var(--workspace-bg, #f1f5f9);
+  --report-subtle: var(--workspace-bg, #f4f7fa);
+  --report-text: var(--workspace-text, #1e293b);
+  --report-accent: var(--workspace-accent, #d17d39);
+  --report-accent-dark: var(--workspace-accent-dark, #bd4f2a);
+  --report-radius: 1rem;
+  --chart-revenue: #2f8a6f;
+  --chart-expenses: #d17d39;
+  --chart-result: #4f74b3;
+  --tone-positive: #23795f;
+  --tone-negative: #c2412d;
+  color: var(--report-text);
+}
+html[data-theme="dark"] #accounting-section {
+  --chart-revenue: #4fb592;
+  --chart-expenses: #e39657;
+  --chart-result: #7c9fdc;
+  --tone-positive: #5fc9a3;
+  --tone-negative: #f28b74;
 }
 
-#accounting-section .accounting-heading,
-#accounting-section .accounting-toolbar {
+#accounting-section [hidden] { display: none !important; }
+#accounting-section :is(dd, td, strong, b) { font-variant-numeric: tabular-nums; }
+
+/* ---------- Header + period picker ---------- */
+#accounting-section .accounting-heading {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: .75rem 1rem;
-}
-
-#accounting-section .accounting-heading {
   justify-content: space-between;
-  margin-bottom: 1rem;
+  gap: .75rem 1rem;
+  margin-bottom: .25rem;
 }
-
 #accounting-section .accounting-heading h2 {
   margin: 0;
-  font-size: 1.45rem;
-  font-weight: 700;
+  font-size: clamp(1.5rem, 2.4vw, 1.9rem);
+  font-weight: 800;
+  letter-spacing: -.02em;
 }
-
-#accounting-section .accounting-heading p,
-#accounting-section [role="status"] {
-  margin: .25rem 0 0;
+#accounting-section .accounting-heading p {
+  margin: .2rem 0 0;
   color: var(--report-muted);
-  font-size: .875rem;
+  font-size: .9rem;
+}
+#accounting-section > [role="status"] {
+  margin: 0 0 1.25rem;
+  color: var(--report-muted);
+  font-size: .82rem;
 }
 
-#accounting-section .accounting-source {
+#accounting-section .accounting-period { position: relative; margin-inline-start: auto; }
+#accounting-section .accounting-period summary {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .6rem .7rem .6rem 1rem;
   border: 1px solid var(--report-border);
   border-radius: 999px;
   background: var(--report-surface);
-  padding: .3rem .75rem;
+  cursor: pointer;
+  list-style: none;
+  font-size: .9rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  transition: border-color .15s;
+}
+#accounting-section .accounting-period summary:hover,
+#accounting-section .accounting-period[open] summary { border-color: var(--report-accent); }
+#accounting-section .accounting-period summary::-webkit-details-marker { display: none; }
+#accounting-section .accounting-period-chevron { color: var(--report-muted); font-size: 1.15rem; line-height: 1; transition: transform .15s; }
+#accounting-section .accounting-period[open] .accounting-period-chevron { transform: rotate(180deg); }
+
+#accounting-section .accounting-toolbar {
+  position: absolute;
+  inset-block-start: calc(100% + .4rem);
+  inset-inline-end: 0;
+  z-index: 3;
+  display: grid;
+  gap: .75rem;
+  width: max(100%, 15rem);
+  box-sizing: border-box;
+  padding: 1rem;
+  border: 1px solid var(--report-border);
+  border-radius: var(--report-radius);
+  background: var(--report-surface);
+  box-shadow: 0 12px 32px rgb(15 23 42 / 14%);
+}
+#accounting-section .accounting-toolbar label { display: grid; gap: .3rem; font-size: .8rem; font-weight: 600; color: var(--report-muted); }
+#accounting-section .accounting-toolbar :is(input, select, button) {
+  box-sizing: border-box;
+  width: 100%;
+  height: 2.6rem;
+  margin: 0;
+  padding: .4rem .7rem;
+  border: 1px solid var(--report-border);
+  border-radius: .6rem;
+  background-color: var(--report-surface);
+  color: var(--report-text);
+  font: inherit;
+  font-size: .9rem;
+}
+#accounting-section .accounting-refresh {
+  border: 0 !important;
+  background: var(--report-accent) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+}
+#accounting-section .accounting-refresh:hover { background: var(--report-accent-dark) !important; }
+#accounting-section .accounting-refresh:disabled { opacity: .6; cursor: progress; }
+
+/* ---------- Overview: result + balances ---------- */
+#accounting-section .accounting-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(16rem, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+#accounting-section .accounting-overview > :only-child { grid-column: 1 / -1; }
+
+#accounting-section .accounting-result,
+#accounting-section .accounting-bank > div,
+#accounting-section .accounting-chart,
+#accounting-section .accounting-table {
+  border: 1px solid var(--report-border);
+  border-radius: var(--report-radius);
+  background: var(--report-surface);
+}
+
+#accounting-section .accounting-result {
+  position: relative;
+  display: grid;
+  gap: 1.5rem;
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  overflow: hidden;
+}
+#accounting-section .accounting-result::before {
+  /* soft terracotta blob */
+  position: absolute;
+  inset-block-start: -5rem;
+  inset-inline-end: -4rem;
+  width: 15rem;
+  height: 15rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--report-accent) 16%, transparent), transparent 70%);
+  content: '';
+  pointer-events: none;
+}
+#accounting-section .accounting-result-head { position: relative; display: grid; justify-items: start; gap: .35rem; }
+#accounting-section .accounting-eyebrow {
+  color: var(--report-muted);
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+#accounting-section .accounting-result-amount {
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -.03em;
+}
+#accounting-section .accounting-result[data-tone="negative"] .accounting-result-amount { color: var(--tone-negative); }
+#accounting-section .accounting-delta {
+  padding: .25rem .65rem;
+  border-radius: 999px;
+  font-size: .8rem;
+  line-height: 1.3;
+  font-weight: 600;
+  color: var(--tone-positive);
+  background: color-mix(in srgb, var(--tone-positive) 12%, transparent);
+}
+#accounting-section .accounting-delta[data-tone="negative"] {
+  color: var(--tone-negative);
+  background: color-mix(in srgb, var(--tone-negative) 12%, transparent);
+}
+
+#accounting-section .accounting-flow { position: relative; display: grid; gap: 1rem; }
+#accounting-section .accounting-flow-bar {
+  position: relative;
+  height: .7rem;
+  border-radius: 999px;
+  background: var(--chart-revenue);
+  overflow: hidden;
+}
+#accounting-section .accounting-flow-bar span {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  border-radius: inherit;
+  background: var(--chart-expenses);
+  box-shadow: 2px 0 0 var(--report-surface);
+}
+#accounting-section .accounting-flow-figures {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .75rem;
+  margin: 0;
+}
+#accounting-section .accounting-flow-figures dt {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
   color: var(--report-muted);
   font-size: .8rem;
 }
-
-#accounting-section .accounting-toolbar,
-#accounting-section .accounting-summary > div,
-#accounting-section .accounting-table {
-  border: 1px solid var(--report-border);
-  border-radius: .75rem;
-  background: var(--report-surface);
+#accounting-section .accounting-flow-figures [data-series] dt::before {
+  width: .55rem;
+  height: .55rem;
+  border-radius: 50%;
+  background: var(--series-color);
+  content: '';
 }
+#accounting-section .accounting-flow-figures [data-series="revenue"] { --series-color: var(--chart-revenue); }
+#accounting-section .accounting-flow-figures [data-series="expenses"] { --series-color: var(--chart-expenses); }
+#accounting-section .accounting-flow-figures dd { margin: .2rem 0 0; font-size: 1.05rem; font-weight: 700; }
 
-#accounting-section .accounting-toolbar {
-  align-items: end;
-  padding: .75rem 1rem;
-}
-
-#accounting-section .accounting-toolbar label {
-  display: grid;
-  gap: .3rem;
-  font-size: .85rem;
+#accounting-section .accounting-bank { display: grid; gap: 1rem; align-content: start; margin: 0; }
+#accounting-section .accounting-bank > div { padding: 1.1rem 1.25rem; }
+#accounting-section .accounting-bank dt {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  color: var(--report-muted);
+  font-size: .82rem;
   font-weight: 600;
 }
-
-#accounting-section .accounting-toolbar :is(input, select, button) {
-  box-sizing: border-box;
-  height: 2.75rem;
-  min-height: 2.75rem;
-  margin: 0;
-  line-height: 1.25;
-  padding: .4rem .65rem;
-  border: 1px solid var(--report-border);
-  border-radius: .4rem;
-  background-color: var(--report-surface);
-  color: inherit;
-}
-
-#accounting-section .accounting-toolbar input { width: 6rem; }
-#accounting-section .accounting-refresh { margin-inline-start: auto; }
-#accounting-section .accounting-refresh:disabled { opacity: .6; }
-#accounting-section [role="status"] { margin: .6rem 0 1rem; }
-
-#accounting-section .accounting-summary {
+#accounting-section .accounting-bank dt small { font-weight: 400; opacity: .85; }
+#accounting-section .accounting-bank dt .material-symbols-outlined {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
-  gap: .75rem;
-  margin: 0 0 1rem;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: .55rem;
+  background: color-mix(in srgb, var(--report-accent) 12%, transparent);
+  color: var(--report-accent);
+  font-size: 1.1rem;
 }
-
-#accounting-section .accounting-summary > div { padding: .85rem 1rem; }
-#accounting-section .accounting-summary dt { color: var(--report-muted); font-size: .85rem; }
-#accounting-section .accounting-summary dd { margin: .25rem 0 0; font-size: 1.2rem; font-weight: 700; }
-#accounting-section .accounting-summary > div:last-child { border-inline-start: 3px solid var(--primary-color, #bd632d); }
-
-#accounting-section .accounting-table { overflow-x: auto; }
-#accounting-section table { width: 100%; border-collapse: collapse; font-size: .875rem; }
-#accounting-section caption { padding: .9rem 1rem; text-align: left; font-size: 1rem; font-weight: 700; }
-#accounting-section :is(th, td) { padding: .6rem 1rem; border-top: 1px solid var(--report-border); text-align: left; }
-#accounting-section thead th:first-child { width: 6rem; }
-#accounting-section :is(th, td):last-child { text-align: right; white-space: nowrap; }
-#accounting-section :is(thead, tfoot, .accounting-group) { background: var(--report-subtle); font-weight: 700; }
-#accounting-section :is(dd, td) { font-variant-numeric: tabular-nums; }
-#accounting-section tbody tr:not(.accounting-group) td:first-child { color: var(--report-muted); }
-#accounting-section [data-report][hidden] { display: none; }
-
-@media (max-width: 600px) {
-  #accounting-section :is(th, td) { padding: .55rem .65rem; }
-  #accounting-section thead th:first-child { width: auto; }
-  #accounting-section .accounting-refresh { margin-inline-start: 0; }
+#accounting-section .accounting-bank dd { margin: .55rem 0 .1rem; font-size: 1.45rem; font-weight: 800; letter-spacing: -.02em; }
+#accounting-section .accounting-bank small { color: var(--report-muted); font-size: .78rem; }
+#accounting-section .accounting-prepaid-detail {
+  margin-block-start: .75rem;
+  padding: .6rem .75rem;
+  border-radius: .6rem;
+  background: var(--report-subtle);
 }
+#accounting-section .accounting-prepaid-detail strong { display: block; font-size: .85rem; font-weight: 600; line-height: 1.35; }
+#accounting-section .accounting-prepaid-detail small { display: block; margin-top: .15rem; }
+#accounting-section [data-prepaid-card] p { margin: .5rem 0 0; color: var(--report-muted); font-size: .78rem; }
 
-#accounting-section .accounting-chart {
-  margin-bottom: 1rem;
-  padding: 1rem;
-  border: 1px solid var(--report-border);
-  border-radius: .75rem;
-  background: var(--report-surface);
-}
-
-#accounting-section .accounting-chart h3 { margin: 0 0 .7rem; font-size: 1rem; font-weight: 700; }
-#accounting-section .accounting-chart {
-  --chart-revenue: #21836c;
-  --chart-expenses: #bd632d;
-  --chart-result: #537bbb;
-  padding: clamp(1rem, 2vw, 1.6rem);
-}
+/* ---------- Monthly chart ---------- */
+#accounting-section .accounting-chart { margin-bottom: 1rem; padding: clamp(1.1rem, 2.2vw, 1.6rem); }
+#accounting-section .accounting-chart h3 { margin: 0 0 .5rem; font-size: 1.05rem; font-weight: 700; }
 #accounting-section .accounting-chart [data-series="revenue"] { --series-color: var(--chart-revenue); }
 #accounting-section .accounting-chart [data-series="expenses"] { --series-color: var(--chart-expenses); }
 #accounting-section .accounting-chart [data-series="result"] { --series-color: var(--chart-result); }
 #accounting-section .accounting-chart-legend {
   display: flex;
   flex-wrap: wrap;
-  gap: .5rem 1.15rem;
-  margin-bottom: 1rem;
+  gap: .4rem 1.15rem;
+  margin-bottom: 1.1rem;
   color: var(--report-muted);
   font-size: .8rem;
 }
@@ -144,10 +277,10 @@
 }
 #accounting-section .accounting-chart-viewport { overflow-x: auto; }
 #accounting-section .accounting-chart-plot {
-  --plot-height: 12rem;
+  --plot-height: 13rem;
   display: grid;
   grid-template-columns: repeat(var(--months), minmax(2.8rem, 1fr));
-  background: repeating-linear-gradient(to bottom, var(--report-border) 0 1px, transparent 1px 25%) top / 100% var(--plot-height) no-repeat;
+  background: repeating-linear-gradient(to bottom, color-mix(in srgb, var(--report-border) 70%, transparent) 0 1px, transparent 1px 25%) top / 100% var(--plot-height) no-repeat;
 }
 #accounting-section .accounting-chart-plot button {
   position: relative;
@@ -155,21 +288,15 @@
   grid-template-rows: var(--plot-height) 2.2rem;
   padding: 0;
   border: 0;
-  border-radius: .4rem;
+  border-radius: .6rem;
   background: transparent;
   color: inherit;
   cursor: pointer;
 }
-#accounting-section .accounting-chart-plot button:hover,
-#accounting-section .accounting-chart-plot button[aria-pressed="true"] { background: color-mix(in srgb, var(--chart-result) 11%, transparent); }
-#accounting-section .accounting-chart-plot button:focus-visible { outline: 2px solid var(--chart-result); outline-offset: -2px; }
-#accounting-section .accounting-chart-bars {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  justify-self: center;
-  width: min(78%, 3.8rem);
-}
+#accounting-section .accounting-chart-plot button:hover { background: var(--report-subtle); }
+#accounting-section .accounting-chart-plot button[aria-pressed="true"] { background: color-mix(in srgb, var(--report-accent) 10%, transparent); }
+#accounting-section .accounting-chart-plot button[aria-pressed="true"] .accounting-chart-month { color: var(--report-accent-dark); font-weight: 700; }
+#accounting-section .accounting-chart-plot button:focus-visible { outline: 2px solid var(--report-accent); outline-offset: -2px; }
 #accounting-section .accounting-chart-plot button::before {
   position: absolute;
   top: 0;
@@ -178,190 +305,176 @@
   background: linear-gradient(to bottom, transparent var(--zero), var(--report-muted) var(--zero), transparent calc(var(--zero) + 1px));
   content: '';
 }
+#accounting-section .accounting-chart-bars {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2px;
+  justify-self: center;
+  width: min(72%, 3.4rem);
+}
 #accounting-section .accounting-chart-bars span {
   position: relative;
-  margin-inline: 1px;
-  border-radius: .2rem;
+  min-height: 2px;
+  border-radius: .25rem;
   background: var(--series-color);
 }
-#accounting-section .accounting-chart-month {
-  align-self: center;
-  color: var(--report-muted);
-  font-size: .8rem;
-  text-transform: capitalize;
-}
+#accounting-section .accounting-chart-month { align-self: center; color: var(--report-muted); font-size: .78rem; text-transform: capitalize; }
 #accounting-section .accounting-chart-detail {
   display: flex;
   flex-wrap: wrap;
-  gap: .45rem 1.25rem;
-  margin-top: .85rem;
-  padding: .7rem .9rem;
-  border-radius: .5rem;
+  align-items: baseline;
+  gap: .45rem 1.5rem;
+  margin-top: 1rem;
+  padding: .8rem 1rem;
+  border-radius: .75rem;
   background: var(--report-subtle);
   font-size: .85rem;
-  font-variant-numeric: tabular-nums;
 }
-#accounting-section .accounting-chart-detail strong { text-transform: capitalize; }
+#accounting-section .accounting-chart-detail strong { margin-inline-end: auto; text-transform: capitalize; }
 #accounting-section .accounting-chart-detail span { color: var(--report-muted); }
-#accounting-section .accounting-chart-detail b { color: var(--workspace-text, inherit); white-space: nowrap; }
+#accounting-section .accounting-chart-detail b { color: var(--report-text); white-space: nowrap; }
+#accounting-section .accounting-chart p { margin: .75rem 0 0; color: var(--report-muted); font-size: .8rem; }
+
+/* ---------- Account table ---------- */
+#accounting-section .accounting-table { overflow-x: auto; }
+#accounting-section table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+#accounting-section caption {
+  padding: 1.15rem 1.25rem .75rem;
+  text-align: left;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+#accounting-section :is(th, td) { padding: .65rem 1.25rem; border-top: 1px solid var(--report-border); text-align: left; }
+#accounting-section :is(th, td):last-child,
+#accounting-section .accounting-comparison :is(th, td):nth-last-child(2):not([colspan]) { text-align: right; white-space: nowrap; }
+#accounting-section thead th {
+  color: var(--report-muted);
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+#accounting-section .accounting-comparison thead th:first-child { width: 5.5rem; }
+#accounting-section .accounting-comparison :is(th, td):first-child:not([colspan]) { white-space: nowrap; }
+#accounting-section tbody tr:not(.accounting-group) td:first-child { color: var(--report-muted); }
+#accounting-section tbody tr:not(.accounting-group):hover { background: var(--report-subtle); }
+
+#accounting-section .accounting-group { background: var(--report-subtle); }
+#accounting-section .accounting-group :is(th, td) { padding-block: .7rem; font-weight: 700; }
+#accounting-section .accounting-group th::before {
+  display: inline-block;
+  margin-inline-end: .55rem;
+  vertical-align: -.2rem;
+  width: .3rem;
+  height: 1.1rem;
+  border-radius: 999px;
+  background: var(--group-color, var(--report-muted));
+  content: '';
+}
+#accounting-section [data-group="Driftsinntekter"] { --group-color: var(--chart-revenue); }
+#accounting-section [data-group="Driftskostnader"] { --group-color: var(--chart-expenses); }
+#accounting-section [data-group="Finansposter"] { --group-color: var(--chart-result); }
 
 #accounting-section .accounting-account-link {
+  display: block;
   padding: 0;
+  border: 0;
   background: transparent;
   color: inherit;
+  font: inherit;
   text-align: start;
-  text-decoration: none;
   cursor: pointer;
 }
+#accounting-section .accounting-account-link:hover { color: var(--report-accent-dark); text-decoration: underline; text-underline-offset: 3px; }
+#accounting-section .accounting-meter {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  margin-top: .35rem;
+}
+#accounting-section .accounting-meter-bar {
+  flex: 0 1 10rem;
+  height: .25rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--report-border) 70%, transparent);
+  overflow: hidden;
+}
+#accounting-section .accounting-meter-bar::before {
+  display: block;
+  width: var(--share);
+  height: 100%;
+  border-radius: inherit;
+  background: var(--group-color, var(--report-accent));
+  content: '';
+}
+#accounting-section .accounting-meter-value {
+  color: var(--report-muted);
+  font-size: .75rem;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+#accounting-section tfoot :is(th, td) {
+  padding-block: .95rem;
+  border-top: 2px solid var(--report-text);
+  font-size: .95rem;
+  font-weight: 800;
+}
+
+/* ---------- Postings dialog ---------- */
 #accounting-section .accounting-postings {
   position: fixed;
   inset: 0;
   box-sizing: border-box;
-  width: 100%;
-  height: 100%;
+  width: min(100%, 64rem);
+  height: min(100%, 48rem);
   max-width: none;
   max-height: none;
-  margin: 0;
-  padding: 0 clamp(.75rem, 3vw, 2rem) 1.25rem;
+  margin: auto;
+  padding: 0 clamp(.75rem, 3vw, 1.75rem) 1.25rem;
   border: 0;
-  border-radius: 0;
+  border-radius: var(--report-radius);
   overflow: auto;
   background: var(--report-surface);
   color: inherit;
+  box-shadow: 0 24px 60px rgb(15 23 42 / 30%);
 }
-#accounting-section .accounting-postings::backdrop { background: rgb(15 23 42 / 55%); }
+#accounting-section .accounting-postings::backdrop { background: rgb(15 23 42 / 50%); backdrop-filter: blur(2px); }
 #accounting-section .accounting-postings form { margin: 0; }
-#accounting-section .accounting-postings button {
-  padding: .4rem .75rem;
-  border: 1px solid var(--report-border);
-  border-radius: .4rem;
-  background: var(--report-subtle);
-  color: inherit;
-}
-
-#accounting-section .accounting-postings :is(th, td):nth-child(-n+2) {
-  width: 1%;
-  white-space: nowrap;
-  word-break: normal;
-  overflow-wrap: normal;
-  hyphens: none;
-}
-
 #accounting-section .accounting-postings .accounting-heading {
   position: sticky;
   top: 0;
   z-index: 1;
-  padding-block: 1rem;
+  margin: 0;
+  padding-block: 1.1rem;
   border-bottom: 1px solid var(--report-border);
   background: var(--report-surface);
 }
-#accounting-section .accounting-postings h3 {
-  flex: 1 1 12rem;
-  min-width: 0;
-  margin: 0;
-}
-
-#accounting-section .accounting-comparison :is(th, td):nth-last-child(2):not([colspan]) {
-  text-align: right;
-  white-space: nowrap;
-}
-
-#accounting-section .accounting-comparison thead th {
-  font-size: .95rem;
-}
-
-#accounting-section .accounting-bank[hidden] { display: none; }
-#accounting-section .accounting-bank small { color: var(--report-muted); }
-
-#accounting-section .accounting-comparison :is(th, td):first-child:not([colspan]) {
-  white-space: nowrap;
-  word-break: normal;
-  overflow-wrap: normal;
-  hyphens: none;
-}
-
-#accounting-section .accounting-period { position: relative; margin-inline-start: auto; }
-#accounting-section .accounting-period summary {
-  display: flex;
-  align-items: center;
-  gap: .65rem;
-  padding: .5rem .75rem;
+#accounting-section .accounting-postings h3 { flex: 1 1 12rem; min-width: 0; margin: 0; font-size: 1.15rem; }
+#accounting-section .accounting-postings button {
+  padding: .45rem 1rem;
   border: 1px solid var(--report-border);
-  border-radius: .45rem;
+  border-radius: 999px;
   background: var(--report-surface);
-  cursor: pointer;
-  list-style: none;
-  font-size: .875rem;
+  color: inherit;
   font-weight: 600;
+  cursor: pointer;
 }
-#accounting-section .accounting-period summary::-webkit-details-marker { display: none; }
-#accounting-section .accounting-period .accounting-toolbar {
-  position: absolute;
-  inset-block-start: calc(100% + .4rem);
-  inset-inline-end: 0;
-  z-index: 3;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  width: 100%;
-  box-sizing: border-box;
-  box-shadow: 0 8px 24px rgb(15 23 42 / 15%);
-}
-#accounting-section .accounting-period .accounting-refresh {
-  grid-column: 1 / -1;
-  justify-self: stretch;
-  margin: 0;
-}
+#accounting-section .accounting-postings [data-posting-status] { margin: .75rem 0; color: var(--report-muted); font-size: .82rem; }
+#accounting-section .accounting-postings .accounting-table { border-radius: .75rem; }
+#accounting-section .accounting-postings :is(th, td):nth-child(-n+2) { width: 1%; white-space: nowrap; }
 
+/* ---------- Responsive ---------- */
+@media (max-width: 960px) {
+  #accounting-section .accounting-overview { grid-template-columns: minmax(0, 1fr); }
+  #accounting-section .accounting-bank { grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
+}
 @media (max-width: 600px) {
-  #accounting-section [data-report] .accounting-summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: .5rem;
-  }
-  #accounting-section [data-report] .accounting-summary > div {
-    padding: .65rem .6rem;
-    overflow-wrap: anywhere;
-  }
-  #accounting-section [data-report] .accounting-summary dd {
-    font-size: clamp(.9rem, 4vw, 1.1rem);
-  }
+  #accounting-section .accounting-heading > .accounting-period { margin-inline-start: 0; }
+  #accounting-section .accounting-toolbar { inset-inline: 0 auto; }
+  #accounting-section .accounting-flow-figures { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #accounting-section :is(th, td) { padding: .6rem .7rem; }
+  #accounting-section caption { padding-inline: .8rem; }
+  #accounting-section .accounting-comparison thead th:first-child { width: auto; }
+  #accounting-section .accounting-postings { width: 100%; height: 100%; border-radius: 0; }
 }
-
-@media (max-width: 600px) {
-  #accounting-section .accounting-heading > .accounting-period {
-    margin-inline-start: 0;
-    margin-inline-end: auto;
-  }
-  #accounting-section .accounting-period summary {
-    width: fit-content;
-  }
-  #accounting-section .accounting-period .accounting-toolbar {
-    inset-inline: 0 auto;
-    max-width: 100%;
-  }
-}
-
-#accounting-section .accounting-bank > [hidden] { display: none; }
-#accounting-section [data-prepaid-card] p { margin: .5rem 0 0; color: var(--report-muted); font-size: .85rem; }
-
-#accounting-section .accounting-period-chevron {
-  color: var(--report-muted);
-  font-size: 1.125rem;
-  line-height: 1;
-}
-#accounting-section .accounting-period[open] .accounting-period-chevron {
-  transform: rotate(180deg);
-}
-
-#accounting-section .accounting-prepaid-detail {
-  margin-block-start: .75rem;
-  padding-block-start: .75rem;
-  border-block-start: 1px solid var(--report-border);
-}
-#accounting-section .accounting-prepaid-detail strong,
-#accounting-section .accounting-prepaid-detail small:not([hidden]) {
-  display: block;
-}
-
-#accounting-section .accounting-period .accounting-toolbar :is(input, select) { width: 100%; }
-
-#accounting-section .accounting-period .accounting-refresh { white-space: normal; }

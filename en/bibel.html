@@ -2,6 +2,19 @@
 <html lang="en">
 
 <head>
+    <script>document.documentElement.classList.add('hkr');</script>
+    <!-- Leseplaner vises i den egne leseplan-visningen -->
+    <script>
+        (function () {
+            try {
+                var p = new URLSearchParams(location.search), id = p.get('plan');
+                if (id && !p.get('ref') && !p.get('stay')) {
+                    var d = parseInt(p.get('day'), 10);
+                    location.replace('/en/reading-plan-details?id=' + encodeURIComponent(id) + (d > 0 ? '&day=' + d : ''));
+                }
+            } catch (e) {}
+        })();
+    </script>
             <!-- Theme Initializer -->
     <script>
         (function () {
@@ -3370,6 +3383,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="/css/bible-restyle.css?v=2026.11.20.10">
     <link rel="preload" href="../css/search-v2.css?v=1.0.3" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="../css/search-v2.css?v=1.0.3"></noscript>
 
     <!-- Open Graph / Facebook -->
@@ -4365,7 +4379,9 @@
     <script type="module" src="../script.js?v=2026.06.21.10.01"></script>
     <script type="module" src="../js/cookie-consent.js"></script>
     <script type="module" src="../js/bible-book-introductions.js?v=2026.07.26.1000"></script>
-    <script type="module" src="../js/bible-reader.js?v=2026.07.26.1320"></script>
+    <script type="module" src="../js/bible-reader.js?v=2026.11.20.2"></script>
+    <script src="/js/bible-restyle.js?v=2026.11.20.6" defer></script>
+    <script src="/js/scroll-progress.js?v=2" defer></script>
     <script type="module" src="../js/i18n.js"></script>
     <!-- Global Search Modal -->
     <div id="site-search-modal" class="search-overlay">

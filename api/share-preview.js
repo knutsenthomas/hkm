@@ -197,8 +197,9 @@ export default async function handler(req, res) {
         if (payload && payload.fields) {
           const plan = decodeFirestoreFields(payload.fields);
           found = true;
-          title = plan.title || 'Leseplan';
-          description = plan.description || plan.subtitle || 'Bibeleseplan fra His Kingdom Ministry';
+          const tr = lang !== 'no' && plan.translations && plan.translations[lang] ? plan.translations[lang] : null;
+          title = (tr && tr.title) || plan.title || (lang === 'en' ? 'Reading plan' : (lang === 'es' ? 'Plan de lectura' : 'Leseplan'));
+          description = (tr && (tr.description || tr.subtitle)) || plan.description || plan.subtitle || 'Bibeleseplan fra His Kingdom Ministry';
           imageUrl = plan.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=600&q=80';
         }
       }
