@@ -30,7 +30,7 @@
       notFoundP: 'Lenken kan være feil, eller planen er ikke publisert ennå.', back: 'Til alle leseplaner', excerpt: 'utdrag',
       loadingV: 'Henter bibelteksten …', noV: 'Bibelteksten kunne ikke hentes her. Åpne den i Bibelen.', moreCh: n => '+ ' + n + (n === 1 ? ' kapittel' : ' kapitler') + ' til – les videre i Bibelen',
       buy: 'Kjøp trykt versjon', print: 'Skriv ut', behind: n => 'Du ligger ' + n + (n === 1 ? ' dag' : ' dager') + ' bak planen.', jump: n => 'Gå til dag ' + n,
-      resources: 'Ressurser', listUrl: '/leseplaner', bibleUrl: '/bibel.html', planUrl: '/leseplan-detaljer',
+      resources: 'Ressurser', onlyNo: '', listUrl: '/leseplaner', bibleUrl: '/bibel.html', planUrl: '/leseplan-detaljer',
       MON: ['januar', 'februar', 'mars', 'april', 'mai', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'desember'],
       MS: ['jan', 'feb', 'mar', 'apr', 'mai', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'des'],
       WD: ['søndag', 'mandag', 'tirsdag', 'onsdag', 'torsdag', 'fredag', 'lørdag'], fmt: (d, M) => d.getDate() + '. ' + M[d.getMonth()]
@@ -56,7 +56,7 @@
       notFoundP: 'The link may be wrong, or the plan is not published yet.', back: 'All reading plans', excerpt: 'excerpt',
       loadingV: 'Loading the Bible text …', noV: 'The Bible text could not be loaded here. Open it in the Bible.', moreCh: n => '+ ' + n + (n === 1 ? ' more chapter' : ' more chapters') + ' – continue in the Bible',
       buy: 'Buy the printed version', print: 'Print', behind: n => 'You are ' + n + (n === 1 ? ' day' : ' days') + ' behind the plan.', jump: n => 'Go to day ' + n,
-      resources: 'Resources', listUrl: '/en/leseplaner', bibleUrl: '/en/bibel.html', planUrl: '/en/reading-plan-details',
+      resources: 'Resources', onlyNo: 'This plan has not been translated yet, so the text is in Norwegian. The Bible verses are shown in English.', listUrl: '/en/leseplaner', bibleUrl: '/en/bibel.html', planUrl: '/en/reading-plan-details',
       MON: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
       MS: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
       WD: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], fmt: (d, M) => M[d.getMonth()] + ' ' + d.getDate()
@@ -82,7 +82,7 @@
       notFoundP: 'Puede que el enlace sea incorrecto o que el plan aún no esté publicado.', back: 'Todos los planes', excerpt: 'extracto',
       loadingV: 'Cargando el texto bíblico …', noV: 'No se pudo cargar el texto aquí. Ábrelo en la Biblia.', moreCh: n => '+ ' + n + (n === 1 ? ' capítulo más' : ' capítulos más') + ' – sigue en la Biblia',
       buy: 'Comprar la versión impresa', print: 'Imprimir', behind: n => 'Vas ' + n + (n === 1 ? ' día' : ' días') + ' atrasado.', jump: n => 'Ir al día ' + n,
-      resources: 'Recursos', listUrl: '/es/leseplaner', bibleUrl: '/es/bibel.html', planUrl: '/es/detalles-plan-lectura',
+      resources: 'Recursos', onlyNo: 'Este plan aún no está traducido, así que el texto está en noruego. Los versículos se muestran en español.', listUrl: '/es/leseplaner', bibleUrl: '/es/bibel.html', planUrl: '/es/detalles-plan-lectura',
       MON: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
       MS: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'],
       WD: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'], fmt: (d, M) => d.getDate() + ' de ' + M[d.getMonth()]
@@ -187,8 +187,8 @@
       keep.push(el.outerHTML);
     }
     out.body = keep.join('');
-    if (!out.title) out.title = out.verses || ('Dag ' + d.dayNumber);
     out.refs = parseRefs(out.verses);
+    if (!out.title || out.title === out.verses) out.title = refsTitle(out.refs.filter(r => r.label)) || out.verses || ('Dag ' + d.dayNumber);
     return out;
   }
 
@@ -263,6 +263,30 @@
       out.push(r);
     });
     return out;
+  }
+  const BOOKNAMES = { en: 'Genesis|Exodus|Leviticus|Numbers|Deuteronomy|Joshua|Judges|Ruth|1 Samuel|2 Samuel|1 Kings|2 Kings|1 Chronicles|2 Chronicles|Ezra|Nehemiah|Esther|Job|Psalm|Proverbs|Ecclesiastes|Song of Songs|Isaiah|Jeremiah|Lamentations|Ezekiel|Daniel|Hosea|Joel|Amos|Obadiah|Jonah|Micah|Nahum|Habakkuk|Zephaniah|Haggai|Zechariah|Malachi|Matthew|Mark|Luke|John|Acts|Romans|1 Corinthians|2 Corinthians|Galatians|Ephesians|Philippians|Colossians|1 Thessalonians|2 Thessalonians|1 Timothy|2 Timothy|Titus|Philemon|Hebrews|James|1 Peter|2 Peter|1 John|2 John|3 John|Jude|Revelation'.split('|'), es: 'Génesis|Éxodo|Levítico|Números|Deuteronomio|Josué|Jueces|Rut|1 Samuel|2 Samuel|1 Reyes|2 Reyes|1 Crónicas|2 Crónicas|Esdras|Nehemías|Ester|Job|Salmos|Proverbios|Eclesiastés|Cantares|Isaías|Jeremías|Lamentaciones|Ezequiel|Daniel|Oseas|Joel|Amós|Abdías|Jonás|Miqueas|Nahúm|Habacuc|Sofonías|Hageo|Zacarías|Malaquías|Mateo|Marcos|Lucas|Juan|Hechos|Romanos|1 Corintios|2 Corintios|Gálatas|Efesios|Filipenses|Colosenses|1 Tesalonicenses|2 Tesalonicenses|1 Timoteo|2 Timoteo|Tito|Filemón|Hebreos|Santiago|1 Pedro|2 Pedro|1 Juan|2 Juan|3 Juan|Judas|Apocalipsis'.split('|') }[LANG] || null;
+  const SEP = { no: ':', en: ':', es: ':' }[LANG];
+  // Visningsnavn for et avsnitt på sidens språk (adressen til Bibelen bruker fortsatt originalteksten).
+  function refShow(r) {
+    if (!r.book || !BOOKNAMES) return r.label;
+    const b = BOOKNAMES[r.book - 1];
+    if (r.vFrom) return b + ' ' + r.ch + SEP + r.vFrom + (r.vTo > r.vFrom ? '–' + r.vTo : '');
+    return b + ' ' + r.ch + (r.chTo > r.ch ? '–' + r.chTo : '');
+  }
+  // Kort tittel av avsnittene: «Matteus 1 & Matteus 2» blir «Matteus 1–2».
+  function refsTitle(refs) {
+    if (!refs.length) return '';
+    const out = [];
+    refs.forEach(r => {
+      const last = out[out.length - 1];
+      if (last && r.book && last.book === r.book && !r.vFrom && !last.vFrom && r.ch === last.chTo + 1) { last.chTo = r.chTo; return; }
+      out.push({ ...r });
+    });
+    return out.map(r => {
+      if (BOOKNAMES || !r.book) return refShow(r);
+      if (r.vFrom) return r.name + ' ' + r.ch + ':' + r.vFrom + (r.vTo > r.vFrom ? '–' + r.vTo : '');
+      return r.name + ' ' + r.ch + (r.chTo > r.ch ? '–' + r.chTo : '');
+    }).join(' · ');
   }
   const bibleHref = r => T.bibleUrl + '?ref=' + encodeURIComponent(r.label);
   const chapCache = new Map();
@@ -363,7 +387,10 @@
   const shopUrl = (typeof raw.shopUrl === 'string' && /^https:\/\//.test(raw.shopUrl) && raw.shopUrl) || SHOP[plan.id] || '';
   const pdfUrl = !shopUrl && raw.printPdf && (raw.printPdf[LANG] || raw.printPdf.no) || '';
   const extra = EXTRA[plan.id] && (EXTRA[plan.id][LANG] || null);
-  const eyebrow = (isPrayer ? T.prayerPlan : T.plan) + (plan.category ? ' · ' + plan.category : (isPrayer ? '' : ''));
+  const TR = LANG === 'no' ? null : ((raw.translations && raw.translations[LANG]) || (LANG === 'en' && raw.english) || null);
+  const translated = LANG === 'no' || !!(TR && (TR.title || (Array.isArray(TR.days) && TR.days.length)));
+  const category = LANG === 'no' ? plan.category : (TR && TR.category) || '';
+  const eyebrow = (isPrayer ? T.prayerPlan : T.plan) + (category ? ' · ' + category : '');
   const lead = plan.description || plan.subtitle || '';
   const nWeeks = Math.ceil(N / 7);
 
@@ -382,6 +409,7 @@ ${lead ? `<p class="lead">${esc(lead)}</p>` : ''}
 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>${esc(T.perDay(minutes))}</li>
 <li>${ICON_BOOK}${esc(T.versesOnPage)}</li>
 </ul>
+${!translated && T.onlyNo ? `<p class="small trnote">${esc(T.onlyNo)}</p>` : ''}
 <div class="headtools">
 <button type="button" class="pill" data-share><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg>${esc(T.share)}</button>
 ${shopUrl ? `<a class="pill" href="${esc(shopUrl)}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>${esc(T.buy)}</a>` : ''}
@@ -479,7 +507,7 @@ ${extra ? `<a class="teach rv" href="${esc(extra.url)}"><span class="ic"><svg vi
     const res = (d.resources || []).filter(r => r && r.url && /^(https?:\/\/|\/)/.test(r.url));
     return `<div class="dhead"><span class="dnum">${String(n).padStart(2, '0')}</span><div><span class="dmeta">${esc(T.dayOf(n, N))} · ${esc(s.name)} · ${esc(T.WD[dt.getDay()])} ${esc(fmt(dt))}</span><h2>${esc(d.title)}</h2></div></div>
   ${refs.length ? `<section class="word" aria-label="${esc(T.verses)}">
-   <div class="wtabs" role="tablist">${refs.map((r, i) => `<button type="button" class="wtab" role="tab" aria-selected="${i === 0}" data-i="${i}">${ICON_BOOK}${esc(r.label)}</button>`).join('')}${refs.length > 1 ? `<button type="button" class="wtab all" data-i="all">${esc(T.readAll(refs.length))}</button>` : ''}</div>
+   <div class="wtabs" role="tablist">${refs.map((r, i) => `<button type="button" class="wtab" role="tab" aria-selected="${i === 0}" data-i="${i}">${ICON_BOOK}${esc(refShow(r))}</button>`).join('')}${refs.length > 1 ? `<button type="button" class="wtab all" data-i="all">${esc(T.readAll(refs.length))}</button>` : ''}</div>
    <div class="wbody" id="wbody"></div>
    <div class="wfoot"><span>${esc(BIBLE.name)}${BIBLE.lic ? ' · ' + (BIBLE.licUrl ? `<a href="${BIBLE.licUrl}" target="_blank" rel="noopener">${esc(BIBLE.lic)}</a>` : esc(BIBLE.lic)) : ''}</span><span class="wbtns"><button type="button" class="wbtn" id="wcopy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>${esc(T.copy)}</button><a class="wbtn" id="wopen" href="${esc(bibleHref(refs[0]))}">${ICON_BOOK}${esc(T.openBible)}</a>${refs.length > 1 ? `<button type="button" class="wbtn" id="wnext">${esc(T.nextV)}</button>` : ''}</span></div>
   </section>` : ''}
@@ -497,9 +525,9 @@ ${extra ? `<a class="teach rv" href="${esc(extra.url)}"><span class="ic"><svg vi
   async function passHTML(r) {
     let p;
     try { p = await passage(r); } catch (e) { p = null; }
-    if (!p || !p.groups.some(g => g.v.length)) return `<div class="wpass"><div class="wref"><b>${esc(r.label)}</b></div><p class="wload">${esc(T.noV)}</p><a class="wmore" href="${esc(bibleHref(r))}">${esc(T.openBible)} →</a></div>`;
+    if (!p || !p.groups.some(g => g.v.length)) return `<div class="wpass"><div class="wref"><b>${esc(refShow(r))}</b></div><p class="wload">${esc(T.noV)}</p><a class="wmore" href="${esc(bibleHref(r))}">${esc(T.openBible)} →</a></div>`;
     const long = p.groups.reduce((a, g) => a + g.v.length, 0) > 6;
-    return `<div class="wpass${long ? ' long' : ''}"><div class="wref"><b>${esc(r.label)}</b></div>${p.groups.map(g => `${g.ch ? `<span class="wchap">${esc(r.name)} ${g.ch}</span>` : ''}<p class="wtext">${g.v.map(([n, t]) => (p.num || g.v.length > 1 ? `<sup>${n}</sup>` : '') + esc(t)).join(' ')}</p>`).join('')}${p.more > 0 ? `<a class="wmore" href="${esc(bibleHref(r))}">${esc(T.moreCh(p.more))} →</a>` : ''}</div>`;
+    return `<div class="wpass${long ? ' long' : ''}"><div class="wref"><b>${esc(refShow(r))}</b></div>${p.groups.map(g => `${g.ch ? `<span class="wchap">${esc(BOOKNAMES && r.book ? BOOKNAMES[r.book - 1] : r.name)} ${g.ch}</span>` : ''}<p class="wtext">${g.v.map(([n, t]) => (p.num || g.v.length > 1 ? `<sup>${n}</sup>` : '') + esc(t)).join(' ')}</p>`).join('')}${p.more > 0 ? `<a class="wmore" href="${esc(bibleHref(r))}">${esc(T.moreCh(p.more))} →</a>` : ''}</div>`;
   }
   function bindWord(n) {
     const d = DAYS[n - 1], refs = d.refs.filter(r => r.label), body = $('#wbody');

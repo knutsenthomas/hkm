@@ -360,3 +360,4 @@
  #plan-view .wbtn{flex:1 1 auto;justify-content:center;white-space:nowrap}
 }
 #plan-view *{hyphens:manual;-webkit-hyphens:manual}
+#plan-view .trnote{margin:16px 0 0;padding:10px 14px;background:var(--soft);border-radius:12px;font-size:14px;color:var(--sec)}
