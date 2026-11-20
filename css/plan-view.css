@@ -515,3 +515,11 @@ html.pv-lock #plan-view .astart{display:none}
  #plan-view .ahead .ameta,#plan-view .ahead .apct{background:none;padding:0;border-radius:0}
 }
 @media (max-width:600px){ #plan-view .ahead .ameta{color:var(--sec);font-size:13px;font-weight:600} #plan-view .ahead .apct{font-size:12px} }
+@media (max-width:600px){
+ #plan-view .abuy{margin:16px 0 0;padding:14px 16px;gap:12px;border-radius:18px}
+ #plan-view .abuy + .abuy{margin-top:10px}
+ #plan-view .abuy .ic{flex:0 0 42px;height:42px;border-radius:12px}
+ #plan-view .abuy b{font-size:15.5px}
+ #plan-view .abuy span span{font-size:13px}
+ #plan-view .about-app{margin-top:16px}
+}

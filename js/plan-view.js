@@ -29,7 +29,7 @@
       others: 'Flere leseplaner', othersP: 'Les mer', loading: 'Laster leseplanen …', notFound: 'Fant ikke leseplanen',
       notFoundP: 'Lenken kan være feil, eller planen er ikke publisert ennå.', back: 'Til alle leseplaner', excerpt: 'utdrag',
       loadingV: 'Henter bibelteksten …', noV: 'Bibelteksten kunne ikke hentes her. Åpne den i Bibelen.', moreCh: n => '+ ' + n + (n === 1 ? ' kapittel' : ' kapitler') + ' til – les videre i Bibelen',
-      buy: 'Kjøp trykt versjon', print: 'Skriv ut', behind: n => 'Du ligger ' + n + (n === 1 ? ' dag' : ' dager') + ' bak planen.', jump: n => 'Gå til dag ' + n,
+      buy: 'Kjøp trykt versjon', buySub: 'Planen som hefte eller PDF i nettbutikken vår', print: 'Skriv ut', behind: n => 'Du ligger ' + n + (n === 1 ? ' dag' : ' dager') + ' bak planen.', jump: n => 'Gå til dag ' + n,
       resources: 'Ressurser', onlyNo: '', listUrl: '/leseplaner', bibleUrl: '/bibel.html', planUrl: '/leseplan-detaljer',
       MON: ['januar', 'februar', 'mars', 'april', 'mai', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'desember'],
       MS: ['jan', 'feb', 'mar', 'apr', 'mai', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'des'],
@@ -55,7 +55,7 @@
       others: 'More reading plans', othersP: 'Read more', loading: 'Loading the reading plan …', notFound: 'Reading plan not found',
       notFoundP: 'The link may be wrong, or the plan is not published yet.', back: 'All reading plans', excerpt: 'excerpt',
       loadingV: 'Loading the Bible text …', noV: 'The Bible text could not be loaded here. Open it in the Bible.', moreCh: n => '+ ' + n + (n === 1 ? ' more chapter' : ' more chapters') + ' – continue in the Bible',
-      buy: 'Buy the printed version', print: 'Print', behind: n => 'You are ' + n + (n === 1 ? ' day' : ' days') + ' behind the plan.', jump: n => 'Go to day ' + n,
+      buy: 'Buy the printed version', buySub: 'The plan as a booklet or PDF in our shop', print: 'Print', behind: n => 'You are ' + n + (n === 1 ? ' day' : ' days') + ' behind the plan.', jump: n => 'Go to day ' + n,
       resources: 'Resources', onlyNo: 'This plan has not been translated yet, so the text is in Norwegian. The Bible verses are shown in English.', listUrl: '/en/leseplaner', bibleUrl: '/en/bibel.html', planUrl: '/en/reading-plan-details',
       MON: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
       MS: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -81,7 +81,7 @@
       others: 'Más planes de lectura', othersP: 'Leer más', loading: 'Cargando el plan …', notFound: 'No se encontró el plan',
       notFoundP: 'Puede que el enlace sea incorrecto o que el plan aún no esté publicado.', back: 'Todos los planes', excerpt: 'extracto',
       loadingV: 'Cargando el texto bíblico …', noV: 'No se pudo cargar el texto aquí. Ábrelo en la Biblia.', moreCh: n => '+ ' + n + (n === 1 ? ' capítulo más' : ' capítulos más') + ' – sigue en la Biblia',
-      buy: 'Comprar la versión impresa', print: 'Imprimir', behind: n => 'Vas ' + n + (n === 1 ? ' día' : ' días') + ' atrasado.', jump: n => 'Ir al día ' + n,
+      buy: 'Comprar la versión impresa', buySub: 'El plan como folleto o PDF en nuestra tienda', print: 'Imprimir', behind: n => 'Vas ' + n + (n === 1 ? ' día' : ' días') + ' atrasado.', jump: n => 'Ir al día ' + n,
       resources: 'Recursos', onlyNo: 'Este plan aún no está traducido, así que el texto está en noruego. Los versículos se muestran en español.', listUrl: '/es/leseplaner', bibleUrl: '/es/bibel.html', planUrl: '/es/detalles-plan-lectura',
       MON: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
       MS: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'],
@@ -670,6 +670,9 @@ ${aboutHTML('about-bottom')}
 <ul class="alist">${items.map((it, k) => `<li><label class="ack"><input type="checkbox" data-i="${k}" ${set.has(k) || dn ? 'checked' : ''} aria-label="${esc(it.label)}"><span></span></label><button type="button" class="aopen" data-i="${k}"><span>${esc(it.label)}</span><em>${esc(T.min(it.min))}</em>${ICON_CHEV}</button></li>`).join('')}</ul>
 ${dn ? `<p class="adone">✓ ${esc(T.dayDoneS)}</p>` : ''}
 <div class="astart"><button type="button" class="pill donebtn" id="astart">${esc(unread > 0 ? T.contReading : (dn ? T.startReading : T.startReading))}</button></div>
+${shopUrl ? `<a class="teach abuy" href="${esc(shopUrl)}" target="_blank" rel="noopener"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg></span><span><b>${esc(T.buy)}</b><span>${esc(T.buySub)}</span></span></a>` : ''}
+${pdfUrl ? `<a class="teach abuy" href="${esc(pdfUrl)}" target="_blank" rel="noopener"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M7 15h10v6H7z"/></svg></span><span><b>${esc(T.print)}</b></span></a>` : ''}
+${extra ? `<a class="teach abuy" href="${esc(extra.url)}"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg></span><span><b>${esc(extra.t)}</b><span>${esc(extra.d)}</span></span></a>` : ''}
 ${aboutHTML('about-app')}
 <div style="height:96px"></div>`;
     el.querySelectorAll('.achip').forEach(b => b.addEventListener('click', () => show(+b.dataset.n, false)));
