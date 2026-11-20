@@ -79,8 +79,9 @@
         const tools = document.createElement('div');
         tools.className = 'hb-tools';
         tools.appendChild(box);
-        const first = cards()[0];
-        if (first && first.querySelector('img, .media-thumbnail, .event-image')) {
+        const ensureToggle = () => {
+        if (tools.querySelector('.hb-view')) return;
+        if (cards().some((c) => c.querySelector('img, .media-thumbnail, .event-image'))) {
             const tg = document.createElement('div');
             tg.className = 'hb-view';
             tg.innerHTML = '<button type="button" data-v="grid" aria-label="Rutenett"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.2"/></svg></button><button type="button" data-v="list" aria-label="Liste"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="3.2" rx="1"/><rect x="4" y="10.4" width="16" height="3.2" rx="1"/><rect x="4" y="15.8" width="16" height="3.2" rx="1"/></svg></button>';
@@ -97,6 +98,9 @@
             setView(view);
             new MutationObserver(() => { if (view === 'list') new Set(cards().map((c) => c.parentElement)).forEach((p) => p && !p.classList.contains('hb-list') && p.classList.add('hb-list')); }).observe(document.body, { childList: true, subtree: true });
         }
+        };
+        ensureToggle();
+        new MutationObserver(() => ensureToggle()).observe(document.body, { childList: true, subtree: true });
         host.appendChild(tools);
         // Filterknapper
         const CAT_SEL = '.blog-category, .media-category, .event-category, .card-category, .category-badge, .podcast-category, .video-category';
