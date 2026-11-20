@@ -120,3 +120,5 @@ body.ed .empire-card [class*="bg-emerald-50"],body.ed .empire-card [class*="bg-b
 body.ed .empire-card .uppercase{text-transform:none!important;letter-spacing:0!important}
 body.ed .empire-card p,body.ed .empire-card li{color:var(--ed-ink)!important}
 body.ed .empire-card li::marker{color:var(--ed-t)}
+/* kort som var laget for å overlappe den gamle toppen */
+body.ed .donor-gift-card,body.ed [class*="overlap"],body.ed .hero-overlap{margin-top:32px!important}

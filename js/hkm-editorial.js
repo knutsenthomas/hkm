@@ -6,11 +6,11 @@
   const LANG = (location.pathname.match(/^\/(en|es)\//) || [])[1] || 'no';
   const P = location.pathname.replace(/^\/(en|es)\//, '/').replace(/\.html$/, '');
   const EYE = {
-    no: { people: 'Ressurser', person: 'Bibelske personer', timeline: 'Ressurser', blog: 'Ressurser', post: 'Blogg', teach: 'Ressurser', series: 'Undervisning' },
-    en: { people: 'Resources', person: 'Biblical people', timeline: 'Resources', blog: 'Resources', post: 'Blog', teach: 'Resources', series: 'Teaching' },
-    es: { people: 'Recursos', person: 'Personajes bíblicos', timeline: 'Recursos', blog: 'Recursos', post: 'Blog', teach: 'Recursos', series: 'Enseñanza' }
+    no: { donate: 'Gi en gave', about: 'Om oss', contact: 'Kontakt', people: 'Ressurser', person: 'Bibelske personer', timeline: 'Ressurser', blog: 'Ressurser', post: 'Blogg', teach: 'Ressurser', series: 'Undervisning' },
+    en: { donate: 'Give', about: 'About us', contact: 'Contact', people: 'Resources', person: 'Biblical people', timeline: 'Resources', blog: 'Resources', post: 'Blog', teach: 'Resources', series: 'Teaching' },
+    es: { donate: 'Donar', about: 'Sobre nosotros', contact: 'Contacto', people: 'Recursos', person: 'Personajes bíblicos', timeline: 'Recursos', blog: 'Recursos', post: 'Blog', teach: 'Recursos', series: 'Enseñanza' }
   }[LANG];
-  const kind = /tidslinje/.test(P) ? 'timeline' : /bibelsk-person-detaljer/.test(P) ? 'person' : /bibelske-personer/.test(P) ? 'people'
+  const kind = /donasjon|donation|donacion/.test(P) ? 'donate' : /om-oss|about|sobre-nosotros/.test(P) ? 'about' : /kontakt|contact|contacto/.test(P) ? 'contact' : /tidslinje/.test(P) ? 'timeline' : /bibelsk-person-detaljer/.test(P) ? 'person' : /bibelske-personer/.test(P) ? 'people'
     : /blogg-post|blog-post/.test(P) ? 'post' : /\/(blogg|blog)$/.test(P) ? 'blog'
     : /undervisningsserier/.test(P) ? 'series' : /undervisning|teaching|ensenanza/.test(P) ? 'teach' : 'page';
 
@@ -20,6 +20,7 @@
     return all.length ? all[all.length - 1] : '';
   };
 
+  const txt = el => { const c = el.cloneNode(true); c.querySelectorAll('br').forEach(b => b.replaceWith(' ')); return c.textContent.replace(/\s+/g, ' ').trim(); };
   function build() {
     const hero = document.querySelector('.subpage-hero, .page-hero');
     if (!hero || hero.dataset.ed) return;
@@ -48,8 +49,8 @@
     const sync = () => {
       const h1 = hero.querySelector('h1'), p = hero.querySelector('p');
       head.querySelector('.ed-eyebrow').textContent = EYE[kind] || crumb || back || 'His Kingdom Ministry';
-      head.querySelector('.ed-h1').textContent = h1 ? h1.textContent.trim() : document.title.split('|')[0].trim();
-      const lead = p ? p.textContent.trim() : '';
+      head.querySelector('.ed-h1').textContent = h1 ? txt(h1) : document.title.split('|')[0].trim();
+      const lead = p ? txt(p) : '';
       const lp = head.querySelector('.ed-lead'); lp.textContent = lead; lp.hidden = !lead;
       const src = urlOf(hero), fig = head.querySelector('.ed-cover'), img = fig.querySelector('img');
       // Unsplash+-bilder har vannmerke i full størrelse: bruk et fritt bilde i stedet
