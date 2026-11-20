@@ -865,7 +865,18 @@ $$('a.hero[href*="youtube.com/watch"], a.vcard[href*="youtube.com/watch"]').forE
   f.src='https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&rel=0';f.title=a.getAttribute('aria-label')||'Video';
   if(getComputedStyle(box).position==='static')box.style.position='relative';box.appendChild(f);
 }));
-const setH=()=>{const hd=document.getElementById('header');if(!hd)return;const b=Math.round(Math.max(hd.getBoundingClientRect().bottom,hd.offsetHeight));if(b>40)R.style.setProperty('--fg-head',b+'px')};setH();addEventListener('resize',setH,{passive:true});addEventListener('load',setH);if(window.ResizeObserver){const ro=new ResizeObserver(setH);const w=()=>{const hd=document.getElementById('header');if(hd)ro.observe(hd)};w();setTimeout(w,1500)}let nH=0;const iH=setInterval(()=>{setH();if(++nH>12)clearInterval(iH)},500);
+/* hopp til overskrift: lander alltid under toppmenyen */
+const headH=()=>{const hd=document.getElementById('header');return hd?Math.round(Math.max(hd.getBoundingClientRect().bottom,hd.offsetHeight)):100};
+R.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{
+  const id=decodeURIComponent(a.getAttribute('href').slice(1));const el=id&&document.getElementById(id);if(!el||!R.contains(el))return;
+  e.preventDefault();
+  R.querySelectorAll('article > [data-rv], .rv').forEach(x=>{if(x.getBoundingClientRect().top<el.getBoundingClientRect().top+40)x.classList.add('in')});
+  el.classList.add('in');
+  const y=el.getBoundingClientRect().top+scrollY-headH()-24;
+  scrollTo({top:Math.max(0,y),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+  history.replaceState(null,'','#'+id);
+}));
+const setH=()=>{const hd=document.getElementById('header');if(!hd)return;const b=Math.round(Math.max(hd.getBoundingClientRect().bottom,hd.offsetHeight));if(b>40){R.style.setProperty('--fg-head',b+'px');document.documentElement.style.scrollPaddingTop=(b+24)+'px'}};setH();addEventListener('resize',setH,{passive:true});addEventListener('load',setH);if(window.ResizeObserver){const ro=new ResizeObserver(setH);const w=()=>{const hd=document.getElementById('header');if(hd)ro.observe(hd)};w();setTimeout(w,1500)}let nH=0;const iH=setInterval(()=>{setH();if(++nH>12)clearInterval(iH)},500);
 }
 </script>
 </body>
