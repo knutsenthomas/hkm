@@ -238,3 +238,4 @@ html[data-theme="dark"] body #faste-guide .toc a.read .tick{box-shadow:inset 0 0
 html[data-theme="dark"] body #faste-guide :is(h1,h2,h3,h4,strong,b,.q,legend,summary){color:#f8fafc}
 html[data-theme="dark"] body :is(#hkm-blog .blog-category,#hkm-blog .featured-badge,.faste-promo .fp-badge,.kurs-grid .category-badge,.plans-grid .duration-badge,#single-post-related .cms-related-category){background:rgba(11,19,41,.88) !important;color:#f8fafc !important}
 html[data-theme="dark"] body #hkp-head .hp-cover{background:#131d36 !important}
+#hkm-media *{hyphens:none !important;-webkit-hyphens:none !important}
