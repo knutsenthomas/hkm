@@ -522,29 +522,69 @@
         </div>
     </div>
 
-    <section class="page-hero subpage-hero relative" id="blog-hero"
-        style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); margin-top: 0; transition: opacity 0.4s ease;">
-        <div class="container" style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
-            <!-- Title hidden until JS populates it -->
-            <h1 class="page-hero-title" id="single-post-title" style="opacity:0; transition: opacity 0.4s ease; margin:0;"></h1>
-            <div class="blog-meta" id="blog-meta-row"
-                style="display:flex; flex-direction:column; gap:8px; justify-content:center; align-items:center; color:white; margin-top:20px; opacity:0; transition:opacity 0.4s ease; width:100%;">
-                <div class="blog-meta-top"
-                    style="display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:nowrap; white-space:nowrap; max-width:100%;">
-                    <img id="single-post-author-avatar" src="" alt="" loading="lazy"
-                        style="display:none; width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,0.7); flex-shrink:0;">
-                    <span id="single-post-author" style="font-weight:600; font-size:0.95rem;"></span>
-                    <span id="single-post-date" style="font-size:0.9rem; opacity:0.9;"></span>
+<style>
+html:has(#hkp-head),html:has(#hkp-head) body{overflow-x:clip!important;overflow-y:visible!important}
+#hkp-head{--ink:#151a21;--mut:#596069;--line:rgba(21,26,33,.12);--or2:#a0531a;font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--ink);background:#fff;padding:calc(var(--hp-head,96px) + 28px) 0 0}
+#hkp-head .hp-wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+#hkp-head .hp-text{max-width:840px}
+#hkp-head .hp-back{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--mut);text-decoration:none;margin:0 0 18px}
+#hkp-head .hp-back:hover{color:var(--ink)}
+#hkp-head #single-post-category{display:block!important;font-size:14px;font-weight:600;color:var(--or2);margin:0 0 10px;min-height:1.2em}
+#hkp-head #single-post-category i{display:none}
+#hkp-head #single-post-title{font-size:clamp(30px,4.2vw,52px)!important;line-height:1.06!important;font-weight:800!important;letter-spacing:-.035em!important;color:var(--ink)!important;margin:0!important;text-align:left!important;text-shadow:none!important;max-width:none!important}
+#hkp-head #blog-meta-row{display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;align-items:center!important;justify-content:flex-start!important;gap:6px 14px!important;color:var(--mut)!important;margin:20px 0 0!important;width:auto!important}
+#hkp-head .blog-meta-top,#hkp-head .blog-meta-bottom{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:6px 12px!important;flex-wrap:wrap!important;white-space:normal!important;opacity:1!important;font-size:14px!important}
+#hkp-head #single-post-author-avatar{width:36px!important;height:36px!important;border:0!important}
+#hkp-head #single-post-author{color:var(--ink);font-weight:600!important;font-size:15px!important}
+#hkp-head #single-post-date,#hkp-head #single-post-readingtime,#hkp-head #single-post-views{font-size:14px!important;opacity:1!important;color:var(--mut)}
+#hkp-head .blog-meta-bottom::before{content:"·";color:var(--mut)}
+#hkp-head .blog-meta-bottom:empty::before,#hkp-head .blog-meta-bottom:not(:has(span[style*="inline"],span[style*="flex"]))::before{content:none}
+#hkp-head .blog-meta-bottom i{font-size:13px}
+#hkp-head .hp-cover{margin:28px 0 0;border-radius:20px;overflow:hidden;aspect-ratio:21/9;background:#f3f1ec;display:none}
+#hkp-head .hp-cover.on{display:block}
+#hkp-head .hp-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.blog-post-section{padding-top:40px!important;font-family:Inter,system-ui,-apple-system,sans-serif}
+.blog-post-section .blog-post-content{font-size:18px;line-height:1.7;color:#2a3038}
+.blog-post-section .blog-post-content h2,.blog-post-section .blog-post-content h3{font-weight:800;letter-spacing:-.02em;color:#151a21}
+@media (max-width:600px){#hkp-head{padding-top:calc(var(--hp-head,80px) + 20px)}#hkp-head .hp-wrap{padding:0 18px}#hkp-head .hp-cover{aspect-ratio:16/10;border-radius:16px;margin-top:22px}.blog-post-section{padding-top:28px!important}.blog-post-section .blog-post-content{font-size:17px}}
+</style>
+    <div id="blog-hero" hidden></div>
+    <header id="hkp-head">
+        <div class="hp-wrap">
+            <div class="hp-text">
+                <a href="/blogg" class="hp-back"><i class="fas fa-arrow-left"></i> <span id="hp-back-label">Nyheter &amp; blogg</span></a>
+                <span id="single-post-category"></span>
+                <h1 class="page-hero-title" id="single-post-title" style="opacity:0; transition: opacity 0.4s ease;"></h1>
+                <div class="blog-meta" id="blog-meta-row" style="opacity:0; transition:opacity 0.4s ease;">
+                    <div class="blog-meta-top">
+                        <img id="single-post-author-avatar" src="" alt="" loading="lazy"
+                            style="display:none; width:36px; height:36px; border-radius:50%; object-fit:cover; flex-shrink:0;">
+                        <span id="single-post-author"></span>
+                        <span id="single-post-date"></span>
+                    </div>
+                    <div class="blog-meta-bottom">
+                        <span id="single-post-readingtime" style="display:none;"></span>
+                        <span id="single-post-views" style="display:none;"></span>
+                    </div>
                 </div>
-                <div class="blog-meta-bottom"
-                    style="display:flex; align-items:center; justify-content:center; gap:12px; font-size:0.85rem; opacity:0.9; flex-wrap:nowrap; white-space:nowrap; max-width:100%;">
-                    <span id="single-post-readingtime" style="display:none;"></span>
-                    <span id="single-post-views" style="display:none;"></span>
-                </div>
-                <span id="single-post-category" style="display:none;"><i class="fas fa-tag"></i> </span>
             </div>
+            <figure class="hp-cover" id="hp-cover"><img id="hp-cover-img" alt="" decoding="async"></figure>
         </div>
-    </section>
+    </header>
+<script>
+(function(){
+  var R=document.getElementById('hkp-head');
+  function h(){var e=document.getElementById('header')||document.querySelector('header');var b=e?Math.round(e.getBoundingClientRect().bottom):90;R.style.setProperty('--hp-head',(b>0?b:90)+'px')}
+  h();window.addEventListener('load',h);window.addEventListener('resize',h);var n=0,iv=setInterval(function(){h();if(++n>20)clearInterval(iv)},250);
+  function setCover(u){if(!u)return;var img=document.getElementById('hp-cover-img');if(img.getAttribute('src')===u)return;img.src=u;img.alt=(document.getElementById('single-post-title')||{}).textContent||'';document.getElementById('hp-cover').classList.add('on')}
+  function fromHero(){var hero=document.getElementById('blog-hero');var m=(hero&&hero.getAttribute('style')||'').match(/url\(['"]?([^'")]+)['"]?\)/);if(m)setCover(m[1])}
+  function fromPrint(){var p=document.getElementById('print-post-image-body');if(p&&p.getAttribute('src'))setCover(p.getAttribute('src'))}
+  var mo=new MutationObserver(function(){fromHero();fromPrint()});
+  function watch(){var hero=document.getElementById('blog-hero');if(hero)mo.observe(hero,{attributes:true,attributeFilter:['style']});var p=document.getElementById('print-post-image-body');if(p)mo.observe(p,{attributes:true,attributeFilter:['src']});fromHero();fromPrint()}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watch);else watch();
+  var bb=setInterval(function(){var b=document.getElementById('back-btn');if(b&&/undervisning/i.test(b.getAttribute('href')||'')){var a=R.querySelector('.hp-back');a.href=b.getAttribute('href');document.getElementById('hp-back-label').textContent='Undervisning';clearInterval(bb)}},500);setTimeout(function(){clearInterval(bb)},10000);
+})();
+</script>
 
     <!-- Blog Post Content -->
     <section class="section blog-post-section">
