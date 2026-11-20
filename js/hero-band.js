@@ -114,7 +114,16 @@
         let useMonths = false;
         const catOf = (c) => {
             if (useMonths) { const m = (c.textContent || '').match(MONTHS); return m ? (m[2].charAt(0).toUpperCase() + m[2].slice(1).toLowerCase() + ' ' + m[3]) : ''; }
-            const e = c.querySelector(CAT_SEL); return e ? e.textContent.trim() : '';
+            const e = c.querySelector(CAT_SEL); if (!e) return '';
+            if (e.classList.contains('duration-badge')) {
+                const d = parseInt(e.textContent, 10); if (!d) return '';
+                const en = ALL === 'All', es = ALL === 'Todos';
+                if (d < 14) return en ? 'Under 2 weeks' : es ? 'Menos de 2 semanas' : 'Under 2 uker';
+                if (d <= 31) return en ? '2–4 weeks' : es ? '2–4 semanas' : '2–4 uker';
+                if (d <= 92) return en ? '1–3 months' : es ? '1–3 meses' : '1–3 måneder';
+                return en ? 'Longer' : es ? 'Más largos' : 'Lengre';
+            }
+            return e.textContent.trim();
         };
         const ALL = L.ph.startsWith('Search') ? 'All' : (L.ph.startsWith('Buscar') ? 'Todos' : 'Alle');
         let activeCat = '';
@@ -130,7 +139,8 @@
         const buildCats = () => {
             if (filters.querySelector('a')) return;
             useMonths = false;
-            let cats = [...new Set(cards().map(catOf).filter(Boolean))].sort((x, y) => x.localeCompare(y));
+            const ORDER = ['Under 2 uker', '2–4 uker', '1–3 måneder', 'Lengre', 'Under 2 weeks', '2–4 weeks', '1–3 months', 'Longer', 'Menos de 2 semanas', '2–4 semanas', '1–3 meses', 'Más largos'];
+            let cats = [...new Set(cards().map(catOf).filter(Boolean))].sort((x, y) => { const a = ORDER.indexOf(x), b = ORDER.indexOf(y); return (a < 0 || b < 0) ? x.localeCompare(y) : a - b; });
             if (cats.length < 2) { useMonths = true; cats = [...new Set(cards().map(catOf).filter(Boolean))]; if (cats.length < 2) useMonths = false; }
             const sig = cats.join('|');
             if (sig === catSig) return; catSig = sig;
