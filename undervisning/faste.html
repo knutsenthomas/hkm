@@ -898,7 +898,7 @@ document.addEventListener('click',e=>{
   const toc=document.getElementById('toc');if(toc)toc.classList.remove('open');
   R.querySelectorAll('article > [data-rv], .rv').forEach(x=>{if(x.getBoundingClientRect().top<el.getBoundingClientRect().top+40)x.classList.add('in')});
   el.classList.add('in');
-  const y=el.getBoundingClientRect().top+scrollY-headH()-24;
+  const y=el.getBoundingClientRect().top+scrollY-Math.max(headH(),70)-36;
   scrollTo({top:Math.max(0,y),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
   history.replaceState(null,'','#'+id);
 },true);
