@@ -962,27 +962,6 @@ html:has(#hkp-head),html:has(#hkp-head) body{overflow-x:clip!important;overflow-
     <script type="module" src="script.js?v=2026.06.21.10.01"></script>
     <script type="module" src="js/content-manager.js?v=2026.05.11.6"></script>
     <script type="module" src="js/cookie-consent.js"></script>
-    <script>
-        // Force mobile spacing overrides via inline styles (beats all CSS cascade)
-        function applyMobileHeroFix() {
-            if (window.innerWidth > 768) return;
-            var hero = document.getElementById('blog-hero');
-            if (hero) {
-                hero.style.setProperty('padding-top', '140px', 'important');
-                hero.style.setProperty('padding-bottom', '70px', 'important');
-            }
-            var section = hero && hero.nextElementSibling;
-            if (section) {
-                section.style.setProperty('padding-top', '16px', 'important');
-            }
-        }
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', applyMobileHeroFix);
-        } else {
-            applyMobileHeroFix();
-        }
-        window.addEventListener('resize', applyMobileHeroFix);
-    </script>
     <!-- Global Search Modal -->
     <div id="site-search-modal" class="search-overlay">
         <div class="search-modal-container">
