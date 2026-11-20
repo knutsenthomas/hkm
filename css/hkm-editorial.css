@@ -105,3 +105,6 @@ body.ed .ed-head,body.ed .ed-head *{hyphens:manual!important;-webkit-hyphens:man
 body.ed main,body.ed main *,body.ed .section,body.ed .section *{hyphens:manual!important;-webkit-hyphens:manual!important}
 body.ed.ed-person .ed-cover img{object-position:50% 18%}
 body.ed .quick-fact-icon{background:transparent!important}
+body.ed .ed-meta .blog-meta{flex-direction:row!important;align-items:center!important}
+body.ed.ed-post .ed-cover{aspect-ratio:16/8}
+body.ed.ed-post .ed-wrap{max-width:720px;margin:0 auto}
