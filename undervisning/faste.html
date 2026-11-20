@@ -126,8 +126,12 @@
 #faste-guide #prog{display:none}
 #faste-guide .yt{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:5}
 #faste-guide #pop,#faste-guide #toast{font-family:Inter,system-ui,sans-serif}
-#faste-guide .ytcover{position:absolute;z-index:0;pointer-events:none;object-fit:cover;right:-22%;top:-38%;width:82%;height:136%;border-radius:45% 55% 60% 40%/50% 45% 55% 50%}
-#faste-guide .vthumb::before{background:#cc712b!important;right:-26%!important;top:-44%!important;width:88%!important;height:148%!important}
+#faste-guide .ytcover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none}
+#faste-guide a.hero .ytcover{z-index:-2}
+#faste-guide a.hero.hascover svg.shape{display:none}
+#faste-guide a.hero.hascover::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(21,26,33,0) 40%,rgba(21,26,33,.55) 65%,rgba(21,26,33,.9) 100%)}
+#faste-guide .vthumb.hascover::before{display:none}
+#faste-guide .vthumb.hascover::after{content:"";position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,rgba(21,26,33,0) 55%,rgba(21,26,33,.55) 100%)}
 #faste-guide .vthumb .play,#faste-guide .vthumb .dur{z-index:1}
 
 #faste-guide .finish .ctas{flex-wrap:nowrap!important;width:max-content;max-width:calc(100vw - 32px)}
@@ -869,23 +873,12 @@ const ytImg=(id,cb)=>{const im=new Image();let fb=false;const alt='https://i.yti
   im.onload=()=>{if(im.naturalWidth<=120&&!fb){fb=true;im.src=alt}else cb(im.src)};im.onerror=()=>{if(!fb){fb=true;im.src=alt}};
   im.src='https://i.ytimg.com/vi/'+id+'/maxresdefault.jpg'};
 $$('a.hero[href*="youtube.com/watch"]').forEach(a=>{
-  const id=new URL(a.href).searchParams.get('v'),svg=a.querySelector('svg.shape');if(!id||!svg)return;
-  const blob=svg.querySelector('path');if(!blob)return;
-  ytImg(id,src=>{
-    const NS='http://www.w3.org/2000/svg';
-    const defs=document.createElementNS(NS,'defs'),cp=document.createElementNS(NS,'clipPath');cp.setAttribute('id','fg-blob');
-    const cpp=document.createElementNS(NS,'path');cpp.setAttribute('d',blob.getAttribute('d'));cp.appendChild(cpp);defs.appendChild(cp);svg.insertBefore(defs,svg.firstChild);
-    const g=document.createElementNS(NS,'g');g.setAttribute('clip-path','url(#fg-blob)');
-    const bg=document.createElementNS(NS,'rect');['x','y','width','height'].forEach((k,i)=>bg.setAttribute(k,[360,-80,480,520][i]));bg.setAttribute('fill','#cc712b');
-    const im=document.createElementNS(NS,'image');im.setAttribute('href',src);['x','y','width','height'].forEach((k,i)=>im.setAttribute(k,[360,-80,480,520][i]));im.setAttribute('preserveAspectRatio','xMidYMid slice');
-    const tint=document.createElementNS(NS,'rect');['x','y','width','height'].forEach((k,i)=>tint.setAttribute(k,[360,-80,480,520][i]));tint.setAttribute('fill','#151a21');tint.setAttribute('fill-opacity','.18');
-    g.append(bg,im,tint);blob.replaceWith(g);
-  });
+  const id=new URL(a.href).searchParams.get('v');if(!id)return;
+  ytImg(id,src=>{const img=new Image();img.className='ytcover';img.alt='';img.src=src;a.insertBefore(img,a.firstChild);a.classList.add('hascover')});
 });
 $$('a.vcard[href*="youtube.com/watch"]').forEach(a=>{
   const id=new URL(a.href).searchParams.get('v'),box=a.querySelector('.vthumb');if(!id||!box)return;
-  if(getComputedStyle(box).position==='static')box.style.position='relative';
-  ytImg(id,src=>{const img=new Image();img.className='ytcover';img.alt='';img.src=src;box.insertBefore(img,box.firstChild)});
+  ytImg(id,src=>{const img=new Image();img.className='ytcover';img.alt='';img.src=src;box.insertBefore(img,box.firstChild);box.classList.add('hascover')});
 });
 /* videoer spilles av på siden */
 $$('a.hero[href*="youtube.com/watch"], a.vcard[href*="youtube.com/watch"]').forEach(a=>a.addEventListener('click',e=>{
