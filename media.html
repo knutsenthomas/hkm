@@ -558,10 +558,11 @@
 
 <style>
 html:has(#hkm-media),html:has(#hkm-media) body{overflow-x:clip!important;overflow-y:visible!important}
-#hkm-media{--ink:#151a21;--mut:#596069;--line:rgba(21,26,33,.12);--or:#e07b2c;--or2:#a0531a;font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--ink);background:#fff;padding:calc(var(--hm-head,96px) + 24px) 0 72px}
+#hkm-media{--ink:#151a21;--mut:#596069;--line:rgba(21,26,33,.12);--or:#e07b2c;--or2:#a0531a;font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--ink);background:#fff;padding:var(--hm-head,96px) 0 72px}
 #hkm-media *{box-sizing:border-box}
 #hkm-media .hm-wrap{max-width:1100px;margin:0 auto;padding:0 24px}
-#hkm-media .hm-head{margin:0 0 24px}
+#hkm-media .hm-band{background:#faf9f6;border-bottom:1px solid var(--line);padding:32px 0 24px;margin:0 0 32px}
+#hkm-media .hm-head{margin:0}
 #hkm-media .hm-eye{font-size:14px;font-weight:600;color:var(--or2);margin:0 0 8px}
 #hkm-media h1{font-size:clamp(28px,3.4vw,40px);line-height:1.08;font-weight:800;letter-spacing:-.035em;margin:0;color:var(--ink)}
 #hkm-media .hm-lead{font-size:17px;line-height:1.5;color:var(--mut);margin:8px 0 0;max-width:640px}
@@ -599,7 +600,7 @@ html:has(#hkm-media),html:has(#hkm-media) body{overflow-x:clip!important;overflo
 .media-newsletter h2{font-weight:800!important;letter-spacing:-.02em;color:#151a21!important}
 .media-newsletter p{color:#596069!important}
 @media (max-width:900px){#hkm-media .hm-posts{grid-template-columns:1fr 1fr}}
-@media (max-width:600px){#hkm-media{padding-top:calc(var(--hm-head,80px) + 20px)}#hkm-media .hm-wrap{padding:0 18px}#hkm-media .hm-lead{font-size:16px}#hkm-media .hm-grid{grid-template-columns:1fr}#hkm-media .hm-posts{grid-template-columns:1fr}#hkm-media .hm-card{padding:16px}#hkm-media .hm-sh{flex-wrap:wrap}#hkm-media .faste-promo{margin-bottom:44px}#hkm-media .hm-sec{margin-bottom:36px}}
+@media (max-width:600px){#hkm-media{padding-top:var(--hm-head,80px)}#hkm-media .hm-band{padding:24px 0 18px;margin-bottom:24px}#hkm-media .hm-wrap{padding:0 18px}#hkm-media .hm-lead{font-size:16px}#hkm-media .hm-grid{grid-template-columns:1fr}#hkm-media .hm-posts{grid-template-columns:1fr}#hkm-media .hm-card{padding:16px}#hkm-media .hm-sh{flex-wrap:wrap}#hkm-media .faste-promo{margin-bottom:44px}#hkm-media .hm-sec{margin-bottom:36px}}
 </style>
 <style>
 .faste-promo{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);align-items:stretch;gap:0;margin:0 auto 48px;max-width:1100px;border:1px solid rgba(21,26,33,.12);border-radius:20px;overflow:hidden;background:#fff;text-decoration:none;color:#151a21;font-family:Inter,system-ui,sans-serif;transition:border-color .2s,transform .2s}
@@ -620,7 +621,7 @@ html:has(#hkm-media),html:has(#hkm-media) body{overflow-x:clip!important;overflo
 .faste-promo .fp-badge{position:absolute;top:14px;left:14px;z-index:2;background:#fff;color:#151a21;font:600 12px/1 Inter,system-ui,sans-serif;padding:7px 10px;border-radius:999px}
 </style>
 <main id="hkm-media">
-  <div class="hm-wrap">
+  <div class="hm-band"><div class="hm-wrap">
     <header class="hm-head">
       <p class="hm-eye">Media &amp; undervisning</p>
       <h1 data-content-key="hero.title">Media &amp; ressurser</h1>
@@ -632,6 +633,8 @@ html:has(#hkm-media),html:has(#hkm-media) body{overflow-x:clip!important;overflo
         <a href="#siste">Siste nytt</a>
       </nav>
     </header>
+  </div></div>
+  <div class="hm-wrap">
 
     <a class="faste-promo" href="/undervisning/faste">
   <span class="fp-img"><img src="https://images.unsplash.com/photo-1457139621581-298d1801c832?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async"><span class="fp-badge">Undervisning</span></span>
