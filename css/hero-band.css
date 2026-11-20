@@ -212,3 +212,4 @@ html[data-theme="dark"] body #blog-interactions :is(.comment-text,.likes-count-t
 html[data-theme="dark"] body #blog-interactions .comment-form :is(input,textarea){background:var(--dk-bg) !important;border-color:var(--dk-line2) !important;color:var(--dk-ink) !important}
 html[data-theme="dark"] body #blog-interactions .comment-avatar{background:rgba(233,160,102,.14) !important;color:var(--dk-or) !important}
 html[data-theme="dark"] body .blog-post-section .blog-navigation{border-top-color:var(--dk-line) !important}
+html[data-theme="dark"] body #hkm-blog :is(.blog-page.section,.blog-filter-section,section),html[data-theme="dark"] body #hkm-tl section:not(.tl-cta),html[data-theme="dark"] body .hb-band ~ section:not(.media-newsletter){background:var(--dk-bg) !important}
