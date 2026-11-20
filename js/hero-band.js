@@ -107,7 +107,6 @@
         ensureToggle();
         new MutationObserver(() => ensureToggle()).observe(document.body, { childList: true, subtree: true });
         host.appendChild(tools);
-        if (filters.parentNode === host) host.appendChild(filters);
         const jump = host.querySelector(':scope > .hm-jump'); if (jump) { jump.classList.add('hb-filters'); host.appendChild(jump); }
         // Filterknapper
         const CAT_SEL = '.blog-category, .media-category, .event-category, .card-category, .category-badge, .podcast-category, .video-category';
@@ -160,6 +159,8 @@
         };
         input.addEventListener('input', run);
         buildCats();
+        if (filters.parentNode === host) host.appendChild(filters);
+        { const j = host.querySelector(':scope > .hm-jump'); if (j) host.appendChild(j); }
         let mt;
         new MutationObserver((recs) => { if (recs.every((r) => r.target.closest && r.target.closest('.hb-filters, .hb-search, #hb-none'))) return; clearTimeout(mt); mt = setTimeout(() => { buildCats(); if (input.value.trim() || activeCat) run(); }, 150); }).observe(document.body, { childList: true, subtree: true });
         return true;
