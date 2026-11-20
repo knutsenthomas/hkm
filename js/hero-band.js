@@ -55,7 +55,7 @@
     }
 
     // ---------- Søk på siden (filtrerer kortene) ----------
-    const CARD_SEL = '.media-card, .event-card, .podcast-card, .video-card, .hm-card, .hm-post, .teaching-card, .resource-card, .calendar-agenda-card';
+    const CARD_SEL = '.plan-card, .media-card, .event-card, .podcast-card, .video-card, .hm-card, .hm-post, .teaching-card, .resource-card, .calendar-agenda-card';
     const OWN_SEARCH = '#course-search, #plans-search, #podcast-search-input, #blog-search-input, .hb-search input';
     const L = (() => { const l = (document.documentElement.lang || 'no').slice(0, 2); return l === 'en' ? { ph: 'Search this page …', none: 'No results' } : l === 'es' ? { ph: 'Buscar en esta página …', none: 'Sin resultados' } : { ph: 'Søk på siden …', none: 'Ingen treff' }; })();
     function searchHost() {
@@ -86,7 +86,7 @@
         tools.appendChild(box);
         const ensureToggle = () => {
         if (tools.querySelector('.hb-view')) return;
-        if (cards().some((c) => c.querySelector('img, .media-thumbnail, .event-image'))) {
+        if (cards().some((c) => c.querySelector('img, .media-thumbnail, .event-image, .plan-image-wrapper'))) {
             const tg = document.createElement('div');
             tg.className = 'hb-view';
             tg.innerHTML = '<button type="button" data-v="grid" aria-label="Rutenett"><span class="material-symbols-outlined">grid_view</span></button><button type="button" data-v="list" aria-label="Liste"><span class="material-symbols-outlined">view_list</span></button>';
@@ -109,7 +109,7 @@
         host.appendChild(tools);
         const jump = host.querySelector(':scope > .hm-jump'); if (jump) { jump.classList.add('hb-filters'); host.appendChild(jump); }
         // Filterknapper
-        const CAT_SEL = '.blog-category, .media-category, .event-category, .card-category, .category-badge, .podcast-category, .video-category';
+        const CAT_SEL = '.duration-badge, .blog-category, .media-category, .event-category, .card-category, .category-badge, .podcast-category, .video-category';
         const MONTHS = /(\d{1,2})\.?\s+(januar|februar|mars|april|mai|juni|juli|august|september|oktober|november|desember|january|february|march|may|june|july|october|december|enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\s+(\d{4})/i;
         let useMonths = false;
         const catOf = (c) => {
