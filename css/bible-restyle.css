@@ -90,3 +90,28 @@ body.hkr #chapter-header-action-bar #btn-crossref-chapter-dynamic.hkr-pill{width
 /* kapittelnummeret står etter boknavnet (ikke foran, så det ikke leses som «1. Romerbrev») */
 body.hkr .hkr-num{display:none!important}
 body.hkr .hkr-ch{color:var(--hkr-t)}
+
+/* versverktøy (når man trykker på et vers) i samme stil som plansidene */
+body.hkr #verse-context-toolbar{background:var(--bg-card,#fff)!important;border:1px solid var(--hkr-line)!important;border-radius:20px!important;box-shadow:0 14px 40px rgba(21,26,33,.12)!important;font-family:Inter,system-ui,sans-serif!important;padding:16px 18px!important}
+body.hkr #sheet-verse-reference{font:800 18px/1.2 Inter,system-ui,sans-serif!important;letter-spacing:-.02em!important;color:var(--hkr-ink)!important;margin-bottom:12px!important}
+body.hkr #verse-context-toolbar .sheet-scrollable-row{gap:8px!important;align-items:center!important}
+body.hkr #verse-context-toolbar .color-swatch-circle{width:30px!important;height:30px!important;min-width:30px!important;box-shadow:none!important;border-width:2px!important}
+body.hkr #verse-context-toolbar .sheet-divider-v{height:28px!important;background:var(--hkr-line)!important;margin:0 6px!important}
+body.hkr #verse-context-toolbar .sheet-action-btn{flex:none!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:7px!important;height:38px!important;min-height:0!important;width:auto!important;min-width:0!important;padding:0 14px!important;border-radius:999px!important;border:1px solid var(--hkr-line)!important;background:var(--bg-card,#fff)!important;color:var(--hkr-ink)!important;box-shadow:none!important;font:600 14px/1 Inter,system-ui,sans-serif!important;white-space:nowrap!important}
+body.hkr #verse-context-toolbar .sheet-action-btn:hover{border-color:var(--hkr-ink)!important;background:var(--bg-card,#fff)!important}
+body.hkr #verse-context-toolbar .sheet-action-btn .material-symbols-outlined{font-size:18px!important;color:var(--hkr-t)!important;margin:0!important}
+body.hkr #verse-context-toolbar .sheet-action-btn span:not(.material-symbols-outlined){font-size:14px!important;font-weight:600!important;color:inherit!important;margin:0!important}
+body.hkr #verse-context-toolbar #toolbar-btn-clear{width:38px!important;padding:0!important;border-color:transparent!important;margin-left:auto!important}
+body.hkr #verse-context-toolbar #toolbar-btn-clear .material-symbols-outlined{color:var(--hkr-sec)!important}
+body.hkr #verse-context-toolbar .sheet-handle-bar{background:var(--hkr-line)!important}
+@media (max-width:768px){
+  body.hkr #verse-context-toolbar{border-radius:20px 20px 0 0!important;border-width:1px 0 0!important;padding:12px 14px 16px!important}
+  body.hkr #verse-context-toolbar .sheet-action-btn{height:36px!important;padding:0 12px!important;font-size:13px!important}
+  body.hkr #verse-context-toolbar .sheet-action-btn span:not(.material-symbols-outlined){font-size:13px!important}
+}
+
+/* innstillinger og kapittelvelger: samme kort-stil */
+body.hkr .floating-settings-popover,body.hkr .floating-chapter-popover{background:var(--bg-card,#fff)!important;border:1px solid var(--hkr-line)!important;border-radius:20px!important;box-shadow:0 14px 40px rgba(21,26,33,.12)!important;font-family:Inter,system-ui,sans-serif!important}
+body.hkr .popover-sheet-header h3{font:800 18px/1.2 Inter,system-ui,sans-serif!important;letter-spacing:-.02em!important;color:var(--hkr-ink)!important}
+body.hkr .floating-chapter-popover .chapter-item.active,body.hkr .chapter-item.active{background:var(--hkr-ink)!important;color:#fff!important}
+body.hkr .hkm-segmented-control .segment-btn.active{background:var(--hkr-ink)!important;color:#fff!important}

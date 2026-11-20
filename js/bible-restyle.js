@@ -53,6 +53,8 @@
     if (bar && look && look.parentElement !== bar) bar.insertBefore(look, bar.firstChild);
     if (look) { const sp = look.querySelectorAll('span')[1]; if (sp && sp.textContent !== T.lookup) sp.textContent = T.lookup; }
     const cr = $('#btn-crossref-chapter-dynamic');
+    const tc = document.querySelector('#toolbar-btn-crossref span:not(.material-symbols-outlined)');
+    if (tc && tc.textContent !== T.crossref) tc.textContent = T.crossref;
     if (cr && !cr.querySelector('.hkr-lbl')) { const l = document.createElement('span'); l.className = 'hkr-lbl'; l.textContent = T.crossref; cr.appendChild(l); }
     document.querySelectorAll('#chapter-header-action-bar .nav-btn, #btn-lookup-chapter').forEach(b => {
       b.classList.add('hkr-pill');
