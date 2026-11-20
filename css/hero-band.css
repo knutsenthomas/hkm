@@ -60,9 +60,10 @@ html body .hb-filters .hb-pill.on{background:#151a21 !important;border-color:#15
 .hb-tools{display:flex;align-items:center;gap:8px;margin:18px 0 0;max-width:520px}
 .hb-tools .hb-search{flex:1;margin:0 !important;max-width:none}
 .hb-view{display:flex;gap:4px;padding:3px;border:1px solid rgba(21,26,33,.12);border-radius:999px;background:#fff;flex:none}
-html body .hb-view button{width:38px !important;height:36px !important;border-radius:999px !important;border:0 !important;background:transparent !important;display:grid !important;place-items:center !important;padding:0 !important;margin:0 !important;cursor:pointer;box-shadow:none !important}
-.hb-view svg{width:20px;height:20px;fill:#596069}
-html body .hb-view button.on{background:#151a21 !important}
+html body .hb-view button,html body .hb-band .hb-view button{width:38px !important;height:36px !important;border-radius:999px !important;border:0 !important;background:transparent !important;display:grid !important;place-items:center !important;padding:0 !important;margin:0 !important;cursor:pointer;box-shadow:none !important}
+.hb-view svg{width:20px;height:20px;fill:#596069;flex:none}
+html body .hb-band .hb-view button svg{display:block}
+html body .hb-view button.on,html body .hb-band .hb-view button.on{background:#151a21 !important}
 .hb-view button.on svg{fill:#fff}
 @media (min-width:861px){
   html body .hb-host>.hb-tools{grid-column:2;grid-row:1 / span 8;align-self:center;margin:0 !important;max-width:none;width:100%}
