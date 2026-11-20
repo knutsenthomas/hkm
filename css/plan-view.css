@@ -564,3 +564,14 @@ html:has(#plan-view),html:has(#plan-view) body{overflow-x:clip!important;overflo
 #plan-view .dhead .dnum{font-size:clamp(56px,6.6vw,86px);line-height:.74;letter-spacing:-.04em}
 #plan-view .dhead h2{margin-top:0}
 @media (max-width:600px){#plan-view .dhead{gap:12px}#plan-view .dhead .dnum{font-size:50px}}
+/* lagringsstatus */
+#plan-view .pv-save:empty{display:none}
+#plan-view .pv-save{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13px;line-height:1.4}
+#plan-view .pv-save svg{width:14px;height:14px;flex:none}
+#plan-view .pv-save a{font-weight:600;text-decoration:underline;text-underline-offset:2px}
+#plan-view .hsave{margin-top:12px;color:rgba(255,255,255,.72)}
+#plan-view .hsave.on svg{color:#e9b384}
+#plan-view .hsave a{color:#fff}
+#plan-view .asave{margin:8px 0 0;color:var(--sec)}
+#plan-view .asave.on svg{color:var(--t)}
+#plan-view .asave a{color:var(--t)}

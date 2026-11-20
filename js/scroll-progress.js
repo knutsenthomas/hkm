@@ -4,7 +4,7 @@
   if (document.getElementById('hkm-scrollbar')) return;
   const bar = document.createElement('div');
   bar.id = 'hkm-scrollbar'; bar.setAttribute('aria-hidden', 'true');
-  bar.style.cssText = 'position:fixed;left:0;top:0;height:3px;width:100%;background:#cc712b;transform-origin:0 50%;transform:scaleX(0);z-index:10001;pointer-events:none;transition:transform .08s linear';
+  bar.style.cssText = 'position:fixed;left:0;top:0;height:3px;width:100%;background:#cc712b;transform-origin:0 50%;transform:scaleX(0);z-index:2147483000;pointer-events:none;transition:transform .08s linear';
   const add = () => document.body.appendChild(bar);
   if (document.body) add(); else document.addEventListener('DOMContentLoaded', add);
   let raf = 0;

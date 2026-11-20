@@ -17,7 +17,7 @@
       over: 'Planen er fullført i kalenderen', doneOf: (a, b) => a + ' av ' + b + ' dager fullført',
       stillRead: 'Du kan fortsatt lese og fullføre dagene.', today: d => 'I dag · ' + d, dayT: (n, t) => 'Dag ' + n + ': ' + t,
       todayDone: 'Dagens dag er fullført. Godt jobbet!', tapDay: 'Trykk på dagen for å lese.', of: n => 'av ' + n,
-      myStart: 'Min startdato', startShort: d => 'Start ' + d + ' · Endre', devotional: 'Andakt', min: m => m + ' min', startReading: 'Start lesing', contReading: 'Fortsett lesingen', pct: p => p + '% fullført', nextS: 'Neste', prevS: 'Forrige', finishDay: 'Fullfør dagen', close: 'Lukk', dayDoneS: 'Dagen er fullført', week: 'Uke', dayRange: (a, b) => 'Dag ' + a + '–' + b, selected: 'Valgt dag', todayL: 'I dag', doneL: 'Fullført',
+      myStart: 'Min startdato', savedOn: 'Fremgangen og notatene dine lagres på profilen din.', savedOff: 'Lagres bare i denne nettleseren.', login: 'Logg inn for å lagre på profilen', startShort: d => 'Start ' + d + ' · Endre', devotional: 'Andakt', min: m => m + ' min', startReading: 'Start lesing', contReading: 'Fortsett lesingen', pct: p => p + '% fullført', nextS: 'Neste', prevS: 'Forrige', finishDay: 'Fullfør dagen', close: 'Lukk', dayDoneS: 'Dagen er fullført', week: 'Uke', dayRange: (a, b) => 'Dag ' + a + '–' + b, selected: 'Valgt dag', todayL: 'I dag', doneL: 'Fullført',
       allDays: 'Alle dager', readOf: (a, b) => a + ' av ' + b + ' fullført', dayOf: (n, m) => 'Dag ' + n + ' av ' + m,
       verses: 'Dagens bibelvers', readAll: n => n === 2 ? 'Les begge' : 'Les alle ' + (['', '', '', 'tre', 'fire', 'fem', 'seks'][n] || n), copy: 'Kopier', nextV: 'Neste vers →', firstV: 'Første vers ↺',
       openBible: 'Les i Bibelen', showAll: 'Vis hele teksten', step: 'Dagens steg', prayFor: 'Be for', prayer: 'Bønn', notes: n => 'Mine notater for dag ' + n,
@@ -43,7 +43,7 @@
       over: 'The plan has ended in the calendar', doneOf: (a, b) => a + ' of ' + b + ' days completed',
       stillRead: 'You can still read and complete the days.', today: d => 'Today · ' + d, dayT: (n, t) => 'Day ' + n + ': ' + t,
       todayDone: "Today's day is completed. Well done!", tapDay: 'Tap the day to read.', of: n => 'of ' + n,
-      myStart: 'My start date', startShort: d => 'Starts ' + d + ' · Change', devotional: 'Devotional', min: m => m + ' min', startReading: 'Start reading', contReading: 'Continue reading', pct: p => p + '% complete', nextS: 'Next', prevS: 'Previous', finishDay: 'Complete the day', close: 'Close', dayDoneS: 'Day completed', week: 'Week', dayRange: (a, b) => 'Day ' + a + '–' + b, selected: 'Selected day', todayL: 'Today', doneL: 'Completed',
+      myStart: 'My start date', savedOn: 'Your progress and notes are saved to your profile.', savedOff: 'Only saved in this browser.', login: 'Log in to save to your profile', startShort: d => 'Starts ' + d + ' · Change', devotional: 'Devotional', min: m => m + ' min', startReading: 'Start reading', contReading: 'Continue reading', pct: p => p + '% complete', nextS: 'Next', prevS: 'Previous', finishDay: 'Complete the day', close: 'Close', dayDoneS: 'Day completed', week: 'Week', dayRange: (a, b) => 'Day ' + a + '–' + b, selected: 'Selected day', todayL: 'Today', doneL: 'Completed',
       allDays: 'All days', readOf: (a, b) => a + ' of ' + b + ' completed', dayOf: (n, m) => 'Day ' + n + ' of ' + m,
       verses: "Today's Bible verses", readAll: n => n === 2 ? 'Read both' : 'Read all ' + n, copy: 'Copy', nextV: 'Next verse →', firstV: 'First verse ↺',
       openBible: 'Read in the Bible', showAll: 'Show the whole passage', step: "Today's step", prayFor: 'Pray for', prayer: 'Prayer', notes: n => 'My notes for day ' + n,
@@ -69,7 +69,7 @@
       over: 'El plan ya terminó en el calendario', doneOf: (a, b) => a + ' de ' + b + ' días completados',
       stillRead: 'Todavía puedes leer y completar los días.', today: d => 'Hoy · ' + d, dayT: (n, t) => 'Día ' + n + ': ' + t,
       todayDone: 'El día de hoy está completado. ¡Bien hecho!', tapDay: 'Toca el día para leer.', of: n => 'de ' + n,
-      myStart: 'Mi fecha de inicio', startShort: d => 'Inicio ' + d + ' · Cambiar', devotional: 'Devocional', min: m => m + ' min', startReading: 'Comenzar lectura', contReading: 'Seguir leyendo', pct: p => p + '% completado', nextS: 'Siguiente', prevS: 'Anterior', finishDay: 'Completar el día', close: 'Cerrar', dayDoneS: 'Día completado', week: 'Semana', dayRange: (a, b) => 'Día ' + a + '–' + b, selected: 'Día elegido', todayL: 'Hoy', doneL: 'Completado',
+      myStart: 'Mi fecha de inicio', savedOn: 'Tu progreso y tus notas se guardan en tu perfil.', savedOff: 'Solo se guarda en este navegador.', login: 'Inicia sesión para guardarlo en tu perfil', startShort: d => 'Inicio ' + d + ' · Cambiar', devotional: 'Devocional', min: m => m + ' min', startReading: 'Comenzar lectura', contReading: 'Seguir leyendo', pct: p => p + '% completado', nextS: 'Siguiente', prevS: 'Anterior', finishDay: 'Completar el día', close: 'Cerrar', dayDoneS: 'Día completado', week: 'Semana', dayRange: (a, b) => 'Día ' + a + '–' + b, selected: 'Día elegido', todayL: 'Hoy', doneL: 'Completado',
       allDays: 'Todos los días', readOf: (a, b) => a + ' de ' + b + ' completados', dayOf: (n, m) => 'Día ' + n + ' de ' + m,
       verses: 'Versículos del día', readAll: n => n === 2 ? 'Leer ambos' : 'Leer los ' + n, copy: 'Copiar', nextV: 'Siguiente →', firstV: 'Primero ↺',
       openBible: 'Leer en la Biblia', showAll: 'Mostrar todo el texto', step: 'Paso de hoy', prayFor: 'Ora por', prayer: 'Oración', notes: n => 'Mis notas del día ' + n,
@@ -413,11 +413,26 @@
       remote = remote || data;
     } catch (e) { console.warn('Kunne ikke lagre fremgang på Min side:', e); }
   }
+  let authed = null;
+  const LOGIN = '/minside/index.html';
+  function saveStatus() {
+    const ok = !!userRef;
+    document.querySelectorAll('#plan-view .pv-save').forEach(el => {
+      if (authed === null) { el.innerHTML = ''; return; }
+      el.classList.toggle('on', ok);
+      el.innerHTML = ok
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"/></svg>' + esc(T.savedOn)
+        : esc(T.savedOff) + ' <a href="' + LOGIN + '">' + esc(T.login) + '</a>';
+    });
+  }
+  const ensureRemote = () => { if (userRef && !remote) saveRemote(); };
   function hookAuth() {
     const go = () => firebase.auth().onAuthStateChanged(async user => {
-      if (!user) { userRef = null; return; }
+      authed = !!user;
+      if (!user) { userRef = null; saveStatus(); return; }
       try {
         userRef = firebase.firestore().collection('users').doc(user.uid).collection('reading_plans').doc(plan.id);
+        saveStatus();
         const snap = await userRef.get();
         if (snap.exists) {
           remote = snap.data() || {};
@@ -494,7 +509,7 @@ ${aboutHTML('about-top')}
 
 <div class="hero plan rv${plan.imageUrl ? ' hasimg' : ''}" aria-live="polite">
 <svg class="shape" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${plan.imageUrl ? `<defs><clipPath id="pv-blob"><path d="M560 -80C720 -70 840 40 815 170 792 290 660 320 570 260 480 200 500 110 440 60 380 10 430 -90 560 -80Z"/></clipPath></defs><g clip-path="url(#pv-blob)"><rect x="400" y="-100" width="420" height="440" fill="#cc712b"/><image href="${esc(plan.imageUrl)}" x="400" y="-100" width="420" height="440" preserveAspectRatio="xMidYMid slice"/><rect x="400" y="-100" width="420" height="440" fill="#151a21" fill-opacity=".35"/></g>` : '<path d="M560 -80C720 -70 840 40 815 170 792 290 660 320 570 260 480 200 500 110 440 60 380 10 430 -90 560 -80Z" fill="#cc712b" fill-opacity=".85"/>'}</svg>
-<div class="htxt"><small id="hSmall">${esc(T.progress)}</small><b id="hTitle"></b><span id="hSub"></span><button type="button" class="hstart" id="pv-startbtn"></button></div>
+<div class="htxt"><small id="hSmall">${esc(T.progress)}</small><b id="hTitle"></b><span id="hSub"></span><button type="button" class="hstart" id="pv-startbtn"></button><span class="pv-save hsave"></span></div>
 <div class="ring"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="52"/><circle class="fg" id="ringfg" cx="60" cy="60" r="52"/></svg><span class="num"><span><b id="ringN">0</b><i>${esc(T.of(N))}</i></span></span></div>
 </div>
 <div class="startrow"><label for="pv-start">${esc(T.myStart)}</label><input type="date" id="pv-start" value="${esc(start)}"></div>
@@ -702,7 +717,7 @@ ${aboutHTML('about-bottom')}
 <div class="acard${img ? ' img' : ''}" ${img}>${img ? '' : '<svg class="shape" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path d="M560 -80C720 -70 840 40 815 170 792 290 660 320 570 260 480 200 500 110 440 60 380 10 430 -90 560 -80Z" fill="#cc712b" fill-opacity=".85"/></svg>'}<b>${esc(plan.title || '')}</b><small>${esc(T.days(N))}</small></div>
 <div class="adays" id="adays">${chips}</div>
 <div class="ahead"><span class="ameta">${esc(T.dayOf(n, N))} · ${esc(T.WD[dayDate(n).getDay()])} ${esc(fmt(dayDate(n)))}</span><span class="apct">${esc(T.pct(pct))}</span></div>
-<div class="abarp" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}"><i style="width:${pct}%"></i></div>
+<div class="abarp" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}"><i style="width:${pct}%"></i></div><p class="pv-save asave"></p>
 <h2 class="atitle">${esc(DAYS[n - 1].heading || DAYS[n - 1].title)}</h2>
 <ul class="alist">${items.map((it, k) => `<li><label class="ack"><input type="checkbox" data-i="${k}" ${set.has(k) || dn ? 'checked' : ''} aria-label="${esc(it.label)}"><span></span></label><button type="button" class="aopen" data-i="${k}"><span>${esc(it.label)}</span><em>${esc(T.min(it.min))}</em>${ICON_CHEV}</button></li>`).join('')}</ul>
 ${dn ? `<p class="adone">✓ ${esc(T.dayDoneS)}</p>` : ''}
@@ -715,7 +730,7 @@ ${aboutHTML('about-app')}
     el.querySelectorAll('.achip').forEach(b => b.addEventListener('click', () => show(+b.dataset.n, false)));
     el.querySelectorAll('.ack input').forEach(c => c.addEventListener('change', () => { toggleItem(n, +c.dataset.i, c.checked); show(n, false, true); }));
     el.querySelectorAll('.aopen').forEach(b => b.addEventListener('click', () => openReader(n, +b.dataset.i)));
-    $('#astart').addEventListener('click', () => openReader(n, unread >= 0 ? unread : 0));
+    $('#astart').addEventListener('click', () => { ensureRemote(); openReader(n, unread >= 0 ? unread : 0); });
     el.querySelectorAll('[data-share]').forEach(b => b.addEventListener('click', shareIt));
     const ad = $('#adays'), on = ad && ad.querySelector('.achip[aria-current=true]');
     if (on) ad.scrollLeft = on.offsetLeft - ad.offsetLeft - ad.clientWidth / 2 + on.clientWidth / 2;
@@ -754,7 +769,7 @@ ${aboutHTML('about-app')}
     const w = $('#daywrap');
     const paint = () => { w.innerHTML = dayHTML(n); bindDay(n); w.classList.remove('swap'); };
     if (quiet || reduced) paint(); else { w.classList.add('swap'); setTimeout(paint, 180); }
-    renderWeeks(); renderDays(); renderToc(); hero(); renderApp();
+    renderWeeks(); renderDays(); renderToc(); hero(); renderApp(); saveStatus();
     try { history.replaceState(null, '', location.pathname + location.search + '#dag-' + n); } catch (e) { }
     if (scroll) $('#dag').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
   }
@@ -762,7 +777,7 @@ ${aboutHTML('about-app')}
   $('#pv-startbtn').addEventListener('click', () => { const i = $('#pv-start'); try { if (i.showPicker) { i.showPicker(); return; } } catch (e) { } i.focus(); i.click(); });
   $('#pv-start').addEventListener('change', e => {
     if (!e.target.value) return; start = e.target.value; S.set('start', start); S.set('startManual', '1');
-    if (userRef && remote) { try { userRef.set({ startedAt: new Date(start + 'T12:00:00') }, { merge: true }); } catch (err) { } }
+    if (userRef && remote) { try { userRef.set({ startedAt: new Date(start + 'T12:00:00') }, { merge: true }); } catch (err) { } } else ensureRemote();
     show(cur, false, true); toast(T.startSaved);
   });
   const hm = (location.hash || '').match(/^#dag-(\d+)$/);
