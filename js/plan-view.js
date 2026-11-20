@@ -17,7 +17,7 @@
       over: 'Planen er fullført i kalenderen', doneOf: (a, b) => a + ' av ' + b + ' dager fullført',
       stillRead: 'Du kan fortsatt lese og fullføre dagene.', today: d => 'I dag · ' + d, dayT: (n, t) => 'Dag ' + n + ': ' + t,
       todayDone: 'Dagens dag er fullført. Godt jobbet!', tapDay: 'Trykk på dagen for å lese.', of: n => 'av ' + n,
-      myStart: 'Min startdato', week: 'Uke', dayRange: (a, b) => 'Dag ' + a + '–' + b, selected: 'Valgt dag', todayL: 'I dag', doneL: 'Fullført',
+      myStart: 'Min startdato', startShort: d => 'Start ' + d + ' · Endre', week: 'Uke', dayRange: (a, b) => 'Dag ' + a + '–' + b, selected: 'Valgt dag', todayL: 'I dag', doneL: 'Fullført',
       allDays: 'Alle dager', readOf: (a, b) => a + ' av ' + b + ' fullført', dayOf: (n, m) => 'Dag ' + n + ' av ' + m,
       verses: 'Dagens bibelvers', readAll: n => n === 2 ? 'Les begge' : 'Les alle ' + (['', '', '', 'tre', 'fire', 'fem', 'seks'][n] || n), copy: 'Kopier', nextV: 'Neste vers →', firstV: 'Første vers ↺',
       openBible: 'Les i Bibelen', showAll: 'Vis hele teksten', step: 'Dagens steg', prayFor: 'Be for', prayer: 'Bønn', notes: n => 'Mine notater for dag ' + n,
@@ -43,7 +43,7 @@
       over: 'The plan has ended in the calendar', doneOf: (a, b) => a + ' of ' + b + ' days completed',
       stillRead: 'You can still read and complete the days.', today: d => 'Today · ' + d, dayT: (n, t) => 'Day ' + n + ': ' + t,
       todayDone: "Today's day is completed. Well done!", tapDay: 'Tap the day to read.', of: n => 'of ' + n,
-      myStart: 'My start date', week: 'Week', dayRange: (a, b) => 'Day ' + a + '–' + b, selected: 'Selected day', todayL: 'Today', doneL: 'Completed',
+      myStart: 'My start date', startShort: d => 'Starts ' + d + ' · Change', week: 'Week', dayRange: (a, b) => 'Day ' + a + '–' + b, selected: 'Selected day', todayL: 'Today', doneL: 'Completed',
       allDays: 'All days', readOf: (a, b) => a + ' of ' + b + ' completed', dayOf: (n, m) => 'Day ' + n + ' of ' + m,
       verses: "Today's Bible verses", readAll: n => n === 2 ? 'Read both' : 'Read all ' + n, copy: 'Copy', nextV: 'Next verse →', firstV: 'First verse ↺',
       openBible: 'Read in the Bible', showAll: 'Show the whole passage', step: "Today's step", prayFor: 'Pray for', prayer: 'Prayer', notes: n => 'My notes for day ' + n,
@@ -69,7 +69,7 @@
       over: 'El plan ya terminó en el calendario', doneOf: (a, b) => a + ' de ' + b + ' días completados',
       stillRead: 'Todavía puedes leer y completar los días.', today: d => 'Hoy · ' + d, dayT: (n, t) => 'Día ' + n + ': ' + t,
       todayDone: 'El día de hoy está completado. ¡Bien hecho!', tapDay: 'Toca el día para leer.', of: n => 'de ' + n,
-      myStart: 'Mi fecha de inicio', week: 'Semana', dayRange: (a, b) => 'Día ' + a + '–' + b, selected: 'Día elegido', todayL: 'Hoy', doneL: 'Completado',
+      myStart: 'Mi fecha de inicio', startShort: d => 'Inicio ' + d + ' · Cambiar', week: 'Semana', dayRange: (a, b) => 'Día ' + a + '–' + b, selected: 'Día elegido', todayL: 'Hoy', doneL: 'Completado',
       allDays: 'Todos los días', readOf: (a, b) => a + ' de ' + b + ' completados', dayOf: (n, m) => 'Día ' + n + ' de ' + m,
       verses: 'Versículos del día', readAll: n => n === 2 ? 'Leer ambos' : 'Leer los ' + n, copy: 'Copiar', nextV: 'Siguiente →', firstV: 'Primero ↺',
       openBible: 'Leer en la Biblia', showAll: 'Mostrar todo el texto', step: 'Paso de hoy', prayFor: 'Ora por', prayer: 'Oración', notes: n => 'Mis notas del día ' + n,
@@ -424,6 +424,12 @@
   const lead = plan.description || plan.subtitle || '';
   const nWeeks = Math.ceil(N / 7);
 
+  const aboutHTML = cls => (intro && (intro.bigIdea || intro.description || (intro.themes || []).length) ? `<details class="about ${cls}"><summary>${esc(T.about)}</summary><div class="ab">
+${intro.bigIdea ? `<div class="bigidea"><span class="lbl">${esc(T.bigIdea)}</span><p>${esc(intro.bigIdea)}</p></div>` : ''}
+${intro.description ? `<p>${esc(intro.description)}</p>` : ''}
+${(intro.themes || []).length ? `<h3>${esc(T.themes)}</h3><ul>${intro.themes.map(t => `<li><b>${esc(t.title)}</b><span>${esc(t.description)}</span></li>`).join('')}</ul>` : ''}
+${(intro.structure || []).length ? `<h3>${esc(T.structure)}</h3><ul>${intro.structure.map(s => `<li><b>${esc(s.range)}${s.title ? ' · ' + esc(s.title) : ''}</b>${s.description ? `<span>${esc(s.description)}</span>` : ''}</li>`).join('')}</ul>` : ''}
+</div></details>` : '');
   document.title = (plan.title || T.plan) + ' | His Kingdom Ministry';
   const md = document.querySelector('meta[name="description"]'); if (md && lead) md.setAttribute('content', lead.slice(0, 160));
 
@@ -445,17 +451,12 @@ ${!translated && T.onlyNo ? `<p class="small trnote">${esc(T.onlyNo)}</p>` : ''}
 ${shopUrl ? `<a class="pill" href="${esc(shopUrl)}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>${esc(T.buy)}</a>` : ''}
 ${pdfUrl ? `<a class="pill" href="${esc(pdfUrl)}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M7 15h10v6H7z"/></svg>${esc(T.print)}</a>` : ''}
 </div>
-${intro && (intro.bigIdea || intro.description || (intro.themes || []).length) ? `<details class="about"><summary>${esc(T.about)}</summary><div class="ab">
-${intro.bigIdea ? `<div class="bigidea"><span class="lbl">${esc(T.bigIdea)}</span><p>${esc(intro.bigIdea)}</p></div>` : ''}
-${intro.description ? `<p>${esc(intro.description)}</p>` : ''}
-${(intro.themes || []).length ? `<h3>${esc(T.themes)}</h3><ul>${intro.themes.map(t => `<li><b>${esc(t.title)}</b><span>${esc(t.description)}</span></li>`).join('')}</ul>` : ''}
-${(intro.structure || []).length ? `<h3>${esc(T.structure)}</h3><ul>${intro.structure.map(s => `<li><b>${esc(s.range)}${s.title ? ' · ' + esc(s.title) : ''}</b>${s.description ? `<span>${esc(s.description)}</span>` : ''}</li>`).join('')}</ul>` : ''}
-</div></details>` : ''}
+${aboutHTML('about-top')}
 </header>
 
 <div class="hero plan rv" aria-live="polite">
 <svg class="shape" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path d="M560 -80C720 -70 840 40 815 170 792 290 660 320 570 260 480 200 500 110 440 60 380 10 430 -90 560 -80Z" fill="#cc712b" fill-opacity=".85"/></svg>
-<div class="htxt"><small id="hSmall">${esc(T.progress)}</small><b id="hTitle"></b><span id="hSub"></span></div>
+<div class="htxt"><small id="hSmall">${esc(T.progress)}</small><b id="hTitle"></b><span id="hSub"></span><button type="button" class="hstart" id="pv-startbtn"></button></div>
 <div class="ring"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="52"/><circle class="fg" id="ringfg" cx="60" cy="60" r="52"/></svg><span class="num"><span><b id="ringN">0</b><i>${esc(T.of(N))}</i></span></span></div>
 </div>
 <div class="startrow"><label for="pv-start">${esc(T.myStart)}</label><input type="date" id="pv-start" value="${esc(start)}"></div>
@@ -463,11 +464,13 @@ ${(intro.structure || []).length ? `<h3>${esc(T.structure)}</h3><ul>${intro.stru
 
 <div class="weeks" role="tablist" aria-label="${esc(T.week)}" id="weeks"></div>
 <div class="days" id="days"></div>
+<div class="dstrip" id="dstrip" role="list"></div>
 <div class="legend"><span><i style="background:#151a21"></i>${esc(T.selected)}</span><span><i style="box-shadow:inset 0 0 0 2px #cc712b"></i>${esc(T.todayL)}</span><span><i style="background:#f7f3ee"></i>${esc(T.doneL)}</span></div>
 
 <section class="day" id="dag" aria-live="polite"><div class="daywrap" id="daywrap"></div></section>
 <div class="celebrate" id="celebrate"><b>${esc(T.celebrateT(N))}</b><p>${esc(T.celebrateP)}</p></div>
 ${extra ? `<a class="teach rv" href="${esc(extra.url)}"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg></span><span><b>${esc(extra.t)}</b><span>${esc(extra.d)}</span></span></a>` : ''}
+${aboutHTML('about-bottom')}
 <div style="height:48px"></div>
 </div>
 
@@ -521,6 +524,16 @@ ${extra ? `<a class="teach rv" href="${esc(extra.url)}"><span class="ic"><svg vi
     }
     $('#days').innerHTML = h;
     $$('.dbtn').forEach(b => b.addEventListener('click', () => show(+b.dataset.n, true)));
+    const st = $('#dstrip');
+    if (st) {
+      let sh = '';
+      for (let n = 1; n <= N; n++) sh += `<button type="button" role="listitem" class="dchip${done.has(n) ? ' done' : ''}${n === ti ? ' today' : ''}" aria-current="${n === cur}" data-n="${n}" aria-label="${esc(T.dayT(n, DAYS[n - 1].title))}"><b>${n}</b><span>${esc(fmtS(dayDate(n)))}</span></button>`;
+      st.innerHTML = sh;
+      st.querySelectorAll('.dchip').forEach(b => b.addEventListener('click', () => show(+b.dataset.n, true)));
+      const on = st.querySelector('.dchip[aria-current=true]');
+      if (on) st.scrollLeft = on.offsetLeft - st.offsetLeft - st.clientWidth / 2 + on.clientWidth / 2;
+    }
+    const sb = $('#pv-startbtn'); if (sb) sb.textContent = T.startShort(fmtS(dayDate(1)));
   }
   function renderToc() {
     $('#toclist').innerHTML = SECTIONS.map(s => `<p class="wkh">${esc(s.name)}</p><div class="grp">` + DAYS.slice(s.from - 1, s.to).map((d, i) => { const n = s.from + i; return `<button type="button" class="tl${n === cur ? ' on' : ''}${done.has(n) ? ' read' : ''}" data-n="${n}"><span class="tick" aria-hidden="true"></span>${n}. ${esc(d.title)}</button>`; }).join('') + '</div>').join('');
@@ -616,6 +629,7 @@ ${extra ? `<a class="teach rv" href="${esc(extra.url)}"><span class="ic"><svg vi
     if (scroll) $('#dag').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
   }
 
+  $('#pv-startbtn').addEventListener('click', () => { const i = $('#pv-start'); try { if (i.showPicker) { i.showPicker(); return; } } catch (e) { } i.focus(); i.click(); });
   $('#pv-start').addEventListener('change', e => {
     if (!e.target.value) return; start = e.target.value; S.set('start', start); S.set('startManual', '1');
     if (userRef && remote) { try { userRef.set({ startedAt: new Date(start + 'T12:00:00') }, { merge: true }); } catch (err) { } }

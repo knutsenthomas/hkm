@@ -382,3 +382,40 @@
  #plan-view .wtab.all{height:38px;margin-left:0;padding:0 14px;background:none;box-shadow:none}
  #plan-view .wtab[aria-selected=true]{background:#fff;box-shadow:0 1px 3px rgba(21,26,33,.12)}
 }
+/* ---- forenklet mobil ---- */
+#plan-view .dstrip,#plan-view .hstart,#plan-view .about-bottom{display:none}
+@media (max-width:600px){
+ #plan-view header.head{padding:28px 0 8px}
+ #plan-view .eyebrow{font-size:13px;margin-bottom:6px}
+ #plan-view h1{font-size:34px;line-height:1.05}
+ #plan-view .lead{font-size:16px;line-height:1.55;margin-top:12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+ #plan-view .meta{margin-top:12px;gap:4px 14px;font-size:13px}
+ #plan-view .meta li:nth-child(3){display:none}
+ #plan-view .headtools{margin-top:14px;gap:6px}
+ #plan-view .headtools .pill{height:36px;padding:0 12px;font-size:13px}
+ #plan-view .about-top{display:none}
+ #plan-view .about-bottom{display:block;margin-top:32px}
+ #plan-view .hero.plan{padding:16px 18px;gap:14px;border-radius:18px;margin-top:18px}
+ #plan-view .hero.plan .htxt small{font-size:12px;margin-bottom:2px}
+ #plan-view .hero.plan .htxt b{font-size:19px;line-height:1.2}
+ #plan-view .hero.plan .htxt span{font-size:13px;margin-top:4px}
+ #plan-view .ring{width:64px;height:64px}
+ #plan-view .ring .num b{font-size:18px}
+ #plan-view .ring .num i{font-size:10px}
+ #plan-view .hstart{display:inline-flex;align-items:center;margin-top:10px;height:30px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:12.5px;font-weight:600;cursor:pointer}
+ #plan-view .startrow{position:absolute;left:0;top:0;width:1px;height:1px;opacity:0;overflow:hidden;margin:0;pointer-events:none}
+ #plan-view .sync{margin-top:10px}
+ #plan-view .weeks,#plan-view .days,#plan-view .legend{display:none}
+ #plan-view .dstrip{display:flex;gap:8px;overflow-x:auto;margin:16px -16px 0;padding:4px 16px 8px;scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+ #plan-view .dstrip::-webkit-scrollbar{display:none}
+ #plan-view .dchip{position:relative;flex:none;width:54px;height:60px;border-radius:14px;border:1px solid var(--line);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;scroll-snap-align:center}
+ #plan-view .dchip b{font-size:17px;font-weight:800;line-height:1}
+ #plan-view .dchip span{font-size:10.5px;color:var(--sec);margin-top:3px}
+ #plan-view .dchip.today{box-shadow:inset 0 0 0 2px #cc712b}
+ #plan-view .dchip.done{background:var(--soft);border-color:transparent}
+ #plan-view .dchip.done::after{content:"";position:absolute;top:5px;right:5px;width:12px;height:12px;border-radius:50%;background:#cc712b url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7'/%3E%3C/svg%3E") center/8px no-repeat}
+ #plan-view .dchip[aria-current=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+ #plan-view .dchip[aria-current=true] span{color:rgba(255,255,255,.7)}
+ #plan-view .day{margin-top:20px;padding-top:24px}
+ #plan-view .teach{padding:14px 16px;gap:12px}
+}
