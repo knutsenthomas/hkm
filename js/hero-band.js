@@ -29,10 +29,13 @@
             const CHILD = ['color', 'text-align', 'text-shadow', 'background', 'background-color', 'background-image', 'box-shadow', 'border', 'border-radius',
                 'padding', 'padding-left', 'padding-right', 'padding-top', 'padding-bottom', 'margin', 'margin-left', 'margin-right', 'margin-top', 'margin-bottom',
                 'width', 'max-width', 'font-size', 'letter-spacing', 'text-transform', 'justify-content', 'align-items', 'backdrop-filter', '-webkit-backdrop-filter', 'line-height', 'font-weight'];
-            el.querySelectorAll('[style]').forEach((c) => {
-                CHILD.forEach((p) => c.style.removeProperty(p));
+            const stripKids = () => el.querySelectorAll('[style]').forEach((c) => {
+                if (c.closest('.hb-search, .hb-filters')) return;
+                CHILD.forEach((p) => { if (c.style.getPropertyValue(p)) c.style.removeProperty(p); });
             });
-            new MutationObserver(() => strip(el)).observe(el, { attributes: true, attributeFilter: ['style'] });
+            stripKids();
+            let busy = false;
+            new MutationObserver(() => { if (busy) return; busy = true; strip(el); stripKids(); busy = false; }).observe(el, { attributes: true, attributeFilter: ['style'], subtree: true });
         });
         heroes.forEach((el) => {
             const n = el.nextElementSibling;
@@ -66,7 +69,12 @@
         host.appendChild(box);
         // Filterknapper
         const CAT_SEL = '.blog-category, .media-category, .event-category, .card-category, .category-badge, .podcast-category, .video-category';
-        const catOf = (c) => { const e = c.querySelector(CAT_SEL); return e ? e.textContent.trim() : ''; };
+        const MONTHS = /(\d{1,2})\.?\s+(januar|februar|mars|april|mai|juni|juli|august|september|oktober|november|desember|january|february|march|may|june|july|october|december|enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\s+(\d{4})/i;
+        let useMonths = false;
+        const catOf = (c) => {
+            if (useMonths) { const m = (c.textContent || '').match(MONTHS); return m ? (m[2].charAt(0).toUpperCase() + m[2].slice(1).toLowerCase() + ' ' + m[3]) : ''; }
+            const e = c.querySelector(CAT_SEL); return e ? e.textContent.trim() : '';
+        };
         const ALL = L.ph.startsWith('Search') ? 'All' : (L.ph.startsWith('Buscar') ? 'Todos' : 'Alle');
         let activeCat = '';
         const filters = document.createElement('div');
@@ -80,7 +88,9 @@
         let catSig = '';
         const buildCats = () => {
             if (filters.querySelector('a')) return;
-            const cats = [...new Set(cards().map(catOf).filter(Boolean))].sort((x, y) => x.localeCompare(y));
+            useMonths = false;
+            let cats = [...new Set(cards().map(catOf).filter(Boolean))].sort((x, y) => x.localeCompare(y));
+            if (cats.length < 2) { useMonths = true; cats = [...new Set(cards().map(catOf).filter(Boolean))]; if (cats.length < 2) useMonths = false; }
             const sig = cats.join('|');
             if (sig === catSig) return; catSig = sig;
             if (cats.length < 2) { filters.remove(); return; }

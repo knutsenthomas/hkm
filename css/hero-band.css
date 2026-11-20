@@ -43,7 +43,7 @@ html body .hb-band .hb-search :is(input){height:100% !important}
 
 /* Samme oppsett som Nyheter & Blogg: tekst til venstre, søk til høyre på PC */
 @media (min-width:861px){
-  .hb-host{display:grid !important;grid-template-columns:minmax(0,1fr) minmax(300px,440px);column-gap:40px;row-gap:0;align-items:start}
+  html body .hb-band>.hb-host,html body .hb-host{display:grid !important;grid-template-columns:minmax(0,1fr) minmax(300px,440px);column-gap:40px;row-gap:0;align-items:start}
   .hb-host>*{grid-column:1}
   .hb-host>.hb-search{grid-column:2;grid-row:1 / span 8;align-self:center;margin:0 !important;max-width:none;width:100%}
 }
