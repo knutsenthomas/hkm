@@ -108,3 +108,15 @@ body.ed .quick-fact-icon{background:transparent!important}
 body.ed .ed-meta .blog-meta{flex-direction:row!important;align-items:center!important}
 body.ed.ed-post .ed-cover{aspect-ratio:16/8}
 body.ed.ed-post .ed-wrap{max-width:720px;margin:0 auto}
+
+/* tidslinjer */
+body.ed .nav-pill{border-radius:999px!important;border:1px solid var(--ed-line)!important;background:#fff!important;color:var(--ed-ink)!important;font:600 14px/1 Inter,system-ui,sans-serif!important;box-shadow:none!important}
+body.ed .nav-pill.active,body.ed .nav-pill[aria-current="true"],body.ed .nav-pill.bg-\[\#d17d39\]{background:var(--ed-ink)!important;color:#fff!important;border-color:var(--ed-ink)!important}
+body.ed .empire-card{background:#fff!important;border:1px solid var(--ed-line)!important;border-top:3px solid var(--ed-t)!important;border-radius:20px!important;box-shadow:none!important;font-family:Inter,system-ui,sans-serif!important}
+body.ed .empire-card h2{color:var(--ed-ink)!important;font-weight:800!important;letter-spacing:-.025em!important}
+body.ed .empire-card h3{color:var(--ed-t)!important;text-transform:none!important;letter-spacing:0!important;font-size:14px!important;font-weight:700!important}
+body.ed .empire-card [class*="text-emerald"],body.ed .empire-card [class*="text-blue"],body.ed .empire-card [class*="text-amber"],body.ed .empire-card [class*="text-purple"],body.ed .empire-card [class*="text-red"],body.ed .empire-card [class*="text-indigo"],body.ed .empire-card [class*="text-cyan"],body.ed .empire-card [class*="text-yellow"]{color:var(--ed-t)!important}
+body.ed .empire-card [class*="bg-emerald-50"],body.ed .empire-card [class*="bg-blue-50"],body.ed .empire-card [class*="bg-amber-50"],body.ed .empire-card [class*="bg-purple-50"],body.ed .empire-card [class*="bg-red-50"],body.ed .empire-card [class*="bg-indigo-50"],body.ed .empire-card [class*="bg-cyan-50"],body.ed .empire-card [class*="bg-yellow-50"]{background:var(--ed-soft)!important;border-color:transparent!important}
+body.ed .empire-card .uppercase{text-transform:none!important;letter-spacing:0!important}
+body.ed .empire-card p,body.ed .empire-card li{color:var(--ed-ink)!important}
+body.ed .empire-card li::marker{color:var(--ed-t)}
