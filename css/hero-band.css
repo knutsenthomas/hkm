@@ -89,3 +89,31 @@ html body .hb-band .hb-view button,html body .hb-view button{width:38px !importa
 html body .hb-band .hb-view button .material-symbols-outlined,html body .hb-view button .material-symbols-outlined{font-size:22px !important;color:inherit !important;line-height:1 !important}
 html body .hb-band .hb-view button.on,html body .hb-view button.on{background:#151a21 !important;color:#fff !important}
 html body .hb-search{height:44px !important}
+
+/* ===== Eksakt samme oppsett som Nyheter & Blogg ===== */
+html body .hb-band{padding:calc(var(--hb-top,96px) + 32px) 0 24px !important}
+#hkm-tl .tl-band,#hkm-media .hm-band{padding:32px 0 24px !important}
+html body .hb-host,html body .hb-band>.hb-host.hb-host,html body .hb-band>div.hb-host:first-of-type{display:grid !important;grid-template-columns:minmax(0,1fr) !important;gap:16px 40px !important;align-items:end !important}
+html body .hb-host>*{grid-column:1 !important;grid-row:auto !important}
+html body .hb-host>.hb-text>*:last-child{margin-bottom:0 !important}
+html body .hb-host>.hb-tools{margin:0 !important;max-width:none !important;width:100%;align-self:end !important}
+html body .hb-host>.hb-filters{margin:0 !important}
+@media (min-width:861px){
+  html body .hb-host,html body .hb-band>.hb-host.hb-host,html body .hb-band>div.hb-host:first-of-type{grid-template-columns:minmax(0,1fr) minmax(320px,440px) !important}
+  html body .hb-host>.hb-text{grid-column:1 !important;grid-row:1 !important}
+  html body .hb-host>.hb-tools{grid-column:2 !important;grid-row:1 !important}
+  html body .hb-host>.hb-filters{grid-column:1 / -1 !important;grid-row:2 !important}
+}
+html body .hb-host .hb-eye,html body .hb-band .hb-eye{font-size:14px !important;font-weight:600 !important;color:#a0531a !important;margin:0 0 8px !important}
+html body .hb-host h1{font-size:clamp(28px,3.4vw,40px) !important;line-height:1.08 !important;font-weight:800 !important;letter-spacing:-.035em !important;margin:0 !important}
+html body .hb-host .hb-text>p:not(.hb-eye):not(.tl-eye){font-size:17px !important;line-height:1.5 !important;margin:8px 0 0 !important;max-width:640px !important}
+html body .hb-tools{gap:8px !important}
+html body .hb-search{height:44px !important;padding:0 16px !important;gap:8px !important}
+html body .hb-search input{font-size:15px !important}
+html body .hb-filters{gap:8px !important}
+html body .hb-filters .hb-pill,html body .hb-filters>a{height:34px !important;padding:0 14px !important;font-size:14px !important}
+@media (max-width:600px){
+  html body .hb-band{padding:calc(var(--hb-top,80px) + 24px) 0 18px !important}
+  #hkm-tl .tl-band,#hkm-media .hm-band{padding:24px 0 18px !important}
+  html body .hb-host .hb-text>p:not(.hb-eye):not(.tl-eye){font-size:16px !important}
+}

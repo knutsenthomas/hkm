@@ -72,9 +72,14 @@
         const input = box.querySelector('input');
         input.placeholder = L.ph; input.setAttribute('aria-label', L.ph);
         host.classList.add('hb-host');
+        if (!host.querySelector(':scope > .hb-text')) {
+            const txt = document.createElement('div'); txt.className = 'hb-text';
+            [...host.childNodes].forEach((n) => { if (!(n.nodeType === 1 && n.matches('.hm-jump'))) txt.appendChild(n); });
+            host.insertBefore(txt, host.firstChild);
+        }
         if (host.closest('.hb-band') && !host.querySelector('.hb-eye, .hero-badge, .section-label')) {
             const eye = document.createElement('p'); eye.className = 'hb-eye'; eye.textContent = 'His Kingdom Ministry';
-            host.insertBefore(eye, host.firstChild);
+            const t = host.querySelector(':scope > .hb-text'); t.insertBefore(eye, t.firstChild);
         }
         const tools = document.createElement('div');
         tools.className = 'hb-tools';
@@ -102,6 +107,8 @@
         ensureToggle();
         new MutationObserver(() => ensureToggle()).observe(document.body, { childList: true, subtree: true });
         host.appendChild(tools);
+        if (filters.parentNode === host) host.appendChild(filters);
+        const jump = host.querySelector(':scope > .hm-jump'); if (jump) { jump.classList.add('hb-filters'); host.appendChild(jump); }
         // Filterknapper
         const CAT_SEL = '.blog-category, .media-category, .event-category, .card-category, .category-badge, .podcast-category, .video-category';
         const MONTHS = /(\d{1,2})\.?\s+(januar|februar|mars|april|mai|juni|juli|august|september|oktober|november|desember|january|february|march|may|june|july|october|december|enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\s+(\d{4})/i;
