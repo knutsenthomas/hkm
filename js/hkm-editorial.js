@@ -1,0 +1,58 @@
+/* Innholdssider (bibelske personer, blogg, undervisning) i samme stil som leseplanene:
+   hvit topp med oransje overlinje, stor tittel og ingress, og coverbildet som et avrundet kort under.
+   Den gamle toppen blir liggende skjult, så sidens egne skript kan fortsette å oppdatere den. */
+(function () {
+  'use strict';
+  const LANG = (location.pathname.match(/^\/(en|es)\//) || [])[1] || 'no';
+  const P = location.pathname.replace(/^\/(en|es)\//, '/').replace(/\.html$/, '');
+  const EYE = {
+    no: { people: 'Bibelske personer', person: 'Bibelsk person', blog: 'Blogg', post: 'Blogg', teach: 'Undervisning', series: 'Undervisning' },
+    en: { people: 'Biblical people', person: 'Biblical person', blog: 'Blog', post: 'Blog', teach: 'Teaching', series: 'Teaching' },
+    es: { people: 'Personajes bíblicos', person: 'Personaje bíblico', blog: 'Blog', post: 'Blog', teach: 'Enseñanza', series: 'Enseñanza' }
+  }[LANG];
+  const kind = /bibelsk-person-detaljer/.test(P) ? 'person' : /bibelske-personer/.test(P) ? 'people'
+    : /blogg-post|blog-post/.test(P) ? 'post' : /\/(blogg|blog)$/.test(P) ? 'blog'
+    : /undervisningsserier/.test(P) ? 'series' : /undervisning|teaching|ensenanza/.test(P) ? 'teach' : 'page';
+
+  const urlOf = el => {
+    const bg = (el.getAttribute('style') || '') + ' ' + getComputedStyle(el).backgroundImage;
+    const all = [...bg.matchAll(/url\((['"]?)(.*?)\1\)/g)].map(m => m[2]).filter(u => u && !/^data:/.test(u));
+    return all.length ? all[all.length - 1] : '';
+  };
+
+  function build() {
+    const hero = document.querySelector('.subpage-hero, .page-hero');
+    if (!hero || hero.dataset.ed) return;
+    hero.dataset.ed = '1';
+    document.body.classList.add('ed', 'ed-' + kind);
+    const hd = document.getElementById('header');
+    const setH = () => { const b = hd ? Math.round(hd.getBoundingClientRect().height) : 80; document.body.style.setProperty('--ed-headh', Math.max(56, Math.min(b, 120)) + 'px'); };
+    setH(); addEventListener('resize', setH, { passive: true });
+    const head = document.createElement('div');
+    head.className = 'ed-head';
+    head.innerHTML = '<div class="ed-wrap"><span class="ed-eyebrow"></span><h1 class="ed-h1"></h1><p class="ed-lead"></p><div class="ed-meta"></div><div class="ed-actions"></div></div><figure class="ed-cover" hidden><img alt="" decoding="async"></figure>';
+    hero.parentNode.insertBefore(head, hero);
+    hero.classList.add('ed-hidden');
+    // flytt levende elementer (meta-rad og tilbake-knapp) inn i den nye toppen
+    const meta = hero.querySelector('#blog-meta-row, .blog-meta');
+    if (meta) head.querySelector('.ed-meta').appendChild(meta);
+    hero.querySelectorAll('a.btn').forEach(a => head.querySelector('.ed-actions').appendChild(a));
+    const sync = () => {
+      const h1 = hero.querySelector('h1'), p = hero.querySelector('p');
+      head.querySelector('.ed-eyebrow').textContent = EYE[kind] || '';
+      head.querySelector('.ed-h1').textContent = h1 ? h1.textContent.trim() : document.title.split('|')[0].trim();
+      const lead = p ? p.textContent.trim() : '';
+      const lp = head.querySelector('.ed-lead'); lp.textContent = lead; lp.hidden = !lead;
+      const src = urlOf(hero), fig = head.querySelector('.ed-cover'), img = fig.querySelector('img');
+      if (src && img.getAttribute('src') !== src) img.src = src;
+      fig.hidden = !src;
+      head.querySelector('.ed-actions').hidden = !head.querySelector('.ed-actions').children.length;
+    };
+    sync();
+    new MutationObserver(sync).observe(hero, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['style', 'class'] });
+    // tilbake-knapper i innholdet blir runde knapper
+    document.querySelectorAll('.back-link-btn').forEach(a => a.classList.add('ed-pill'));
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build); else build();
+  setTimeout(build, 800);
+})();
