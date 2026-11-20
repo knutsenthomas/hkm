@@ -376,3 +376,9 @@
 #plan-view .wbody.clamp::after{content:"";position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(rgba(255,255,255,0),#fff 70%);pointer-events:none}
 #plan-view .wexpand{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:2;height:40px;padding:0 18px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(21,26,33,.08)}
 #plan-view .wbody:not(.clamp) .wexpand{display:none}
+@media (max-width:600px){
+ #plan-view .wtabs{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:6px;padding:8px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+ #plan-view .wtab{flex:none;white-space:nowrap;justify-content:center;padding:0 14px;height:38px;font-size:14px;scroll-snap-align:start}
+ #plan-view .wtab.all{height:38px;margin-left:0;padding:0 14px;background:none;box-shadow:none}
+ #plan-view .wtab[aria-selected=true]{background:#fff;box-shadow:0 1px 3px rgba(21,26,33,.12)}
+}

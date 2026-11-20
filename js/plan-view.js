@@ -330,9 +330,17 @@
     return p;
   }
   const MAXCH = 3;
+  const PS1 = new Set([3,4,5,6,7,8,9,12,18,19,20,21,22,30,31,34,36,38,39,40,41,42,44,45,46,47,48,49,53,55,56,57,58,59,61,62,63,64,65,67,68,69,70,75,76,77,80,81,83,84,85,88,89,92,102,108,140,142]);
+  const PS2 = new Set([51,52,54,60]);
   async function passage(r) {
     if (!r.book) return null;
-    if (r.vFrom) { const vs = await chapter(r.book, r.ch); return { groups: [{ ch: null, v: vs.filter(v => v[0] >= r.vFrom && v[0] <= r.vTo) }], more: 0, num: r.vTo > r.vFrom }; }
+    if (r.vFrom) {
+      const vs = await chapter(r.book, r.ch);
+      // Norske salmehenvisninger teller overskriften som vers 1; bibelteksten følger engelsk nummerering.
+      const off = (LANG === 'no' && r.book === 19) ? (PS2.has(r.ch) ? 2 : (PS1.has(r.ch) ? 1 : 0)) : 0;
+      const a = Math.max(1, r.vFrom - off), b = Math.max(1, r.vTo - off);
+      return { groups: [{ ch: null, v: vs.filter(v => v[0] >= a && v[0] <= b).map(v => [v[0] + off, v[1]]) }], more: 0, num: r.vTo > r.vFrom };
+    }
     const last = Math.min(r.chTo, r.ch + MAXCH - 1), groups = [];
     for (let c = r.ch; c <= last; c++) groups.push({ ch: r.chTo > r.ch ? c : null, v: await chapter(r.book, c) });
     return { groups, more: r.chTo - last, num: true };
