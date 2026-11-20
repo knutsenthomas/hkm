@@ -314,7 +314,8 @@ export function mountAccounting(section, firebaseService) {
       for (const [title, prefix] of groups) {
         const accounts = accountsByNumber.filter(account => prefix.test(account.number));
         if (!accounts.length) continue;
-        const largest = Math.max(1, ...accounts.map(account => Math.abs(currentAccounts.get(account.number)?.amount ?? 0)));
+        const groupTotal = accounts.reduce((sum, account) => sum + Math.abs(currentAccounts.get(account.number)?.amount ?? 0), 0);
+        const groupName = { Driftsinntekter: 'inntektene', Driftskostnader: 'kostnadene', Finansposter: 'finanspostene' }[title];
         const heading = document.createElement('tr');
         heading.className = 'accounting-group';
         heading.dataset.group = title;
@@ -333,10 +334,17 @@ export function mountAccounting(section, firebaseService) {
           link.className = 'accounting-account-link';
           link.textContent = account.name;
           link.addEventListener('click', () => showAccount(dialog, settings, account, currentAccounts.has(account.number) ? data : previous));
+          const share = groupTotal ? Math.abs(currentAccounts.get(account.number)?.amount ?? 0) / groupTotal * 100 : 0;
           const meter = document.createElement('span');
           meter.className = 'accounting-meter';
-          meter.setAttribute('aria-hidden', 'true');
-          meter.style.setProperty('--share', Math.abs(currentAccounts.get(account.number)?.amount ?? 0) / largest * 100 + '%');
+          meter.title = 'Andel av ' + groupName;
+          const bar = document.createElement('span');
+          bar.className = 'accounting-meter-bar';
+          bar.style.setProperty('--share', share + '%');
+          const percent = document.createElement('span');
+          percent.className = 'accounting-meter-value';
+          percent.textContent = (share > 0 && share < 1 ? '<1' : Math.round(share)) + ' % av ' + groupName;
+          meter.append(bar, percent);
           row.dataset.group = title;
           row.insertCell().append(link, meter);
           row.insertCell().textContent = currency.format(currentAccounts.get(account.number)?.amount ?? 0);
