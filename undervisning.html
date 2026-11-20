@@ -456,11 +456,13 @@
 .faste-promo .fp-h{font-size:clamp(24px,2.6vw,32px);line-height:1.1;font-weight:800;letter-spacing:-.03em;margin:0;color:#151a21}
 .faste-promo .fp-p{font-size:16px;line-height:1.6;color:#596069;margin:12px 0 0}
 .faste-promo .fp-meta{font-size:14px;color:#596069;margin:14px 0 0}
+.faste-promo .fp-cta::after{content:"";width:16px;height:16px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6'/%3E%3C/svg%3E") center/contain no-repeat;transition:transform .2s}
+.faste-promo:hover .fp-cta::after{transform:translateX(3px)}
 .faste-promo .fp-cta{display:inline-flex;align-self:flex-start;align-items:center;gap:8px;margin-top:20px;height:42px;padding:0 18px;border-radius:999px;background:#151a21;color:#fff;font-size:14px;font-weight:600}
 @media (max-width:760px){.faste-promo{grid-template-columns:1fr;margin-bottom:32px}.faste-promo .fp-img{min-height:0;aspect-ratio:16/9}.faste-promo .fp-txt{padding:22px 20px 24px}}
 </style>
 <a class="faste-promo" href="/undervisning/faste">
-  <span class="fp-img"><img src="https://i.ytimg.com/vi/wCo2LN7E6bo/maxresdefault.jpg" alt="" loading="lazy" decoding="async"><span class="fp-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span></span>
+  <span class="fp-img"><img src="https://images.unsplash.com/photo-1457139621581-298d1801c832?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async"></span>
   <span class="fp-txt">
     <span class="fp-eye">Ny undervisning · Bibelstudie</span>
     <span class="fp-h">Faste – å gi Gud mer plass</span>

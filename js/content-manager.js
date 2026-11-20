@@ -4581,12 +4581,18 @@ class ContentManager {
         }
 
         if (query) {
+            const toText = (v) => {
+                if (v == null) return '';
+                if (typeof v === 'string') return v.replace(/<[^>]*>/g, ' ');
+                try { return JSON.stringify(v).replace(/<[^>]*>/g, ' ').replace(/\\[nrt]/g, ' '); } catch (e) { return String(v); }
+            };
             filtered = filtered.filter(post => {
-                const title = (post.title || '').toLowerCase();
-                const content = (post.content || '').toLowerCase();
-                const author = (post.author || '').toLowerCase();
-                const category = (post.category || '').toLowerCase();
-                const excerpt = (this.generateExcerpt(post.content, post.title) || '').toLowerCase();
+                const title = toText(post.title).toLowerCase();
+                const content = toText(post.content).toLowerCase();
+                const author = toText(post.author).toLowerCase();
+                const category = toText(post.category).toLowerCase();
+                let excerpt = '';
+                try { excerpt = toText(this.generateExcerpt(post.content, post.title)).toLowerCase(); } catch (e) { excerpt = ''; }
                 return title.includes(query) || content.includes(query) || author.includes(query) || category.includes(query) || excerpt.includes(query);
             });
         }

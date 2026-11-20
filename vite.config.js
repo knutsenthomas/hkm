@@ -76,6 +76,12 @@ const sharedSiteShellPlugin = {
                 });
             }
 
+            // Felles typografi (ikke forsiden)
+            const isFront = /(?:^|\/)(?:en\/|es\/)?index\.html$/.test((context.path || '').replace(/\\/g, '/'));
+            if (!isFront && !html.includes('/css/typography.css')) {
+                tags.push({ tag: 'link', attrs: { rel: 'stylesheet', href: '/css/typography.css' }, injectTo: 'head' });
+            }
+
             return tags;
         }
     }
