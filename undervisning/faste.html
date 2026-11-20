@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="no">
+
+<head>
+            <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('hkm_theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else {
+                const hour = new Date().getHours();
+                const isNight = hour >= 22 || hour < 6;
+                const systemTheme = isNight || window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', systemTheme);
+            }
+        })();
+    </script>
+    <link rel="canonical" href="https://hiskingdomministry.no/undervisning/faste">
+    <meta name="description" content="Hva er bibelsk faste, hvorfor faster vi, og hvordan kan du komme i gang på en trygg måte? En undervisning med video, spørsmål og sjekkliste.">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faste – å gi Gud mer plass | His Kingdom Ministry</title>
+
+    <!-- Google Fonts: Inter for hele siden -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"></noscript>
+
+    <!-- Font Awesome -->
+    <!-- Font Awesome (Deferred) -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
+    <!-- Material Symbols Outlined -->
+    <!-- Material Symbols Outlined (Deferred) -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block"></noscript>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="preload" href="/css/cookie-consent.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="/css/cookie-consent.css"></noscript>
+    
+    <!-- Firebase Config & Service (Moved to head for early loading) -->
+    <script type="module" src="/js/firebase-config.js"></script>
+    <script type="module" src="/js/firebase-service.js?v=2026.05.10.1"></script>
+    <script type="module" src="/js/content-manager.js?v=2026.05.10.8"></script>
+    <!-- Loader Safety Net -->
+    <script>
+        (function() {
+            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
+                }
+            }, 4000);
+        })();
+    </script>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+        
+    <link rel="preload" href="/css/search-v2.css?v=1.0.3" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="/css/search-v2.css?v=1.0.3"></noscript>
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://hiskingdomministry.no/undervisning/faste">
+    <meta property="og:title" content="Faste – å gi Gud mer plass">
+    <meta property="og:description" content="Hva er bibelsk faste, hvorfor faster vi, og hvordan kan du komme i gang på en trygg måte? En undervisning med video, spørsmål og sjekkliste.">
+    <meta property="og:image" content="https://hiskingdomministry.no/img/og/21-dager-bonn-og-faste-no.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://hiskingdomministry.no/undervisning">
+    <meta property="twitter:title" content="Undervisning | His Kingdom Ministry">
+    <meta property="twitter:description" content="Utforsk bibelsk undervisning, artikler og ressurser fra His Kingdom Ministry.">
+    <meta property="twitter:image" content="https://images.unsplash.com/photo-1491841550275-ad7854e35ca6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80">
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "CollectionPage",
+          "@id": "https://hiskingdomministry.no/undervisning#page",
+          "name": "Undervisning | His Kingdom Ministry",
+          "url": "https://hiskingdomministry.no/undervisning",
+          "description": "Utforsk bibelsk undervisning, artikler og ressurser fra His Kingdom Ministry.",
+          "inLanguage": "no",
+          "publisher": {
+            "@type": "Organization",
+            "name": "His Kingdom Ministry",
+            "url": "https://hiskingdomministry.no"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://hiskingdomministry.no/undervisning#breadcrumb",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Hjem",
+              "item": "https://hiskingdomministry.no/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Undervisning"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+<style>
+#faste-guide{color-scheme:light;--t:#cc712b;--td:#a0531a;--ink:#151a21;--sec:#596069;--line:rgba(21,26,33,.12);--soft:#f7f3ee;--bg:#fff}#faste-guide *,#faste-guide{box-sizing:border-box;min-width:0}#faste-guide{scroll-padding-top:84px;scroll-behavior:smooth}#faste-guide{margin:0;background:var(--bg);color:var(--ink);font:17px/1.7 Inter,system-ui,sans-serif;overflow-x:clip;-webkit-font-smoothing:antialiased}#faste-guide a{color:inherit}#faste-guide button{font:inherit;color:inherit}#faste-guide :focus-visible{outline:2px solid var(--t);outline-offset:3px;border-radius:6px}#faste-guide .bar-removed{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.92);backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}#faste-guide .bar-removed .in{max-width:1120px;margin:0 auto;height:64px;padding:0 max(4vw,16px);display:flex;align-items:center;justify-content:space-between;gap:16px}#faste-guide .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.02em;font-size:16px;text-decoration:none}#faste-guide .brand img{width:32px;height:32px}#faste-guide .bar-removed nav{display:flex;align-items:center;gap:6px}#faste-guide .bar-removed nav span{font-size:14px;font-weight:600;color:var(--sec);padding:0 10px}#faste-guide .pill{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none}#faste-guide .pill:hover{border-color:var(--ink)}#faste-guide .pill.dark{background:var(--ink);color:#fff;border-color:var(--ink)}#faste-guide .pill svg{width:16px;height:16px}#faste-guide #prog{position:absolute;left:0;bottom:-1px;height:2px;width:0;background:var(--t)}#faste-guide .wrap{max-width:1120px;margin:0 auto;padding:0 max(4vw,16px);display:grid;grid-template-columns:minmax(0,680px) 240px;justify-content:space-between;gap:64px}#faste-guide header.head{padding:56px 0 28px}#faste-guide .eyebrow{font-size:14px;font-weight:600;color:var(--td);margin:0 0 10px}#faste-guide h1{margin:0;font-size:clamp(38px,5.4vw,60px);line-height:1.02;font-weight:800;letter-spacing:-.035em;text-wrap:balance}#faste-guide .lead{font-size:19px;line-height:1.6;color:var(--sec);margin:18px 0 0;max-width:600px}#faste-guide .meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin:20px 0 0;padding:0;list-style:none;font-size:14px;color:var(--sec)}#faste-guide .meta li{display:flex;align-items:center;gap:6px}#faste-guide .meta svg{width:16px;height:16px;color:var(--t)}#faste-guide .hero{display:block;position:relative;aspect-ratio:16/9;border-radius:20px;overflow:hidden;background:#151a21;text-decoration:none;color:#fff;isolation:isolate}#faste-guide .hero svg.shape{position:absolute;inset:0;width:100%;height:100%;z-index:-1}#faste-guide .hero .ht{position:absolute;left:28px;bottom:26px;right:120px;font-size:clamp(20px,2.6vw,28px);font-weight:800;line-height:1.15;letter-spacing:-.02em}#faste-guide .hero .ht small{display:block;font-size:13px;font-weight:600;color:#e9b384;margin-bottom:8px;letter-spacing:0}#faste-guide .play{position:absolute;left:50%;top:44%;width:76px;height:76px;margin:-38px 0 0 -38px;border-radius:50%;background:rgba(255,255,255,.96);display:grid;place-items:center;transition:transform .35s cubic-bezier(.2,.7,.2,1);box-shadow:0 10px 30px rgba(0,0,0,.25)}#faste-guide .play svg{width:30px;height:30px;fill:var(--t);margin-left:4px}#faste-guide .hero:hover .play,#faste-guide .vcard:hover .play{transform:scale(1.08)}#faste-guide .dur{position:absolute;right:14px;bottom:14px;font-size:12px;font-weight:700;background:rgba(21,26,33,.75);color:#fff;border-radius:8px;padding:2px 8px}#faste-guide .cap{margin:12px 0 0;font-size:14px;color:var(--sec)}#faste-guide .cap strong{display:block;color:var(--ink);font-size:16px}#faste-guide article{padding:40px 0}#faste-guide article > p,#faste-guide article > ul{margin:0 0 18px}#faste-guide article h2{font-size:clamp(28px,3.4vw,36px);line-height:1.12;letter-spacing:-.03em;margin:64px 0 16px;text-wrap:balance}#faste-guide article h3{font-size:20px;letter-spacing:-.01em;margin:32px 0 8px}#faste-guide article ul{list-style:none;padding:0}#faste-guide article > ul li{position:relative;padding-left:22px;margin-bottom:10px}#faste-guide article > ul li::before{content:"";position:absolute;left:4px;top:.72em;width:6px;height:6px;border-radius:50%;background:var(--t)}#faste-guide article a{color:var(--td);text-decoration-thickness:1px;text-underline-offset:3px}#faste-guide .lbl{display:block;font-size:13px;font-weight:700;color:var(--td);margin-bottom:6px}#faste-guide .small{font-size:14px;color:var(--sec);margin:10px 0 0}#faste-guide .bigidea{background:var(--soft);border-radius:20px;padding:26px 28px;margin:36px 0 0}#faste-guide .bigidea h2{margin:0 0 8px;font-size:24px}#faste-guide .bigidea p{margin:0;font-size:18px;line-height:1.6}#faste-guide .steps{list-style:none;margin:20px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}#faste-guide .steps a{display:flex;flex-direction:column;gap:2px;height:100%;padding:16px 18px;border:1px solid var(--line);border-radius:16px;text-decoration:none;transition:border-color .2s,transform .2s}#faste-guide .steps a:hover{border-color:var(--ink);transform:translateY(-2px)}#faste-guide .steps .n{font-size:28px;font-weight:800;color:var(--t);line-height:1}#faste-guide .steps b{font-size:16px;margin-top:8px}#faste-guide .steps span{font-size:14px;color:var(--sec)}#faste-guide .verse{margin:28px 0;border:1px solid var(--line);border-radius:18px;padding:20px 24px}#faste-guide .verse figcaption{font-size:14px;font-weight:700;margin-bottom:6px}#faste-guide .verse blockquote{margin:0;font-size:19px;line-height:1.55;font-weight:500}#faste-guide .hl{border-left:3px solid var(--t);padding:4px 0 4px 20px;margin:28px 0}#faste-guide .hl p{margin:0;font-size:20px;line-height:1.5;font-weight:600;letter-spacing:-.01em}#faste-guide .term{all:unset;cursor:pointer;font-style:italic;border-bottom:1.5px dotted var(--t);position:relative}#faste-guide .term:focus-visible{outline:2px solid var(--t)}#faste-guide #pop{position:fixed;z-index:50;max-width:300px;background:var(--ink);color:#fff;border-radius:14px;padding:14px 16px;font-size:14px;line-height:1.5;box-shadow:0 16px 40px rgba(21,26,33,.25);opacity:0;transform:translateY(6px);pointer-events:none;transition:opacity .2s,transform .2s}#faste-guide #pop.on{opacity:1;transform:none;pointer-events:auto}#faste-guide #pop b{display:block;font-size:15px;margin-bottom:4px;color:#e9b384}#faste-guide .vgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin:28px 0}#faste-guide .vcard{display:block;text-decoration:none}#faste-guide .vthumb{position:relative;display:block;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,#232a33,#151a21)}#faste-guide .vthumb::before{content:"";position:absolute;right:-30%;top:-40%;width:80%;height:120%;border-radius:45% 55% 60% 40%;background:rgba(204,113,43,.35)}#faste-guide .vthumb .play{width:52px;height:52px;margin:-26px 0 0 -26px;top:50%}#faste-guide .vthumb .play svg{width:22px;height:22px}#faste-guide .vcap{display:block;font-size:13px;color:var(--sec);margin-top:10px}#faste-guide .vcard strong{display:block;font-size:16px;line-height:1.35}#faste-guide .card{border:1px solid var(--line);border-radius:20px;padding:24px;margin:32px 0;background:#fff}#faste-guide .q{font-size:19px;font-weight:700;margin:0 0 14px;line-height:1.4}#faste-guide .opts{display:grid;gap:8px}#faste-guide .opt{display:flex;align-items:center;gap:12px;text-align:left;min-height:52px;padding:10px 14px;border-radius:14px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:16px;transition:border-color .2s,background .2s}#faste-guide .opt .k{flex:0 0 28px;height:28px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-size:13px;font-weight:700;color:var(--sec);transition:background .2s,color .2s}#faste-guide .opt:hover:not(:disabled){border-color:var(--ink)}#faste-guide .opt:disabled{cursor:default}#faste-guide .opt.right{border-color:#2f7d4f;background:#f2f8f4}#faste-guide .opt.right .k{background:#2f7d4f;color:#fff}#faste-guide .opt.wrong{border-color:#c0533e;background:#fcf3f1;animation:shake .35s}#faste-guide .opt.wrong .k{background:#c0533e;color:#fff}@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}#faste-guide .fb{margin:12px 0 0;font-size:15px;font-weight:600;min-height:1.2em}#faste-guide .fb.good{color:#2f7d4f}#faste-guide .fb.bad{color:#c0533e}#faste-guide .write{display:block;margin-top:18px;font-size:15px;color:var(--sec)}#faste-guide textarea{display:block;width:100%;margin-top:8px;font:16px/1.55 Inter,sans-serif;color:var(--ink);background:var(--soft);border:1px solid transparent;border-radius:14px;padding:12px 14px;resize:vertical;transition:border-color .2s,background .2s}#faste-guide textarea:focus{outline:none;border-color:var(--t);background:#fff}#faste-guide fieldset{border:0;padding:0;margin:0 0 16px}#faste-guide legend{font-weight:600;font-size:16px;margin-bottom:8px;padding:0}#faste-guide fieldset label{position:relative;display:inline-block;margin:0 6px 8px 0;cursor:pointer}#faste-guide fieldset input{position:absolute;opacity:0}#faste-guide fieldset label span{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:999px;font-size:15px;transition:all .2s}#faste-guide fieldset input:checked+span{background:var(--ink);color:#fff;border-color:var(--ink)}#faste-guide fieldset input:focus-visible+span{outline:2px solid var(--t);outline-offset:2px}#faste-guide .result{background:var(--soft);border-radius:14px;padding:16px 18px;margin-top:4px}#faste-guide .result p{margin:0}#faste-guide .result strong{color:var(--td)}#faste-guide .checks{margin:0;padding:0;list-style:none}#faste-guide .checks label{display:flex;gap:14px;align-items:center;min-height:48px;cursor:pointer;border-bottom:1px solid var(--line)}#faste-guide .checks li:last-child label{border:0}#faste-guide .checks input{appearance:none;-webkit-appearance:none;margin:0;flex:0 0 24px;height:24px;border:2px solid rgba(21,26,33,.28);border-radius:8px;display:grid;place-items:center;cursor:pointer;transition:background .2s,border-color .2s}#faste-guide .checks input::after{content:"";width:11px;height:6px;border:solid #fff;border-width:0 0 2.5px 2.5px;transform:rotate(-45deg) scale(0);margin-top:-3px;transition:transform .25s cubic-bezier(.2,1.5,.4,1)}#faste-guide .checks input:checked{background:var(--t);border-color:var(--t)}#faste-guide .checks input:checked::after{transform:rotate(-45deg) scale(1)}#faste-guide .checks input:checked+span{color:var(--sec)}#faste-guide .meter{height:6px;border-radius:6px;background:var(--soft);overflow:hidden;margin-top:14px}#faste-guide .meter span{display:block;height:100%;width:0;background:var(--t);transition:width .5s cubic-bezier(.2,.7,.2,1)}#faste-guide .qa details{border-bottom:1px solid var(--line)}#faste-guide .qa summary{cursor:pointer;font-weight:600;font-size:17px;padding:18px 0;list-style:none;display:flex;justify-content:space-between;gap:16px;align-items:center}#faste-guide .qa summary::-webkit-details-marker{display:none}#faste-guide .qa summary::after{content:"";flex:0 0 12px;height:12px;border:solid var(--ink);border-width:0 2px 2px 0;transform:rotate(45deg) translate(-3px,-3px);transition:transform .3s}#faste-guide .qa details[open] summary::after{transform:rotate(-135deg)}#faste-guide .qa details p{margin:0 0 18px;color:var(--sec)}#faste-guide .rq{display:block;margin-bottom:18px;font-weight:600}#faste-guide .rq b{color:var(--t);margin-right:10px}#faste-guide aside.toc{position:relative}#faste-guide aside.toc .stick{position:sticky;top:96px;padding-top:56px}#faste-guide .toc h4{margin:0 0 12px;font-size:14px;font-weight:700}#faste-guide .toc ol{list-style:none;margin:0;padding:0;border-left:1px solid var(--line)}#faste-guide .toc a{display:flex;gap:8px;align-items:flex-start;padding:6px 0 6px 14px;margin-left:-1px;border-left:2px solid transparent;font-size:14px;line-height:1.4;color:var(--sec);text-decoration:none;transition:color .2s,border-color .2s}#faste-guide .toc a:hover{color:var(--ink)}#faste-guide .toc a.on{color:var(--ink);font-weight:700;border-left-color:var(--t)}#faste-guide .tick{flex:0 0 14px;height:14px;margin-top:3px;border-radius:50%;border:1.5px solid rgba(21,26,33,.25);transition:all .3s}#faste-guide .toc a.read .tick{background:var(--t);border-color:var(--t);box-shadow:inset 0 0 0 2.5px #fff}#faste-guide .tocprog{margin-top:16px;font-size:13px;color:var(--sec)}#faste-guide .tocprog .meter{margin-top:6px}#faste-guide .tocbtn{display:none}#faste-guide .finish{grid-column:1/-1;margin:24px 0 0;padding:56px 0 64px;border-top:1px solid var(--line)}#faste-guide .finish .in{max-width:680px}#faste-guide .finish h2{font-size:clamp(28px,3.4vw,36px);letter-spacing:-.03em;margin:0 0 8px;line-height:1.12}#faste-guide .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:24px 0}#faste-guide .stat{background:var(--soft);border-radius:16px;padding:18px}#faste-guide .stat b{display:block;font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.1}#faste-guide .stat span{font-size:14px;color:var(--sec)}#faste-guide .ctas{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}#faste-guide .ctas .pill{height:46px;padding:0 20px;font-size:15px}#faste-guide .ctas .pill.accent{background:var(--t);border-color:var(--t);color:#fff}#faste-guide .endverse{font-size:20px;font-weight:600;line-height:1.5;margin:32px 0 0}#faste-guide .endverse small{display:block;font-size:14px;color:var(--sec);font-weight:600;margin-top:6px}#faste-guide footer{border-top:1px solid var(--line);padding:28px max(4vw,16px)}#faste-guide footer .in{max-width:1120px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font-size:14px;color:var(--sec)}#faste-guide .note{font-size:13px;color:var(--sec)}#faste-guide #toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--ink);color:#fff;font-size:14px;font-weight:600;padding:10px 16px;border-radius:999px;opacity:0;transition:all .3s;z-index:60;pointer-events:none}#faste-guide #toast.on{opacity:1;transform:translate(-50%,0)}#faste-guide article > [data-rv],#faste-guide .rv{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}#faste-guide article > [data-rv].in,#faste-guide .rv.in{opacity:1;transform:none}@media (max-width:960px){#faste-guide .wrap{grid-template-columns:minmax(0,1fr);gap:0}#faste-guide aside.toc{position:fixed;inset:auto 0 0 0;z-index:40;pointer-events:none}#faste-guide aside.toc .stick{position:static;padding:0}#faste-guide .tocpanel{pointer-events:auto;background:#fff;border-radius:22px 22px 0 0;box-shadow:0 -10px 40px rgba(21,26,33,.18);padding:22px 22px 28px;max-height:70vh;overflow:auto;transform:translateY(105%);transition:transform .35s cubic-bezier(.2,.7,.2,1)}#faste-guide aside.toc.open .tocpanel{transform:none}#faste-guide .tocbtn{pointer-events:auto;display:inline-flex;position:fixed;right:16px;bottom:16px;z-index:41;box-shadow:0 8px 24px rgba(21,26,33,.2)}#faste-guide aside.toc.open .tocbtn{display:none}
+}@media (max-width:600px){#faste-guide .stats{grid-template-columns:1fr}#faste-guide .steps{grid-template-columns:1fr;gap:8px}#faste-guide .steps a{flex-direction:row;align-items:center;gap:14px;padding:12px 16px}#faste-guide .steps .n{font-size:22px}#faste-guide .steps b{margin:0;min-width:44px}#faste-guide .hero{aspect-ratio:4/3}#faste-guide .hero .ht{right:20px;left:20px;bottom:18px;font-size:22px}#faste-guide .play{top:38%;width:60px;height:60px;margin:-30px 0 0 -30px}#faste-guide .play svg{width:24px;height:24px}#faste-guide .bar-removed nav span{display:none}#faste-guide header.head{padding-top:36px}}@media (prefers-reduced-motion:reduce){#faste-guide{scroll-behavior:auto}#faste-guide *,#faste-guide,#faste-guide *::before,#faste-guide *::after{transition:none!important;animation:none!important}#faste-guide article > [data-rv],#faste-guide .rv{opacity:1;transform:none}}
+
+#faste-guide{background:#fff;padding-top:var(--fg-head,100px)}
+#faste-guide h2[id]{scroll-margin-top:calc(var(--fg-head,100px) + 24px)}
+#faste-guide aside.toc .stick{top:calc(var(--fg-head,100px) + 16px)!important}
+#faste-guide #prog{display:none}
+#faste-guide .yt{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:5}
+#faste-guide #pop,#faste-guide #toast{font-family:Inter,system-ui,sans-serif}
+
+</style>
+</head>
+
+<body class="header-always-scrolled">
+
+    <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
+        <div class="header-content" id="header-container">
+            <!-- Logo -->
+            <a href="/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+                <div
+                    class="w-[45px] h-[45px] flex items-center justify-center rounded-lg overflow-hidden shrink-0 logo-icon">
+                    <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover"
+                        data-content-doc="settings_global" data-content-key="brand.logoAlt" data-content-attr="alt">
+                </div>
+                <span class="text-xl" data-content-doc="settings_global" data-content-key="brand.name">His Kingdom
+                    Ministry</span>
+            </a>
+
+            <!-- Right Actions: Donate + Language + Hamburger -->
+            <div class="header-actions">
+                <!-- Utilities Dock (Search, Bible, Reading Plans, Language Selector) -->
+                <div class="header-actions-dock">
+                    <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Søk i nettsiden">
+                        <span class="material-symbols-outlined text-xl" style="position: relative; top: 0px; left: 9px;">search</span>
+                    </button>
+                    
+                    <div class="header-actions-expandable">
+                        <a href="/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-bible-btn" aria-label="Les Bibelen" title="Les Bibelen">
+                            <span class="material-symbols-outlined text-xl">menu_book</span>
+                        </a>
+                        <a href="/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-reading-plans-btn" aria-label="Leseplaner" title="Leseplaner">
+                            <span class="material-symbols-outlined text-xl">calendar_today</span>
+                        </a>
+                        
+                        <div class="hidden md:block w-px h-5 bg-white/20 mx-1 dock-divider"></div>
+
+                        <!-- Language Switcher in same styling -->
+                        <div class="lang-switcher relative group">
+                            <button class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full text-white hover:bg-white/15 transition-all lang-btn" aria-label="Velg språk">
+                                <span class="material-symbols-outlined text-lg">language</span>
+                                <span data-content-doc="settings_global" data-content-key="header.currentLanguage">NO</span>
+                            </button>
+                            <div class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden border border-gray-100">
+                                <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                                    data-lang="no" data-content-doc="settings_global" data-content-key="header.languages.no">🇳🇴
+                                    Norsk</a>
+                                <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                                    data-lang="en" data-content-doc="settings_global" data-content-key="header.languages.en">🇺🇸
+                                    English</a>
+                                <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                                    data-lang="es" data-content-doc="settings_global" data-content-key="header.languages.es">🇪🇸
+                                    Español</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Button -->
+                <a href="/minside/index.html" id="header-profile-link" class="w-11 h-11 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all relative overflow-hidden hidden" aria-label="Min Side" title="Min Side">
+                    <span class="material-symbols-outlined text-xl">account_circle</span>
+                    <img id="header-profile-img" src="" alt="Profilbilde" class="absolute inset-0 w-full h-full object-cover hidden rounded-full">
+                </a>
+
+                <!-- Primary CTA: Donate (Pill Style, gradient) -->
+                <a href="/donasjoner"
+                    class="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-[1.03] active:scale-[0.98] transition-all shadow-md shadow-orange-500/10 header-donate-btn">
+                    <span data-content-doc="settings_global" data-content-key="header.donateLabel">Gi gave</span>
+                    <span class="material-symbols-outlined text-lg">favorite</span>
+                </a>
+
+                <!-- Unified Toggle Button (Neutral circular button matching utilities) -->
+                <button
+                    class="menu-toggle w-11 h-11 rounded-full flex items-center justify-center text-white bg-white/15 border border-white/10 hover:bg-white/25 active:scale-95 transition-all relative focus:outline-none focus:ring-0"
+                    id="menu-toggle" aria-label="Toggle meny" aria-controls="mega-menu" aria-expanded="false"
+                    data-content-doc="settings_global" data-content-key="header.menuToggleLabel"
+                    data-content-attr="aria-label">
+                    <span class="material-symbols-outlined text-2xl open-icon">menu</span>
+                    <span class="material-symbols-outlined text-2xl close-icon hidden">close</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Full-screen Mega Menu Overlay -->
+    <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
+        id="mega-menu" style="display: none;" aria-hidden="true">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+            <!-- Menu Top Controls (Search & Mobile Lang) -->
+            <div class="flex flex-col gap-6">
+                <div class="relative w-full md:hidden">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="Søk..." data-content-doc="settings_global"
+                        data-content-key="menu.searchPlaceholder"
+                        class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
+                </div>
+
+                <!-- Language Selector & Theme Toggle (Pill Style) -->
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex md:hidden items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
+                        <i class="fas fa-globe text-gray-400"></i>
+                        <div class="flex gap-4 items-center">
+                            <a href="/" class="text-sm font-bold text-primary-orange lang-switch-btn" data-lang="no"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="/en/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="en"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="/es/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="es"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
+                        </div>
+                    </div>
+
+                    <div class="ml-auto flex items-center gap-3">
+                        <!-- Mobile Menu Profile Link -->
+                        <a href="/minside/index.html" id="mobile-menu-profile-link" class="w-12 h-12 flex items-center justify-center rounded-full border border-gray-200 bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-all relative overflow-hidden hidden" aria-label="My Page" title="My Page">
+                            <span class="material-symbols-outlined text-2xl">account_circle</span>
+                            <img id="mobile-menu-profile-img" src="" alt="Profilbilde" class="absolute inset-0 w-full h-full object-cover hidden rounded-full">
+                        </a>
+                        <button class="mobile-theme-toggle-btn flex items-center justify-center h-12 w-12 border border-gray-200 rounded-full bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-colors" aria-label="Bytt tema" title="Bytt tema">
+                            <span class="material-symbols-outlined text-2xl theme-toggle-icon">dark_mode</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mega-menu-body">
+                <!-- Menu Content Grid -->
+                <div class="mega-menu-grid">
+                    <!-- Column 1: Engasjer deg -->
+                    <div class="menu-col">
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.engage.title">Engasjer deg</div>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">volunteer_activism</span>
+                                <div class="flex flex-col">
+                                    <a href="/donasjoner" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.supportWork">Støtt arbeidet</a>
+                                    <span class="mega-menu-desc">Bidra økonomisk til vår tjeneste.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">favorite</span>
+                                <div class="flex flex-col">
+                                    <a href="/bli-fast-giver" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.regularDonor">Bli fast giver</a>
+                                    <span class="mega-menu-desc">Støtt oss månedlig for langsiktig arbeid.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">church</span>
+                                <div class="flex flex-col">
+                                    <a href="/for-menigheter" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.churches">For menigheter</a>
+                                    <span class="mega-menu-desc">Ressurser og undervisning for din kirke.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">corporate_fare</span>
+                                <div class="flex flex-col">
+                                    <a href="/for-bedrifter" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.businesses">For bedrifter</a>
+                                    <span class="mega-menu-desc">Samarbeidsavtaler for næringslivet.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">business_center</span>
+                                <div class="flex flex-col">
+                                    <a href="/bnn" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.network">Business Network</a>
+                                    <span class="mega-menu-desc">Nettverk for kristne ledere og gründere.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 2: Bli kjent med oss -->
+                    <div class="menu-col">
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.about.title">Bli kjent med oss</div>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">info</span>
+                                <div class="flex flex-col">
+                                    <a href="/om-oss" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.about">Om oss</a>
+                                    <span class="mega-menu-desc">Lær mer om vår visjon, tro og verdier.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">mail</span>
+                                <div class="flex flex-col">
+                                    <a href="/kontakt" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.contact">Kontakt oss</a>
+                                    <span class="mega-menu-desc">Send oss en melding eller still spørsmål.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 3: Ressurser -->
+                    <div class="menu-col">
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.resources.title">Ressurser</div>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">menu_book</span>
+                                <div class="flex flex-col">
+                                    <a href="/bibel" data-content-doc="settings_global" data-content-key="menu.sections.resources.bible">Les Bibelen</a>
+                                    <span class="mega-menu-desc">Les Guds ord med vår bibelleser.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">shopping_bag</span>
+                                <div class="flex flex-col">
+                                    <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.store">Butikk</a>
+                                    <span class="mega-menu-desc">Kristne klær, kopper og tilbehør.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">podcasts</span>
+                                <div class="flex flex-col">
+                                    <a href="/media" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.media">Media & Podcast</a>
+                                    <span class="mega-menu-desc">Se taler og lytt til våre podcaster.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">school</span>
+                                <div class="flex flex-col">
+                                    <a href="/kurs" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Kurs</a>
+                                    <span class="mega-menu-desc">Undervisning og kurs for vekst.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 4: Aktuell aktivitet -->
+                    <div class="menu-col">
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.activity.title">Aktuell aktivitet</div>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">calendar_month</span>
+                                <div class="flex flex-col">
+                                    <a href="/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Leseplaner</a>
+                                    <span class="mega-menu-desc">Følg våre daglige leseplaner.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">event</span>
+                                <div class="flex flex-col">
+                                    <a href="/arrangementer" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.events">Arrangementer</a>
+                                    <span class="mega-menu-desc">Bli med på seminarer og samlinger.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">feed</span>
+                                <div class="flex flex-col">
+                                    <a href="/blogg" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.blog">Nyheter & Blogg</a>
+                                    <span class="mega-menu-desc">Siste oppdateringer og artikler.</span>
+                                </div>
+                            </li>
+                            <li class="min-side-pill">
+                                <span class="material-symbols-outlined">person</span>
+                                <div class="flex flex-col">
+                                    <a href="/minside/index.html" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.myPage">Min Side</a>
+                                    <span class="mega-menu-desc">Din profil og leseplaner.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Menu Footer -->
+                <div class="mega-menu-footer">
+                    <a href="/donasjoner" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Støtt nå</span><i
+                            class="fas fa-heart heart"></i></a>
+                    <div class="menu-footer-links">
+                        <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Butikk</a>
+                        <a href="/donasjoner" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Skattefradrag</a>
+                        <a href="/om-oss" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">Om oss</a>
+                        <a href="/personvern" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Personvern</a>
+                        <a href="/betingelser" data-content-doc="settings_global" data-content-key="menu.footer.terms">Betingelser</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<main id="faste-guide">
+<div class="wrap" id="top">
+<div>
+<header class="head">
+<p class="eyebrow">Bibelstudie · Faste</p>
+<h1>Faste – å gi Gud mer plass</h1>
+<p class="lead">Hva er bibelsk faste, hvorfor faster vi, og hvordan kan du komme i gang på en trygg måte? En undervisning til deg som vil bli med på 21 dager med bønn og faste.</p>
+<ul class="meta">
+<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Ca. 12 min lesing</li>
+<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9l5 3-5 3z" fill="currentColor"/></svg>4 videoer</li>
+<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>5 spørsmål</li>
+</ul>
+</header>
+
+<a class="hero rv" id="se" href="https://www.youtube.com/watch?v=wCo2LN7E6bo" target="_blank" rel="noopener" aria-label="Se videoen Ikke gi, be eller faste for å bli sett på YouTube">
+<svg class="shape" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path d="M520 -60C700 -50 840 70 810 230 782 380 640 420 540 350 440 280 470 170 400 110 330 50 380 -70 520 -60Z" fill="#cc712b" fill-opacity=".9"/><path d="M-80 330C40 300 160 360 170 440 175 500 60 520-40 500Z" fill="#cc712b" fill-opacity=".25"/></svg>
+<span class="play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span>
+<span class="ht"><small>Bergprekenen · Matteus 6,1–18</small>Ikke gi, be eller faste for å bli sett</span>
+<span class="dur">6:43</span>
+</a>
+<p class="cap"><strong>Start her: Hva mener Jesus med å faste i det skjulte?</strong>Video fra BibleProject, på engelsk.</p>
+
+<section class="bigidea rv"><h2>Hovedtanken</h2><p>Faste er å legge noe til side for å gi Gud mer plass. Det er ikke en prestasjon eller et krav, men en invitasjon til å søke ham – i det skjulte, med et hjerte som vender seg til Gud og til nesten.</p></section>
+
+<ol class="steps">
+<li class="rv"><a href="#hva-er-faste"><span class="n">1</span><b>Les</b><span>13 korte deler · ca. 12 min</span></a></li>
+<li class="rv"><a href="#se"><span class="n">2</span><b>Se</b><span>4 videoer fra BibleProject</span></a></li>
+<li class="rv"><a href="#sporsmal-til-ettertanke"><span class="n">3</span><b>Tenk</b><span>Svar på spørsmål og skriv</span></a></li>
+</ol>
+
+<article>
+<p data-rv>Faste er en av de eldste og enkleste måtene å søke Gud på. Likevel er det mange som aldri har prøvd det, eller som har prøvd og gitt opp fordi det føltes som et krav de ikke klarte å leve opp til. Denne undervisningen er skrevet for deg som vil forstå hva faste er, hvorfor det er verdt det, og hvordan du kan komme i gang. Den passer også som en forberedelse til <a href="https://hiskingdomministry.no/leseplan-detaljer?id=21-dager-bonn-og-faste">21 dager med bønn og faste</a>.</p>
+<h2 data-rv id="hva-er-faste">Hva er faste?</h2>
+<p data-rv>I Bibelen betyr faste å la være å spise i en periode for å søke Gud. Det hebraiske ordet <button type="button" class="term" data-t="צוֹם · tsom" data-d="Hebraisk ord for faste. Brukes om å avstå fra mat for å søke Gud, ofte i sorg, nød eller omvendelse.">tsom</button> og det greske <button type="button" class="term" data-t="νηστεία · nesteia" data-d="Gresk ord for faste i Det nye testamente. Bokstavelig: å være uten mat.">nesteia</button> handler begge om å avstå fra mat. Men poenget har aldri vært selve matpausen. Poenget er å vende hele seg mot Gud.</p>
+<p data-rv>Når vi faster, sier vi med kroppen det hjertet vårt ber om: «Gud, jeg trenger deg mer enn jeg trenger det jeg vanligvis lener meg på.» Faste er derfor ikke en slankekur, en sultestreik for å presse Gud eller en prestasjon som gjør oss mer verdifulle. Det er en måte å rydde plass på, så vi blir mer oppmerksomme på ham.</p>
+<p data-rv><strong>Faste er ikke det samme som periodisk faste.</strong> I dag snakker mange om faste som en helse- eller vekttrend, for eksempel 16:8 eller 5:2. Det kan se likt ut utenfra, men målet er et helt annet. Periodisk faste handler om kroppen. Kristen faste handler om Gud. Hvis vi ikke bruker fasten til bønn og til å søke ham, er det bare en matpause. Det er ikke galt å merke at kroppen har godt av en pause, men det er ikke derfor vi faster.</p>
+<p data-rv>Mange faster i dag også fra andre ting enn mat: sosiale medier, TV, strømmetjenester, shopping eller andre vaner som fyller tiden og tankene. Det er ikke det samme som bibelsk faste fra mat, men prinsippet er likt. Vi legger noe til side for å gi Gud mer plass.</p>
+<aside class="hl rv"><span class="lbl">Hovedpoeng</span><p data-rv>Faste er ikke en prestasjon, men en måte å si med kroppen: «Gud, jeg trenger deg mer enn noe annet.»</p></aside><div class="card quiz rv" data-ok="1"><span class="lbl">Sjekk deg selv</span><p data-rv class="q">Hva er målet med kristen faste?</p><div class="opts"><button type="button" class="opt" data-i="0"><span class="k">A</span><span>Å gå ned i vekt</span></button><button type="button" class="opt" data-i="1"><span class="k">B</span><span>Å vende seg mot Gud og gi ham mer plass</span></button><button type="button" class="opt" data-i="2"><span class="k">C</span><span>Å vise andre hvor åndelig man er</span></button></div><p data-rv class="fb" aria-live="polite" data-ok-text="Riktig. Matpausen er ikke poenget – poenget er å søke Gud."></p><label class="write"><span>Hvordan vil du at fasten skal hjelpe deg å komme nærmere Gud?</span><textarea data-k="w-hva-er-faste" rows="2" placeholder="Skriv din tanke …"></textarea></label></div><h2 data-rv id="faste-gjennom-hele-bibelen">Faste gjennom hele Bibelen</h2>
+<p data-rv>Faste går som en rød tråd gjennom Skriften.</p>
+<p data-rv><strong>Moses</strong> fastet i førti dager på fjellet da han mottok loven (2 Mos 34,28). <strong>David</strong> fastet og ba da sønnen hans var syk (2 Sam 12,16). <strong>Esras</strong> folk fastet og ba om beskyttelse før den farlige reisen hjem til Jerusalem (Esra 8,21–23). <strong>Ester</strong> ba hele det jødiske folket faste i tre dager før hun gikk inn til kongen med livet som innsats (Est 4,16). <strong>Daniel</strong> fastet og ba for folket sitt, og senere holdt han en delvis faste i tre uker der han ikke spiste god mat, kjøtt eller vin (Dan 9,3; Dan 10,2–3). Hele byen <strong>Ninive</strong> fastet og omvendte seg da Jona forkynte dom, og Gud viste nåde (Jona 3,5–10).</p>
+<p data-rv>I Det nye testamente fastet <strong>Jesus</strong> i førti dager i ørkenen før han begynte sin offentlige tjeneste (Matt 4,1–2). Profetinnen <strong>Anna</strong> tjente Gud i templet «med faste og bønn natt og dag» (Luk 2,37). Den første menigheten fastet når de søkte Guds ledelse. Det var mens de fastet og ba, at Den hellige ånd sendte ut Barnabas og Saulus (Apg 13,2–3), og de fastet og ba når de innsatte eldste i menighetene (Apg 14,23).</p>
+<p data-rv>Mønsteret er tydelig: Guds folk fastet i avgjørende øyeblikk, når de trengte ledelse, når de var i nød, når de ville vende om, og når de ville gi seg selv helt til Gud.</p>
+<div class="vgrid"><a class="vcard rv" href="https://www.youtube.com/watch?v=JydNSlufRIs" target="_blank" rel="noopener">
+<span class="vthumb"><span class="play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span><span class="dur">9:13</span></span>
+<span class="vcap">BibleProject · Gamle testamente</span><strong>Ester – oversikt over boken</strong></a><a class="vcard rv" href="https://www.youtube.com/watch?v=dLIabZc0O4c" target="_blank" rel="noopener">
+<span class="vthumb"><span class="play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span><span class="dur">9:01</span></span>
+<span class="vcap">BibleProject · Gamle testamente</span><strong>Jona – oversikt over boken</strong></a></div><h2 data-rv id="faste-i-kirkens-historie">Faste i kirkens historie</h2>
+<p data-rv>Fasten stoppet ikke da Det nye testamente var skrevet ferdig. I <button type="button" class="term" data-t="Didakhe" data-d="«Lærdommen». Et kort kristent skrift fra rundt år 100 med råd om dåp, nattverd, bønn og faste.">Didakhe</button>, en av de eldste kristne skriftene vi har utenom Bibelen, får de troende beskjed om å faste på onsdager og fredager. Fasten var altså en fast del av hverdagen for de første kristne, ikke noe som bare var for de spesielt åndelige.</p>
+<p data-rv>Gjennom kirkehistorien har faste fulgt Guds folk: i fastetiden før påske, i vekkelser og i bønnebevegelser. John Wesley, som Metodistkirken vokste fram fra, fastet selv regelmessig på onsdager og fredager og oppmuntret andre til det samme. Mange vekkelser har startet med at noen få mennesker begynte å faste og be.</p>
+<p data-rv>Når vi faster i dag, gjør vi altså ikke noe nytt eller ekstremt. Vi går inn i en vane som kristne over hele verden har hatt i to tusen år.</p>
+<h2 data-rv id="jesus-forventet-at-vi-skulle-faste">Jesus forventet at vi skulle faste</h2>
+<p data-rv>I Bergprekenen sier Jesus: «<em>Når</em> dere faster …» (Matt 6,16), ikke «<em>hvis</em> dere faster». Han tar det for gitt at disiplene hans kommer til å faste, på samme måte som han tar det for gitt at de kommer til å gi og be (Matt 6,2–6).</p><figure class="verse"><figcaption>Matteus 6,17–18</figcaption><blockquote>«Men når du faster, så salv hodet og vask ansiktet … og din Far, som ser i det skjulte, skal lønne deg.»</blockquote></figure>
+<p data-rv>Da noen spurte hvorfor disiplene hans ikke fastet, svarte Jesus at brudgommens venner ikke faster mens brudgommen er hos dem. «Men det skal komme dager da brudgommen blir tatt fra dem, og da skal de faste» (Matt 9,15). Vi lever i de dagene nå. Jesus har gått til Faderen, og vi lengter etter at han skal komme igjen. Faste er en del av denne lengselen.</p>
+<p data-rv>Samtidig advarer Jesus mot å faste for å bli sett. Fariseerne gjorde fasten til et show og fikk sin lønn i form av menneskers beundring. Jesus sier at vi heller skal salve hodet og vaske ansiktet, så ingen merker at vi faster, «og din Far, som ser i det skjulte, skal lønne deg» (Matt 6,17–18). Faste er først og fremst noe mellom deg og Gud.</p>
+<div class="card quiz rv" data-ok="1"><span class="lbl">Sjekk deg selv</span><p data-rv class="q">Hva sier Jesus i Matt 6,16?</p><div class="opts"><button type="button" class="opt" data-i="0"><span class="k">A</span><span>«Hvis dere faster …»</span></button><button type="button" class="opt" data-i="1"><span class="k">B</span><span>«Når dere faster …»</span></button><button type="button" class="opt" data-i="2"><span class="k">C</span><span>«Dere trenger ikke å faste»</span></button></div><p data-rv class="fb" aria-live="polite" data-ok-text="Riktig. Jesus tar det for gitt at disiplene hans kommer til å faste."></p><label class="write"><span>Hva betyr det for deg at fasten skal være «i det skjulte»?</span><textarea data-k="w-jesus-forventet-at-vi-skulle-faste" rows="2" placeholder="Skriv din tanke …"></textarea></label></div><h2 data-rv id="hvorfor-faster-vi">Hvorfor faster vi?</h2>
+<p data-rv>Det finnes mange gode grunner til å faste. Her er noen av de viktigste.</p><div class="vgrid"><a class="vcard rv" href="https://www.youtube.com/watch?v=3Dv4-n6OYGI" target="_blank" rel="noopener">
+<span class="vthumb"><span class="play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span><span class="dur">8:15</span></span>
+<span class="vcap">BibleProject · Det nye testamente</span><strong>Matteus 1–13 – oversikt</strong></a></div>
+<h3 data-rv>For å komme nærmere Gud</h3>
+<p data-rv>Den viktigste grunnen er Gud selv. «Søk først Guds rike og hans rettferdighet» (Matt 6,33). Når magen knurrer, blir den en påminnelse om å vende seg til Gud. Mange opplever at fasten skjerper den åndelige sansen, gjør det lettere å høre Guds stemme og gir en dypere sult etter Ordet. Jesus sa selv: «Mennesket skal ikke leve av brød alene, men av hvert ord som kommer fra Guds munn» (Matt 4,4).</p>
+<h3 data-rv>For ydmykhet og omvendelse</h3>
+<p data-rv>I Bibelen henger faste ofte sammen med å ydmyke seg for Gud og vende om fra synd. «Vend om til meg av hele ditt hjerte, med faste, gråt og klage» (Joel 2,12). Faste avslører hva som egentlig styrer oss. Det vi tyr til for trøst, kommer fram i lyset når vi legger det bort. Det kan være smertefullt, men det er en nådefull smerte. Gud viser oss ikke dette for å skamme oss ut, men for å sette oss fri.</p>
+<h3 data-rv>For ledelse og klarhet</h3>
+<p data-rv>Den første menigheten fastet når de trengte å vite Guds vilje (Apg 13,2–3; 14,23). Står du foran et viktig valg, eller kjenner du at du trenger retning for et nytt år, er faste en god måte å søke Gud på. Det handler ikke om å tvinge fram et svar, men om å stille seg åpen og lyttende.</p>
+<h3 data-rv>For gjennombrudd og frihet</h3>
+<p data-rv>Jesaja 58 beskriver den fasten Gud gleder seg over: «å løse urettferdige lenker, sprenge åkets bånd, sette undertrykte fri» (Jes 58,6). I noen manuskripter av Markus 9,29 sier Jesus at visse ting bare drives ut «ved bønn og faste». Faste gir ikke oss makt over Gud, men det gjør oss mer avhengige av hans kraft. Mange har opplevd at bindinger brytes, sår leges og bønner blir besvart i tider med faste.</p>
+<h3 data-rv>For andre</h3>
+<p data-rv>Faste er ikke bare for vår egen del. Ester fastet for hele folket sitt. Daniel fastet for nasjonen. Mange faster og ber for familie, menighet, by og land. Jesaja 58 knytter også fasten til omsorg for andre: å dele brødet med den som sulter og ta imot den som ikke har noe hjem (Jes 58,7). Den pengen og tiden vi sparer på å faste, kan gjerne gis videre.</p>
+<h2 data-rv id="den-fasten-gud-gleder-seg-over">Den fasten Gud gleder seg over</h2>
+<p data-rv>Jesaja 58 er et av de viktigste kapitlene om faste i Bibelen. Folket klaget: «Hvorfor faster vi når du ikke ser det?» Gud svarte at de fastet, men samtidig utnyttet arbeiderne sine, kranglet og levde som før. Fasten deres var et ritual uten hjerte.</p><figure class="verse"><figcaption>Jesaja 58,8</figcaption><blockquote>«Da skal lyset ditt bryte fram som morgenrøden, og legedom for deg skal spire fram i hast.»</blockquote></figure>
+<p data-rv>Dette er en viktig påminnelse. Faste er ikke en religiøs prestasjon som gjør oss bedre enn andre. Det som teller, er et hjerte som vender seg til Gud og til nesten. Gud lover at når fasten springer ut av et slikt hjerte, «da skal lyset ditt bryte fram som morgenrøden, og legedom for deg skal spire fram i hast» (Jes 58,8).</p>
+<div class="card quiz rv" data-ok="1"><span class="lbl">Sjekk deg selv</span><p data-rv class="q">Hva kritiserer Gud i Jesaja 58?</p><div class="opts"><button type="button" class="opt" data-i="0"><span class="k">A</span><span>At folket fastet for sjelden</span></button><button type="button" class="opt" data-i="1"><span class="k">B</span><span>At de fastet, men behandlet andre urettferdig</span></button><button type="button" class="opt" data-i="2"><span class="k">C</span><span>At de spiste feil mat</span></button></div><p data-rv class="fb" aria-live="polite" data-ok-text="Riktig. Fasten deres var et ritual uten hjerte for Gud og nesten."></p><label class="write"><span>Er det noen du kan vise omsorg for i fastetiden?</span><textarea data-k="w-den-fasten-gud-gleder-seg-over" rows="2" placeholder="Skriv din tanke …"></textarea></label></div><h2 data-rv id="ulike-typer-faste">Ulike typer faste</h2>
+<p data-rv>Det finnes ikke én riktig måte å faste på. Her er noen vanlige former:</p>
+<ul data-rv>
+<li><strong>Full faste:</strong> Du spiser ikke mat, men drikker vann. Jesus fastet slik i ørkenen. Lengre perioder med full faste bør bare gjøres med god kunnskap og gjerne i samråd med lege.</li>
+<li><strong>Delvis faste (Daniel-faste):</strong> Du spiser enkel mat og avstår fra noe, for eksempel kjøtt, søtsaker, kaffe eller ferdigmat, slik Daniel gjorde i tre uker (Dan 10,3). Dette er en god form for mange som faster i 21 dager.</li>
+<li><strong>Måltidsfaste:</strong> Du hopper over ett eller flere måltider om dagen og bruker tiden på bønn og bibellesing.</li>
+<li><strong>Faste fra annet enn mat:</strong> Du legger bort sosiale medier, skjermtid eller andre vaner. Dette kan være et godt alternativ hvis du av helsemessige grunner ikke kan faste fra mat.</li>
+</ul>
+<p data-rv>Det viktigste er ikke hvor mye du avstår fra, men at du bruker fasten til å søke Gud.</p>
+<div class="card quiz rv" data-ok="2"><span class="lbl">Sjekk deg selv</span><p data-rv class="q">Hva kalles det når du spiser enkel mat og kutter for eksempel kjøtt og søtsaker?</p><div class="opts"><button type="button" class="opt" data-i="0"><span class="k">A</span><span>Full faste</span></button><button type="button" class="opt" data-i="1"><span class="k">B</span><span>Måltidsfaste</span></button><button type="button" class="opt" data-i="2"><span class="k">C</span><span>Delvis faste (Daniel-faste)</span></button></div><p data-rv class="fb" aria-live="polite" data-ok-text="Riktig. Daniel holdt en slik faste i tre uker (Dan 10,3)."></p></div><div class="card tool rv" id="velger">
+<span class="lbl">Verktøy</span><p data-rv class="q">Hvilken faste passer for deg?</p>
+<fieldset><legend>Har du en sykdom, tar faste medisiner, er gravid eller ammer?</legend>
+<label><input type="radio" name="helse" value="ja"><span>Ja</span></label><label><input type="radio" name="helse" value="nei"><span>Nei</span></label></fieldset>
+<fieldset><legend>Har du fastet fra mat før?</legend>
+<label><input type="radio" name="erf" value="nei"><span>Aldri</span></label><label><input type="radio" name="erf" value="litt"><span>Et par ganger</span></label><label><input type="radio" name="erf" value="ja"><span>Flere ganger</span></label></fieldset>
+<fieldset><legend>Hvor lenge vil du faste?</legend>
+<label><input type="radio" name="lengde" value="dag"><span>Én dag</span></label><label><input type="radio" name="lengde" value="uke"><span>Noen dager</span></label><label><input type="radio" name="lengde" value="21"><span>21 dager</span></label></fieldset>
+<div class="result" id="resultat" aria-live="polite"><span class="lbl">Forslag</span><p data-rv>Svar på de tre spørsmålene.</p></div></div><h2 data-rv id="faste-med-omtanke-for-kroppen">Faste med omtanke for kroppen</h2>
+<p data-rv>Kroppen vår er et tempel for Den hellige ånd (1 Kor 6,19), og Gud vil at vi skal ta vare på den. Faste skal ikke skade deg.</p>
+<ul data-rv>
+<li>Snakk med legen før du faster fra mat hvis du har diabetes, hjerte- eller nyresykdom, tar faste medisiner, er gravid eller ammer, eller har hatt et vanskelig forhold til mat. Velg heller en annen form for faste.</li>
+<li>Er du eldre og har en kronisk sykdom, er undervektig, eller har tungt fysisk arbeid, bør du også være forsiktig. En delvis faste eller faste fra skjerm kan være et bedre valg.</li>
+<li>Bruker du medisiner, ikke slutt med dem eller endre dosen på egen hånd. Noen medisiner, for eksempel mot diabetes, må kanskje justeres når du spiser mindre, og det skal legen hjelpe deg med.</li>
+<li>Barn og ungdom bør ikke faste fra mat over tid. De kan heller faste fra skjerm eller godteri.</li>
+<li>Drikk nok vann, og trapp gjerne ned på kaffe og sukker noen dager før du begynner, så slipper du hodepine.</li>
+<li>Start forsiktig hvis du aldri har fastet før. Begynn med ett måltid eller én dag.</li>
+<li>Avslutt en lengre faste gradvis med lett mat.</li>
+<li>Hvis du blir svimmel, uvel eller får andre plager, er det lov å spise. Gud er ikke skuffet over deg.</li>
+</ul>
+<aside class="hl rv"><span class="lbl">Hovedpoeng</span><p data-rv>Faste skal aldri skade deg. Velg en form som passer for kroppen og livet ditt.</p></aside><div class="card quiz rv" data-ok="1"><span class="lbl">Sjekk deg selv</span><p data-rv class="q">Du blir svimmel og uvel under fasten. Hva bør du gjøre?</p><div class="opts"><button type="button" class="opt" data-i="0"><span class="k">A</span><span>Holde ut – det er en del av det</span></button><button type="button" class="opt" data-i="1"><span class="k">B</span><span>Spise. Gud er ikke skuffet over deg</span></button><button type="button" class="opt" data-i="2"><span class="k">C</span><span>Drikke mer kaffe</span></button></div><p data-rv class="fb" aria-live="polite" data-ok-text="Riktig. Faste skal ikke skade deg. Ta vare på kroppen."></p></div><h2 data-rv id="slik-kommer-du-i-gang">Slik kommer du i gang</h2>
+<p data-rv><strong>1. Bestem deg for hvorfor.</strong> Skriv ned hva du vil søke Gud for. Det kan være nærhet til ham, ledelse, et gjennombrudd, familien din eller noe annet som ligger på hjertet.</p>
+<p data-rv><strong>2. Velg hva og hvor lenge.</strong> Bestem på forhånd hva du skal faste fra og hvor lenge. Det gjør det lettere å stå i det når det blir krevende.</p>
+<p data-rv><strong>3. Erstatt, ikke bare fjern.</strong> Bruk tiden du ellers ville brukt på mat eller skjerm til bønn, bibellesing og stillhet. En leseplan kan være en god hjelp.</p>
+<p data-rv><strong>4. Vær forberedt på motstand.</strong> De første dagene kan være tunge, både fysisk og åndelig. Irritasjon, sult og tvil er vanlig. Se det som en invitasjon til å be, ikke som et tegn på at du har mislyktes.</p>
+<p data-rv><strong>5. Faste sammen med andre.</strong> Det er lettere å holde ut når man ikke er alene. Inviter en venn, familien eller noen i menigheten til å være med.</p>
+<p data-rv><strong>6. Vær nådig med deg selv.</strong> Hvis du snubler og spiser det du hadde bestemt deg for å la være, så begynn på nytt. Faste handler om relasjon, ikke om å bestå en prøve.</p>
+<div class="card tool rv" id="sjekk"><span class="lbl">Sjekkliste</span><p data-rv class="q">Før du starter</p><ul data-rv class="checks"><li><label><input type="checkbox" data-k="c0"><span>Jeg har skrevet ned hvorfor jeg vil faste</span></label></li><li><label><input type="checkbox" data-k="c1"><span>Jeg har bestemt hva jeg faster fra og hvor lenge</span></label></li><li><label><input type="checkbox" data-k="c2"><span>Jeg har snakket med legen, hvis jeg har en sykdom eller tar medisiner</span></label></li><li><label><input type="checkbox" data-k="c3"><span>Jeg har trappet ned på kaffe og sukker</span></label></li><li><label><input type="checkbox" data-k="c4"><span>Jeg har en plan for tiden jeg sparer (bønn, bibellesing)</span></label></li><li><label><input type="checkbox" data-k="c5"><span>Jeg har spurt noen om å faste sammen med meg</span></label></li></ul><div class="meter"><span id="bar"></span></div><p data-rv class="small" id="ant">0 av 6 klare</p></div><h2 data-rv id="sporsmal-og-svar">Spørsmål og svar</h2><div class="qa"><details class="rv"><summary>Kan jeg drikke kaffe eller te?</summary><p data-rv>Det kommer an på hvilken faste du har valgt. Ved full faste drikker mange bare vann. Ved Daniel-faste velger mange å kutte kaffe. Det viktigste er at du bestemmer deg på forhånd, og at valget hjelper deg å søke Gud.</p></details><details class="rv"><summary>Hva gjør jeg hvis jeg må spise på jobb eller sammen med andre?</summary><p data-rv>Du trenger ikke å forklare deg. Jesus sa at fasten skal være i det skjulte. Velg enkel mat, eller gjør et lite unntak for fellesskapets skyld. Gud ser hjertet ditt.</p></details><details class="rv"><summary>Kan jeg trene mens jeg faster?</summary><p data-rv>Rolig gåtur og lett aktivitet er vanligvis greit. Tung trening kan gjøre deg svimmel og slapp, spesielt ved full faste. Lytt til kroppen, og trapp ned i fasteperioden.</p></details><details class="rv"><summary>Hva om jeg ikke klarer hele perioden?</summary><p data-rv>Da har du likevel søkt Gud i de dagene du fastet. Faste er ikke en prøve du består eller stryker på. Du kan fortsette med en lettere form, eller begynne igjen neste dag.</p></details><details class="rv"><summary>Er det galt å si at jeg faster?</summary><p data-rv>Nei. Jesus advarer mot å faste for å bli sett, ikke mot at andre vet om det. Når vi faster sammen som menighet, er det naturlig å snakke om det og oppmuntre hverandre.</p></details></div><h2 data-rv id="hva-du-kan-forvente">Hva du kan forvente</h2>
+<p data-rv>Noen opplever store ting når de faster: tydelig tale fra Gud, sterk fred, bønnesvar og gjennombrudd. Andre opplever mest at det er krevende, og at forandringen skjer stille og gradvis. Begge deler er helt normalt.</p>
+<p data-rv>Gud ser fasten din selv når du ikke kjenner noe. Jesus lover at Faderen, som ser i det skjulte, skal lønne deg (Matt 6,18). Ofte er det først i ettertid at vi ser hva Gud gjorde: at vi ble mer følsomme for hans stemme, at en vane mistet grepet, at et forhold ble legt, eller at vi fikk ny glede i bønn og bibellesing.</p>
+<h2 data-rv id="sporsmal-til-ettertanke">Spørsmål til ettertanke</h2>
+<p data-rv>Ta gjerne med deg disse spørsmålene inn i fasten, og skriv ned svarene underveis:</p>
+<div class="card refl rv"><label class="rq"><span><b>1</b>Hvorfor vil jeg faste akkurat nå? Hva vil jeg søke Gud for?</span><textarea data-k="r1" rows="2" placeholder="Skriv her …"></textarea></label><label class="rq"><span><b>2</b>Hva er det jeg tyr til for trøst eller flukt, i stedet for å gå til Gud?</span><textarea data-k="r2" rows="2" placeholder="Skriv her …"></textarea></label><label class="rq"><span><b>3</b>Hva vil jeg bruke den ekstra tiden på?</span><textarea data-k="r3" rows="2" placeholder="Skriv her …"></textarea></label><label class="rq"><span><b>4</b>Hvem kan jeg faste og be for, utenom meg selv?</span><textarea data-k="r4" rows="2" placeholder="Skriv her …"></textarea></label><label class="rq"><span><b>5</b>Hva har Gud vist meg eller gjort i meg i løpet av fasten?</span><textarea data-k="r5" rows="2" placeholder="Skriv her …"></textarea></label><p data-rv class="small">Svarene lagres bare i nettleseren din.</p></div>
+<h2 data-rv id="bli-med-pa-21-dager-med-bonn-og-faste">Bli med på 21 dager med bønn og faste</h2>
+<p data-rv>Fra mandag 4. januar til søndag 24. januar går vi gjennom 21 dager med bønn og faste sammen. Hver dag får du noen bibelvers, en kort tanke, et konkret steg og bønneemner. Den første uken handler om nærhet og rensing, den andre om frihet og gjennombrudd, og den tredje om gjenopprettelse og oppdrag.</p>
+<p data-rv>Du kan følge planen gratis på <a href="https://hiskingdomministry.no/leseplan-detaljer?id=21-dager-bonn-og-faste">hiskingdomministry.no</a> og på Facebook og Instagram. Planen finnes også som trykt utgave og PDF i <a href="https://hiskingdomdesigns.no/produkt/77f0ae24-0f07-fc56-99f6-fd8d15e6170a">nettbutikken vår</a>.</p>
+
+</article>
+</div>
+
+<aside class="toc" id="toc">
+<div class="stick">
+<button type="button" class="pill dark tocbtn" id="tocbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Innhold</button>
+<div class="tocpanel">
+<h4>Innhold</h4>
+<ol><li><a href="#hva-er-faste"><span class="tick" aria-hidden="true"></span>Hva er faste?</a></li><li><a href="#faste-gjennom-hele-bibelen"><span class="tick" aria-hidden="true"></span>Faste gjennom hele Bibelen</a></li><li><a href="#faste-i-kirkens-historie"><span class="tick" aria-hidden="true"></span>Faste i kirkens historie</a></li><li><a href="#jesus-forventet-at-vi-skulle-faste"><span class="tick" aria-hidden="true"></span>Jesus forventet at vi skulle faste</a></li><li><a href="#hvorfor-faster-vi"><span class="tick" aria-hidden="true"></span>Hvorfor faster vi?</a></li><li><a href="#den-fasten-gud-gleder-seg-over"><span class="tick" aria-hidden="true"></span>Den fasten Gud gleder seg over</a></li><li><a href="#ulike-typer-faste"><span class="tick" aria-hidden="true"></span>Ulike typer faste</a></li><li><a href="#faste-med-omtanke-for-kroppen"><span class="tick" aria-hidden="true"></span>Faste med omtanke for kroppen</a></li><li><a href="#slik-kommer-du-i-gang"><span class="tick" aria-hidden="true"></span>Slik kommer du i gang</a></li><li><a href="#sporsmal-og-svar"><span class="tick" aria-hidden="true"></span>Spørsmål og svar</a></li><li><a href="#hva-du-kan-forvente"><span class="tick" aria-hidden="true"></span>Hva du kan forvente</a></li><li><a href="#sporsmal-til-ettertanke"><span class="tick" aria-hidden="true"></span>Spørsmål til ettertanke</a></li><li><a href="#bli-med-pa-21-dager-med-bonn-og-faste"><span class="tick" aria-hidden="true"></span>Bli med på 21 dager med bønn og faste</a></li></ol>
+<div class="tocprog"><span id="readtxt">0 av 13 lest</span><div class="meter"><span id="readbar"></span></div></div>
+</div>
+</div>
+</aside>
+
+<section class="finish rv" id="ferdig"><div class="in">
+<span class="lbl">Ferdig</span>
+<h2>Du har kommet til slutten</h2>
+<p class="lead" style="margin-top:6px">Takk for at du tok deg tid. Her er det du har gjort.</p>
+<div class="stats">
+<div class="stat"><b id="sQuiz">0/5</b><span>riktige svar</span></div>
+<div class="stat"><b id="sChk">0/6</b><span>klart før fasten</span></div>
+<div class="stat"><b id="sRefl">0/5</b><span>spørsmål besvart</span></div>
+</div>
+<div class="ctas">
+<a class="pill accent" href="https://hiskingdomministry.no/leseplan-detaljer?id=21-dager-bonn-og-faste" target="_blank" rel="noopener">Bli med på 21 dager med bønn og faste</a>
+<button type="button" class="pill" data-share>Del undervisningen</button>
+<button type="button" class="pill" id="copyAns">Kopier svarene mine</button>
+</div>
+<p class="endverse">«Søk først Guds rike og hans rettferdighet, så skal dere få alt det andre i tillegg.»<small>Matteus 6,33</small></p>
+</div></section>
+</div>
+
+<div id="pop" role="tooltip"></div><div id="toast" aria-live="polite"></div>
+</main>
+    <footer class="footer" id="kontakt">
+        <div class="container">
+            <div class="footer-layout-v2">
+                <!-- Left Section: Brand + Links -->
+                <div class="footer-left">
+                    <!-- Brand / Intro -->
+                    <div class="footer-brand">
+                        <a href="/" class="logo">
+                            <div class="logo-icon">
+                                <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo"
+                                    data-content-doc="settings_global" data-content-key="brand.logoAlt"
+                                    data-content-attr="alt" loading="lazy">
+                            </div>
+                            <span class="logo-text" data-content-doc="settings_global" data-content-key="brand.name">His
+                                Kingdom Ministry</span>
+                        </a>
+                        <p class="brand-description" data-content-doc="settings_global"
+                            data-content-key="footer.description">His Kingdom Ministry er en
+                            non-profit organisasjon dedikert til
+                            åndelig vekst gjennom undervisning, podcast og reisevirksomhet.</p>
+                    </div>
+
+                    <!-- Links Grid -->
+                    <div class="footer-nav-grid">
+                        <div class="nav-col">
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_about">Om oss</h4>
+                            <ul>
+                                <li><a href="/" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.home">Hjem</a></li>
+                                <li><a href="/om-oss" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.about">Om oss</a></li>
+                                <li><a href="/om-oss" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.vision">Vår visjon</a></li>
+                                <li><a href="/kontakt" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.contact">Kontakt oss</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_resources">Ressurser
+                            </h4>
+                            <ul>
+                                <li><a href="/bibel" data-content-doc="settings_global" data-content-key="footer.links.resources.bible">Les Bibelen</a></li>
+                                <li><a href="/media" data-content-doc="settings_global"
+                                        data-content-key="footer.links.resources.teaching">Undervisning</a></li>
+
+                                <li><a href="/arrangementer" data-content-doc="settings_global"
+                                    data-content-key="footer.links.resources.courses">Arrangementer</a></li>
+                                <li><a href="/blogg" data-content-doc="settings_global"
+                                    data-content-key="footer.links.resources.blog">Nyheter & blogg</a></li>
+                                <li><a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
+                                        data-content-key="footer.links.resources.store">Butikk</a></li>
+                                <li><a href="/minside/index.html" target="_blank" data-content-doc="settings_global"
+                                        data-content-key="footer.links.resources.myPage">Min Side</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_media">Media</h4>
+                            <ul>
+                                <li><a href="/media" data-content-doc="settings_global"
+                                        data-content-key="footer.links.media.podcast">Podcast</a></li>
+                                <li><a href="/media" data-content-doc="settings_global"
+                                        data-content-key="footer.links.media.videos">Videoer</a></li>
+                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"
+                                        data-content-doc="settings_global"
+                                        data-content-key="footer.links.media.youtube">YouTube</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_involvement">
+                                Involvering</h4>
+                            <ul>
+                                <li><a href="/arrangementer" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.calendar">Kalender</a></li>
+                                <li><a href="/donasjoner" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.donate">Gi en gave</a></li>
+                                <li><a href="/personvern" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.privacy">Personvern</a></li>
+                                <li><a href="/betingelser">Vilkår og betingelser</a></li>
+                                <li><a href="/tilgjengelighet" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.accessibility">Tilgjengelighet</a>
+                                </li>
+                                <li><a href="javascript:void(0)"
+                                        onclick="if(window.showCookieBanner){window.showCookieBanner();}else{localStorage.removeItem('hkm_cookie_consent');location.reload();}return false;"
+                                        data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.cookies">Cookies</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Section: Cards -->
+                <div class="footer-right">
+                    <!-- Follow Us Card -->
+                    <div class="footer-card">
+                        <h4 data-content-doc="settings_global" data-content-key="footer.title_follow">Følg oss</h4>
+                        <div class="footer-social-icons">
+                            <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank" aria-label="Facebook"><i
+                                    class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank" aria-label="Instagram"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank" aria-label="YouTube"><i
+                                    class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Contact Us Card -->
+                    <div class="footer-card contact-card">
+                        <h4 data-content-doc="settings_global" data-content-key="footer.title_contact">Kontakt oss</h4>
+                        <a href="/kontakt" class="btn btn-primary btn-block btn-sm" data-content-doc="settings_global"
+                            data-content-key="footer.contactButton">Kontaktskjema</a>
+
+                        <div class="contact-details">
+                            <div class="detail-item">
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.emailLabel">E-post:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.email">
+                                    post@hiskingdomministry.no</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.phoneLabel">Telefon:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.phone">+47 930 94
+                                    615</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.vippsLabel">Vipps:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.vipps">938361</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.accountLabel">Konto nr.:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.account">3000.66.08759
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; <span id="copyright-year">2026</span> <span data-content-doc="settings_global"
+                        data-content-key="footer.copyright">His Kingdom Ministry. Alle rettigheter reservert.</span></p>
+                <p class="footer-network" style="margin:.5rem 0 0;font-size:.875rem;line-height:1.6">Del av <a href="https://hiskingdomfoundation.no/" target="_blank" rel="noopener">His Kingdom Foundation</a> · <a href="https://www.hkpc.no/" target="_blank" rel="noopener">His Kingdom Prophetic Community</a> · <a href="https://hiskingdomdesigns.no/" target="_blank" rel="noopener">His Kingdom Designs</a></p>
+                <p class="footer-credit" style="margin:.25rem 0 .5rem;font-size:.8125rem">Nettside laget av <a href="https://www.tk-design.no/" target="_blank" rel="noopener">TK-design</a></p>
+                <a href="/admin/login.html" class="admin-link" id="admin-link" data-content-doc="settings_global"
+                    data-content-key="footer.adminLink">Admin</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK (Compat) -->
+
+    <!-- JavaScript -->
+    <script type="module" src="/script.js?v=2026.06.21.10.01"></script>
+    <script type="module" src="/js/cookie-consent.js"></script>
+    <script type="module" src="/js/i18n.js"></script>
+    <!-- Global Search Modal -->
+    <div id="site-search-modal" class="search-overlay">
+        <div class="search-modal-container">
+            <button class="close-search-btn" id="close-site-search" aria-label="Lukk søk">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="search-modal-title" data-content-doc="settings_global" data-content-key="search.modalTitle">Søk i systemet</div>
+            <div class="search-input-group">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" id="site-search-input-v2" class="search-input-field" placeholder="Hva leter du etter? Skriv for forslag..." autocomplete="off">
+            </div>
+            
+            <!-- Live Suggestions Container -->
+            <div id="site-search-suggestions" class="search-suggestions-container hidden"></div>
+            
+            <!-- Full Results Container (When Enter is pressed) -->
+            <div id="site-search-results-v2" class="search-suggestions-container hidden"></div>
+            
+            <div class="search-help-text">
+                <span data-content-doc="settings_global" data-content-key="search.helpText">Trykk 'Enter' for fullstendig søk.</span>
+            </div>
+
+        </div>
+    </div>
+<script src="/js/scroll-progress.js?v=2" defer></script>
+<script>
+
+{
+const S={get(k){try{return localStorage.getItem('hkmfaste:'+k)}catch(e){return null}},set(k,v){try{localStorage.setItem('hkmfaste:'+k,v)}catch(e){}}};
+const R=document.getElementById('faste-guide');const $=s=>R.querySelector(s)||document.querySelector(s),$$=s=>[...R.querySelectorAll(s)];
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),1800)};
+
+/* reveal */
+const rv=$$('article > [data-rv], .rv');
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{rootMargin:'0px 0px -6% 0px'});
+rv.forEach(el=>io.observe(el));
+function chk(){const H=innerHeight;rv.forEach(el=>{if(!el.classList.contains('in')&&el.getBoundingClientRect().top<H*.95)el.classList.add('in')})}
+
+/* toc + progress */
+const links=$$('.toc a'),heads=links.map(a=>document.getElementById(a.getAttribute('href').slice(1)));
+const read=new Set(JSON.parse(S.get('read')||'[]'));
+function onScroll(){
+  const h=document.documentElement;($('#prog')||{style:{}}).style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';
+  let cur=-1;heads.forEach((el,i)=>{if(el&&el.getBoundingClientRect().top<(parseInt(getComputedStyle(R).getPropertyValue('--fg-head'))||100)+60)cur=i});
+  links.forEach((a,i)=>a.classList.toggle('on',i===cur));
+  if(cur>0)for(let i=0;i<cur;i++)read.add(i);
+  if(h.scrollTop+h.clientHeight>=h.scrollHeight-40)heads.forEach((_,i)=>read.add(i));
+  links.forEach((a,i)=>a.classList.toggle('read',read.has(i)));
+  $('#readtxt').textContent=read.size+' av '+links.length+' lest';$('#readbar').style.width=(read.size/links.length*100)+'%';
+  S.set('read',JSON.stringify([...read]));chk();
+}
+let pend=false;addEventListener('scroll',()=>{if(!pend){pend=true;requestAnimationFrame(()=>{pend=false;onScroll()})}},{passive:true});
+onScroll();setTimeout(chk,250);
+const toc=$('#toc');$('#tocbtn').addEventListener('click',()=>toc.classList.add('open'));
+links.forEach(a=>a.addEventListener('click',()=>toc.classList.remove('open')));
+document.addEventListener('click',e=>{if(toc.classList.contains('open')&&!e.target.closest('.tocpanel')&&!e.target.closest('#tocbtn'))toc.classList.remove('open')});
+
+/* share */
+$$('[data-share]').forEach(b=>b.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(location.href.split('#')[0]);toast('Lenken er kopiert')}catch(e){toast('Kunne ikke kopiere lenken her')}}));
+
+/* glossary */
+const pop=$('#pop');
+$$('.term').forEach(t=>t.addEventListener('click',e=>{
+  e.stopPropagation();if(pop.classList.contains('on')&&pop.dataset.for===t.textContent){pop.classList.remove('on');return}
+  pop.innerHTML='<b></b><span></span>';pop.querySelector('b').textContent=t.dataset.t;pop.querySelector('span').textContent=t.dataset.d;pop.dataset.for=t.textContent;
+  const r=t.getBoundingClientRect();pop.style.left=Math.max(12,Math.min(r.left,innerWidth-312))+'px';pop.style.top=(r.bottom+10)+'px';pop.classList.add('on');
+}));
+document.addEventListener('click',()=>pop.classList.remove('on'));addEventListener('scroll',()=>pop.classList.remove('on'),{passive:true});
+
+/* quiz */
+const quizzes=$$('.quiz');let right=0;
+quizzes.forEach(q=>{
+  const ok=+q.dataset.ok,fb=q.querySelector('.fb'),btns=[...q.querySelectorAll('.opt')];let tried=false;
+  btns.forEach(b=>b.addEventListener('click',()=>{
+    if(+b.dataset.i===ok){b.classList.add('right');fb.textContent=fb.dataset.okText;fb.className='fb good';btns.forEach(x=>x.disabled=true);if(!tried)right++;tried=true;stats()}
+    else{b.classList.add('wrong');tried=true;setTimeout(()=>b.disabled=true,350);fb.textContent='Ikke helt. Prøv igjen – svaret står i teksten over.';fb.className='fb bad'}
+  }));
+});
+
+/* chooser */
+const res=$('#resultat p');
+$$('#velger input').forEach(i=>i.addEventListener('change',()=>{
+  const v=n=>(document.querySelector('input[name='+n+']:checked')||{}).value,h=v('helse'),e=v('erf'),l=v('lengde');
+  if(!h||!e||!l){res.textContent='Svar på alle tre spørsmålene.';return}
+  let t;
+  if(h==='ja')t='<strong>Faste fra skjerm eller vaner</strong>, eller en mild delvis faste etter samtale med legen. Kroppen din skal ikke ta skade – Gud ser hjertet.';
+  else if(l==='21')t=e==='ja'?'<strong>Delvis faste (Daniel-faste)</strong> i 21 dager, gjerne med noen dager med måltidsfaste underveis.':'<strong>Delvis faste (Daniel-faste)</strong>. Enkel mat i 21 dager er en god og trygg start.';
+  else if(e==='nei')t='<strong>Måltidsfaste</strong>. Hopp over ett måltid og bruk tiden på bønn. Kjenn etter, og øk forsiktig.';
+  else if(l==='dag')t='<strong>Full faste i én dag</strong> med vann, eller måltidsfaste hvis det er lenge siden sist.';
+  else t=e==='ja'?'<strong>Full faste eller delvis faste</strong> i noen dager. Drikk nok, og avslutt gradvis.':'<strong>Måltidsfaste eller delvis faste</strong> i noen dager.';
+  res.innerHTML=t;
+}));
+
+/* checklist */
+const cbs=$$('#sjekk input');
+function count(){const n=cbs.filter(c=>c.checked).length;$('#bar').style.width=(n/cbs.length*100)+'%';$('#ant').textContent=n===cbs.length?'Alt klart. Gud velsigne fasten din!':n+' av '+cbs.length+' klare';stats()}
+cbs.forEach(c=>{c.checked=S.get(c.dataset.k)==='1';c.addEventListener('change',()=>{S.set(c.dataset.k,c.checked?'1':'0');count()})});
+
+/* text fields */
+$$('textarea[data-k]').forEach(t=>{t.value=S.get(t.dataset.k)||'';t.addEventListener('input',()=>{S.set(t.dataset.k,t.value);stats()})});
+
+function stats(){
+  $('#sQuiz').textContent=right+'/'+quizzes.length;
+  $('#sChk').textContent=cbs.filter(c=>c.checked).length+'/'+cbs.length;
+  const r=$$('.rq textarea');$('#sRefl').textContent=r.filter(t=>t.value.trim()).length+'/'+r.length;
+}
+count();
+
+$('#copyAns').addEventListener('click',async()=>{
+  const parts=$$('textarea[data-k]').filter(t=>t.value.trim()).map(t=>{const l=t.closest('label');return l.querySelector('span').textContent.trim()+'\n'+t.value.trim()});
+  if(!parts.length){toast('Du har ikke skrevet noe ennå');return}
+  try{await navigator.clipboard.writeText('Faste – å gi Gud mer plass\n\n'+parts.join('\n\n'));toast('Svarene er kopiert')}catch(e){toast('Kunne ikke kopiere her')}
+});
+
+/* videoer spilles av på siden */
+$$('a.hero[href*="youtube.com/watch"], a.vcard[href*="youtube.com/watch"]').forEach(a=>a.addEventListener('click',e=>{
+  const id=new URL(a.href).searchParams.get('v');if(!id)return;e.preventDefault();
+  const box=a.classList.contains('hero')?a:(a.querySelector('.vthumb')||a);
+  if(box.querySelector('iframe'))return;
+  const f=document.createElement('iframe');f.className='yt';f.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';f.allowFullscreen=true;
+  f.src='https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&rel=0';f.title=a.getAttribute('aria-label')||'Video';
+  if(getComputedStyle(box).position==='static')box.style.position='relative';box.appendChild(f);
+}));
+const hd=document.getElementById('header');const setH=()=>{if(hd)R.style.setProperty('--fg-head',Math.round(hd.getBoundingClientRect().height)+'px')};setH();addEventListener('resize',setH,{passive:true});
+}
+</script>
+</body>
+
+</html>
