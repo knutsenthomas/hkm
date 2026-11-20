@@ -126,6 +126,9 @@
 #faste-guide #prog{display:none}
 #faste-guide .yt{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:5}
 #faste-guide #pop,#faste-guide #toast{font-family:Inter,system-ui,sans-serif}
+/* innholdslisten skal stå fast på PC: overflow på html/body hindrer sticky */
+html:has(#faste-guide),html:has(#faste-guide) body{overflow-x:clip!important;overflow-y:visible!important}
+
 #faste-guide .ytcover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none}
 #faste-guide a.hero .ytcover{z-index:-2}
 #faste-guide a.hero.hascover svg.shape{display:none}
