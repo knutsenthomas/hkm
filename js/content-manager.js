@@ -4383,6 +4383,7 @@ class ContentManager {
 
         // 2b. Podcast item (Fetch newest via proxy)
         let podcastHtml = '';
+        let podcastTs = 0;
         try {
             const proxyUrl = '/api/podcast';
             const response = await fetch(proxyUrl);
@@ -4414,6 +4415,7 @@ class ContentManager {
                 }
                 
                 const epId = ep.guid?._text || ep.guid || ep.link?._text || ep.link || epTitle;
+                podcastTs = Date.parse(ep.pubDate?._text || ep.pubDate || '') || 0;
                 const podcastLink = `${this.getLocalizedLink('podcast.html')}?play=${encodeURIComponent(epId)}`;
 
                 podcastHtml = `
@@ -4446,8 +4448,9 @@ class ContentManager {
         }
 
         // 2c. Teaching item
-        const teachingItems = this.getCollectionItems(teachingData);
-        const latestTeaching = teachingItems[0];
+        const teachingItems = this.getCollectionItems(teachingData).filter(i => i && i.published !== false);
+        const tsOf = (i) => { const v = Date.parse((i && (i.date || i.createdAt)) || ''); return isNaN(v) ? 0 : v; };
+        const latestTeaching = teachingItems.slice().sort((x, y) => tsOf(y) - tsOf(x))[0];
         let teachingHtml = '';
         if (latestTeaching) {
             const teachingLink = this.getLocalizedLink('blogg-post.html') + '?id=' + encodeURIComponent(latestTeaching.id || latestTeaching.title);
@@ -4487,7 +4490,14 @@ class ContentManager {
             `;
         }
 
-        this.setHTMLIfChanged(rightContainer, newsHtml + podcastHtml + teachingHtml + secondNewsHtml, 'aggregated:right');
+        // Sorter etter dato, nyeste først
+        const rows = [
+            { html: newsHtml, ts: tsOf(latestNews), o: 0 },
+            { html: podcastHtml, ts: podcastTs, o: 1 },
+            { html: teachingHtml, ts: tsOf(latestTeaching), o: 2 },
+            { html: secondNewsHtml, ts: tsOf(secondNews), o: 3 }
+        ].filter(r => r.html).sort((a, b) => (b.ts - a.ts) || (a.o - b.o));
+        this.setHTMLIfChanged(rightContainer, rows.map(r => r.html).join(''), 'aggregated:right');
     }
 
     setupBlogFiltersAndSearch(posts, selector) {
