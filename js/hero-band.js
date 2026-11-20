@@ -3,6 +3,9 @@
 (function () {
     const path = location.pathname.replace(/\/+$/, '') || '/';
     if (/^\/(?:en|es)?\/?(?:index(?:\.html)?)?$/.test(path)) return;
+    // Om oss, kontakt og lignende informasjonssider beholder den gamle toppen
+    const KEEP_OLD = /^\/(?:en\/|es\/)?(?:om-oss|kontakt|betingelser|personvern|tilgjengelighet|bnn|donasjoner|for-bedrifter|for-menigheter|reisevirksomhet|about|contact|privacy|accessibility|donations|for-businesses|for-churches|terms|sobre-nosotros|contacto|privacidad|accesibilidad|donaciones|para-empresas|para-iglesias|terminos)(?:\.html)?$/;
+    const keepOld = KEEP_OLD.test(path);
     const SEL = '.page-hero, .subpage-hero';
     const STRIP = ['background', 'background-image', 'background-color', 'min-height', 'height', 'padding', 'padding-top', 'padding-bottom', 'color'];
 
@@ -17,6 +20,7 @@
         STRIP.forEach((p) => { if (el.style.getPropertyValue(p)) el.style.removeProperty(p); });
     }
     function apply() {
+        if (keepOld) return;
         const heroes = document.querySelectorAll(SEL);
         if (!heroes.length) return;
         document.body.classList.remove('header-dark-start');
