@@ -40,8 +40,8 @@
     const s = state(); if (!s || !s.name) { h.hidden = true; return; }
     h.hidden = false;
     h.querySelector('.hkr-eyebrow').textContent = s.genre || s.name;
-    h.querySelector('.hkr-num').textContent = s.intro ? '' : s.ch;
-    h.querySelector('.hkr-h1').textContent = s.intro ? `${s.name} – ${T.intro}` : `${s.name} ${s.ch}`;
+    h.querySelector('.hkr-num').textContent = '';
+    h.querySelector('.hkr-h1').innerHTML = s.intro ? esc(`${s.name} – ${T.intro}`) : `${esc(s.name)} <span class="hkr-ch">${esc(s.ch)}</span>`;
     h.querySelector('.hkr-meta').textContent = [s.intro ? '' : T.chOf(s.ch, s.max), s.tr].filter(Boolean).join(' · ');
     h.classList.toggle('intro', s.intro);
     buttons(); bottomNav(s);
