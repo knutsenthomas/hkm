@@ -335,7 +335,7 @@
 #plan-view .sync .pill{height:36px}
 @media (min-width:961px){
  #plan-view aside.toc .stick{top:calc(var(--pv-head,84px) + 24px);padding-top:56px}
- #plan-view aside.toc .tocpanel{max-height:calc(100vh - var(--pv-head,84px) - 110px);overflow:auto;padding-right:6px;scrollbar-width:thin}
+ #plan-view aside.toc .tocpanel{max-height:calc(100vh - var(--pv-head,84px) - 120px);overflow:auto;padding-right:6px;scrollbar-width:thin}
 }
 @media (max-width:960px){
  #plan-view .tocbtn{right:auto;left:16px}
@@ -527,3 +527,30 @@ html.pv-lock #plan-view .astart{display:none}
  #plan-view .astart{position:static;padding:16px 0 0;background:none}
  #plan-view .astart .pill{width:100%}
 }
+/* ---- PC: roligere dagside ---- */
+#plan-view .about-top{display:none!important}
+#plan-view .about-bottom{display:block;margin-top:32px}
+#plan-view .weeks,#plan-view .days,#plan-view .legend{display:none!important}
+#plan-view .hstart{display:inline-flex;align-items:center;margin-top:14px;height:34px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+#plan-view .hstart:hover{background:rgba(255,255,255,.16)}
+#plan-view .startrow{position:absolute;left:0;top:0;width:1px;height:1px;opacity:0;overflow:hidden;margin:0;pointer-events:none}
+@media (min-width:601px) and (max-width:960px){
+ #plan-view .dstrip{display:flex;gap:8px;overflow-x:auto;margin:20px 0 0;padding:4px 0 8px;scrollbar-width:none}
+ #plan-view .dstrip::-webkit-scrollbar{display:none}
+ #plan-view .dchip{position:relative;flex:none;width:58px;height:62px;border-radius:14px;border:1px solid var(--line);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer}
+ #plan-view .dchip b{font-size:17px;font-weight:800;line-height:1}
+ #plan-view .dchip span{font-size:10.5px;color:var(--sec);margin-top:3px}
+ #plan-view .dchip.today{box-shadow:inset 0 0 0 2px #cc712b}
+ #plan-view .dchip.done{background:var(--soft);border-color:transparent}
+ #plan-view .dchip[aria-current=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+ #plan-view .dchip[aria-current=true] span{color:rgba(255,255,255,.7)}
+}
+#plan-view .day{margin-top:32px}
+#plan-view .dhead{align-items:center;gap:18px}
+#plan-view .dnum{font-size:52px;line-height:1;color:transparent;-webkit-text-stroke:1.5px #cc712b;flex:none}
+#plan-view .day h2{margin:0}
+#plan-view .dmeta{display:block;margin-top:6px}
+#plan-view .wbody:not(.multi) .wref{display:none}
+#plan-view .dsec{margin:32px 0 10px;font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--td)}
+/* innholdslisten må kunne stå fast: overflow-x:hidden på html/body hindrer sticky */
+html:has(#plan-view),html:has(#plan-view) body{overflow-x:clip!important;overflow-y:visible!important}

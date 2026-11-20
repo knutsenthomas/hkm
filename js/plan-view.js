@@ -555,13 +555,13 @@ ${aboutHTML('about-bottom')}
     const d = DAYS[n - 1], s = SECTIONS[secOf(n)], dt = dayDate(n), k = 's' + n, isDone = done.has(n);
     const refs = d.refs.filter(r => r.label);
     const res = (d.resources || []).filter(r => r && r.url && /^(https?:\/\/|\/)/.test(r.url));
-    return `<div class="dhead"><span class="dnum">${String(n).padStart(2, '0')}</span><div><span class="dmeta">${esc(T.dayOf(n, N))} · ${esc(s.name)} · ${esc(T.WD[dt.getDay()])} ${esc(fmt(dt))}</span><h2>${esc(d.heading || d.title)}</h2></div></div>
+    return `<div class="dhead"><span class="dnum" aria-hidden="true">${String(n).padStart(2, '0')}</span><div><h2>${esc(d.heading || d.title)}</h2><span class="dmeta">${esc(T.dayOf(n, N))} · ${esc(T.WD[dt.getDay()])} ${esc(fmt(dt))}</span></div></div>
   ${refs.length ? `<section class="word" aria-label="${esc(T.verses)}">
    <div class="wtabs" role="tablist" style="--n:${Math.min(refs.length, 3)}"${refs.length < 2 ? ' hidden' : ''}>${refs.map((r, i) => `<button type="button" class="wtab" role="tab" aria-selected="${i === 0}" data-i="${i}">${ICON_BOOK}${esc(refShow(r))}</button>`).join('')}${refs.length > 1 ? `<button type="button" class="wtab all" data-i="all">${esc(T.readAll(refs.length))}</button>` : ''}</div>
    <div class="wbody" id="wbody"></div>
-   <div class="wfoot"><span>${esc(BIBLE.name)}${BIBLE.lic ? ' · ' + (BIBLE.licUrl ? `<a href="${BIBLE.licUrl}" target="_blank" rel="noopener">${esc(BIBLE.lic)}</a>` : esc(BIBLE.lic)) : ''}</span><span class="wbtns"><button type="button" class="wbtn" id="wcopy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>${esc(T.copy)}</button><a class="wbtn" id="wopen" href="${esc(bibleHref(refs[0]))}">${ICON_BOOK}${esc(T.openBible)}</a>${refs.length > 1 ? `<button type="button" class="wbtn" id="wnext">${esc(T.nextV)}</button>` : ''}</span></div>
+   <div class="wfoot"><span>${esc(BIBLE.name)}${BIBLE.lic ? ' · ' + (BIBLE.licUrl ? `<a href="${BIBLE.licUrl}" target="_blank" rel="noopener">${esc(BIBLE.lic)}</a>` : esc(BIBLE.lic)) : ''}</span><span class="wbtns"><button type="button" class="wbtn" id="wcopy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>${esc(T.copy)}</button><a class="wbtn" id="wopen" href="${esc(bibleHref(refs[0]))}">${ICON_BOOK}${esc(T.openBible)}</a></span></div>
   </section>` : ''}
-  ${d.body ? `<div class="dtext">${d.body}</div>` : ''}
+  ${d.body ? `<h3 class="dsec">${esc(T.devotional)}</h3><div class="dtext">${d.body}</div>` : ''}
   ${d.step ? `<label class="stepcard"><input type="checkbox" id="stepcb" ${S.get(k) === '1' ? 'checked' : ''}><span><span class="lbl">${esc(T.step)}</span><p>${esc(d.step)}</p></span></label>` : ''}
   ${d.pray.length || d.prayer ? `<div class="pray">${d.pray.length ? `<span class="lbl">${esc(T.prayFor)}</span><ul>${d.pray.map(p => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}${d.prayer ? `${d.pray.length ? '<div style="height:12px"></div>' : ''}<span class="lbl">${esc(T.prayer)}</span><p>${esc(d.prayer)}</p>` : ''}</div>` : ''}
   ${res.length ? `<div class="res">${res.map(r => `<a class="teach" href="${esc(r.url)}" ${/^https?:/.test(r.url) ? 'target="_blank" rel="noopener"' : ''}><span class="ic">${r.type === 'video' ? '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg>'}</span><span><b>${esc(r.title || T.resources)}</b>${r.description ? `<span>${esc(r.description)}</span>` : ''}</span></a>`).join('')}</div>` : ''}
@@ -594,6 +594,7 @@ ${aboutHTML('about-bottom')}
       const [html] = await Promise.all([htmlP, anim ? new Promise(r => setTimeout(r, 160)) : null]);
       if (my !== token) return;
       body.innerHTML = html;
+      body.classList.toggle('multi', i === 'all');
       const isLong = !!body.querySelector('.wpass.long');
       body.classList.toggle('long', isLong);
       const nv = body.querySelectorAll('.wtext sup').length;
