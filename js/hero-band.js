@@ -76,7 +76,28 @@
             const eye = document.createElement('p'); eye.className = 'hb-eye'; eye.textContent = 'His Kingdom Ministry';
             host.insertBefore(eye, host.firstChild);
         }
-        host.appendChild(box);
+        const tools = document.createElement('div');
+        tools.className = 'hb-tools';
+        tools.appendChild(box);
+        const first = cards()[0];
+        if (first && first.querySelector('img, .media-thumbnail, .event-image')) {
+            const tg = document.createElement('div');
+            tg.className = 'hb-view';
+            tg.innerHTML = '<button type="button" data-v="grid" aria-label="Rutenett"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.2"/></svg></button><button type="button" data-v="list" aria-label="Liste"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="3.2" rx="1"/><rect x="4" y="10.4" width="16" height="3.2" rx="1"/><rect x="4" y="15.8" width="16" height="3.2" rx="1"/></svg></button>';
+            tools.appendChild(tg);
+            let view = 'grid';
+            try { view = localStorage.getItem('hkm_page_view') || 'grid'; } catch (e) {}
+            const setView = (v) => {
+                view = v;
+                try { localStorage.setItem('hkm_page_view', v); } catch (e) {}
+                tg.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x.dataset.v === v));
+                new Set(cards().map((c) => c.parentElement)).forEach((p) => p && p.classList.toggle('hb-list', v === 'list'));
+            };
+            tg.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) setView(b.dataset.v); });
+            setView(view);
+            new MutationObserver(() => { if (view === 'list') new Set(cards().map((c) => c.parentElement)).forEach((p) => p && !p.classList.contains('hb-list') && p.classList.add('hb-list')); }).observe(document.body, { childList: true, subtree: true });
+        }
+        host.appendChild(tools);
         // Filterknapper
         const CAT_SEL = '.blog-category, .media-category, .event-category, .card-category, .category-badge, .podcast-category, .video-category';
         const MONTHS = /(\d{1,2})\.?\s+(januar|februar|mars|april|mai|juni|juli|august|september|oktober|november|desember|january|february|march|may|june|july|october|december|enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\s+(\d{4})/i;

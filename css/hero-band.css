@@ -55,3 +55,28 @@ html body .hb-filters .hb-pill{display:inline-flex !important;align-items:center
 html body .hb-filters .hb-pill:hover{border-color:#151a21 !important}
 html body .hb-filters .hb-pill.on{background:#151a21 !important;border-color:#151a21 !important;color:#fff !important}
 @media (max-width:600px){.hb-filters{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-right:-18px;padding-right:18px}.hb-pill{flex:0 0 auto}}
+
+/* Verktøy til høyre: søk + rutenett/liste */
+.hb-tools{display:flex;align-items:center;gap:8px;margin:18px 0 0;max-width:520px}
+.hb-tools .hb-search{flex:1;margin:0 !important;max-width:none}
+.hb-view{display:flex;gap:4px;padding:3px;border:1px solid rgba(21,26,33,.12);border-radius:999px;background:#fff;flex:none}
+html body .hb-view button{width:38px !important;height:36px !important;border-radius:999px !important;border:0 !important;background:transparent !important;display:grid !important;place-items:center !important;padding:0 !important;margin:0 !important;cursor:pointer;box-shadow:none !important}
+.hb-view svg{width:20px;height:20px;fill:#596069}
+html body .hb-view button.on{background:#151a21 !important}
+.hb-view button.on svg{fill:#fff}
+@media (min-width:861px){
+  html body .hb-host>.hb-tools{grid-column:2;grid-row:1 / span 8;align-self:center;margin:0 !important;max-width:none;width:100%}
+}
+/* Listevisning */
+html body .hb-list{display:grid !important;grid-template-columns:1fr !important;gap:12px !important}
+html body .hb-list>:is(.media-card,.event-card,.podcast-card,.video-card,.teaching-card){display:grid !important;grid-template-columns:260px minmax(0,1fr) !important;align-items:stretch !important;height:auto !important;min-height:0 !important;flex-direction:row !important}
+html body .hb-list>*>:is(.media-thumbnail,.event-image){width:auto !important;height:auto !important;min-height:160px !important;aspect-ratio:auto !important;position:relative !important;overflow:hidden}
+html body .hb-list>*>:is(.media-thumbnail,.event-image) img,html body .hb-list .event-image-zoom{position:absolute !important;inset:0 !important;width:100% !important;height:100% !important;object-fit:cover !important}
+html body .hb-list>*>:is(.media-content,.event-content){display:flex;flex-direction:column;justify-content:center}
+@media (max-width:600px){
+  html body .hb-list>:is(.media-card,.event-card,.podcast-card,.video-card,.teaching-card){grid-template-columns:112px minmax(0,1fr) !important}
+  html body .hb-list>*>:is(.media-thumbnail,.event-image){min-height:112px !important}
+  html body .hb-list :is(.media-description,.event-desc-excerpt){display:none !important}
+  html body .hb-list .event-date{transform:scale(.75);transform-origin:top right}
+  .hb-tools{max-width:none}
+}
