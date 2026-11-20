@@ -97,6 +97,29 @@ function articleContentText(value) {
   return ['text', 'html', 'content', 'items', 'caption'].map(key => articleContentText(value[key])).filter(Boolean).join(' ');
 }
 
+function articleContentHtml(value) {
+  const esc = (t) => String(t == null ? '' : t).replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()
+    .replace(/&(?!(?:amp|lt|gt|quot|#39|#\d+);)/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const sanitize = (html) => String(html)
+    .replace(/<(script|style|iframe|object|embed|noscript)\b[^>]*>[\s\S]*?<\/\1>/gi, '')
+    .replace(/<(\/?)(p|h2|h3|h4|ul|ol|li|blockquote|br|strong|em|b|i)\b[^>]*>/gi, '\u0001$1$2\u0002')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\u0001/g, '<').replace(/\u0002/g, '>');
+  if (typeof value === 'string') return sanitize(value);
+  const blocks = Array.isArray(value) ? value : (value && Array.isArray(value.blocks) ? value.blocks : null);
+  if (!blocks) return '<p>' + esc(articleContentText(value)) + '</p>';
+  return blocks.map((b) => {
+    const d = (b && b.data) || {};
+    const type = String((b && b.type) || '').toLowerCase();
+    if (type === 'header' || type === 'heading') { const l = Math.min(4, Math.max(2, Number(d.level) || 2)); return `<h${l}>${esc(d.text)}</h${l}>`; }
+    if (type === 'list') { const tag = d.style === 'ordered' ? 'ol' : 'ul'; const items = (d.items || []).map(it => `<li>${esc(typeof it === 'string' ? it : (it && (it.content || it.text)) || '')}</li>`).join(''); return `<${tag}>${items}</${tag}>`; }
+    if (type === 'quote') return `<blockquote><p>${esc(d.text)}</p>${d.caption ? `<p>— ${esc(d.caption)}</p>` : ''}</blockquote>`;
+    const t = esc(d.text || d.html || d.content || d.caption || '');
+    return t ? `<p>${t}</p>` : '';
+  }).filter(Boolean).join('');
+}
+
 function errorPage(res, status, message) {
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'no-store');
@@ -438,7 +461,10 @@ export default async function handler(req, res) {
     if (type === 'blog') {
       const text = articleContentText(articleText).replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
       html = html.replace(/(<h1\b[^>]*id="single-post-title"[^>]*>)[\s\S]*?<\/h1>/i, (_, tag) => tag.replace('opacity:0', 'opacity:1') + escapeHtml(title) + '</h1>');
-      html = html.replace(/(<article\b[^>]*id="single-post-content"[^>]*>)[\s\S]*?<\/article>/i, (_, tag) => tag.replace('display:none', 'display:block') + '<p>' + escapeHtml(text) + '</p></article>');
+      let bodyHtml = '';
+      try { bodyHtml = articleContentHtml(articleText); } catch (e) { bodyHtml = ''; }
+      if (!bodyHtml || !bodyHtml.replace(/<[^>]+>/g, '').trim()) bodyHtml = '<p>' + escapeHtml(text) + '</p>';
+      html = html.replace(/(<article\b[^>]*id="single-post-content"[^>]*>)[\s\S]*?<\/article>/i, (_, tag) => tag.replace('display:none', 'display:block') + bodyHtml + '</article>');
       html = html.replace(/(<div\b[^>]*id="post-skeleton"[^>]*style=")/i, '$1display:none;');
     }
 
