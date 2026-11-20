@@ -77,6 +77,7 @@
     <meta property="twitter:title" content="Seminarer | His Kingdom Ministry">
     <meta property="twitter:description" content="Bli med på våre seminarer og opplæringskurs for å vokse i troen og utrustes til tjeneste.">
     <meta property="twitter:image" content="https://images.unsplash.com/photo-1491841550275-ad7854e35ca6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80">
+    <link rel="stylesheet" href="/css/teaching-list.css?v=1">
 </head>
 
 <body class="cms-loading">
@@ -377,47 +378,23 @@
         </div>
     </div>
 
-    <section class="page-hero" data-content-key="hero.backgroundImage"
-        style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1491841550275-ad7854e35ca6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');">
-        <div class="container">
-            <h1 class="page-hero-title" data-content-key="hero.title">Seminarer</h1>
-            <p class="page-hero-subtitle" data-content-key="hero.subtitle">Temabaserte undervisningsdager</p>
-            <div style="margin-top: 20px;">
-                <a href="/media#undervisning" class="btn btn-outline btn-sm">
-                    <i class="fas fa-arrow-left"></i> Tilbake til Undervisning
-                </a>
-            </div>
+    <main id="hkm-tl">
+        <div class="tl-wrap">
+            <a class="tl-back" href="/media#undervisning"><i class="fas fa-arrow-left"></i> Media &amp; undervisning</a>
+            <p class="tl-eye">Undervisning</p>
+            <h1 data-content-key="hero.title">Seminarer</h1>
+            <p class="tl-lead" data-content-key="hero.subtitle">Temabaserte undervisningsdager</p>
+            <div class="tl-bar"><h2 class="section-title">Laster innhold …</h2><a href="/leseplaner">Leseplaner</a></div>
+            <div class="media-grid" id="teaching-grid"></div>
+            <section class="tl-cta">
+                <div><h2 data-content-key="cta.title">Lær og voks sammen med oss</h2><p data-content-key="cta.text">Alle våre seminarer er tilgjengelige gratis. Bli med på våre kommende arrangementer!</p></div>
+                <div class="tl-btns"><a href="/media" class="tl-btn dark">Se alle ressurser</a><a href="/kontakt" class="tl-btn">Kontakt oss</a></div>
+            </section>
         </div>
-    </section>
-
-    <!-- Seminars Grid -->
-    <section class="media-content-section">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-label" data-content-key="intro.label">Tilgjengelige Seminarer</span>
-                <h2 class="section-title">Laster innhold...</h2>
-                <p class="section-description" data-content-key="intro.description">Lær fra våre dyptgående seminarer og konferanser</p>
-            </div>
-
-            <div class="media-grid" id="teaching-grid">
-                <!-- Content loaded dynamically -->
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="cta-section">
-        <div class="container">
-            <div class="cta-content">
-                <h2 data-content-key="cta.title">Lær og Voks Sammen Med Oss</h2>
-                <p data-content-key="cta.text">Alle våre seminarer er tilgjengelige gratis. Bli med på våre kommende arrangementer!</p>
-                <div class="cta-buttons">
-                    <a href="/arrangementer" class="btn btn-primary">Se arrangementer</a>
-                    <a href="/media" class="btn btn-outline">Tilbake til Media</a>
-                </div>
-            </div>
-        </div>
-    </section>
+    </main>
+    <script>
+    (function(){var R=document.getElementById('hkm-tl');function h(){var e=document.getElementById('header')||document.querySelector('header');var r=e?e.getBoundingClientRect():null;var b=r?Math.round(Math.max(r.bottom,r.height)):90;R.style.setProperty('--tl-head',(b>40?b:90)+'px')}h();window.addEventListener('load',h);window.addEventListener('resize',h);var n=0,iv=setInterval(function(){h();if(++n>20)clearInterval(iv)},250);if(window.ResizeObserver){var hd=document.getElementById('header');if(hd)new ResizeObserver(h).observe(hd)}})();
+    </script>
 
     <!-- Footer -->
     <footer class="footer" id="kontakt">
