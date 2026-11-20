@@ -1,0 +1,30 @@
+/* Lys toppflate på alle undersider (samme som Nyheter & Blogg). Gjelder ikke forsiden. */
+html body .hb-band{--hb-ink:#151a21;--hb-mut:#596069;--hb-line:rgba(21,26,33,.12);
+  background:#faf9f6 !important;background-image:none !important;color:var(--hb-ink) !important;
+  min-height:0 !important;height:auto !important;display:block !important;text-align:left !important;
+  padding:calc(var(--hb-top,96px) + 32px) 0 26px !important;margin:0 !important;border-bottom:1px solid var(--hb-line) !important;
+  overflow:visible !important;position:relative !important;font-family:Inter,system-ui,-apple-system,sans-serif}
+html body .hb-band::before,html body .hb-band::after,html body .hb-band>.hero-overlay,html body .hb-band .hero-bg,html body .hb-band>[class*="overlay"]{display:none !important}
+html body .hb-band>.container,html body .hb-band>div:first-of-type{max-width:1100px !important;width:100% !important;margin:0 auto !important;padding:0 24px !important;
+  display:block !important;text-align:left !important;align-items:flex-start !important;min-height:0 !important;position:relative !important;z-index:1}
+html body .hb-band :is(h1,.page-hero-title,.hero-title){color:var(--hb-ink) !important;text-shadow:none !important;text-align:left !important;
+  font-size:clamp(28px,3.4vw,40px) !important;line-height:1.08 !important;font-weight:800 !important;letter-spacing:-.035em !important;
+  margin:0 !important;padding:0 !important;max-width:none !important;width:auto !important;display:block !important}
+html body .hb-band :is(p,.page-hero-subtitle,.hero-subtitle){color:var(--hb-mut) !important;text-shadow:none !important;text-align:left !important;
+  font-size:17px !important;line-height:1.5 !important;font-weight:400 !important;margin:8px 0 0 !important;max-width:640px !important;padding:0 !important;opacity:1 !important}
+html body .hb-band .hb-eye{display:block;font-size:14px !important;font-weight:600 !important;color:#a0531a !important;margin:0 0 8px !important;letter-spacing:0 !important;text-transform:none !important}
+html body .hb-band :is(.hero-badge,.section-label,.page-hero-label){display:inline-block !important;background:none !important;border:0 !important;padding:0 !important;
+  font-size:14px !important;font-weight:600 !important;color:#a0531a !important;margin:0 0 8px !important;letter-spacing:0 !important;text-transform:none !important;box-shadow:none !important}
+html body .hb-band :is(.btn,a.btn,.hero-btn-primary,.hero-btn-secondary,button){display:inline-flex !important;align-items:center !important;gap:8px !important;height:40px !important;
+  padding:0 16px !important;border-radius:999px !important;border:1px solid var(--hb-line) !important;background:#fff !important;color:var(--hb-ink) !important;
+  font:600 14px/1 Inter,system-ui,sans-serif !important;box-shadow:none !important;text-decoration:none !important;margin:16px 8px 0 0 !important;transform:none !important}
+html body .hb-band :is(.btn,a.btn,.hero-btn-primary,.hero-btn-secondary,button):hover{border-color:var(--hb-ink) !important}
+html body .hb-band :is(.hero-btn-primary,.btn-primary){background:var(--hb-ink) !important;color:#fff !important;border-color:var(--hb-ink) !important}
+html body .hb-band *{color:inherit;text-shadow:none !important}
+html body .hb-band :is(div,span,small){text-align:left !important}
+html body .hb-band [class*="justify-center"],html body .hb-band [style*="justify-content: center"]{justify-content:flex-start !important}
+@media (max-width:600px){
+  html body .hb-band{padding:calc(var(--hb-top,80px) + 24px) 0 18px !important}
+  html body .hb-band>.container,html body .hb-band>div:first-of-type{padding:0 18px !important}
+  html body .hb-band :is(p,.page-hero-subtitle,.hero-subtitle){font-size:16px !important}
+}
