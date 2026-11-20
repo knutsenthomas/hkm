@@ -447,6 +447,16 @@ html:has(#hkm-blog),html:has(#hkm-blog) body{overflow-x:clip!important;overflow-
 @media (max-width:900px){#hkm-blog .blog-grid{grid-template-columns:1fr 1fr!important}}
 @media (max-width:760px){#hkm-blog .featured-post-card{grid-template-columns:1fr!important}#hkm-blog .featured-image{min-height:0!important;aspect-ratio:16/9}#hkm-blog .featured-content{padding:20px!important}}
 @media (max-width:600px){#hkm-blog{padding-top:calc(var(--hb-head,80px) + 20px)}#hkm-blog .hb-wrap,#hkm-blog .blog-filter-section .container,#hkm-blog .blog-page .container{padding:0 18px}#hkm-blog .hb-lead{font-size:16px}#hkm-blog .blog-grid{grid-template-columns:1fr!important}#hkm-blog .blog-grid.list-view .blog-image{width:120px!important;flex-basis:120px!important;min-height:0}#hkm-blog .blog-grid.list-view .blog-excerpt{display:none}#hkm-blog .blog-category-filters{flex-wrap:nowrap!important;overflow-x:auto!important;scrollbar-width:none;margin-right:-18px!important;padding-right:18px!important}#hkm-blog .filter-btn{flex:0 0 auto!important}}
+#hkm-blog .hb-head{margin:0;background:#faf9f6;border-bottom:1px solid var(--line);padding:32px 0 24px}
+#hkm-blog{padding-top:var(--hb-head,96px)!important}
+#hkm-blog .hb-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,440px);gap:16px 40px;align-items:end}
+#hkm-blog .hb-top .blog-filter-section,#hkm-blog .hb-top .blog-filter-section>.container,#hkm-blog .hb-top .blog-search-filter-wrapper{display:contents!important}
+#hkm-blog .hb-top .blog-search-view-wrapper{grid-column:2;align-self:end}
+#hkm-blog .hb-top .blog-category-filters{grid-column:1/-1}
+#hkm-blog .hb-top .blog-search-box,#hkm-blog .hb-top .blog-view-toggle{background:#fff!important}
+#hkm-blog .hb-top .filter-btn:not(.active){background:#fff!important}
+@media (max-width:860px){#hkm-blog .hb-top{grid-template-columns:1fr}#hkm-blog .hb-top .blog-search-view-wrapper{grid-column:1}}
+@media (max-width:600px){#hkm-blog .hb-head{padding:24px 0 18px}}
 </style>
 <script>
 (function(){function h(){var e=document.querySelector('header');var b=e?e.getBoundingClientRect().bottom:90;b=b>0?Math.round(b):90;var m=document.getElementById('hkm-blog');if(m)m.style.setProperty('--hb-head',b+'px')}
@@ -455,13 +465,12 @@ document.addEventListener('DOMContentLoaded',h);window.addEventListener('load',h
 
     <main id="hkm-blog">
         <header class="hb-head">
-            <div class="hb-wrap">
-                <p class="hb-eye">Nyheter &amp; blogg</p>
+            <div class="hb-wrap hb-top">
+              <div class="hb-txt">
+                <p class="hb-eye">His Kingdom Ministry</p>
                 <h1 data-content-key="hero.title">Siste nytt</h1>
                 <p class="hb-lead" data-content-key="hero.subtitle">Artikler, refleksjoner og oppdateringer fra His Kingdom Ministry.</p>
-            </div>
-        </header>
-
+              </div>
         <!-- Search & Filter Bar -->
         <div class="blog-filter-section">
             <div class="container">
@@ -490,6 +499,9 @@ document.addEventListener('DOMContentLoaded',h);window.addEventListener('load',h
                 </div>
             </div>
         </div>
+
+            </div>
+        </header>
 
         <!-- Blog Posts List -->
         <section class="blog-page section">
