@@ -24,7 +24,8 @@
     const nums = (r.chapters || []).map(c => +String(c.id).split('_')[1]).filter(n => n > 0);
     const max = nums.length ? Math.max(...nums) : 0;
     const trEl = document.querySelector('.selected-translation-name');
-    return { name: book ? book.name : '', ch, max, intro: ch === 'intro', tr: trEl ? trEl.textContent.trim() : '' };
+    const act = document.querySelector('.book-item.active .sidebar-genre-badge');
+    return { genre: act ? act.textContent.trim() : '', name: book ? book.name : '', ch, max, intro: ch === 'intro', tr: trEl ? trEl.textContent.trim() : '' };
   }
 
   /* ---------- kapitteltopp ---------- */
@@ -38,7 +39,7 @@
     }
     const s = state(); if (!s || !s.name) { h.hidden = true; return; }
     h.hidden = false;
-    h.querySelector('.hkr-eyebrow').textContent = s.name;
+    h.querySelector('.hkr-eyebrow').textContent = s.genre || s.name;
     h.querySelector('.hkr-num').textContent = s.intro ? '' : s.ch;
     h.querySelector('.hkr-h1').textContent = s.intro ? `${s.name} – ${T.intro}` : `${s.name} ${s.ch}`;
     h.querySelector('.hkr-meta').textContent = [s.intro ? '' : T.chOf(s.ch, s.max), s.tr].filter(Boolean).join(' · ');
@@ -53,7 +54,11 @@
     if (look) { const sp = look.querySelectorAll('span')[1]; if (sp && sp.textContent !== T.lookup) sp.textContent = T.lookup; }
     const cr = $('#btn-crossref-chapter-dynamic');
     if (cr && !cr.querySelector('.hkr-lbl')) { const l = document.createElement('span'); l.className = 'hkr-lbl'; l.textContent = T.crossref; cr.appendChild(l); }
-    document.querySelectorAll('#chapter-header-action-bar .nav-btn, #btn-lookup-chapter').forEach(b => b.classList.add('hkr-pill'));
+    document.querySelectorAll('#chapter-header-action-bar .nav-btn, #btn-lookup-chapter').forEach(b => {
+      b.classList.add('hkr-pill');
+      if (b.getAttribute('style')) b.removeAttribute('style');
+      b.querySelectorAll('[style]').forEach(x => x.removeAttribute('style'));
+    });
   }
 
   /* ---------- forrige / neste nederst ---------- */
