@@ -703,16 +703,16 @@ html:has(#hkm-media),html:has(#hkm-media) body{overflow-x:clip!important;overflo
     items=(items||[]).filter(function(i){return i&&i.published!==false&&i.title}).sort(function(a,b){return ts(b)-ts(a)}).slice(0,3);
     if(!items.length){el.innerHTML='<p class="hm-empty">'+empty+'</p>';return}
     el.innerHTML=items.map(function(i){
-      var key=i.id||i.title,img=i.imageUrl||i.image||'';
+      var key=i.id||i.title,img=i.imageUrl||i.image||'',link=i.href||('/blogg-post?id='+encodeURIComponent(key));
       var k=kind||i.category||i.teachingType||'';
-      return '<a class="hm-post" href="/blogg-post?id='+encodeURIComponent(key)+'"><span class="ph">'+(img?'<img src="'+esc(img)+'" alt="" loading="lazy" decoding="async">':'')+'</span><span class="pt">'+(k?'<p class="pk">'+esc(k)+'</p>':'')+'<p class="pn">'+esc(i.title)+'</p>'+(i.date?'<p class="pd">'+esc(d(i.date))+'</p>':'')+'</span></a>';
+      return '<a class="hm-post" href="'+esc(link)+'"><span class="ph">'+(img?'<img src="'+esc(img)+'" alt="" loading="lazy" decoding="async">':'')+'</span><span class="pt">'+(k?'<p class="pk">'+esc(k)+'</p>':'')+'<p class="pn">'+esc(i.title)+'</p>'+(i.date?'<p class="pd">'+esc(d(i.date))+'</p>':'')+'</span></a>';
     }).join('');
   }
   var tries=0;
   (function go(){
     var fs=window.firebaseService;
     if(!fs||typeof fs.getPageContent!=='function'){if(++tries<60)return setTimeout(go,200);render('hm-teach',[],'','Kunne ikke hente undervisning nå.');render('hm-blog',[],'Blogg','Kunne ikke hente innlegg nå.');return}
-    fs.getPageContent('collection_teaching').then(function(r){render('hm-teach',r&&r.items,'','Ingen undervisning ennå.')}).catch(function(){render('hm-teach',[],'','Kunne ikke hente undervisning nå.')});
+    fs.getPageContent('collection_teaching').then(function(r){var faste={id:'item-1795125986813-h8n6uapai',title:'Faste – å gi Gud mer plass',date:'2026-11-20',category:'Bibelstudie',imageUrl:'https://images.unsplash.com/photo-1457139621581-298d1801c832?auto=format&fit=crop&w=1200&q=80',href:'/undervisning/faste'};var items=[faste].concat(((r&&r.items)||[]).filter(function(i){return i&&i.id!==faste.id}));render('hm-teach',items,'','Ingen undervisning ennå.')}).catch(function(){render('hm-teach',[],'','Kunne ikke hente undervisning nå.')});
     fs.getPageContent('collection_blog').then(function(r){render('hm-blog',r&&r.items,'Blogg','Ingen innlegg ennå.')}).catch(function(){render('hm-blog',[],'Blogg','Kunne ikke hente innlegg nå.')});
   })();
 })();
