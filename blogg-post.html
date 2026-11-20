@@ -671,6 +671,10 @@ html:has(#hkp-head),html:has(#hkp-head) body{overflow-x:clip!important;overflow-
   function watch(){var hero=document.getElementById('blog-hero');if(hero)mo.observe(hero,{attributes:true,attributeFilter:['style']});var p=document.getElementById('print-post-image-body');if(p)mo.observe(p,{attributes:true,attributeFilter:['src']});fromHero();fromPrint()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watch);else watch();
   if(window.ResizeObserver){var hd=document.getElementById('header');if(hd)new ResizeObserver(h).observe(hd)}
+  var junk=/^\s*(ja,?\s*jeg\s+ønsker\s+å\s+abonnere\s+på\s+deres\s+nyhetsbrev|yes,?\s*i\s+would\s+like\s+to\s+subscribe\s+to\s+your\s+newsletter|sí,?\s*deseo\s+suscribirme[^*]*)\s*\*?\s*$/i;
+  function clean(){var c=document.getElementById('single-post-content');if(!c)return;c.querySelectorAll('p,div,span,li,label').forEach(function(el){if(el.children.length>2)return;if(junk.test(el.textContent||''))el.remove()})}
+  var cm=new MutationObserver(clean);function watchC(){var c=document.getElementById('single-post-content');if(c){cm.observe(c,{childList:true,subtree:true});clean()}}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watchC);else watchC();
   var bb=setInterval(function(){var b=document.getElementById('back-btn');if(b&&/undervisning/i.test(b.getAttribute('href')||'')){var a=R.querySelector('.hp-back');a.href=b.getAttribute('href');document.getElementById('hp-back-label').textContent='Undervisning';clearInterval(bb)}},500);setTimeout(function(){clearInterval(bb)},10000);
 })();
 </script>
