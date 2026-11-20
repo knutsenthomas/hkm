@@ -34,8 +34,17 @@
                 CHILD.forEach((p) => { if (c.style.getPropertyValue(p)) c.style.removeProperty(p); });
             });
             stripKids();
-            let busy = false;
-            new MutationObserver(() => { if (busy) return; busy = true; strip(el); stripKids(); busy = false; }).observe(el, { attributes: true, attributeFilter: ['style'], subtree: true });
+            let runs = 0, queued = false;
+            const mo = new MutationObserver(() => {
+                if (queued) return; queued = true;
+                requestAnimationFrame(() => {
+                    queued = false;
+                    if (++runs > 30) { mo.disconnect(); return; }
+                    mo.disconnect(); strip(el); stripKids();
+                    mo.observe(el, { attributes: true, attributeFilter: ['style'], subtree: true });
+                });
+            });
+            mo.observe(el, { attributes: true, attributeFilter: ['style'], subtree: true });
         });
         heroes.forEach((el) => {
             const n = el.nextElementSibling;
@@ -119,7 +128,7 @@
         input.addEventListener('input', run);
         buildCats();
         let mt;
-        new MutationObserver(() => { clearTimeout(mt); mt = setTimeout(() => { buildCats(); if (input.value.trim() || activeCat) run(); }, 120); }).observe(document.body, { childList: true, subtree: true });
+        new MutationObserver((recs) => { if (recs.every((r) => r.target.closest && r.target.closest('.hb-filters, .hb-search, #hb-none'))) return; clearTimeout(mt); mt = setTimeout(() => { buildCats(); if (input.value.trim() || activeCat) run(); }, 150); }).observe(document.body, { childList: true, subtree: true });
         return true;
     }
     let searchTries = 0;
