@@ -308,9 +308,9 @@ class BibleReader {
         // UI Settings
         let settings = {
             fontSize: 18,
-            fontFamily: 'serif', // 'serif' | 'sans'
-            lineHeight: 1.8,
-            theme: 'cream', // 'light' | 'cream' | 'dark'
+            fontFamily: 'sans', // 'serif' | 'sans'
+            lineHeight: 1.75,
+            theme: 'light', // 'light' | 'cream' | 'dark'
             layout: 'verse' // 'verse' | 'paragraph' (Verse-by-verse is standard default)
         };
         try {
@@ -323,6 +323,16 @@ class BibleReader {
             console.warn("[BibleReader] Failed to parse settings:", e);
         }
         this.settings = settings;
+
+        // Migrering: samme skrift og hvit bakgrunn som leseplanene (én gang per bruker)
+        try {
+            if (!this.safeGetLocalStorage('hkm_bible_style_v4')) {
+                this.settings.fontFamily = 'sans';
+                if (this.settings.theme === 'cream') this.settings.theme = 'light';
+                this.safeSetLocalStorage('hkm_bible_settings', JSON.stringify(this.settings));
+                this.safeSetLocalStorage('hkm_bible_style_v4', 'true');
+            }
+        } catch (e) { }
 
         // Migration: Force verse layout by default once for all users
         try {
@@ -341,7 +351,7 @@ class BibleReader {
         if (activeGlobalTheme === 'dark') {
             this.settings.theme = 'dark';
         } else if (this.settings.theme === 'dark') {
-            this.settings.theme = 'cream';
+            this.settings.theme = 'light';
         }
 
         // Audio Player State

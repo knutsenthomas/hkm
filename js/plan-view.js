@@ -310,7 +310,7 @@
       return r.name + ' ' + r.ch + (r.chTo > r.ch ? '–' + r.chTo : '');
     }).join(' · ');
   }
-  const bibleHref = r => T.bibleUrl + '?ref=' + encodeURIComponent(r.label);
+  const bibleHref = r => T.bibleUrl + '?ref=' + encodeURIComponent(r.label) + '&fra=' + encodeURIComponent(plan.id) + '&dag=' + (typeof cur === 'number' ? cur : 1) + '&t=' + encodeURIComponent((plan.title || '').slice(0, 80));
   const chapCache = new Map();
   async function chapter(book, ch) {
     const key = BIBLE.id + ':' + book + ':' + ch;
