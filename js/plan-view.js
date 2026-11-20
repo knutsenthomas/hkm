@@ -356,7 +356,34 @@
   /* ---------- fremgang ---------- */
   const PWA = 'hkm_reading_plan_progress_' + plan.id, OLD = 'hkm_plan_' + plan.id + '_completed', NS = 'hkmpv:' + plan.id + ':';
   const ls = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) { } } };
-  const S = { get: k => ls.get(NS + k), set: (k, v) => ls.set(NS + k, v) };
+  const S = { get: k => ls.get(NS + k), set: (k, v) => { ls.set(NS + k, v); queueRemote(k, v); } };
+  /* notater, dagens steg og leste tekster følger med profilen når man er logget inn */
+  const RKEY = { n: 'reflections', s: 'steps', p: 'readItems' };
+  let pend = {}, pendT = null;
+  function remoteVal(k, v) {
+    const m = /^([nsp])(\d+)$/.exec(k); if (!m) return null;
+    const f = RKEY[m[1]];
+    let val = v;
+    if (m[1] === 's') val = v === '1';
+    else if (m[1] === 'p') { try { val = JSON.parse(v || '[]').map(Number); } catch (e) { val = []; } }
+    return [f, m[2], val];
+  }
+  function queueRemote(k, v) {
+    const r = remoteVal(k, v); if (!r) return;
+    (pend[r[0]] = pend[r[0]] || {})[r[1]] = r[2];
+    clearTimeout(pendT); pendT = setTimeout(flushRemote, 1200);
+  }
+  async function flushRemote() {
+    if (!userRef || !Object.keys(pend).length) return;
+    const data = pend; pend = {};
+    try {
+      if (!remote) { data.planId = plan.id; data.startedAt = new Date(start + 'T12:00:00'); data.completedDays = [...done].sort((a, b) => a - b); data.currentDay = 1; }
+      data.lastActiveAt = firebase.firestore.FieldValue.serverTimestamp();
+      await userRef.set(data, { merge: true });
+      remote = remote || data;
+    } catch (e) { console.warn('Kunne ikke lagre notater på Min side:', e); }
+  }
+  addEventListener('pagehide', () => { if (pendT) { clearTimeout(pendT); flushRemote(); } });
   function loadDone() {
     try { const p = JSON.parse(ls.get(PWA) || 'null'); if (p && Array.isArray(p.completedDays)) return p.completedDays.map(Number); } catch (e) { }
     try { const o = JSON.parse(ls.get(OLD) || 'null'); if (Array.isArray(o)) return o.map(Number); } catch (e) { }
@@ -381,7 +408,7 @@
     try {
       const arr = [...done].sort((a, b) => a - b);
       const data = { planId: plan.id, completedDays: arr, lastActiveAt: firebase.firestore.FieldValue.serverTimestamp() };
-      if (!remote) { data.currentDay = 1; data.reflections = {}; data.startedAt = new Date(start + 'T12:00:00'); }
+      if (!remote) { data.currentDay = 1; data.startedAt = new Date(start + 'T12:00:00'); }
       await userRef.set(data, { merge: true });
       remote = remote || data;
     } catch (e) { console.warn('Kunne ikke lagre fremgang på Min side:', e); }
@@ -394,12 +421,21 @@
         const snap = await userRef.get();
         if (snap.exists) {
           remote = snap.data() || {};
+          [['reflections', 'n', v => typeof v === 'string' ? v : ''], ['steps', 's', v => v ? '1' : '0'], ['readItems', 'p', v => JSON.stringify(Array.isArray(v) ? v : [])]].forEach(([f, pre, conv]) => {
+            const o = remote[f]; if (!o || typeof o !== 'object' || Array.isArray(o)) return;
+            Object.keys(o).forEach(key => { const n = +key; if (n >= 1 && n <= N) ls.set(NS + pre + n, conv(o[key])); });
+          });
           if (Array.isArray(remote.completedDays)) { remote.completedDays.map(Number).forEach(n => n >= 1 && n <= N && done.add(n)); saveLocal(); }
           const sa = remote.startedAt && (remote.startedAt.toDate ? remote.startedAt.toDate() : new Date(remote.startedAt));
           if (sa && !isNaN(sa) && !S.get('startManual')) { start = sa.getFullYear() + '-' + String(sa.getMonth() + 1).padStart(2, '0') + '-' + String(sa.getDate()).padStart(2, '0'); S.set('start', start); const inp = $('#pv-start'); if (inp) inp.value = start; }
           const m = (location.hash || '').match(/^#dag-(\d+)$/);
           show(m ? cur : defaultDay(), false, true);
         }
+        for (let n = 1; n <= N; n++) ['n', 's', 'p'].forEach(pre => {
+          const v = ls.get(NS + pre + n); if (v == null || v === '' || v === '0' || v === '[]') return;
+          const f = RKEY[pre]; if (remote && remote[f] && Object.prototype.hasOwnProperty.call(remote[f], String(n))) return;
+          queueRemote(pre + n, v);
+        });
       } catch (e) { console.warn('Fremgang fra Min side:', e); }
     });
     if (fbReady()) { try { go(); } catch (e) { } return; }
