@@ -52,3 +52,17 @@ html:has(#hkm-tl), html:has(#hkm-tl) body { overflow-x: clip !important; overflo
   #hkm-tl .media-grid { grid-template-columns: 1fr !important; }
   #hkm-tl .tl-cta { padding: 22px 20px; }
 }
+
+/* Listevisning (knappen ved søket) */
+#hkm-tl .media-grid.hb-list { grid-template-columns: 1fr !important; gap: 12px !important; }
+#hkm-tl .media-grid.hb-list .media-card { display: grid !important; grid-template-columns: 260px minmax(0, 1fr) !important; }
+#hkm-tl .media-grid.hb-list .media-thumbnail { aspect-ratio: auto !important; min-height: 160px !important; position: relative !important; }
+#hkm-tl .media-grid.hb-list .media-thumbnail img { position: absolute !important; inset: 0 !important; }
+#hkm-tl .media-grid.hb-list .media-content { justify-content: center !important; }
+@media (max-width: 600px) {
+  #hkm-tl .media-grid.hb-list .media-card { grid-template-columns: 112px minmax(0, 1fr) !important; }
+  #hkm-tl .media-grid.hb-list .media-thumbnail { min-height: 112px !important; }
+  #hkm-tl .media-grid.hb-list .media-description { display: none !important; }
+  #hkm-tl .media-grid.hb-list .media-content { padding: 12px 14px !important; }
+  #hkm-tl .media-grid.hb-list .media-title { font-size: 16px !important; }
+}
