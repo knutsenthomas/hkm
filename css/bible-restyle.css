@@ -120,3 +120,18 @@ html.hkr body .hkm-segmented-control .segment-btn.active{background:var(--hkr-in
 html.hkr body:not(.bible-theme-dark):not(.bible-theme-cream){--bg-base:#fff;--bg-sidebar:#fff;--bg-card:#fff;--text-base:#151a21;--text-muted:#596069;--border-color:rgba(21,26,33,.12)}
 html.hkr body #btn-lookup-chapter:not(.hkr-pill),html.hkr body #chapter-header-action-bar .nav-btn:not(.hkr-pill){visibility:hidden}
 html.hkr body #bible-reading-pane{font-family:Inter,system-ui,-apple-system,sans-serif}
+
+/* Bibeleksikon i samme stil */
+html.hkr body .dictionary-drawer,html.hkr body .dictionary-drawer *{font-family:Inter,system-ui,-apple-system,sans-serif!important}
+html.hkr body .dictionary-drawer .material-symbols-outlined{font-family:'Material Symbols Outlined'!important}
+html.hkr body .dict-header h3{color:var(--hkr-ink)!important;font-weight:800!important;font-size:18px!important;letter-spacing:-.02em!important}
+html.hkr body .dict-word-title{font-weight:800!important;font-size:30px!important;line-height:1.1!important;letter-spacing:-.03em!important;color:var(--hkr-ink)!important}
+html.hkr body .dict-category-badge{background:transparent!important;padding:0!important;color:var(--hkr-t)!important;font-size:14px!important;font-weight:600!important;border-radius:0!important}
+html.hkr body .dict-section-title{color:var(--hkr-t)!important;text-transform:none!important;letter-spacing:0!important;font-size:14px!important;font-weight:700!important}
+html.hkr body .dict-definition-text,html.hkr body #dict-extended-text{font-size:16px!important;line-height:1.7!important;color:var(--hkr-ink)!important;hyphens:manual!important;-webkit-hyphens:manual!important}
+html.hkr body #dict-extended-text h1,html.hkr body #dict-extended-text h2,html.hkr body #dict-extended-text h3,html.hkr body #dict-extended-text h4{font-weight:800!important;letter-spacing:-.02em!important;color:var(--hkr-ink)!important}
+html.hkr body #dict-extended-text li::marker{color:var(--hkr-t)}
+html.hkr body #dict-search-input{border-radius:999px!important;border:1px solid var(--hkr-line)!important;padding:0 16px!important;height:42px!important;box-shadow:none!important}
+html.hkr body #dict-search-submit-btn{border-radius:999px!important;background:var(--hkr-ink)!important;height:42px!important;padding:0 18px!important;font-size:14px!important}
+html.hkr body .dict-extended-btn{border-radius:999px!important;border:1px solid var(--hkr-line)!important;background:var(--bg-card,#fff)!important;color:var(--hkr-ink)!important;box-shadow:none!important;font-weight:600!important}
+html.hkr body .close-dict-btn{box-shadow:none!important;border:1px solid var(--hkr-line)!important;background:transparent!important}
