@@ -17,7 +17,7 @@
       over: 'Planen er fullført i kalenderen', doneOf: (a, b) => a + ' av ' + b + ' dager fullført',
       stillRead: 'Du kan fortsatt lese og fullføre dagene.', today: d => 'I dag · ' + d, dayT: (n, t) => 'Dag ' + n + ': ' + t,
       todayDone: 'Dagens dag er fullført. Godt jobbet!', tapDay: 'Trykk på dagen for å lese.', of: n => 'av ' + n,
-      myStart: 'Min startdato', startShort: d => 'Start ' + d + ' · Endre', week: 'Uke', dayRange: (a, b) => 'Dag ' + a + '–' + b, selected: 'Valgt dag', todayL: 'I dag', doneL: 'Fullført',
+      myStart: 'Min startdato', startShort: d => 'Start ' + d + ' · Endre', devotional: 'Andakt', startReading: 'Start lesing', contReading: 'Fortsett lesingen', pct: p => p + '% fullført', nextS: 'Neste', prevS: 'Forrige', finishDay: 'Fullfør dagen', close: 'Lukk', dayDoneS: 'Dagen er fullført', week: 'Uke', dayRange: (a, b) => 'Dag ' + a + '–' + b, selected: 'Valgt dag', todayL: 'I dag', doneL: 'Fullført',
       allDays: 'Alle dager', readOf: (a, b) => a + ' av ' + b + ' fullført', dayOf: (n, m) => 'Dag ' + n + ' av ' + m,
       verses: 'Dagens bibelvers', readAll: n => n === 2 ? 'Les begge' : 'Les alle ' + (['', '', '', 'tre', 'fire', 'fem', 'seks'][n] || n), copy: 'Kopier', nextV: 'Neste vers →', firstV: 'Første vers ↺',
       openBible: 'Les i Bibelen', showAll: 'Vis hele teksten', step: 'Dagens steg', prayFor: 'Be for', prayer: 'Bønn', notes: n => 'Mine notater for dag ' + n,
@@ -43,7 +43,7 @@
       over: 'The plan has ended in the calendar', doneOf: (a, b) => a + ' of ' + b + ' days completed',
       stillRead: 'You can still read and complete the days.', today: d => 'Today · ' + d, dayT: (n, t) => 'Day ' + n + ': ' + t,
       todayDone: "Today's day is completed. Well done!", tapDay: 'Tap the day to read.', of: n => 'of ' + n,
-      myStart: 'My start date', startShort: d => 'Starts ' + d + ' · Change', week: 'Week', dayRange: (a, b) => 'Day ' + a + '–' + b, selected: 'Selected day', todayL: 'Today', doneL: 'Completed',
+      myStart: 'My start date', startShort: d => 'Starts ' + d + ' · Change', devotional: 'Devotional', startReading: 'Start reading', contReading: 'Continue reading', pct: p => p + '% complete', nextS: 'Next', prevS: 'Previous', finishDay: 'Complete the day', close: 'Close', dayDoneS: 'Day completed', week: 'Week', dayRange: (a, b) => 'Day ' + a + '–' + b, selected: 'Selected day', todayL: 'Today', doneL: 'Completed',
       allDays: 'All days', readOf: (a, b) => a + ' of ' + b + ' completed', dayOf: (n, m) => 'Day ' + n + ' of ' + m,
       verses: "Today's Bible verses", readAll: n => n === 2 ? 'Read both' : 'Read all ' + n, copy: 'Copy', nextV: 'Next verse →', firstV: 'First verse ↺',
       openBible: 'Read in the Bible', showAll: 'Show the whole passage', step: "Today's step", prayFor: 'Pray for', prayer: 'Prayer', notes: n => 'My notes for day ' + n,
@@ -69,7 +69,7 @@
       over: 'El plan ya terminó en el calendario', doneOf: (a, b) => a + ' de ' + b + ' días completados',
       stillRead: 'Todavía puedes leer y completar los días.', today: d => 'Hoy · ' + d, dayT: (n, t) => 'Día ' + n + ': ' + t,
       todayDone: 'El día de hoy está completado. ¡Bien hecho!', tapDay: 'Toca el día para leer.', of: n => 'de ' + n,
-      myStart: 'Mi fecha de inicio', startShort: d => 'Inicio ' + d + ' · Cambiar', week: 'Semana', dayRange: (a, b) => 'Día ' + a + '–' + b, selected: 'Día elegido', todayL: 'Hoy', doneL: 'Completado',
+      myStart: 'Mi fecha de inicio', startShort: d => 'Inicio ' + d + ' · Cambiar', devotional: 'Devocional', startReading: 'Comenzar lectura', contReading: 'Seguir leyendo', pct: p => p + '% completado', nextS: 'Siguiente', prevS: 'Anterior', finishDay: 'Completar el día', close: 'Cerrar', dayDoneS: 'Día completado', week: 'Semana', dayRange: (a, b) => 'Día ' + a + '–' + b, selected: 'Día elegido', todayL: 'Hoy', doneL: 'Completado',
       allDays: 'Todos los días', readOf: (a, b) => a + ' de ' + b + ' completados', dayOf: (n, m) => 'Día ' + n + ' de ' + m,
       verses: 'Versículos del día', readAll: n => n === 2 ? 'Leer ambos' : 'Leer los ' + n, copy: 'Copiar', nextV: 'Siguiente →', firstV: 'Primero ↺',
       openBible: 'Leer en la Biblia', showAll: 'Mostrar todo el texto', step: 'Paso de hoy', prayFor: 'Ora por', prayer: 'Oración', notes: n => 'Mis notas del día ' + n,
@@ -434,6 +434,8 @@ ${(intro.structure || []).length ? `<h3>${esc(T.structure)}</h3><ul>${intro.stru
   const md = document.querySelector('meta[name="description"]'); if (md && lead) md.setAttribute('content', lead.slice(0, 160));
 
   root.innerHTML = `
+<section class="app" id="pv-app" aria-label="${esc(plan.title || '')}"></section>
+<div class="reader" id="pv-reader" hidden role="dialog" aria-modal="true"><div class="rbar"><button type="button" class="ricon" id="rclose" aria-label="${esc(T.close)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button><b id="rtitle"></b><span id="rcount"></span></div><div class="rbody" id="rbody"></div><div class="rfoot"><button type="button" class="pill" id="rprev"></button><button type="button" class="pill donebtn" id="rnext"></button></div></div>
 <div class="wrap" id="pv-top">
 <div>
 <header class="head">
@@ -489,6 +491,11 @@ ${aboutHTML('about-bottom')}
   if (!document.getElementById('pv-toast')) { const t = document.createElement('div'); t.id = 'pv-toast'; t.setAttribute('aria-live', 'polite'); t.style.cssText = ''; document.body.appendChild(t); }
   if (!document.getElementById('pv-prog')) { const p = document.createElement('div'); p.id = 'pv-prog'; document.body.appendChild(p); }
 
+  async function shareIt() {
+    const url = location.origin + location.pathname + location.search;
+    if (navigator.share && matchMedia('(pointer:coarse)').matches) { try { await navigator.share({ title: plan.title, url }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+    try { await navigator.clipboard.writeText(url); toast(T.linkCopied); } catch (e) { toast(T.noLink); }
+  }
   /* ---------- tegning ---------- */
   function hero() {
     const n = done.size, ti = todayIdx(), C = 2 * Math.PI * 52;
@@ -619,12 +626,91 @@ ${aboutHTML('about-bottom')}
       saveLocal(); saveRemote(); show(n, false, true);
     });
   }
+
+  /* ---------- app-visning på mobil ---------- */
+  const ICON_CHEV = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>';
+  function dayItems(n) {
+    const d = DAYS[n - 1], items = [];
+    if (d.body || d.step || d.pray.length || d.prayer) items.push({ type: 'dev', label: T.devotional });
+    d.refs.filter(r => r.label).forEach(r => items.push({ type: 'ref', label: refShow(r), ref: r }));
+    return items;
+  }
+  const readGet = n => { try { return new Set(JSON.parse(S.get('p' + n) || '[]')); } catch (e) { return new Set(); } };
+  const readSet = (n, set) => S.set('p' + n, JSON.stringify([...set]));
+  function setDayDone(n, on) {
+    if (on && !done.has(n)) { done.add(n); toast(done.size === N ? T.allDone(N) : T.dayDone(n)); }
+    else if (!on) done.delete(n);
+    saveLocal(); saveRemote();
+  }
+  function toggleItem(n, i, on) {
+    const items = dayItems(n), set = readGet(n);
+    if (on) set.add(i); else set.delete(i);
+    readSet(n, set);
+    const all = items.length && items.every((_, k) => set.has(k));
+    if (all !== done.has(n)) setDayDone(n, all);
+  }
+  function renderApp() {
+    const el = $('#pv-app'); if (!el) return;
+    const n = cur, ti = todayIdx(), items = dayItems(n), set = readGet(n), dn = done.has(n);
+    const pct = Math.round(done.size / N * 100);
+    const img = plan.imageUrl ? `style="background-image:linear-gradient(180deg,rgba(21,26,33,.15),rgba(21,26,33,.75)),url('${esc(plan.imageUrl)}')"` : '';
+    let chips = '';
+    for (let k = 1; k <= N; k++) { const dt = dayDate(k); chips += `<button type="button" class="achip${done.has(k) ? ' done' : ''}${k === ti ? ' today' : ''}" aria-current="${k === n}" data-n="${k}"><b>${k}${done.has(k) ? '<i aria-hidden="true">✓</i>' : ''}</b><span>${esc(T.MS[dt.getMonth()].toUpperCase())} ${dt.getDate()}</span></button>`; }
+    const unread = items.findIndex((_, k) => !set.has(k));
+    el.innerHTML = `
+<div class="abar"><a class="ricon" href="${T.listUrl}" aria-label="${esc(T.back)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></a><b>${esc(plan.title || '')}</b><button type="button" class="ricon" data-share aria-label="${esc(T.share)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg></button></div>
+<div class="acard${img ? ' img' : ''}" ${img}>${img ? '' : '<svg class="shape" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path d="M560 -80C720 -70 840 40 815 170 792 290 660 320 570 260 480 200 500 110 440 60 380 10 430 -90 560 -80Z" fill="#cc712b" fill-opacity=".85"/></svg>'}<b>${esc(plan.title || '')}</b>${ICON_BOOK}</div>
+<div class="adays" id="adays">${chips}</div>
+<div class="ahead"><b>${esc(T.dayOf(n, N))}</b><span>${esc(T.pct(pct))}</span></div>
+<p class="atitle">${esc(DAYS[n - 1].heading || DAYS[n - 1].title)}</p>
+<ul class="alist">${items.map((it, k) => `<li><label class="ack"><input type="checkbox" data-i="${k}" ${set.has(k) || dn ? 'checked' : ''} aria-label="${esc(it.label)}"><span></span></label><button type="button" class="aopen" data-i="${k}"><span>${esc(it.label)}</span>${ICON_CHEV}</button></li>`).join('')}</ul>
+${dn ? `<p class="adone">✓ ${esc(T.dayDoneS)}</p>` : ''}
+<div class="astart"><button type="button" class="pill donebtn" id="astart">${esc(unread > 0 ? T.contReading : (dn ? T.startReading : T.startReading))}</button></div>
+${aboutHTML('about-app')}
+<div style="height:96px"></div>`;
+    el.querySelectorAll('.achip').forEach(b => b.addEventListener('click', () => show(+b.dataset.n, false)));
+    el.querySelectorAll('.ack input').forEach(c => c.addEventListener('change', () => { toggleItem(n, +c.dataset.i, c.checked); show(n, false, true); }));
+    el.querySelectorAll('.aopen').forEach(b => b.addEventListener('click', () => openReader(n, +b.dataset.i)));
+    $('#astart').addEventListener('click', () => openReader(n, unread >= 0 ? unread : 0));
+    el.querySelectorAll('[data-share]').forEach(b => b.addEventListener('click', shareIt));
+    const ad = $('#adays'), on = ad && ad.querySelector('.achip[aria-current=true]');
+    if (on) ad.scrollLeft = on.offsetLeft - ad.offsetLeft - ad.clientWidth / 2 + on.clientWidth / 2;
+  }
+  let rState = null;
+  function devHTML(n) {
+    const d = DAYS[n - 1], k = 's' + n;
+    return `${d.body ? `<div class="dtext">${d.body}</div>` : ''}
+  ${d.step ? `<label class="stepcard"><input type="checkbox" id="rstep" ${S.get(k) === '1' ? 'checked' : ''}><span><span class="lbl">${esc(T.step)}</span><p>${esc(d.step)}</p></span></label>` : ''}
+  ${d.pray.length || d.prayer ? `<div class="pray">${d.pray.length ? `<span class="lbl">${esc(T.prayFor)}</span><ul>${d.pray.map(p => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}${d.prayer ? `${d.pray.length ? '<div style="height:12px"></div>' : ''}<span class="lbl">${esc(T.prayer)}</span><p>${esc(d.prayer)}</p>` : ''}</div>` : ''}
+  <label class="notes write"><span>${esc(T.notes(n))}</span><textarea id="rnote" placeholder="${esc(T.notesPh)}">${esc(S.get('n' + n) || '')}</textarea></label>`;
+  }
+  async function openReader(n, i) {
+    const items = dayItems(n); if (!items.length) return;
+    i = Math.max(0, Math.min(items.length - 1, i)); rState = { n, i };
+    const it = items[i], rd = $('#pv-reader'), body = $('#rbody');
+    $('#rtitle').textContent = it.label; $('#rcount').textContent = items.length > 1 ? (i + 1) + '/' + items.length : '';
+    $('#rprev').textContent = '← ' + T.prevS; $('#rprev').style.visibility = i > 0 ? 'visible' : 'hidden';
+    $('#rnext').textContent = i < items.length - 1 ? T.nextS + ' →' : T.finishDay;
+    rd.hidden = false; document.documentElement.classList.add('pv-lock');
+    if (it.type === 'dev') {
+      body.innerHTML = devHTML(n);
+      const sc = $('#rstep'); if (sc) sc.addEventListener('change', e => S.set('s' + n, e.target.checked ? '1' : '0'));
+      $('#rnote').addEventListener('input', e => S.set('n' + n, e.target.value));
+    } else {
+      body.innerHTML = `<p class="wload">${esc(T.loadingV)}</p>`;
+      const html = await passHTML(it.ref);
+      if (!rState || rState.n !== n || rState.i !== i) return;
+      body.innerHTML = `<div class="wbody">${html}</div><p class="rsrc">${esc(BIBLE.name)}${BIBLE.lic ? ' · ' + esc(BIBLE.lic) : ''} · <a href="${esc(bibleHref(it.ref))}">${esc(T.openBible)}</a></p>`;
+    }
+    body.scrollTop = 0;
+  }
+  function closeReader() { $('#pv-reader').hidden = true; document.documentElement.classList.remove('pv-lock'); rState = null; show(cur, false, true); }
   function show(n, scroll, quiet) {
     cur = n; sec = Math.max(0, secOf(n));
     const w = $('#daywrap');
     const paint = () => { w.innerHTML = dayHTML(n); bindDay(n); w.classList.remove('swap'); };
     if (quiet || reduced) paint(); else { w.classList.add('swap'); setTimeout(paint, 180); }
-    renderWeeks(); renderDays(); renderToc(); hero();
+    renderWeeks(); renderDays(); renderToc(); hero(); renderApp();
     try { history.replaceState(null, '', location.pathname + location.search + '#dag-' + n); } catch (e) { }
     if (scroll) $('#dag').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
   }
@@ -642,11 +728,15 @@ ${aboutHTML('about-bottom')}
   hookAuth();
 
   /* del, innholdsliste på mobil, fremdriftslinje, animasjon */
-  $$('[data-share]').forEach(b => b.addEventListener('click', async () => {
-    const url = location.origin + location.pathname + location.search;
-    if (navigator.share && matchMedia('(pointer:coarse)').matches) { try { await navigator.share({ title: plan.title, url }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
-    try { await navigator.clipboard.writeText(url); toast(T.linkCopied); } catch (e) { toast(T.noLink); }
-  }));
+  $$('.wrap [data-share]').forEach(b => b.addEventListener('click', shareIt));
+  $('#rclose').addEventListener('click', closeReader);
+  $('#rprev').addEventListener('click', () => rState && openReader(rState.n, rState.i - 1));
+  $('#rnext').addEventListener('click', () => {
+    if (!rState) return; const { n, i } = rState, items = dayItems(n);
+    toggleItem(n, i, true);
+    if (i < items.length - 1) openReader(n, i + 1); else { if (!done.has(n)) setDayDone(n, true); closeReader(); }
+  });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && rState) closeReader(); });
   const toc = $('#toc'); $('#tocbtn').addEventListener('click', () => toc.classList.add('open'));
   document.addEventListener('click', e => { if (toc.classList.contains('open') && !e.target.closest('.tocpanel') && !e.target.closest('#tocbtn')) toc.classList.remove('open'); });
   const rv = $$('.rv');
