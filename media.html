@@ -556,18 +556,51 @@
         </div>
     </div>
 
-    <section class="page-hero subpage-hero" data-content-key="hero.backgroundImage"
-        style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1516280440614-37939bbacd81?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') !important;">
-        <div class="container">
-            <h1 class="page-hero-title" data-content-key="hero.title">Media & Ressurser</h1>
-            <p class="page-hero-subtitle" data-content-key="hero.subtitle">Utforsk videoer, podcaster, bibelstudier og historiske ressurser.</p>
-        </div>
-    </section>
-
-    <!-- Media & Ressurser Dashboard Section -->
-    <section class="py-16 bg-[#faf9f6]">
-        <div class="container max-w-6xl mx-auto px-6">
-            <!-- Fremhevet undervisning: Faste -->
+<style>
+html:has(#hkm-media),html:has(#hkm-media) body{overflow-x:clip!important;overflow-y:visible!important}
+#hkm-media{--ink:#151a21;--mut:#596069;--line:rgba(21,26,33,.12);--or:#e07b2c;--or2:#a0531a;font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--ink);background:#fff;padding:calc(var(--hm-head,96px) + 24px) 0 72px}
+#hkm-media *{box-sizing:border-box}
+#hkm-media .hm-wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+#hkm-media .hm-head{margin:0 0 24px}
+#hkm-media .hm-eye{font-size:14px;font-weight:600;color:var(--or2);margin:0 0 8px}
+#hkm-media h1{font-size:clamp(28px,3.4vw,40px);line-height:1.08;font-weight:800;letter-spacing:-.035em;margin:0;color:var(--ink)}
+#hkm-media .hm-lead{font-size:17px;line-height:1.5;color:var(--mut);margin:8px 0 0;max-width:640px}
+#hkm-media .hm-jump{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0}
+#hkm-media .hm-jump a{display:inline-flex;align-items:center;height:34px;padding:0 14px;border:1px solid var(--line);border-radius:999px;font-size:14px;font-weight:600;color:var(--ink);text-decoration:none;background:#fff;transition:border-color .2s}
+#hkm-media .hm-jump a:hover{border-color:var(--ink)}
+#hkm-media .faste-promo{margin:0 0 48px;max-width:none}
+#hkm-media .hm-sec{margin:0 0 56px;scroll-margin-top:calc(var(--hm-head,96px) + 24px)}
+#hkm-media .hm-sh{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:0 0 16px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+#hkm-media h2{font-size:24px;line-height:1.2;font-weight:800;letter-spacing:-.02em;margin:0;color:var(--ink)}
+#hkm-media .hm-sh p{margin:0;font-size:15px;color:var(--mut)}
+#hkm-media .hm-sh a{font-size:14px;font-weight:600;color:var(--or2);text-decoration:none;white-space:nowrap}
+#hkm-media .hm-sh a:hover{text-decoration:underline}
+#hkm-media .hm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+#hkm-media .hm-card{display:grid;grid-template-columns:44px 1fr 18px;align-items:center;gap:16px;padding:18px 20px;border:1px solid var(--line);border-radius:20px;background:#fff;text-decoration:none;color:var(--ink);transition:border-color .2s,transform .2s}
+#hkm-media .hm-card:hover{border-color:var(--ink);transform:translateY(-2px)}
+#hkm-media .hm-ic{width:44px;height:44px;border-radius:12px;background:#fdf1e7;color:var(--or2);display:grid;place-items:center;font-size:18px}
+#hkm-media .hm-t{display:block;font-size:17px;font-weight:700;letter-spacing:-.01em;line-height:1.3}
+#hkm-media .hm-d{display:block;font-size:14px;line-height:1.45;color:var(--mut);margin-top:3px}
+#hkm-media .hm-ar{color:var(--mut);font-size:14px;transition:transform .2s,color .2s}
+#hkm-media .hm-card:hover .hm-ar{transform:translateX(3px);color:var(--ink)}
+#hkm-media .hm-posts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+#hkm-media .hm-post{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:20px;overflow:hidden;background:#fff;text-decoration:none;color:var(--ink);transition:border-color .2s,transform .2s}
+#hkm-media .hm-post:hover{border-color:var(--ink);transform:translateY(-2px)}
+#hkm-media .hm-post .ph{aspect-ratio:16/9;background:#f3f1ec;overflow:hidden}
+#hkm-media .hm-post img{width:100%;height:100%;object-fit:cover;display:block}
+#hkm-media .hm-post .pt{padding:16px 18px 18px}
+#hkm-media .hm-post .pk{font-size:13px;font-weight:600;color:var(--or2);margin:0 0 6px}
+#hkm-media .hm-post .pn{font-size:17px;font-weight:700;line-height:1.3;letter-spacing:-.01em;margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+#hkm-media .hm-post .pd{font-size:14px;color:var(--mut);margin:8px 0 0}
+#hkm-media .hm-sk{border:1px solid var(--line);border-radius:16px;min-height:260px;background:linear-gradient(90deg,#f6f5f2 0,#fbfaf8 50%,#f6f5f2 100%);background-size:200% 100%;animation:hmsk 1.4s infinite}
+@keyframes hmsk{to{background-position:-200% 0}}
+#hkm-media .hm-empty{color:var(--mut);font-size:15px;margin:0}
+.media-newsletter{background:#faf9f6!important;font-family:Inter,system-ui,sans-serif}
+.media-newsletter h2{font-weight:800!important;letter-spacing:-.02em;color:#151a21!important}
+.media-newsletter p{color:#596069!important}
+@media (max-width:900px){#hkm-media .hm-posts{grid-template-columns:1fr 1fr}}
+@media (max-width:600px){#hkm-media{padding-top:calc(var(--hm-head,80px) + 20px)}#hkm-media .hm-wrap{padding:0 18px}#hkm-media .hm-lead{font-size:16px}#hkm-media .hm-grid{grid-template-columns:1fr}#hkm-media .hm-posts{grid-template-columns:1fr}#hkm-media .hm-card{padding:16px}#hkm-media .hm-sh{flex-wrap:wrap}#hkm-media .faste-promo{margin-bottom:44px}#hkm-media .hm-sec{margin-bottom:44px}}
+</style>
 <style>
 .faste-promo{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);align-items:stretch;gap:0;margin:0 auto 48px;max-width:1100px;border:1px solid rgba(21,26,33,.12);border-radius:20px;overflow:hidden;background:#fff;text-decoration:none;color:#151a21;font-family:Inter,system-ui,sans-serif;transition:border-color .2s,transform .2s}
 .faste-promo:hover{border-color:#151a21;transform:translateY(-2px)}
@@ -583,7 +616,21 @@
 .faste-promo .fp-cta{display:inline-flex;align-self:flex-start;align-items:center;gap:8px;margin-top:20px;height:42px;padding:0 18px;border-radius:999px;background:#151a21;color:#fff;font-size:14px;font-weight:600}
 @media (max-width:760px){.faste-promo{grid-template-columns:1fr;margin-bottom:32px}.faste-promo .fp-img{min-height:0;aspect-ratio:16/9}.faste-promo .fp-txt{padding:22px 20px 24px}}
 </style>
-<a class="faste-promo" href="/undervisning/faste">
+<main id="hkm-media">
+  <div class="hm-wrap">
+    <header class="hm-head">
+      <p class="hm-eye">Media &amp; undervisning</p>
+      <h1 data-content-key="hero.title">Media &amp; ressurser</h1>
+      <p class="hm-lead" data-content-key="hero.subtitle">Undervisning, videoer, podcast og bibelressurser – samlet på ett sted.</p>
+      <nav class="hm-jump" aria-label="Snarveier">
+        <a href="#se-og-lytt">Se og lytt</a>
+        <a href="#undervisning">Undervisning</a>
+        <a href="#utforsk">Utforsk Bibelen</a>
+        <a href="#siste">Siste nytt</a>
+      </nav>
+    </header>
+
+    <a class="faste-promo" href="/undervisning/faste">
   <span class="fp-img"><img src="https://i.ytimg.com/vi/wCo2LN7E6bo/maxresdefault.jpg" alt="" loading="lazy" decoding="async"><span class="fp-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span></span>
   <span class="fp-txt">
     <span class="fp-eye">Ny undervisning · Bibelstudie</span>
@@ -593,167 +640,82 @@
     <span class="fp-cta">Les undervisningen</span>
   </span>
 </a>
-            <div class="media-dashboard-grid">
-                <!-- 1. YouTube -->
-                <a href="/youtube" class="dashboard-card group">
-                    <div class="dashboard-card-icon icon-youtube">
-                        <i class="fab fa-youtube text-2xl"></i>
-                    </div>
-                    <h3 class="dashboard-card-title">YouTube-videoer</h3>
-                    <p class="dashboard-card-text">Se våre nyeste videoer, taler og undervisninger direkte på YouTube.</p>
-                    <div class="dashboard-card-footer">
-                        <span>Se videoer</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </div>
-                </a>
 
-                <!-- 2. Podcast -->
-                <a href="/podcast" class="dashboard-card group">
-                    <div class="dashboard-card-icon icon-podcast">
-                        <i class="fas fa-podcast text-2xl"></i>
-                    </div>
-                    <h3 class="dashboard-card-title">Podcast & Lyd</h3>
-                    <p class="dashboard-card-text">Lytt til podcasten "Tro og Liv" for daglig oppmuntring og bibelsk undervisning.</p>
-                    <div class="dashboard-card-footer">
-                        <span>Hør episoder</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </div>
-                </a>
-
-                <!-- 2b. Kurs -->
-                <a href="/kurs" class="dashboard-card group">
-                    <div class="dashboard-card-icon icon-kurs">
-                        <i class="fas fa-graduation-cap text-2xl"></i>
-                    </div>
-                    <h3 class="dashboard-card-title">Kurs & Undervisning</h3>
-                    <p class="dashboard-card-text">Utrust deg med interaktive kurs, leksjoner og aktivering for troen og bønnelivet.</p>
-                    <div class="dashboard-card-footer">
-                        <span>Utforsk kurs</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </div>
-                </a>
-
-                <!-- 3. Bibelstudier -->
-                <a href="/bibelstudier" class="dashboard-card group">
-                    <div class="dashboard-card-icon icon-bibelstudier">
-                        <i class="fas fa-book-bible text-2xl"></i>
-                    </div>
-                    <h3 class="dashboard-card-title">Bibelstudier</h3>
-                    <p class="dashboard-card-text">Gå i dybden på Bibelens bøker og temaer med hefter og studier.</p>
-                    <span class="dashboard-card-count" data-count="bibelstudier">Laster...</span>
-                    <div class="dashboard-card-footer">
-                        <span>Utforsk studier</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </div>
-                </a>
-
-                <!-- 4. Leseplaner -->
-                <a href="/leseplaner" class="dashboard-card group">
-                    <div class="dashboard-card-icon icon-leseplaner">
-                        <i class="fas fa-calendar-alt text-2xl"></i>
-                    </div>
-                    <h3 class="dashboard-card-title">Leseplaner</h3>
-                    <p class="dashboard-card-text">Følg våre leseplaner for en strukturert gjennomgang av Bibelen.</p>
-                    <div class="dashboard-card-footer">
-                        <span>Se leseplaner</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </div>
-                </a>
-
-                <!-- 5. Tidslinje -->
-                <a href="/ressurser/tidslinje-imperier" class="dashboard-card group">
-                    <div class="dashboard-card-icon icon-tidslinje">
-                        <i class="fas fa-history text-2xl"></i>
-                    </div>
-                    <h3 class="dashboard-card-title">Tidslinje: Imperier</h3>
-                    <p class="dashboard-card-text">Se historien til de store imperiene som påvirket det bibelske narrativet.</p>
-                    <div class="dashboard-card-footer">
-                        <span>Vis tidslinje</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </div>
-                </a>
-
-                <!-- 6. Bibelens tidslinje -->
-                <a href="/ressurser/bibelsk-tidslinje" class="dashboard-card group">
-                    <div class="dashboard-card-icon icon-tidslinje" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
-                        <i class="fas fa-timeline text-2xl"></i>
-                    </div>
-                    <h3 class="dashboard-card-title">Bibelens tidslinje</h3>
-                    <p class="dashboard-card-text">Utforsk historien fra skapelsen til den tidlige kirken og moderne tid.</p>
-                    <div class="dashboard-card-footer">
-                        <span>Vis tidslinje</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </div>
-                </a>
-
-                <!-- 7. Bibelske personer -->
-                <a href="/ressurser/bibelske-personer" class="dashboard-card group">
-                    <div class="dashboard-card-icon icon-personer">
-                        <i class="fas fa-user-friends text-2xl"></i>
-                    </div>
-                    <h3 class="dashboard-card-title">Bibelske personer</h3>
-                    <p class="dashboard-card-text">Lær mer om livene, historien og den teologiske rollen til sentrale personer.</p>
-                    <div class="dashboard-card-footer">
-                        <span>Utforsk personer</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </div>
-                </a>
-
-                <!-- 8. Bibelens oppbygning -->
-                <a href="/ressurser/bibeloppbygning" class="dashboard-card group">
-                    <div class="dashboard-card-icon" style="background: rgba(209, 125, 57, 0.15); color: #d17d39;">
-                        <i class="fas fa-book-open text-2xl"></i>
-                    </div>
-                    <h3 class="dashboard-card-title">Bibelens oppbygning (GT & NT)</h3>
-                    <p class="dashboard-card-text">Lær om Bibelens 66 bøker, Det gamle og Det nye testamente, sjangre og leseguide.</p>
-                    <div class="dashboard-card-footer">
-                        <span>Les guiden</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </div>
-                </a>
-            </div>
-
-            <!-- YouTube Latest Feed -->
-            <div class="feed-section-header">
-                <div class="feed-section-info">
-                    <h2 class="feed-section-title">Siste fra YouTube</h2>
-                    <p class="feed-section-desc">Se våre nyeste videoer og undervisninger.</p>
-                </div>
-                <a href="/youtube" class="feed-see-all-btn">
-                    <span>Se alle videoer</span>
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-
-            <div class="media-grid" id="youtube-grid" style="margin-bottom: 64px;">
-                <div class="loader-container" style="grid-column: 1/-1; text-align: center; padding: 50px;">
-                    <div class="loader"></div>
-                    <p style="margin-top: 15px; color: var(--text-muted);">Henter videoer fra YouTube...</p>
-                </div>
-            </div>
-
-            <!-- Podcast Latest Feed -->
-            <div class="feed-section-header">
-                <div class="feed-section-info">
-                    <h2 class="feed-section-title">Siste fra Podcast</h2>
-                    <p class="feed-section-desc">Lytt til de nyeste episodene av "Tro og Liv".</p>
-                </div>
-                <a href="/podcast" class="feed-see-all-btn">
-                    <span>Hør alle episoder</span>
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-
-            <div class="podcast-grid" id="podcast-grid" style="margin-bottom: 64px;">
-                <div class="loader-container" style="grid-column: 1/-1; text-align: center; padding: 50px;">
-                    <div class="loader"></div>
-                    <p style="margin-top: 15px; color: var(--text-muted);">Henter podcast-episoder...</p>
-                </div>
-            </div>
-        </div>
+    <section class="hm-sec" id="se-og-lytt">
+      <div class="hm-sh"><h2>Se og lytt</h2><p>Taler, videoer og podcast</p></div>
+      <div class="hm-grid">
+        <a class="hm-card" href="/youtube"><span class="hm-ic"><i class="fab fa-youtube"></i></span><span><span class="hm-t">YouTube-videoer</span><span class="hm-d">Våre nyeste videoer, taler og undervisninger.</span></span><i class="fas fa-arrow-right hm-ar"></i></a>
+        <a class="hm-card" href="/podcast"><span class="hm-ic"><i class="fas fa-headphones"></i></span><span><span class="hm-t">Podcast &amp; lyd</span><span class="hm-d">«Tro og Liv» – daglig oppmuntring og bibelsk undervisning.</span></span><i class="fas fa-arrow-right hm-ar"></i></a>
+      </div>
     </section>
 
-    <!-- Newsletter CTA -->
+    <section class="hm-sec" id="undervisning">
+      <div class="hm-sh"><h2>Undervisning</h2><p>Studer og voks i troen</p></div>
+      <div class="hm-grid">
+        <a class="hm-card" href="/bibelstudier"><span class="hm-ic"><i class="fas fa-book-open"></i></span><span><span class="hm-t">Bibelstudier</span><span class="hm-d">Gå i dybden på Bibelens bøker og temaer.</span></span><i class="fas fa-arrow-right hm-ar"></i></a>
+        <a class="hm-card" href="/undervisningsserier"><span class="hm-ic"><i class="fas fa-layer-group"></i></span><span><span class="hm-t">Undervisningsserier</span><span class="hm-d">Tematiske serier som bygger på hverandre.</span></span><i class="fas fa-arrow-right hm-ar"></i></a>
+        <a class="hm-card" href="/seminarer"><span class="hm-ic"><i class="fas fa-chalkboard-teacher"></i></span><span><span class="hm-t">Seminarer</span><span class="hm-d">Opptak fra seminarer og samlinger.</span></span><i class="fas fa-arrow-right hm-ar"></i></a>
+        <a class="hm-card" href="/kurs"><span class="hm-ic"><i class="fas fa-graduation-cap"></i></span><span><span class="hm-t">Kurs</span><span class="hm-d">Interaktive kurs og leksjoner for troen og bønnelivet.</span></span><i class="fas fa-arrow-right hm-ar"></i></a>
+        <a class="hm-card" href="/leseplaner"><span class="hm-ic"><i class="fas fa-calendar-check"></i></span><span><span class="hm-t">Leseplaner</span><span class="hm-d">Les Bibelen strukturert, dag for dag.</span></span><i class="fas fa-arrow-right hm-ar"></i></a>
+        <a class="hm-card" href="/bibel"><span class="hm-ic"><i class="fas fa-bible"></i></span><span><span class="hm-t">Bibelen</span><span class="hm-d">Les, lytt og slå opp ord direkte på nettsiden.</span></span><i class="fas fa-arrow-right hm-ar"></i></a>
+      </div>
+    </section>
+
+    <section class="hm-sec" id="utforsk">
+      <div class="hm-sh"><h2>Utforsk Bibelen</h2><p>Historie, personer og oppbygning</p></div>
+      <div class="hm-grid">
+        <a class="hm-card" href="/ressurser/bibelsk-tidslinje"><span class="hm-ic"><i class="fas fa-stream"></i></span><span><span class="hm-t">Bibelens tidslinje</span><span class="hm-d">Fra skapelsen til den tidlige kirken.</span></span><i class="fas fa-arrow-right hm-ar"></i></a>
+        <a class="hm-card" href="/ressurser/tidslinje-imperier"><span class="hm-ic"><i class="fas fa-landmark"></i></span><span><span class="hm-t">Tidslinje: imperier</span><span class="hm-d">Stormaktene som formet den bibelske historien.</span></span><i class="fas fa-arrow-right hm-ar"></i></a>
+        <a class="hm-card" href="/ressurser/bibelske-personer"><span class="hm-ic"><i class="fas fa-users"></i></span><span><span class="hm-t">Bibelske personer</span><span class="hm-d">Liv, historie og rolle til sentrale personer.</span></span><i class="fas fa-arrow-right hm-ar"></i></a>
+        <a class="hm-card" href="/ressurser/bibeloppbygning"><span class="hm-ic"><i class="fas fa-sitemap"></i></span><span><span class="hm-t">Bibelens oppbygning</span><span class="hm-d">De 66 bøkene, GT og NT, sjangre og leseguide.</span></span><i class="fas fa-arrow-right hm-ar"></i></a>
+      </div>
+    </section>
+
+    <section class="hm-sec" id="siste">
+      <div class="hm-sh"><h2>Siste undervisning</h2><a href="/bibelstudier">Se alt</a></div>
+      <div class="hm-posts" id="hm-teach"><div class="hm-sk"></div><div class="hm-sk"></div><div class="hm-sk"></div></div>
+    </section>
+
+    <section class="hm-sec" id="blogg" style="margin-bottom:0">
+      <div class="hm-sh"><h2>Siste fra bloggen</h2><a href="/blogg">Alle innlegg</a></div>
+      <div class="hm-posts" id="hm-blog"><div class="hm-sk"></div><div class="hm-sk"></div><div class="hm-sk"></div></div>
+    </section>
+  </div>
+</main>
+<script>
+(function(){
+  var R=document.getElementById('hkm-media');
+  function head(){var h=document.querySelector('.header, header.header, #header, header');if(!h)return 90;var b=h.getBoundingClientRect().bottom;return b>0?Math.round(b):90}
+  function setH(){var v=head();R.style.setProperty('--hm-head',v+'px');document.documentElement.style.scrollPaddingTop=(v+24)+'px'}
+  setH();window.addEventListener('resize',setH);window.addEventListener('load',setH);
+  if(window.ResizeObserver){var h=document.querySelector('header');if(h)new ResizeObserver(setH).observe(h)}
+  var n=0,iv=setInterval(function(){setH();if(++n>20)clearInterval(iv)},250);
+  document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('#hkm-media a[href^="#"]');if(!a)return;var t=document.getElementById(a.getAttribute('href').slice(1));if(!t)return;e.preventDefault();e.stopPropagation();window.scrollTo({top:t.getBoundingClientRect().top+scrollY-head()-24,behavior:'smooth'});history.replaceState(null,'','#'+t.id)},true);
+
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function d(x){if(!x)return '';var t=new Date(x);return isNaN(t)?String(x):t.toLocaleDateString('nb-NO',{day:'numeric',month:'long',year:'numeric'})}
+  function ts(i){var t=new Date(i.date||i.createdAt||0).getTime();return isNaN(t)?0:t}
+  function render(id,items,kind,empty){
+    var el=document.getElementById(id);if(!el)return;
+    items=(items||[]).filter(function(i){return i&&i.published!==false&&i.title}).sort(function(a,b){return ts(b)-ts(a)}).slice(0,3);
+    if(!items.length){el.innerHTML='<p class="hm-empty">'+empty+'</p>';return}
+    el.innerHTML=items.map(function(i){
+      var key=i.id||i.title,img=i.imageUrl||i.image||'';
+      var k=kind||i.category||i.teachingType||'';
+      return '<a class="hm-post" href="/blogg-post?id='+encodeURIComponent(key)+'"><span class="ph">'+(img?'<img src="'+esc(img)+'" alt="" loading="lazy" decoding="async">':'')+'</span><span class="pt">'+(k?'<p class="pk">'+esc(k)+'</p>':'')+'<p class="pn">'+esc(i.title)+'</p>'+(i.date?'<p class="pd">'+esc(d(i.date))+'</p>':'')+'</span></a>';
+    }).join('');
+  }
+  var tries=0;
+  (function go(){
+    var fs=window.firebaseService;
+    if(!fs||typeof fs.getPageContent!=='function'){if(++tries<60)return setTimeout(go,200);render('hm-teach',[],'','Kunne ikke hente undervisning nå.');render('hm-blog',[],'Blogg','Kunne ikke hente innlegg nå.');return}
+    fs.getPageContent('collection_teaching').then(function(r){render('hm-teach',r&&r.items,'','Ingen undervisning ennå.')}).catch(function(){render('hm-teach',[],'','Kunne ikke hente undervisning nå.')});
+    fs.getPageContent('collection_blog').then(function(r){render('hm-blog',r&&r.items,'Blogg','Ingen innlegg ennå.')}).catch(function(){render('hm-blog',[],'Blogg','Kunne ikke hente innlegg nå.')});
+  })();
+})();
+</script>
+
+
     <section class="media-newsletter">
         <div class="container">
             <div class="newsletter-content">

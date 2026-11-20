@@ -204,6 +204,11 @@
       "permanent": true
     },
     {
+      "source": "/undervisning",
+      "destination": "/media#undervisning",
+      "permanent": false
+    },
+    {
       "source": "/es/undervisning",
       "destination": "/es/ensenanza",
       "permanent": true
