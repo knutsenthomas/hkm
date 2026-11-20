@@ -524,7 +524,7 @@
 
 <style>
 html:has(#hkp-head),html:has(#hkp-head) body{overflow-x:clip!important;overflow-y:visible!important}
-#hkp-head{--ink:#151a21;--mut:#596069;--line:rgba(21,26,33,.12);--or2:#a0531a;font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--ink);background:#fff;padding:calc(var(--hp-head,96px) + 28px) 0 0}
+#hkp-head{--ink:#151a21;--mut:#596069;--line:rgba(21,26,33,.12);--or2:#a0531a;font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--ink);background:#fff;padding:calc(var(--hp-head,96px) + 28px) 0 0!important;margin:0!important;position:static!important;height:auto!important;box-shadow:none!important;border:0!important}
 #hkp-head .hp-wrap{max-width:1100px;margin:0 auto;padding:0 24px}
 #hkp-head .hp-text{max-width:none}
 #hkp-head .hp-back{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--mut);text-decoration:none;margin:0 0 18px}
@@ -553,7 +553,7 @@ html:has(#hkp-head),html:has(#hkp-head) body{overflow-x:clip!important;overflow-
 #hkp-head .blog-meta-bottom::before{content:none!important}
 #hkp-head #single-post-author{display:inline!important}
 }
-@media (max-width:600px){#hkp-head{padding-top:calc(var(--hp-head,80px) + 28px)}#hkp-head .hp-wrap{padding:0 18px}#hkp-head .hp-cover{aspect-ratio:16/10;border-radius:16px;margin-top:22px}.blog-post-section{padding-top:28px!important}.blog-post-section .blog-post-content{font-size:17px}}
+@media (max-width:600px){#hkp-head{padding-top:calc(var(--hp-head,80px) + 24px)!important}#hkp-head .hp-wrap{padding:0 18px}#hkp-head .hp-cover{aspect-ratio:16/10;border-radius:16px;margin-top:22px}.blog-post-section{padding-top:28px!important}.blog-post-section .blog-post-content{font-size:17px}}
 </style>
 <style id="hkp-body">
 .blog-post-section{--ink:#151a21;--mut:#596069;--line:rgba(21,26,33,.12);--or:#e07b2c;--or2:#a0531a;background:#fff!important}
@@ -637,7 +637,7 @@ html:has(#hkp-head),html:has(#hkp-head) body{overflow-x:clip!important;overflow-
 @media (max-width:600px){.blog-post-section .blog-post-content{font-size:17px!important}#single-post-related .cms-related-grid{grid-template-columns:1fr!important}.blog-post-section .blog-share{flex-direction:column;align-items:flex-start}.blog-post-section .blog-share>div{flex-wrap:wrap}#blog-interactions .comment-form{padding:18px!important}}
 </style>
     <div id="blog-hero" hidden></div>
-    <header id="hkp-head">
+    <div id="hkp-head">
         <div class="hp-wrap">
             <div class="hp-text">
                 <a href="/blogg" class="hp-back"><i class="fas fa-arrow-left"></i> <span id="hp-back-label">Nyheter &amp; blogg</span></a>
@@ -658,7 +658,7 @@ html:has(#hkp-head),html:has(#hkp-head) body{overflow-x:clip!important;overflow-
             </div>
             <figure class="hp-cover" id="hp-cover"><img id="hp-cover-img" alt="" decoding="async"></figure>
         </div>
-    </header>
+    </div>
 <script>
 (function(){
   var R=document.getElementById('hkp-head');
