@@ -67,9 +67,27 @@
     }
     function cards() { return [...document.querySelectorAll(CARD_SEL)].filter((c) => !c.closest('header, footer, #site-search-modal, .hb-band, .tl-band, .hm-band')); }
     function addSearch() {
-        if (document.querySelector(OWN_SEARCH)) return true;
         const host = searchHost();
-        if (!host || cards().length < 2) return false;
+        // Sider med eget søk (Podcast): flytt søk og kategorier opp i toppflaten
+        const podIn = document.getElementById('podcast-search-input');
+        if (podIn && host && !host.querySelector('.hb-tools')) {
+            host.classList.add('hb-host');
+            if (!host.querySelector(':scope > .hb-text')) { const txt = document.createElement('div'); txt.className = 'hb-text'; [...host.childNodes].forEach((n) => txt.appendChild(n)); host.appendChild(txt); }
+            const t = host.querySelector(':scope > .hb-text');
+            if (!t.querySelector('.hb-eye')) { const eye = document.createElement('p'); eye.className = 'hb-eye'; eye.textContent = 'His Kingdom Ministry'; t.insertBefore(eye, t.firstChild); }
+            const tools = document.createElement('div'); tools.className = 'hb-tools';
+            const wrap = podIn.closest('.podcast-search-wrap') || podIn.parentElement;
+            wrap.classList.add('hb-search');
+            tools.appendChild(wrap); host.appendChild(tools);
+            const cats = document.getElementById('podcast-categories');
+            if (cats) { cats.classList.add('hb-filters'); host.appendChild(cats); }
+            const ctr = document.querySelector('.podcast-controls');
+            if (ctr && !ctr.querySelector('input, button, a')) ctr.style.display = 'none';
+            return true;
+        }
+        if (document.querySelector(OWN_SEARCH)) return true;
+        const inTeach = !!(host && host.closest('.tl-band'));
+        if (!host || (!inTeach && cards().length < 2)) return false;
         const box = document.createElement('label');
         box.className = 'hb-search';
         box.innerHTML = '<span class="material-symbols-outlined" aria-hidden="true">search</span><input type="search" autocomplete="off">';

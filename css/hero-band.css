@@ -137,3 +137,13 @@ html body.hb-has-band .event-card *{hyphens:none !important;-webkit-hyphens:none
 
 html body .hb-list.plans-grid{grid-template-columns:1fr !important}
 html body .hb-list .plan-image-wrapper{aspect-ratio:auto !important}
+
+/* Podcast: eget søk og kategorier i toppflaten */
+html body .hb-tools .podcast-search-wrap{display:flex !important;align-items:center !important;gap:8px !important;height:44px !important;padding:0 16px !important;border:1px solid rgba(21,26,33,.12) !important;border-radius:999px !important;background:#fff !important;box-shadow:none !important;max-width:none !important;width:100% !important;margin:0 !important}
+html body .hb-tools .podcast-search-wrap i,html body .hb-tools .podcast-search-wrap .material-symbols-outlined{color:#596069 !important;position:static !important;transform:none !important;font-size:16px !important}
+html body .hb-tools .podcast-search-wrap input{border:0 !important;outline:0 !important;box-shadow:none !important;background:transparent !important;padding:0 !important;height:100% !important;width:100% !important;font:400 15px/1 Inter,system-ui,sans-serif !important;color:#151a21 !important}
+html body .hb-host>#podcast-categories{display:flex !important;flex-wrap:wrap !important;gap:8px !important;justify-content:flex-start !important;margin:0 !important;padding:0 !important}
+html body .hb-host>#podcast-categories button,html body .hb-host>#podcast-categories a{display:inline-flex !important;align-items:center !important;height:34px !important;padding:0 14px !important;border:1px solid rgba(21,26,33,.12) !important;border-radius:999px !important;background:#fff !important;color:#151a21 !important;font:600 14px/1 Inter,system-ui,sans-serif !important;box-shadow:none !important;margin:0 !important;width:auto !important;transform:none !important}
+html body .hb-host>#podcast-categories :is(button,a):hover{border-color:#151a21 !important}
+html body .hb-host>#podcast-categories :is(button,a).active{background:#151a21 !important;border-color:#151a21 !important;color:#fff !important}
+@media (min-width:861px){html body .hb-host>#podcast-categories{grid-column:1 / -1 !important;grid-row:2 !important}}
