@@ -495,7 +495,7 @@ document.addEventListener('DOMContentLoaded',h);window.addEventListener('load',h
 (function(){
   function build(){
     var fc=document.getElementById('blog-featured-container'),g=document.querySelector('#hkm-blog .blog-grid');if(!fc||!g)return;
-    var art=fc.querySelector('.featured-post-card');var old=g.querySelector('[data-hk-feat]');
+    var art=fc.style.display==='none'||g.querySelector('.blog-empty-card')?null:fc.querySelector('.featured-post-card');var old=g.querySelector('[data-hk-feat]');
     if(!art){if(old)old.remove();return}
     var a=art.querySelector('.featured-title a');if(!a)return;var href=a.getAttribute('href');
     if(old&&old.getAttribute('data-hk-feat')===href&&g.firstElementChild===old)return;
@@ -511,7 +511,7 @@ document.addEventListener('DOMContentLoaded',h);window.addEventListener('load',h
     var l=c.querySelector('.blog-link');l.href=href;l.setAttribute('aria-label','Les mer - '+a.textContent.trim());
     g.insertBefore(c,g.firstChild);
   }
-  function init(){var fc=document.getElementById('blog-featured-container'),g=document.querySelector('#hkm-blog .blog-grid');if(!fc||!g)return;var t;var run=function(){clearTimeout(t);t=setTimeout(build,30)};new MutationObserver(run).observe(fc,{childList:true,subtree:true});new MutationObserver(function(m){if(!g.querySelector('[data-hk-feat]')||g.firstElementChild&&!g.firstElementChild.hasAttribute('data-hk-feat'))run()}).observe(g,{childList:true});build()}
+  function init(){var fc=document.getElementById('blog-featured-container'),g=document.querySelector('#hkm-blog .blog-grid');if(!fc||!g)return;var t;var run=function(){clearTimeout(t);t=setTimeout(build,30)};new MutationObserver(run).observe(fc,{childList:true,subtree:true,attributes:true,attributeFilter:['style']});new MutationObserver(function(m){run()}).observe(g,{childList:true});build()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
