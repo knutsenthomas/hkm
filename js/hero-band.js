@@ -161,6 +161,7 @@
         let catSig = '';
         const buildCats = () => {
             if (filters.querySelector('a')) return;
+            if (host.querySelector('.hm-jump')) { filters.remove(); return; }
             useMonths = false;
             const ORDER = ['Under 2 uker', '2–4 uker', '1–3 måneder', 'Lengre', 'Under 2 weeks', '2–4 weeks', '1–3 months', 'Longer', 'Menos de 2 semanas', '2–4 semanas', '1–3 meses', 'Más largos'];
             let cats = [...new Set(cards().map(catOf).filter(Boolean))].sort((x, y) => { const a = ORDER.indexOf(x), b = ORDER.indexOf(y); return (a < 0 || b < 0) ? x.localeCompare(y) : a - b; });
