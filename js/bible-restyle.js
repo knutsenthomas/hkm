@@ -134,7 +134,7 @@
   let tm = null;
   const kick = () => { clearTimeout(tm); tm = setTimeout(() => { head(); tabs(); stripe(); }, 60); };
   function start() {
-    document.body.classList.add('hkr');
+    document.documentElement.classList.add('hkr'); document.body.classList.add('hkr');
     const watch = ['#current-chapter-number', '#current-book-badge', '#chapter-header-action-bar', '.bible-nav-right .tabs-header', '.selected-translation-name'];
     const mo = new MutationObserver(kick);
     const attach = () => watch.forEach(s => { const e = $(s); if (e && !e.__hkr) { e.__hkr = 1; mo.observe(e, { childList: true, characterData: true, subtree: true }); } });
