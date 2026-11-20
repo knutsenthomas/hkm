@@ -178,7 +178,7 @@
         const run = () => {
             const q = norm(input.value.trim());
             const list = cards();
-            list.forEach((c) => { const okC = !activeCat || catOf(c) === activeCat; c.style.display = okC && (!q || norm(c.textContent).includes(q)) ? '' : 'none'; });
+            list.forEach((c) => { const okC = !activeCat || catOf(c) === activeCat; if (okC && (!q || norm(c.textContent).includes(q))) c.style.removeProperty('display'); else c.style.setProperty('display', 'none', 'important'); });
             document.querySelectorAll('.hm-sec').forEach((sec) => {
                 const cs = [...sec.querySelectorAll(CARD_SEL)];
                 if (cs.length) sec.style.display = q && cs.every((c) => c.style.display === 'none') ? 'none' : '';
