@@ -6,9 +6,9 @@
   const LANG = (location.pathname.match(/^\/(en|es)\//) || [])[1] || 'no';
   const P = location.pathname.replace(/^\/(en|es)\//, '/').replace(/\.html$/, '');
   const EYE = {
-    no: { people: 'Bibelske personer', person: 'Bibelsk person', blog: 'Blogg', post: 'Blogg', teach: 'Undervisning', series: 'Undervisning' },
-    en: { people: 'Biblical people', person: 'Biblical person', blog: 'Blog', post: 'Blog', teach: 'Teaching', series: 'Teaching' },
-    es: { people: 'Personajes bíblicos', person: 'Personaje bíblico', blog: 'Blog', post: 'Blog', teach: 'Enseñanza', series: 'Enseñanza' }
+    no: { people: 'Ressurser', person: 'Bibelske personer', blog: 'Ressurser', post: 'Blogg', teach: 'Ressurser', series: 'Undervisning' },
+    en: { people: 'Resources', person: 'Biblical people', blog: 'Resources', post: 'Blog', teach: 'Resources', series: 'Teaching' },
+    es: { people: 'Recursos', person: 'Personajes bíblicos', blog: 'Recursos', post: 'Blog', teach: 'Recursos', series: 'Enseñanza' }
   }[LANG];
   const kind = /bibelsk-person-detaljer/.test(P) ? 'person' : /bibelske-personer/.test(P) ? 'people'
     : /blogg-post|blog-post/.test(P) ? 'post' : /\/(blogg|blog)$/.test(P) ? 'blog'
@@ -24,7 +24,9 @@
     const hero = document.querySelector('.subpage-hero, .page-hero');
     if (!hero || hero.dataset.ed) return;
     hero.dataset.ed = '1';
-    document.body.classList.add('ed', 'ed-' + kind);
+    document.body.classList.add('ed', 'ed-' + kind, 'header-always-scrolled');
+    document.body.classList.remove('header-dark-start', 'header-transparent');
+    const hdr = document.getElementById('header'); if (hdr) hdr.classList.add('scrolled');
     const hd = document.getElementById('header');
     const setH = () => { const b = hd ? Math.round(hd.getBoundingClientRect().height) : 80; document.body.style.setProperty('--ed-headh', Math.max(56, Math.min(b, 120)) + 'px'); };
     setH(); addEventListener('resize', setH, { passive: true });
@@ -44,7 +46,8 @@
       const lead = p ? p.textContent.trim() : '';
       const lp = head.querySelector('.ed-lead'); lp.textContent = lead; lp.hidden = !lead;
       const src = urlOf(hero), fig = head.querySelector('.ed-cover'), img = fig.querySelector('img');
-      if (src && img.getAttribute('src') !== src) img.src = src;
+      const big = /images\.unsplash\.com/.test(src) ? src.replace(/([?&])w=\d+/, '$1w=1800').replace(/([?&])q=\d+/, '$1q=75') : src;
+      if (big && img.getAttribute('src') !== big) img.src = big;
       fig.hidden = !src;
       head.querySelector('.ed-actions').hidden = !head.querySelector('.ed-actions').children.length;
     };

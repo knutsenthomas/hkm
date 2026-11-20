@@ -100,3 +100,5 @@ body.ed .comment-form input,body.ed .comment-form textarea{border-radius:12px!im
   body.ed .ed-actions .btn,body.ed .ed-pill{height:36px!important;padding:0 14px!important;font-size:13px!important}
   body.ed .blog-post-content,body.ed .blog-post-content p,body.ed .blog-post-content li{font-size:16px!important}
 }
+body.ed{background:#fff!important}
+body.ed .ed-head,body.ed .ed-head *{hyphens:manual!important;-webkit-hyphens:manual!important}
