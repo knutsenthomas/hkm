@@ -24,6 +24,7 @@
         heroes.forEach((el) => {
             if (el.dataset.hbDone) return;
             el.dataset.hbDone = '1';
+            el.dataset.heroAlign = 'left';
             el.classList.add('hb-band');
             strip(el);
             const CHILD = ['color', 'text-align', 'text-shadow', 'background', 'background-color', 'background-image', 'box-shadow', 'border', 'border-radius',
