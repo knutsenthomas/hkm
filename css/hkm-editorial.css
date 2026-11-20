@@ -102,3 +102,6 @@ body.ed .comment-form input,body.ed .comment-form textarea{border-radius:12px!im
 }
 body.ed{background:#fff!important}
 body.ed .ed-head,body.ed .ed-head *{hyphens:manual!important;-webkit-hyphens:manual!important}
+body.ed main,body.ed main *,body.ed .section,body.ed .section *{hyphens:manual!important;-webkit-hyphens:manual!important}
+body.ed.ed-person .ed-cover img{object-position:50% 18%}
+body.ed .quick-fact-icon{background:transparent!important}

@@ -6,11 +6,11 @@
   const LANG = (location.pathname.match(/^\/(en|es)\//) || [])[1] || 'no';
   const P = location.pathname.replace(/^\/(en|es)\//, '/').replace(/\.html$/, '');
   const EYE = {
-    no: { people: 'Ressurser', person: 'Bibelske personer', blog: 'Ressurser', post: 'Blogg', teach: 'Ressurser', series: 'Undervisning' },
-    en: { people: 'Resources', person: 'Biblical people', blog: 'Resources', post: 'Blog', teach: 'Resources', series: 'Teaching' },
-    es: { people: 'Recursos', person: 'Personajes bíblicos', blog: 'Recursos', post: 'Blog', teach: 'Recursos', series: 'Enseñanza' }
+    no: { people: 'Ressurser', person: 'Bibelske personer', timeline: 'Ressurser', blog: 'Ressurser', post: 'Blogg', teach: 'Ressurser', series: 'Undervisning' },
+    en: { people: 'Resources', person: 'Biblical people', timeline: 'Resources', blog: 'Resources', post: 'Blog', teach: 'Resources', series: 'Teaching' },
+    es: { people: 'Recursos', person: 'Personajes bíblicos', timeline: 'Recursos', blog: 'Recursos', post: 'Blog', teach: 'Recursos', series: 'Enseñanza' }
   }[LANG];
-  const kind = /bibelsk-person-detaljer/.test(P) ? 'person' : /bibelske-personer/.test(P) ? 'people'
+  const kind = /tidslinje/.test(P) ? 'timeline' : /bibelsk-person-detaljer/.test(P) ? 'person' : /bibelske-personer/.test(P) ? 'people'
     : /blogg-post|blog-post/.test(P) ? 'post' : /\/(blogg|blog)$/.test(P) ? 'blog'
     : /undervisningsserier/.test(P) ? 'series' : /undervisning|teaching|ensenanza/.test(P) ? 'teach' : 'page';
 
@@ -46,7 +46,9 @@
       const lead = p ? p.textContent.trim() : '';
       const lp = head.querySelector('.ed-lead'); lp.textContent = lead; lp.hidden = !lead;
       const src = urlOf(hero), fig = head.querySelector('.ed-cover'), img = fig.querySelector('img');
-      const big = /images\.unsplash\.com/.test(src) ? src.replace(/([?&])w=\d+/, '$1w=1800').replace(/([?&])q=\d+/, '$1q=75') : src;
+      // Unsplash+-bilder har vannmerke i full størrelse: bruk et fritt bilde i stedet
+      const clean = /plus\.unsplash\.com\/premium/.test(src) ? 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1800&q=75' : src;
+      const big = /images\.unsplash\.com/.test(clean) && clean !== src ? clean : /images\.unsplash\.com/.test(src) ? src.replace(/([?&])w=\d+/, '$1w=1800').replace(/([?&])q=\d+/, '$1q=75') : src;
       if (big && img.getAttribute('src') !== big) img.src = big;
       fig.hidden = !src;
       head.querySelector('.ed-actions').hidden = !head.querySelector('.ed-actions').children.length;
