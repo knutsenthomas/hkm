@@ -48,3 +48,10 @@ html body .hb-band .hb-search :is(input){height:100% !important}
   .hb-host>.hb-search{grid-column:2;grid-row:1 / span 8;align-self:center;margin:0 !important;max-width:none;width:100%}
 }
 .hb-host>.hm-jump{grid-column:1 / -1}
+
+.hb-filters{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
+.hb-host>.hb-filters{grid-column:1 / -1}
+html body .hb-filters .hb-pill{display:inline-flex !important;align-items:center;height:36px !important;padding:0 15px !important;border:1px solid rgba(21,26,33,.12) !important;border-radius:999px !important;background:#fff !important;color:#151a21 !important;font:600 14px/1 Inter,system-ui,sans-serif !important;text-decoration:none !important;cursor:pointer;box-shadow:none !important;margin:0 !important;width:auto !important}
+html body .hb-filters .hb-pill:hover{border-color:#151a21 !important}
+html body .hb-filters .hb-pill.on{background:#151a21 !important;border-color:#151a21 !important;color:#fff !important}
+@media (max-width:600px){.hb-filters{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-right:-18px;padding-right:18px}.hb-pill{flex:0 0 auto}}

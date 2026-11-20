@@ -64,24 +64,52 @@
             host.insertBefore(eye, host.firstChild);
         }
         host.appendChild(box);
+        // Filterknapper
+        const CAT_SEL = '.blog-category, .media-category, .event-category, .card-category, .category-badge, .podcast-category, .video-category';
+        const catOf = (c) => { const e = c.querySelector(CAT_SEL); return e ? e.textContent.trim() : ''; };
+        const ALL = L.ph.startsWith('Search') ? 'All' : (L.ph.startsWith('Buscar') ? 'Todos' : 'Alle');
+        let activeCat = '';
+        const filters = document.createElement('div');
+        filters.className = 'hb-filters';
+        const TEACH = [['/bibelstudier', 'Bibelstudier'], ['/undervisningsserier', 'Undervisningsserier'], ['/seminarer', 'Seminarer']];
+        const here = location.pathname.replace(/\.html$/, '').replace(/\/+$/, '');
+        if (TEACH.some(([p]) => p === here)) {
+            filters.innerHTML = TEACH.map(([p, t]) => `<a class="hb-pill${p === here ? ' on' : ''}" href="${p}">${t}</a>`).join('');
+            host.appendChild(filters);
+        }
+        let catSig = '';
+        const buildCats = () => {
+            if (filters.querySelector('a')) return;
+            const cats = [...new Set(cards().map(catOf).filter(Boolean))].sort((x, y) => x.localeCompare(y));
+            const sig = cats.join('|');
+            if (sig === catSig) return; catSig = sig;
+            if (cats.length < 2) { filters.remove(); return; }
+            filters.innerHTML = [ALL, ...cats].map((c, i) => `<button type="button" class="hb-pill${(i === 0 && !activeCat) || c === activeCat ? ' on' : ''}" data-cat="${i === 0 ? '' : c.replace(/"/g, '&quot;')}">${c}</button>`).join('');
+            if (!filters.parentNode) host.appendChild(filters);
+            filters.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
+                activeCat = b.dataset.cat; filters.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b)); run();
+            }));
+        };
         const norm = (t) => (t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         const run = () => {
             const q = norm(input.value.trim());
             const list = cards();
-            list.forEach((c) => { c.style.display = !q || norm(c.textContent).includes(q) ? '' : 'none'; });
+            list.forEach((c) => { const okC = !activeCat || catOf(c) === activeCat; c.style.display = okC && (!q || norm(c.textContent).includes(q)) ? '' : 'none'; });
             document.querySelectorAll('.hm-sec').forEach((sec) => {
                 const cs = [...sec.querySelectorAll(CARD_SEL)];
                 if (cs.length) sec.style.display = q && cs.every((c) => c.style.display === 'none') ? 'none' : '';
             });
             let msg = document.getElementById('hb-none');
             const any = list.some((c) => c.style.display !== 'none');
-            if (q && !any) {
+            if ((q || activeCat) && !any) {
                 if (!msg) { msg = document.createElement('p'); msg.id = 'hb-none'; msg.className = 'hb-none'; msg.textContent = L.none; (list[0] && list[0].parentElement || host).appendChild(msg); }
                 msg.style.display = '';
             } else if (msg) msg.style.display = 'none';
         };
         input.addEventListener('input', run);
-        new MutationObserver(() => { if (input.value.trim()) run(); }).observe(document.body, { childList: true, subtree: true });
+        buildCats();
+        let mt;
+        new MutationObserver(() => { clearTimeout(mt); mt = setTimeout(() => { buildCats(); if (input.value.trim() || activeCat) run(); }, 120); }).observe(document.body, { childList: true, subtree: true });
         return true;
     }
     let searchTries = 0;
