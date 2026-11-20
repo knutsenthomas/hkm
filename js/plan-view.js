@@ -112,6 +112,10 @@
     root.innerHTML = `<div class="pvstate">${loading ? '<div class="pvspin"></div>' : ''}<b>${esc(msg[0])}</b>${msg[1] ? `<p>${esc(msg[1])}</p>` : ''}${msg[2] ? `<p><a class="pill" href="${T.listUrl}">${esc(T.back)}</a></p>` : ''}</div>`;
   }
   state([T.loading], true);
+  const headEl = document.getElementById('header');
+  const setHead = () => { const h = headEl ? Math.round(headEl.getBoundingClientRect().bottom) : 84; root.style.setProperty('--pv-head', Math.max(56, Math.min(h, 140)) + 'px'); };
+  setHead(); addEventListener('resize', setHead, { passive: true });
+  if (headEl && window.ResizeObserver) new ResizeObserver(setHead).observe(headEl);
 
   let service = window.firebaseService;
   for (let i = 0; !service && i < 100; i++) { await new Promise(r => setTimeout(r, 50)); service = window.firebaseService; }
