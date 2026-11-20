@@ -39,9 +39,15 @@
     const meta = hero.querySelector('#blog-meta-row, .blog-meta');
     if (meta) head.querySelector('.ed-meta').appendChild(meta);
     hero.querySelectorAll('a.btn').forEach(a => head.querySelector('.ed-actions').appendChild(a));
+    // overlinje fra brødsmulesti («Hjem / Arrangementer / …») eller tilbake-knappen («Tilbake til Media»)
+    const bc = hero.querySelector('.breadcrumbs, .hero-breadcrumbs, nav');
+    const crumbs = bc ? [...bc.querySelectorAll('a')].map(a => a.textContent.trim()).filter(Boolean) : [];
+    const crumb = crumbs.length ? crumbs[crumbs.length - 1] : '';
+    const bt = head.querySelector('.ed-actions a');
+    const back = bt ? bt.textContent.trim().replace(/^(Tilbake til|Back to|Volver a)\s+/i, '').split('&')[0].trim() : '';
     const sync = () => {
       const h1 = hero.querySelector('h1'), p = hero.querySelector('p');
-      head.querySelector('.ed-eyebrow').textContent = EYE[kind] || '';
+      head.querySelector('.ed-eyebrow').textContent = EYE[kind] || crumb || back || 'His Kingdom Ministry';
       head.querySelector('.ed-h1').textContent = h1 ? h1.textContent.trim() : document.title.split('|')[0].trim();
       const lead = p ? p.textContent.trim() : '';
       const lp = head.querySelector('.ed-lead'); lp.textContent = lead; lp.hidden = !lead;
