@@ -5552,7 +5552,8 @@ const newsletterAi = require('./newsletter-ai-mcp.cjs').createNewsletterAiServic
   endpoint: newsletterMcpEndpoint, oauth: newsletterOAuth, sendReviewTest: sendNewsletterReviewTest,
   extraTools: {
     ...require('./content-ai-tools.cjs').createContentAiTools({ db, Timestamp, HttpsError }),
-    ...require('./admin-ai-tools.cjs').createAdminAiTools({ db, HttpsError })
+    ...require('./admin-ai-tools.cjs').createAdminAiTools({ db, HttpsError }),
+    ...require('./accounting-ai-tools.cjs').createAccountingAiTools({ db, HttpsError })
   }
 });
 

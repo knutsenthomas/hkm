@@ -144,24 +144,35 @@ export function mountAccounting(section, firebaseService) {
       </details>
     </header>
     <p role="status" aria-live="polite"></p>
-    <dl class="accounting-summary accounting-bank" hidden>
-      <div><dt>Bokført banksaldo · konto 1920</dt><dd data-bank-balance></dd>
-        <small data-bank-date></small></div>
-      <div data-prepaid-card hidden><dt>Forskuddsbetalte kostnader</dt>
-        <dd data-prepaid-balance></dd><small data-prepaid-date></small>
-        <div class="accounting-prepaid-detail" hidden>
-          <strong data-prepaid-description></strong><small data-prepaid-reference></small>
+    <div class="accounting-overview">
+      <article class="accounting-result" data-report-summary hidden>
+        <div class="accounting-result-head">
+          <span class="accounting-eyebrow">Resultat · <span data-period-name></span></span>
+          <strong class="accounting-result-amount" data-amount="result"></strong>
+          <span class="accounting-delta" data-result-delta hidden></span>
         </div>
-        <p>Betalt på forskudd. Kostnadsføres i perioden det gjelder.</p>
-      </div>
-    </dl>
-    <div data-report hidden>
-      <dl class="accounting-summary">
-        <div><dt>Driftsinntekter</dt><dd data-amount="revenue"></dd></div>
-        <div><dt>Driftskostnader</dt><dd data-amount="expenses"></dd></div>
-        <div><dt>Netto finans</dt><dd data-amount="financial"></dd></div>
-        <div><dt>Resultat</dt><dd data-amount="result"></dd></div>
+        <div class="accounting-flow">
+          <div class="accounting-flow-bar" role="img" data-flow-bar><span data-flow-expenses></span></div>
+          <dl class="accounting-flow-figures">
+            <div data-series="revenue"><dt>Driftsinntekter</dt><dd data-amount="revenue"></dd></div>
+            <div data-series="expenses"><dt>Driftskostnader</dt><dd data-amount="expenses"></dd></div>
+            <div><dt>Netto finans</dt><dd data-amount="financial"></dd></div>
+          </dl>
+        </div>
+      </article>
+      <dl class="accounting-bank" hidden>
+        <div data-bank-card><dt><span class="material-symbols-outlined" aria-hidden="true">account_balance</span>Bokført bank <small>konto 1920</small></dt>
+          <dd data-bank-balance></dd><small data-bank-date></small></div>
+        <div data-prepaid-card hidden><dt><span class="material-symbols-outlined" aria-hidden="true">event_upcoming</span>Forskuddsbetalt <small>konto 1749</small></dt>
+          <dd data-prepaid-balance></dd><small data-prepaid-date></small>
+          <div class="accounting-prepaid-detail" hidden>
+            <strong data-prepaid-description></strong><small data-prepaid-reference></small>
+          </div>
+          <p>Kostnadsføres i perioden det gjelder.</p>
+        </div>
       </dl>
+    </div>
+    <div data-report hidden>
       <section class="accounting-chart" aria-label="Utvikling per måned">
         <h3>Utvikling per måned</h3>
         <div data-trend></div>
@@ -190,6 +201,8 @@ export function mountAccounting(section, firebaseService) {
   const button = form.querySelector('button');
   const status = section.querySelector('[role="status"]');
   const report = section.querySelector('[data-report]');
+  const summary = section.querySelector('[data-report-summary]');
+  const setReportHidden = hidden => { report.hidden = hidden; summary.hidden = hidden; };
   const table = section.querySelector('[data-report] tbody');
   const dialog = section.querySelector('dialog');
   year.value = new Intl.DateTimeFormat('nb-NO', { year: 'numeric', timeZone: 'Europe/Oslo' }).format(new Date());
@@ -226,7 +239,7 @@ export function mountAccounting(section, firebaseService) {
     activeRequest = request;
     lastCheck = Date.now();
     if (reset) {
-      report.hidden = true;
+      setReportHidden(true);
       table.replaceChildren();
       lastSuccess = 0;
     }
@@ -243,7 +256,7 @@ export function mountAccounting(section, firebaseService) {
       if (request.signal.aborted) return;
       const bankCard = section.querySelector('.accounting-bank');
       bankCard.hidden = !bank && !prepaid;
-      bankCard.querySelector('[data-bank-balance]').closest('div').hidden = !bank;
+      bankCard.querySelector('[data-bank-card]').hidden = !bank;
       bankCard.querySelector('[data-prepaid-card]').hidden = !prepaid;
       if (prepaid) {
         const description = bankCard.querySelector('[data-prepaid-description]');
@@ -254,7 +267,7 @@ export function mountAccounting(section, firebaseService) {
         referenceLabel.textContent = reference.join(' · ');
         referenceLabel.hidden = !reference.length;
         bankCard.querySelector('[data-prepaid-balance]').textContent = currency.format(prepaid.balance);
-        bankCard.querySelector('[data-prepaid-date]').textContent = 'Konto 1749 · Tripletex · ' + prepaid.asOf.split('-').reverse().join('.');
+        bankCard.querySelector('[data-prepaid-date]').textContent = 'Per ' + prepaid.asOf.split('-').reverse().join('.') + ' · Tripletex';
       }
       if (bank) {
         bankCard.querySelector('[data-bank-balance]').textContent = currency.format(bank.balance);
@@ -273,9 +286,22 @@ export function mountAccounting(section, firebaseService) {
       report.querySelector('[data-current-year]').textContent = period.slice(0, 4);
       report.querySelector('[data-prior-year]').textContent = priorYear + (period.endsWith('-00') ? ' · hele året' : '');
       report.querySelector('[data-prior-result]').textContent = priorAmount(previous?.result);
-      for (const field of report.querySelectorAll('[data-amount]')) {
+      for (const field of section.querySelectorAll('[data-amount]')) {
         field.textContent = currency.format(data[field.dataset.amount]);
       }
+      section.querySelector('[data-period-name]').textContent = month.selectedOptions[0].textContent.replace('Årsoversikt', 'hele året') + ' ' + period.slice(0, 4);
+      summary.dataset.tone = data.result < 0 ? 'negative' : 'positive';
+      const delta = section.querySelector('[data-result-delta]');
+      delta.hidden = !previous;
+      if (previous) {
+        const change = data.result - (previous.result ?? 0);
+        delta.dataset.tone = change < 0 ? 'negative' : 'positive';
+        delta.textContent = (change < 0 ? '▼ ' : '▲ ') + currency.format(Math.abs(change)) + ' mot ' + priorYear;
+      }
+      const share = data.revenue > 0 ? Math.min(100, Math.max(0, data.expenses / data.revenue * 100)) : 100;
+      section.querySelector('[data-flow-expenses]').style.width = share + '%';
+      section.querySelector('[data-flow-bar]').setAttribute('aria-label',
+        'Kostnadene utgjør ' + Math.round(share) + ' % av inntektene');
       const groups = [
         ['Driftsinntekter', /^3/],
         ['Driftskostnader', /^[4-7]/],
@@ -288,8 +314,10 @@ export function mountAccounting(section, firebaseService) {
       for (const [title, prefix] of groups) {
         const accounts = accountsByNumber.filter(account => prefix.test(account.number));
         if (!accounts.length) continue;
+        const largest = Math.max(1, ...accounts.map(account => Math.abs(currentAccounts.get(account.number)?.amount ?? 0)));
         const heading = document.createElement('tr');
         heading.className = 'accounting-group';
+        heading.dataset.group = title;
         const label = document.createElement('th');
         label.colSpan = 2;
         label.textContent = title;
@@ -305,14 +333,19 @@ export function mountAccounting(section, firebaseService) {
           link.className = 'accounting-account-link';
           link.textContent = account.name;
           link.addEventListener('click', () => showAccount(dialog, settings, account, currentAccounts.has(account.number) ? data : previous));
-          row.insertCell().append(link);
+          const meter = document.createElement('span');
+          meter.className = 'accounting-meter';
+          meter.setAttribute('aria-hidden', 'true');
+          meter.style.setProperty('--share', Math.abs(currentAccounts.get(account.number)?.amount ?? 0) / largest * 100 + '%');
+          row.dataset.group = title;
+          row.insertCell().append(link, meter);
           row.insertCell().textContent = currency.format(currentAccounts.get(account.number)?.amount ?? 0);
           row.insertCell().textContent = priorAmount(previousAccounts.get(account.number)?.amount);
           rows.push(row);
         }
       }
       table.replaceChildren(...rows);
-      report.hidden = false;
+      setReportHidden(false);
       await renderTrend(section.querySelector('[data-trend]'), settings, year.value, month.value, data, request.signal);
       if (request.signal.aborted) return;
       lastSuccess = Date.parse(data.fetchedAt);
