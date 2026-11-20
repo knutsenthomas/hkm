@@ -480,3 +480,38 @@ html.pv-lock,html.pv-lock body{overflow:hidden}
 html.pv-lock #header,html.pv-lock .header{visibility:hidden}
 html.pv-lock #plan-view .astart{display:none}
 #plan-view .rbody .wref{display:none}
+/* ---- app: strammere størrelser ---- */
+@media (max-width:600px){
+ #plan-view .abar{padding:6px 0}
+ #plan-view .abar b{font-size:16px}
+ #plan-view .ricon{width:40px;height:40px}
+ #plan-view .ricon svg{width:22px;height:22px}
+ #plan-view .acard{min-height:118px;padding:16px 18px;margin-top:14px;border-radius:18px;justify-content:flex-end;gap:4px}
+ #plan-view .acard b{font-size:21px;max-width:90%}
+ #plan-view .acard small{font-size:12.5px;font-weight:600;color:rgba(255,255,255,.8)}
+ #plan-view .adays{margin-top:14px;gap:7px}
+ #plan-view .achip{width:54px;height:58px;border-radius:14px;gap:3px}
+ #plan-view .achip b{font-size:16px}
+ #plan-view .achip span{font-size:10px}
+ #plan-view .ahead{margin-top:18px}
+ #plan-view .ameta{font-size:13px;font-weight:600;color:var(--sec)}
+ #plan-view .apct{flex:none;font-size:12px;font-weight:700;color:var(--td)}
+ #plan-view .abarp{height:4px;border-radius:4px;background:var(--soft);overflow:hidden;margin-top:8px}
+ #plan-view .abarp i{display:block;height:100%;background:var(--t);border-radius:4px;transition:width .5s}
+ #plan-view h2.atitle{margin:14px 0 0;font-size:22px;line-height:1.2;font-weight:800;letter-spacing:-.02em;color:var(--ink)}
+ #plan-view .alist{margin-top:12px}
+ #plan-view .ack{padding:14px 12px 14px 2px}
+ #plan-view .ack span{width:24px;height:24px}
+ #plan-view .aopen{min-height:54px;font-size:16px;gap:8px}
+ #plan-view .aopen span{flex:1}
+ #plan-view .aopen em{flex:none;font-style:normal;font-size:12.5px;font-weight:600;color:var(--sec)}
+ #plan-view .astart{padding-right:88px}
+ #plan-view .astart .pill{height:48px;font-size:15px}
+ #plan-view .rbody .wtext{font-size:18px}
+ #plan-view .rbody .dtext{font-size:17px}
+ #plan-view .rfoot .pill{height:46px}
+}
+@media (max-width:600px){
+ #plan-view .ahead .ameta,#plan-view .ahead .apct{background:none;padding:0;border-radius:0}
+}
+@media (max-width:600px){ #plan-view .ahead .ameta{color:var(--sec);font-size:13px;font-weight:600} #plan-view .ahead .apct{font-size:12px} }

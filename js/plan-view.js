@@ -17,7 +17,7 @@
       over: 'Planen er fullført i kalenderen', doneOf: (a, b) => a + ' av ' + b + ' dager fullført',
       stillRead: 'Du kan fortsatt lese og fullføre dagene.', today: d => 'I dag · ' + d, dayT: (n, t) => 'Dag ' + n + ': ' + t,
       todayDone: 'Dagens dag er fullført. Godt jobbet!', tapDay: 'Trykk på dagen for å lese.', of: n => 'av ' + n,
-      myStart: 'Min startdato', startShort: d => 'Start ' + d + ' · Endre', devotional: 'Andakt', startReading: 'Start lesing', contReading: 'Fortsett lesingen', pct: p => p + '% fullført', nextS: 'Neste', prevS: 'Forrige', finishDay: 'Fullfør dagen', close: 'Lukk', dayDoneS: 'Dagen er fullført', week: 'Uke', dayRange: (a, b) => 'Dag ' + a + '–' + b, selected: 'Valgt dag', todayL: 'I dag', doneL: 'Fullført',
+      myStart: 'Min startdato', startShort: d => 'Start ' + d + ' · Endre', devotional: 'Andakt', min: m => m + ' min', startReading: 'Start lesing', contReading: 'Fortsett lesingen', pct: p => p + '% fullført', nextS: 'Neste', prevS: 'Forrige', finishDay: 'Fullfør dagen', close: 'Lukk', dayDoneS: 'Dagen er fullført', week: 'Uke', dayRange: (a, b) => 'Dag ' + a + '–' + b, selected: 'Valgt dag', todayL: 'I dag', doneL: 'Fullført',
       allDays: 'Alle dager', readOf: (a, b) => a + ' av ' + b + ' fullført', dayOf: (n, m) => 'Dag ' + n + ' av ' + m,
       verses: 'Dagens bibelvers', readAll: n => n === 2 ? 'Les begge' : 'Les alle ' + (['', '', '', 'tre', 'fire', 'fem', 'seks'][n] || n), copy: 'Kopier', nextV: 'Neste vers →', firstV: 'Første vers ↺',
       openBible: 'Les i Bibelen', showAll: 'Vis hele teksten', step: 'Dagens steg', prayFor: 'Be for', prayer: 'Bønn', notes: n => 'Mine notater for dag ' + n,
@@ -43,7 +43,7 @@
       over: 'The plan has ended in the calendar', doneOf: (a, b) => a + ' of ' + b + ' days completed',
       stillRead: 'You can still read and complete the days.', today: d => 'Today · ' + d, dayT: (n, t) => 'Day ' + n + ': ' + t,
       todayDone: "Today's day is completed. Well done!", tapDay: 'Tap the day to read.', of: n => 'of ' + n,
-      myStart: 'My start date', startShort: d => 'Starts ' + d + ' · Change', devotional: 'Devotional', startReading: 'Start reading', contReading: 'Continue reading', pct: p => p + '% complete', nextS: 'Next', prevS: 'Previous', finishDay: 'Complete the day', close: 'Close', dayDoneS: 'Day completed', week: 'Week', dayRange: (a, b) => 'Day ' + a + '–' + b, selected: 'Selected day', todayL: 'Today', doneL: 'Completed',
+      myStart: 'My start date', startShort: d => 'Starts ' + d + ' · Change', devotional: 'Devotional', min: m => m + ' min', startReading: 'Start reading', contReading: 'Continue reading', pct: p => p + '% complete', nextS: 'Next', prevS: 'Previous', finishDay: 'Complete the day', close: 'Close', dayDoneS: 'Day completed', week: 'Week', dayRange: (a, b) => 'Day ' + a + '–' + b, selected: 'Selected day', todayL: 'Today', doneL: 'Completed',
       allDays: 'All days', readOf: (a, b) => a + ' of ' + b + ' completed', dayOf: (n, m) => 'Day ' + n + ' of ' + m,
       verses: "Today's Bible verses", readAll: n => n === 2 ? 'Read both' : 'Read all ' + n, copy: 'Copy', nextV: 'Next verse →', firstV: 'First verse ↺',
       openBible: 'Read in the Bible', showAll: 'Show the whole passage', step: "Today's step", prayFor: 'Pray for', prayer: 'Prayer', notes: n => 'My notes for day ' + n,
@@ -69,7 +69,7 @@
       over: 'El plan ya terminó en el calendario', doneOf: (a, b) => a + ' de ' + b + ' días completados',
       stillRead: 'Todavía puedes leer y completar los días.', today: d => 'Hoy · ' + d, dayT: (n, t) => 'Día ' + n + ': ' + t,
       todayDone: 'El día de hoy está completado. ¡Bien hecho!', tapDay: 'Toca el día para leer.', of: n => 'de ' + n,
-      myStart: 'Mi fecha de inicio', startShort: d => 'Inicio ' + d + ' · Cambiar', devotional: 'Devocional', startReading: 'Comenzar lectura', contReading: 'Seguir leyendo', pct: p => p + '% completado', nextS: 'Siguiente', prevS: 'Anterior', finishDay: 'Completar el día', close: 'Cerrar', dayDoneS: 'Día completado', week: 'Semana', dayRange: (a, b) => 'Día ' + a + '–' + b, selected: 'Día elegido', todayL: 'Hoy', doneL: 'Completado',
+      myStart: 'Mi fecha de inicio', startShort: d => 'Inicio ' + d + ' · Cambiar', devotional: 'Devocional', min: m => m + ' min', startReading: 'Comenzar lectura', contReading: 'Seguir leyendo', pct: p => p + '% completado', nextS: 'Siguiente', prevS: 'Anterior', finishDay: 'Completar el día', close: 'Cerrar', dayDoneS: 'Día completado', week: 'Semana', dayRange: (a, b) => 'Día ' + a + '–' + b, selected: 'Día elegido', todayL: 'Hoy', doneL: 'Completado',
       allDays: 'Todos los días', readOf: (a, b) => a + ' de ' + b + ' completados', dayOf: (n, m) => 'Día ' + n + ' de ' + m,
       verses: 'Versículos del día', readAll: n => n === 2 ? 'Leer ambos' : 'Leer los ' + n, copy: 'Copiar', nextV: 'Siguiente →', firstV: 'Primero ↺',
       openBible: 'Leer en la Biblia', showAll: 'Mostrar todo el texto', step: 'Paso de hoy', prayFor: 'Ora por', prayer: 'Oración', notes: n => 'Mis notas del día ' + n,
@@ -631,8 +631,11 @@ ${aboutHTML('about-bottom')}
   const ICON_CHEV = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>';
   function dayItems(n) {
     const d = DAYS[n - 1], items = [];
-    if (d.body || d.step || d.pray.length || d.prayer) items.push({ type: 'dev', label: T.devotional });
-    d.refs.filter(r => r.label).forEach(r => items.push({ type: 'ref', label: refShow(r), ref: r }));
+    if (d.body || d.step || d.pray.length || d.prayer) {
+      const words = (d.body.replace(/<[^>]+>/g, ' ') + ' ' + d.step + ' ' + d.pray.join(' ') + ' ' + d.prayer).split(/\s+/).filter(Boolean).length;
+      items.push({ type: 'dev', label: T.devotional, min: Math.max(1, Math.round(words / 180)) });
+    }
+    d.refs.filter(r => r.label).forEach(r => items.push({ type: 'ref', label: refShow(r), ref: r, min: r.vFrom ? Math.max(1, Math.round((r.vTo - r.vFrom + 1) / 6)) : (r.chTo - r.ch + 1) * 4 }));
     return items;
   }
   const readGet = n => { try { return new Set(JSON.parse(S.get('p' + n) || '[]')); } catch (e) { return new Set(); } };
@@ -659,11 +662,12 @@ ${aboutHTML('about-bottom')}
     const unread = items.findIndex((_, k) => !set.has(k));
     el.innerHTML = `
 <div class="abar"><a class="ricon" href="${T.listUrl}" aria-label="${esc(T.back)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></a><b>${esc(plan.title || '')}</b><button type="button" class="ricon" data-share aria-label="${esc(T.share)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg></button></div>
-<div class="acard${img ? ' img' : ''}" ${img}>${img ? '' : '<svg class="shape" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path d="M560 -80C720 -70 840 40 815 170 792 290 660 320 570 260 480 200 500 110 440 60 380 10 430 -90 560 -80Z" fill="#cc712b" fill-opacity=".85"/></svg>'}<b>${esc(plan.title || '')}</b>${ICON_BOOK}</div>
+<div class="acard${img ? ' img' : ''}" ${img}>${img ? '' : '<svg class="shape" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path d="M560 -80C720 -70 840 40 815 170 792 290 660 320 570 260 480 200 500 110 440 60 380 10 430 -90 560 -80Z" fill="#cc712b" fill-opacity=".85"/></svg>'}<b>${esc(plan.title || '')}</b><small>${esc(T.days(N))}</small></div>
 <div class="adays" id="adays">${chips}</div>
-<div class="ahead"><b>${esc(T.dayOf(n, N))}</b><span>${esc(T.pct(pct))}</span></div>
-<p class="atitle">${esc(DAYS[n - 1].heading || DAYS[n - 1].title)}</p>
-<ul class="alist">${items.map((it, k) => `<li><label class="ack"><input type="checkbox" data-i="${k}" ${set.has(k) || dn ? 'checked' : ''} aria-label="${esc(it.label)}"><span></span></label><button type="button" class="aopen" data-i="${k}"><span>${esc(it.label)}</span>${ICON_CHEV}</button></li>`).join('')}</ul>
+<div class="ahead"><span class="ameta">${esc(T.dayOf(n, N))} · ${esc(T.WD[dayDate(n).getDay()])} ${esc(fmt(dayDate(n)))}</span><span class="apct">${esc(T.pct(pct))}</span></div>
+<div class="abarp" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}"><i style="width:${pct}%"></i></div>
+<h2 class="atitle">${esc(DAYS[n - 1].heading || DAYS[n - 1].title)}</h2>
+<ul class="alist">${items.map((it, k) => `<li><label class="ack"><input type="checkbox" data-i="${k}" ${set.has(k) || dn ? 'checked' : ''} aria-label="${esc(it.label)}"><span></span></label><button type="button" class="aopen" data-i="${k}"><span>${esc(it.label)}</span><em>${esc(T.min(it.min))}</em>${ICON_CHEV}</button></li>`).join('')}</ul>
 ${dn ? `<p class="adone">✓ ${esc(T.dayDoneS)}</p>` : ''}
 <div class="astart"><button type="button" class="pill donebtn" id="astart">${esc(unread > 0 ? T.contReading : (dn ? T.startReading : T.startReading))}</button></div>
 ${aboutHTML('about-app')}
