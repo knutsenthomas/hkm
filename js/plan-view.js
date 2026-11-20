@@ -138,6 +138,24 @@
   if (window.contentManager && window.contentManager.getLocalizedContentItem) {
     try { plan = window.contentManager.getLocalizedContentItem(plan, LANG); } catch (e) { }
   }
+  // Oversatte dagtekster ligger i et eget dokument (store planer får ikke plass i plan-dokumentet).
+  if (LANG !== 'no') {
+    try {
+      const ready = () => !!(window.firebase && firebase.apps && firebase.apps.length && typeof firebase.firestore === 'function');
+      if (!ready() && typeof service.waitForInitialization === 'function') await service.waitForInitialization(8000);
+      if (ready()) {
+        const snap = await firebase.firestore().doc('siteContent/readingPlanTranslations/items/' + realId + '__' + LANG).get();
+        const td = snap.exists ? (snap.data().days || []) : [];
+        if (td.length) {
+          plan.days = (plan.days || []).map(d => {
+            const t = td.find(x => x.dayNumber === d.dayNumber);
+            if (!t) return d;
+            return { ...d, prayerFocus: t.prayerFocus || d.prayerFocus, resources: (d.resources || []).map((r, i) => ({ ...r, title: (t.resources && t.resources[i] && t.resources[i].title) || r.title })) };
+          });
+        }
+      }
+    } catch (e) { console.warn('Oversatte dagtekster:', e); }
+  }
 
 
   /* ---------- tekstbehandling ---------- */
@@ -156,7 +174,7 @@
   const RX_TITLE = /^\s*(?:dag|day|día|dia)\s*\d+\s*[:.\-–—]\s*(.+)$/i;
   const RX_STEP = /^\s*(?:dagens steg|today[’']?s step|paso de hoy)\s*:\s*/i;
   const RX_PRAY = /^\s*(?:be for|pray for|ora por|oremos por)\s*:?\s*$/i;
-  const RX_PRAYER = /^\s*(?:be\s*\/\s*reflekter|bønn|pray\s*\/\s*reflect|prayer|ora\s*\/\s*reflexiona|oración)\s*:\s*/i;
+  const RX_PRAYER = /^\s*(?:be\s*\/\s*reflekter|bønn|be|pray\s*\/\s*reflect|prayer|pray|ora\s*\/\s*reflexiona|oración|ora)\s*:\s*/i;
 
   function parseDay(d) {
     const out = { n: d.dayNumber, verses: (d.verses || '').trim(), title: (d.title || '').trim(), body: '', step: '', pray: [], prayer: '', resources: Array.isArray(d.resources) ? d.resources : [] };
