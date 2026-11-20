@@ -149,3 +149,5 @@ html.hkr body .hkm-audio-player-bar select{-webkit-appearance:none!important;app
 html.hkr body .hkm-audio-player-bar select:hover{border-color:var(--hkr-ink)!important}
 html.hkr body.bible-theme-dark .hkm-audio-player-bar select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f1f5f9' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")!important}
 @media (max-width:768px){html.hkr body .hkm-audio-player-bar{border-radius:20px!important;flex-wrap:wrap!important}}
+html.hkr body .hkm-audio-player-bar select{width:auto!important;min-width:0!important;max-width:none!important;flex:none!important}
+html.hkr body .hkm-audio-player-bar .audio-info-display{flex:1 1 auto!important;min-width:0!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
