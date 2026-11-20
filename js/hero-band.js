@@ -29,6 +29,7 @@
             if (el.dataset.hbDone) return;
             el.dataset.hbDone = '1';
             el.dataset.heroAlign = 'left';
+            el.querySelectorAll('a .fa-arrow-left').forEach((i) => { const a = i.closest('a'); const box = a.parentElement; a.remove(); if (box && box !== el && !box.textContent.trim() && !box.children.length) box.remove(); });
             el.classList.add('hb-band');
             strip(el);
             const CHILD = ['color', 'text-align', 'text-shadow', 'background', 'background-color', 'background-image', 'box-shadow', 'border', 'border-radius',
