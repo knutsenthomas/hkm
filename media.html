@@ -258,7 +258,7 @@
     </style>
 </head>
 
-<body class="header-dark-start">
+<body class="cms-loading">
     <!-- Header -->
     <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
         <div class="header-content" id="header-container">
@@ -558,10 +558,11 @@
 
 <style>
 html:has(#hkm-media),html:has(#hkm-media) body{overflow-x:clip!important;overflow-y:visible!important}
-#hkm-media{--ink:#151a21;--mut:#596069;--line:rgba(21,26,33,.12);--or:#e07b2c;--or2:#a0531a;font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--ink);background:#fff;padding:calc(var(--hm-head,96px) + 24px) 0 72px}
+#hkm-media{--ink:#151a21;--mut:#596069;--line:rgba(21,26,33,.12);--or:#e07b2c;--or2:#a0531a;font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--ink);background:#fff;padding:var(--hm-head,96px) 0 72px}
 #hkm-media *{box-sizing:border-box}
 #hkm-media .hm-wrap{max-width:1100px;margin:0 auto;padding:0 24px}
-#hkm-media .hm-head{margin:0 0 24px}
+#hkm-media .hm-band{background:#faf9f6;border-bottom:1px solid var(--line);padding:32px 0 24px;margin:0 0 32px}
+#hkm-media .hm-head{margin:0}
 #hkm-media .hm-eye{font-size:14px;font-weight:600;color:var(--or2);margin:0 0 8px}
 #hkm-media h1{font-size:clamp(28px,3.4vw,40px);line-height:1.08;font-weight:800;letter-spacing:-.035em;margin:0;color:var(--ink)}
 #hkm-media .hm-lead{font-size:17px;line-height:1.5;color:var(--mut);margin:8px 0 0;max-width:640px}
@@ -597,9 +598,16 @@ html:has(#hkm-media),html:has(#hkm-media) body{overflow-x:clip!important;overflo
 #hkm-media .hm-empty{color:var(--mut);font-size:15px;margin:0}
 .media-newsletter{background:#faf9f6!important;font-family:Inter,system-ui,sans-serif}
 .media-newsletter h2{font-weight:800!important;letter-spacing:-.02em;color:#151a21!important}
+.media-newsletter{border-top:1px solid rgba(21,26,33,.12)}
+.media-newsletter .newsletter-icon{color:#a0531a!important;background:#fdf1e7!important;width:56px;height:56px;border-radius:16px;display:inline-grid!important;place-items:center;font-size:24px!important;margin-bottom:16px!important;box-shadow:none!important}
+.media-newsletter h2{font-size:clamp(24px,2.6vw,30px)!important;line-height:1.2!important}
+.media-newsletter .newsletter-form{gap:8px!important}
+.media-newsletter .newsletter-form input{height:46px!important;border:1px solid rgba(21,26,33,.12)!important;border-radius:999px!important;padding:0 18px!important;font:400 15px/1 Inter,system-ui,sans-serif!important;background:#fff!important;color:#151a21!important;box-shadow:none!important}
+.media-newsletter .newsletter-form input:focus{border-color:#151a21!important;outline:0!important}
+.media-newsletter .newsletter-form .btn{height:46px!important;border-radius:999px!important;background:#151a21!important;border-color:#151a21!important;color:#fff!important;font:600 15px/1 Inter,system-ui,sans-serif!important;padding:0 22px!important;box-shadow:none!important}
 .media-newsletter p{color:#596069!important}
 @media (max-width:900px){#hkm-media .hm-posts{grid-template-columns:1fr 1fr}}
-@media (max-width:600px){#hkm-media{padding-top:calc(var(--hm-head,80px) + 20px)}#hkm-media .hm-wrap{padding:0 18px}#hkm-media .hm-lead{font-size:16px}#hkm-media .hm-grid{grid-template-columns:1fr}#hkm-media .hm-posts{grid-template-columns:1fr}#hkm-media .hm-card{padding:16px}#hkm-media .hm-sh{flex-wrap:wrap}#hkm-media .faste-promo{margin-bottom:44px}#hkm-media .hm-sec{margin-bottom:36px}}
+@media (max-width:600px){#hkm-media{padding-top:var(--hm-head,80px)}#hkm-media .hm-band{padding:24px 0 18px;margin-bottom:24px}#hkm-media .hm-wrap{padding:0 18px}#hkm-media .hm-lead{font-size:16px}#hkm-media .hm-grid{grid-template-columns:1fr}#hkm-media .hm-posts{grid-template-columns:1fr}#hkm-media .hm-card{padding:16px}#hkm-media .hm-sh{flex-wrap:wrap}#hkm-media .faste-promo{margin-bottom:44px}#hkm-media .hm-sec{margin-bottom:36px}}
 </style>
 <style>
 .faste-promo{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);align-items:stretch;gap:0;margin:0 auto 48px;max-width:1100px;border:1px solid rgba(21,26,33,.12);border-radius:20px;overflow:hidden;background:#fff;text-decoration:none;color:#151a21;font-family:Inter,system-ui,sans-serif;transition:border-color .2s,transform .2s}
@@ -620,7 +628,7 @@ html:has(#hkm-media),html:has(#hkm-media) body{overflow-x:clip!important;overflo
 .faste-promo .fp-badge{position:absolute;top:14px;left:14px;z-index:2;background:#fff;color:#151a21;font:600 12px/1 Inter,system-ui,sans-serif;padding:7px 10px;border-radius:999px}
 </style>
 <main id="hkm-media">
-  <div class="hm-wrap">
+  <div class="hm-band"><div class="hm-wrap">
     <header class="hm-head">
       <p class="hm-eye">Media &amp; undervisning</p>
       <h1 data-content-key="hero.title">Media &amp; ressurser</h1>
@@ -632,6 +640,8 @@ html:has(#hkm-media),html:has(#hkm-media) body{overflow-x:clip!important;overflo
         <a href="#siste">Siste nytt</a>
       </nav>
     </header>
+  </div></div>
+  <div class="hm-wrap">
 
     <a class="faste-promo" href="/undervisning/faste">
   <span class="fp-img"><img src="https://images.unsplash.com/photo-1457139621581-298d1801c832?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async"><span class="fp-badge">Undervisning</span></span>
@@ -703,16 +713,16 @@ html:has(#hkm-media),html:has(#hkm-media) body{overflow-x:clip!important;overflo
     items=(items||[]).filter(function(i){return i&&i.published!==false&&i.title}).sort(function(a,b){return ts(b)-ts(a)}).slice(0,3);
     if(!items.length){el.innerHTML='<p class="hm-empty">'+empty+'</p>';return}
     el.innerHTML=items.map(function(i){
-      var key=i.id||i.title,img=i.imageUrl||i.image||'';
+      var key=i.id||i.title,img=i.imageUrl||i.image||'',link=i.href||('/blogg-post?id='+encodeURIComponent(key));
       var k=kind||i.category||i.teachingType||'';
-      return '<a class="hm-post" href="/blogg-post?id='+encodeURIComponent(key)+'"><span class="ph">'+(img?'<img src="'+esc(img)+'" alt="" loading="lazy" decoding="async">':'')+'</span><span class="pt">'+(k?'<p class="pk">'+esc(k)+'</p>':'')+'<p class="pn">'+esc(i.title)+'</p>'+(i.date?'<p class="pd">'+esc(d(i.date))+'</p>':'')+'</span></a>';
+      return '<a class="hm-post" href="'+esc(link)+'"><span class="ph">'+(img?'<img src="'+esc(img)+'" alt="" loading="lazy" decoding="async">':'')+'</span><span class="pt">'+(k?'<p class="pk">'+esc(k)+'</p>':'')+'<p class="pn">'+esc(i.title)+'</p>'+(i.date?'<p class="pd">'+esc(d(i.date))+'</p>':'')+'</span></a>';
     }).join('');
   }
   var tries=0;
   (function go(){
     var fs=window.firebaseService;
     if(!fs||typeof fs.getPageContent!=='function'){if(++tries<60)return setTimeout(go,200);render('hm-teach',[],'','Kunne ikke hente undervisning nå.');render('hm-blog',[],'Blogg','Kunne ikke hente innlegg nå.');return}
-    fs.getPageContent('collection_teaching').then(function(r){render('hm-teach',r&&r.items,'','Ingen undervisning ennå.')}).catch(function(){render('hm-teach',[],'','Kunne ikke hente undervisning nå.')});
+    fs.getPageContent('collection_teaching').then(function(r){var faste={id:'item-1795125986813-h8n6uapai',title:'Faste – å gi Gud mer plass',date:'2026-11-20',category:'Bibelstudie',imageUrl:'https://images.unsplash.com/photo-1457139621581-298d1801c832?auto=format&fit=crop&w=1200&q=80',href:'/undervisning/faste'};var items=[faste].concat(((r&&r.items)||[]).filter(function(i){return i&&i.id!==faste.id}));render('hm-teach',items,'','Ingen undervisning ennå.')}).catch(function(){render('hm-teach',[],'','Kunne ikke hente undervisning nå.')});
     fs.getPageContent('collection_blog').then(function(r){render('hm-blog',r&&r.items,'Blogg','Ingen innlegg ennå.')}).catch(function(){render('hm-blog',[],'Blogg','Kunne ikke hente innlegg nå.')});
   })();
 })();
@@ -723,7 +733,7 @@ html:has(#hkm-media),html:has(#hkm-media) body{overflow-x:clip!important;overflo
         <div class="container">
             <div class="newsletter-content">
                 <i class="fas fa-bell newsletter-icon"></i>
-                <h2>Få Varsler om Nytt Innhold</h2>
+                <h2>Få varsler om nytt innhold</h2>
                 <p>Abonner på vårt nyhetsbrev og få beskjed når vi publiserer nye videoer, podcaster og undervisning.</p>
                 <form class="newsletter-form">
                     <input type="email" placeholder="Din e-postadresse" required>

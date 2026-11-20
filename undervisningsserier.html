@@ -86,6 +86,7 @@
     <meta property="twitter:title" content="Undervisningsserier | His Kingdom Ministry">
     <meta property="twitter:description" content="Oppdag våre dyptgående undervisningsserier om bibelske bøker og teologiske emner.">
     <meta property="twitter:image" content="https://hiskingdomministry.no/img/logo-hkm.png">
+    <link rel="stylesheet" href="/css/teaching-list.css?v=3">
 </head>
 
 <body class="cms-loading">
@@ -386,46 +387,25 @@
         </div>
     </div>
 
-    <section class="page-hero" data-content-key="hero.backgroundImage" style="padding-top: 160px;">
-        <div class="container">
-            <h1 class="page-hero-title">Undervisningsserier</h1>
-            <p class="page-hero-subtitle">Tematiske undervisningsserier om viktige kristne emner</p>
-            <div style="margin-top: 20px;">
-                <a href="/media#undervisning" class="btn btn-outline btn-sm">
-                    <i class="fas fa-arrow-left"></i> Tilbake til Undervisning
-                </a>
-            </div>
+    <main id="hkm-tl">
+        <div class="tl-band"><div class="tl-wrap">
+            <a class="tl-back" href="/media#undervisning"><i class="fas fa-arrow-left"></i> Media &amp; undervisning</a>
+            <p class="tl-eye">Undervisning</p>
+            <h1>Undervisningsserier</h1>
+            <p class="tl-lead">Tematiske undervisningsserier om viktige kristne emner</p>
+        </div></div>
+        <div class="tl-wrap">
+            <div class="tl-bar"><h2 class="section-title">Laster innhold …</h2><a href="/leseplaner">Leseplaner</a></div>
+            <div class="media-grid" id="teaching-grid"></div>
+            <section class="tl-cta">
+                <div><h2>Start din læringsreise</h2><p>Alle våre undervisningsserier er gratis og tilgjengelige. Voks i din tro sammen med oss!</p></div>
+                <div class="tl-btns"><a href="/media" class="tl-btn dark">Se alle ressurser</a><a href="/kontakt" class="tl-btn">Kontakt oss</a></div>
+            </section>
         </div>
-    </section>
-
-    <!-- Teaching Series Grid -->
-    <section class="media-content-section">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-label">Tilgjengelige Serier</span>
-                <h2 class="section-title">Laster innhold...</h2>
-                <p class="section-description">Dyptgående undervisning om sentrale kristne temaer</p>
-            </div>
-
-            <div class="media-grid" id="teaching-grid">
-                <!-- Content loaded dynamically -->
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="cta-section">
-        <div class="container">
-            <div class="cta-content">
-                <h2>Start Din Læringsreise</h2>
-                <p>Alle våre undervisningsserier er gratis og tilgjengelige. Voks i din tro sammen med oss!</p>
-                <div class="cta-buttons">
-                    <a href="/media" class="btn btn-primary">Se alle ressurser</a>
-                    <a href="/kontakt" class="btn btn-primary">Kontakt oss</a>
-                </div>
-            </div>
-        </div>
-    </section>
+    </main>
+    <script>
+    (function(){var R=document.getElementById('hkm-tl');function h(){var e=document.getElementById('header')||document.querySelector('header');var r=e?e.getBoundingClientRect():null;var b=r?Math.round(Math.max(r.bottom,r.height)):90;R.style.setProperty('--tl-head',(b>40?b:90)+'px')}h();window.addEventListener('load',h);window.addEventListener('resize',h);var n=0,iv=setInterval(function(){h();if(++n>20)clearInterval(iv)},250);if(window.ResizeObserver){var hd=document.getElementById('header');if(hd)new ResizeObserver(h).observe(hd)}})();
+    </script>
 
     <!-- Footer -->
     <footer class="footer" id="kontakt">

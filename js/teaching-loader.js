@@ -2,6 +2,17 @@
 // Teaching Content Loader
 // ===================================
 
+
+// Faste-undervisningen er en egen side (ikke et CMS-innlegg) og vises først under Bibelstudier.
+const FASTE_ID = 'item-1795125986813-h8n6uapai';
+function getFasteTeachingItem() {
+    const lang = (document.documentElement.lang || 'no').toLowerCase();
+    const base = { id: FASTE_ID, date: '2026-11-20', imageUrl: 'https://images.unsplash.com/photo-1457139621581-298d1801c832?auto=format&fit=crop&w=1200&q=80', category: 'Bibelstudie', teachingType: 'Bibelstudie', published: true };
+    if (lang.startsWith('en')) return Object.assign(base, { title: 'Fasting – making more room for God', href: '/en/teaching/fasting', seoDescription: 'What is biblical fasting, why do we fast, and how can you get started safely? With videos, questions and a checklist.' });
+    if (lang.startsWith('es')) return Object.assign(base, { title: 'El ayuno – dar más espacio a Dios', href: '/es/ensenanza/ayuno', seoDescription: '¿Qué es el ayuno bíblico, por qué ayunamos y cómo empezar de forma segura? Con videos, preguntas y lista de control.' });
+    return Object.assign(base, { title: 'Faste – å gi Gud mer plass', href: '/undervisning/faste', seoDescription: 'Hva er bibelsk faste, hvorfor faster vi, og hvordan kommer du i gang på en trygg måte? Med videoer, spørsmål og sjekkliste.' });
+}
+
 /**
  * Load and render teaching content by category
  * @param {string} categoryName - The category to filter by (e.g., 'Bibelstudier', 'Seminarer', 'Undervisningsserier')
@@ -12,7 +23,12 @@
 async function loadTeachingCategory(categoryName, gridContainerId = 'teaching-grid', countElementSelector = '.section-title', emptyLabel = 'undervisning') {
     try {
         // Get the teaching collection data
-        const teachingData = await firebaseService.getPageContent('collection_teaching');
+        let teachingData = await firebaseService.getPageContent('collection_teaching');
+
+        if (String(categoryName).toLowerCase().includes('bibelstudie')) {
+            const rest = (teachingData && Array.isArray(teachingData.items) ? teachingData.items : []).filter(i => i && i.id !== FASTE_ID);
+            teachingData = Object.assign({}, teachingData || {}, { items: [getFasteTeachingItem(), ...rest] });
+        }
 
         if (!teachingData || !teachingData.items || teachingData.items.length === 0) {
             renderEmptyTeachingState(gridContainerId, emptyLabel);
@@ -88,7 +104,7 @@ async function loadTeachingCategory(categoryName, gridContainerId = 'teaching-gr
 function createTeachingCard(item, index) {
     const itemKey = item.id || item.title;
     const isClickable = !!itemKey;
-    const detailsUrl = isClickable ? `${getLocalizedPostLink()}?id=${encodeURIComponent(itemKey)}` : '#';
+    const detailsUrl = item.href ? item.href : (isClickable ? `${getLocalizedPostLink()}?id=${encodeURIComponent(itemKey)}` : '#');
 
     const card = document.createElement(isClickable ? 'a' : 'div');
     card.className = 'media-card';

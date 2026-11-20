@@ -88,6 +88,49 @@
     <meta property="twitter:title" content="Kurs | His Kingdom Ministry">
     <meta property="twitter:description" content="Utforsk kurs fra His Kingdom Ministry. Lær om bibelstudium, bønn, lederskap og mer.">
     <meta property="twitter:image" content="https://hiskingdomministry.no/img/logo-hkm.png">
+
+<style id="kurs-new">
+html:has(.kurs-featured),html:has(.kurs-featured) body{overflow-x:clip !important}
+.kurs-featured-wrap{max-width:1100px;margin:28px auto 0;padding:0 24px;font-family:Inter,system-ui,sans-serif}
+.kurs-featured{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);border:1px solid rgba(21,26,33,.12);border-radius:20px;overflow:hidden;background:#fff}
+.kf-img{min-height:260px;background:#151a21 center/cover no-repeat;background-size:cover !important;background-position:center !important}
+.kf-txt{padding:28px 30px;display:flex;flex-direction:column;justify-content:center}
+.kf-eye{font-size:14px;font-weight:600;color:#a0531a;margin:0 0 8px;display:flex;gap:6px;align-items:center}
+.kf-txt h2{font-size:clamp(22px,2.4vw,30px);line-height:1.15;font-weight:800;letter-spacing:-.03em;color:#151a21 !important;margin:0}
+.kf-txt p#hero-course-desc{font-size:16px;line-height:1.6;color:#596069 !important;margin:12px 0 0;text-align:left !important}
+.kf-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.kf-btn{display:inline-flex !important;align-items:center;gap:8px;height:42px;padding:0 18px;border-radius:999px;border:1px solid rgba(21,26,33,.12);background:#fff;color:#151a21 !important;font:600 14px/1 Inter,system-ui,sans-serif;text-decoration:none;cursor:pointer;box-shadow:none !important}
+.kf-btn:hover{border-color:#151a21}
+.kf-btn.dark{background:#151a21 !important;border-color:#151a21;color:#fff !important}
+.kurs-featured *{hyphens:none !important;-webkit-hyphens:none !important}
+.kurs-main{max-width:1100px !important;margin:0 auto !important;padding:28px 24px 72px !important}
+.kurs-grid{display:grid !important;grid-template-columns:repeat(3,minmax(0,1fr)) !important;gap:16px !important}
+.kurs-grid .course-card{border:1px solid rgba(21,26,33,.12) !important;border-radius:20px !important;box-shadow:none !important;overflow:hidden !important;background:#fff !important;font-family:Inter,system-ui,sans-serif;display:flex;flex-direction:column}
+.kurs-grid .course-card:hover{border-color:#151a21 !important;transform:translateY(-2px) !important;box-shadow:none !important}
+.kurs-grid .course-thumb{aspect-ratio:16/9;height:auto !important;border-radius:0 !important;position:relative;overflow:hidden}
+.kurs-grid .course-thumb img{width:100%;height:100%;object-fit:cover;transform:none !important}
+.kurs-grid .category-badge{background:#fff !important;color:#151a21 !important;font:600 12px/1 Inter,system-ui,sans-serif !important;padding:7px 10px !important;border-radius:999px !important;box-shadow:none !important;backdrop-filter:none !important}
+.kurs-grid .course-body{padding:16px 18px 18px !important;display:flex;flex-direction:column;flex:1}
+.kurs-grid .course-body h3{font:700 18px/1.3 Inter,system-ui,sans-serif !important;letter-spacing:-.01em;color:#151a21 !important;margin:0 0 6px !important}
+.kurs-grid .course-meta{font-size:13px !important;color:#596069 !important;gap:4px 12px !important}
+.kurs-grid .course-body p{font-size:15px !important;line-height:1.55 !important;color:#596069 !important}
+.kurs-grid .enroll-btn{border-radius:999px !important;height:42px !important;font:600 14px/1 Inter,system-ui,sans-serif !important;box-shadow:none !important}
+.kurs-grid .course-card *{hyphens:none !important;-webkit-hyphens:none !important}
+html body .hb-band #filter-scroll .filter-btn{display:inline-flex !important;align-items:center !important;height:34px !important;padding:0 14px !important;border:1px solid rgba(21,26,33,.12) !important;border-radius:999px !important;background:#fff !important;color:#151a21 !important;font:600 14px/1 Inter,system-ui,sans-serif !important;box-shadow:none !important;margin:0 !important;width:auto !important;transform:none !important}
+html body .hb-band #filter-scroll .filter-btn:hover{border-color:#151a21 !important}
+html body .hb-band #filter-scroll .filter-btn.active{background:#151a21 !important;border-color:#151a21 !important;color:#fff !important}
+/* listevisning */
+.kurs-grid.hb-list{grid-template-columns:1fr !important;gap:12px !important}
+.kurs-grid.hb-list .course-card{display:grid !important;grid-template-columns:260px minmax(0,1fr) !important}
+.kurs-grid.hb-list .course-thumb{aspect-ratio:auto !important;min-height:170px}
+.kurs-grid.hb-list .course-thumb img{position:absolute;inset:0}
+@media (max-width:900px){.kurs-grid{grid-template-columns:1fr 1fr !important}}
+@media (max-width:760px){.kurs-featured{grid-template-columns:1fr}.kf-img{min-height:0;aspect-ratio:16/9}.kf-txt{padding:20px}}
+@media (max-width:600px){.kurs-featured-wrap{padding:0 18px;margin-top:20px}.kurs-main{padding:20px 18px 56px !important}.kurs-grid{grid-template-columns:1fr !important}.kurs-grid.hb-list .course-card{grid-template-columns:112px minmax(0,1fr) !important}.kurs-grid.hb-list .course-thumb{min-height:112px}.kurs-grid.hb-list .course-body p,.kurs-grid.hb-list .course-card-actions{display:none !important}}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',function(){var tg=document.getElementById('kurs-view'),g=document.getElementById('kurs-grid');if(!tg||!g)return;var v='grid';try{v=localStorage.getItem('hkm_page_view')||'grid'}catch(e){}function set(x){v=x;try{localStorage.setItem('hkm_page_view',x)}catch(e){}tg.querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.dataset.v===x)});g.classList.toggle('hb-list',x==='list')}tg.addEventListener('click',function(e){var b=e.target.closest('button');if(b)set(b.dataset.v)});set(v)});
+</script>
 </head>
 
 <body class="cms-loading">
@@ -389,46 +432,38 @@
     </div>
 
     <!-- Full-Width Background Image Hero with Generous Height -->
-    <section id="kurs-hero-section" style="background: linear-gradient(rgba(11, 37, 54, 0.72), rgba(11, 37, 54, 0.82)), url('https://images.unsplash.com/photo-1553729784-e91953dec042?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MzIzNjJ8MHwxfHNlYXJjaHwxM3x8QmlibGV8ZW58MHx8fHwxNzgzNjc3NTk3fDA&ixlib=rb-4.1.0&q=80&w=1080') no-repeat center center / cover !important; min-height: 620px !important; padding: 240px 24px 170px !important; text-align: center; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; color: white;">
-        <div class="container" style="max-width: 900px; margin: 0 auto; text-align: center; position: relative; z-index: 2;">
-            <div style="display:inline-flex; align-items:center; gap:8px; padding:6px 18px; border-radius:24px; background:rgba(255, 255, 255, 0.12); border:1px solid rgba(255, 255, 255, 0.25); color:#ffffff; font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:16px; backdrop-filter:blur(12px); box-shadow:0 4px 14px rgba(0,0,0,0.15);">
-                <i class="fas fa-star" style="font-size:0.78rem; color:#d17d39;"></i> Utvalgt kurs
+    <section class="hb-band hb-static" data-hero-align="left">
+        <div class="container hb-host">
+            <div class="hb-text">
+                <p class="hb-eye">His Kingdom Ministry</p>
+                <h1>Kurs</h1>
+                <p class="hb-lead">Nettkurs og undervisning for å vokse i tro, bønn og tjeneste – i ditt eget tempo.</p>
             </div>
-            <h1 id="hero-course-title" style="font-size: clamp(2rem, 4.5vw, 3.1rem); font-weight: 800; color: #ffffff !important; margin: 0 auto 16px auto; line-height: 1.2; letter-spacing: -0.02em; max-width: 820px;">
-                Seerkurs med aktivering
-            </h1>
-            <p id="hero-course-desc" style="font-size: 1.15rem; color: #e2e8f0 !important; margin: 0 auto 32px auto; line-height: 1.6; max-width: 680px; text-align: center;">
-                Hvordan se i ånden og hvordan bruke bibelvers til å se i ånden
-            </p>
-            <div style="display: flex; gap: 18px; align-items: center; justify-content: center; flex-wrap: wrap;">
-                <button class="hero-btn-primary" id="hero-primary-btn" onclick="if(allCourses && allCourses[0]) openEnrollModal(allCourses[0]); return false;" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; font-weight: 800; padding: 18px 40px; border-radius: 16px; font-size: 1.1rem; border: none; cursor: pointer; box-shadow: 0 10px 30px rgba(209, 125, 57, 0.45); transition: all 0.25s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
-                    <i class="fas fa-graduation-cap"></i><span>Meld deg på nå</span><i class="fas fa-arrow-right"></i>
-                </button>
-                <a href="#kurs-grid-section" class="hero-btn-secondary" style="background: rgba(255,255,255,0.15); color: #ffffff !important; border: 1.5px solid rgba(255,255,255,0.35); padding: 18px 34px; border-radius: 16px; font-weight: 700; text-decoration: none; backdrop-filter: blur(12px); font-size: 1.05rem; display: inline-flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-list-ul" style="margin-right: 8px;"></i> Se kursplan & leksjoner <i class="fas fa-chevron-down" style="margin-left: 8px; font-size: 0.88rem;"></i>
-                </a>
+            <div class="hb-tools">
+                <label class="hb-search"><span class="material-symbols-outlined" aria-hidden="true">search</span><input type="text" id="course-search" placeholder="Søk etter kurs..." autocomplete="off"></label>
+                <div class="hb-view" id="kurs-view"><button type="button" data-v="grid" class="on" aria-label="Rutenett"><span class="material-symbols-outlined">grid_view</span></button><button type="button" data-v="list" aria-label="Liste"><span class="material-symbols-outlined">view_list</span></button></div>
+            </div>
+            <div class="hb-filters filter-scroll" id="filter-scroll">
+                <button class="filter-btn active" data-cat="all">Alle kurs</button>
             </div>
         </div>
     </section>
 
-    <!-- Search + Filters -->
-    <div class="kurs-controls">
-        <div class="kurs-controls-inner">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="course-search" placeholder="Søk etter kurs...">
-            </div>
-            <div class="filter-scroll" id="filter-scroll" style="display:flex;gap:8px;flex-wrap:wrap;">
-                <button class="filter-btn active" data-cat="all">Alle kurs</button>
-                <button class="filter-btn" data-cat="Bibelstudium">Bibelstudium</button>
-                <button class="filter-btn" data-cat="Bønn">Bønn</button>
-                <button class="filter-btn" data-cat="Lederskap">Lederskap</button>
-                <button class="filter-btn" data-cat="Helbredelse">Helbredelse</button>
-                <button class="filter-btn" data-cat="Identitet">Identitet</button>
-                <button class="filter-btn" data-cat="Evangelisering">Evangelisering</button>
+    <!-- Utvalgt kurs -->
+    <section class="kurs-featured-wrap">
+        <div class="kurs-featured">
+            <div class="kf-img" id="kurs-hero-section"></div>
+            <div class="kf-txt">
+                <p class="kf-eye"><i class="fas fa-star"></i> Utvalgt kurs</p>
+                <h2 id="hero-course-title">Seerkurs med aktivering</h2>
+                <p id="hero-course-desc">Hvordan se i ånden og hvordan bruke bibelvers til å se i ånden</p>
+                <div class="kf-btns">
+                    <button class="kf-btn dark" id="hero-primary-btn" onclick="if(allCourses && allCourses[0]) openEnrollModal(allCourses[0]); return false;"><i class="fas fa-graduation-cap"></i><span>Meld deg på nå</span><i class="fas fa-arrow-right"></i></button>
+                    <a href="#kurs-grid-section" class="kf-btn">Se alle kurs</a>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
 
     <!-- Main Grid -->
     <section class="kurs-main" id="kurs-grid-section">
@@ -1315,7 +1350,7 @@
                             }
                             const heroSecEl = document.getElementById('kurs-hero-section');
                             if (heroSecEl && mainCourse.imageUrl) {
-                                heroSecEl.style.setProperty('background', `linear-gradient(rgba(11, 37, 54, 0.72), rgba(11, 37, 54, 0.82)), url('${mainCourse.imageUrl}') no-repeat center center / cover`, 'important');
+                                heroSecEl.style.setProperty('background', `url('${mainCourse.imageUrl}') no-repeat center center / cover`, 'important');
                             }
 
                             updateHeroPrimaryButton(mainCourse);

@@ -82,6 +82,12 @@ const sharedSiteShellPlugin = {
                 tags.push({ tag: 'link', attrs: { rel: 'stylesheet', href: '/css/typography.css' }, injectTo: 'head' });
             }
 
+            // Lys toppflate på undersider (ikke forsiden)
+            if (!isFront && !html.includes('/css/hero-band.css')) {
+                tags.push({ tag: 'link', attrs: { rel: 'stylesheet', href: '/css/hero-band.css' }, injectTo: 'head' });
+                tags.push({ tag: 'script', attrs: { type: 'module', src: '/js/hero-band.js' }, injectTo: 'head' });
+            }
+
             return tags;
         }
     }
