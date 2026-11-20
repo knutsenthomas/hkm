@@ -2,6 +2,18 @@
 <html lang="en">
 
 <head>
+    <!-- Leseplaner vises i den egne leseplan-visningen -->
+    <script>
+        (function () {
+            try {
+                var p = new URLSearchParams(location.search), id = p.get('plan');
+                if (id && !p.get('ref') && !p.get('stay')) {
+                    var d = parseInt(p.get('day'), 10);
+                    location.replace('/en/reading-plan-details?id=' + encodeURIComponent(id) + (d > 0 ? '&day=' + d : ''));
+                }
+            } catch (e) {}
+        })();
+    </script>
             <!-- Theme Initializer -->
     <script>
         (function () {
