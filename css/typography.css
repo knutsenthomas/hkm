@@ -1,0 +1,18 @@
+/* Felles typografi i samme stil som leseplanene og faste-siden (Inter, tette overskrifter, nesten svart tekst).
+   Lastes på alle offentlige sider unntatt forsiden (se vite.config.js). */
+html body{color:#151a21;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+html body :where(h1,h2,h3,h4,h5,h6){font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;text-wrap:balance}
+html body :where(h1,h2,h3),html body .section-title,html body .page-hero-title,html body .hero-title{font-weight:800!important;letter-spacing:-.03em!important;color:inherit}
+html body :where(h1),html body .page-hero-title,html body .hero-title{letter-spacing:-.035em!important;line-height:1.05!important}
+html body :where(h2),html body .section-title{line-height:1.12!important}
+html body :where(h3){line-height:1.2}
+html body :where(h4,h5,h6){font-weight:700;letter-spacing:-.01em}
+/* gråblå overskrifter blir nesten svarte, som på faste-siden */
+html body :is(h1,h2,h3,h4,.section-title)[class*="1B4965"],html body .section-title{color:#151a21!important}
+html body .page-hero :is(h1,h2,.page-hero-title),html body .subpage-hero :is(h1,h2,.hero-title,.page-hero-title){color:#fff!important}
+/* brødtekst: litt større og luftigere */
+html body :is(article,.blog-post-content,.detail-paragraph-body) :is(p,li){font-size:17px;line-height:1.7}
+html body .section-description,html body .page-hero-subtitle{font-size:18px;line-height:1.6}
+html body :where(p,li){letter-spacing:-.003em}
+html body :is(.section-label){letter-spacing:.04em}
+@media (max-width:640px){html body :is(article,.blog-post-content,.detail-paragraph-body) :is(p,li){font-size:16px}}
