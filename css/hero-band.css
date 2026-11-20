@@ -147,3 +147,68 @@ html body .hb-host>#podcast-categories button,html body .hb-host>#podcast-catego
 html body .hb-host>#podcast-categories :is(button,a):hover{border-color:#151a21 !important}
 html body .hb-host>#podcast-categories :is(button,a).active{background:#151a21 !important;border-color:#151a21 !important;color:#fff !important}
 @media (min-width:861px){html body .hb-host>#podcast-categories{grid-column:1 / -1 !important;grid-row:2 !important}}
+
+/* =====================================================================
+   MØRK MODUS for de nye sidene (html[data-theme="dark"])
+   ===================================================================== */
+html[data-theme="dark"]{--dk-bg:#0b1329;--dk-band:#101a33;--dk-card:#131d36;--dk-field:#16213b;--dk-line:#26344f;--dk-line2:#33425f;--dk-ink:#f8fafc;--dk-txt:#cbd5e1;--dk-mut:#94a3b8;--dk-or:#e9a066}
+/* sideflater */
+html[data-theme="dark"] :is(#hkm-media,#hkm-tl,#hkm-blog,#hkp-head,.blog-post-section,.kurs-main,.plans-main,.kurs-featured-wrap){background:var(--dk-bg) !important;color:var(--dk-txt) !important}
+/* toppflaten */
+html[data-theme="dark"] body :is(.hb-band,.tl-band,.hm-band),html[data-theme="dark"] #hkm-blog .hb-head{background:var(--dk-band) !important;border-bottom-color:var(--dk-line) !important}
+html[data-theme="dark"] body :is(.hb-band,.tl-band,.hm-band,#hkm-blog .hb-head) :is(h1,.page-hero-title,.hero-title){color:var(--dk-ink) !important}
+html[data-theme="dark"] body :is(.hb-band,.tl-band,.hm-band,#hkm-blog .hb-head) :is(p,.page-hero-subtitle,.hero-subtitle,.hb-lead,.tl-lead,.hm-lead){color:var(--dk-mut) !important}
+html[data-theme="dark"] body :is(.hb-eye,.tl-eye,.hm-eye,.kf-eye,.hb-band .hero-badge){color:var(--dk-or) !important}
+html[data-theme="dark"] body :is(.tl-back,.hp-back){color:var(--dk-mut) !important}
+html[data-theme="dark"] body :is(.tl-back,.hp-back):hover{color:var(--dk-ink) !important}
+/* søk og visningsknapper */
+html[data-theme="dark"] body :is(.hb-search,.hb-tools .podcast-search-wrap),html[data-theme="dark"] #hkm-blog .blog-search-box{background:var(--dk-field) !important;border-color:var(--dk-line2) !important}
+html[data-theme="dark"] body :is(.hb-search,.hb-tools .podcast-search-wrap,#hkm-blog .blog-search-box):focus-within{border-color:var(--dk-txt) !important}
+html[data-theme="dark"] body :is(.hb-search,.hb-tools .podcast-search-wrap,#hkm-blog .blog-search-box) input{color:var(--dk-ink) !important;background:transparent !important}
+html[data-theme="dark"] body :is(.hb-search,.hb-tools .podcast-search-wrap,#hkm-blog .blog-search-box) input::placeholder{color:#7d8aa3 !important}
+html[data-theme="dark"] body :is(.hb-search,.hb-tools .podcast-search-wrap,#hkm-blog .blog-search-box) :is(.material-symbols-outlined,i,svg,.search-icon){color:var(--dk-mut) !important;stroke:var(--dk-mut)}
+html[data-theme="dark"] body :is(.hb-view,#hkm-blog .blog-view-toggle){background:var(--dk-field) !important;border-color:var(--dk-line2) !important}
+html[data-theme="dark"] body :is(.hb-view button,#hkm-blog .view-btn){color:var(--dk-mut) !important;background:transparent !important}
+html[data-theme="dark"] body :is(.hb-view button.on,#hkm-blog .view-btn.active){background:var(--dk-ink) !important;color:var(--dk-bg) !important}
+/* filterknapper */
+html[data-theme="dark"] body :is(.hb-filters .hb-pill,.hb-filters>a,#hkm-blog .filter-btn,.hb-band #filter-scroll .filter-btn,.hb-host>#podcast-categories :is(button,a),#hkm-media .hm-jump a){background:var(--dk-field) !important;border-color:var(--dk-line2) !important;color:var(--dk-txt) !important}
+html[data-theme="dark"] body :is(.hb-filters .hb-pill,.hb-filters>a,#hkm-blog .filter-btn,.hb-band #filter-scroll .filter-btn,.hb-host>#podcast-categories :is(button,a),#hkm-media .hm-jump a):hover{border-color:var(--dk-txt) !important}
+html[data-theme="dark"] body :is(.hb-filters .hb-pill.on,#hkm-blog .filter-btn.active,.hb-band #filter-scroll .filter-btn.active,.hb-host>#podcast-categories :is(button,a).active){background:var(--dk-ink) !important;border-color:var(--dk-ink) !important;color:var(--dk-bg) !important}
+/* kort */
+html[data-theme="dark"] body :is(#hkm-blog .blog-card,#hkm-blog .featured-post-card,#hkm-tl .media-card,#hkm-media .hm-card,#hkm-media .hm-post,.event-card,.plans-grid .plan-card,.kurs-grid .course-card,.faste-promo,.kurs-featured,#single-post-related .cms-related-card,#hkm-tl .tl-cta,#blog-interactions .comment-form,#blog-interactions .comments-empty){background:var(--dk-card) !important;border-color:var(--dk-line) !important;box-shadow:none !important}
+html[data-theme="dark"] body :is(#hkm-blog .blog-card,#hkm-blog .featured-post-card,#hkm-tl .media-card,#hkm-media .hm-card,#hkm-media .hm-post,.event-card,.plans-grid .plan-card,.kurs-grid .course-card,.faste-promo,#single-post-related .cms-related-card):hover{border-color:var(--dk-txt) !important}
+html[data-theme="dark"] body :is(.blog-title,.featured-title,.featured-title a,.media-title,.hm-t,.hm-post .pn,.event-title,.plan-title,.kurs-grid .course-body h3,.fp-h,.kurs-featured h2,.cms-related-title,.tl-cta h2,#hkm-tl h2,#hkm-media h2,.media-newsletter h2){color:var(--dk-ink) !important}
+html[data-theme="dark"] body :is(.blog-excerpt,.featured-excerpt,.media-description,.hm-d,.plan-desc,.kurs-grid .course-body p,.fp-p,.fp-meta,.kurs-featured p,.tl-cta p,.hm-sh p,.media-newsletter p,.hm-empty,.hb-none){color:var(--dk-mut) !important}
+html[data-theme="dark"] body :is(.blog-meta,.featured-meta,.media-meta,.hm-post .pd,.event-card .event-meta,.event-card .event-meta *,.kurs-grid .course-meta,.cms-related-meta,#hkm-tl .tl-bar .section-title){color:var(--dk-mut) !important}
+html[data-theme="dark"] body :is(.blog-link,.plan-link,.hm-sh a,#hkm-tl .tl-bar a,.hm-post .pk,.fp-eye,.cms-related-cta,.blog-post-content a){color:var(--dk-or) !important}
+html[data-theme="dark"] body :is(#hkm-tl .tl-bar,#hkm-media .hm-sh,#single-post-related .cms-related-heading){border-color:var(--dk-line) !important}
+html[data-theme="dark"] body #hkm-media .hm-ic{background:rgba(233,160,102,.14) !important;color:var(--dk-or) !important}
+html[data-theme="dark"] body #hkm-media .hm-ar{color:var(--dk-mut) !important}
+html[data-theme="dark"] body :is(.blog-image,.media-thumbnail,.plan-image-wrapper,.course-thumb,.hm-post .ph,.cms-related-image){background:#1a2540 !important}
+html[data-theme="dark"] body #hkm-media .hm-sk{background:linear-gradient(90deg,#141e37 0,#1b2743 50%,#141e37 100%) !important;background-size:200% 100% !important;border-color:var(--dk-line) !important}
+html[data-theme="dark"] body .event-card .event-date{background:var(--dk-card) !important;color:var(--dk-ink) !important}
+/* knapper: mørke blir lyse */
+html[data-theme="dark"] body :is(.fp-cta,.kf-btn.dark,.tl-btn.dark,#hkm-blog .featured-link,#blog-interactions .comment-submit-btn,.media-newsletter .newsletter-form .btn){background:var(--dk-ink) !important;border-color:var(--dk-ink) !important;color:var(--dk-bg) !important}
+html[data-theme="dark"] body :is(.kf-btn:not(.dark),.tl-btn:not(.dark),.blog-post-section #back-btn,#blog-interactions .like-btn){background:var(--dk-field) !important;border-color:var(--dk-line2) !important;color:var(--dk-ink) !important}
+/* nyhetsbrev */
+html[data-theme="dark"] body .media-newsletter{background:var(--dk-band) !important;border-top-color:var(--dk-line) !important}
+html[data-theme="dark"] body .media-newsletter .newsletter-icon{background:rgba(233,160,102,.14) !important;color:var(--dk-or) !important}
+html[data-theme="dark"] body .media-newsletter .newsletter-form input{background:var(--dk-field) !important;border-color:var(--dk-line2) !important;color:var(--dk-ink) !important}
+/* innleggssiden */
+html[data-theme="dark"] body #hkp-head #single-post-title,html[data-theme="dark"] body #hkp-head #single-post-author{color:var(--dk-ink) !important}
+html[data-theme="dark"] body #hkp-head :is(#single-post-date,#single-post-readingtime,#single-post-views,.blog-meta-bottom){color:var(--dk-mut) !important}
+html[data-theme="dark"] body #hkp-head #single-post-category{color:var(--dk-or) !important}
+html[data-theme="dark"] body .blog-post-section .blog-post-content{color:var(--dk-txt) !important}
+html[data-theme="dark"] body .blog-post-section .blog-post-content :is(h2,h3,h4,strong,b){color:var(--dk-ink) !important}
+html[data-theme="dark"] body .blog-post-section .blog-post-content blockquote{background:var(--dk-card) !important;color:var(--dk-ink) !important}
+html[data-theme="dark"] body .blog-post-section .blog-share{border-top-color:var(--dk-line) !important}
+html[data-theme="dark"] body .blog-post-section .blog-share h4{color:var(--dk-ink) !important}
+html[data-theme="dark"] body .blog-post-section .blog-share .social-link{background:var(--dk-field) !important;border-color:var(--dk-line2) !important;color:var(--dk-ink) !important}
+html[data-theme="dark"] body .blog-post-section .blog-share .social-link svg{fill:var(--dk-ink) !important}
+html[data-theme="dark"] body #single-post-author-box .blog-tag{background:var(--dk-field) !important;border-color:var(--dk-line2) !important;color:var(--dk-txt) !important}
+html[data-theme="dark"] body #blog-interactions :is(.likes-section,.comment-item){border-color:var(--dk-line) !important}
+html[data-theme="dark"] body #blog-interactions :is(.comments-header,.comments-header *,.comment-author,.comment-input-group label,.comments-section h3,.comments-section h2){color:var(--dk-ink) !important}
+html[data-theme="dark"] body #blog-interactions :is(.comment-text,.likes-count-text,.comment-date){color:var(--dk-mut) !important}
+html[data-theme="dark"] body #blog-interactions .comment-form :is(input,textarea){background:var(--dk-bg) !important;border-color:var(--dk-line2) !important;color:var(--dk-ink) !important}
+html[data-theme="dark"] body #blog-interactions .comment-avatar{background:rgba(233,160,102,.14) !important;color:var(--dk-or) !important}
+html[data-theme="dark"] body .blog-post-section .blog-navigation{border-top-color:var(--dk-line) !important}
