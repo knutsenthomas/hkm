@@ -456,8 +456,8 @@ ${pdfUrl ? `<a class="pill" href="${esc(pdfUrl)}" target="_blank" rel="noopener"
 ${aboutHTML('about-top')}
 </header>
 
-<div class="hero plan rv" aria-live="polite">
-<svg class="shape" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path d="M560 -80C720 -70 840 40 815 170 792 290 660 320 570 260 480 200 500 110 440 60 380 10 430 -90 560 -80Z" fill="#cc712b" fill-opacity=".85"/></svg>
+<div class="hero plan rv${plan.imageUrl ? ' hasimg' : ''}" aria-live="polite">
+<svg class="shape" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${plan.imageUrl ? `<defs><clipPath id="pv-blob"><path d="M560 -80C720 -70 840 40 815 170 792 290 660 320 570 260 480 200 500 110 440 60 380 10 430 -90 560 -80Z"/></clipPath></defs><g clip-path="url(#pv-blob)"><rect x="400" y="-100" width="420" height="440" fill="#cc712b"/><image href="${esc(plan.imageUrl)}" x="400" y="-100" width="420" height="440" preserveAspectRatio="xMidYMid slice"/><rect x="400" y="-100" width="420" height="440" fill="#151a21" fill-opacity=".35"/></g>` : '<path d="M560 -80C720 -70 840 40 815 170 792 290 660 320 570 260 480 200 500 110 440 60 380 10 430 -90 560 -80Z" fill="#cc712b" fill-opacity=".85"/>'}</svg>
 <div class="htxt"><small id="hSmall">${esc(T.progress)}</small><b id="hTitle"></b><span id="hSub"></span><button type="button" class="hstart" id="pv-startbtn"></button></div>
 <div class="ring"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="52"/><circle class="fg" id="ringfg" cx="60" cy="60" r="52"/></svg><span class="num"><span><b id="ringN">0</b><i>${esc(T.of(N))}</i></span></span></div>
 </div>

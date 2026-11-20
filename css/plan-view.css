@@ -559,3 +559,8 @@ html:has(#plan-view),html:has(#plan-view) body{overflow-x:clip!important;overflo
 #plan-view .dnum{color:#cc712b;-webkit-text-stroke:0;font-size:inherit;line-height:inherit;letter-spacing:-.02em}
 #plan-view .dhead .dnum{font-size:clamp(30px,4vw,42px);line-height:1.05;font-weight:800}
 @media (max-width:600px){#plan-view .dhead{flex-direction:row}#plan-view .dhead .dnum{font-size:26px;line-height:1.12}}
+/* dagnummer like høyt som tittel + undertekst */
+#plan-view .dhead{align-items:center;gap:16px}
+#plan-view .dhead .dnum{font-size:clamp(56px,6.6vw,86px);line-height:.74;letter-spacing:-.04em}
+#plan-view .dhead h2{margin-top:0}
+@media (max-width:600px){#plan-view .dhead{gap:12px}#plan-view .dhead .dnum{font-size:50px}}
