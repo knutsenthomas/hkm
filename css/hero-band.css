@@ -31,3 +31,12 @@ html body .hb-band [class*="justify-center"],html body .hb-band [style*="justify
   html body .hb-band>.container,html body .hb-band>div:first-of-type{padding:0 18px !important}
   html body .hb-band :is(p,.page-hero-subtitle,.hero-subtitle){font-size:16px !important}
 }
+
+/* Søk på siden */
+.hb-search{display:flex;align-items:center;gap:8px;height:44px;max-width:460px;margin:18px 0 0;padding:0 16px;border:1px solid rgba(21,26,33,.12);border-radius:999px;background:#fff;cursor:text;font-family:Inter,system-ui,sans-serif}
+.hb-search:focus-within{border-color:#151a21}
+.hb-search svg{width:18px;height:18px;flex:none;fill:none;stroke:#596069;stroke-width:2.2;stroke-linecap:round}
+.hb-search input{flex:1;min-width:0;height:100%;border:0 !important;outline:0 !important;box-shadow:none !important;background:transparent !important;padding:0 !important;margin:0 !important;font:400 15px/1 Inter,system-ui,sans-serif !important;color:#151a21 !important;-webkit-appearance:none;appearance:none}
+.hb-search input::-webkit-search-cancel-button{cursor:pointer}
+.hb-none{grid-column:1/-1;color:#596069;font:500 15px/1.5 Inter,system-ui,sans-serif;padding:24px 0;margin:0}
+html body .hb-band .hb-search :is(input){height:100% !important}

@@ -34,11 +34,57 @@
             });
             new MutationObserver(() => strip(el)).observe(el, { attributes: true, attributeFilter: ['style'] });
         });
+        heroes.forEach((el) => {
+            const n = el.nextElementSibling;
+            if (n && !n.dataset.hbPad && parseFloat(getComputedStyle(n).paddingTop) > 64) { n.dataset.hbPad = '1'; n.style.setProperty('padding-top', '36px', 'important'); }
+        });
         setTop();
     }
+
+    // ---------- Søk på siden (filtrerer kortene) ----------
+    const CARD_SEL = '.media-card, .event-card, .podcast-card, .video-card, .hm-card, .hm-post, .teaching-card, .resource-card, .calendar-agenda-card';
+    const OWN_SEARCH = '#course-search, #plans-search, #podcast-search-input, #blog-search-input, .hb-search input';
+    const L = (() => { const l = (document.documentElement.lang || 'no').slice(0, 2); return l === 'en' ? { ph: 'Search this page …', none: 'No results' } : l === 'es' ? { ph: 'Buscar en esta página …', none: 'Sin resultados' } : { ph: 'Søk på siden …', none: 'Ingen treff' }; })();
+    function searchHost() {
+        return document.querySelector('.hb-band > .container') || document.querySelector('#hkm-tl .tl-band .tl-wrap') || document.querySelector('#hkm-media .hm-band .hm-head');
+    }
+    function cards() { return [...document.querySelectorAll(CARD_SEL)].filter((c) => !c.closest('header, footer, #site-search-modal, .hb-band, .tl-band, .hm-band')); }
+    function addSearch() {
+        if (document.querySelector(OWN_SEARCH)) return true;
+        const host = searchHost();
+        if (!host || cards().length < 2) return false;
+        const box = document.createElement('label');
+        box.className = 'hb-search';
+        box.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" autocomplete="off">';
+        const input = box.querySelector('input');
+        input.placeholder = L.ph; input.setAttribute('aria-label', L.ph);
+        host.appendChild(box);
+        const norm = (t) => (t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const run = () => {
+            const q = norm(input.value.trim());
+            const list = cards();
+            list.forEach((c) => { c.style.display = !q || norm(c.textContent).includes(q) ? '' : 'none'; });
+            document.querySelectorAll('.hm-sec').forEach((sec) => {
+                const cs = [...sec.querySelectorAll(CARD_SEL)];
+                if (cs.length) sec.style.display = q && cs.every((c) => c.style.display === 'none') ? 'none' : '';
+            });
+            let msg = document.getElementById('hb-none');
+            const any = list.some((c) => c.style.display !== 'none');
+            if (q && !any) {
+                if (!msg) { msg = document.createElement('p'); msg.id = 'hb-none'; msg.className = 'hb-none'; msg.textContent = L.none; (list[0] && list[0].parentElement || host).appendChild(msg); }
+                msg.style.display = '';
+            } else if (msg) msg.style.display = 'none';
+        };
+        input.addEventListener('input', run);
+        new MutationObserver(() => { if (input.value.trim()) run(); }).observe(document.body, { childList: true, subtree: true });
+        return true;
+    }
+    let searchTries = 0;
+    function trySearch() { if (addSearch() || ++searchTries > 40) return; setTimeout(trySearch, 250); }
     function init() {
         apply();
         setTop();
+        trySearch();
         window.addEventListener('resize', setTop);
         window.addEventListener('load', () => { apply(); setTop(); });
         let n = 0; const iv = setInterval(() => { apply(); setTop(); if (++n > 20) clearInterval(iv); }, 250);
