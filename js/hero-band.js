@@ -68,7 +68,7 @@
         if (!host || cards().length < 2) return false;
         const box = document.createElement('label');
         box.className = 'hb-search';
-        box.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" autocomplete="off">';
+        box.innerHTML = '<span class="material-symbols-outlined" aria-hidden="true">search</span><input type="search" autocomplete="off">';
         const input = box.querySelector('input');
         input.placeholder = L.ph; input.setAttribute('aria-label', L.ph);
         host.classList.add('hb-host');
@@ -84,7 +84,7 @@
         if (cards().some((c) => c.querySelector('img, .media-thumbnail, .event-image'))) {
             const tg = document.createElement('div');
             tg.className = 'hb-view';
-            tg.innerHTML = '<button type="button" data-v="grid" aria-label="Rutenett"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.2"/></svg></button><button type="button" data-v="list" aria-label="Liste"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="3.2" rx="1"/><rect x="4" y="10.4" width="16" height="3.2" rx="1"/><rect x="4" y="15.8" width="16" height="3.2" rx="1"/></svg></button>';
+            tg.innerHTML = '<button type="button" data-v="grid" aria-label="Rutenett"><span class="material-symbols-outlined">grid_view</span></button><button type="button" data-v="list" aria-label="Liste"><span class="material-symbols-outlined">view_list</span></button>';
             tools.appendChild(tg);
             let view = 'grid';
             try { view = localStorage.getItem('hkm_page_view') || 'grid'; } catch (e) {}

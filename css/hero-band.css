@@ -81,3 +81,11 @@ html body .hb-list>*>:is(.media-content,.event-content){display:flex;flex-direct
   html body .hb-list .event-date{transform:scale(.75);transform-origin:top right}
   .hb-tools{max-width:none}
 }
+
+/* Samme ikoner og mål som på Nyheter & Blogg */
+html body .hb-search .material-symbols-outlined{font-size:20px !important;color:#596069 !important;flex:none}
+html body .hb-view{gap:4px !important;padding:3px !important;border:1px solid rgba(21,26,33,.12) !important;background:#fff !important;border-radius:999px !important}
+html body .hb-band .hb-view button,html body .hb-view button{width:38px !important;height:36px !important;border:0 !important;background:transparent !important;color:#596069 !important;margin:0 !important;padding:0 !important}
+html body .hb-band .hb-view button .material-symbols-outlined,html body .hb-view button .material-symbols-outlined{font-size:22px !important;color:inherit !important;line-height:1 !important}
+html body .hb-band .hb-view button.on,html body .hb-view button.on{background:#151a21 !important;color:#fff !important}
+html body .hb-search{height:44px !important}
