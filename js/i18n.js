@@ -513,11 +513,14 @@ const i18nManager = {
             }
         } else if (targetLang === 'no') {
             // Reverse mapping
-            const allMappings = { ...mappings.en, ...mappings.es };
-            for (const [no, translated] of Object.entries(allMappings)) {
-                if (cleanPath === translated) {
-                    result = no;
-                    break;
+            // Check each language on its own: the Norwegian names repeat across languages,
+            // so merging the maps would drop the English names.
+            outer: for (const map of [mappings.en, mappings.es]) {
+                for (const [no, translated] of Object.entries(map || {})) {
+                    if (cleanPath === translated) {
+                        result = no;
+                        break outer;
+                    }
                 }
             }
         }

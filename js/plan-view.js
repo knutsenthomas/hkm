@@ -4,8 +4,9 @@
 (async function () {
   const root = document.getElementById('plan-view');
   if (!root) return;
-  const LANG = (document.documentElement.lang || 'no').slice(0, 2) === 'en' ? 'en'
-    : ((document.documentElement.lang || '').slice(0, 2) === 'es' ? 'es' : 'no');
+  const PATH_LANG = (location.pathname.match(/^\/(en|es)\//) || [])[1];
+  const LANG = PATH_LANG || ((document.documentElement.lang || 'no').slice(0, 2) === 'en' ? 'en'
+    : ((document.documentElement.lang || '').slice(0, 2) === 'es' ? 'es' : 'no'));
 
   const T = {
     no: {
@@ -135,7 +136,7 @@
   if (!raw) { state([T.notFound, T.notFoundP, 1]); return; }
   let plan = { id: realId, ...raw };
   if (window.contentManager && window.contentManager.getLocalizedContentItem) {
-    try { plan = window.contentManager.getLocalizedContentItem(plan); } catch (e) { }
+    try { plan = window.contentManager.getLocalizedContentItem(plan, LANG); } catch (e) { }
   }
 
 
@@ -576,7 +577,7 @@ ${extra ? `<a class="teach rv" href="${esc(extra.url)}"><span class="ic"><svg vi
   try {
     const list = all || await service.getCollection('reading_plans');
     const others = list.filter(p => p.id !== plan.id && p.published !== false && p.status !== 'draft')
-      .map(p => window.contentManager && window.contentManager.getLocalizedContentItem ? window.contentManager.getLocalizedContentItem(p) : p).slice(0, 3);
+      .map(p => window.contentManager && window.contentManager.getLocalizedContentItem ? window.contentManager.getLocalizedContentItem(p, LANG) : p).slice(0, 3);
     if (others.length) {
       $('#pv-ogrid').innerHTML = others.map(p => `<a class="ocard" href="${T.planUrl}?id=${encodeURIComponent(p.id)}"><small>${esc(T.days(p.durationDays || (p.days || []).length))}</small><b>${esc(p.title || '')}</b>${p.description ? `<span>${esc(p.description)}</span>` : ''}</a>`).join('');
       $('#pv-others').hidden = false;
