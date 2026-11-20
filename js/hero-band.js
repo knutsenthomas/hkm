@@ -3,7 +3,7 @@
 (function () {
     const path = location.pathname.replace(/\/+$/, '') || '/';
     if (/^\/(?:en|es)?\/?(?:index(?:\.html)?)?$/.test(path)) return;
-    const SEL = '.page-hero, .subpage-hero, #kurs-hero-section';
+    const SEL = '.page-hero, .subpage-hero';
     const STRIP = ['background', 'background-image', 'background-color', 'min-height', 'height', 'padding', 'padding-top', 'padding-bottom', 'color'];
 
     function setTop() {
