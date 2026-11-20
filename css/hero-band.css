@@ -20,7 +20,10 @@ html body .hb-band :is(.btn,a.btn,.hero-btn-primary,.hero-btn-secondary,button){
   font:600 14px/1 Inter,system-ui,sans-serif !important;box-shadow:none !important;text-decoration:none !important;margin:16px 8px 0 0 !important;transform:none !important}
 html body .hb-band :is(.btn,a.btn,.hero-btn-primary,.hero-btn-secondary,button):hover{border-color:var(--hb-ink) !important}
 html body .hb-band :is(.hero-btn-primary,.btn-primary){background:var(--hb-ink) !important;color:#fff !important;border-color:var(--hb-ink) !important}
-html body .hb-band *{color:inherit;text-shadow:none !important}
+html body .hb-band *{color:inherit;text-shadow:none !important;hyphens:none !important;-webkit-hyphens:none !important}
+html body .hb-band :is(.btn,a.btn,.hero-btn-primary,.hero-btn-secondary,button){width:auto !important;max-width:100% !important;justify-content:center !important}
+html body .hb-band>.container>div:not([class]),html body .hb-band .hero-actions,html body .hb-band .hero-buttons{display:flex !important;flex-wrap:wrap !important;gap:0 !important;justify-content:flex-start !important;align-items:center !important;width:auto !important}
+html body .hb-band>.container>div:first-child:not([class]){display:inline-flex !important;align-items:center !important;gap:6px !important;font-size:14px !important;font-weight:600 !important;color:#a0531a !important;margin:0 0 8px !important}
 html body .hb-band :is(div,span,small){text-align:left !important}
 html body .hb-band [class*="justify-center"],html body .hb-band [style*="justify-content: center"]{justify-content:flex-start !important}
 @media (max-width:600px){

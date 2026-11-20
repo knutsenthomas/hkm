@@ -26,8 +26,11 @@
             el.dataset.hbDone = '1';
             el.classList.add('hb-band');
             strip(el);
+            const CHILD = ['color', 'text-align', 'text-shadow', 'background', 'background-color', 'background-image', 'box-shadow', 'border', 'border-radius',
+                'padding', 'padding-left', 'padding-right', 'padding-top', 'padding-bottom', 'margin', 'margin-left', 'margin-right', 'margin-top', 'margin-bottom',
+                'width', 'max-width', 'font-size', 'letter-spacing', 'text-transform', 'justify-content', 'align-items', 'backdrop-filter', '-webkit-backdrop-filter', 'line-height', 'font-weight'];
             el.querySelectorAll('[style]').forEach((c) => {
-                ['color', 'text-align', 'text-shadow'].forEach((p) => c.style.removeProperty(p));
+                CHILD.forEach((p) => c.style.removeProperty(p));
             });
             new MutationObserver(() => strip(el)).observe(el, { attributes: true, attributeFilter: ['style'] });
         });
