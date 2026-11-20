@@ -58,6 +58,11 @@
         box.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" autocomplete="off">';
         const input = box.querySelector('input');
         input.placeholder = L.ph; input.setAttribute('aria-label', L.ph);
+        host.classList.add('hb-host');
+        if (host.closest('.hb-band') && !host.querySelector('.hb-eye, .hero-badge, .section-label')) {
+            const eye = document.createElement('p'); eye.className = 'hb-eye'; eye.textContent = 'His Kingdom Ministry';
+            host.insertBefore(eye, host.firstChild);
+        }
         host.appendChild(box);
         const norm = (t) => (t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         const run = () => {
