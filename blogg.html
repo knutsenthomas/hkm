@@ -467,17 +467,18 @@ html:has(#hkm-blog),html:has(#hkm-blog) body{overflow-x:clip!important;overflow-
 
 /* listevisning: fremhevet + faste som rader */
 #hkm-blog .faste-promo *,#hkm-blog .featured-post-card *{hyphens:none!important;-webkit-hyphens:none!important}
-#hkm-blog .faste-promo,#hkm-blog.is-list .featured-post-card{grid-template-columns:260px minmax(0,1fr)!important;margin-bottom:12px!important}
+#hkm-blog.is-list .faste-promo,#hkm-blog.is-list .featured-post-card{grid-template-columns:260px minmax(0,1fr)!important;margin-bottom:12px!important}
 #hkm-blog.is-list .blog-featured-container{margin-bottom:12px!important}
-#hkm-blog .faste-promo .fp-img,#hkm-blog.is-list .featured-image{min-height:170px!important;aspect-ratio:auto!important}
-#hkm-blog .faste-promo .fp-txt,#hkm-blog.is-list .featured-content{padding:18px 22px!important}
-#hkm-blog .faste-promo .fp-h,#hkm-blog.is-list .featured-title{font-size:18px!important;line-height:1.3!important;letter-spacing:-.01em!important;font-weight:700!important}
-#hkm-blog .faste-promo .fp-eye{font-size:13px!important;margin-bottom:6px!important}
-#hkm-blog .faste-promo .fp-p,#hkm-blog.is-list .featured-excerpt{font-size:15px!important;margin-top:8px!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-#hkm-blog .faste-promo .fp-meta{display:none!important}
-#hkm-blog .faste-promo .fp-cta,#hkm-blog.is-list .featured-link{background:none!important;color:var(--or2)!important;height:auto!important;padding:0!important;margin-top:12px!important;font-size:14px!important}
+#hkm-blog.is-list .faste-promo .fp-img,#hkm-blog.is-list .featured-image{min-height:170px!important;aspect-ratio:auto!important}
+#hkm-blog.is-list .faste-promo .fp-txt,#hkm-blog.is-list .featured-content{padding:18px 22px!important}
+#hkm-blog.is-list .faste-promo .fp-h,#hkm-blog.is-list .featured-title{font-size:18px!important;line-height:1.3!important;letter-spacing:-.01em!important;font-weight:700!important}
+#hkm-blog.is-list .faste-promo .fp-eye{font-size:13px!important;margin-bottom:6px!important}
+#hkm-blog.is-list .faste-promo .fp-p,#hkm-blog.is-list .featured-excerpt{font-size:15px!important;margin-top:8px!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#hkm-blog.is-list .faste-promo .fp-meta{display:none!important}
+#hkm-blog.is-list .faste-promo .fp-cta,#hkm-blog.is-list .featured-link{background:none!important;color:var(--or2)!important;height:auto!important;padding:0!important;margin-top:12px!important;font-size:14px!important}
 #hkm-blog.is-list .featured-meta span:nth-child(2){display:none!important}
-@media (max-width:760px){#hkm-blog .faste-promo,#hkm-blog.is-list .featured-post-card{grid-template-columns:112px minmax(0,1fr)!important}#hkm-blog .faste-promo .fp-img,#hkm-blog.is-list .featured-image{min-height:112px!important;aspect-ratio:auto!important}#hkm-blog .faste-promo .fp-txt,#hkm-blog.is-list .featured-content{padding:12px 14px!important}#hkm-blog .faste-promo .fp-h,#hkm-blog.is-list .featured-title{font-size:16px!important}#hkm-blog .faste-promo .fp-p,#hkm-blog.is-list .featured-excerpt,#hkm-blog .faste-promo .fp-badge,#hkm-blog.is-list .featured-badge{display:none!important}#hkm-blog .faste-promo .fp-cta,#hkm-blog.is-list .featured-link{margin-top:8px!important;font-size:13px!important}#hkm-blog.is-list .featured-meta{font-size:12px!important;margin-bottom:4px!important}}
+@media (max-width:760px){#hkm-blog.is-list .faste-promo,#hkm-blog.is-list .featured-post-card{grid-template-columns:112px minmax(0,1fr)!important}#hkm-blog.is-list .faste-promo .fp-img,#hkm-blog.is-list .featured-image{min-height:112px!important;aspect-ratio:auto!important}#hkm-blog.is-list .faste-promo .fp-txt,#hkm-blog.is-list .featured-content{padding:12px 14px!important}#hkm-blog.is-list .faste-promo .fp-h,#hkm-blog.is-list .featured-title{font-size:16px!important}#hkm-blog.is-list .faste-promo .fp-p,#hkm-blog.is-list .featured-excerpt,#hkm-blog.is-list .faste-promo .fp-badge,#hkm-blog.is-list .featured-badge{display:none!important}#hkm-blog.is-list .faste-promo .fp-cta,#hkm-blog.is-list .featured-link{margin-top:8px!important;font-size:13px!important}#hkm-blog.is-list .featured-meta{font-size:12px!important;margin-bottom:4px!important}}
+#hkm-blog .blog-featured-container{display:none!important}
 </style>
 <script>
 (function(){function sync(){var m=document.getElementById('hkm-blog'),g=document.querySelector('#hkm-blog .blog-grid');if(m&&g)m.classList.toggle('is-list',g.classList.contains('list-view'))}
@@ -489,6 +490,30 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 document.addEventListener('DOMContentLoaded',h);window.addEventListener('load',h);window.addEventListener('resize',h);var n=0,iv=setInterval(function(){h();if(++n>20)clearInterval(iv)},250);})();
 </script>
 
+<script>
+(function(){
+  function build(){
+    var fc=document.getElementById('blog-featured-container'),g=document.querySelector('#hkm-blog .blog-grid');if(!fc||!g)return;
+    var art=fc.querySelector('.featured-post-card');var old=g.querySelector('[data-hk-feat]');
+    if(!art){if(old)old.remove();return}
+    var a=art.querySelector('.featured-title a');if(!a)return;var href=a.getAttribute('href');
+    if(old&&old.getAttribute('data-hk-feat')===href&&g.firstElementChild===old)return;
+    if(old)old.remove();
+    var img=art.querySelector('.featured-image img'),badge=art.querySelector('.featured-badge'),meta=art.querySelector('.featured-meta'),ex=art.querySelector('.featured-excerpt');
+    var c=document.createElement('article');c.className='blog-card';c.setAttribute('data-hk-feat',href);
+    c.innerHTML='<div class="blog-image">'+(img?'<img loading="lazy" alt="">':'')+(badge?'<span class="blog-category"></span>':'')+'</div><div class="blog-content"><div class="blog-meta"></div><h3 class="blog-title"></h3><p class="blog-excerpt"></p><a class="blog-link">Les mer <i class="fas fa-arrow-right"></i></a></div>';
+    if(img){var ci=c.querySelector('img');ci.src=img.getAttribute('src');ci.alt=img.getAttribute('alt')||''}
+    if(badge)c.querySelector('.blog-category').textContent=badge.textContent.trim();
+    if(meta)c.querySelector('.blog-meta').innerHTML=meta.innerHTML;
+    c.querySelector('.blog-title').textContent=a.textContent.trim();
+    c.querySelector('.blog-excerpt').textContent=ex?ex.textContent.trim():'';
+    var l=c.querySelector('.blog-link');l.href=href;l.setAttribute('aria-label','Les mer - '+a.textContent.trim());
+    g.insertBefore(c,g.firstChild);
+  }
+  function init(){var fc=document.getElementById('blog-featured-container'),g=document.querySelector('#hkm-blog .blog-grid');if(!fc||!g)return;var t;var run=function(){clearTimeout(t);t=setTimeout(build,30)};new MutationObserver(run).observe(fc,{childList:true,subtree:true});new MutationObserver(function(m){if(!g.querySelector('[data-hk-feat]')||g.firstElementChild&&!g.firstElementChild.hasAttribute('data-hk-feat'))run()}).observe(g,{childList:true});build()}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
     <main id="hkm-blog">
         <header class="hb-head">
             <div class="hb-wrap hb-top">
