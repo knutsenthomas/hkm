@@ -554,3 +554,8 @@ html.pv-lock #plan-view .astart{display:none}
 #plan-view .dsec{margin:32px 0 10px;font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--td)}
 /* innholdslisten må kunne stå fast: overflow-x:hidden på html/body hindrer sticky */
 html:has(#plan-view),html:has(#plan-view) body{overflow-x:clip!important;overflow-y:visible!important}
+/* dagnummer: oransje, samme størrelse og grunnlinje som tittelen */
+#plan-view .dhead{align-items:baseline;gap:14px}
+#plan-view .dnum{color:#cc712b;-webkit-text-stroke:0;font-size:inherit;line-height:inherit;letter-spacing:-.02em}
+#plan-view .dhead .dnum{font-size:clamp(30px,4vw,42px);line-height:1.05;font-weight:800}
+@media (max-width:600px){#plan-view .dhead{flex-direction:row}#plan-view .dhead .dnum{font-size:26px;line-height:1.12}}
