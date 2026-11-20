@@ -126,6 +126,9 @@
 #faste-guide #prog{display:none}
 #faste-guide .yt{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:5}
 #faste-guide #pop,#faste-guide #toast{font-family:Inter,system-ui,sans-serif}
+#faste-guide .ytcover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none}
+#faste-guide .vthumb .play,#faste-guide .vthumb .dur{z-index:1}
+
 #faste-guide .finish .ctas{flex-wrap:nowrap!important;width:max-content;max-width:calc(100vw - 32px)}
 #faste-guide .finish .ctas .pill{white-space:nowrap}
 @media (max-width:820px){#faste-guide .finish .ctas{flex-wrap:wrap!important;width:auto}}
@@ -860,6 +863,29 @@ $('#copyAns').addEventListener('click',async()=>{
   try{await navigator.clipboard.writeText('Faste – å gi Gud mer plass\n\n'+parts.join('\n\n'));toast('Svarene er kopiert')}catch(e){toast('Kunne ikke kopiere her')}
 });
 
+/* YouTube-cover: i den oransje formen på den store videoen, hele coveret på de små kortene */
+const ytImg=(id,cb)=>{const im=new Image();let fb=false;const alt='https://i.ytimg.com/vi/'+id+'/hqdefault.jpg';
+  im.onload=()=>{if(im.naturalWidth<=120&&!fb){fb=true;im.src=alt}else cb(im.src)};im.onerror=()=>{if(!fb){fb=true;im.src=alt}};
+  im.src='https://i.ytimg.com/vi/'+id+'/maxresdefault.jpg'};
+$$('a.hero[href*="youtube.com/watch"]').forEach(a=>{
+  const id=new URL(a.href).searchParams.get('v'),svg=a.querySelector('svg.shape');if(!id||!svg)return;
+  const blob=svg.querySelector('path');if(!blob)return;
+  ytImg(id,src=>{
+    const NS='http://www.w3.org/2000/svg';
+    const defs=document.createElementNS(NS,'defs'),cp=document.createElementNS(NS,'clipPath');cp.setAttribute('id','fg-blob');
+    const cpp=document.createElementNS(NS,'path');cpp.setAttribute('d',blob.getAttribute('d'));cp.appendChild(cpp);defs.appendChild(cp);svg.insertBefore(defs,svg.firstChild);
+    const g=document.createElementNS(NS,'g');g.setAttribute('clip-path','url(#fg-blob)');
+    const bg=document.createElementNS(NS,'rect');['x','y','width','height'].forEach((k,i)=>bg.setAttribute(k,[360,-80,480,520][i]));bg.setAttribute('fill','#cc712b');
+    const im=document.createElementNS(NS,'image');im.setAttribute('href',src);['x','y','width','height'].forEach((k,i)=>im.setAttribute(k,[360,-80,480,520][i]));im.setAttribute('preserveAspectRatio','xMidYMid slice');
+    const tint=document.createElementNS(NS,'rect');['x','y','width','height'].forEach((k,i)=>tint.setAttribute(k,[360,-80,480,520][i]));tint.setAttribute('fill','#151a21');tint.setAttribute('fill-opacity','.18');
+    g.append(bg,im,tint);blob.replaceWith(g);
+  });
+});
+$$('a.vcard[href*="youtube.com/watch"]').forEach(a=>{
+  const id=new URL(a.href).searchParams.get('v'),box=a.querySelector('.vthumb');if(!id||!box)return;
+  if(getComputedStyle(box).position==='static')box.style.position='relative';
+  ytImg(id,src=>{const img=new Image();img.className='ytcover';img.alt='';img.src=src;box.insertBefore(img,box.firstChild)});
+});
 /* videoer spilles av på siden */
 $$('a.hero[href*="youtube.com/watch"], a.vcard[href*="youtube.com/watch"]').forEach(a=>a.addEventListener('click',e=>{
   const id=new URL(a.href).searchParams.get('v');if(!id)return;e.preventDefault();
