@@ -151,3 +151,5 @@ html.hkr body.bible-theme-dark .hkm-audio-player-bar select{background-image:url
 @media (max-width:768px){html.hkr body .hkm-audio-player-bar{border-radius:20px!important;flex-wrap:wrap!important}}
 html.hkr body .hkm-audio-player-bar select{width:auto!important;min-width:0!important;max-width:none!important;flex:none!important}
 html.hkr body .hkm-audio-player-bar .audio-info-display{flex:1 1 auto!important;min-width:0!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* lukkeknappen i verktøypanelet trengs bare når panelet er en skuff (mobil/nettbrett) */
+@media (min-width:901px){html.hkr body .bible-nav-right .close-sidebar-btn{display:none!important}}
