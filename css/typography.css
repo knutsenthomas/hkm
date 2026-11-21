@@ -1,5 +1,5 @@
 /* Felles typografi i samme stil som leseplanene og faste-siden (Inter, tette overskrifter, nesten svart tekst).
-   Lastes på alle offentlige sider unntatt forsiden (se vite.config.js). */
+   Lastes på alle offentlige sider, også forsiden (se vite.config.js). */
 html body{color:#151a21;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
 html body :where(h1,h2,h3,h4,h5,h6){font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;text-wrap:balance}
 html body :where(h1,h2,h3),html body .section-title,html body .page-hero-title,html body .hero-title{font-weight:800!important;letter-spacing:-.03em!important;color:inherit}
@@ -16,3 +16,7 @@ html body .section-description,html body .page-hero-subtitle{font-size:18px;line
 html body :where(p,li){letter-spacing:-.003em}
 html body :is(.section-label){letter-spacing:.04em}
 @media (max-width:640px){html body :is(article,.blog-post-content,.detail-paragraph-body) :is(p,li){font-size:16px}}
+/* forsiden: overskrifter på mørk bakgrunn forblir hvite */
+html body :is(.hero-slider .hero-title,.funfacts .section-title,.newsletter :is(h2,.newsletter-title)){color:#fff!important}
+/* mørk modus: nesten svarte overskrifter blir lyse */
+html[data-theme="dark"] body :is(.section-title,:is(h1,h2,h3,h4)[class*="1B4965"]){color:#f8fafc!important}
