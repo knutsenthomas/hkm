@@ -252,33 +252,36 @@ export function initHkmChatWidget() {
       bottom: max(24px, env(safe-area-inset-bottom, 24px));
       right: max(20px, env(safe-area-inset-right, 20px));
       z-index: 9999;
-      width: 56px;
-      height: 56px;
+      width: 58px;
+      height: 58px;
       min-width: 44px;
       min-height: 44px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
+      background: #d17d39 !important;
+      background-image: linear-gradient(160deg, #e0904a 0%, #c75f30 100%) !important;
       color: #ffffff !important;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 8px 24px rgba(209, 125, 57, 0.35), 0 2px 8px rgba(0, 0, 0, 0.15);
+      border: 0;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.28), 0 10px 26px -6px rgba(199,95,48,.55), 0 2px 6px rgba(0,0,0,.12);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 200ms ease;
+      transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 220ms ease;
     }
     .hkm-chat-launcher:hover {
-      transform: scale(1.06);
-      box-shadow: 0 12px 28px rgba(209, 125, 57, 0.45);
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.28), 0 14px 30px -6px rgba(199,95,48,.6), 0 3px 8px rgba(0,0,0,.14);
     }
     .hkm-chat-launcher:active {
-      transform: scale(0.95);
+      transform: scale(0.94);
     }
-    .hkm-chat-launcher svg, .hkm-chat-launcher .material-symbols-outlined {
-      font-size: 26px;
-      line-height: 1;
+    .hkm-chat-launcher .hkm-ico {
+      display: block;
       color: #ffffff;
+      animation: hkmIcoIn 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
     }
+    @keyframes hkmIcoIn { from { opacity: 0; transform: rotate(-30deg) scale(.6); } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) { .hkm-chat-launcher, .hkm-chat-launcher .hkm-ico { transition: none; animation: none; } }
 
     .hkm-chat-box {
       position: fixed;
@@ -818,7 +821,7 @@ export function initHkmChatWidget() {
   root.id = 'hkm-chat-widget-root';
   root.innerHTML = `
     <button class="hkm-chat-launcher" id="hkm-chat-launcher" aria-label="${t.openChat}">
-      <span class="material-symbols-outlined">chat</span>
+      <svg class="hkm-ico" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><circle cx="8" cy="12" r=".6" fill="currentColor"/><circle cx="12" cy="12" r=".6" fill="currentColor"/><circle cx="16" cy="12" r=".6" fill="currentColor"/></svg>
     </button>
 
     <div class="hkm-chat-box" id="hkm-chat-box" role="dialog" aria-modal="false" aria-label="${t.title}">
@@ -1002,12 +1005,12 @@ export function initHkmChatWidget() {
     if (isOpen) {
       initializeChatSession();
       box.classList.add('open');
-      launcher.innerHTML = '<span class="material-symbols-outlined">close</span>';
+      launcher.innerHTML = '<svg class="hkm-ico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>';
       setTimeout(() => inputEl.focus(), 150);
       startPolling();
     } else {
       box.classList.remove('open');
-      launcher.innerHTML = '<span class="material-symbols-outlined">chat</span>';
+      launcher.innerHTML = '<svg class="hkm-ico" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><circle cx="8" cy="12" r=".6" fill="currentColor"/><circle cx="12" cy="12" r=".6" fill="currentColor"/><circle cx="16" cy="12" r=".6" fill="currentColor"/></svg>';
       stopPolling();
     }
   }
