@@ -200,7 +200,7 @@
     .fst-page .fst-cta .fst-actions .fst-btn { flex: 1 1 100%; }
 
     /* Topp på mobil: luftigere og mer kompakt */
-    .fst-page .fst-hero { align-items: flex-end; min-height: 0; padding: calc(var(--fst-header-h) + clamp(120px, 26vh, 260px)) 0 104px; }
+    .fst-page .fst-hero { align-items: flex-end; min-height: 0; padding: calc(var(--fst-header-h) + clamp(40px, 10vh, 120px)) 0 104px; }
     .fst-page .fst-hero-img { object-position: 60% 20%; }
     .fst-page .fst-hero-shade { background: linear-gradient(0deg, rgba(21,26,33,.97) 0%, rgba(21,26,33,.9) 40%, rgba(21,26,33,.62) 70%, rgba(21,26,33,.45) 100%); }
     .fst-page .fst-hero .fst-overline { font-size: 11px; margin-bottom: 10px; }
