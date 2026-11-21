@@ -2,6 +2,12 @@
    Venstrejusterte overskrifter, liten oransje etikett, nesten svart tittel, dempet brødtekst, tynne linjer og runde mørke knapper. */
 html body{--hs-ink:#151a21;--hs-mut:#596069;--hs-line:rgba(21,26,33,.12);--hs-or:#cc712b;--hs-or2:#a0531a}
 
+/* Samme bredde som Om oss (1200 px med luft på sidene) */
+html body :is(.features,.funfacts,.causes,.events,.shop-home-promo,.bible-home-promo,.home-giving,.testimonials,.facebook-feed-section,.newsletter)>.container,
+html body #aktivitet-seksjon>.container{max-width:1200px!important;width:100%!important;margin-left:auto!important;margin-right:auto!important;padding-left:max(4vw,20px)!important;padding-right:max(4vw,20px)!important;box-sizing:border-box!important}
+html body :is(.features-grid,.funfacts-grid,.causes-grid,.events-grid,.facebook-feed-grid,.shop-home-promo-card,.bible-home-promo-card){max-width:none!important;margin-left:0!important;margin-right:0!important;width:100%!important;box-sizing:border-box}
+html body #aktivitet-seksjon>.container>*{margin-left:0!important;margin-right:0!important}
+
 /* Seksjonstopper */
 html body :is(.features,.funfacts,.causes,.events,.testimonials,.facebook-feed-section) .section-header{text-align:left!important;margin-left:0!important;margin-right:0!important;max-width:760px!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:14px!important}
 html body :is(.features,.funfacts,.causes,.events,.testimonials,.facebook-feed-section,.home-giving) .section-label{display:block!important;margin:0!important;padding:0!important;background:none!important;border:0!important;border-radius:0!important;font-size:14px!important;font-weight:600!important;letter-spacing:0!important;text-transform:none!important;color:var(--hs-or2)!important}
