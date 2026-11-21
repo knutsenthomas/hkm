@@ -247,3 +247,4 @@ html body :is(.hb-filters,#hkm-media .hm-jump,#hkm-blog .blog-category-filters,.
 @media (max-width:600px){
   html body :is(.hb-filters,#hkm-media .hm-jump,#hkm-blog .blog-category-filters,.hb-band #filter-scroll,.hb-host>#podcast-categories){margin-right:-18px !important;padding-right:18px !important}
 }
+html body .hb-host>*{min-width:0 !important}
