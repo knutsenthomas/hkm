@@ -239,3 +239,11 @@ html[data-theme="dark"] body #faste-guide :is(h1,h2,h3,h4,strong,b,.q,legend,sum
 html[data-theme="dark"] body :is(#hkm-blog .blog-category,#hkm-blog .featured-badge,.faste-promo .fp-badge,.kurs-grid .category-badge,.plans-grid .duration-badge,#single-post-related .cms-related-category){background:rgba(11,19,41,.88) !important;color:#f8fafc !important}
 html[data-theme="dark"] body #hkp-head .hp-cover{background:#131d36 !important}
 #hkm-media *{hyphens:none !important;-webkit-hyphens:none !important}
+
+/* Filterknapper alltid på én linje (sveip sidelengs ved behov) – alle sider */
+html body :is(.hb-filters,#hkm-media .hm-jump,#hkm-blog .blog-category-filters,.hb-band #filter-scroll,.hb-host>#podcast-categories){display:flex !important;flex-wrap:nowrap !important;overflow-x:auto !important;overflow-y:hidden !important;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:8px !important;max-width:100%}
+html body :is(.hb-filters,#hkm-media .hm-jump,#hkm-blog .blog-category-filters,.hb-band #filter-scroll,.hb-host>#podcast-categories)::-webkit-scrollbar{display:none}
+html body :is(.hb-filters,#hkm-media .hm-jump,#hkm-blog .blog-category-filters,.hb-band #filter-scroll,.hb-host>#podcast-categories)>*{flex:0 0 auto !important;white-space:nowrap !important}
+@media (max-width:600px){
+  html body :is(.hb-filters,#hkm-media .hm-jump,#hkm-blog .blog-category-filters,.hb-band #filter-scroll,.hb-host>#podcast-categories){margin-right:-18px !important;padding-right:18px !important}
+}
