@@ -200,7 +200,7 @@
     .fst-page .fst-cta .fst-actions .fst-btn { flex: 1 1 100%; }
 
     /* Topp på mobil: luftigere og mer kompakt */
-    .fst-page .fst-hero { align-items: flex-end; min-height: 100svh; padding: calc(var(--fst-header-h) + 24px) 0 32px; }
+    .fst-page .fst-hero { align-items: flex-end; min-height: 100svh; padding: calc(var(--fst-header-h) + 24px) 0 104px; }
     .fst-page .fst-hero-img { object-position: 60% 20%; }
     .fst-page .fst-hero-shade { background: linear-gradient(0deg, rgba(21,26,33,.97) 0%, rgba(21,26,33,.9) 40%, rgba(21,26,33,.62) 70%, rgba(21,26,33,.45) 100%); }
     .fst-page .fst-hero .fst-overline { font-size: 11px; margin-bottom: 10px; }
@@ -208,14 +208,14 @@
     .fst-page .fst-hero .fst-lead { font-size: 16px; line-height: 1.5; margin-bottom: 20px; }
     .fst-page .fst-hero .fst-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .fst-page .fst-hero .fst-btn { padding: 13px 10px; font-size: 12px; letter-spacing: .04em; }
-    .fst-page .fst-count { margin-top: 20px; padding: 16px 18px; gap: 12px; border-radius: 1rem; flex-wrap: nowrap; flex-direction: column; align-items: stretch; }
-    .fst-page .fst-count-main { flex-direction: row; align-items: baseline; justify-content: space-between; border-right: 0; padding-right: 0; gap: 12px; }
+    .fst-page .fst-count { margin-top: 20px; padding: 18px 20px; gap: 14px; border-radius: 1rem; flex-wrap: nowrap; flex-direction: column; align-items: flex-start; }
+    .fst-page .fst-count-main { flex-direction: column; align-items: flex-start; border-right: 0; padding-right: 0; gap: 6px; }
     .fst-page .fst-count-label { font-size: 11px; }
-    .fst-page .fst-count-num { font-size: 32px; }
+    .fst-page .fst-count-num { font-size: 36px; }
     .fst-page .fst-count-unit { font-size: 14px; }
     .fst-page .fst-count-side { gap: 10px; }
-    .fst-page .fst-days { grid-template-columns: repeat(21, 1fr); gap: 3px; }
-    .fst-page .fst-days span { width: auto; height: auto; aspect-ratio: 1; border-width: 1px; }
+    .fst-page .fst-days { grid-template-columns: repeat(21, 8px); gap: 4px; }
+    .fst-page .fst-days span { width: 8px; height: 8px; border-width: 1px; }
     .fst-page .fst-days span:nth-child(7n) { margin-right: 0; }
     .fst-page .fst-meta { gap: 16px; }
     .fst-page .fst-meta span { font-size: 12px; letter-spacing: .03em; }
