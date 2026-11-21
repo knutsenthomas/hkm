@@ -45,9 +45,14 @@
   .fst-page .fst-lead { font: 400 18px/1.6 Inter, sans-serif; color: var(--fst-text-2); }
   .fst-page .fst-text-2 { color: var(--fst-text-2); }
   .fst-page .fst-link {
-    color: var(--fst-text); font-weight: 600; text-decoration: underline;
-    text-decoration-color: var(--fst-terracotta); text-decoration-thickness: 2px; text-underline-offset: 3px;
+    color: var(--fst-text); font-weight: 600; text-decoration: none;
+    padding-bottom: 3px;
+    background-image: linear-gradient(var(--fst-terracotta), var(--fst-terracotta));
+    background-repeat: no-repeat; background-position: 0 100%; background-size: 100% 2px;
+    transition: color 300ms, background-size 300ms;
   }
+  .fst-page .fst-link:hover { color: var(--fst-terracotta); }
+  .fst-page .fst-link:focus-visible { outline: 2px solid var(--fst-terracotta); outline-offset: 3px; border-radius: 2px; }
 
   /* Topp: fullskjermsbilde med mørk overgang */
   .fst-page .fst-hero {
