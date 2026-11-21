@@ -379,38 +379,40 @@
         </div>
     </div>
 
-    <section class="hb-band hb-static" data-hero-align="left">
-        <div class="container hb-host">
-            <div class="hb-text">
-                <p class="hb-eye">Bønn og faste · Januar 2027</p>
-                <h1 data-content-key="hero.title">21 dager med bønn og faste</h1>
-                <p class="hb-lead" data-content-key="hero.subtitle">Vi starter det nye året med å søke Gud først – sammen. Fra mandag 4. januar.</p>
-            </div>
-        </div>
-    </section>
 
 <main class="fst-page">
+  <!-- TOPP: fullskjermsbilde -->
+  <section class="fst-hero" aria-labelledby="fst-title">
+    <img class="fst-hero-img" src="/img/fb_fallback_prayer.jpg" alt="" width="1376" height="768" fetchpriority="high" decoding="async">
+    <span class="fst-hero-shade" aria-hidden="true"></span>
+    <div class="fst-wrap fst-hero-inner">
+      <span class="fst-overline">Bønn og faste · Januar 2027</span>
+      <h1 id="fst-title" data-content-key="hero.title">21 dager med <span class="fst-accent">bønn og faste</span></h1>
+      <p class="fst-lead" data-content-key="hero.subtitle">Vi starter det nye året med å søke Gud først – sammen. Tre uker der vi legger noe til side for å gi ham mer plass.</p>
+      <div class="fst-actions">
+        <a href="/leseplan-detaljer?id=21-dager-bonn-og-faste" class="fst-btn fst-btn-primary">Start leseplanen</a>
+        <a href="/undervisning/faste" class="fst-btn fst-btn-light">Lær om faste</a>
+      </div>
+      <div class="fst-count" id="fst-count" data-start="2027-01-04" data-days="21" aria-live="polite">
+        <div class="fst-count-main">
+          <span class="fst-count-label" id="fst-count-label">Vi starter om</span>
+          <span class="fst-count-row"><span class="fst-count-num" id="fst-count-num">–</span><span class="fst-count-unit" id="fst-count-unit">dager</span></span>
+        </div>
+        <div class="fst-count-side">
+          <div class="fst-days" id="fst-days" aria-hidden="true"></div>
+          <div class="fst-meta">
+            <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>4.–24. januar</span>
+            <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Ca. 10 min om dagen</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <a href="#om-fasten" class="fst-scroll" aria-label="Les mer om fasten"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></a>
+  </section>
 
   <!-- OM FASTEN -->
   <section class="fst-section" id="om-fasten">
     <div class="fst-wrap">
-      <div class="fst-start" aria-label="Oversikt over fasten">
-        <div class="fst-count" id="fst-count" data-start="2027-01-04" data-days="21">
-          <span class="fst-count-label" id="fst-count-label">Vi starter om</span>
-          <span class="fst-count-num" id="fst-count-num">–</span>
-          <span class="fst-count-unit" id="fst-count-unit">dager</span>
-        </div>
-        <div class="fst-start-info">
-          <div class="fst-meta">
-            <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>4.–24. januar</span>
-            <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Ca. 10 min om dagen</span>
-          </div>
-          <div class="fst-actions">
-            <a href="/leseplan-detaljer?id=21-dager-bonn-og-faste" class="fst-btn fst-btn-primary">Start leseplanen</a>
-            <a href="/undervisning/faste" class="fst-btn fst-btn-dark">Lær om faste</a>
-          </div>
-        </div>
-      </div>
       <div class="fst-narrow">
         <span class="fst-overline">Om fasten</span>
         <h2 data-content-key="faste.intro.title">Gi Gud førsteplassen igjen</h2>
@@ -533,6 +535,18 @@
 
     <script>
     (function () {
+        var page = document.querySelector('.fst-page');
+        function setTop() {
+            var h = document.getElementById('header') || document.querySelector('header.header');
+            if (!h || !page) return;
+            var r = h.getBoundingClientRect();
+            var b = Math.round(Math.max(r.bottom, r.height));
+            page.style.setProperty('--fst-header-h', (b > 40 ? b : 88) + 'px');
+        }
+        setTop();
+        window.addEventListener('load', setTop);
+        window.addEventListener('resize', setTop);
+
         var box = document.getElementById('fst-count');
         if (!box) return;
         var parts = box.dataset.start.split('-').map(Number);
@@ -544,18 +558,28 @@
         var label = document.getElementById('fst-count-label');
         var num = document.getElementById('fst-count-num');
         var unit = document.getElementById('fst-count-unit');
+        var done = 0;
         if (diff > 0) {
             label.textContent = 'Vi starter om';
             num.textContent = diff;
             unit.textContent = diff === 1 ? 'dag' : 'dager';
         } else if (-diff < total) {
+            done = 1 - diff;
             label.textContent = 'Vi er i gang';
-            num.textContent = 'Dag ' + (1 - diff);
+            num.textContent = 'Dag ' + done;
             unit.textContent = 'av ' + total;
         } else {
+            done = total;
             label.textContent = 'Takk for at du var med';
             num.textContent = total;
             unit.textContent = 'dager med bønn og faste';
+        }
+        var dots = document.getElementById('fst-days');
+        for (var i = 1; i <= total; i++) {
+            var d = document.createElement('span');
+            if (i < done || (i === done && done === total)) d.className = 'is-done';
+            else if (i === done) d.className = 'is-today';
+            dots.appendChild(d);
         }
     })();
     </script>
