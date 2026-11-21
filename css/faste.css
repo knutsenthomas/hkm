@@ -63,14 +63,14 @@
   .fst-page .fst-hero-shade {
     position: absolute; inset: 0; z-index: -1; pointer-events: none;
     background:
-      linear-gradient(90deg, rgba(21,26,33,.94) 0%, rgba(21,26,33,.82) 34%, rgba(21,26,33,.35) 62%, rgba(21,26,33,.1) 100%),
+      linear-gradient(90deg, rgba(21,26,33,.95) 0%, rgba(21,26,33,.88) 40%, rgba(21,26,33,.7) 58%, rgba(21,26,33,.25) 82%, rgba(21,26,33,.1) 100%),
       linear-gradient(0deg, rgba(21,26,33,.7) 0%, rgba(21,26,33,0) 35%);
   }
   .fst-page .fst-hero-inner { width: 100%; }
   .fst-page .fst-hero-inner > * { max-width: 620px; }
   .fst-page .fst-hero h1 { color: #fff; font: 800 64px/1.04 Inter, sans-serif; letter-spacing: -.035em; margin: 0 0 20px; }
   .fst-page .fst-hero .fst-accent { color: var(--fst-terracotta); }
-  .fst-page .fst-hero-inner > h1 { max-width: none; white-space: nowrap; font-size: clamp(40px, 4.4vw, 64px); }
+  .fst-page .fst-hero-inner > h1 { max-width: none; white-space: nowrap; font-size: clamp(40px, 4.4vw, 64px); text-shadow: 0 2px 24px rgba(21,26,33,.55); }
   .fst-page .fst-hero .fst-overline { color: #fff; }
   .fst-page .fst-hero .fst-lead { color: rgba(245, 245, 237, .82); max-width: 540px; margin-bottom: 32px; }
   .fst-page .fst-btn-light { background: var(--fst-parchment); color: var(--fst-onyx); }
