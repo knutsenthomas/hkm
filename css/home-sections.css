@@ -157,3 +157,6 @@ html[data-theme="dark"] body .newsletter .newsletter-content{background:#16213b}
 html body .home-giving .home-giving-photo{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:22px;margin:0 0 8px}
 html body .events-grid>.event-card:only-child .event-meta{margin-top:4px!important}
 html body .newsletter{padding-top:72px!important}
+html body .newsletter .newsletter-form{flex-direction:row!important;align-items:center!important}
+html body .newsletter .newsletter-input{height:52px!important;max-height:52px!important;min-width:0!important;box-sizing:border-box!important}
+@media (max-width:600px){html body .newsletter .newsletter-input{flex:1 1 100%!important;width:100%!important}html body .newsletter .newsletter-form .btn{flex:1 1 100%!important;width:100%!important}}
