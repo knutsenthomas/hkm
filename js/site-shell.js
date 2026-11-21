@@ -88,6 +88,7 @@ const ROUTES = {
         podcast: '/podcast',
         courses: '/kurs',
         readingPlans: '/leseplaner',
+        fasting: '/faste',
         events: '/arrangementer',
         blog: '/blogg',
         privacy: '/personvern',
@@ -184,6 +185,7 @@ const COPY = {
             activity: {
                 title: 'Aktuell aktivitet',
                 items: [
+                    ['event_upcoming', 'Bønn og faste', '21 dager sammen fra 4. januar.', 'fasting', 'menu.sections.resources.fasting'],
                     ['calendar_month', 'Leseplaner', 'Følg våre daglige leseplaner.', 'readingPlans', 'menu.sections.resources.readingPlans'],
                     ['event', 'Arrangementer', 'Bli med på seminarer og samlinger.', 'events', 'menu.sections.resources.events'],
                     ['feed', 'Nyheter & Blogg', 'Siste oppdateringer og artikler.', 'blog', 'menu.sections.resources.blog'],

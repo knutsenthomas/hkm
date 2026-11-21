@@ -93,7 +93,10 @@
   const SHOP = { '21-dager-bonn-og-faste': 'https://hiskingdomdesigns.no/produkt/77f0ae24-0f07-fc56-99f6-fd8d15e6170a' };
   const EXTRA = {
     '21-dager-bonn-og-faste': {
-      no: { url: '/blogg-post.html?id=item-1795125986813-h8n6uapai', t: 'Les undervisningen om faste', d: 'Hva bibelsk faste er, hvorfor vi faster og hvordan du kommer trygt i gang.' }
+      no: [
+        { url: '/faste', t: 'Om fasten i januar', d: 'Nedtelling, slik blir du med og hvilken faste som passer for deg.', icon: 'cal' },
+        { url: '/undervisning/faste', t: 'Les undervisningen om faste', d: 'Hva bibelsk faste er, hvorfor vi faster og hvordan du kommer trygt i gang.' }
+      ]
     }
   };
   const DEFAULT_START = { '21-dager-bonn-og-faste': '2027-01-04' };
@@ -467,7 +470,11 @@
   const minutes = plan.estimatedMinutes || (/sprint/.test(titleL) ? '30–40' : (/historisk|kronologisk|balansert|chronolog|balanced/.test(titleL) ? '15–20' : '10'));
   const shopUrl = (typeof raw.shopUrl === 'string' && /^https:\/\//.test(raw.shopUrl) && raw.shopUrl) || SHOP[plan.id] || '';
   const pdfUrl = !shopUrl && raw.printPdf && (raw.printPdf[LANG] || raw.printPdf.no) || '';
-  const extra = EXTRA[plan.id] && (EXTRA[plan.id][LANG] || null);
+  const extraRaw = EXTRA[plan.id] && (EXTRA[plan.id][LANG] || null);
+  const extras = Array.isArray(extraRaw) ? extraRaw : (extraRaw ? [extraRaw] : []);
+  const ICON_TEACH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg>';
+  const ICON_CAL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>';
+  const extrasHTML = cls => extras.map(x => `<a class="teach ${cls}" href="${esc(x.url)}"><span class="ic">${x.icon === 'cal' ? ICON_CAL : ICON_TEACH}</span><span><b>${esc(x.t)}</b><span>${esc(x.d)}</span></span></a>`).join('');
   const TR = LANG === 'no' ? null : ((raw.translations && raw.translations[LANG]) || (LANG === 'en' && raw.english) || null);
   const translated = LANG === 'no' || !!(TR && (TR.title || (Array.isArray(TR.days) && TR.days.length)));
   const category = LANG === 'no' ? plan.category : (TR && TR.category) || '';
@@ -522,7 +529,7 @@ ${aboutHTML('about-top')}
 
 <section class="day" id="dag" aria-live="polite"><div class="daywrap" id="daywrap"></div></section>
 <div class="celebrate" id="celebrate"><b>${esc(T.celebrateT(N))}</b><p>${esc(T.celebrateP)}</p></div>
-${extra ? `<a class="teach rv" href="${esc(extra.url)}"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg></span><span><b>${esc(extra.t)}</b><span>${esc(extra.d)}</span></span></a>` : ''}
+${extrasHTML('rv')}
 ${aboutHTML('about-bottom')}
 <div style="height:48px"></div>
 </div>
@@ -724,7 +731,7 @@ ${dn ? `<p class="adone">✓ ${esc(T.dayDoneS)}</p>` : ''}
 <div class="astart"><button type="button" class="pill donebtn" id="astart">${esc(unread > 0 ? T.contReading : (dn ? T.startReading : T.startReading))}</button></div>
 ${shopUrl ? `<a class="teach abuy" href="${esc(shopUrl)}" target="_blank" rel="noopener"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg></span><span><b>${esc(T.buy)}</b><span>${esc(T.buySub)}</span></span></a>` : ''}
 ${pdfUrl ? `<a class="teach abuy" href="${esc(pdfUrl)}" target="_blank" rel="noopener"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M7 15h10v6H7z"/></svg></span><span><b>${esc(T.print)}</b></span></a>` : ''}
-${extra ? `<a class="teach abuy" href="${esc(extra.url)}"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg></span><span><b>${esc(extra.t)}</b><span>${esc(extra.d)}</span></span></a>` : ''}
+${extrasHTML('abuy')}
 ${aboutHTML('about-app')}
 <div style="height:40px"></div>`;
     el.querySelectorAll('.achip').forEach(b => b.addEventListener('click', () => show(+b.dataset.n, false)));
