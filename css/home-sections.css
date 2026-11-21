@@ -57,7 +57,9 @@ html body .funfacts .impact-panel{margin-top:0!important}
 html body .funfacts .funfacts-grid{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))!important}
 html body .funfacts .funfact{display:block!important}
 html body .funfacts .funfact-icon{display:none!important}
-html body .funfacts .funfact-number{display:block!important;font-size:40px!important;line-height:1.1!important}
+html body .funfacts .funfact-number{display:block!important;font-size:40px!important;line-height:1.1!important;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif!important}
+html body .funfacts{padding-top:0!important}
+html body .hkm-about{padding-bottom:56px!important}
 html body .funfacts .funfact-label{display:block!important;font-size:15px!important;margin-top:4px!important}
 html body .funfacts .funfact-number{color:var(--hs-ink)!important;font-weight:800!important;letter-spacing:-.03em!important}
 html body .funfacts .funfact-label{color:var(--hs-mut)!important;text-transform:none!important;letter-spacing:0!important;font-weight:500!important}
