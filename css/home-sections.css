@@ -153,3 +153,6 @@ html[data-theme="dark"] body :is(.features,.home-giving,.events,.facebook-feed-s
 html[data-theme="dark"] body :is(.home-giving .home-giving-layout,.events .event-card,.features .feature-box){background:#131d36!important}
 html[data-theme="dark"] body :is(.home-giving .home-giving-card,.shop-home-promo-card,.bible-home-promo-card){background:#16213b!important}
 html[data-theme="dark"] body .newsletter .newsletter-content{background:#16213b}
+
+html body .home-giving .home-giving-photo{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:22px;margin:0 0 8px}
+html body .events-grid>.event-card:only-child .event-meta{margin-top:4px!important}
