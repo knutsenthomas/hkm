@@ -1,0 +1,162 @@
+/* Faste-siden (/faste) – bygget etter HKM-designreglene (His Kingdom Designs, norsk). Klasser: fst- */
+  .fst-page {
+    --fst-header-h: 88px;
+    --fst-terracotta: var(--terracotta, #cc712b);
+    --fst-onyx: var(--onyx, #151a21);
+    --fst-parchment: var(--parchment, #f5f5ed);
+    --fst-bg: var(--fst-parchment);
+    --fst-card: #fff;
+    --fst-text: var(--fst-onyx);
+    --fst-text-2: rgba(21, 26, 33, .72);
+    --fst-line: rgba(21, 26, 33, .12);
+    --fst-icon-bg: rgba(204, 113, 43, .10);
+    --fst-hero-bg: var(--fst-onyx);
+    background: var(--fst-bg);
+    color: var(--fst-text);
+    font-family: Inter, sans-serif;
+  }
+  [data-theme="dark"] .fst-page {
+    --fst-bg: #151a21;
+    --fst-card: #1d242d;
+    --fst-text: #f5f5ed;
+    --fst-text-2: rgba(245, 245, 237, .68);
+    --fst-line: rgba(245, 245, 237, .12);
+    --fst-icon-bg: rgba(204, 113, 43, .16);
+    --fst-hero-bg: #0f1318;
+  }
+
+  .fst-page *, .fst-page *::before, .fst-page *::after { box-sizing: border-box; }
+  .fst-page [id] { scroll-margin-top: calc(var(--fst-header-h) + 24px); }
+  .fst-page .fst-wrap { max-width: 1280px; margin: 0 auto; padding: 0 64px; }
+  .fst-page .fst-narrow { max-width: 760px; }
+  .fst-page .fst-section { padding: 80px 0; }
+  .fst-page #om-fasten { padding-top: 48px; }
+  .fst-page .fst-section + .fst-section { padding-top: 0; }
+
+  /* Typografi */
+  .fst-page .fst-overline {
+    display: block; margin: 0 0 12px; font: 600 12px/1 Inter, sans-serif;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--fst-terracotta);
+  }
+  .fst-page h1 { font: 700 48px/1.2 Inter, sans-serif; letter-spacing: -.02em; margin: 0 0 16px; }
+  .fst-page h2 { font: 700 32px/1.25 Inter, sans-serif; margin: 0 0 16px; color: var(--fst-text); }
+  .fst-page h3 { font: 600 20px/1.4 Inter, sans-serif; margin: 0 0 8px; color: var(--fst-text); }
+  .fst-page p { font: 400 16px/1.6 Inter, sans-serif; margin: 0 0 16px; color: var(--fst-text); }
+  .fst-page .fst-lead { font: 400 18px/1.6 Inter, sans-serif; color: var(--fst-text-2); }
+  .fst-page .fst-text-2 { color: var(--fst-text-2); }
+  .fst-page .fst-link {
+    color: var(--fst-text); font-weight: 600; text-decoration: underline;
+    text-decoration-color: var(--fst-terracotta); text-decoration-thickness: 2px; text-underline-offset: 3px;
+  }
+
+  /* Knapper */
+  .fst-page .fst-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  .fst-page .fst-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px 24px; border-radius: .75rem; border: 0; cursor: pointer; text-decoration: none;
+    font: 700 14px/1 Inter, sans-serif; letter-spacing: .05em; text-transform: uppercase;
+    transition: opacity 300ms, transform 300ms, background-color 300ms;
+  }
+  .fst-page .fst-btn:hover { opacity: .9; }
+  .fst-page .fst-btn:active { transform: scale(.98); }
+  .fst-page .fst-btn:focus-visible { outline: 2px solid var(--fst-terracotta); outline-offset: 3px; }
+  .fst-page .fst-btn-primary { background: var(--fst-terracotta); color: #fff; box-shadow: 0 1px 2px 0 rgba(0,0,0,.05); }
+  .fst-page .fst-btn-dark { background: var(--fst-onyx); color: #fff; }
+  .fst-page .fst-btn-dark:hover { background: var(--fst-terracotta); opacity: 1; }
+  [data-theme="dark"] .fst-page .fst-btn-dark { background: var(--fst-parchment); color: var(--fst-onyx); }
+  [data-theme="dark"] .fst-page .fst-btn-dark:hover { background: var(--fst-terracotta); color: #fff; }
+
+  /* Oppstart: nedtelling, dato og knapper */
+  .fst-page .fst-start {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 32px; margin-bottom: 64px;
+    background: var(--fst-card); border: 1px solid var(--fst-line); border-radius: 1.5rem; padding: 32px;
+  }
+  .fst-page .fst-count {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-width: 160px;
+    padding-right: 32px; border-right: 1px solid var(--fst-line);
+  }
+  .fst-page .fst-count-label { font: 600 12px/1 Inter, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--fst-terracotta); }
+  .fst-page .fst-count-num { font: 800 48px/1.05 Inter, sans-serif; letter-spacing: -.02em; color: var(--fst-text); }
+  .fst-page .fst-count-unit { font: 500 14px/1.3 Inter, sans-serif; color: var(--fst-text-2); }
+  .fst-page .fst-start-info { flex: 1 1 320px; display: flex; flex-direction: column; gap: 20px; }
+  .fst-page .fst-meta { display: flex; flex-wrap: wrap; gap: 24px; }
+  .fst-page .fst-meta span { display: inline-flex; align-items: center; gap: 8px; font: 600 14px/1 Inter, sans-serif; letter-spacing: .05em; color: var(--fst-text); }
+  .fst-page .fst-meta svg { color: var(--fst-terracotta); }
+
+  /* Kort */
+  .fst-page .fst-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 32px; }
+  .fst-page .fst-card {
+    background: var(--fst-card); border: 1px solid var(--fst-line); border-radius: .75rem; padding: 28px;
+    transition: box-shadow 300ms;
+  }
+  .fst-page .fst-card:hover { box-shadow: 0 20px 25px -5px rgba(0,0,0,.1), 0 8px 10px -6px rgba(0,0,0,.1); }
+  .fst-page .fst-card p { margin: 0; color: var(--fst-text-2); }
+  .fst-page .fst-card p + p { margin-top: 12px; }
+  .fst-page .fst-icon {
+    width: 44px; height: 44px; border-radius: 9999px; background: var(--fst-icon-bg); color: var(--fst-terracotta);
+    display: flex; align-items: center; justify-content: center; margin-bottom: 16px;
+  }
+  .fst-page .fst-step {
+    width: 36px; height: 36px; border-radius: 9999px; background: var(--fst-terracotta); color: #fff;
+    display: flex; align-items: center; justify-content: center; font: 700 16px/1 Inter, sans-serif; margin-bottom: 16px;
+  }
+
+  /* Bibelvers */
+  .fst-page .fst-verse {
+    margin: 32px 0 0; padding: 28px 32px; background: var(--fst-card); border: 1px solid var(--fst-line);
+    border-left: 4px solid var(--fst-terracotta); border-radius: .75rem;
+  }
+  .fst-page .fst-verse p { font: 500 20px/1.5 Inter, sans-serif; margin: 0; color: var(--fst-text); }
+  .fst-page .fst-verse cite { display: block; margin-top: 12px; font: 600 12px/1 Inter, sans-serif; letter-spacing: .12em; text-transform: uppercase; font-style: normal; color: var(--fst-text-2); }
+
+  /* Helsemerknad */
+  .fst-page .fst-note {
+    display: flex; gap: 16px; align-items: flex-start; margin-top: 24px; padding: 20px 24px;
+    background: var(--fst-icon-bg); border-radius: .75rem;
+  }
+  .fst-page .fst-note svg { flex: none; color: var(--fst-terracotta); margin-top: 2px; }
+  .fst-page .fst-note p { margin: 0; font-size: 15px; }
+
+  /* Spørsmål og svar */
+  .fst-page .fst-faq { background: var(--fst-card); border: 1px solid var(--fst-line); border-radius: .75rem; margin-top: 32px; }
+  .fst-page .fst-faq details { border-top: 1px solid var(--fst-line); }
+  .fst-page .fst-faq details:first-child { border-top: 0; }
+  .fst-page .fst-faq summary {
+    list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    padding: 20px 24px; font: 600 16px/1.4 Inter, sans-serif; color: var(--fst-text);
+  }
+  .fst-page .fst-faq summary::-webkit-details-marker { display: none; }
+  .fst-page .fst-faq summary svg { flex: none; color: var(--fst-terracotta); transition: transform 300ms; }
+  .fst-page .fst-faq details[open] summary svg { transform: rotate(45deg); }
+  .fst-page .fst-faq summary:focus-visible { outline: 2px solid var(--fst-terracotta); outline-offset: -2px; border-radius: .75rem; }
+  .fst-page .fst-faq details p { padding: 0 24px 20px; margin: 0; color: var(--fst-text-2); }
+
+  /* Avslutning (onyx-panel) */
+  .fst-page .fst-cta {
+    background: var(--fst-hero-bg); color: var(--fst-parchment); border-radius: 1.5rem; padding: 56px;
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 32px;
+  }
+  .fst-page .fst-cta h2 { color: #fff; margin-bottom: 8px; }
+  .fst-page .fst-cta p { color: rgba(245, 245, 237, .72); margin: 0; }
+  [data-theme="dark"] .fst-page .fst-cta { border: 1px solid var(--fst-line); }
+
+  @media (max-width: 1023px) {
+    .fst-page .fst-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 767px) {
+    .fst-page .fst-wrap { padding: 0 16px; }
+    .fst-page .fst-section { padding: 56px 0; }
+    .fst-page h1 { font-size: 34px; }
+    .fst-page h2 { font-size: 28px; line-height: 1.3; }
+    .fst-page .fst-grid { grid-template-columns: 1fr; gap: 16px; }
+    .fst-page .fst-verse { padding: 22px; }
+    .fst-page .fst-verse p { font-size: 18px; }
+    .fst-page .fst-cta { padding: 32px 24px; }
+    .fst-page .fst-start { padding: 24px; gap: 20px; margin-bottom: 48px; }
+    .fst-page .fst-count { border-right: 0; padding-right: 0; padding-bottom: 20px; border-bottom: 1px solid var(--fst-line); width: 100%; }
+    .fst-page .fst-actions .fst-btn { flex: 1 1 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fst-page * { transition: none !important; }
+  }
+
