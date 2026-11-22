@@ -1032,6 +1032,11 @@ export function createCommunications1Methods({ firebaseService, adminUtils, show
             description: "Sendes ved påmelding til nyhetsbrev.",
           },
           {
+            id: "faste_confirmation",
+            name: "Faste-bekreftelse",
+            description: "Sendes ved påmelding til fastehilsener på /faste.",
+          },
+          {
             id: "daily_bible_reading",
             name: "Dagens bibellesing",
             description: "Sendes som daglig e-postvarsel for leseplaner.",

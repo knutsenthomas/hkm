@@ -9538,9 +9538,13 @@ class NewsletterBuilder {
         const hasSelectedSegments = this.selectedSegments && this.selectedSegments.size > 0;
         const hasSelectedUsers = this.selectedUserEmails && this.selectedUserEmails.size > 0;
 
+        // Påmeldte som bare har sagt ja til én kampanje (f.eks. fastehilsener) får aldri det vanlige
+        // nyhetsbrevet. De tas bare med når etiketten deres er valgt eksplisitt.
+        const campaignOnly = rec => rec && rec.newsletterConsent === false;
+
         // If no specific filters are checked, return all active recipients
         if (!hasSelectedLabels && !hasSelectedSegments && !hasSelectedUsers) {
-            return allRecipients;
+            return allRecipients.filter(rec => !campaignOnly(rec));
         }
 
         const normSelectedLabels = Array.from(this.selectedLabels || []).map(l => String(l).toLowerCase().trim());
@@ -9560,6 +9564,11 @@ class NewsletterBuilder {
             const tags = Array.isArray(rec.tags) ? rec.tags : (typeof rec.tags === 'string' ? rec.tags.split(',') : []);
             const segments = Array.isArray(rec.segments) ? rec.segments : (typeof rec.segments === 'string' ? rec.segments.split(',') : []);
             const allRecTags = [...tags, ...segments, rec.source || ''].map(t => String(t).toLowerCase().trim());
+
+            if (campaignOnly(rec)) {
+                const ownTags = tags.map(t => String(t).toLowerCase().trim()).filter(Boolean);
+                return [...normSelectedLabels, ...normSelectedSegments].some(sel => ownTags.includes(sel));
+            }
 
             if (hasSelectedLabels) {
                 const matchesLabel = normSelectedLabels.some(sel => allRecTags.some(t => t.includes(sel) || sel.includes(t)));
@@ -11217,8 +11226,9 @@ class NewsletterBuilder {
                             name,
                             email,
                             phone,
-                            source: data.source === 'website_footer' ? 'Nettsted' : (data.source || 'Direkte påmeldt'),
+                            source: data.source === 'website_footer' ? 'Nettsted' : (data.source === 'faste_page' ? 'Faste-siden' : (data.source || 'Direkte påmeldt')),
                             status: data.status || 'Aktiv',
+                            newsletterConsent: data.newsletterConsent !== false,
                             registeredAt: this.subscriberDateValue(data.subscribedAt || data.createdAt),
                             dateStr,
                             tags,
@@ -11294,9 +11304,9 @@ class NewsletterBuilder {
         const tags = (subscriber.tags || []).map(label);
         const segments = (subscriber.segments || []).map(normalize);
         const source = normalize(subscriber.source);
-        const newsletterMember = tags.includes('nyhetsbrev') || segments.includes('nyhetsbrev')
+        const newsletterMember = subscriber.newsletterConsent !== false && (tags.includes('nyhetsbrev') || segments.includes('nyhetsbrev')
             || ['nyhetsbrev', 'direkte påmeldt', 'nettsted'].includes(source)
-            || subscriber.collection === 'newsletter_subscriptions';
+            || subscriber.collection === 'newsletter_subscriptions');
         const q = normalize(query), seg = normalize(segment), selectedTag = label(tag);
         const matchesQuery = !q || [subscriber.name, subscriber.email, subscriber.phone, ...tags, ...segments].some(value => normalize(value).includes(q));
         const matchesSegment = !seg || (seg === 'nyhetsbrev' ? newsletterMember : source.includes(seg) || segments.some(value => value.includes(seg)));
