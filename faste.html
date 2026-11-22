@@ -447,6 +447,7 @@
           <div class="fst-step">3</div>
           <h3>Be sammen med oss</h3>
           <p>Inviter en venn, familien eller smågruppen din, og følg His Kingdom Ministry på YouVersion for oppmuntring underveis.</p>
+          <p><a class="fst-link" href="#pamelding">Få en hilsen hver uke</a></p>
         </article>
       </div>
     </div>
@@ -482,6 +483,32 @@
         <p>Snakk med legen din før du faster fra mat hvis du er gravid eller ammer, har diabetes eller en annen sykdom, bruker medisiner, har eller har hatt et vanskelig forhold til mat, eller er under 18 år. Da kan du heller faste fra vaner – den fasten er like verdifull.</p>
       </div>
       <p style="margin-top:24px"><a class="fst-link" href="/undervisning/faste">Les hele undervisningen om faste</a></p>
+    </div>
+  </section>
+
+  <!-- PÅMELDING -->
+  <section class="fst-section" id="pamelding">
+    <div class="fst-wrap">
+      <div class="fst-signup">
+        <div class="fst-signup-text">
+          <span class="fst-overline">Oppmuntring på e-post</span>
+          <h2>Få en hilsen hver uke i fasten</h2>
+          <p class="fst-text-2">Vi sender deg en kort e-post når hver av de tre ukene starter, med tema for uken, bønneemner og en oppmuntring på veien. Du kan melde deg av når som helst.</p>
+        </div>
+        <form class="fst-form" id="fst-signup-form" novalidate>
+          <label class="fst-field">
+            <span>Fornavn <em>(valgfritt)</em></span>
+            <input type="text" name="name" autocomplete="given-name" maxlength="200">
+          </label>
+          <label class="fst-field">
+            <span>E-post</span>
+            <input type="email" name="email" autocomplete="email" required maxlength="254" inputmode="email">
+          </label>
+          <button type="submit" class="fst-btn fst-btn-primary">Meld meg på</button>
+          <p class="fst-form-note">Du blir også med på nyhetsbrevet fra His Kingdom Ministry. Les mer i <a class="fst-link" href="/personvern">personvernerklæringen</a>.</p>
+          <p class="fst-form-status" id="fst-signup-status" role="status" aria-live="polite"></p>
+        </form>
+      </div>
     </div>
   </section>
 
@@ -581,6 +608,36 @@
             else if (i === done) d.className = 'is-today';
             dots.appendChild(d);
         }
+    })();
+    </script>
+
+    <script>
+    (function () {
+        var form = document.getElementById('fst-signup-form');
+        if (!form) return;
+        var status = document.getElementById('fst-signup-status');
+        var btn = form.querySelector('button[type="submit"]');
+        function show(msg, kind) { status.textContent = msg; status.dataset.kind = kind || ''; }
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            var addr = form.elements.email.value.trim();
+            var name = form.elements.name.value.trim();
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(addr)) { show('Skriv inn en gyldig e-postadresse.', 'error'); form.elements.email.focus(); return; }
+            btn.disabled = true; btn.textContent = 'Sender …'; show('');
+            try {
+                for (var i = 0; i < 20 && !(window.firebaseService && window.firebaseService.isInitialized); i++) await new Promise(function (r) { setTimeout(r, 250); });
+                if (!(window.firebaseService && window.firebaseService.isInitialized)) throw new Error('not-ready');
+                await window.firebaseService.subscribeNewsletter(addr, { name: name, source: 'faste_page', tags: ['faste'], language: 'no' });
+                try { localStorage.setItem('hkm_newsletter_subscribed', '1'); } catch (err) { /* valgfritt */ }
+                form.reset();
+                show('Takk! Du er påmeldt. Første hilsen kommer når fasten starter 4. januar.', 'ok');
+            } catch (err) {
+                console.error('Faste-påmelding:', err);
+                show('Det gikk ikke å melde deg på akkurat nå. Prøv igjen om litt.', 'error');
+            } finally {
+                btn.disabled = false; btn.textContent = 'Meld meg på';
+            }
+        });
     })();
     </script>
 

@@ -1066,8 +1066,11 @@ class FirebaseService {
             emailLower: normalizedEmail,
             ...(String(options.name || '').trim() ? { name: String(options.name).trim().slice(0, 200) } : {}),
             subscribedAt: firebase.firestore.FieldValue.serverTimestamp(),
-            source: options.source === 'website_popup' ? 'website_popup' : 'website_footer',
-            tags: language === 'en' ? ['engelsk'] : [],
+            source: ['website_popup', 'faste_page'].includes(options.source) ? options.source : 'website_footer',
+            tags: [
+                ...(language === 'en' ? ['engelsk'] : []),
+                ...(Array.isArray(options.tags) ? options.tags.filter(t => ['faste'].includes(t)) : [])
+            ],
             newsletterLanguage: language === 'en' ? 'en' : 'no',
             newsletterConsent: true
         });
