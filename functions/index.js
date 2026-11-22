@@ -5216,7 +5216,20 @@ exports.onNewsletterSubscribe = onDocumentCreated({
 </div>`
   };
 
-  const template = await getEmailTemplate("newsletter_confirmation", fallback);
+  // Påmelding fra faste-siden får egen bekreftelse (mal «faste_confirmation» i email_templates).
+  const isFasteSignup = subData.source === "faste_page";
+  const fasteFallback = {
+    subject: "Du er påmeldt fastehilsenene – vi starter 4. januar",
+    body: `<div class="hkm-email-container" style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #FCF9F5; color: #151a21;">
+  <h1 style="font-size: 24px; margin: 0 0 16px;">21 dager med bønn og faste</h1>
+  <p style="font-size: 16px; line-height: 1.6;">Takk for at du vil være med! Vi sender tre hilsener til {{email}} – mandag 4., 11. og 18. januar.</p>
+  <p style="font-size: 16px; line-height: 1.6;"><a href="https://www.hiskingdomministry.no/faste" style="color: #cc712b; font-weight: 700;">Se faste-siden</a></p>
+  <p style="font-size: 12px; color: #596069;"><a href="https://www.hiskingdomministry.no/avmeld" style="color: #596069;">Meld deg av</a></p>
+</div>`
+  };
+  const template = isFasteSignup
+    ? await getEmailTemplate("faste_confirmation", fasteFallback)
+    : await getEmailTemplate("newsletter_confirmation", fallback);
   const subject = template.subject.replace("{{email}}", email);
   const htmlBody = template.body.replace("{{email}}", email);
 
@@ -5241,7 +5254,9 @@ exports.onNewsletterSubscribe = onDocumentCreated({
       to: email,
       subject,
       html,
-      text: `Takk for at du meldte deg på nyhetsbrevet vårt!\n\nMeld deg av: ${unsubscribeUrl}`
+      text: isFasteSignup
+        ? `Takk for at du er med på 21 dager med bønn og faste! Du får tre hilsener: mandag 4., 11. og 18. januar.\n\nhttps://www.hiskingdomministry.no/faste\n\nMeld deg av: ${unsubscribeUrl}`
+        : `Takk for at du meldte deg på nyhetsbrevet vårt!\n\nMeld deg av: ${unsubscribeUrl}`
     });
     if (ok) {
       console.log(`Nyhetsbrev-bekreftelse sendt til ${email}`);
@@ -5636,7 +5651,8 @@ exports.onNewsletterCampaignCreate = onDocumentCreated({
       subsSnap.forEach(doc => {
         const data = doc.data();
         const email = (data.email || '').trim().toLowerCase();
-        if (email && !data.newsletterUnsubscribed && data.status !== 'unsubscribed') {
+        // newsletterConsent === false: bare påmeldt én kampanje (f.eks. faste), ikke det vanlige nyhetsbrevet
+        if (email && !data.newsletterUnsubscribed && data.status !== 'unsubscribed' && data.newsletterConsent !== false) {
           recipientsMap.set(email, {
             email: data.email,
             tags: data.tags || data.labels || [],
