@@ -162,6 +162,31 @@
   .fst-page .fst-note svg { flex: none; color: var(--fst-terracotta); margin-top: 2px; }
   .fst-page .fst-note p { margin: 0; font-size: 15px; }
 
+  /* Påmelding */
+  .fst-page .fst-signup {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: start;
+    background: var(--fst-card); border: 1px solid var(--fst-line); border-radius: 1.5rem; padding: 48px;
+  }
+  .fst-page .fst-form { display: flex; flex-direction: column; gap: 16px; }
+  .fst-page .fst-field { display: flex; flex-direction: column; gap: 8px; }
+  .fst-page .fst-field span { font: 600 14px/1 Inter, sans-serif; letter-spacing: .05em; color: var(--fst-text); }
+  .fst-page .fst-field em { font-style: normal; font-weight: 500; color: var(--fst-text-2); letter-spacing: 0; }
+  .fst-page .fst-field input {
+    font: 400 16px/1.4 Inter, sans-serif; color: var(--fst-text); background: var(--fst-bg);
+    border: 1px solid var(--fst-line); border-radius: .75rem; padding: 14px 16px; width: 100%;
+    transition: border-color 300ms, box-shadow 300ms;
+  }
+  .fst-page .fst-field input:focus { outline: none; border-color: var(--fst-terracotta); box-shadow: 0 0 0 3px rgba(204, 113, 43, .2); }
+  .fst-page .fst-form .fst-btn { align-self: flex-start; }
+  .fst-page .fst-btn:disabled { opacity: .5; pointer-events: none; }
+  .fst-page .fst-form-note { font-size: 13px; line-height: 1.5; margin: 0; color: var(--fst-text-2); }
+  .fst-page .fst-form-status { margin: 0; font-weight: 600; font-size: 15px; }
+  .fst-page .fst-form-status:empty { display: none; }
+  .fst-page .fst-form-status[data-kind="ok"] { color: #21543d; }
+  [data-theme="dark"] .fst-page .fst-form-status[data-kind="ok"] { color: #7fc79f; }
+  .fst-page .fst-form-status[data-kind="error"] { color: #ba1a1a; }
+  [data-theme="dark"] .fst-page .fst-form-status[data-kind="error"] { color: #ffb4ab; }
+
   /* Spørsmål og svar */
   .fst-page .fst-faq { background: var(--fst-card); border: 1px solid var(--fst-line); border-radius: .75rem; margin-top: 32px; }
   .fst-page .fst-faq details { border-top: 1px solid var(--fst-line); }
@@ -187,6 +212,7 @@
 
   @media (max-width: 1023px) {
     .fst-page .fst-grid { grid-template-columns: 1fr 1fr; }
+    .fst-page .fst-signup { grid-template-columns: 1fr; gap: 28px; }
     .fst-page .fst-hero-inner > h1 { white-space: normal; font-size: 52px; }
   }
   @media (max-width: 767px) {
@@ -197,6 +223,8 @@
     .fst-page .fst-verse { padding: 22px; }
     .fst-page .fst-verse p { font-size: 18px; }
     .fst-page .fst-cta { padding: 32px 24px; }
+    .fst-page .fst-signup { grid-template-columns: 1fr; gap: 24px; padding: 24px; }
+    .fst-page .fst-form .fst-btn { align-self: stretch; }
     .fst-page .fst-cta .fst-actions .fst-btn { flex: 1 1 100%; }
 
     /* Topp på mobil: luftigere og mer kompakt */
