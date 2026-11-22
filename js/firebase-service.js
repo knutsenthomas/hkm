@@ -1072,7 +1072,8 @@ class FirebaseService {
                 ...(Array.isArray(options.tags) ? options.tags.filter(t => ['faste'].includes(t)) : [])
             ],
             newsletterLanguage: language === 'en' ? 'en' : 'no',
-            newsletterConsent: true
+            // false = bare den kampanjen påmeldingen gjelder (f.eks. faste), ikke det vanlige nyhetsbrevet
+            newsletterConsent: options.newsletterConsent !== false
         });
     }
 

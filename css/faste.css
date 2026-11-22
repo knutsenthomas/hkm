@@ -177,6 +177,8 @@
     transition: border-color 300ms, box-shadow 300ms;
   }
   .fst-page .fst-field input:focus { outline: none; border-color: var(--fst-terracotta); box-shadow: 0 0 0 3px rgba(204, 113, 43, .2); }
+  .fst-page .fst-check { display: flex; gap: 12px; align-items: flex-start; cursor: pointer; font-size: 15px; line-height: 1.45; color: var(--fst-text); }
+  .fst-page .fst-check input { flex: none; width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--fst-terracotta); cursor: pointer; }
   .fst-page .fst-form .fst-btn { align-self: flex-start; }
   .fst-page .fst-btn:disabled { opacity: .5; pointer-events: none; }
   .fst-page .fst-form-note { font-size: 13px; line-height: 1.5; margin: 0; color: var(--fst-text-2); }

@@ -508,8 +508,12 @@
             <span>E-post</span>
             <input type="email" name="email" autocomplete="email" required maxlength="254" inputmode="email">
           </label>
+          <label class="fst-check">
+            <input type="checkbox" name="newsletter">
+            <span>Ja takk, jeg vil også ha det vanlige nyhetsbrevet fra His Kingdom Ministry</span>
+          </label>
           <button type="submit" class="fst-btn fst-btn-primary">Meld meg på</button>
-          <p class="fst-form-note">Du blir også med på nyhetsbrevet fra His Kingdom Ministry. Les mer i <a class="fst-link" href="/personvern">personvernerklæringen</a>.</p>
+          <p class="fst-form-note">Du får bare de tre fastehilsenene, med mindre du krysser av for nyhetsbrevet. Les mer i <a class="fst-link" href="/personvern">personvernerklæringen</a>.</p>
           <p class="fst-form-status" id="fst-signup-status" role="status" aria-live="polite"></p>
         </form>
       </div>
@@ -631,7 +635,8 @@
             try {
                 for (var i = 0; i < 20 && !(window.firebaseService && window.firebaseService.isInitialized); i++) await new Promise(function (r) { setTimeout(r, 250); });
                 if (!(window.firebaseService && window.firebaseService.isInitialized)) throw new Error('not-ready');
-                await window.firebaseService.subscribeNewsletter(addr, { name: name, source: 'faste_page', tags: ['faste'], language: 'no' });
+                var alsoNewsletter = !!form.elements.newsletter.checked;
+                await window.firebaseService.subscribeNewsletter(addr, { name: name, source: 'faste_page', tags: ['faste'], language: 'no', newsletterConsent: alsoNewsletter });
                 try { localStorage.setItem('hkm_newsletter_subscribed', '1'); } catch (err) { /* valgfritt */ }
                 form.reset();
                 show('Takk! Du er påmeldt. Første hilsen kommer når fasten starter 4. januar.', 'ok');
