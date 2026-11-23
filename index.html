@@ -196,7 +196,7 @@
     <script type="module" src="js/home-involve.js"></script>
 </head>
 
-<body class="page-index cms-loading">
+<body class="page-index header-dark-start cms-loading">
     <!-- Header -->
     <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
         <div class="header-content" id="header-container">
@@ -495,20 +495,60 @@
     </div>
 
     <!-- Hero Slider (Ingen Utelatt Style) -->
-    <section class="hkm-hero" id="hjem">
-        <div class="hkm-hero-in">
-            <img class="hkm-hero-img" src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=2000&q=75&auto=format&fit=crop" alt="Venner som står sammen i solnedgang" fetchpriority="high">
-            <div class="hkm-hero-shade" aria-hidden="true"></div>
-            <div class="hkm-hero-content">
-                <p class="hkm-hero-eyebrow">His Kingdom Ministry</p>
-                <h1 class="hkm-hero-title">Vi gleder oss til å møte deg.</h1>
-                <p class="hkm-hero-text">Et fellesskap med rom for hele deg – der vi blir bedre kjent med Jesus sammen gjennom bønn, undervisning og fellesskap.</p>
-                <div class="hkm-hero-actions">
-                    <a href="/om-oss" class="hkm-hero-btn hkm-hero-btn--light">Ny her? Start her</a>
-                    <a href="/media#undervisning" class="hkm-hero-btn hkm-hero-btn--line">Se undervisning</a>
+    <section class="hero-slider" id="hjem">
+        <div class="slider-container">
+            <!-- Slide 1: Kjærlighet i praksis -->
+            <div class="hero-slide active">
+                <div class="hero-bg" data-content-key="hero.bg"
+                    style="background-image: url('https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=1920&q=80&auto=format&fit=crop')">
+                </div>
+                <div class="container hero-container">
+                    <div class="hero-content">
+                        <h1 class="hero-title" data-content-key="hero.title">Kjærlighet i praksis</h1>
+                        <p class="hero-subtitle" data-content-key="hero.subtitle">Velkommen til et fellesskap med rom for hele deg! Vi deler livets gleder og utfordringer, og blir bedre kjent med Jesus sammen.</p>
+                        <div class="slide-buttons">
+                            <a href="/om-oss" class="btn btn-primary" aria-label="Les mer om His Kingdom Ministry"><span data-content-key="hero.btnText">Les om oss</span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 2: Et fellesskap for alle -->
+            <div class="hero-slide">
+                <div class="hero-bg"
+                    style="background-image: url('https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=1920&q=80&auto=format&fit=crop')">
+                </div>
+                <div class="container hero-container">
+                    <div class="hero-content">
+                        <h2 class="hero-title">Et fellesskap for alle</h2>
+                        <p class="hero-subtitle">Uansett hvor du er på din vandring, ønsker vi å gå sammen med deg. Bli med i et fellesskap som utforsker Guds ord og styrker troen.</p>
+                        <div class="slide-buttons">
+                            <a href="/om-oss" class="btn btn-primary">Les mer</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3: Støtt vårt arbeid -->
+            <div class="hero-slide">
+                <div class="hero-bg"
+                    style="background-image: url('https://firebasestorage.googleapis.com/v0/b/his-kingdom-ministry.firebasestorage.app/o/hero%2F1777289116685_IMG_3651-web-1920w.webp?alt=media&token=2fb2fc33-acd4-4d59-9928-59479f3e8680')">
+                </div>
+                <div class="container hero-container">
+                    <div class="hero-content">
+                        <h2 class="hero-title">Støtt vårt arbeid</h2>
+                        <p class="hero-subtitle">Din gave gjør en forskjell. Hjelp oss å nå flere mennesker med evangeliet gjennom undervisning, reisevirksomhet og fellesskap.</p>
+                        <div class="slide-buttons">
+                            <a href="/donasjoner" class="btn btn-primary">Gi gave nå</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Navigation Arrows (Minimalist) -->
+        <button class="hero-nav prev" aria-label="Forrige bilde"><span class="material-symbols-outlined text-2xl">chevron_left</span></button>
+        <button class="hero-nav next" aria-label="Neste bilde"><span class="material-symbols-outlined text-2xl">chevron_right</span></button>
     </section>
 
     <!-- Bli involvert: én ting om gangen (byttes ved scroll på PC) -->
