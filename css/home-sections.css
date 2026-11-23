@@ -211,3 +211,9 @@ html body .shop-home-promo-card{grid-template-columns:minmax(0,540px) minmax(0,1
 html body .bible-home-promo-image-panel{height:auto!important;min-height:0!important;max-height:none!important;aspect-ratio:15/13}
 html body .bible-home-promo-image-panel img{height:100%!important;max-height:none!important;aspect-ratio:auto}
 @media (max-width:900px){html body :is(.shop-home-promo-card,.bible-home-promo-card){grid-template-columns:minmax(0,1fr)!important}}
+/* Butikk: tekst til venstre, bilde til høyre. Bibel: bilde til venstre, tekst til høyre */
+@media (min-width:901px){
+html body .shop-home-promo-card{grid-template-columns:minmax(0,1fr) minmax(0,540px)!important;grid-template-areas:"text photo" "list photo"!important}
+html body .bible-home-promo-card{grid-template-columns:minmax(0,540px) minmax(0,1fr)!important}
+html body .bible-home-promo-image-panel{order:-1}
+}
