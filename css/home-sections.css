@@ -275,3 +275,13 @@ html body .hkm-inv-stage{aspect-ratio:4/5}
 html body .hkm-inv-sticky{padding:64px 0}
 }
 html[data-theme="dark"] body .hkm-inv{background:#101a33}
+/* Bli involvert: tydelig at punktene kan trykkes på */
+html body .hkm-inv-step{grid-template-columns:48px minmax(0,1fr) 36px!important;opacity:.72;padding:20px 12px 20px 0!important;border-radius:0;transition:opacity .25s,background .25s}
+html body .hkm-inv-step::before{content:"";grid-column:3;grid-row:1;justify-self:end;width:36px;height:36px;border-radius:50%;border:1px solid var(--hs-line);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23151a21' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6'/%3E%3C/svg%3E") center/16px no-repeat;transition:transform .2s,background-color .2s,border-color .2s}
+html body .hkm-inv-step .hkm-inv-num{grid-column:1;grid-row:1}
+html body .hkm-inv-step .hkm-inv-step-text{grid-column:2;grid-row:1}
+html body .hkm-inv-step:hover,html body .hkm-inv-step:focus-visible{opacity:1;background:rgba(21,26,33,.03)}
+html body .hkm-inv-step:hover::before{transform:translateX(3px);border-color:var(--hs-ink)}
+html body .hkm-inv-step.is-active::before{background-color:var(--hs-or);border-color:var(--hs-or);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6'/%3E%3C/svg%3E")}
+html body .hkm-inv-step:focus-visible{outline:2px solid var(--hs-or);outline-offset:2px}
+html[data-theme="dark"] body .hkm-inv-step::before{background-color:#131d36}
