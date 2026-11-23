@@ -161,3 +161,47 @@ html body .newsletter .newsletter-form{flex-direction:row!important;align-items:
 html body .newsletter .newsletter-input{height:52px!important;max-height:52px!important;min-width:0!important;box-sizing:border-box!important}
 @media (max-width:600px){html body .newsletter .newsletter-input{flex:1 1 100%!important;width:100%!important}html body .newsletter .newsletter-form .btn{flex:1 1 100%!important;width:100%!important}}
 html body .newsletter .newsletter-form{padding:0!important;width:100%!important;box-sizing:border-box!important;background:none!important;border:0!important;box-shadow:none!important}
+
+/* ---- Butikk og Bibel i samme stil som Om oss (bilde + tekst, uten boks, bildet bytter side) ---- */
+html body .shop-home-promo{padding:40px 0 56px!important;background:#fff!important}
+html body .bible-home-promo{padding:56px 0 104px!important;background:#fff!important}
+html body :is(.shop-home-promo-card,.bible-home-promo-card){background:none!important;border:0!important;border-radius:0!important;padding:0!important;box-shadow:none!important;display:grid!important;align-items:center!important;column-gap:clamp(40px,6vw,80px)!important;row-gap:28px!important}
+html body .shop-home-promo-card{grid-template-columns:minmax(0,600px) minmax(0,1fr)!important;grid-template-areas:"photo text" "photo list"!important}
+html body .shop-home-promo-photo{grid-area:photo;display:block;width:100%;aspect-ratio:15/14;object-fit:cover;border-radius:28px;align-self:center}
+html body .shop-home-promo-content{grid-area:text;padding:0!important;display:flex!important;flex-direction:column!important;gap:20px!important;align-self:end}
+html body .shop-home-promo-panel{grid-area:list;background:none!important;border:0!important;padding:0!important;box-shadow:none!important;align-self:start}
+html body .shop-home-promo-chip-grid{display:flex!important;flex-direction:column!important;gap:0!important;border-top:1px solid var(--hs-line)}
+html body .shop-home-promo-chip{display:flex!important;flex-direction:column!important;align-items:flex-start!important;position:relative;padding:16px 32px 16px 0!important;background:none!important;border:0!important;border-bottom:1px solid var(--hs-line)!important;border-radius:0!important;box-shadow:none!important;text-decoration:none!important;transform:none!important}
+html body .shop-home-promo-chip::after{content:"→";position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--hs-ink);transition:transform .2s}
+html body .shop-home-promo-chip:hover::after{transform:translate(4px,-50%)}
+html body .shop-home-promo-chip-title{font-size:17px!important;font-weight:700!important;color:var(--hs-ink)!important}
+html body .shop-home-promo-chip-meta{font-size:15px!important;color:var(--hs-mut)!important}
+html body :is(.shop-home-promo-title,.bible-home-promo-title){font-size:clamp(32px,3.8vw,48px)!important;line-height:1.05!important;letter-spacing:-.035em!important;margin:0!important}
+html body :is(.shop-home-promo-text,.bible-home-promo-text){font-size:18px!important;line-height:1.6!important;margin:0!important}
+html body :is(.shop-home-promo-actions,.bible-home-promo-actions){margin:0!important}
+html body .shop-home-promo-actions{order:9}
+html body .bible-home-promo-card{grid-template-columns:minmax(0,1fr) minmax(0,600px)!important}
+html body .bible-home-promo-content{padding:0!important;display:flex!important;flex-direction:column!important;gap:20px!important}
+html body .bible-home-promo-image-panel{border-radius:28px!important;overflow:hidden;margin:0!important;padding:0!important;background:none!important;border:0!important;box-shadow:none!important}
+html body .bible-home-promo-image-panel img{display:block;width:100%!important;aspect-ratio:15/12;height:auto!important;object-fit:cover;border-radius:28px}
+@media (max-width:900px){
+html body .shop-home-promo-card{grid-template-columns:minmax(0,1fr)!important;grid-template-areas:"photo" "text" "list"!important}
+html body .bible-home-promo-card{grid-template-columns:minmax(0,1fr)!important}
+html body .bible-home-promo-image-panel{order:-1}
+html body .shop-home-promo-photo{aspect-ratio:4/3}
+}
+
+/* ---- Arrangement: ett arrangement vises som Om oss (stort bilde + tekst, uten kort) ---- */
+html body .events-grid>.event-card:only-child{background:none!important;border:0!important;border-radius:0!important;overflow:visible!important;grid-template-columns:minmax(0,600px) minmax(0,1fr)!important;column-gap:clamp(40px,6vw,80px)!important;min-height:0!important;align-items:center!important}
+html body .events-grid>.event-card:only-child:hover{border:0!important}
+html body .events-grid>.event-card:only-child .event-image{aspect-ratio:15/12;height:auto!important;min-height:0!important;border-radius:28px!important;overflow:hidden!important}
+html body .events-grid>.event-card:only-child .event-date{top:20px!important;left:20px!important;right:auto!important;border-radius:16px!important;padding:10px 14px!important;background:#fff!important;box-shadow:none!important}
+html body .events-grid>.event-card:only-child .event-content{padding:0!important;background:none!important;gap:20px!important}
+html body .events-grid>.event-card:only-child .event-content::before{content:"Neste arrangement";font-size:14px;font-weight:600;color:var(--hs-or2)}
+html body .events-grid>.event-card:only-child .event-title{font-size:clamp(30px,3.4vw,44px)!important;line-height:1.08!important;letter-spacing:-.03em!important;font-weight:800!important}
+html body .events-grid>.event-card:only-child .event-desc-excerpt{font-size:18px!important;line-height:1.6!important;margin:0!important;color:var(--hs-mut)!important}
+html body .events-grid>.event-card:only-child .event-meta{margin:0!important;padding:16px 0!important;border-top:1px solid var(--hs-line);border-bottom:1px solid var(--hs-line);font-size:16px!important;color:var(--hs-ink)!important}
+html body .events-grid>.event-card:only-child .event-content::after{content:"Se arrangementet  →";align-self:flex-start;display:inline-flex;align-items:center;height:52px;padding:0 26px;border-radius:999px;background:var(--hs-ink);color:#fff;font-size:16px;font-weight:600}
+html[data-theme="dark"] body .events-grid>.event-card:only-child .event-content::after{background:#f8fafc;color:#0b1329}
+html[data-theme="dark"] body .events-grid>.event-card:only-child{background:none!important}
+@media (max-width:900px){html body .events-grid>.event-card:only-child{grid-template-columns:minmax(0,1fr)!important;row-gap:24px}}
