@@ -287,3 +287,30 @@ html body .hkm-inv-step:focus-visible{outline:2px solid var(--hs-or);outline-off
 html[data-theme="dark"] body .hkm-inv-step::before{background-color:#131d36}
 /* «Bli involvert» bruker position: sticky; overflow-x:hidden på html/body stopper sticky, clip gjør ikke det */
 @supports (overflow:clip){html:has(body.page-index),html body.page-index{overflow-x:clip!important;overflow-y:visible!important}}
+
+/* ---- Ny struktur: sju seksjoner ---- */
+html body #innsamling,html body #facebook-feed,html body section.testimonials{display:none!important}
+html body .hkm-inv{background:#fff!important}
+html body #aktivitet-seksjon{background:#faf9f6!important;padding:104px 0!important}
+html body #activity-list-right>*:nth-child(n+3){display:none!important}
+html body .events{background:#fff!important;padding:104px 0!important}
+html body .hkm-about{padding-bottom:0!important}
+html body .funfacts{padding:72px 0 0!important}
+/* Gi en gave-stripe */
+html body .hkm-give{background:#fbefe4;padding:112px 0}
+html body .hkm-give-in{max-width:1200px;margin:0 auto;padding:0 max(4vw,20px);box-sizing:border-box;display:flex;flex-direction:column;align-items:center;text-align:center;gap:22px}
+html body .hkm-give-eyebrow{margin:0;font-size:14px;font-weight:600;color:var(--hs-or2)}
+html body .hkm-give .hkm-give-title{margin:0;max-width:760px;font-size:clamp(32px,4vw,52px)!important;line-height:1.05!important;font-weight:800!important;letter-spacing:-.035em!important;color:var(--hs-ink)!important}
+html body .hkm-give-text{margin:0;max-width:620px;font-size:18px;line-height:1.6;color:var(--hs-mut)}
+html body .hkm-give-actions{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:12px 28px;margin-top:6px}
+html body .hkm-give-btn{display:inline-flex;align-items:center;height:52px;padding:0 26px;border-radius:999px;background:var(--hs-or);color:#fff!important;font-size:16px;font-weight:600;text-decoration:none;transition:background .2s,transform .2s}
+html body .hkm-give-btn:hover{background:#151a21;transform:translateY(-1px)}
+html body .hkm-give-link{font-size:16px;font-weight:600;color:var(--hs-or2)!important;text-decoration:none}
+html[data-theme="dark"] body .hkm-give{background:#16213b}
+/* Avslutning: mørk stripe over hele bredden */
+html body .newsletter{background:#151a21!important;padding:104px 0!important;margin:0!important}
+html body .newsletter .newsletter-content{background:none!important;border-radius:0!important;padding:0!important}
+html body .newsletter .hkm-nl-contact{grid-column:2;font-size:16px;font-weight:600;color:#f3c79c;text-decoration:none}
+html body .newsletter .newsletter-form{grid-row:1/span 2!important}
+@media (max-width:820px){html body .newsletter .hkm-nl-contact{grid-column:1}}
+html[data-theme="dark"] body .newsletter{background:#101a33!important}
