@@ -217,3 +217,61 @@ html body .shop-home-promo-card{grid-template-columns:minmax(0,1fr) minmax(0,540
 html body .bible-home-promo-card{grid-template-columns:minmax(0,540px) minmax(0,1fr)!important}
 html body .bible-home-promo-image-panel{order:-1}
 }
+
+/* ---- Toppen: invitasjon i et innfelt bilde ---- */
+html body .hkm-hero{padding:calc(var(--hkm-header-height,80px) + 16px) 16px 0;background:#fff}
+html body .hkm-hero-in{position:relative;min-height:min(78vh,720px);border-radius:32px;overflow:hidden;display:flex;align-items:flex-end;color:#fff}
+html body .hkm-hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+html body .hkm-hero-shade{position:absolute;inset:0;background:linear-gradient(0deg,rgba(11,15,22,.85) 0%,rgba(11,15,22,.45) 50%,rgba(11,15,22,.15) 100%)}
+html body .hkm-hero-content{position:relative;width:100%;max-width:1200px;margin:0 auto;padding:0 max(4vw,20px) clamp(40px,6vw,64px);box-sizing:border-box;display:flex;flex-direction:column;gap:20px;align-items:flex-start}
+html body .hkm-hero-eyebrow{margin:0;font-size:15px;font-weight:600;color:#f3c79c}
+html body .hkm-hero .hkm-hero-title{margin:0;max-width:760px;font-size:clamp(44px,6.4vw,84px)!important;line-height:.98!important;font-weight:800!important;letter-spacing:-.045em!important;color:#fff!important}
+html body .hkm-hero-text{margin:0;max-width:560px;font-size:clamp(17px,1.6vw,20px);line-height:1.55;color:rgba(255,255,255,.88)}
+html body .hkm-hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}
+html body .hkm-hero-btn{display:inline-flex;align-items:center;height:52px;padding:0 26px;border-radius:999px;font-size:16px;font-weight:600;text-decoration:none;transition:background .2s,transform .2s}
+html body .hkm-hero-btn--light{background:#fff;color:#151a21!important}
+html body .hkm-hero-btn--light:hover{background:#f3c79c;transform:translateY(-1px)}
+html body .hkm-hero-btn--line{border:1px solid rgba(255,255,255,.55);color:#fff!important}
+html body .hkm-hero-btn--line:hover{background:rgba(255,255,255,.12)}
+@media (max-width:600px){html body .hkm-hero{padding-left:10px;padding-right:10px}html body .hkm-hero-in{min-height:76vh;border-radius:24px}}
+html[data-theme="dark"] body .hkm-hero{background:#0b1329}
+
+/* ---- Bli involvert: én ting om gangen ---- */
+html body .hkm-inv{background:#faf9f6;position:relative}
+html body .hkm-inv-sticky{padding:88px 0}
+html body .hkm-inv-in{max-width:1200px;margin:0 auto;padding:0 max(4vw,20px);box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,600px);column-gap:clamp(40px,6vw,80px);row-gap:32px;align-items:center}
+html body .hkm-inv-left{display:flex;flex-direction:column;gap:28px}
+html body .hkm-inv-head{display:flex;flex-direction:column;gap:14px}
+html body .hkm-inv-eyebrow{margin:0;font-size:14px;font-weight:600;color:var(--hs-or2)}
+html body .hkm-inv .hkm-inv-title{margin:0!important;font-size:clamp(32px,4vw,52px)!important;line-height:1.05!important;font-weight:800!important;letter-spacing:-.035em!important;color:var(--hs-ink)!important}
+html body .hkm-inv-lead{margin:0;font-size:18px;line-height:1.6;color:var(--hs-mut);max-width:520px}
+html body .hkm-inv-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--hs-line)}
+html body .hkm-inv-step{position:relative;display:grid;grid-template-columns:48px minmax(0,1fr);gap:12px;align-items:center;width:100%;padding:20px 0;border:0;border-bottom:1px solid var(--hs-line);background:none;cursor:pointer;text-align:left;font:inherit;opacity:.5;transition:opacity .3s}
+html body .hkm-inv-step::after{content:"";position:absolute;left:0;bottom:-1px;height:2px;width:0;background:var(--hs-or);transition:width .5s ease}
+html body .hkm-inv-step.is-active{opacity:1}
+html body .hkm-inv-step.is-active::after{width:100%}
+html body .hkm-inv-num{font-size:15px;font-weight:700;color:var(--hs-mut)}
+html body .hkm-inv-step.is-active .hkm-inv-num{color:var(--hs-or)}
+html body .hkm-inv-step-text{display:flex;flex-direction:column;gap:2px}
+html body .hkm-inv-step-text strong{font-size:18px;font-weight:700;color:var(--hs-ink)}
+html body .hkm-inv-step-text span{font-size:15px;color:var(--hs-mut)}
+html body .hkm-inv-stage{position:relative;aspect-ratio:15/14;border-radius:28px;overflow:hidden;background:#151a21}
+html body .hkm-inv-panel{position:absolute;inset:0;display:block;color:#fff!important;text-decoration:none!important;opacity:0;visibility:hidden;transform:scale(1.02);transition:opacity .5s ease,transform .6s ease,visibility 0s linear .5s}
+html body .hkm-inv-panel.is-active{opacity:1;visibility:visible;transform:none;transition:opacity .5s ease,transform .6s ease}
+html body .hkm-inv-panel img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+html body .hkm-inv-panel::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(0deg,rgba(11,15,22,.85) 0%,rgba(11,15,22,.2) 60%,rgba(11,15,22,0) 100%)}
+html body .hkm-inv-panel-body{position:absolute;z-index:2;left:0;right:0;bottom:0;padding:clamp(24px,3vw,36px);display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+html body .hkm-inv-count{font-size:14px;font-weight:700;color:#f3c79c}
+html body .hkm-inv-panel-title{font-size:clamp(30px,3vw,40px);line-height:1.05;font-weight:800;letter-spacing:-.03em}
+html body .hkm-inv-panel-text{font-size:17px;line-height:1.55;color:rgba(255,255,255,.88);max-width:460px}
+html body .hkm-inv-btn{display:inline-flex;align-items:center;gap:6px;height:52px;padding:0 26px;border-radius:999px;background:#fff;color:#151a21;font-size:16px;font-weight:600;margin-top:6px}
+@media (min-width:901px) and (prefers-reduced-motion:no-preference){
+html body .hkm-inv{height:calc(100vh + 120vh)}
+html body .hkm-inv-sticky{position:sticky;top:var(--hkm-header-height,80px);min-height:calc(100vh - var(--hkm-header-height,80px));box-sizing:border-box;display:flex;align-items:center;padding:40px 0}
+}
+@media (max-width:900px){
+html body .hkm-inv-in{grid-template-columns:minmax(0,1fr)}
+html body .hkm-inv-stage{aspect-ratio:4/5}
+html body .hkm-inv-sticky{padding:64px 0}
+}
+html[data-theme="dark"] body .hkm-inv{background:#101a33}

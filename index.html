@@ -193,6 +193,7 @@
     </style>
     <link rel="stylesheet" href="/css/home-about.css">
     <link rel="stylesheet" href="/css/home-sections.css">
+    <script type="module" src="js/home-involve.js"></script>
 </head>
 
 <body class="page-index header-dark-start cms-loading">
@@ -494,112 +495,51 @@
     </div>
 
     <!-- Hero Slider (Ingen Utelatt Style) -->
-    <section class="hero-slider" id="hjem">
-        <div class="slider-container">
-            <!-- Slide 1: Kjærlighet i praksis -->
-            <div class="hero-slide active">
-                <div class="hero-bg" data-content-key="hero.bg"
-                    style="background-image: url('https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=1920&q=80&auto=format&fit=crop')">
-                </div>
-                <div class="container hero-container">
-                    <div class="hero-content">
-                        <h1 class="hero-title" data-content-key="hero.title">Kjærlighet i praksis</h1>
-                        <p class="hero-subtitle" data-content-key="hero.subtitle">Velkommen til et fellesskap med rom for hele deg! Vi deler livets gleder og utfordringer, og blir bedre kjent med Jesus sammen.</p>
-                        <div class="slide-buttons">
-                            <a href="/om-oss" class="btn btn-primary" aria-label="Les mer om His Kingdom Ministry"><span data-content-key="hero.btnText">Les om oss</span></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Slide 2: Et fellesskap for alle -->
-            <div class="hero-slide">
-                <div class="hero-bg"
-                    style="background-image: url('https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=1920&q=80&auto=format&fit=crop')">
-                </div>
-                <div class="container hero-container">
-                    <div class="hero-content">
-                        <h2 class="hero-title">Et fellesskap for alle</h2>
-                        <p class="hero-subtitle">Uansett hvor du er på din vandring, ønsker vi å gå sammen med deg. Bli med i et fellesskap som utforsker Guds ord og styrker troen.</p>
-                        <div class="slide-buttons">
-                            <a href="/om-oss" class="btn btn-primary">Les mer</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Slide 3: Støtt vårt arbeid -->
-            <div class="hero-slide">
-                <div class="hero-bg"
-                    style="background-image: url('https://firebasestorage.googleapis.com/v0/b/his-kingdom-ministry.firebasestorage.app/o/hero%2F1777289116685_IMG_3651-web-1920w.webp?alt=media&token=2fb2fc33-acd4-4d59-9928-59479f3e8680')">
-                </div>
-                <div class="container hero-container">
-                    <div class="hero-content">
-                        <h2 class="hero-title">Støtt vårt arbeid</h2>
-                        <p class="hero-subtitle">Din gave gjør en forskjell. Hjelp oss å nå flere mennesker med evangeliet gjennom undervisning, reisevirksomhet og fellesskap.</p>
-                        <div class="slide-buttons">
-                            <a href="/donasjoner" class="btn btn-primary">Gi gave nå</a>
-                        </div>
-                    </div>
+    <section class="hkm-hero" id="hjem">
+        <div class="hkm-hero-in">
+            <img class="hkm-hero-img" src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=2000&q=75&auto=format&fit=crop" alt="Venner som står sammen i solnedgang" fetchpriority="high">
+            <div class="hkm-hero-shade" aria-hidden="true"></div>
+            <div class="hkm-hero-content">
+                <p class="hkm-hero-eyebrow">His Kingdom Ministry</p>
+                <h1 class="hkm-hero-title">Vi gleder oss til å møte deg.</h1>
+                <p class="hkm-hero-text">Et fellesskap med rom for hele deg – der vi blir bedre kjent med Jesus sammen gjennom bønn, undervisning og fellesskap.</p>
+                <div class="hkm-hero-actions">
+                    <a href="/om-oss" class="hkm-hero-btn hkm-hero-btn--light">Ny her? Start her</a>
+                    <a href="/media#undervisning" class="hkm-hero-btn hkm-hero-btn--line">Se undervisning</a>
                 </div>
             </div>
         </div>
-
-        <!-- Navigation Arrows (Minimalist) -->
-        <button class="hero-nav prev" aria-label="Forrige bilde"><span class="material-symbols-outlined text-2xl">chevron_left</span></button>
-        <button class="hero-nav next" aria-label="Neste bilde"><span class="material-symbols-outlined text-2xl">chevron_right</span></button>
     </section>
 
-    <!-- Feature Boxes -->
-    <section class="features">
-        <div class="container">
-            <div class="section-header features-section-header">
-                <span class="section-label" data-content-key="features.header.label">Neste steg</span>
-                <h2 class="section-title" data-content-key="features.header.title">Bli involvert</h2>
-                <p class="section-description" data-content-key="features.header.description">Det finnes flere naturlige måter å bli med i arbeidet på. Velg det som passer deg best akkurat nå.</p>
-            </div>
-
-            <div class="features-grid">
-                <div class="feature-box teaching">
-                    <div class="feature-media">
-                        <span class="material-symbols-outlined">school</span>
+    <!-- Bli involvert: én ting om gangen (byttes ved scroll på PC) -->
+    <section class="hkm-inv" id="bli-involvert">
+        <div class="hkm-inv-sticky">
+            <div class="hkm-inv-in">
+                <div class="hkm-inv-left">
+                    <div class="hkm-inv-head">
+                        <p class="hkm-inv-eyebrow" data-content-key="features.header.label">Neste steg</p>
+                        <h2 class="hkm-inv-title" data-content-key="features.header.title">Bli involvert</h2>
+                        <p class="hkm-inv-lead" data-content-key="features.header.description">Det finnes flere naturlige måter å bli med i arbeidet på. Velg det som passer deg best akkurat nå.</p>
                     </div>
-                    <div class="feature-content">
-                        <h3 class="feature-title" data-content-key="features.teaching.title">Undervisning</h3>
-                        <p class="feature-text" data-content-key="features.teaching.text">Bibelskoler, seminarer og
-                            dyptgående undervisning.</p>
-                        <a href="/media" class="feature-link" aria-label="Les mer om vår undervisning og seminarer"><span
-                                data-content-key="features.teaching.btnText">Les mer</span> <i
-                                class="fas fa-arrow-right"></i></a>
-                    </div>
+                    <ol class="hkm-inv-list" role="tablist" aria-label="Måter å bli involvert">
+                        <li><button type="button" class="hkm-inv-step is-active" role="tab" aria-selected="true" data-step="0"><span class="hkm-inv-num">01</span><span class="hkm-inv-step-text"><strong data-content-key="features.teaching.title">Undervisning</strong><span data-content-key="features.teaching.text">Blogg, undervisning og bibelsk innhold</span></span></button></li>
+                        <li><button type="button" class="hkm-inv-step" role="tab" aria-selected="false" data-step="1"><span class="hkm-inv-num">02</span><span class="hkm-inv-step-text"><strong data-content-key="features.podcast.title">Podcast</strong><span data-content-key="features.podcast.text">Lytt til våre samtaler om tro, liv og åndelig vekst.</span></span></button></li>
+                        <li><button type="button" class="hkm-inv-step" role="tab" aria-selected="false" data-step="2"><span class="hkm-inv-num">03</span><span class="hkm-inv-step-text"><strong data-content-key="features.travel.title">Reisevirksomhet</strong><span data-content-key="features.travel.text">Forkynnelse og konferanser rundt om i verden.</span></span></button></li>
+                    </ol>
                 </div>
-
-                <div class="feature-box podcast">
-                    <div class="feature-media">
-                        <span class="material-symbols-outlined">mic</span>
-                    </div>
-                    <div class="feature-content">
-                        <h3 class="feature-title" data-content-key="features.podcast.title">Podcast</h3>
-                        <p class="feature-text" data-content-key="features.podcast.text">Lytt til våre samtaler om tro, liv
-                            og åndelig vekst.</p>
-                        <a href="/podcast" class="feature-link"><span
-                                data-content-key="features.podcast.btnText">Lytt nå</span> <i
-                                class="fas fa-arrow-right"></i></a>
-                    </div>
-                </div>
-
-                <div class="feature-box travel">
-                    <div class="feature-media">
-                        <span class="material-symbols-outlined">public</span>
-                    </div>
-                    <div class="feature-content">
-                        <h3 class="feature-title" data-content-key="features.travel.title">Reisevirksomhet</h3>
-                        <p class="feature-text" data-content-key="features.travel.text">Forkynnelse og konferanser rundt om
-                            i verden.</p>
-                        <a href="/reisevirksomhet" class="feature-link"><span
-                                data-content-key="features.travel.btnText">Se kalender</span> <i
-                                class="fas fa-arrow-right"></i></a>
-                    </div>
+                <div class="hkm-inv-stage">
+                    <a href="/media" class="hkm-inv-panel is-active" data-panel="0" role="tabpanel">
+                        <img src="/img/fb_fallback_bible.jpg" alt="Åpen bibel ved et vindu" loading="lazy">
+                        <span class="hkm-inv-panel-body"><span class="hkm-inv-count">01 / 03</span><span class="hkm-inv-panel-title">Undervisning</span><span class="hkm-inv-panel-text">Bibelstudier, undervisningsserier og seminarer som hjelper deg å vokse i troen.</span><span class="hkm-inv-btn"><span data-content-key="features.teaching.btnText">Les mer</span> →</span></span>
+                    </a>
+                    <a href="/podcast" class="hkm-inv-panel" data-panel="1" role="tabpanel">
+                        <img src="/img/tro-og-liv-podcast.jpg" alt="Tro og Liv podcast" loading="lazy">
+                        <span class="hkm-inv-panel-body"><span class="hkm-inv-count">02 / 03</span><span class="hkm-inv-panel-title">Podcast</span><span class="hkm-inv-panel-text">Lytt til Tro og Liv – samtaler om tro, liv og åndelig vekst.</span><span class="hkm-inv-btn"><span data-content-key="features.podcast.btnText">Lytt nå</span> →</span></span>
+                    </a>
+                    <a href="/reisevirksomhet" class="hkm-inv-panel" data-panel="2" role="tabpanel">
+                        <img src="/img/fb_fallback_worship.jpg" alt="Lovsang på et møte" loading="lazy">
+                        <span class="hkm-inv-panel-body"><span class="hkm-inv-count">03 / 03</span><span class="hkm-inv-panel-title">Reisevirksomhet</span><span class="hkm-inv-panel-text">Bli med på møter, konferanser og forkynnelse rundt om i verden.</span><span class="hkm-inv-btn"><span data-content-key="features.travel.btnText">Oppdag mer</span> →</span></span>
+                    </a>
                 </div>
             </div>
         </div>
