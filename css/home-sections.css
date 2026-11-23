@@ -282,3 +282,7 @@ html body .hkm-inv-step:hover::before{transform:translateX(3px);border-color:var
 html body .hkm-inv-step.is-active::before{background-color:var(--hs-or);border-color:var(--hs-or);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6'/%3E%3C/svg%3E")}
 html body .hkm-inv-step:focus-visible{outline:2px solid var(--hs-or);outline-offset:2px}
 html[data-theme="dark"] body .hkm-inv-step::before{background-color:#131d36}
+
+html body .hkm-faste-actions{display:flex!important;flex-wrap:wrap;align-items:center;gap:12px 28px}
+html body .hkm-faste-link{font-size:16px;font-weight:600;color:var(--hs-or2);text-decoration:none}
+html body .hkm-faste-link:hover{color:var(--hs-ink)}
