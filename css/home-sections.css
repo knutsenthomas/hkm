@@ -265,10 +265,7 @@ html body .hkm-inv-count{font-size:14px;font-weight:700;color:#f3c79c}
 html body .hkm-inv-panel-title{font-size:clamp(30px,3vw,40px);line-height:1.05;font-weight:800;letter-spacing:-.03em}
 html body .hkm-inv-panel-text{font-size:17px;line-height:1.55;color:rgba(255,255,255,.88);max-width:460px}
 html body .hkm-inv-btn{display:inline-flex;align-items:center;gap:6px;height:52px;padding:0 26px;border-radius:999px;background:#fff;color:#151a21;font-size:16px;font-weight:600;margin-top:6px}
-@media (min-width:901px) and (prefers-reduced-motion:no-preference){
-html body .hkm-inv{height:calc(100vh + 120vh)}
-html body .hkm-inv-sticky{position:sticky;top:var(--hkm-header-height,80px);min-height:calc(100vh - var(--hkm-header-height,80px));box-sizing:border-box;display:flex;align-items:center;padding:40px 0}
-}
+
 @media (max-width:900px){
 html body .hkm-inv-in{grid-template-columns:minmax(0,1fr)}
 html body .hkm-inv-stage{aspect-ratio:4/5}
@@ -285,5 +282,3 @@ html body .hkm-inv-step:hover::before{transform:translateX(3px);border-color:var
 html body .hkm-inv-step.is-active::before{background-color:var(--hs-or);border-color:var(--hs-or);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6'/%3E%3C/svg%3E")}
 html body .hkm-inv-step:focus-visible{outline:2px solid var(--hs-or);outline-offset:2px}
 html[data-theme="dark"] body .hkm-inv-step::before{background-color:#131d36}
-/* «Bli involvert» bruker position: sticky; overflow-x:hidden på html/body stopper sticky, clip gjør ikke det */
-@supports (overflow:clip){html:has(body.page-index),html body.page-index{overflow-x:clip!important;overflow-y:visible!important}}
