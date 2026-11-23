@@ -1,6 +1,6 @@
 // Forsiden: «Bli involvert» viser én ting om gangen.
 // PC: seksjonen blir stående mens man scroller, og innholdet bytter for hver tredjedel.
-// Mobil / redusert bevegelse: klikk i listen for å bytte.
+// Klikk på et punkt åpner siden for det punktet.
 const section = document.getElementById('bli-involvert');
 if (section) {
     const steps = Array.from(section.querySelectorAll('.hkm-inv-step'));
@@ -13,7 +13,6 @@ if (section) {
         current = i;
         steps.forEach((s, n) => {
             s.classList.toggle('is-active', n === i);
-            s.setAttribute('aria-selected', n === i ? 'true' : 'false');
         });
         panels.forEach((p, n) => p.classList.toggle('is-active', n === i));
     };
@@ -31,15 +30,15 @@ if (section) {
         setActive(Math.floor(p * count));
     };
 
-    steps.forEach((s, i) => s.addEventListener('click', () => {
-        if (scrollMode()) {
-            const sticky = section.querySelector('.hkm-inv-sticky');
-            const travel = section.offsetHeight - sticky.offsetHeight;
-            const top = section.getBoundingClientRect().top + window.scrollY;
-            window.scrollTo({ top: top + travel * ((i + 0.5) / count), behavior: 'smooth' });
-        }
-        setActive(i);
-    }));
+    // Klikk går til siden for punktet. Hold musen over (eller fokus) viser punktet med en gang.
+    steps.forEach((s, i) => {
+        s.addEventListener('click', () => {
+            const href = panels[i] && panels[i].getAttribute('href');
+            if (href) window.location.href = href;
+        });
+        s.addEventListener('mouseenter', () => setActive(i));
+        s.addEventListener('focus', () => setActive(i));
+    });
 
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
