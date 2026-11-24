@@ -3111,7 +3111,7 @@ class BibleReader {
 
         const keyVersesHtml = (intro.keyVerses || []).map(v => `
             <div style="border-left: 4px solid #D17D39; padding: 14px 18px; margin-top: 12px; background: rgba(209,125,57,0.05); border-radius: 0 12px 12px 0;">
-                <p style="margin: 0; font-size: 15px; font-style: italic; color: var(--text-base); line-height: 1.6; font-family: var(--font-serif, Georgia, serif);">"${v.text}"</p>
+                <p style="margin: 0; font-size: 15px; font-style: italic; color: var(--text-base); line-height: 1.6; font-family: var(--font-serif, Georgia, serif);" ${v.loc ? `data-kv="${v.loc.join(',')}"` : ''}>${v.text ? `"${v.text}"` : '…'}</p>
                 <span style="font-size: 13px; font-weight: 700; color: #D17D39; font-style: normal; display: inline-block; margin-top: 6px;">— ${v.ref}</span>
             </div>
         `).join('');
@@ -3292,7 +3292,7 @@ class BibleReader {
 
         const keyVersesHtml = (intro.keyVerses || []).map(v => `
             <div style="border-left: 3px solid #d17d39; padding-left: 12px; margin-top: 8px;">
-                <p style="margin: 0; font-size: 13.5px; font-style: italic; color: var(--text-base); line-height: 1.5;">"${v.text}"</p>
+                <p style="margin: 0; font-size: 13.5px; font-style: italic; color: var(--text-base); line-height: 1.5;" ${v.loc ? `data-kv="${v.loc.join(',')}"` : ''}>${v.text ? `"${v.text}"` : '…'}</p>
                 <span style="font-size: 11.5px; font-weight: 700; color: #d17d39; font-style: normal; display: inline-block; margin-top: 2px;">— ${v.ref}</span>
             </div>
         `).join('');
