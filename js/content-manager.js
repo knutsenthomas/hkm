@@ -23,6 +23,22 @@ const protectMediaHtml = (html) => {
 };
 
 
+function buildCourseEventTranslations(course, lesson, index) {
+    const out = {};
+    const tr = (course && course.translations) || {};
+    const words = { en: ['Lesson', 'HKM Online / Course'], es: ['Lección', 'HKM Online / Curso'] };
+    Object.keys(words).forEach((lang) => {
+        const loc = tr[lang];
+        if (!loc) return;
+        const l = (Array.isArray(loc.lessons) ? loc.lessons : []).find(x => x && lesson && x.id === lesson.id) || {};
+        const courseTitle = loc.title || course.title || '';
+        const lessonTitle = l.title || `${words[lang][0]} ${index + 1}`;
+        const desc = l.description || loc.description || '';
+        out[lang] = { title: courseTitle ? `${courseTitle} – ${lessonTitle}` : lessonTitle, description: desc, excerpt: desc, location: words[lang][1] };
+    });
+    return Object.keys(out).length ? out : undefined;
+}
+
 class ContentManager {
     constructor() {
         this.pageId = this.detectPageId();
@@ -503,8 +519,30 @@ class ContentManager {
             tags: Array.isArray(localized.tags) && localized.tags.length ? localized.tags : item.tags,
             days: localizedDays,
             introduction: (localized.introduction && typeof localized.introduction === 'object') ? localized.introduction : item.introduction,
+            priceSuffix: this.isUsableLocalizedString(localized.priceSuffix) ? localized.priceSuffix : item.priceSuffix,
+            lessons: this.localizeCourseLessons(item.lessons, localized.lessons),
             __stableId: this.getContentItemStableId(item)
         };
+    }
+
+    // Course lessons are translated on the course (translations.<lang>.lessons, matched by id)
+    // so that editing a lesson in admin does not remove its translation.
+    localizeCourseLessons(lessons, localizedLessons) {
+        if (!Array.isArray(lessons) || !Array.isArray(localizedLessons) || !localizedLessons.length) return lessons;
+        return lessons.map((lesson, idx) => {
+            const loc = localizedLessons.find(l => l && lesson && l.id && l.id === lesson.id) || null;
+            if (!loc) return lesson;
+            const resources = Array.isArray(lesson.resources) && Array.isArray(loc.resources)
+                ? lesson.resources.map((res, i) => (loc.resources[i] && this.isUsableLocalizedString(loc.resources[i].title) && res && typeof res === 'object')
+                    ? { ...res, title: loc.resources[i].title } : res)
+                : lesson.resources;
+            return {
+                ...lesson,
+                title: this.isUsableLocalizedString(loc.title) ? loc.title : lesson.title,
+                description: this.isUsableLocalizedString(loc.description) ? loc.description : lesson.description,
+                resources
+            };
+        });
     }
 
     hasUsableLocalizedTranslation(item, lang = this.getCurrentLanguage()) {
@@ -1987,6 +2025,8 @@ class ContentManager {
                                     source: 'manual',
                                     isFeatured: true
                                 };
+                                const courseEvtTr = buildCourseEventTranslations(course, lesson, index);
+                                if (courseEvtTr) courseEvent.translations = courseEvtTr;
 
                                 if (!finalEvents.some(e => e.id === courseEvtId || (e.title === fullTitle && this.isSameDay(this.parseEventDate(e.start || e.date), startDateObj)))) {
                                     finalEvents.push(courseEvent);

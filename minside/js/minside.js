@@ -16,6 +16,15 @@ function withTimeout(promise, ms = 3000) {
 // ── Multilingual Translation Dictionary ──────────────────────────
 const minsideTranslations = {
     no: {
+        'extra.cookies': 'Informasjonskapsler',
+        'extra.searchHere': 'Søk her...',
+        'extra.loadingContent': 'Laster innhold...',
+        'extra.searchPlaceholder': 'Søk etter kurs, leseplaner, notater...',
+        'extra.searchHint': 'Skriv noe for å søke på tvers av Min Side...',
+        'extra.chooseLanguage': 'Velg språk',
+        'extra.toggleThemeTitle': 'Bytt tema (Lyst/Mørkt)',
+        'extra.toggleTheme': 'Bytt tema',
+        'extra.profileMenu': 'Profilmeny',
         'common.loading': 'Laster',
         'common.initError': 'Feil ved oppstart',
         'common.errorOccurred': 'Noe gikk galt',
@@ -322,6 +331,15 @@ const minsideTranslations = {
         'prayer.disabledMsg': 'Bønneveggen er for øyeblikket ikke tilgjengelig.'
     },
     en: {
+        'extra.cookies': 'Cookies',
+        'extra.searchHere': 'Search here...',
+        'extra.loadingContent': 'Loading content...',
+        'extra.searchPlaceholder': 'Search courses, reading plans, notes...',
+        'extra.searchHint': 'Type something to search across My Page...',
+        'extra.chooseLanguage': 'Choose language',
+        'extra.toggleThemeTitle': 'Toggle theme (Light/Dark)',
+        'extra.toggleTheme': 'Toggle theme',
+        'extra.profileMenu': 'Profile menu',
         'common.loading': 'Loading',
         'common.initError': 'Initialization Error',
         'common.errorOccurred': 'Something went wrong',
@@ -627,6 +645,15 @@ const minsideTranslations = {
         'prayer.disabledMsg': 'The prayer wall is currently not available.'
     },
     es: {
+        'extra.cookies': 'Cookies',
+        'extra.searchHere': 'Buscar aquí...',
+        'extra.loadingContent': 'Cargando contenido...',
+        'extra.searchPlaceholder': 'Buscar cursos, planes de lectura, notas...',
+        'extra.searchHint': 'Escribe algo para buscar en Mi página...',
+        'extra.chooseLanguage': 'Elegir idioma',
+        'extra.toggleThemeTitle': 'Cambiar tema (claro/oscuro)',
+        'extra.toggleTheme': 'Cambiar tema',
+        'extra.profileMenu': 'Menú de perfil',
         'common.loading': 'Cargando',
         'common.initError': 'Error de inicio',
         'common.errorOccurred': 'Algo salió mal',
@@ -943,6 +970,14 @@ function t(key, vars = {}) {
     return text;
 }
 
+// Inline three-language text: tx(norsk, english, español)
+function tx(no, en, es) {
+    const lang = (document.documentElement.lang || 'no').split('-')[0];
+    if (lang === 'en') return en;
+    if (lang === 'es') return es ?? en;
+    return no;
+}
+
 // Static DOM Translation Utility
 function translateStaticHTML() {
     const lang = document.documentElement.lang || 'no';
@@ -954,6 +989,16 @@ function translateStaticHTML() {
         if (translated) {
             el.textContent = translated;
         }
+    });
+
+    // Tooltips and screen-reader labels
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        const translated = minsideTranslations[lang]?.[el.getAttribute('data-i18n-title')];
+        if (translated) el.setAttribute('title', translated);
+    });
+    document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+        const translated = minsideTranslations[lang]?.[el.getAttribute('data-i18n-aria')];
+        if (translated) el.setAttribute('aria-label', translated);
     });
 
     // Inputs with data-i18n-placeholder
@@ -1711,7 +1756,15 @@ class MinSideManager {
     }
 
     _getPhoneCountries() {
-        return [
+        const lang = (document.documentElement.lang || 'no').split('-')[0];
+        let regionNames = null;
+        if (lang !== 'no') {
+            try { regionNames = new Intl.DisplayNames([lang], { type: 'region' }); } catch (e) { regionNames = null; }
+        }
+        const localize = (list) => regionNames
+            ? list.map(([iso, dial, name]) => { let n = name; try { n = regionNames.of(iso) || name; } catch (e) {} return [iso, dial, n]; })
+            : list;
+        return localize([
             ['NO', '+47', 'Norge'], ['SE', '+46', 'Sverige'], ['DK', '+45', 'Danmark'], ['FI', '+358', 'Finland'],
             ['IS', '+354', 'Island'], ['GB', '+44', 'Storbritannia'], ['US', '+1', 'USA'], ['CA', '+1', 'Canada'],
             ['AF', '+93', 'Afghanistan'], ['AL', '+355', 'Albania'], ['DZ', '+213', 'Algerie'], ['AS', '+1684', 'Amerikansk Samoa'],
@@ -1773,7 +1826,7 @@ class MinSideManager {
             ['VA', '+379', 'Vatikanstaten'], ['VE', '+58', 'Venezuela'], ['VN', '+84', 'Vietnam'], ['VI', '+1340', 'De amerikanske jomfruøyene'],
             ['WF', '+681', 'Wallis og Futuna'], ['EH', '+212', 'Vest-Sahara'], ['YE', '+967', 'Jemen'], ['ZM', '+260', 'Zambia'],
             ['ZW', '+263', 'Zimbabwe']
-        ];
+        ]);
     }
 
     async _fetchCurrentUserDonations({ order = false } = {}) {
@@ -1953,7 +2006,7 @@ class MinSideManager {
                         // Handle foreground push notifications
                         msg.onMessage((payload) => {
                             console.log('[MinSide] Foreground message received:', payload);
-                            const title = payload.notification?.title || 'Ny oppdatering';
+                            const title = payload.notification?.title || tx('Ny oppdatering', 'New update', 'Nueva actualización');
                             const body = payload.notification?.body || '';
                             if (typeof window.showToast === 'function') {
                                 window.showToast(`🔔 ${title}: ${body}`, "success", 10000);
@@ -2363,7 +2416,7 @@ class MinSideManager {
 
             // Progress render
             let progressPct = 0;
-            let progressTitle = 'Ingen aktiv plan';
+            let progressTitle = tx('Ingen aktiv plan', 'No active plan', 'Ningún plan activo');
             if (plansSnap && !plansSnap.empty) {
                 // Sort active plans in memory by lastActiveAt desc
                 const activePlans = plansSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -2817,7 +2870,7 @@ class MinSideManager {
                 ? `<div style="display: flex; align-items: center; gap: 8px;">
                     <span class="info-row-value" id="ssn-masked-val" style="font-family: monospace; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.08em;">${esc(ssnVal.substring(0, 6))} •••••</span>
                     <span class="info-row-value" id="ssn-full-val" style="display: none; font-family: monospace; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.08em;">${esc(ssnVal.substring(0, 6))} ${esc(ssnVal.substring(6))}</span>
-                    <button type="button" id="toggle-ssn-eye" style="background: none; border: none; cursor: pointer; color: var(--text-muted); display: inline-flex; align-items: center; padding: 3px 6px; border-radius: 6px; transition: color 0.2s;" title="Vis/skjul fødselsnummer">
+                    <button type="button" id="toggle-ssn-eye" style="background: none; border: none; cursor: pointer; color: var(--text-muted); display: inline-flex; align-items: center; padding: 3px 6px; border-radius: 6px; transition: color 0.2s;" title="${tx('Vis/skjul fødselsnummer', 'Show/hide ID number', 'Mostrar/ocultar número de identidad')}">
                         <span class="material-symbols-outlined" style="font-size: 18px;">visibility</span>
                     </button>
                    </div>`
@@ -3038,7 +3091,7 @@ class MinSideManager {
                                         <span>${esc(navigator.platform || 'Nettleser')} • ${esc(this.currentUser.providerData[0]?.providerId === 'google.com' ? 'Google Login' : 'E-post')}</span>
                                     </div>
                                     <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 3px;">
-                                        ${isNo ? 'Aktiv sesjon (Sist innlogget: ' : 'Active session (Last sign-in: '}${this.currentUser.metadata?.lastSignInTime ? new Date(this.currentUser.metadata.lastSignInTime).toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : 'no-NO') : 'Akkurat nå'})
+                                        ${tx('Aktiv sesjon (Sist innlogget: ', 'Active session (Last sign-in: ', 'Sesión activa (último inicio de sesión: ')}${this.currentUser.metadata?.lastSignInTime ? new Date(this.currentUser.metadata.lastSignInTime).toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : 'no-NO') : 'Akkurat nå'})
                                     </div>
                                 </div>
                             </div>
@@ -3049,7 +3102,7 @@ class MinSideManager {
                     <div class="ms-security-danger-box">
                         <div class="ms-security-danger-header">
                             <span class="material-symbols-outlined">warning</span>
-                            <span>${isNo ? 'Permanentsletting (GDPR)' : 'Permanent account deletion'}</span>
+                            <span>${tx('Permanentsletting (GDPR)', 'Permanent account deletion', 'Eliminación permanente de la cuenta')}</span>
                         </div>
                         <p class="ms-danger-copy" style="margin: 0 !important; font-size: 0.83rem; line-height: 1.5; color: #475569;">
                             ${t('profile.deleteAccountNotice')}
@@ -3360,10 +3413,10 @@ class MinSideManager {
             if (!email) return;
             try {
                 await firebase.auth().sendPasswordResetEmail(email);
-                this._notify(isNo ? `E-post for å tilbakestille passord er sendt til ${email}!` : `Password reset email sent to ${email}!`, 'success');
+                this._notify(tx(`E-post for å tilbakestille passord er sendt til ${email}!`, `Password reset email sent to ${email}!`, `Correo para restablecer la contraseña enviado a ${email}`), 'success');
             } catch (err) {
                 console.error('Password reset error:', err);
-                this._notify(isNo ? 'Kunne ikke sende e-post for passordtilbakestilling.' : 'Failed to send password reset email.', 'warning');
+                this._notify(tx('Kunne ikke sende e-post for passordtilbakestilling.', 'Failed to send password reset email.', 'No se pudo enviar el correo para restablecer la contraseña.'), 'warning');
             }
         });
 
@@ -3433,7 +3486,7 @@ class MinSideManager {
                 }
             } catch (err) {
                 console.error("Save custom nav error:", err);
-                alert("Kunne ikke lagre menyvalg: " + err.message);
+                alert(tx('Kunne ikke lagre menyvalg: ', 'Could not save menu choice: ', 'No se pudo guardar la opción del menú: ') + err.message);
                 if (btn) btn.disabled = false;
             }
         });
@@ -3538,7 +3591,7 @@ class MinSideManager {
                     btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px !important;">check_circle</span> ${t('common.saved')}`;
                 }
                 
-                const successMsg = "Preferansene dine ble lagret!";
+                const successMsg = tx('Preferansene dine ble lagret!', 'Your preferences have been saved!', '¡Tus preferencias se han guardado!');
                 if (typeof window.showToast === 'function') {
                     window.showToast(successMsg, "success", 4000);
                 } else {
@@ -3572,7 +3625,7 @@ class MinSideManager {
                 if (window.hkmLogger) {
                     window.hkmLogger.error(`Save preferences failed: ${e.message || e}. Stack: ${e.stack || ''}`);
                 }
-                const errorMsg = "Kunne ikke lagre preferanser: " + (e.message || e);
+                const errorMsg = tx('Kunne ikke lagre preferanser: ', 'Could not save preferences: ', 'No se pudieron guardar las preferencias: ') + (e.message || e);
                 if (typeof window.showToast === 'function') {
                     window.showToast(errorMsg, "error", 5000);
                 } else {
@@ -3887,18 +3940,18 @@ class MinSideManager {
             if (!('Notification' in window)) {
                 if (window.hkmLogger) window.hkmLogger.warn("Push not supported: 'Notification' in window is false");
                 if (typeof window.showToast === 'function') {
-                    window.showToast("Nettleseren din støtter ikke push-varslinger.", "error", 5000);
+                    window.showToast(tx('Nettleseren din støtter ikke push-varslinger.', 'Your browser does not support push notifications.', 'Tu navegador no admite notificaciones push.'), "error", 5000);
                 } else {
-                    alert("Nettleseren din støtter ikke push-varslinger.");
+                    alert(tx('Nettleseren din støtter ikke push-varslinger.', 'Your browser does not support push notifications.', 'Tu navegador no admite notificaciones push.'));
                 }
                 return;
             }
             if (!firebase.messaging || !firebase.messaging.isSupported()) {
                 if (window.hkmLogger) window.hkmLogger.warn("Push not supported: firebase.messaging.isSupported() is false");
                 if (typeof window.showToast === 'function') {
-                    window.showToast("Push-varslinger er ikke støttet i denne nettleseren.", "error", 5000);
+                    window.showToast(tx('Push-varslinger er ikke støttet i denne nettleseren.', 'Push notifications are not supported in this browser.', 'Las notificaciones push no son compatibles con este navegador.'), "error", 5000);
                 } else {
-                    alert("Push-varslinger er ikke støttet i denne nettleseren.");
+                    alert(tx('Push-varslinger er ikke støttet i denne nettleseren.', 'Push notifications are not supported in this browser.', 'Las notificaciones push no son compatibles con este navegador.'));
                 }
                 return;
             }
@@ -3906,7 +3959,7 @@ class MinSideManager {
             const currentPermission = Notification.permission;
             if (currentPermission === 'denied') {
                 if (window.hkmLogger) window.hkmLogger.warn("Push permission is denied");
-                const msg = "Varsler er blokkert for dette nettstedet i nettleseren din. Vennligst tilbakestill tillatelsen i nettleserinnstillingene dine.";
+                const msg = tx('Varsler er blokkert for dette nettstedet i nettleseren din. Vennligst tilbakestill tillatelsen i nettleserinnstillingene dine.', 'Notifications are blocked for this site in your browser. Please reset the permission in your browser settings.', 'Las notificaciones están bloqueadas para este sitio en tu navegador. Restablece el permiso en la configuración del navegador.');
                 if (typeof window.showToast === 'function') {
                     window.showToast(msg, "warning", 7000);
                 } else {
@@ -3918,7 +3971,7 @@ class MinSideManager {
             const perm = await Notification.requestPermission();
             if (perm !== 'granted') {
                 if (window.hkmLogger) window.hkmLogger.warn("Push permission was not granted by user: " + perm);
-                const msg = "Du må tillate varsler for å motta push-meldinger på denne enheten.";
+                const msg = tx('Du må tillate varsler for å motta push-meldinger på denne enheten.', 'You must allow notifications to receive push messages on this device.', 'Debes permitir las notificaciones para recibir mensajes push en este dispositivo.');
                 if (typeof window.showToast === 'function') {
                     window.showToast(msg, "warning", 5000);
                 } else {
@@ -3933,7 +3986,7 @@ class MinSideManager {
             // Handle foreground push notifications
             msg.onMessage((payload) => {
                 console.log('[MinSide] Foreground message received:', payload);
-                const title = payload.notification?.title || 'Ny oppdatering';
+                const title = payload.notification?.title || tx('Ny oppdatering', 'New update', 'Nueva actualización');
                 const body = payload.notification?.body || '';
                 if (typeof window.showToast === 'function') {
                     window.showToast(`🔔 ${title}: ${body}`, "success", 10000);
@@ -3957,7 +4010,7 @@ class MinSideManager {
                 });
                 if (window.hkmLogger) window.hkmLogger.log("Push notifications registered successfully on device");
                 if (showSuccessToast && typeof window.showToast === 'function') {
-                    window.showToast("Push-varslinger ble vellykket registrert på denne enheten!", "success", 5000);
+                    window.showToast(tx('Push-varslinger ble vellykket registrert på denne enheten!', 'Push notifications were successfully registered on this device!', '¡Las notificaciones push se registraron correctamente en este dispositivo!'), "success", 5000);
                 }
             } else {
                 throw new Error("Kunne ikke hente varslingstoken.");
@@ -3967,7 +4020,7 @@ class MinSideManager {
             if (window.hkmLogger) {
                 window.hkmLogger.error(`FCM Registration failed: ${e.message || e}. Stack: ${e.stack || ''}`);
             }
-            const errorMsg = `Kunne ikke registrere push-varsler: ${e.message || e}`;
+            const errorMsg = `${tx('Kunne ikke registrere push-varsler:', 'Could not register push notifications:', 'No se pudieron registrar las notificaciones push:')} ${e.message || e}`;
             if (typeof window.showToast === 'function') {
                 window.showToast(errorMsg, "error", 7000);
             } else {
@@ -4091,13 +4144,13 @@ class MinSideManager {
                     timelineItems.push({
                         id: doc.id,
                         category: 'logins',
-                        typeLabel: isNo ? 'Innlogging' : 'Login',
-                        title: isNo ? `Innlogging fra ${data.device || 'Nettleser'}` : `Login from ${data.device || 'Browser'}`,
+                        typeLabel: tx('Innlogging', 'Login', 'Inicio de sesión'),
+                        title: tx(`Innlogging fra ${data.device || 'Nettleser'}`, `Login from ${data.device || 'Browser'}`, `Inicio de sesión desde ${data.device || 'Navegador'}`),
                         subtitle: `${data.browser || 'Ukjent'} • ${data.authMethod || 'Konto'}`,
                         date: date,
                         icon: 'login',
                         badgeClass: 'badge-login',
-                        badgeText: isNo ? 'Innlogget' : 'Logged in',
+                        badgeText: tx('Innlogget', 'Logged in', 'Sesión iniciada'),
                         details: {
                             'Enhet': data.device || 'Nettleser',
                             'Nettleser': data.browser || 'Ukjent',
@@ -4111,15 +4164,15 @@ class MinSideManager {
                 timelineItems.push({
                     id: 'current-session',
                     category: 'logins',
-                    typeLabel: isNo ? 'Innlogging' : 'Login',
-                    title: isNo ? 'Aktiv økt (Nåværende enhet)' : 'Active Session (Current device)',
+                    typeLabel: tx('Innlogging', 'Login', 'Inicio de sesión'),
+                    title: tx('Aktiv økt (Nåværende enhet)', 'Active Session (Current device)', 'Sesión activa (dispositivo actual)'),
                     subtitle: `${navigator.userAgent.includes('Mac') ? 'Mac' : 'Enhet'} • Innlogget som ${userEmail}`,
                     date: new Date(),
                     icon: 'verified_user',
                     badgeClass: 'badge-active-session',
-                    badgeText: isNo ? 'Aktiv nå' : 'Active now',
+                    badgeText: tx('Aktiv nå', 'Active now', 'Activo ahora'),
                     details: {
-                        'Status': isNo ? 'Aktiv økt' : 'Active session',
+                        'Status': tx('Aktiv økt', 'Active session', 'Sesión activa'),
                         'Konto': userEmail,
                         'System': navigator.userAgent.substring(0, 90)
                     }
@@ -4134,13 +4187,13 @@ class MinSideManager {
                     timelineItems.push({
                         id: doc.id,
                         category: 'sent',
-                        typeLabel: isNo ? 'Sendt melding' : 'Sent message',
-                        title: data.subject || (isNo ? 'Henvendelse via kontaktskjema' : 'Contact form inquiry'),
+                        typeLabel: tx('Sendt melding', 'Sent message', 'Mensaje enviado'),
+                        title: data.subject || (tx('Henvendelse via kontaktskjema', 'Contact form inquiry', 'Consulta por formulario de contacto')),
                         subtitle: data.message ? (data.message.substring(0, 90) + (data.message.length > 90 ? '...' : '')) : '',
                         date: date,
                         icon: 'send',
                         badgeClass: 'badge-sent',
-                        badgeText: data.status === 'besvart' ? (isNo ? 'Besvart' : 'Answered') : (isNo ? 'Sendt inn' : 'Submitted'),
+                        badgeText: data.status === 'besvart' ? (tx('Besvart', 'Answered', 'Respondido')) : (tx('Sendt inn', 'Submitted', 'Enviado')),
                         details: {
                             'Emne': data.subject || 'Generell henvendelse',
                             'Status': data.status || 'Sendt inn',
@@ -4158,16 +4211,16 @@ class MinSideManager {
                     timelineItems.push({
                         id: doc.id,
                         category: 'sent',
-                        typeLabel: isNo ? 'Chat-dialog' : 'Chat inquiry',
-                        title: data.lastVisitorMessage || (isNo ? 'Chat-henvendelse til HKM' : 'Chat inquiry to HKM'),
-                        subtitle: data.lastMessage || (isNo ? 'Melding sendt i chat' : 'Message sent in chat'),
+                        typeLabel: tx('Chat-dialog', 'Chat inquiry', 'Consulta por chat'),
+                        title: data.lastVisitorMessage || (tx('Chat-henvendelse til HKM', 'Chat inquiry to HKM', 'Consulta por chat a HKM')),
+                        subtitle: data.lastMessage || (tx('Melding sendt i chat', 'Message sent in chat', 'Mensaje enviado en el chat')),
                         date: date,
                         icon: 'chat',
                         badgeClass: 'badge-chat',
-                        badgeText: isNo ? 'Chat-dialog' : 'Chat dialog',
+                        badgeText: tx('Chat-dialog', 'Chat dialog', 'Conversación de chat'),
                         details: {
                             'Mottaker': 'HKM Support',
-                            'Siste melding': data.lastMessage || 'Ingen meldinger'
+                            'Siste melding': data.lastMessage || tx('Ingen meldinger', 'No messages', 'Sin mensajes')
                         }
                     });
                 });
@@ -4181,17 +4234,17 @@ class MinSideManager {
                     timelineItems.push({
                         id: doc.id,
                         category: 'sent',
-                        typeLabel: isNo ? 'Bønneønske' : 'Prayer request',
-                        title: data.request || data.title || (isNo ? 'Innsendt bønneønske' : 'Submitted prayer request'),
+                        typeLabel: tx('Bønneønske', 'Prayer request', 'Petición de oración'),
+                        title: data.request || data.title || (tx('Innsendt bønneønske', 'Submitted prayer request', 'Petición de oración enviada')),
                         subtitle: data.details ? (data.details.substring(0, 80) + '...') : '',
                         date: date,
                         icon: 'favorite',
                         badgeClass: 'badge-prayer',
-                        badgeText: isNo ? 'Bønneønske' : 'Prayer',
+                        badgeText: tx('Bønneønske', 'Prayer', 'Oración'),
                         details: {
                             'Bønneønske': data.request || 'Bønneønske',
-                            'Detaljer': data.details || 'Ingen ekstra detaljer',
-                            'Forbedere': `${data.prayedCount || 0} personer har bedt for dette`
+                            'Detaljer': data.details || tx('Ingen ekstra detaljer', 'No additional details', 'Sin detalles adicionales'),
+                            'Forbedere': `${data.prayedCount || 0} ${tx('personer har bedt for dette', 'people have prayed for this', 'personas han orado por esto')}`
                         }
                     });
                 });
@@ -4206,9 +4259,9 @@ class MinSideManager {
                     timelineItems.push({
                         id: d.id,
                         category: 'payments',
-                        typeLabel: isNo ? 'Gave / Betaling' : 'Donation / Payment',
-                        title: `${isNo ? 'Gave på' : 'Donation of'} ${amountFormatted}`,
-                        subtitle: `${isNo ? 'Betalt med' : 'Paid via'} ${method} • ${d.status === 'completed' || d.status === 'fullført' ? (isNo ? 'Fullført' : 'Completed') : d.status}`,
+                        typeLabel: tx('Gave / Betaling', 'Donation / Payment', 'Ofrenda / Pago'),
+                        title: `${tx('Gave på', 'Donation of', 'Ofrenda de')} ${amountFormatted}`,
+                        subtitle: `${tx('Betalt med', 'Paid via', 'Pagado con')} ${method} • ${d.status === 'completed' || d.status === 'fullført' ? (tx('Fullført', 'Completed', 'Completado')) : d.status}`,
                         date: date,
                         icon: 'payments',
                         badgeClass: 'badge-payment',
@@ -4231,13 +4284,13 @@ class MinSideManager {
                     timelineItems.push({
                         id: doc.id,
                         category: 'study',
-                        typeLabel: isNo ? 'Notat lagret' : 'Note saved',
-                        title: data.title || (isNo ? 'Uten tittel' : 'Untitled'),
+                        typeLabel: tx('Notat lagret', 'Note saved', 'Nota guardada'),
+                        title: data.title || (tx('Uten tittel', 'Untitled', 'Sin título')),
                         subtitle: data.content ? (data.content.replace(/<[^>]*>/g, '').substring(0, 80) + '...') : '',
                         date: date,
                         icon: 'note_alt',
                         badgeClass: 'badge-note',
-                        badgeText: isNo ? 'Notat' : 'Note',
+                        badgeText: tx('Notat', 'Note', 'Nota'),
                         details: {
                             'Tittel': data.title || 'Notat',
                             'Dato': date.toLocaleDateString('no-NO')
@@ -4254,7 +4307,7 @@ class MinSideManager {
 
         } catch (err) {
             console.error("renderHistory error:", err);
-            rootEl.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">error</span><h3>Kunne ikke laste historikk</h3><p>${err.message}</p></div>`;
+            rootEl.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">error</span><h3>${tx('Kunne ikke laste historikk', 'Could not load history', 'No se pudo cargar el historial')}</h3><p>${err.message}</p></div>`;
         }
     }
 
@@ -4286,7 +4339,7 @@ class MinSideManager {
                         </div>
                         <div>
                             <div class="history-stat-val">${countTotal}</div>
-                            <div class="history-stat-label">${isNo ? 'Totalt registrerte hendelser' : 'Total recorded events'}</div>
+                            <div class="history-stat-label">${tx('Totalt registrerte hendelser', 'Total recorded events', 'Total de eventos registrados')}</div>
                         </div>
                     </div>
 
@@ -4296,7 +4349,7 @@ class MinSideManager {
                         </div>
                         <div>
                             <div class="history-stat-val">${countSent}</div>
-                            <div class="history-stat-label">${isNo ? 'Sendte henvendelser' : 'Sent inquiries'}</div>
+                            <div class="history-stat-label">${tx('Sendte henvendelser', 'Sent inquiries', 'Consultas enviadas')}</div>
                         </div>
                     </div>
 
@@ -4306,7 +4359,7 @@ class MinSideManager {
                         </div>
                         <div>
                             <div class="history-stat-val">${totalAmountPaid > 0 ? totalAmountPaid.toLocaleString('no-NO') + ' kr' : countPayments}</div>
-                            <div class="history-stat-label">${isNo ? 'Gaver & Betalinger' : 'Donations & Payments'}</div>
+                            <div class="history-stat-label">${tx('Gaver & Betalinger', 'Donations & Payments', 'Ofrendas y pagos')}</div>
                         </div>
                     </div>
 
@@ -4316,7 +4369,7 @@ class MinSideManager {
                         </div>
                         <div>
                             <div class="history-stat-val">${countLogins}</div>
-                            <div class="history-stat-label">${isNo ? 'Innlogginger registrert' : 'Logins recorded'}</div>
+                            <div class="history-stat-label">${tx('Innlogginger registrert', 'Logins recorded', 'Inicios de sesión registrados')}</div>
                         </div>
                     </div>
                 </div>
@@ -4326,29 +4379,29 @@ class MinSideManager {
                     <div class="history-filter-pills">
                         <button class="history-pill ${activeTab === 'all' ? 'active' : ''}" data-tab="all">
                             <span class="material-symbols-outlined" style="font-size: 16px;">apps</span>
-                            ${isNo ? 'Alt' : 'All'} (${countTotal})
+                            ${tx('Alt', 'All', 'Todo')} (${countTotal})
                         </button>
                         <button class="history-pill ${activeTab === 'sent' ? 'active' : ''}" data-tab="sent">
                             <span class="material-symbols-outlined" style="font-size: 16px;">send</span>
-                            ${isNo ? 'Sendt ut' : 'Sent'} (${countSent})
+                            ${tx('Sendt ut', 'Sent', 'Enviados')} (${countSent})
                         </button>
                         <button class="history-pill ${activeTab === 'logins' ? 'active' : ''}" data-tab="logins">
                             <span class="material-symbols-outlined" style="font-size: 16px;">login</span>
-                            ${isNo ? 'Innlogginger' : 'Logins'} (${countLogins})
+                            ${tx('Innlogginger', 'Logins', 'Inicios de sesión')} (${countLogins})
                         </button>
                         <button class="history-pill ${activeTab === 'payments' ? 'active' : ''}" data-tab="payments">
                             <span class="material-symbols-outlined" style="font-size: 16px;">payments</span>
-                            ${isNo ? 'Betalinger' : 'Payments'} (${countPayments})
+                            ${tx('Betalinger', 'Payments', 'Pagos')} (${countPayments})
                         </button>
                         <button class="history-pill ${activeTab === 'study' ? 'active' : ''}" data-tab="study">
                             <span class="material-symbols-outlined" style="font-size: 16px;">auto_stories</span>
-                            ${isNo ? 'Notater & Studier' : 'Notes & Study'} (${countStudy})
+                            ${tx('Notater & Studier', 'Notes & Study', 'Notas y estudio')} (${countStudy})
                         </button>
                     </div>
 
                     <div class="history-search-box">
                         <span class="material-symbols-outlined" style="color: var(--text-muted, #64748b); font-size: 18px;">search</span>
-                        <input type="text" id="history-search-input" placeholder="${isNo ? 'Søk i historikk...' : 'Search history...'}" autocomplete="off">
+                        <input type="text" id="history-search-input" placeholder="${tx('Søk i historikk...', 'Search history...', 'Buscar en el historial...')}" autocomplete="off">
                     </div>
                 </div>
 
@@ -4384,8 +4437,8 @@ class MinSideManager {
                 listEl.innerHTML = `
                     <div class="empty-state" style="padding: 48px 24px; text-align: center; background: var(--card-bg, #ffffff); border-radius: 16px; border: 1px solid var(--border-solid, #e2e8f0);">
                         <span class="material-symbols-outlined" style="font-size: 44px; color: var(--text-muted, #94a3b8); margin-bottom: 12px;">history_toggle_off</span>
-                        <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main, #0f172a); margin: 0 0 4px 0;">${isNo ? 'Ingen treff i historikken' : 'No history items found'}</h3>
-                        <p style="font-size: 13.5px; color: var(--text-muted, #64748b); margin: 0;">${isNo ? 'Ingen aktiviteter matcher valgte filter eller søkeord.' : 'No activity matches your selected filter or query.'}</p>
+                        <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main, #0f172a); margin: 0 0 4px 0;">${tx('Ingen treff i historikken', 'No history items found', 'No se encontraron elementos en el historial')}</h3>
+                        <p style="font-size: 13.5px; color: var(--text-muted, #64748b); margin: 0;">${tx('Ingen aktiviteter matcher valgte filter eller søkeord.', 'No activity matches your selected filter or query.', 'Ninguna actividad coincide con el filtro o la búsqueda seleccionados.')}</p>
                     </div>
                 `;
                 return;
@@ -4526,7 +4579,7 @@ class MinSideManager {
                     <input type="checkbox" id="select-all-notifs-cb" style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent-color);">
                     <span>${isNo ? 'Velg alle meldinger' : (isEs ? 'Seleccionar todas' : 'Select all messages')}</span>
                 </label>
-                <span id="selection-count-text" style="font-size: 12px; font-weight: 600; color: var(--text-muted);">0 ${isNo ? 'valgt' : 'selected'}</span>
+                <span id="selection-count-text" style="font-size: 12px; font-weight: 600; color: var(--text-muted);">0 ${tx('valgt', 'selected', 'seleccionados')}</span>
             </div>
 
             <div id="notifs-inner"><div class="loading-state ms-loading-min-80"><div class="spinner"></div></div></div>
@@ -4620,7 +4673,7 @@ class MinSideManager {
                             </div>
                             
                             <div class="activity-right-section">
-                                ${!n.read ? `<div class="ms-unread-dot" title="${isNo ? 'Ulest' : 'Unread'}"></div>` : ''}
+                                ${!n.read ? `<div class="ms-unread-dot" title="${tx('Ulest', 'Unread', 'No leídos')}"></div>` : ''}
                                 <div class="notif-actions">
                                     <button type="button" class="btn-archive-notif" data-id="${n.id}" title="${archiveTitle}">
                                         <span class="material-symbols-outlined">${archiveIcon}</span>
@@ -4659,7 +4712,7 @@ class MinSideManager {
                     deleteSelectedText.textContent = `${isNo ? 'Slett valgte' : (isEs ? 'Eliminar seleccionados' : 'Delete selected')} (${count})`;
                 }
                 if (selectionCountText) {
-                    selectionCountText.textContent = `${count} ${isNo ? 'valgt' : 'selected'}`;
+                    selectionCountText.textContent = `${count} ${tx('valgt', 'selected', 'seleccionados')}`;
                 }
                 if (deleteSelectedBtn) {
                     deleteSelectedBtn.style.setProperty('display', count > 0 ? 'inline-flex' : 'none', 'important');
@@ -4878,11 +4931,11 @@ class MinSideManager {
                                 });
                                 await batch.commit();
                             }
-                            this._notify(isNo ? `${selectedIds.length} meldinger slettet` : `${selectedIds.length} messages deleted`, 'success');
+                            this._notify(tx(`${selectedIds.length} meldinger slettet`, `${selectedIds.length} messages deleted`, `${selectedIds.length} mensajes eliminados`), 'success');
                             this.renderNotifications(container);
                         } catch (err) {
                             console.error('Error deleting selected notifications:', err);
-                            this._notify(isNo ? 'Kunne ikke slette valgte meldinger' : 'Failed to delete selected messages', 'warning');
+                            this._notify(tx('Kunne ikke slette valgte meldinger', 'Failed to delete selected messages', 'No se pudieron eliminar los mensajes seleccionados'), 'warning');
                         }
                     }
                 });
@@ -4894,11 +4947,11 @@ class MinSideManager {
                 let confirmMsg = isNo ? 'Vil du slette alle varsler permanent? Dette kan ikke angres.' : (isEs ? '¿Eliminar todas las notificaciones permanentemente?' : 'Permanently delete all notifications?');
 
                 if (activeFilter === 'archived') {
-                    confirmTitle = isNo ? 'Slett alle arkiverte varsler' : 'Delete all archived notifications';
-                    confirmMsg = isNo ? 'Vil du slette alle arkiverte varsler permanent?' : 'Permanently delete all archived notifications?';
+                    confirmTitle = tx('Slett alle arkiverte varsler', 'Delete all archived notifications', 'Eliminar todas las notificaciones archivadas');
+                    confirmMsg = tx('Vil du slette alle arkiverte varsler permanent?', 'Permanently delete all archived notifications?', '¿Eliminar permanentemente todas las notificaciones archivadas?');
                 } else if (activeFilter === 'unread') {
-                    confirmTitle = isNo ? 'Slett alle uleste varsler' : 'Delete all unread notifications';
-                    confirmMsg = isNo ? 'Vil du slette alle uleste varsler permanent?' : 'Permanently delete all unread notifications?';
+                    confirmTitle = tx('Slett alle uleste varsler', 'Delete all unread notifications', 'Eliminar todas las notificaciones no leídas');
+                    confirmMsg = tx('Vil du slette alle uleste varsler permanent?', 'Permanently delete all unread notifications?', '¿Eliminar permanentemente todas las notificaciones no leídas?');
                 }
 
                 this.showCustomConfirm({
@@ -4928,7 +4981,7 @@ class MinSideManager {
                             this.renderNotifications(container);
                         } catch (err) {
                             console.error('Error mass deleting notifications:', err);
-                            this._notify(isNo ? 'Kunne ikke masseslette meldinger' : 'Failed to delete notifications', 'warning');
+                            this._notify(tx('Kunne ikke masseslette meldinger', 'Failed to delete notifications', 'No se pudieron eliminar las notificaciones'), 'warning');
                         }
                     }
                 });
@@ -5303,13 +5356,13 @@ class MinSideManager {
                             ${isNo ? 'Fast månedlig giveravtale' : (isEs ? 'Donación mensual recurrente' : 'Monthly recurring donation')}
                         </h4>
                         <p style="font-size: 0.84rem; color: var(--text-muted, #475569); margin: 0; line-height: 1.4;">
-                            ${isNo ? 'Støtt His Kingdom Ministry fast hver måned via Vipps eller kort.' : 'Support His Kingdom Ministry monthly via Vipps or card.'}
+                            ${tx('Støtt His Kingdom Ministry fast hver måned via Vipps eller kort.', 'Support His Kingdom Ministry monthly via Vipps or card.', 'Apoya a His Kingdom Ministry cada mes con Vipps o tarjeta.')}
                         </p>
                     </div>
                 </div>
                 <a href="/bli-fast-giver.html" class="btn btn-primary" style="background: linear-gradient(135deg, #d17d39, #bd4f2a); border: none; border-radius: 10px; font-weight: 700; text-decoration: none; color: #fff; display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; font-size: 0.85rem;">
                     <span class="material-symbols-outlined" style="font-size: 18px;">favorite</span>
-                    <span>${isNo ? 'Bli Fastgiver' : 'Become a Supporter'}</span>
+                    <span>${tx('Bli Fastgiver', 'Become a Supporter', 'Hazte donante')}</span>
                 </a>
             </div>
 
@@ -5472,7 +5525,7 @@ class MinSideManager {
 
         const printWindow = window.open('', '_blank');
         if (!printWindow) {
-            this._notify('Popup-blokkerer forhindret åpning av utskriftsvinduet. Vennligst tillat popups.', 'warning');
+            this._notify(tx('Popup-blokkerer forhindret åpning av utskriftsvinduet. Vennligst tillat popups.', 'A pop-up blocker prevented the print window from opening. Please allow pop-ups.', 'Un bloqueador de ventanas emergentes impidió abrir la ventana de impresión. Permite las ventanas emergentes.'), 'warning');
             return;
         }
 
@@ -5548,7 +5601,7 @@ class MinSideManager {
                             <h3 style="margin:0 0 8px 0; font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Giver</h3>
                             <p style="margin:0; font-size:14px; font-weight:700; color:#0f172a;">${this._escapeHtml(userName)}</p>
                             ${userSsn ? `<p style="margin:4px 0 0; font-size:12px; color:#475569;"><strong>F.nr:</strong> ${this._escapeHtml(userSsn)}</p>` : ''}
-                            ${userBirthday ? `<p style="margin:4px 0 0; font-size:12px; color:#475569;"><strong>Fødselsdato:</strong> ${this._escapeHtml(userBirthday)}</p>` : ''}
+                            ${userBirthday ? `<p style="margin:4px 0 0; font-size:12px; color:#475569;"><strong>${tx('Fødselsdato:', 'Date of birth:', 'Fecha de nacimiento:')}</strong> ${this._escapeHtml(userBirthday)}</p>` : ''}
                             ${userEmail ? `<p style="margin:4px 0 0; font-size:12px; color:#475569;">${this._escapeHtml(userEmail)}</p>` : ''}
                             ${userAddress && userAddress !== 'Ingen registrert adresse' && userAddress !== 'Sin dirección registrada' && userAddress !== 'No registered address' ? `<p style="margin:4px 0 0; font-size:12px; color:#475569;">${this._escapeHtml(userAddress)}</p>` : ''}
                         </div>
@@ -5833,7 +5886,7 @@ class MinSideManager {
                                             <div>
                                                 <div style="display:flex; gap:8px; align-items:center;">
                                                     <a href="/kurs-detaljer.html?id=${encodeURIComponent(c.id)}&lesson=${lIdx}" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; background:#d17d39; border-color:#d17d39; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none; color:white;">
-                                                        <span class="material-symbols-outlined" style="font-size:18px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">${l.zoomUrl ? 'video_camera_front' : 'play_circle'}</span> ${l.zoomUrl ? 'Bli med på Zoom' : 'Start leksjon'}
+                                                        <span class="material-symbols-outlined" style="font-size:18px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">${l.zoomUrl ? 'video_camera_front' : 'play_circle'}</span> ${l.zoomUrl ? tx('Bli med på Zoom', 'Join on Zoom', 'Unirse por Zoom') : tx('Start leksjon', 'Start lesson', 'Empezar lección')}
                                                     </a>
                                                 </div>
                                             </div>
@@ -6015,7 +6068,7 @@ class MinSideManager {
             metaItems.push({
                 icon: 'videocam',
                 label: 'Type',
-                val: 'Live Zoom-møte',
+                val: tx('Live Zoom-møte', 'Live Zoom meeting', 'Reunión de Zoom en directo'),
                 class: ''
             });
             if (lesson.date) {
@@ -6039,7 +6092,7 @@ class MinSideManager {
                     metaItems.push({
                         icon: 'alarm',
                         label: 'Starter om',
-                        val: `<span id="zoom-countdown" data-target="${lessonTime}">Laster nedtelling...</span>`,
+                        val: `<span id="zoom-countdown" data-target="${lessonTime}">${tx('Laster nedtelling...', 'Loading countdown...', 'Cargando cuenta atrás...')}</span>`,
                         class: 'secondary'
                     });
                 } else {
@@ -6049,7 +6102,7 @@ class MinSideManager {
                         metaItems.push({
                             icon: 'live_tv',
                             label: 'Status',
-                            val: '<span style="color: #ef4444; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;"><span class="material-symbols-outlined hkm-live-pulse" style="font-size: 16px; color: #ef4444;">radio_button_checked</span> LIVE NÅ</span>',
+                            val: '<span style="color: #ef4444; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;"><span class="material-symbols-outlined hkm-live-pulse" style="font-size: 16px; color: #ef4444;">radio_button_checked</span> ' + tx('LIVE NÅ', 'LIVE NOW', 'EN DIRECTO') + '</span>',
                             class: 'secondary'
                         });
                     } else {
@@ -6801,7 +6854,7 @@ class MinSideManager {
 
                         <!-- Beskrivelse -->
                         <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin: 0 0 24px 0;">
-                            ${lesson.description || 'I denne leksjonen går vi gjennom det fundamentale grunnlaget for undervisningen. Du finner ressurser og bønneguider i sidemenyen.'}
+                            ${lesson.description || tx('I denne leksjonen går vi gjennom det fundamentale grunnlaget for undervisningen. Du finner ressurser og bønneguider i sidemenyen.', 'In this lesson we go through the fundamental basis of the teaching. You will find resources and prayer guides in the side menu.', 'En esta lección repasamos la base fundamental de la enseñanza. Encontrarás recursos y guías de oración en el menú lateral.')}
                         </p>
 
                         <!-- Metadata Grid (Varighet, ressurser, kommentarer) -->
@@ -6908,7 +6961,7 @@ class MinSideManager {
                                             <button type="button" class="rte-btn" data-cmd="removeFormat" title="${t('notes.toolClear')}"><span class="material-symbols-outlined">format_clear</span></button>
                                         </div>
                                         <div class="rte-editor" id="lesson-notes-editor" contenteditable="true"
-                                            data-placeholder="Skriv dine notater for denne leksjonen her... De lagres automatisk til kontoen din."></div>
+                                            data-placeholder="${tx('Skriv dine notater for denne leksjonen her... De lagres automatisk til kontoen din.', 'Write your notes for this lesson here... They are saved automatically to your account.', 'Escribe aquí tus notas de esta lección... Se guardan automáticamente en tu cuenta.')}"></div>
                                     </div>
                                 </div>
                             </div>
@@ -6935,7 +6988,7 @@ class MinSideManager {
                                     <!-- Interactive Tools Toolbar -->
                                     <div class="hkm-bible-toolbar" style="display: flex; justify-content: space-between; align-items: center; margin-top: -8px; margin-bottom: -4px;">
                                         <div style="display: flex; gap: 6px;">
-                                            <button type="button" id="bible-btn-layout" class="hkm-bible-tool-btn" title="Bytt visning (Vers / Løpende tekst)">
+                                            <button type="button" id="bible-btn-layout" class="hkm-bible-tool-btn" title="${tx('Bytt visning (Vers / Løpende tekst)', 'Switch view (Verses / Running text)', 'Cambiar vista (versículos / texto continuo)')}">
                                                 <span class="material-symbols-outlined" style="font-size:16px;">segment</span>
                                             </button>
                                             <button type="button" id="bible-btn-copy" class="hkm-bible-tool-btn" title="Kopier markerte vers" disabled>
@@ -6948,7 +7001,7 @@ class MinSideManager {
                                         <div style="display: flex; align-items: center; gap: 4px;">
                                             <button type="button" id="bible-btn-font-dec" class="hkm-bible-tool-btn" title="Mindre skrift" style="font-size:9px;">A-</button>
                                             <span id="bible-font-size-indicator" style="font-size: 11px; font-weight: 600; color: #64748b; width: 34px; text-align: center;">15px</span>
-                                            <button type="button" id="bible-btn-font-inc" class="hkm-bible-tool-btn" title="Større skrift" style="font-size:9px;">A+</button>
+                                            <button type="button" id="bible-btn-font-inc" class="hkm-bible-tool-btn" title="${tx('Større skrift', 'Larger text', 'Texto más grande')}" style="font-size:9px;">A+</button>
                                         </div>
                                     </div>
 
@@ -7304,7 +7357,7 @@ class MinSideManager {
                     if (saveStatus) saveStatus.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px; color:#16a34a;">cloud_done</span> Lagret`;
                 } else {
                     if (editor) editor.innerHTML = '';
-                    if (saveStatus) saveStatus.innerHTML = `Ingen lagrede notater`;
+                    if (saveStatus) saveStatus.innerHTML = tx('Ingen lagrede notater', 'No saved notes', 'No hay notas guardadas');
                 }
             } catch (e) {
                 console.error("Notes fetch error:", e);
@@ -7354,7 +7407,7 @@ class MinSideManager {
                     }, 2000);
                 } catch (e) {
                     console.error("Notes autosave error:", e);
-                    if (saveStatus) saveStatus.innerHTML = `Kunne ikke lagre`;
+                    if (saveStatus) saveStatus.innerHTML = tx('Kunne ikke lagre', 'Could not save', 'No se pudo guardar');
                 }
             }, 1000); // 1 sec debounce
         });
@@ -7435,7 +7488,7 @@ class MinSideManager {
 
         const loadVerses = async (bibleId, chapterId) => {
             try {
-                if (bibDisplay) bibDisplay.innerHTML = `<p style="color:#64748b; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Laster bibeltekst...</p>`;
+                if (bibDisplay) bibDisplay.innerHTML = `<p style="color:#64748b; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">${tx('Laster bibeltekst...', 'Loading Bible text...', 'Cargando texto bíblico...')}</p>`;
                 
                 // Clear active selection on reload
                 selectedVerses = [];
@@ -7447,7 +7500,7 @@ class MinSideManager {
                 const verses = data.verses || [];
                 
                 if (verses.length === 0) {
-                    if (bibDisplay) bibDisplay.innerHTML = `<p style="color:#94a3b8; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Fant ingen vers.</p>`;
+                    if (bibDisplay) bibDisplay.innerHTML = `<p style="color:#94a3b8; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">${tx('Fant ingen vers.', 'No verses found.', 'No se encontraron versículos.')}</p>`;
                     return;
                 }
                 
@@ -7529,7 +7582,7 @@ class MinSideManager {
         const lookupWord = async (word) => {
             dictOverlay.style.display = 'flex';
             dictTitle.textContent = `Leksikon: "${word}"`;
-            dictContent.innerHTML = `<p style="color:#64748b; text-align:center; font-style:italic; padding-top:40px;">Søker i Bibeleksikon...</p>`;
+            dictContent.innerHTML = `<p style="color:#64748b; text-align:center; font-style:italic; padding-top:40px;">${tx('Søker i Bibeleksikon...', 'Searching the Bible dictionary...', 'Buscando en el diccionario bíblico...')}</p>`;
             
             try {
                 const lang = document.documentElement.lang || 'no';
@@ -7554,11 +7607,11 @@ class MinSideManager {
                     }
                     dictContent.innerHTML = html;
                 } else {
-                    dictContent.innerHTML = `<p style="color:#64748b; text-align:center; font-style:italic; padding-top:40px;">Fant ingen definisjon på "${word}" i leksikonet.</p>`;
+                    dictContent.innerHTML = `<p style="color:#64748b; text-align:center; font-style:italic; padding-top:40px;">${tx(`Fant ingen definisjon på "${word}" i leksikonet.`, `No definition found for "${word}" in the dictionary.`, `No se encontró ninguna definición de "${word}" en el diccionario.`)}</p>`;
                 }
             } catch (e) {
                 console.error("Word lookup error:", e);
-                dictContent.innerHTML = `<p style="color:#e74c3c; text-align:center; font-style:italic; padding-top:40px;">Feil ved søk i leksikon.</p>`;
+                dictContent.innerHTML = `<p style="color:#e74c3c; text-align:center; font-style:italic; padding-top:40px;">${tx('Feil ved søk i leksikon.', 'Error searching the dictionary.', 'Error al buscar en el diccionario.')}</p>`;
             }
         };
 
@@ -7580,10 +7633,10 @@ class MinSideManager {
             }).filter(Boolean).join('\n');
             
             const fullRef = `${bookName} ${chapterNum}:${selectedVerses.join(', ')}`;
-            const finalString = `${fullRef}\n\n${textToCopy}\n\n(Delt fra His Kingdom Ministry)`;
+            const finalString = `${fullRef}\n\n${textToCopy}\n\n(${tx('Delt fra His Kingdom Ministry', 'Shared from His Kingdom Ministry', 'Compartido desde His Kingdom Ministry')})`;
             
             navigator.clipboard.writeText(finalString).then(() => {
-                window.showToast?.('Bibelversene er kopiert!', 'success') || alert('Kopiert til utklippstavle!');
+                window.showToast?.(tx('Bibelversene er kopiert!', 'The Bible verses have been copied!', '¡Los versículos se han copiado!'), 'success') || alert(tx('Kopiert til utklippstavle!', 'Copied to clipboard!', '¡Copiado al portapapeles!'));
                 selectedVerses = [];
                 bibDisplay.querySelectorAll('.bible-verse-item').forEach(el => el.classList.remove('selected-verse'));
                 updateToolbarStates();
@@ -7738,7 +7791,7 @@ class MinSideManager {
                 const diff = targetTime - now;
                 
                 if (diff <= 0) {
-                    el.innerHTML = '<span style="color: #ef4444; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;"><span class="material-symbols-outlined hkm-live-pulse" style="font-size: 16px; color: #ef4444;">radio_button_checked</span> LIVE NÅ</span>';
+                    el.innerHTML = '<span style="color: #ef4444; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;"><span class="material-symbols-outlined hkm-live-pulse" style="font-size: 16px; color: #ef4444;">radio_button_checked</span> ' + tx('LIVE NÅ', 'LIVE NOW', 'EN DIRECTO') + '</span>';
                     if (window._playerCountdownInterval) {
                         clearInterval(window._playerCountdownInterval);
                         window._playerCountdownInterval = null;
@@ -8041,7 +8094,7 @@ class MinSideManager {
                             </div>
                             <p style="font-size: 14px; color: #64748b; margin: 0; line-height: 1.5; max-width: 600px;">${globalPlan.description || ''}</p>
                         </div>
-                        <button class="btn btn-secondary btn-sm" id="btn-change-plan">${userPlan.isPreview ? 'Gå tilbake' : 'Bytt leseplan'}</button>
+                        <button class="btn btn-secondary btn-sm" id="btn-change-plan">${userPlan.isPreview ? tx('Gå tilbake', 'Go back', 'Volver') : tx('Bytt leseplan', 'Change reading plan', 'Cambiar plan de lectura')}</button>
                     </div>
 
                     <!-- Progress Bar -->
@@ -8560,7 +8613,7 @@ class MinSideManager {
                                 <span class="material-symbols-outlined" style="font-size:16px;">launch</span>
                                 ${res.title} (${res.type})
                             </a>
-                            `).join('') : '<span style="font-size:12px; color:#cbd5e1; font-style:italic;">Ingen ressurser</span>'
+                            `).join('') : '<span style="font-size:12px; color:#cbd5e1; font-style:italic;">' + tx('Ingen ressurser', 'No resources', 'Sin recursos') + '</span>'
                         }
                     </div>
                 </div>
@@ -8603,7 +8656,7 @@ class MinSideManager {
             scriptureHtml = await this.fetchAndFilterVersesText(dayConfig.verses);
         } catch (e) {
             console.error("Failed to fetch scripture text for devotional:", e);
-            scriptureHtml = `<p style="text-align: center; color: #ef4444;">Kunne ikke hente bibelteksten for: <strong>${dayConfig.verses}</strong></p>`;
+            scriptureHtml = `<p style="text-align: center; color: #ef4444;">${tx('Kunne ikke hente bibelteksten for:', 'Could not fetch the Bible text for:', 'No se pudo obtener el texto bíblico de:')} <strong>${dayConfig.verses}</strong></p>`;
         }
 
         this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 1, scriptureHtml);
@@ -8748,12 +8801,12 @@ class MinSideManager {
         } else if (step === 2) {
             const title = document.createElement('h3');
             title.className = 'hkm-devotional-step-title';
-            title.innerText = '2. Dagens Bønnefokus';
+            title.innerText = tx('2. Dagens Bønnefokus', '2. Today’s prayer focus', '2. Enfoque de oración de hoy');
             stepContainer.appendChild(title);
 
             const prayerBox = document.createElement('div');
             prayerBox.className = 'hkm-devotional-prayer-box';
-            prayerBox.innerText = dayConfig.prayerFocus || 'Be i dag over ordene du har lest, og be om visdom og veiledning for dagen.';
+            prayerBox.innerText = dayConfig.prayerFocus || tx('Be i dag over ordene du har lest, og be om visdom og veiledning for dagen.', 'Pray today over the words you have read, and ask for wisdom and guidance for the day.', 'Ora hoy sobre las palabras que has leído y pide sabiduría y dirección para el día.');
             stepContainer.appendChild(prayerBox);
 
             const actions = document.createElement('div');
@@ -8789,7 +8842,7 @@ class MinSideManager {
             desc.style.color = '#64748b';
             desc.style.marginBottom = '20px';
             desc.style.lineHeight = '1.5';
-            desc.innerText = 'Bruk disse ressursene til å gå dypere i dagens tema:';
+            desc.innerText = tx('Bruk disse ressursene til å gå dypere i dagens tema:', 'Use these resources to go deeper into today’s theme:', 'Usa estos recursos para profundizar en el tema de hoy:');
             stepContainer.appendChild(desc);
 
             const resourcesList = document.createElement('div');
@@ -8853,7 +8906,7 @@ class MinSideManager {
         } else if (step === 4) {
             const title = document.createElement('h3');
             title.className = 'hkm-devotional-step-title';
-            title.innerText = '4. Skriv dine refleksjoner';
+            title.innerText = tx('4. Skriv dine refleksjoner', '4. Write your reflections', '4. Escribe tus reflexiones');
             stepContainer.appendChild(title);
 
             const desc = document.createElement('p');
@@ -8861,12 +8914,12 @@ class MinSideManager {
             desc.style.color = '#64748b';
             desc.style.marginBottom = '16px';
             desc.style.lineHeight = '1.5';
-            desc.innerText = 'Noter ned hva Gud talte til deg gjennom ordene du leste, eller skriv en bønn.';
+            desc.innerText = tx('Noter ned hva Gud talte til deg gjennom ordene du leste, eller skriv en bønn.', 'Note down what God spoke to you through the words you read, or write a prayer.', 'Anota lo que Dios te habló a través de las palabras que leíste, o escribe una oración.');
             stepContainer.appendChild(desc);
 
             const textarea = document.createElement('textarea');
             textarea.className = 'hkm-devotional-reflection-textarea';
-            textarea.placeholder = 'Skriv dine tanker her... (Dette lagres også i dine notater på Min Side)';
+            textarea.placeholder = tx('Skriv dine tanker her... (Dette lagres også i dine notater på Min Side)', 'Write your thoughts here... (This is also saved in your notes on My Page)', 'Escribe aquí tus pensamientos... (También se guarda en tus notas de Mi página)');
             stepContainer.appendChild(textarea);
 
             const actions = document.createElement('div');
@@ -8899,9 +8952,9 @@ class MinSideManager {
                     this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 5, scriptureHtml);
                 } catch (e) {
                     console.error("Failed to complete devotional day:", e);
-                    alert("Kunne ikke lagre andakt: " + e.message);
+                    alert(tx('Kunne ikke lagre andakt: ', 'Could not save devotional: ', 'No se pudo guardar el devocional: ') + e.message);
                     saveBtn.disabled = false;
-                    saveBtn.innerHTML = `Fullfør og Lagre <span class="material-symbols-outlined">check</span>`;
+                    saveBtn.innerHTML = `${tx('Fullfør og Lagre', 'Complete and save', 'Completar y guardar')} <span class="material-symbols-outlined">check</span>`;
                 }
             };
 
@@ -8915,7 +8968,7 @@ class MinSideManager {
 
             const title = document.createElement('h3');
             title.className = 'hkm-celebration-title';
-            title.innerText = 'Andakt fullført!';
+            title.innerText = tx('Andakt fullført!', 'Devotional completed!', '¡Devocional completado!');
             stepContainer.appendChild(title);
 
             const readingStreak = this.profileData?.readingStreak || 0;
@@ -8928,7 +8981,7 @@ class MinSideManager {
 
             const desc = document.createElement('p');
             desc.className = 'hkm-celebration-desc';
-            desc.innerHTML = `Kjempebra jobbet! Du har fullført dag ${dayNumber} av leseplanen "${plan.title}".<br>${streakHtml}`;
+            desc.innerHTML = `${tx(`Kjempebra jobbet! Du har fullført dag ${dayNumber} av leseplanen "${plan.title}".`, `Great work! You have completed day ${dayNumber} of the reading plan "${plan.title}".`, `¡Excelente trabajo! Has completado el día ${dayNumber} del plan de lectura "${plan.title}".`)}<br>${streakHtml}`;
             stepContainer.appendChild(desc);
 
             const actions = document.createElement('div');
@@ -9045,7 +9098,7 @@ class MinSideManager {
                 .collection('personal_notes')
                 .add({
                     userId: uid,
-                    title: `Leseplan: ${plan.title} - Dag ${dayNumber}`,
+                    title: tx(`Leseplan: ${plan.title} - Dag ${dayNumber}`, `Reading plan: ${plan.title} - Day ${dayNumber}`, `Plan de lectura: ${plan.title} - Día ${dayNumber}`),
                     text: reflectionText,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     isReadingPlanNote: true,
@@ -9470,7 +9523,7 @@ class MinSideManager {
 
         // Create new category click event
         document.getElementById('btn-add-category')?.addEventListener('click', async () => {
-            const name = prompt("Skriv inn navn på den nye kategorien:");
+            const name = prompt(tx('Skriv inn navn på den nye kategorien:', 'Enter a name for the new category:', 'Escribe un nombre para la nueva categoría:'));
             if (!name || !name.trim()) return;
             const cleanName = name.trim();
 
@@ -9489,7 +9542,7 @@ class MinSideManager {
                 categories.sort((a, b) => a.name.localeCompare(b.name));
                 this._renderNotesUI(container, personalNotes, hkmNotes, categories);
             } catch (e) {
-                alert("Kunne ikke opprette kategori: " + e.message);
+                alert(tx('Kunne ikke opprette kategori: ', 'Could not create category: ', 'No se pudo crear la categoría: ') + e.message);
             }
         });
 
@@ -9729,7 +9782,7 @@ class MinSideManager {
     async renderTasks(container) {
         const uid = this.currentUser?.uid;
         if (!uid) {
-            container.innerHTML = `<div class="bento-card" style="padding: 24px; text-align: center;"><p>Vennligst logg inn for å se din huskeliste.</p></div>`;
+            container.innerHTML = `<div class="bento-card" style="padding: 24px; text-align: center;"><p>${tx('Vennligst logg inn for å se din huskeliste.', 'Please sign in to see your to-do list.', 'Inicia sesión para ver tu lista de tareas.')}</p></div>`;
             return;
         }
 
@@ -9812,7 +9865,7 @@ class MinSideManager {
                     <!-- Quick Add Form Row -->
                     <form id="hkm-add-task-form" style="background: var(--bg-main, #f8fafc); border: 1.5px solid #f1f5f9; border-radius: 14px; padding: 12px 16px; margin-bottom: 20px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
                         <div style="flex: 1; min-width: 240px;">
-                            <input type="text" id="task-input-title" placeholder="Legg til et nytt gjøremål her..." required
+                            <input type="text" id="task-input-title" placeholder="${tx('Legg til et nytt gjøremål her...', 'Add a new task here...', 'Añade una nueva tarea aquí...')}" required
                                 style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid #e2e8f0; background: var(--bg-card, #ffffff); font-size: 14px; color: var(--text-main, #1e293b); outline: none; box-sizing: border-box;">
                         </div>
                         <select id="task-input-priority" style="padding: 10px 14px; border-radius: 10px; border: 1px solid #e2e8f0; background: var(--bg-card, #ffffff); font-size: 13px; color: var(--text-main, #1e293b); cursor: pointer; outline: none;">
@@ -9838,7 +9891,7 @@ class MinSideManager {
                             </div>
                         ` : filteredTasks.map(task => {
                             const prioColors = {
-                                high: { bg: '#fef2f2', text: '#dc2626', border: '#fecaca', label: 'Høy prio' },
+                                high: { bg: '#fef2f2', text: '#dc2626', border: '#fecaca', label: tx('Høy prio', 'High priority', 'Prioridad alta') },
                                 medium: { bg: '#fff7ed', text: '#d97706', border: '#ffedd5', label: 'Medium prio' },
                                 low: { bg: '#f8fafc', text: '#64748b', border: '#e2e8f0', label: 'Lav prio' }
                             };
@@ -9918,11 +9971,11 @@ class MinSideManager {
                         .add(newTask);
 
                     tasks.unshift({ id: docRef.id, ...newTask, createdAt: new Date() });
-                    this._notify('Oppgave lagt til!', 'success');
+                    this._notify(tx('Oppgave lagt til!', 'Task added!', '¡Tarea añadida!'), 'success');
                     this._renderTasksUI(container, tasks);
                 } catch (err) {
                     console.error('Error adding task:', err);
-                    this._notify('Kunne ikke legge til oppgave', 'warning');
+                    this._notify(tx('Kunne ikke legge til oppgave', 'Could not add task', 'No se pudo añadir la tarea'), 'warning');
                 }
             });
         }
@@ -10108,9 +10161,9 @@ class MinSideManager {
         modal.querySelector('#delete-notif-modal')?.addEventListener('click', () => {
             const isNo = document.documentElement.lang === 'no' || !document.documentElement.lang;
             this.showCustomConfirm({
-                title: isNo ? 'Slett melding' : 'Delete message',
-                message: t('notifications.deleteConfirm') || (isNo ? 'Vil du slette denne meldingen permanent?' : 'Delete this message permanently?'),
-                confirmText: isNo ? 'Slett' : 'Delete',
+                title: tx('Slett melding', 'Delete message', 'Eliminar mensaje'),
+                message: t('notifications.deleteConfirm') || (tx('Vil du slette denne meldingen permanent?', 'Delete this message permanently?', '¿Eliminar este mensaje permanentemente?')),
+                confirmText: tx('Slett', 'Delete', 'Eliminar'),
                 isDanger: true,
                 onConfirm: async () => {
                     const btn = modal.querySelector('#delete-notif-modal');
@@ -10125,10 +10178,10 @@ class MinSideManager {
                         }
                         document.querySelectorAll(`.activity-item[data-id="${notif.id}"]`).forEach(el => el.remove());
                         close();
-                        this._notify(isNo ? 'Melding slettet' : 'Message deleted', 'success');
+                        this._notify(tx('Melding slettet', 'Message deleted', 'Mensaje eliminado'), 'success');
                     } catch (err) {
                         console.error('Error deleting notification:', err);
-                        this._notify(t('notifications.deleteError') || 'Kunne ikke slette melding', 'warning');
+                        this._notify(t('notifications.deleteError') || tx('Kunne ikke slette melding', 'Could not delete message', 'No se pudo eliminar el mensaje'), 'warning');
                         if (btn) {
                             btn.disabled = false;
                             btn.innerHTML = `<span class="material-symbols-outlined">delete</span> ${t('notifications.deleteAlert')}`;
@@ -10183,7 +10236,7 @@ class MinSideManager {
         modal.querySelector('#confirm-delete-btn')?.addEventListener('click', () => {
             this.showCustomConfirm({
                 title: t('deleteAccount.modalTitle') || 'Slett konto',
-                message: t('deleteAccount.doubleConfirm') || 'Dette vil slette kontoen og alle dine data permanent. Er du helt sikker?',
+                message: t('deleteAccount.doubleConfirm') || tx('Dette vil slette kontoen og alle dine data permanent. Er du helt sikker?', 'This will permanently delete your account and all your data. Are you absolutely sure?', 'Esto eliminará permanentemente tu cuenta y todos tus datos. ¿Estás completamente seguro?'),
                 confirmText: t('deleteAccount.deleteBtn') || 'Slett permanent',
                 isDanger: true,
                 onConfirm: async () => {
@@ -10353,7 +10406,7 @@ class MinSideManager {
 
         } catch (err) {
             console.error("Load prayer feed error:", err);
-            container.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">error</span><h3>Feil</h3><p>Kunne ikke laste bønneveggen: ${err.message}</p></div>`;
+            container.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">error</span><h3>${tx('Feil', 'Error', 'Error')}</h3><p>${tx('Kunne ikke laste bønneveggen:', 'Could not load the prayer wall:', 'No se pudo cargar el muro de oración:')} ${err.message}</p></div>`;
         }
     }
 
@@ -10394,7 +10447,7 @@ class MinSideManager {
 
             // Write notification to the owner
             if (authorUid && authorUid !== uid) {
-                const name = this.profileData?.displayName || 'En søster/bror';
+                const name = this.profileData?.displayName || tx('En søster/bror', 'A sister/brother', 'Una hermana/un hermano');
                 await firebase.firestore().collection('user_notifications').add({
                     userId: authorUid,
                     title: 'Bønnefellesskap',
@@ -10411,13 +10464,13 @@ class MinSideManager {
 
         } catch (err) {
             console.error("Support prayer failed:", err);
-            alert("Kunne ikke fullføre handlingen: " + err.message);
+            alert(tx('Kunne ikke fullføre handlingen: ', 'Could not complete the action: ', 'No se pudo completar la acción: ') + err.message);
         }
     }
 
     deletePrayer(prayerId) {
         this.showCustomConfirm({
-            title: 'Slett bønneemne',
+            title: tx('Slett bønneemne', 'Delete prayer request', 'Eliminar petición de oración'),
             message: t('prayer.confirmDelete') || 'Vil du slette dette bønneemnet permanent?',
             confirmText: 'Slett',
             isDanger: true,
@@ -10708,7 +10761,7 @@ class MinSideManager {
                 searchCache.prayers = prayersSnap.empty ? [] : prayersSnap.docs.map(d => {
                     const data = d.data();
                     const name = data.isAnonymous ? 'Anonym' : (data.userName || 'Medlem');
-                    return { id: d.id, type: 'prayer-wall', title: `Bønneemne fra ${name}`, desc: data.text || '' };
+                    return { id: d.id, type: 'prayer-wall', title: tx(`Bønneemne fra ${name}`, `Prayer request from ${name}`, `Petición de oración de ${name}`), desc: data.text || '' };
                 });
             } catch (err) {
                 console.warn("[search] Failed to prefetch search data:", err);
@@ -10953,9 +11006,9 @@ class MinSideManager {
 
             selectedIndex = -1;
             const typeLabels = {
-                'course': { name: 'Kurs & Undervisning', icon: 'school', color: '#d17d39' },
+                'course': { name: tx('Kurs & Undervisning', 'Courses & teaching', 'Cursos y enseñanza'), icon: 'school', color: '#d17d39' },
                 'reading-plan': { name: 'Leseplaner & Andakt', icon: 'auto_stories', color: '#bd4f2a' },
-                'note': { name: 'Dine Notater', icon: 'notes', color: '#d17d39' },
+                'note': { name: tx('Dine Notater', 'Your notes', 'Tus notas'), icon: 'notes', color: '#d17d39' },
                 'prayer-wall': { name: 'Bønneveggen', icon: 'favorite', color: '#bd4f2a' },
                 'bible-search': { name: 'Bibel & Ordbok', icon: 'menu_book', color: '#d17d39' },
                 'bible-ref': { name: 'Nettbibel', icon: 'menu_book', color: '#d17d39' },
@@ -11094,23 +11147,23 @@ class MinSideManager {
         const faqs = [
             {
                 q: isNo ? 'Hvordan endrer jeg kontaktinformasjonen min?' : (isEs ? '¿Cómo cambio mi información de contacto?' : 'How do I change my contact info?'),
-                a: isNo ? 'Gå til «Profil» i menyen og trykk på redigeringsikonet (blyant) øverst på kortet for kontaktinformasjon. Husk å trykke «Lagre» etter at du har oppdatert opplysningene dine.' : 'Go to "Profile" in the menu and click the edit icon on the contact info card.'
+                a: tx('Gå til «Profil» i menyen og trykk på redigeringsikonet (blyant) øverst på kortet for kontaktinformasjon. Husk å trykke «Lagre» etter at du har oppdatert opplysningene dine.', 'Go to "Profile" in the menu and click the edit icon on the contact info card.', 'Ve a «Perfil» en el menú y haz clic en el icono de editar en la tarjeta de contacto.')
             },
             {
                 q: isNo ? 'Hvordan tilpasser jeg Push- og e-postvarsler?' : (isEs ? '¿Cómo personalizo mis notificaciones?' : 'How do I customize my notification preferences?'),
-                a: isNo ? 'Under «Profil» finner du fanen «Varsler». Der kan du enkelt slå av eller på push-varsler for ny undervisning, podcast, blogg og generelle nyhetsbrev.' : 'Under "Profile" click the "Notifications" tab to enable or disable push and email notifications.'
+                a: tx('Under «Profil» finner du fanen «Varsler». Der kan du enkelt slå av eller på push-varsler for ny undervisning, podcast, blogg og generelle nyhetsbrev.', 'Under "Profile" click the "Notifications" tab to enable or disable push and email notifications.', 'En «Perfil», haz clic en la pestaña «Notificaciones» para activar o desactivar las notificaciones push y por correo.')
             },
             {
                 q: isNo ? 'Hvor finner jeg kvittering for gaver og årsrapport?' : (isEs ? '¿Dónde encuentro mis recibos de donación?' : 'Where do I find my donation receipts?'),
-                a: isNo ? 'Klikk på «Gaver» i menyen. Der ser du en fullstendig historikk over alle dine gaver. Trykk på en enkelt gave for å se kvittering, eller bruk knappen «Skriv ut rapport» øverst for å laste ned samlerapport.' : 'Click "Giving" in the menu to view all donations and print reports.'
+                a: tx('Klikk på «Gaver» i menyen. Der ser du en fullstendig historikk over alle dine gaver. Trykk på en enkelt gave for å se kvittering, eller bruk knappen «Skriv ut rapport» øverst for å laste ned samlerapport.', 'Click "Giving" in the menu to view all donations and print reports.', 'Haz clic en «Ofrendas» en el menú para ver todas tus donaciones e imprimir informes.')
             },
             {
                 q: isNo ? 'Hvordan fungerer leseplaner?' : (isEs ? '¿Cómo funcionan los planes de lectura?' : 'How do reading plans work?'),
-                a: isNo ? 'Gå til «Leseplaner» i menyen for å se dine aktive og tilgjengelige leseplaner. Du kan trykke på dagslesningen for å åpne bibelteksten direkte i leseren.' : 'Go to "Reading Plans" in the menu to track your active plans and read daily scripture.'
+                a: tx('Gå til «Leseplaner» i menyen for å se dine aktive og tilgjengelige leseplaner. Du kan trykke på dagslesningen for å åpne bibelteksten direkte i leseren.', 'Go to "Reading Plans" in the menu to track your active plans and read daily scripture.', 'Ve a «Planes de lectura» en el menú para seguir tus planes activos y leer la Escritura cada día.')
             },
             {
                 q: isNo ? 'Hvordan kan jeg endre passord eller slette kontoen min?' : (isEs ? '¿Cómo puedo cambiar la contraseña o eliminar mi cuenta?' : 'How can I change my password or delete my account?'),
-                a: isNo ? 'Under «Profil» finner du kortet «Sikkerhet & kontoadministrasjon». Du kan be om tilbakestilling av passord på e-post, eller slette kontoen din permanent i tråd med GDPR.' : 'Under "Profile" you can request a password reset link or permanently delete your account.'
+                a: tx('Under «Profil» finner du kortet «Sikkerhet & kontoadministrasjon». Du kan be om tilbakestilling av passord på e-post, eller slette kontoen din permanent i tråd med GDPR.', 'Under "Profile" you can request a password reset link or permanently delete your account.', 'En «Perfil» puedes solicitar un enlace para restablecer la contraseña o eliminar tu cuenta permanentemente.')
             }
         ];
 
@@ -11120,12 +11173,12 @@ class MinSideManager {
             <div class="ms-help-hero">
                 <div>
                     <h2 style="font-size: 1.5rem; font-weight: 800; margin: 0 0 6px 0;">${isNo ? 'Hjelp & Support' : (isEs ? 'Ayuda y Soporte' : 'Help & Support')}</h2>
-                    <p style="font-size: 0.9rem; margin: 0; max-width: 600px; line-height: 1.5;">${isNo ? 'Finn svar på ofte stilte spørsmål eller send en melding direkte til teamet vårt i His Kingdom Ministry.' : 'Find answers to common questions or send a message directly to our team.'}</p>
+                    <p style="font-size: 0.9rem; margin: 0; max-width: 600px; line-height: 1.5;">${tx('Finn svar på ofte stilte spørsmål eller send en melding direkte til teamet vårt i His Kingdom Ministry.', 'Find answers to common questions or send a message directly to our team.', 'Encuentra respuestas a preguntas frecuentes o envía un mensaje directamente a nuestro equipo.')}</p>
                 </div>
                 <div style="display: flex; gap: 10px;">
                     <a href="https://www.hiskingdomministry.no/kontakt" target="_blank" class="btn btn-primary" style="background: linear-gradient(135deg, #d17d39, #bd4f2a); border: none; border-radius: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; text-decoration: none; color: #fff;">
                         <span class="material-symbols-outlined">support_agent</span>
-                        <span>${isNo ? 'Kontakt HKM' : 'Contact HKM'}</span>
+                        <span>${tx('Kontakt HKM', 'Contact HKM', 'Contactar con HKM')}</span>
                     </a>
                 </div>
             </div>
@@ -11164,29 +11217,29 @@ class MinSideManager {
                         <div class="info-card-header" style="padding: 18px 22px;">
                             <h3 style="display: flex; align-items: center; gap: 8px; font-size: 1rem; margin: 0;">
                                 <span class="material-symbols-outlined" style="color: var(--accent-color, #d17d39);">send</span>
-                                <span>${isNo ? 'Send melding til support' : 'Send message to support'}</span>
+                                <span>${tx('Send melding til support', 'Send message to support', 'Enviar mensaje a soporte')}</span>
                             </h3>
                         </div>
                         <form id="help-support-form" style="padding: 20px; display: grid; gap: 12px;">
                             <div class="form-group">
-                                <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">${isNo ? 'Ditt navn' : 'Your name'}</label>
+                                <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">${tx('Ditt navn', 'Your name', 'Tu nombre')}</label>
                                 <input type="text" value="${this._escapeHtml(this.currentUser?.displayName || '')}" readonly disabled style="background: var(--main-bg, #f8fafc); opacity: 0.8; width: 100%; padding: 10px 12px; border: 1.5px solid var(--border-solid, #e2e8f0); border-radius: 10px;">
                             </div>
                             <div class="form-group">
-                                <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">${isNo ? 'E-post' : 'Email'}</label>
+                                <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">${tx('E-post', 'Email', 'Correo electrónico')}</label>
                                 <input type="email" value="${this._escapeHtml(this.currentUser?.email || '')}" readonly disabled style="background: var(--main-bg, #f8fafc); opacity: 0.8; width: 100%; padding: 10px 12px; border: 1.5px solid var(--border-solid, #e2e8f0); border-radius: 10px;">
                             </div>
                             <div class="form-group">
-                                <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">${isNo ? 'Emne' : 'Subject'}</label>
-                                <input type="text" id="support-subject" placeholder="${isNo ? 'Hva gjelder meldingen?' : 'Subject'}" required style="width: 100%; padding: 10px 12px; border: 1.5px solid var(--border-solid, #e2e8f0); border-radius: 10px; font-family: inherit; font-size: 0.88rem;">
+                                <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">${tx('Emne', 'Subject', 'Asunto')}</label>
+                                <input type="text" id="support-subject" placeholder="${tx('Hva gjelder meldingen?', 'Subject', 'Asunto')}" required style="width: 100%; padding: 10px 12px; border: 1.5px solid var(--border-solid, #e2e8f0); border-radius: 10px; font-family: inherit; font-size: 0.88rem;">
                             </div>
                             <div class="form-group">
-                                <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">${isNo ? 'Melding' : 'Message'}</label>
-                                <textarea id="support-message" rows="4" placeholder="${isNo ? 'Beskriv det du trenger hjelp med...' : 'Describe what you need help with...'}" required style="width: 100%; padding: 10px 12px; border: 1.5px solid var(--border-solid, #e2e8f0); border-radius: 10px; font-family: inherit; font-size: 0.88rem; resize: vertical;"></textarea>
+                                <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">${tx('Melding', 'Message', 'Mensaje')}</label>
+                                <textarea id="support-message" rows="4" placeholder="${tx('Beskriv det du trenger hjelp med...', 'Describe what you need help with...', 'Describe en qué necesitas ayuda...')}" required style="width: 100%; padding: 10px 12px; border: 1.5px solid var(--border-solid, #e2e8f0); border-radius: 10px; font-family: inherit; font-size: 0.88rem; resize: vertical;"></textarea>
                             </div>
                             <button type="submit" class="btn btn-primary" id="support-submit-btn" style="width: 100%; justify-content: center; margin-top: 4px; background: linear-gradient(135deg, #d17d39, #bd4f2a); border: none; border-radius: 10px; font-weight: 700; height: 42px; display: inline-flex; align-items: center; gap: 6px;">
                                 <span class="material-symbols-outlined">send</span>
-                                <span>${isNo ? 'Send melding' : 'Send message'}</span>
+                                <span>${tx('Send melding', 'Send message', 'Enviar mensaje')}</span>
                             </button>
                         </form>
                     </div>
@@ -11208,7 +11261,7 @@ class MinSideManager {
             if (!subject || !message) return;
 
             btn.disabled = true;
-            btn.innerHTML = `<div class="spinner" style="width: 16px; height: 16px; border-width: 2px;"></div> <span>${isNo ? 'Sender...' : 'Sending...'}</span>`;
+            btn.innerHTML = `<div class="spinner" style="width: 16px; height: 16px; border-width: 2px;"></div> <span>${tx('Sender...', 'Sending...', 'Enviando...')}</span>`;
 
             try {
                 await firebase.firestore().collection('support_tickets').add({
@@ -11221,14 +11274,14 @@ class MinSideManager {
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                this._notify(isNo ? 'Meldingen din er sendt til support! Vi svarer så fort som mulig.' : 'Your message has been sent to support!', 'success');
+                this._notify(tx('Meldingen din er sendt til support! Vi svarer så fort som mulig.', 'Your message has been sent to support!', '¡Tu mensaje se ha enviado a soporte!'), 'success');
                 form.reset();
             } catch (err) {
                 console.error('Support ticket error:', err);
-                this._notify(isNo ? 'Kunne ikke sende melding. Prøv igjen senere.' : 'Could not send message. Please try again.', 'warning');
+                this._notify(tx('Kunne ikke sende melding. Prøv igjen senere.', 'Could not send message. Please try again.', 'No se pudo enviar el mensaje. Inténtalo de nuevo.'), 'warning');
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = `<span class="material-symbols-outlined">send</span> <span>${isNo ? 'Send melding' : 'Send message'}</span>`;
+                btn.innerHTML = `<span class="material-symbols-outlined">send</span> <span>${tx('Send melding', 'Send message', 'Enviar mensaje')}</span>`;
             }
         });
     }

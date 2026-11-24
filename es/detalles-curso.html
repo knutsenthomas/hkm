@@ -1347,76 +1347,69 @@
 </head>
 
 <body id="body" class="header-always-scrolled">
-
     <!-- Header -->
     <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
-        <div class="header-content" id="header-container">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
+            id="header-container">
             <!-- Logo -->
-            <a href="/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+            <a href="/es/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
                 <div
-                    class="w-[45px] h-[45px] flex items-center justify-center rounded-lg overflow-hidden shrink-0 logo-icon">
-                    <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover"
-                        data-content-doc="settings_global" data-content-key="brand.logoAlt" data-content-attr="alt">
+                    class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
+                    <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
                 </div>
-                <span class="text-xl" data-content-doc="settings_global" data-content-key="brand.name">His Kingdom
-                    Ministry</span>
+                <span class="text-xl text-white">His Kingdom Ministry</span>
             </a>
 
             <!-- Right Actions: Donate + Language + Hamburger -->
             <div class="header-actions">
                 <!-- Utilities Dock (Search, Bible, Reading Plans, Language Selector) -->
                 <div class="header-actions-dock">
-                    <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Søk i nettsiden">
+                    <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Buscar en el sitio">
                         <span class="material-symbols-outlined text-xl" style="position: relative; top: 0px; left: 9px;">search</span>
                     </button>
-                    
+
                     <div class="header-actions-expandable">
-                        <a href="/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-bible-btn" aria-label="Les Bibelen" title="Les Bibelen">
+                        <a href="/es/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-bible-btn" aria-label="Leer la Biblia" title="Leer la Biblia">
                             <span class="material-symbols-outlined text-xl">menu_book</span>
                         </a>
-                        <a href="/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-reading-plans-btn" aria-label="Leseplaner" title="Leseplaner">
+                        <a href="/es/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-reading-plans-btn" aria-label="Planes de lectura" title="Planes de lectura">
                             <span class="material-symbols-outlined text-xl">calendar_today</span>
                         </a>
-                        
+
                         <div class="hidden md:block w-px h-5 bg-white/20 mx-1 dock-divider"></div>
 
                         <!-- Language Switcher in same styling -->
                         <div class="lang-switcher relative group">
                             <button class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full text-white hover:bg-white/15 transition-all lang-btn" aria-label="Velg språk">
                                 <span class="material-symbols-outlined text-lg">language</span>
-                                <span data-content-doc="settings_global" data-content-key="header.currentLanguage">NO</span>
+                                <span>ES</span>
                             </button>
                             <div class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden border border-gray-100">
-                                <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                                    data-lang="no" data-content-doc="settings_global" data-content-key="header.languages.no">🇳🇴
-                                    Norsk</a>
-                                <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                                    data-lang="en" data-content-doc="settings_global" data-content-key="header.languages.en">🇺🇸
-                                <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                                    data-lang="es" data-content-doc="settings_global" data-content-key="header.languages.es">🇪🇸
-                                    Español</a>
+                                <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
+                                <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="en">🇺🇸 English</a>
+                                <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="es">🇪🇸 Español</a>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Profile Button (Desktop Only) -->
-                <a href="/minside/index.html" id="header-profile-link" class="w-11 h-11 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all relative overflow-hidden hidden md:flex" aria-label="Min Side" title="Min Side">
+                <!-- Profile Button -->
+                <a href="/minside/index.html" id="header-profile-link" class="w-11 h-11 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all relative overflow-hidden hidden" aria-label="Mi página" title="Mi página">
                     <span class="material-symbols-outlined text-xl">account_circle</span>
-                    <img id="header-profile-img" src="" alt="Profilbilde" class="absolute inset-0 w-full h-full object-cover hidden rounded-full">
+                    <img id="header-profile-img" src="" alt="Foto de perfil" class="absolute inset-0 w-full h-full object-cover hidden rounded-full">
                 </a>
-                <a href="/donasjoner"
+
+                <!-- Primary CTA: Donate (Pill Style, gradient) -->
+                <a href="/es/donaciones"
                     class="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-[1.03] active:scale-[0.98] transition-all shadow-md shadow-orange-500/10 header-donate-btn">
-                    <span data-content-doc="settings_global" data-content-key="header.donateLabel">Gi gave</span>
+                    <span>Donar</span>
                     <span class="material-symbols-outlined text-lg">favorite</span>
                 </a>
 
                 <!-- Unified Toggle Button (Neutral circular button matching utilities) -->
                 <button
                     class="menu-toggle w-11 h-11 rounded-full flex items-center justify-center text-white bg-white/15 border border-white/10 hover:bg-white/25 active:scale-95 transition-all relative focus:outline-none focus:ring-0"
-                    id="menu-toggle" aria-label="Toggle meny" aria-controls="mega-menu" aria-expanded="false"
-                    data-content-doc="settings_global" data-content-key="header.menuToggleLabel"
-                    data-content-attr="aria-label">
+                    id="menu-toggle" aria-label="Toggle menu">
                     <span class="material-symbols-outlined text-2xl open-icon">menu</span>
                     <span class="material-symbols-outlined text-2xl close-icon hidden">close</span>
                 </button>
@@ -1437,6 +1430,7 @@
                         class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
                 </div>
 
+                <!-- Mobile Language Selector & Theme Toggle (Pill Style) -->
                 <!-- Language Selector & Theme Toggle (Pill Style) -->
                 <div class="flex items-center justify-between gap-4">
                     <div class="flex md:hidden items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
@@ -1461,7 +1455,7 @@
                             <span class="material-symbols-outlined text-2xl">account_circle</span>
                             <img id="mobile-menu-profile-img" src="" alt="Profilbilde" class="absolute inset-0 w-full h-full object-cover hidden rounded-full">
                         </a>
-                        <button class="mobile-theme-toggle-btn flex items-center justify-center h-12 w-12 border border-gray-200 rounded-full bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-colors" aria-label="Bytt tema" title="Bytt tema">
+                        <button class="mobile-theme-toggle-btn flex items-center justify-center h-12 w-12 border border-gray-200 rounded-full bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-colors" aria-label="Cambiar tema" title="Cambiar tema">
                             <span class="material-symbols-outlined text-2xl theme-toggle-icon">dark_mode</span>
                         </button>
                     </div>
@@ -1471,150 +1465,150 @@
             <div class="mega-menu-body">
                 <!-- Menu Content Grid -->
                 <div class="mega-menu-grid">
-                    <!-- Column 1: Engasjer deg -->
+                    <!-- Column 1: Involúcrate -->
                     <div class="menu-col">
                         <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
-                            data-content-key="menu.sections.engage.title">Engasjer deg</div>
+                            data-content-key="menu.sections.engage.title">Involúcrate</div>
                         <ul class="mega-nav-list">
                             <li>
                                 <span class="material-symbols-outlined">volunteer_activism</span>
                                 <div class="flex flex-col">
-                                    <a href="/donasjoner" data-content-doc="settings_global"
-                                        data-content-key="menu.sections.engage.supportWork">Støtt arbeidet</a>
-                                    <span class="mega-menu-desc">Bidra økonomisk til vår tjeneste.</span>
+                                    <a href="/es/donaciones" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.supportWork">Apoya la obra</a>
+                                    <span class="mega-menu-desc">Apoya nuestro ministerio financieramente.</span>
                                 </div>
                             </li>
                             <li>
                                 <span class="material-symbols-outlined">favorite</span>
                                 <div class="flex flex-col">
-                                    <a href="/bli-fast-giver" data-content-doc="settings_global"
-                                        data-content-key="menu.sections.engage.regularDonor">Bli fast giver</a>
-                                    <span class="mega-menu-desc">Støtt oss månedlig for langsiktig arbeid.</span>
+                                    <a href="/es/donantes-regulares" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.regularDonor">Hazte donante mensual</a>
+                                    <span class="mega-menu-desc">Únete a nosotros con un apoyo mensual.</span>
                                 </div>
                             </li>
                             <li>
                                 <span class="material-symbols-outlined">church</span>
                                 <div class="flex flex-col">
-                                    <a href="/for-menigheter" data-content-doc="settings_global"
-                                        data-content-key="menu.sections.engage.churches">For menigheter</a>
-                                    <span class="mega-menu-desc">Ressurser og undervisning for din kirke.</span>
+                                    <a href="/es/para-iglesias" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.churches">Para iglesias</a>
+                                    <span class="mega-menu-desc">Recursos y enseñanza para tu iglesia.</span>
                                 </div>
                             </li>
                             <li>
                                 <span class="material-symbols-outlined">corporate_fare</span>
                                 <div class="flex flex-col">
-                                    <a href="/for-bedrifter" data-content-doc="settings_global"
-                                        data-content-key="menu.sections.engage.businesses">For bedrifter</a>
-                                    <span class="mega-menu-desc">Samarbeidsavtaler for næringslivet.</span>
+                                    <a href="/es/para-empresas" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.businesses">Para empresas</a>
+                                    <span class="mega-menu-desc">Acuerdos de patrocinio para empresas.</span>
                                 </div>
                             </li>
                             <li>
                                 <span class="material-symbols-outlined">business_center</span>
                                 <div class="flex flex-col">
-                                    <a href="/bnn" data-content-doc="settings_global"
+                                    <a href="/es/bnn" data-content-doc="settings_global"
                                         data-content-key="menu.sections.engage.network">Business Network</a>
-                                    <span class="mega-menu-desc">Nettverk for kristne ledere og gründere.</span>
+                                    <span class="mega-menu-desc">Red para líderes y empresarios cristianos.</span>
                                 </div>
                             </li>
                         </ul>
                     </div>
 
-                    <!-- Column 2: Bli kjent med oss -->
+                    <!-- Column 2: Conócenos -->
                     <div class="menu-col">
                         <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
-                            data-content-key="menu.sections.about.title">Bli kjent med oss</div>
+                            data-content-key="menu.sections.about.title">Conócenos</div>
                         <ul class="mega-nav-list">
                             <li>
                                 <span class="material-symbols-outlined">info</span>
                                 <div class="flex flex-col">
-                                    <a href="/om-oss" data-content-doc="settings_global"
-                                        data-content-key="menu.sections.about.about">Om oss</a>
-                                    <span class="mega-menu-desc">Lær mer om vår visjon, tro og verdier.</span>
+                                    <a href="/es/sobre-nosotros" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.about">Sobre nosotros</a>
+                                    <span class="mega-menu-desc">Conoce nuestra visión, fe y valores.</span>
                                 </div>
                             </li>
                             <li>
                                 <span class="material-symbols-outlined">mail</span>
                                 <div class="flex flex-col">
-                                    <a href="/kontakt" data-content-doc="settings_global"
-                                        data-content-key="menu.sections.about.contact">Kontakt oss</a>
-                                    <span class="mega-menu-desc">Send oss en melding eller still spørsmål.</span>
+                                    <a href="/es/contacto" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.contact">Contáctanos</a>
+                                    <span class="mega-menu-desc">Envíanos un mensaje o pregunta.</span>
                                 </div>
                             </li>
                         </ul>
                     </div>
 
-                    <!-- Column 3: Ressurser -->
+                    <!-- Column 3: Recursos -->
                     <div class="menu-col">
                         <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
-                            data-content-key="menu.sections.resources.title">Ressurser</div>
+                            data-content-key="menu.sections.resources.title">Recursos</div>
                         <ul class="mega-nav-list">
                             <li>
                                 <span class="material-symbols-outlined">menu_book</span>
                                 <div class="flex flex-col">
-                                    <a href="/bibel" data-content-doc="settings_global" data-content-key="menu.sections.resources.bible">Les Bibelen</a>
-                                    <span class="mega-menu-desc">Les Guds ord med vår bibelleser.</span>
+                                    <a href="/bibel" data-content-doc="settings_global" data-content-key="menu.sections.resources.bible">Biblia</a>
+                                    <span class="mega-menu-desc">Lee la Palabra de Dios con nuestra biblia.</span>
                                 </div>
                             </li>
                             <li>
                                 <span class="material-symbols-outlined">shopping_bag</span>
                                 <div class="flex flex-col">
-                                    <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
-                                        data-content-key="menu.sections.resources.store">Butikk</a>
-                                    <span class="mega-menu-desc">Kristne klær, kopper og tilbehør.</span>
+                                    <a href="/es/../butikk" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.store">Tienda</a>
+                                    <span class="mega-menu-desc">Ropa, tazas y accesorios cristianos.</span>
                                 </div>
                             </li>
                             <li>
                                 <span class="material-symbols-outlined">podcasts</span>
                                 <div class="flex flex-col">
-                                    <a href="/media" data-content-doc="settings_global"
+                                    <a href="/es/media" data-content-doc="settings_global"
                                         data-content-key="menu.sections.resources.media">Media & Podcast</a>
-                                    <span class="mega-menu-desc">Se taler og lytt til våre podcaster.</span>
+                                    <span class="mega-menu-desc">Mira mensajes y escucha podcasts.</span>
                                 </div>
                             </li>
                             <li>
                                 <span class="material-symbols-outlined">school</span>
                                 <div class="flex flex-col">
-                                    <a href="/kurs" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Kurs</a>
-                                    <span class="mega-menu-desc">Undervisning og kurs for vekst.</span>
+                                    <a href="/es/cursos" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Cursos</a>
+                                    <span class="mega-menu-desc">Enseñanzas y cursos para el crecimiento.</span>
                                 </div>
                             </li>
                         </ul>
                     </div>
 
-                    <!-- Column 4: Aktuell aktivitet -->
+                    <!-- Column 4: Actividad reciente -->
                     <div class="menu-col">
                         <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
-                            data-content-key="menu.sections.activity.title">Aktuell aktivitet</div>
+                            data-content-key="menu.sections.activity.title">Actividad reciente</div>
                         <ul class="mega-nav-list">
                             <li>
                                 <span class="material-symbols-outlined">calendar_month</span>
                                 <div class="flex flex-col">
-                                    <a href="/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Leseplaner</a>
-                                    <span class="mega-menu-desc">Følg våre daglige leseplaner.</span>
+                                    <a href="/es/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Planes de lectura</a>
+                                    <span class="mega-menu-desc">Sigue nuestros planes diarios de lectura.</span>
                                 </div>
                             </li>
                             <li>
                                 <span class="material-symbols-outlined">event</span>
                                 <div class="flex flex-col">
-                                    <a href="/arrangementer" data-content-doc="settings_global"
-                                        data-content-key="menu.sections.resources.events">Arrangementer</a>
-                                    <span class="mega-menu-desc">Bli med på seminarer og samlinger.</span>
+                                    <a href="/es/eventos" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.events">Eventos</a>
+                                    <span class="mega-menu-desc">Únete a nuestros seminarios y reuniones.</span>
                                 </div>
                             </li>
                             <li>
                                 <span class="material-symbols-outlined">feed</span>
                                 <div class="flex flex-col">
-                                    <a href="/blogg" data-content-doc="settings_global"
-                                        data-content-key="menu.sections.resources.blog">Nyheter & Blogg</a>
-                                    <span class="mega-menu-desc">Siste oppdateringer og artikler.</span>
+                                    <a href="/es/blog" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.blog">Noticias y Blog</a>
+                                    <span class="mega-menu-desc">Últimas actualizaciones y artículos.</span>
                                 </div>
                             </li>
                             <li class="min-side-pill">
                                 <span class="material-symbols-outlined">person</span>
                                 <div class="flex flex-col">
-                                    <a href="/minside/index.html" data-content-doc="settings_global"
-                                        data-content-key="menu.sections.resources.myPage">Min Side</a>
-                                    <span class="mega-menu-desc">Din profil og leseplaner.</span>
+                                    <a href="/es/../minside/index" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.myPage">Mi página</a>
+                                    <span class="mega-menu-desc">Tu perfil y planes personales.</span>
                                 </div>
                             </li>
                         </ul>
@@ -1623,31 +1617,29 @@
 
                 <!-- Menu Footer -->
                 <div class="mega-menu-footer">
-                    <a href="/donasjoner" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
-                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Støtt nå</span><i
+                    <a href="/es/donaciones" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Apoya ahora</span><i
                             class="fas fa-heart heart"></i></a>
                     <div class="menu-footer-links">
-                        <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
-                            data-content-key="menu.footer.store">Butikk</a>
-                        <a href="/donasjoner" data-content-doc="settings_global"
-                            data-content-key="menu.footer.taxDeduction">Skattefradrag</a>
-                        <a href="/om-oss" data-content-doc="settings_global"
-                            data-content-key="menu.footer.about">Om oss</a>
-                        <a href="/personvern" data-content-doc="settings_global"
-                            data-content-key="menu.footer.privacy">Personvern</a>
-                        <a href="/betingelser" data-content-doc="settings_global" data-content-key="menu.footer.terms">Betingelser</a>
+                        <a href="/es/../butikk" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Tienda</a>
+                        <a href="/es/donaciones" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Deducción fiscal</a>
+                        <a href="/es/sobre-nosotros" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">Sobre nosotros</a>
+                        <a href="/es/privacidad" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Privacidad</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Platform Container -->
     <div id="platform-container" class="platform-container">
         <!-- Left Sidebar: Course Modules & Lessons Navigation -->
         <aside class="sidebar-nav" id="sidebar-nav">
             <div class="sidebar-header" onclick="window.toggleMobileSidebar()">
-                <span class="sidebar-title" id="sidebar-course-title">Seerkurs med aktivering</span>
+                <span class="sidebar-title" id="sidebar-course-title">Curso de videntes con activación</span>
                 <span class="mobile-sidebar-toggle-btn"><i class="fas fa-chevron-down" id="mobile-sidebar-chevron"></i></span>
             </div>
 
@@ -1659,11 +1651,11 @@
                         <i class="fas fa-chevron-down" id="mod-1-icon"></i>
                     </div>
                     <ul class="lesson-list" id="mod-1-list">
-                        <a href="../javascript:void(0)" class="lesson-item active" onclick="window.selectLesson(0)" style="cursor: pointer;">
+                        <a href="javascript:void(0)" class="lesson-item active" onclick="window.selectLesson(0)" style="cursor: pointer;">
                             <span class="lesson-dot"></span>
                             <span>Lección 1.1: Cómo ver en el espíritu</span>
                         </a>
-                        <a href="../javascript:void(0)" class="lesson-item" onclick="window.selectLesson(1)" style="cursor: pointer;">
+                        <a href="javascript:void(0)" class="lesson-item" onclick="window.selectLesson(1)" style="cursor: pointer;">
                             <span class="lesson-dot"></span>
                             <span>Lección 1.2: Escuchar la voz de Dios</span>
                         </a>
@@ -1677,7 +1669,7 @@
                         <i class="fas fa-chevron-down" id="mod-2-icon"></i>
                     </div>
                     <ul class="lesson-list" id="mod-2-list">
-                        <a href="../javascript:void(0)" class="lesson-item" onclick="window.selectLesson(2)" style="cursor: pointer;">
+                        <a href="javascript:void(0)" class="lesson-item" onclick="window.selectLesson(2)" style="cursor: pointer;">
                             <span class="lesson-dot"></span>
                             <span>Lección 2.1: Encuentro con Jesús</span>
                         </a>
@@ -1927,6 +1919,19 @@
                         console.warn('Firestore courses fallback error:', e);
                     }
                 }
+
+                courses = courses.map(c => {
+                    const loc = c && c.translations && c.translations['es'];
+                    if (!loc) return c;
+                    const ok = v => typeof v === 'string' && v.trim();
+                    const lessons = Array.isArray(c.lessons) ? c.lessons.map(l => {
+                        const t = (loc.lessons || []).find(x => x && l && x.id === l.id);
+                        if (!t) return l;
+                        const resources = Array.isArray(l.resources) ? l.resources.map((r, i) => (r && typeof r === 'object' && t.resources && t.resources[i] && ok(t.resources[i].title)) ? { ...r, title: t.resources[i].title } : r) : l.resources;
+                        return { ...l, title: ok(t.title) ? t.title : l.title, description: ok(t.description) ? t.description : l.description, resources };
+                    }) : c.lessons;
+                    return { ...c, title: ok(loc.title) ? loc.title : c.title, description: ok(loc.description) ? loc.description : c.description, category: ok(loc.category) ? loc.category : c.category, priceSuffix: ok(loc.priceSuffix) ? loc.priceSuffix : c.priceSuffix, lessons };
+                });
 
                 if (targetId) {
                     currentCourse = courses.find(c => String(c.id) === String(targetId));
@@ -2431,13 +2436,13 @@
 
             const courseHeading = document.getElementById('course-lesson-heading');
             if (courseHeading && currentCourse) {
-                const cleanDisplayTitle = (lesson.title || `Lección ${index + 1}`).replace(/^leksjon\s+\d+:\s*/i, '');
+                const cleanDisplayTitle = (lesson.title || `Lección ${index + 1}`).replace(/^(leksjon|lesson|lección)\s+\d+:\s*/i, '');
                 courseHeading.innerHTML = `<strong>${currentCourse.title || 'Curso'} – Lección ${index + 1}:</strong> <span>${cleanDisplayTitle}</span>`;
             }
 
             const overviewTitle = document.getElementById('lesson-overview-title');
             if (overviewTitle) {
-                const cleanTitle = (lesson.title || '').replace(/^leksjon\s+\d+:\s*/i, '').trim();
+                const cleanTitle = (lesson.title || '').replace(/^(leksjon|lesson|lección)\s+\d+:\s*/i, '').trim();
                 overviewTitle.textContent = cleanTitle || 'Om leksjonen';
             }
 
@@ -2578,8 +2583,8 @@
             if (isUpcoming) {
                 const releaseDateVal = currentCourse.releaseDate || currentCourse.startDate || currentCourse.date;
                 const releaseDateObj = releaseDateVal ? new Date(releaseDateVal) : new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
-                const formattedDate = releaseDateObj.toLocaleDateString('no-NO', { day: 'numeric', month: 'long', year: 'numeric' });
-                const formattedTime = releaseDateObj.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
+                const formattedDate = releaseDateObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+                const formattedTime = releaseDateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 
                 videoContainer.innerHTML = `
                     <img id="course-cover-img" src="${courseImg}" alt="Kursbilde" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
@@ -2811,7 +2816,7 @@
                 author: userName,
                 avatar: userPhoto,
                 role: 'Kursdeltaker',
-                date: new Date().toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' }),
+                date: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
                 text: text
             };
 
