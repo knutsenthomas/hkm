@@ -5,6 +5,7 @@
 
 import { mountSiteShell } from './js/site-shell.js';
 
+window.hkmTx = window.hkmTx || function (no, en, es) { const l = (document.documentElement.lang || 'no').slice(0, 2); return l === 'en' ? en : l === 'es' ? (es == null ? en : es) : no; };
 mountSiteShell();
 
 function onDOMReady(callback) {
@@ -932,7 +933,7 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
 
     const q = (query || '').trim();
     if (!q) {
-        resultsEl.innerHTML = '<p class="site-search-helper">Skriv inn et søkeord og trykk Enter.</p>';
+        resultsEl.innerHTML = ("<p class=\"site-search-helper\">" + hkmTx("Skriv inn et søkeord og trykk Enter.", "Type a search term and press Enter.", "Escribe un término de búsqueda y pulsa Intro.") + "</p>");
         return;
     }
 
@@ -958,12 +959,12 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
             resultsEl.innerHTML = `
                 <div style="padding: 40px 20px; display: flex; align-items: center; justify-content: center; gap: 12px;">
                     <div class="spinner" style="width: 24px; height: 24px; border: 3.5px solid rgba(27,73,101,0.15); border-top-color: #1B4965; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
-                    <span style="font-size: 14.5px; color: #64748b; font-weight: 600;">Søker...</span>
+                    <span style="font-size: 14.5px; color: #64748b; font-weight: 600;">${hkmTx("Søker...", "Searching...", "Buscando...")}</span>
                 </div>
             `;
         }
     } else {
-        resultsEl.innerHTML = '<p class="site-search-helper">Søker i innhold...</p>';
+        resultsEl.innerHTML = ("<p class=\"site-search-helper\">" + hkmTx("Søker i innhold...", "Searching content...", "Buscando en el contenido...") + "</p>");
     }
     resultsEl.classList.remove('hidden');
 
@@ -972,7 +973,7 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
         (typeof window.firebaseService.canReadPublicContent === 'function' && window.firebaseService.canReadPublicContent())
     );
     if (!isServiceReady) {
-        resultsEl.innerHTML = '<p class="site-search-helper">Innhold kan ikke søkes akkurat nå.</p>';
+        resultsEl.innerHTML = ("<p class=\"site-search-helper\">" + hkmTx("Innhold kan ikke søkes akkurat nå.", "Content cannot be searched right now.", "No se puede buscar contenido en este momento.") + "</p>");
         restoreIcon();
         return;
     }
@@ -1621,7 +1622,7 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
 
     } catch (err) {
         console.error('Feil ved søk:', err);
-        resultsEl.innerHTML = '<p class="site-search-helper">Det oppstod en feil ved søk. Prøv igjen senere.</p>';
+        resultsEl.innerHTML = ("<p class=\"site-search-helper\">" + hkmTx("Det oppstod en feil ved søk. Prøv igjen senere.", "An error occurred while searching. Please try again later.", "Se produjo un error en la búsqueda. Inténtalo de nuevo más tarde.") + "</p>");
         restoreIcon();
     }
 }
@@ -1966,7 +1967,7 @@ function initScrollToTop() {
     const btn = document.createElement('button');
     btn.className = 'scroll-to-top';
     btn.innerHTML = '<span class="material-symbols-outlined flex items-center justify-center h-full w-full" style="font-size: 24px;">expand_less</span>';
-    btn.setAttribute('aria-label', 'Til toppen');
+    btn.setAttribute('aria-label', hkmTx("Til toppen", "Back to top", "Volver arriba"));
     document.body.appendChild(btn);
 
     // Show/Hide on scroll
@@ -2163,27 +2164,27 @@ if (newsletterForm) {
 
         try {
             submitBtn.disabled = true;
-            submitBtn.innerText = 'Sender...';
+            submitBtn.innerText = hkmTx("Sender...", "Sending...", "Enviando...");
 
-            if (!window.firebaseService?.isInitialized) throw new Error('Påmeldingen er ikke tilgjengelig. Prøv igjen om litt.');
+            if (!window.firebaseService?.isInitialized) throw new Error(hkmTx("Påmeldingen er ikke tilgjengelig. Prøv igjen om litt.", "Sign-up is not available. Please try again shortly.", "La suscripción no está disponible. Inténtalo de nuevo en un momento."));
             if (window.firebaseService) {
                 await window.firebaseService.subscribeNewsletter(email);
                 try { localStorage.setItem('hkm_newsletter_subscribed', '1'); } catch { /* Browser storage is optional. */ }
                 if (window.notifications) {
-                    window.notifications.show(`Takk! Du er nå påmeldt med ${email}`, 'success');
+                    window.notifications.show(`${hkmTx("Takk! Du er nå påmeldt med", "Thank you! You are now subscribed with", "¡Gracias! Ya estás suscrito con")} ${email}`, 'success');
                 } else {
-                    alert(`Takk! Påmeldingen med ${email} er lagret.`);
+                    alert(`${hkmTx("Takk! Påmeldingen med", "Thank you! The sign-up with", "¡Gracias! La suscripción con")} ${email} ${hkmTx("er lagret.", "has been saved.", "se ha guardado.")}`);
                 }
                 newsletterForm.reset();
             }
         } catch (error) {
             console.error("Newsletter error:", error);
             if (window.notifications) {
-                window.notifications.show("Det oppsto en feil. Prøv igjen senere.", "error");
+                window.notifications.show(hkmTx("Det oppsto en feil. Prøv igjen senere.", "An error occurred. Please try again later.", "Se produjo un error. Inténtalo de nuevo más tarde."), "error");
             }
         } finally {
             submitBtn.disabled = false;
-            submitBtn.innerText = 'Abonner';
+            submitBtn.innerText = hkmTx("Abonner", "Subscribe", "Suscribirse");
         }
     });
 }
@@ -2197,14 +2198,14 @@ if (footerNewsletterForm) {
         const email = emailInput.value;
 
         try {
-            if (!window.firebaseService?.isInitialized) throw new Error('Påmeldingen er ikke tilgjengelig. Prøv igjen om litt.');
+            if (!window.firebaseService?.isInitialized) throw new Error(hkmTx("Påmeldingen er ikke tilgjengelig. Prøv igjen om litt.", "Sign-up is not available. Please try again shortly.", "La suscripción no está disponible. Inténtalo de nuevo en un momento."));
             if (window.firebaseService) {
                 await window.firebaseService.subscribeNewsletter(email);
                 try { localStorage.setItem('hkm_newsletter_subscribed', '1'); } catch { /* Browser storage is optional. */ }
                 if (window.notifications) {
-                    window.notifications.show(`Takk for påmeldingen!`, 'success');
+                    window.notifications.show(`${hkmTx("Takk for påmeldingen!", "Thank you for subscribing!", "¡Gracias por suscribirte!")}`, 'success');
                 } else {
-                    alert(`Takk! Påmeldingen med ${email} er lagret.`);
+                    alert(`${hkmTx("Takk! Påmeldingen med", "Thank you! The sign-up with", "¡Gracias! La suscripción con")} ${email} ${hkmTx("er lagret.", "has been saved.", "se ha guardado.")}`);
                 }
                 footerNewsletterForm.reset();
             }
@@ -2289,7 +2290,7 @@ function initTeamCards() {
         const toggle = () => {
             const expanded = member.classList.toggle('expanded');
             if (toggleBtn) {
-                toggleBtn.textContent = expanded ? 'Vis mindre' : 'Les mer';
+                toggleBtn.textContent = expanded ? hkmTx("Vis mindre", "Show less", "Mostrar menos") : hkmTx("Les mer", "Read more", "Leer más");
             }
         };
 
@@ -2327,7 +2328,7 @@ document.querySelectorAll('a[href="#gi-gave"]').forEach(btn => {
     btn.addEventListener('click', (e) => {
         e.preventDefault();
         // Here you can integrate with a payment gateway like Stripe or Vipps
-        alert('Takk for at du vil støtte vårt arbeid! Denne funksjonen vil kobles til et betalingssystem.');
+        alert(hkmTx("Takk for at du vil støtte vårt arbeid! Denne funksjonen vil kobles til et betalingssystem.", "Thank you for wanting to support our work! This function will be connected to a payment system.", "¡Gracias por querer apoyar nuestro trabajo! Esta función se conectará a un sistema de pago."));
     });
 });
 
@@ -2721,22 +2722,22 @@ window.addEventListener('load', () => {
 
             profileDropdown.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9; margin-bottom: 10px;">
-                    <img id="dropdown-user-avatar" src="" alt="Profilbilde" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--hkm-terracotta); background: #f1f5f9;">
+                    <img id="dropdown-user-avatar" src="" alt="${hkmTx("Profilbilde", "Profile picture", "Foto de perfil")}" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--hkm-terracotta); background: #f1f5f9;">
                     <div style="min-width: 0; flex: 1;">
-                        <div id="dropdown-user-name" style="font-weight: 750; font-size: 0.95rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Innlogget bruker</div>
+                        <div id="dropdown-user-name" style="font-weight: 750; font-size: 0.95rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${hkmTx("Innlogget bruker", "Signed-in user", "Usuario conectado")}</div>
                         <div id="dropdown-user-email" style="font-size: 0.78rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-</div>
                     </div>
                 </div>
 
                 <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px;">
                     <a href="/minside/index.html#overview" class="dropdown-link-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: #334155; font-size: 0.88rem; font-weight: 600; text-decoration: none;">
-                        <i class="fas fa-user-circle" style="color: var(--hkm-terracotta); font-size: 1rem; width: 18px; text-align: center;"></i> Min Side
+                        <i class="fas fa-user-circle" style="color: var(--hkm-terracotta); font-size: 1rem; width: 18px; text-align: center;"></i> ${hkmTx("Min Side", "My Page", "Mi página")}
                     </a>
                     <a href="/minside/index.html#courses" class="dropdown-link-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: #334155; font-size: 0.88rem; font-weight: 600; text-decoration: none;">
-                        <i class="fas fa-graduation-cap" style="color: var(--hkm-terracotta); font-size: 1rem; width: 18px; text-align: center;"></i> Mine kurs
+                        <i class="fas fa-graduation-cap" style="color: var(--hkm-terracotta); font-size: 1rem; width: 18px; text-align: center;"></i> ${hkmTx("Mine kurs", "My courses", "Mis cursos")}
                     </a>
                     <a href="/minside/index.html#reading-plans" class="dropdown-link-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: #334155; font-size: 0.88rem; font-weight: 600; text-decoration: none;">
-                        <i class="fas fa-book-open" style="color: var(--hkm-terracotta); font-size: 1rem; width: 18px; text-align: center;"></i> Mine leseplaner
+                        <i class="fas fa-book-open" style="color: var(--hkm-terracotta); font-size: 1rem; width: 18px; text-align: center;"></i> ${hkmTx("Mine leseplaner", "My reading plans", "Mis planes de lectura")}
                     </a>
                     <a id="dropdown-admin-link" href="/admin/index.html#overview" class="dropdown-link-item hidden" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: #d17d39; font-size: 0.88rem; font-weight: 700; text-decoration: none; background: rgba(209, 125, 57, 0.08);">
                         <i class="fas fa-user-shield" style="font-size: 1rem; width: 18px; text-align: center;"></i> Admin Panel
@@ -2745,7 +2746,7 @@ window.addEventListener('load', () => {
 
                 <div style="border-top: 1px solid #f1f5f9; padding-top: 8px;">
                     <button id="dropdown-logout-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 9px 12px; border-radius: 10px; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); color: #dc2626; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.2s;">
-                        <i class="fas fa-sign-out-alt"></i> Logg ut
+                        <i class="fas fa-sign-out-alt"></i> ${hkmTx("Logg ut", "Log out", "Cerrar sesión")}
                     </button>
                 </div>
             `;

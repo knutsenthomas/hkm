@@ -96,6 +96,14 @@
       no: [
         { url: '/faste', t: 'Om fasten i januar', d: 'Nedtelling, slik blir du med og hvilken faste som passer for deg.', icon: 'cal' },
         { url: '/undervisning/faste', t: 'Les undervisningen om faste', d: 'Hva bibelsk faste er, hvorfor vi faster og hvordan du kommer trygt i gang.' }
+      ],
+      en: [
+        { url: '/en/fasting', t: 'About the fast in January', d: 'Countdown, how to join and which fast suits you.', icon: 'cal' },
+        { url: '/en/teaching/fasting', t: 'Read the teaching on fasting', d: 'What biblical fasting is, why we fast and how to get started safely.' }
+      ],
+      es: [
+        { url: '/es/ayuno', t: 'Sobre el ayuno de enero', d: 'Cuenta atrás, cómo unirte y qué ayuno te conviene.', icon: 'cal' },
+        { url: '/es/ensenanza/ayuno', t: 'Lee la enseñanza sobre el ayuno', d: 'Qué es el ayuno bíblico, por qué ayunamos y cómo empezar de forma segura.' }
       ]
     }
   };
@@ -213,7 +221,7 @@
     const tm = out.title.match(/^(.*\S)\s*\(([^()]*\d[^()]*)\)\s*$/);
     out.heading = out.title;
     if (tm && out.refs.length && parseRefs(tm[2]).some(r => r.book)) { out.heading = tm[1]; out.title = refsTitle(out.refs.filter(r => r.label)) || tm[1]; }
-    if (!out.title || out.title === out.verses) out.title = refsTitle(out.refs.filter(r => r.label)) || out.verses || ('Dag ' + d.dayNumber);
+    if (!out.title || out.title === out.verses) out.title = refsTitle(out.refs.filter(r => r.label)) || out.verses || ((LANG === 'en' ? 'Day ' : LANG === 'es' ? 'Día ' : 'Dag ') + d.dayNumber);
     return out;
   }
 

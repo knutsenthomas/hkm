@@ -1,5 +1,6 @@
 import { firebaseService } from './firebase-service.js';
 
+window.hkmTx = window.hkmTx || function (no, en, es) { const l = (document.documentElement.lang || 'no').slice(0, 2); return l === 'en' ? en : l === 'es' ? (es == null ? en : es) : no; };
 export class InteractionsManager {
     constructor(containerId, postId) {
         this.containerId = containerId;
@@ -67,7 +68,7 @@ export class InteractionsManager {
             });
         } else {
             console.warn('[Interactions] Firebase not initialized. Interactions disabled.');
-            container.innerHTML = '<div class="comments-empty"><p>Interaksjoner er for øyeblikket utilgjengelige.</p></div>';
+            container.innerHTML = ("<div class=\"comments-empty\"><p>" + hkmTx("Interaksjoner er for øyeblikket utilgjengelige.", "Interactions are currently unavailable.", "Las interacciones no están disponibles en este momento.") + "</p></div>");
         }
     }
     
@@ -76,28 +77,28 @@ export class InteractionsManager {
             <div class="interactions-container">
                 <!-- Likes -->
                 <div class="likes-section">
-                    <button id="interaction-like-btn" class="like-btn" aria-label="Liker">
+                    <button id="interaction-like-btn" class="like-btn" aria-label="${hkmTx("Liker", "Like", "Me gusta")}">
                         <i class="fa-regular fa-heart"></i>
-                        <span>Liker</span>
+                        <span>${hkmTx("Liker", "Like", "Me gusta")}</span>
                     </button>
-                    <span id="interaction-likes-count" class="likes-count-text">Henter likes...</span>
+                    <span id="interaction-likes-count" class="likes-count-text">${hkmTx("Henter likes...", "Loading likes...", "Cargando me gusta...")}</span>
                 </div>
                 
                 <!-- Comments -->
                 <div class="comments-section">
-                    <h3 class="comments-header">Kommentarer</h3>
+                    <h3 class="comments-header">${hkmTx("Kommentarer", "Comments", "Comentarios")}</h3>
                     
                     <form id="interaction-comment-form" class="comment-form">
                         <div class="comment-input-group">
-                            <label for="comment-name">Ditt navn</label>
-                            <input type="text" id="comment-name" placeholder="F.eks. Ola Nordmann" required />
+                            <label for="comment-name">${hkmTx("Ditt navn", "Your name", "Tu nombre")}</label>
+                            <input type="text" id="comment-name" placeholder="${hkmTx("F.eks. Ola Nordmann", "E.g. John Smith", "Ej.: Juan Pérez")}" required />
                         </div>
                         <div class="comment-input-group">
-                            <label for="comment-text">Din kommentar</label>
-                            <textarea id="comment-text" placeholder="Hva synes du om dette?" required></textarea>
+                            <label for="comment-text">${hkmTx("Din kommentar", "Your comment", "Tu comentario")}</label>
+                            <textarea id="comment-text" placeholder="${hkmTx("Hva synes du om dette?", "What do you think about this?", "¿Qué te parece esto?")}" required></textarea>
                         </div>
                         <button type="submit" class="comment-submit-btn" id="comment-submit-btn">
-                            <span>Publiser kommentar</span>
+                            <span>${hkmTx("Publiser kommentar", "Post comment", "Publicar comentario")}</span>
                             <i class="fa-solid fa-paper-plane"></i>
                         </button>
                     </form>
@@ -106,7 +107,7 @@ export class InteractionsManager {
                         <!-- Loading or empty state -->
                         <div class="comments-empty">
                             <i class="fa-regular fa-comments"></i>
-                            <p>Ingen kommentarer enda. Bli den første til å kommentere!</p>
+                            <p>${hkmTx("Ingen kommentarer enda. Bli den første til å kommentere!", "No comments yet. Be the first to comment!", "Aún no hay comentarios. ¡Sé el primero en comentar!")}</p>
                         </div>
                     </div>
                 </div>
@@ -169,7 +170,7 @@ export class InteractionsManager {
             this.updateLikesUI();
             
             if (error.message.includes('permission-denied')) {
-                alert('Du har ikke tilgang til å like dette innlegget for øyeblikket.');
+                alert(hkmTx("Du har ikke tilgang til å like dette innlegget for øyeblikket.", "You cannot like this post right now.", "No puedes indicar que te gusta esta publicación en este momento."));
             }
         } finally {
             if (btn) {
@@ -202,7 +203,7 @@ export class InteractionsManager {
         
         try {
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publiserer...';
+            submitBtn.innerHTML = ("<i class=\"fas fa-spinner fa-spin\"></i> " + hkmTx("Publiserer...", "Posting...", "Publicando..."));
             
             await firebaseService.addComment(this.postId, {
                 author_name: name,
@@ -213,10 +214,10 @@ export class InteractionsManager {
             textInput.value = ''; // clear text
         } catch (error) {
             console.error('[Interactions] Failed to post comment:', error);
-            alert('Det skjedde en feil ved publisering av kommentaren. Prøv igjen senere.');
+            alert(hkmTx("Det skjedde en feil ved publisering av kommentaren. Prøv igjen senere.", "An error occurred while posting the comment. Please try again later.", "Se produjo un error al publicar el comentario. Inténtalo de nuevo más tarde."));
         } finally {
             submitBtn.disabled = false;
-            submitBtn.innerHTML = '<span>Publiser kommentar</span> <i class="fas fa-paper-plane"></i>';
+            submitBtn.innerHTML = ("<span>" + hkmTx("Publiser kommentar", "Post comment", "Publicar comentario") + "</span> <i class=\"fas fa-paper-plane\"></i>");
         }
     }
     
@@ -239,11 +240,11 @@ export class InteractionsManager {
         }
         
         if (this.likesCount === 0) {
-            countText.textContent = 'Bli den første til å like dette';
+            countText.textContent = hkmTx("Bli den første til å like dette", "Be the first to like this", "Sé el primero en indicar que te gusta");
         } else if (this.likesCount === 1) {
-            countText.textContent = '1 person liker dette';
+            countText.textContent = hkmTx("1 person liker dette", "1 person likes this", "A 1 persona le gusta esto");
         } else {
-            countText.textContent = `${this.likesCount} personer liker dette`;
+            countText.textContent = `${this.likesCount} ${hkmTx("personer liker dette", "people like this", "personas les gusta esto")}`;
         }
     }
     
@@ -255,7 +256,7 @@ export class InteractionsManager {
             list.innerHTML = `
                 <div class="comments-empty">
                     <i class="far fa-comments"></i>
-                    <p>Ingen kommentarer enda. Bli den første til å kommentere!</p>
+                    <p>${hkmTx("Ingen kommentarer enda. Bli den første til å kommentere!", "No comments yet. Be the first to comment!", "Aún no hay comentarios. ¡Sé el primero en comentar!")}</p>
                 </div>
             `;
             return;
@@ -293,7 +294,7 @@ export class InteractionsManager {
     }
     
     formatDate(timestamp) {
-        if (!timestamp) return 'Akkurat nå';
+        if (!timestamp) return hkmTx("Akkurat nå", "Just now", "Justo ahora");
         
         // Handle Firestore timestamp
         let date;
@@ -306,7 +307,7 @@ export class InteractionsManager {
         }
         
         // Simple formatting e.g. "24. apr 2026 kl 14:30"
-        return date.toLocaleDateString('no-NO', { 
+        return date.toLocaleDateString(({ en: 'en-GB', es: 'es-ES' })[(document.documentElement.lang || 'no').slice(0, 2)] || 'nb-NO', { 
             day: 'numeric', 
             month: 'short', 
             year: 'numeric',

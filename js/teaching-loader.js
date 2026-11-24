@@ -116,10 +116,11 @@ function createTeachingCard(item, index) {
     const imageUrl = item.imageUrl || 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=600&h=400&fit=crop';
 
     // Extract title - handle markdown/text safely
-    const title = item.title || `Undervisning ${index + 1}`;
+    const tlLang = (document.documentElement.lang || 'no').slice(0, 2);
+    const title = item.title || `${tlLang === 'en' ? 'Teaching' : tlLang === 'es' ? 'Enseñanza' : 'Undervisning'} ${index + 1}`;
 
     // Extract description - handle markdown/text safely
-    const description = getDescriptionText(item) || 'Klikk for mer informasjon';
+    const description = getDescriptionText(item) || (tlLang === 'en' ? 'Click for more information' : tlLang === 'es' ? 'Haz clic para más información' : 'Klikk for mer informasjon');
 
     // Format date if available
     let dateStr = '';

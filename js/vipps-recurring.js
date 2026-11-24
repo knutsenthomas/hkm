@@ -1,4 +1,5 @@
 // Vipps, Stripe, and PayPal Recurring Payments integration for Bli Fast Giver page
+window.hkmTx = window.hkmTx || function (no, en, es) { const l = (document.documentElement.lang || 'no').slice(0, 2); return l === 'en' ? en : l === 'es' ? (es == null ? en : es) : no; };
 const VIPPS_CREATE_AGREEMENT_URL = "https://createvippsagreement-42bhgdjkcq-uc.a.run.app";
 const VIPPS_FINALIZE_AGREEMENT_URL = "https://finalizevippsagreement-42bhgdjkcq-uc.a.run.app";
 const RECURRING_PAYMENT_URL = "https://us-central1-his-kingdom-ministry.cloudfunctions.net/createRecurringPayment";
@@ -825,7 +826,7 @@ function openAgreementModal(method = "vipps") {
                 const data = await parseJsonOrThrow(response);
 
                 if (!data.redirectUrl) {
-                    throw new Error("Mottok ikke bekreftelseslenke fra Vipps.");
+                    throw new Error(hkmTx("Mottok ikke bekreftelseslenke fra Vipps.", "Did not receive a confirmation link from Vipps.", "No se recibió el enlace de confirmación de Vipps."));
                 }
 
                 window.location.href = data.redirectUrl;
@@ -858,14 +859,14 @@ function openAgreementModal(method = "vipps") {
                         </div>
                         <button id="submit-payment" class="hkm-submit-btn" type="button">
                             <span class="hkm-spinner hidden" id="spinner" style="width: 20px; height: 20px; border-width: 2px; margin-right: 10px; margin-bottom: 0; display: inline-block; vertical-align: middle;"></span>
-                            <span id="button-text">${monthly ? t('stripe_confirm_btn') : 'Bekreft gave'} (${amount} kr${monthly ? '/mnd' : ''})</span>
+                            <span id="button-text">${monthly ? t('stripe_confirm_btn') : hkmTx("Bekreft gave", "Confirm gift", "Confirmar donación")} (${amount} kr${monthly ? hkmTx('/mnd', '/month', '/mes') : ''})</span>
                         </button>
                         <div id="payment-message" class="hidden"></div>
                     </div>
                 `;
 
                 if (typeof window.initializeStripe !== "function") {
-                    throw new Error("Stripe checkout-skriptet er ikke ferdig lastet.");
+                    throw new Error(hkmTx("Stripe checkout-skriptet er ikke ferdig lastet.", "The card payment script has not finished loading.", "El script de pago con tarjeta aún no ha terminado de cargarse."));
                 }
 
                 await window.initializeStripe(amount, customerDetails, "card", monthly);
