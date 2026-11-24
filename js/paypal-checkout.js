@@ -1,5 +1,6 @@
 import { trackConfirmedDonation } from './donation-analytics.js';
 // Replace 'test' with your live Client ID.
+window.hkmTx = window.hkmTx || function (no, en, es) { const l = (document.documentElement.lang || 'no').slice(0, 2); return l === 'en' ? en : l === 'es' ? (es == null ? en : es) : no; };
 const PAYPAL_CLIENT_ID = "Adja3K8kDYk5_GUz10nBkwlYMgHNNXwiiwfGdGD7wkU354Z-qf9UJApOfD_YfV98t-SuzjXJZg2kPp-a"; 
 const PAYPAL_CREATE_ORDER_URL = "https://createpaypalorder-42bhgdjkcq-uc.a.run.app";
 const PAYPAL_CAPTURE_ORDER_URL = "https://capturepaypalorder-42bhgdjkcq-uc.a.run.app";
@@ -22,7 +23,7 @@ function loadPayPalSdk(clientId, callback) {
     };
     script.onerror = () => {
         console.error("Failed to load PayPal SDK");
-        alert("Kunne ikke laste PayPal-betalingstjenesten. Vennligst prøv igjen.");
+        alert(hkmTx("Kunne ikke laste PayPal-betalingstjenesten. Vennligst prøv igjen.", "Could not load the PayPal payment service. Please try again.", "No se pudo cargar el servicio de pago de PayPal. Inténtalo de nuevo."));
     };
     document.head.appendChild(script);
 }
@@ -79,7 +80,7 @@ export function initPayPalDonation(options = {}) {
 
     // Clear previous button if any and render heading
     paypalContainer.innerHTML = `
-        <h4 style="margin-bottom: 16px; color: #1B4965; font-weight: 700; font-size: 16px; text-align: center;">Fullfør med PayPal</h4>
+        <h4 style="margin-bottom: 16px; color: #1B4965; font-weight: 700; font-size: 16px; text-align: center;">${hkmTx("Fullfør med PayPal", "Complete with PayPal", "Completar con PayPal")}</h4>
         <div class="paypal-button-mount" style="margin-bottom: 16px;"></div>
     `;
 
@@ -87,7 +88,7 @@ export function initPayPalDonation(options = {}) {
     loadPayPalSdk(PAYPAL_CLIENT_ID, () => {
         if (typeof paypal === "undefined") {
             console.error("PayPal global object is missing after SDK load.");
-            alert("Det oppstod et problem med å starte PayPal. Vennligst prøv igjen.");
+            alert(hkmTx("Det oppstod et problem med å starte PayPal. Vennligst prøv igjen.", "There was a problem starting PayPal. Please try again.", "Hubo un problema al iniciar PayPal. Inténtalo de nuevo."));
             return;
         }
 
@@ -99,7 +100,7 @@ export function initPayPalDonation(options = {}) {
 
                 const details = donationDetails();
                 if (details.amount <= 0) {
-                    alert("Vennligst velg eller skriv inn et beløp.");
+                    alert(hkmTx("Vennligst velg eller skriv inn et beløp.", "Please choose or enter an amount.", "Elige o introduce un importe."));
                     return actions.reject();
                 }
 
@@ -130,7 +131,7 @@ export function initPayPalDonation(options = {}) {
                     return data.orderId;
                 } catch (error) {
                     console.error("PayPal order creation failed:", error);
-                    alert("Kunne ikke opprette PayPal-ordre: " + error.message);
+                    alert((hkmTx("Kunne ikke opprette PayPal-ordre:", "Could not create PayPal order:", "No se pudo crear el pedido de PayPal:") + " ") + error.message);
                     throw error;
                 }
             },
@@ -155,9 +156,9 @@ export function initPayPalDonation(options = {}) {
 
                     // Success modal or alert
                     if (window.showResultModal) {
-                        window.showResultModal(true, "Tusen takk for din gave! Betalingen via PayPal var vellykket.");
+                        window.showResultModal(true, hkmTx("Tusen takk for din gave! Betalingen via PayPal var vellykket.", "Thank you so much for your gift! The PayPal payment was successful.", "¡Muchas gracias por tu donación! El pago con PayPal se realizó correctamente."));
                     } else {
-                        alert("Tusen takk! Din PayPal-donasjon ble fullført.");
+                        alert(hkmTx("Tusen takk! Din PayPal-donasjon ble fullført.", "Thank you so much! Your PayPal donation was completed.", "¡Muchas gracias! Tu donación con PayPal se ha completado."));
                     }
                     
                     // Reset form and container
@@ -184,7 +185,7 @@ export function initPayPalDonation(options = {}) {
             },
             onError: (err) => {
                 console.error("PayPal Smart Button Error:", err);
-                alert("Det oppstod en feil i PayPal-vinduet. Vennligst prøv igjen.");
+                alert(hkmTx("Det oppstod en feil i PayPal-vinduet. Vennligst prøv igjen.", "An error occurred in the PayPal window. Please try again.", "Se produjo un error en la ventana de PayPal. Inténtalo de nuevo."));
             },
             style: {
                 layout: 'vertical',
@@ -206,7 +207,7 @@ function showLoadingOverlay(show) {
             overlay.innerHTML = `
                 <div style="background: white; padding: 30px; border-radius: 12px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
                     <i class="fas fa-spinner fa-spin" style="font-size: 40px; color: #FF5B24; margin-bottom: 15px;"></i>
-                    <p style="font-weight: 600; color: #333; margin: 0;">Bekrefter betalingen med PayPal...</p>
+                    <p style="font-weight: 600; color: #333; margin: 0;">${hkmTx("Bekrefter betalingen med PayPal...", "Confirming the payment with PayPal...", "Confirmando el pago con PayPal...")}</p>
                 </div>
             `;
             document.body.appendChild(overlay);

@@ -27,6 +27,23 @@ const stripeWebhookSecretParam = defineSecret('STRIPE_WEBHOOK_SECRET');
 const paypalClientIdParam = defineSecret('PAYPAL_CLIENT_ID');
 const paypalClientSecretParam = defineSecret('PAYPAL_CLIENT_SECRET');
 
+// Course lessons become events; carry the course's own translations along.
+function buildCourseEventTranslations(course, lesson, index) {
+    const out = {};
+    const tr = (course && course.translations) || {};
+    const words = { en: ['Lesson', 'HKM Online / Course'], es: ['Lección', 'HKM Online / Curso'] };
+    Object.keys(words).forEach((lang) => {
+        const loc = tr[lang];
+        if (!loc) return;
+        const l = (Array.isArray(loc.lessons) ? loc.lessons : []).find(x => x && lesson && x.id === lesson.id) || {};
+        const courseTitle = loc.title || course.title || '';
+        const lessonTitle = l.title || `${words[lang][0]} ${index + 1}`;
+        const desc = l.description || loc.description || '';
+        out[lang] = { title: courseTitle ? `${courseTitle} – ${lessonTitle}` : lessonTitle, description: desc, excerpt: desc, location: words[lang][1] };
+    });
+    return Object.keys(out).length ? out : undefined;
+}
+
 const { onRequest, onCall, HttpsError } = require('firebase-functions/v2/https');
 const { onDocumentCreated, onDocumentUpdated, onDocumentWritten } = require('firebase-functions/v2/firestore');
 const { onSchedule } = require('firebase-functions/v2/scheduler');
@@ -8302,7 +8319,10 @@ exports.scheduledSync = onSchedule("every 15 minutes", async (event) => {
                   dashboardImage: imgUrl,
                   link: `kurs-detaljer.html?id=${course.id || ''}`,
                   source: 'manual',
-                  isFeatured: true
+                  isFeatured: true,
+                  ...(buildCourseEventTranslations(course, lesson, index)
+                    ? { translations: buildCourseEventTranslations(course, lesson, index) }
+                    : {})
                 });
               }
             });

@@ -1787,11 +1787,66 @@ const BIBLE_BOOK_ALIAS_MAP = {
 /**
  * Helper to get a book introduction by ID or name
  */
+// English and Spanish versions load only on those pages.
+const INTRO_LANG = (typeof document !== 'undefined' ? (document.documentElement.lang || 'no') : 'no').slice(0, 2);
+const LOCALIZED_INTRODUCTIONS = {};
+if (INTRO_LANG === 'en') import('./bible-book-introductions-en.js').then(m => { LOCALIZED_INTRODUCTIONS.en = m.default; }).catch(() => {});
+if (INTRO_LANG === 'es') import('./bible-book-introductions-es.js').then(m => { LOCALIZED_INTRODUCTIONS.es = m.default; }).catch(() => {});
+
 function getBibleBookIntroduction(bookId) {
     if (!bookId) return null;
     const cleanKey = String(bookId).toUpperCase().trim().replace(/[^A-Z0-9]/g, '');
     const canonicalKey = BIBLE_BOOK_ALIAS_MAP[cleanKey] || BIBLE_BOOK_ALIAS_MAP[String(bookId).toUpperCase().trim()] || String(bookId).toUpperCase().trim();
-    return BIBLE_BOOK_INTRODUCTIONS[canonicalKey] || null;
+    const base = BIBLE_BOOK_INTRODUCTIONS[canonicalKey] || null;
+    const localized = LOCALIZED_INTRODUCTIONS[INTRO_LANG] && LOCALIZED_INTRODUCTIONS[INTRO_LANG][canonicalKey];
+    return localized ? { ...base, ...localized } : base;
+}
+
+// Key verses in the English/Spanish introductions carry only a location; fetch the
+// text from the Bible translation the reader is showing (WEB / RV1960 by default).
+const introChapterCache = {};
+function introVerseText(bibleId, book, chapter, from, to) {
+    const key = `${bibleId}|${book}|${chapter}`;
+    if (!introChapterCache[key]) {
+        introChapterCache[key] = fetch(`/api/bible/bibles/${bibleId}/chapters/${book}_${chapter}`)
+            .then(r => r.json())
+            .then(j => {
+                const doc = new DOMParser().parseFromString('<div>' + (((j && j.data) || j || {}).content || '') + '</div>', 'text/html');
+                const verses = {}; let cur = null;
+                const walk = (node) => {
+                    for (const ch of node.childNodes) {
+                        if (ch.nodeType === 1 && ch.tagName === 'SUP' && ch.classList.contains('v')) { cur = parseInt(ch.textContent, 10); verses[cur] = verses[cur] || ''; }
+                        else if (ch.nodeType === 3) { if (cur) verses[cur] += ch.nodeValue; }
+                        else if (ch.nodeType === 1) { if (cur && verses[cur] && /^(P|DIV)$/.test(ch.tagName)) verses[cur] += ' '; walk(ch); }
+                    }
+                };
+                walk(doc.body);
+                return verses;
+            })
+            .catch(() => { delete introChapterCache[key]; return {}; });
+    }
+    return introChapterCache[key].then(verses => {
+        const parts = [];
+        for (let v = from; v <= to; v++) if (verses[v]) parts.push(verses[v].replace(/\s+/g, ' ').trim());
+        return parts.join(' ');
+    });
+}
+function hydrateIntroVerses(root) {
+    if (!root || !root.querySelectorAll) return;
+    const bibleId = (typeof window !== 'undefined' && window.bibleReader && window.bibleReader.selectedBibleId) || (INTRO_LANG === 'es' ? 'RV1960' : 'WEB');
+    root.querySelectorAll('[data-kv]:not([data-kv-done])').forEach(el => {
+        el.setAttribute('data-kv-done', '1');
+        const [book, c, v1, v2] = el.getAttribute('data-kv').split(',');
+        introVerseText(bibleId, book, +c, +v1, +(v2 || v1)).then(text => { if (text) el.textContent = `"${text}"`; });
+    });
+}
+if (typeof window !== 'undefined' && INTRO_LANG !== 'no' && typeof MutationObserver !== 'undefined') {
+    const startIntroObserver = () => {
+        hydrateIntroVerses(document.body);
+        let introQueued = false;
+        new MutationObserver(() => { if (introQueued) return; introQueued = true; requestAnimationFrame(() => { introQueued = false; hydrateIntroVerses(document.body); }); }).observe(document.body, { childList: true, subtree: true });
+    };
+    if (document.body) startIntroObserver(); else document.addEventListener('DOMContentLoaded', startIntroObserver);
 }
 
 if (typeof window !== 'undefined') {

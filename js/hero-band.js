@@ -152,7 +152,11 @@
         let activeCat = '';
         const filters = document.createElement('div');
         filters.className = 'hb-filters';
-        const TEACH = [['/bibelstudier', 'Bibelstudier'], ['/undervisningsserier', 'Undervisningsserier'], ['/seminarer', 'Seminarer']];
+        const TEACH = ALL === 'All'
+            ? [['/en/bible-studies', 'Bible studies'], ['/en/teaching-series', 'Teaching series'], ['/en/seminars', 'Seminars']]
+            : ALL === 'Todos'
+                ? [['/es/estudios-biblicos', 'Estudios bíblicos'], ['/es/series-de-ensenanza', 'Series de enseñanza'], ['/es/seminarios', 'Seminarios']]
+                : [['/bibelstudier', 'Bibelstudier'], ['/undervisningsserier', 'Undervisningsserier'], ['/seminarer', 'Seminarer']];
         const here = location.pathname.replace(/\.html$/, '').replace(/\/+$/, '');
         if (TEACH.some(([p]) => p === here)) {
             filters.innerHTML = TEACH.map(([p, t]) => `<a class="hb-pill${p === here ? ' on' : ''}" href="${p}">${t}</a>`).join('');

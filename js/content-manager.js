@@ -4,6 +4,7 @@
 
 import { InteractionsManager } from './interactions.js';
 
+window.hkmTx = window.hkmTx || function (no, en, es) { const l = (document.documentElement.lang || 'no').slice(0, 2); return l === 'en' ? en : l === 'es' ? (es == null ? en : es) : no; };
 const pageCache = new Map();
 const protectMediaHtml = (html) => {
     if (window.SitePrivacy?.protectMediaHtml) return window.SitePrivacy.protectMediaHtml(html);
@@ -22,6 +23,22 @@ const protectMediaHtml = (html) => {
     return template.innerHTML;
 };
 
+
+function buildCourseEventTranslations(course, lesson, index) {
+    const out = {};
+    const tr = (course && course.translations) || {};
+    const words = { en: ['Lesson', 'HKM Online / Course'], es: ['Lección', 'HKM Online / Curso'] };
+    Object.keys(words).forEach((lang) => {
+        const loc = tr[lang];
+        if (!loc) return;
+        const l = (Array.isArray(loc.lessons) ? loc.lessons : []).find(x => x && lesson && x.id === lesson.id) || {};
+        const courseTitle = loc.title || course.title || '';
+        const lessonTitle = l.title || `${words[lang][0]} ${index + 1}`;
+        const desc = l.description || loc.description || '';
+        out[lang] = { title: courseTitle ? `${courseTitle} – ${lessonTitle}` : lessonTitle, description: desc, excerpt: desc, location: words[lang][1] };
+    });
+    return Object.keys(out).length ? out : undefined;
+}
 
 class ContentManager {
     constructor() {
@@ -503,8 +520,30 @@ class ContentManager {
             tags: Array.isArray(localized.tags) && localized.tags.length ? localized.tags : item.tags,
             days: localizedDays,
             introduction: (localized.introduction && typeof localized.introduction === 'object') ? localized.introduction : item.introduction,
+            priceSuffix: this.isUsableLocalizedString(localized.priceSuffix) ? localized.priceSuffix : item.priceSuffix,
+            lessons: this.localizeCourseLessons(item.lessons, localized.lessons),
             __stableId: this.getContentItemStableId(item)
         };
+    }
+
+    // Course lessons are translated on the course (translations.<lang>.lessons, matched by id)
+    // so that editing a lesson in admin does not remove its translation.
+    localizeCourseLessons(lessons, localizedLessons) {
+        if (!Array.isArray(lessons) || !Array.isArray(localizedLessons) || !localizedLessons.length) return lessons;
+        return lessons.map((lesson, idx) => {
+            const loc = localizedLessons.find(l => l && lesson && l.id && l.id === lesson.id) || null;
+            if (!loc) return lesson;
+            const resources = Array.isArray(lesson.resources) && Array.isArray(loc.resources)
+                ? lesson.resources.map((res, i) => (loc.resources[i] && this.isUsableLocalizedString(loc.resources[i].title) && res && typeof res === 'object')
+                    ? { ...res, title: loc.resources[i].title } : res)
+                : lesson.resources;
+            return {
+                ...lesson,
+                title: this.isUsableLocalizedString(loc.title) ? loc.title : lesson.title,
+                description: this.isUsableLocalizedString(loc.description) ? loc.description : lesson.description,
+                resources
+            };
+        });
     }
 
     hasUsableLocalizedTranslation(item, lang = this.getCurrentLanguage()) {
@@ -638,7 +677,7 @@ class ContentManager {
 
         if (notifyUser && now - lastAt > 12000) {
             this._errorNoticeTimestamps.set(scopeKey, now);
-            this.notifyUser(userMessage || 'Noe innhold kunne ikke lastes akkurat nå.', 'warning', 5000);
+            this.notifyUser(userMessage || hkmTx("Noe innhold kunne ikke lastes akkurat nå.", "Some content could not be loaded right now.", "No se pudo cargar parte del contenido en este momento."), 'warning', 5000);
         }
     }
 
@@ -652,7 +691,7 @@ class ContentManager {
             if (!silent) {
                 this.reportError('firebase-unavailable', new Error(`Firebase not initialized for ${pageId}`), {
                     notifyUser: true,
-                    userMessage: 'Tilkobling til innholdstjenesten er ikke klar ennå.'
+                    userMessage: hkmTx("Tilkobling til innholdstjenesten er ikke klar ennå.", "The connection to the content service is not ready yet.", "La conexión con el servicio de contenido aún no está lista.")
                 });
             }
             return null;
@@ -664,7 +703,7 @@ class ContentManager {
             if (!silent) {
                 this.reportError(`getContentDoc:${pageId}`, error, {
                     notifyUser: true,
-                    userMessage: 'Kunne ikke hente oppdatert innhold. Viser lagret innhold hvis tilgjengelig.'
+                    userMessage: hkmTx("Kunne ikke hente oppdatert innhold. Viser lagret innhold hvis tilgjengelig.", "Could not fetch updated content. Showing saved content if available.", "No se pudo obtener el contenido actualizado. Se muestra el contenido guardado si está disponible.")
                 });
             }
             return null;
@@ -691,7 +730,7 @@ class ContentManager {
             if (!silent) {
                 this.reportError('getContentDocs', error, {
                     notifyUser: true,
-                    userMessage: 'Noe innhold kunne ikke lastes akkurat nå.'
+                    userMessage: hkmTx("Noe innhold kunne ikke lastes akkurat nå.", "Some content could not be loaded right now.", "No se pudo cargar parte del contenido en este momento.")
                 });
             }
             return {};
@@ -837,7 +876,7 @@ class ContentManager {
         } catch (error) {
             this.reportError('init', error, {
                 notifyUser: true,
-                userMessage: 'Noe innhold kunne ikke lastes. Siden kan være delvis oppdatert.'
+                userMessage: hkmTx("Noe innhold kunne ikke lastes. Siden kan være delvis oppdatert.", "Some content could not be loaded. The page may be partly updated.", "No se pudo cargar parte del contenido. La página puede estar actualizada solo en parte.")
             });
         } finally {
             // A settled failure may reveal the static fallback, but never before the request settles.
@@ -1253,7 +1292,7 @@ class ContentManager {
         const pageContent = (window.HKM_PAGE_CONTENT && this.pageId && window.HKM_PAGE_CONTENT[this.pageId]) || {};
         const fallbackTitle = this.getValueByPath(pageContent, 'causes.card.defaultTitle') || 'Innsamlingsaksjon';
         const collectedLabel = this.getValueByPath(pageContent, 'causes.card.collectedLabel') || 'samlet inn';
-        const goalLabel = this.getValueByPath(pageContent, 'causes.card.goalLabel') || 'Mål';
+        const goalLabel = this.getValueByPath(pageContent, 'causes.card.goalLabel') || hkmTx("Mål", "Goal", "Meta");
         const ctaText = this.getValueByPath(pageContent, 'causes.card.cta') || 'Støtt prosjektet';
 
         container.innerHTML = causes.map(cause => {
@@ -1395,7 +1434,7 @@ class ContentManager {
         const itemId = urlParams.get('id');
 
         if (!itemId) {
-            container.innerHTML = '<p>Fant ikke innlegget.</p>';
+            container.innerHTML = ("<p>" + hkmTx("Fant ikke innlegget.", "The post was not found.", "No se encontró la publicación.") + "</p>");
             revealPostContainer();
             return;
         }
@@ -1643,7 +1682,7 @@ class ContentManager {
         if (container) {
             try {
                 const finalHtml = this.cleanLegacyHtml(articleHtml);
-                container.innerHTML = protectMediaHtml(finalHtml) || '<p>Dette innlegget har foreløpig ikke noe innhold.</p>';
+                container.innerHTML = protectMediaHtml(finalHtml) || ("<p>" + hkmTx("Dette innlegget har foreløpig ikke noe innhold.", "This post has no content yet.", "Esta publicación aún no tiene contenido.") + "</p>");
             } catch (err) {
                 console.error('[ContentManager] Render error:', err);
             }
@@ -1665,10 +1704,10 @@ class ContentManager {
         if (backBtn) {
             if (isTeaching) {
                 backBtn.href = 'media.html#teaching-section';
-                backBtn.innerHTML = '<i class="fas fa-arrow-left cms-inline-icon-gap"></i> Tilbake til undervisning';
+                backBtn.innerHTML = ("<i class=\"fas fa-arrow-left cms-inline-icon-gap\"></i> " + hkmTx("Tilbake til undervisning", "Back to teaching", "Volver a la enseñanza"));
             } else {
                 backBtn.href = 'blogg.html';
-                backBtn.innerHTML = '<i class="fas fa-arrow-left cms-inline-icon-gap"></i> Tilbake til blogg';
+                backBtn.innerHTML = ("<i class=\"fas fa-arrow-left cms-inline-icon-gap\"></i> " + hkmTx("Tilbake til blogg", "Back to blog", "Volver al blog"));
             }
         }
 
@@ -1785,7 +1824,7 @@ class ContentManager {
         this.injectSchemaOrgData(item, isTeaching);
         } catch (error) {
             console.error('[ContentManager] renderSingleBlogPost failed:', error);
-            container.innerHTML = '<p>Kunne ikke laste innlegget akkurat nå.</p>';
+            container.innerHTML = ("<p>" + hkmTx("Kunne ikke laste innlegget akkurat nå.", "Could not load the post right now.", "No se pudo cargar la publicación en este momento.") + "</p>");
             revealPostContainer();
         }
     }
@@ -1987,6 +2026,8 @@ class ContentManager {
                                     source: 'manual',
                                     isFeatured: true
                                 };
+                                const courseEvtTr = buildCourseEventTranslations(course, lesson, index);
+                                if (courseEvtTr) courseEvent.translations = courseEvtTr;
 
                                 if (!finalEvents.some(e => e.id === courseEvtId || (e.title === fullTitle && this.isSameDay(this.parseEventDate(e.start || e.date), startDateObj)))) {
                                     finalEvents.push(courseEvent);
@@ -2101,7 +2142,7 @@ class ContentManager {
             const isLocalFile = window.location.protocol === 'file:';
             this.reportError('loadEvents', err, {
                 notifyUser: !isLocalFile, // Only notify if NOT a local file
-                userMessage: 'Kunne ikke laste arrangementer akkurat nå.'
+                userMessage: hkmTx("Kunne ikke laste arrangementer akkurat nå.", "Could not load events right now.", "No se pudieron cargar los eventos en este momento.")
             });
             return [];
         }
@@ -2157,7 +2198,7 @@ class ContentManager {
         const sourceMap = new Map();
         (events || []).forEach(event => {
             const sourceId = event.sourceId || (event.isHoliday ? 'holiday' : 'unknown');
-            const sourceLabel = event.sourceLabel || (event.isHoliday ? 'Helligdager' : 'Kalender');
+            const sourceLabel = event.sourceLabel || (event.isHoliday ? hkmTx("Helligdager", "Public holidays", "Festivos") : 'Kalender');
             if (!sourceMap.has(sourceId)) {
                 sourceMap.set(sourceId, { id: sourceId, label: sourceLabel });
             }
@@ -2336,7 +2377,7 @@ class ContentManager {
                 const hasTime = this.eventHasTime(startValue);
                 const timeLabel = eventTime && hasTime
                     ? eventTime.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })
-                    : 'Tid ikke satt';
+                    : hkmTx("Tid ikke satt", "Time not set", "Hora no definida");
                 tag.title = `${e.title}\nKl: ${timeLabel}\n${e.location || ''}`;
 
                 const eventKey = this.getEventKey(e);
@@ -2453,8 +2494,8 @@ class ContentManager {
             if (!events || events.length === 0) {
                 container.innerHTML = `
                     <div class="events-empty-state cms-events-empty-state">
-                        <h3 class="cms-events-empty-title">Ingen kommende arrangementer</h3>
-                        <p>Vi har foreløpig ingen planlagte arrangementer i kalenderen.</p>
+                        <h3 class="cms-events-empty-title">${hkmTx("Ingen kommende arrangementer", "No upcoming events", "No hay próximos eventos")}</h3>
+                        <p>${hkmTx("Vi har foreløpig ingen planlagte arrangementer i kalenderen.", "We have no events planned in the calendar yet.", "Por ahora no tenemos eventos previstos en el calendario.")}</p>
                     </div>
                 `;
                 return;
@@ -2570,7 +2611,7 @@ class ContentManager {
         this.setEventCache(events || []);
 
         if (!events || events.length === 0) {
-            container.innerHTML = '<li class="agenda-empty">Ingen kommende arrangementer er registrert.</li>';
+            container.innerHTML = ("<li class=\"agenda-empty\">" + hkmTx("Ingen kommende arrangementer er registrert.", "No upcoming events are registered.", "No hay próximos eventos registrados.") + "</li>");
             return;
         }
 
@@ -2617,8 +2658,8 @@ class ContentManager {
             const timeStr = startDate && hasTime
                 ? startDate.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })
                 : '';
-            const timeLabel = timeStr ? timeStr : 'Tid ikke satt';
-            const location = event.location || 'Sted ikke satt';
+            const timeLabel = timeStr ? timeStr : hkmTx("Tid ikke satt", "Time not set", "Hora no definida");
+            const location = event.location || hkmTx("Sted ikke satt", "Location not set", "Lugar no definido");
 
             // Check if event is in the past for graying out
             const isPast = this.isEventPast(event);
@@ -2654,7 +2695,7 @@ class ContentManager {
 
             const loadMoreBtn = document.createElement('button');
             loadMoreBtn.className = 'btn btn-agenda-load'; // Specific class for visibility
-            loadMoreBtn.innerText = 'Last flere arrangementer';
+            loadMoreBtn.innerText = hkmTx("Last flere arrangementer", "Load more events", "Cargar más eventos");
             loadMoreBtn.style.fontSize = '14px';
 
             loadMoreBtn.onclick = () => {
@@ -2875,14 +2916,14 @@ class ContentManager {
                     const link = item.full_url || config.pageUrl || "https://www.facebook.com/hiskingdomministry777";
                     const pubDate = item.external_created_at || "";
                     
-                    let friendlyDate = "Nylig";
+                    let friendlyDate = hkmTx("Nylig", "Recently", "Recientemente");
                     if (pubDate) {
                         const date = new Date(pubDate);
                         const diffTime = Math.abs(new Date() - date);
                         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                        if (diffDays <= 1) friendlyDate = "I går";
-                        else if (diffDays <= 7) friendlyDate = `${diffDays} dager siden`;
-                        else friendlyDate = date.toLocaleDateString('no-NO', { day: 'numeric', month: 'short' });
+                        if (diffDays <= 1) friendlyDate = hkmTx("I går", "Yesterday", "Ayer");
+                        else if (diffDays <= 7) friendlyDate = `${diffDays} ${hkmTx("dager siden", "days ago", "días atrás")}`;
+                        else friendlyDate = date.toLocaleDateString(({ en: 'en-GB', es: 'es-ES' })[(document.documentElement.lang || 'no').slice(0, 2)] || 'nb-NO', { day: 'numeric', month: 'short' });
                     }
                     
                     const sourceName = item.source?.source || 'Facebook';
@@ -2893,7 +2934,7 @@ class ContentManager {
                         date: friendlyDate,
                         title: title,
                         excerpt: excerpt,
-                        cta: isYoutube ? "Se på YouTube" : "Les på Facebook",
+                        cta: isYoutube ? hkmTx("Se på YouTube", "Watch on YouTube", "Ver en YouTube") : hkmTx("Les på Facebook", "Read on Facebook", "Leer en Facebook"),
                         image: item.image || getFallbackImageByContent(cleanText),
                         link: link,
                         likes: typeof item.like_count === 'number' ? item.like_count : 0,
@@ -2945,14 +2986,14 @@ class ContentManager {
                     }
 
                     // Calculate a friendly relative date (e.g. '3 dager siden')
-                    let friendlyDate = "Nylig";
+                    let friendlyDate = hkmTx("Nylig", "Recently", "Recientemente");
                     if (pubDate) {
                         const date = new Date(pubDate);
                         const diffTime = Math.abs(new Date() - date);
                         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                        if (diffDays <= 1) friendlyDate = "I går";
-                        else if (diffDays <= 7) friendlyDate = `${diffDays} dager siden`;
-                        else friendlyDate = date.toLocaleDateString('no-NO', { day: 'numeric', month: 'short' });
+                        if (diffDays <= 1) friendlyDate = hkmTx("I går", "Yesterday", "Ayer");
+                        else if (diffDays <= 7) friendlyDate = `${diffDays} ${hkmTx("dager siden", "days ago", "días atrás")}`;
+                        else friendlyDate = date.toLocaleDateString(({ en: 'en-GB', es: 'es-ES' })[(document.documentElement.lang || 'no').slice(0, 2)] || 'nb-NO', { day: 'numeric', month: 'short' });
                     }
 
                     return {
@@ -2960,7 +3001,7 @@ class ContentManager {
                         date: friendlyDate,
                         title: (cleanText && cleanText.length > 50) ? (cleanText.substring(0, 47) + "...") : (title || "Innlegg"),
                         excerpt: excerpt,
-                        cta: "Les på Facebook",
+                        cta: hkmTx("Les på Facebook", "Read on Facebook", "Leer en Facebook"),
                         image: image || getFallbackImageByContent(cleanText),
                         link: link
                     };
@@ -3232,7 +3273,7 @@ class ContentManager {
         titleEl.textContent = event.title || 'Arrangement';
         dateEl.innerHTML = `<i class="far fa-calendar-alt"></i> ${dateLabel}`;
         timeEl.innerHTML = `<i class="far fa-clock"></i> ${timeLabel}`;
-        locationEl.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${event.location || 'Sted ikke satt'}`;
+        locationEl.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${event.location || hkmTx("Sted ikke satt", "Location not set", "Lugar no definido")}`;
 
         // Handle both Google Calendar 'description' and Firebase 'content'
         const contentData = event.content || event.description || '';
@@ -3262,7 +3303,7 @@ class ContentManager {
             videoLinkEl.innerHTML = `
                 <a href="${videoLink}" target="_blank" rel="noopener noreferrer" class="btn btn-primary event-modal-video-cta">
                     <i class="fas fa-video"></i>
-                    Bli med på nettmøtet
+                    ${hkmTx("Bli med på nettmøtet", "Join the online meeting", "Unirse a la reunión en línea")}
                 </a>
             `;
             videoLinkEl.classList.remove('cms-hidden');
@@ -3298,7 +3339,7 @@ class ContentManager {
                             <div class="event-modal-video-link cms-hidden"></div>
                         </div>
                         <div class="event-modal-right">
-                            <h4 class="event-modal-section-title">Mer om arrangement</h4>
+                            <h4 class="event-modal-section-title">${hkmTx("Mer om arrangement", "More about the event", "Más sobre el evento")}</h4>
                             <p class="event-modal-description"></p>
                         </div>
                     </div>
@@ -3330,7 +3371,7 @@ class ContentManager {
                     <div class="event-modal-video-link cms-hidden"></div>
                 </div>
                 <div class="event-modal-right">
-                    <h4 class="event-modal-section-title">Mer om arrangement</h4>
+                    <h4 class="event-modal-section-title">${hkmTx("Mer om arrangement", "More about the event", "Más sobre el evento")}</h4>
                     <p class="event-modal-description"></p>
                 </div>
             `;
@@ -3481,22 +3522,22 @@ class ContentManager {
             holidays.push({
                 id: `holiday - ${isoDate} -${title} `,
                 title,
-                description: 'Helligdag / kristen høytid',
+                description: hkmTx("Helligdag / kristen høytid", "Public holiday / Christian feast", "Festivo / fiesta cristiana"),
                 start: isoDate,
                 end: isoDate,
                 location: 'Norge',
                 isHoliday: true,
                 sourceId: 'holiday',
-                sourceLabel: 'Helligdager'
+                sourceLabel: hkmTx("Helligdager", "Public holidays", "Festivos")
             });
         };
 
         // Fixed-date helligdager
-        addHoliday(new Date(year, 0, 1), '1. nyttårsdag');
-        addHoliday(new Date(year, 4, 1), 'Arbeidernes dag');
-        addHoliday(new Date(year, 4, 17), 'Grunnlovsdagen');
-        addHoliday(new Date(year, 11, 25), '1. juledag');
-        addHoliday(new Date(year, 11, 26), '2. juledag');
+        addHoliday(new Date(year, 0, 1), hkmTx("1. nyttårsdag", "New Year’s Day", "Año Nuevo"));
+        addHoliday(new Date(year, 4, 1), hkmTx("Arbeidernes dag", "Labour Day", "Día del Trabajo"));
+        addHoliday(new Date(year, 4, 17), hkmTx("Grunnlovsdagen", "Norwegian Constitution Day", "Día de la Constitución de Noruega"));
+        addHoliday(new Date(year, 11, 25), hkmTx("1. juledag", "Christmas Day", "Navidad"));
+        addHoliday(new Date(year, 11, 26), hkmTx("2. juledag", "Boxing Day", "San Esteban"));
 
         // Bevegelige kristne høytider basert på påskedag
         const easterSunday = this.calculateEasterSunday(year);
@@ -3508,18 +3549,18 @@ class ContentManager {
             };
 
             // Palmesøndag (-7), Skjærtorsdag (-3), Langfredag (-2), 1. og 2. påskedag
-            addHoliday(offsetDays(easterSunday, -7), 'Palmesøndag');
-            addHoliday(offsetDays(easterSunday, -3), 'Skjærtorsdag');
-            addHoliday(offsetDays(easterSunday, -2), 'Langfredag');
-            addHoliday(easterSunday, '1. påskedag');
-            addHoliday(offsetDays(easterSunday, 1), '2. påskedag');
+            addHoliday(offsetDays(easterSunday, -7), hkmTx("Palmesøndag", "Palm Sunday", "Domingo de Ramos"));
+            addHoliday(offsetDays(easterSunday, -3), hkmTx("Skjærtorsdag", "Maundy Thursday", "Jueves Santo"));
+            addHoliday(offsetDays(easterSunday, -2), hkmTx("Langfredag", "Good Friday", "Viernes Santo"));
+            addHoliday(easterSunday, hkmTx("1. påskedag", "Easter Sunday", "Domingo de Resurrección"));
+            addHoliday(offsetDays(easterSunday, 1), hkmTx("2. påskedag", "Easter Monday", "Lunes de Pascua"));
 
             // Kristi himmelfartsdag (39 dager etter påskedag)
-            addHoliday(offsetDays(easterSunday, 39), 'Kristi himmelfartsdag');
+            addHoliday(offsetDays(easterSunday, 39), hkmTx("Kristi himmelfartsdag", "Ascension Day", "Día de la Ascensión"));
 
             // 1. og 2. pinsedag (49 og 50 dager etter påskedag)
-            addHoliday(offsetDays(easterSunday, 49), '1. pinsedag');
-            addHoliday(offsetDays(easterSunday, 50), '2. pinsedag');
+            addHoliday(offsetDays(easterSunday, 49), hkmTx("1. pinsedag", "Pentecost Sunday", "Domingo de Pentecostés"));
+            addHoliday(offsetDays(easterSunday, 50), hkmTx("2. pinsedag", "Whit Monday", "Lunes de Pentecostés"));
         }
 
         return holidays;
@@ -4798,7 +4839,7 @@ class ContentManager {
 
         if (!eventKey) {
             const container = document.querySelector('.event-main-content');
-            if (container) container.innerHTML = '<p>Arrangementet ble ikke funnet.</p>';
+            if (container) container.innerHTML = ("<p>" + hkmTx("Arrangementet ble ikke funnet.", "The event was not found.", "No se encontró el evento.") + "</p>");
             return;
         }
 
@@ -4856,7 +4897,7 @@ class ContentManager {
 
         if (!event) {
             const container = document.querySelector('.event-main-content');
-            if (container) container.innerHTML = '<div class="alert alert-info">Fant ikke arrangementet eller det har passert datoen for visning.</div>';
+            if (container) container.innerHTML = ("<div class=\"alert alert-info\">" + hkmTx("Fant ikke arrangementet eller det har passert datoen for visning.", "The event was not found, or it is past its display date.", "No se encontró el evento o ya pasó su fecha de publicación.") + "</div>");
 
             const titleEl = document.querySelector('.page-title');
             if (titleEl && titleEl.textContent === 'Laster...') titleEl.textContent = 'Fant ikke arrangement';
@@ -4880,7 +4921,7 @@ class ContentManager {
                 'loading': 'Laster...',
                 'loading_recent': 'Laster nylige...',
                 'no_events': 'Ingen andre arrangementer.',
-                'not_found': 'Arrangementet ble ikke funnet.',
+                'not_found': hkmTx("Arrangementet ble ikke funnet.", "The event was not found.", "No se encontró el evento."),
                 'location_not_set': 'Sted ikke oppgitt',
                 'no_description': 'Ingen beskrivelse tilgjengelig.',
                 'read_more': 'Les mer',
@@ -5188,7 +5229,7 @@ class ContentManager {
         // Count events per category
         const categoryCounts = {};
         activeEvents.forEach(e => {
-            const sourceLabel = e.sourceLabel || (e.isHoliday ? 'Helligdager' : 'Kalender');
+            const sourceLabel = e.sourceLabel || (e.isHoliday ? hkmTx("Helligdager", "Public holidays", "Festivos") : 'Kalender');
             let categoryName = e.category || sourceLabel;
 
             // A calendar address is an internal identifier, not a visitor-facing category.
