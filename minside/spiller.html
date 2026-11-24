@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html data-workspace-design="unified" lang="nb">
 <head>
+    <script src="/minside/js/page-lang.js"></script>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <meta name="robots" content="noindex, nofollow"/>
@@ -549,6 +550,22 @@
             { text: "For jeg vet hvilke tanker jeg har med dere, sier Herren, tanker til lykke og ikke til ulykke, for å gi dere fremtid og håp.", ref: "Jeremia 29:11", keywords: ["tanker", "herren", "lykke", "fremtid", "håp"] },
             { text: "Dersom vi bekjenner våre synder, er han trofast og rettferdig, så han tilgir oss syndene og renser oss fra all urettferdighet.", ref: "1. Johannes 1:9", keywords: ["bekjenner", "synder", "trofast", "tilgir", "renser"] }
         ];
+        if (window.hkmPageLang === 'en') bibleVerses.splice(0, bibleVerses.length, ...[
+            { text: "For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.", ref: "John 3:16", keywords: ["love", "loved", "world", "son", "believe", "eternal", "life"] },
+            { text: "Now faith is assurance of things hoped for, proof of things not seen.", ref: "Hebrews 11:1", keywords: ["faith", "hope", "hoped", "proof", "seen"] },
+            { text: "Yahweh is my shepherd: I shall lack nothing. He makes me lie down in green pastures. He leads me beside still waters.", ref: "Psalm 23:1-2", keywords: ["lord", "shepherd", "lack", "rest", "waters", "pastures"] },
+            { text: "In nothing be anxious, but in everything, by prayer and petition with thanksgiving, let your requests be made known to God.", ref: "Philippians 4:6", keywords: ["anxious", "worry", "prayer", "thanksgiving", "god"] },
+            { text: "For I know the thoughts that I think toward you, says Yahweh, thoughts of peace, and not of evil, to give you hope and a future.", ref: "Jeremiah 29:11", keywords: ["thoughts", "plans", "lord", "peace", "future", "hope"] },
+            { text: "If we confess our sins, he is faithful and righteous to forgive us the sins, and to cleanse us from all unrighteousness.", ref: "1 John 1:9", keywords: ["confess", "sins", "faithful", "forgive", "cleanse"] }
+        ]);
+        if (window.hkmPageLang === 'es') bibleVerses.splice(0, bibleVerses.length, ...[
+            { text: "Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.", ref: "Juan 3:16", keywords: ["amor", "amó", "mundo", "hijo", "cree", "vida", "eterna"] },
+            { text: "Es, pues, la fe la certeza de lo que se espera, la convicción de lo que no se ve.", ref: "Hebreos 11:1", keywords: ["fe", "certeza", "espera", "esperanza", "convicción"] },
+            { text: "Jehová es mi pastor; nada me faltará. En lugares de delicados pastos me hará descansar; junto a aguas de reposo me pastoreará.", ref: "Salmos 23:1-2", keywords: ["señor", "jehová", "pastor", "descansar", "aguas", "pastos"] },
+            { text: "Por nada estéis afanosos, sino sean conocidas vuestras peticiones delante de Dios en toda oración y ruego, con acción de gracias.", ref: "Filipenses 4:6", keywords: ["afanosos", "ansiedad", "oración", "gracias", "dios"] },
+            { text: "Porque yo sé los pensamientos que tengo acerca de vosotros, dice Jehová, pensamientos de paz, y no de mal, para daros el fin que esperáis.", ref: "Jeremías 29:11", keywords: ["pensamientos", "planes", "señor", "paz", "esperanza", "futuro"] },
+            { text: "Si confesamos nuestros pecados, él es fiel y justo para perdonar nuestros pecados, y limpiarnos de toda maldad.", ref: "1 Juan 1:9", keywords: ["confesar", "pecados", "fiel", "perdonar", "limpiar"] }
+        ]);
 
         // Active State tracking
         let currentCourse = null;
@@ -656,6 +673,19 @@
                 console.warn('[HKM Spiller] Kunne ikke laste kurs fra Firestore:', err);
             }
 
+            if (window.hkmPageLang && window.hkmPageLang !== 'no') {
+                const L = window.hkmPageLang;
+                const ok = v => typeof v === 'string' && v.trim();
+                courses = courses.map(c => {
+                    const t = c && c.translations && c.translations[L];
+                    if (!t) return c;
+                    const lessons = Array.isArray(c.lessons) ? c.lessons.map(l => {
+                        const lt = (t.lessons || []).find(x => x && l && x.id === l.id);
+                        return lt ? { ...l, title: ok(lt.title) ? lt.title : l.title, description: ok(lt.description) ? lt.description : l.description } : l;
+                    }) : c.lessons;
+                    return { ...c, title: ok(t.title) ? t.title : c.title, description: ok(t.description) ? t.description : c.description, lessons };
+                });
+            }
             let course = null;
             if (requestedCourseId && courses.length > 0) {
                 course = courses.find(c => c.id === requestedCourseId || c.slug === requestedCourseId);
@@ -718,7 +748,7 @@
             lessonsListContainer.innerHTML = '';
             lessons.forEach((lesson, index) => {
                 const isActive = String(lesson.id) === String(currentActiveLessonId);
-                const cleanTitle = (lesson.title || `Leksjon ${index + 1}`).replace(/^leksjon\s+\d+:\s*/i, '');
+                const cleanTitle = (lesson.title || `Leksjon ${index + 1}`).replace(/^(leksjon|lesson|lección)\s+\d+:\s*/i, '');
                 
                 const card = document.createElement('div');
                 card.id = `lesson-item-${lesson.id}`;
@@ -1107,5 +1137,238 @@
             }
         })();
     </script>
+
+<script>
+    window.hkmTranslatePage({
+ "Tilbake til Min Side": [
+  "Back to My Page",
+  "Volver a Mi página"
+ ],
+ "Prøv igjen": [
+  "Try again",
+  "Inténtalo de nuevo"
+ ],
+ "HKM Studio | Kurs-spiller": [
+  "HKM Studio | Course player",
+  "HKM Studio | Reproductor de cursos"
+ ],
+ "Medlemsportal": [
+  "Member portal",
+  "Portal de miembros"
+ ],
+ "Se nettside": [
+  "View website",
+  "Ver sitio web"
+ ],
+ "Oversikt": [
+  "Overview",
+  "Resumen"
+ ],
+ "Mitt Medlemskap": [
+  "My membership",
+  "Mi membresía"
+ ],
+ "Profil": [
+  "Profile",
+  "Perfil"
+ ],
+ "Kurs": [
+  "Courses",
+  "Cursos"
+ ],
+ "Leseplaner": [
+  "Reading plans",
+  "Planes de lectura"
+ ],
+ "Gaver": [
+  "Giving",
+  "Ofrendas"
+ ],
+ "Aktivitet": [
+  "Activity",
+  "Actividad"
+ ],
+ "Varslinger": [
+  "Notifications",
+  "Notificaciones"
+ ],
+ "Notater": [
+  "Notes",
+  "Notas"
+ ],
+ "Administrasjon": [
+  "Administration",
+  "Administración"
+ ],
+ "Logg ut": [
+  "Log out",
+  "Cerrar sesión"
+ ],
+ "Kurs-spiller": [
+  "Course player",
+  "Reproductor de cursos"
+ ],
+ "Laster kurs...": [
+  "Loading course...",
+  "Cargando curso..."
+ ],
+ "Alle kurs": [
+  "All courses",
+  "Todos los cursos"
+ ],
+ "Min Side": [
+  "My Page",
+  "Mi página"
+ ],
+ "Medlem": [
+  "Member",
+  "Miembro"
+ ],
+ "Laster leksjon...": [
+  "Loading lesson...",
+  "Cargando lección..."
+ ],
+ "Velg en leksjon for å starte avspilling": [
+  "Choose a lesson to start playback",
+  "Elige una lección para empezar la reproducción"
+ ],
+ "Fullskjerm": [
+  "Full screen",
+  "Pantalla completa"
+ ],
+ "Åpne i Zoom": [
+  "Open in Zoom",
+  "Abrir en Zoom"
+ ],
+ "Varighet": [
+  "Duration",
+  "Duración"
+ ],
+ "Ressurser": [
+  "Resources",
+  "Recursos"
+ ],
+ "Fellesskap": [
+  "Community",
+  "Comunidad"
+ ],
+ "HKM Fellesskap": [
+  "HKM Community",
+  "Comunidad HKM"
+ ],
+ "Innhold": [
+  "Contents",
+  "Contenido"
+ ],
+ "Bibel": [
+  "Bible",
+  "Biblia"
+ ],
+ "Laster innhold...": [
+  "Loading content...",
+  "Cargando contenido..."
+ ],
+ "Mine Notater": [
+  "My notes",
+  "Mis notas"
+ ],
+ "Dine personlige notater lagres lokalt i nettleseren din.": [
+  "Your personal notes are saved locally in your browser.",
+  "Tus notas personales se guardan localmente en tu navegador."
+ ],
+ "Lagre notat": [
+  "Save note",
+  "Guardar nota"
+ ],
+ "Tidligere lagrede notater": [
+  "Previously saved notes",
+  "Notas guardadas anteriormente"
+ ],
+ "Ingen lagrede notater for denne leksjonen ennå.": [
+  "No saved notes for this lesson yet.",
+  "Aún no hay notas guardadas para esta lección."
+ ],
+ "Slå opp i Bibelen": [
+  "Look up in the Bible",
+  "Buscar en la Biblia"
+ ],
+ "Søk etter nøkkelord eller spesifikke bibelvers.": [
+  "Search for keywords or specific Bible verses.",
+  "Busca palabras clave o versículos bíblicos concretos."
+ ],
+ "Se alle kurs": [
+  "See all courses",
+  "Ver todos los cursos"
+ ],
+ "Gå tilbake": [
+  "Go back",
+  "Volver"
+ ],
+ "Søk i leksjoner...": [
+  "Search lessons...",
+  "Buscar lecciones..."
+ ],
+ "Skriv ned dine notater og refleksjoner her...": [
+  "Write down your notes and reflections here...",
+  "Escribe aquí tus notas y reflexiones..."
+ ],
+ "F.eks. Johannes 3:16 eller Tro...": [
+  "E.g. John 3:16 or Faith...",
+  "Ej.: Juan 3:16 o Fe..."
+ ],
+ "Ingen kurs valgt": [
+  "No course selected",
+  "Ningún curso seleccionado"
+ ],
+ "Ingen ytterligere beskrivelse for denne leksjonen.": [
+  "No further description for this lesson.",
+  "No hay más descripción para esta lección."
+ ],
+ "PDF Notater": [
+  "PDF notes",
+  "Notas en PDF"
+ ],
+ "Ingen vedlegg": [
+  "No attachments",
+  "Sin archivos adjuntos"
+ ],
+ "Ingen leksjon valgt": [
+  "No lesson selected",
+  "Ninguna lección seleccionada"
+ ],
+ "Velg en leksjon fra listen for å starte.": [
+  "Choose a lesson from the list to start.",
+  "Elige una lección de la lista para empezar."
+ ],
+ "Leksjonen er klar til gjennomgang. Se notater og ressurser nedenfor.": [
+  "The lesson is ready to go through. See notes and resources below.",
+  "La lección está lista para repasarla. Consulta las notas y los recursos a continuación."
+ ],
+ "Ingen treff. Prøv et annet kapittel eller søkeord.": [
+  "No results. Try another chapter or keyword.",
+  "Sin resultados. Prueba con otro capítulo o palabra clave."
+ ],
+ "Ikke innlogget": [
+  "Not signed in",
+  "Sin iniciar sesión"
+ ],
+ "Johannes 3:16": [
+  "John 3:16",
+  "Juan 3:16"
+ ],
+ "Hebreerne 11:1": [
+  "Hebrews 11:1",
+  "Hebreos 11:1"
+ ],
+ "\"For så høyt har Gud elsket verden, at han ga sin Sønn, den enbårne, for at hver den som tror på ham, ikke skal gå fortapt, men ha evig liv.\"": [
+  "\"For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.\"",
+  "\"Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.\""
+ ],
+ "\"Troen er et pant på det vi håper, et bevis på det vi ikke ser.\"": [
+  "\"Now faith is assurance of things hoped for, proof of things not seen.\"",
+  "\"Es, pues, la fe la certeza de lo que se espera, la convicción de lo que no se ve.\""
+ ]
+}, [[new RegExp("^Leksjon #(\\d+)$"), "Lesson #$1", "Lecci\u00f3n #$1"],[new RegExp("^Leksjon (\\d+)$"), "Lesson $1", "Lecci\u00f3n $1"]]);
+</script>
 </body>
 </html>

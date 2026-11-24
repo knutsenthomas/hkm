@@ -300,5 +300,41 @@
     </main>
 
     <script type="module" src="/script.js"></script>
+
+<script>
+(function () {
+    var p = location.pathname;
+    var lang = /^\/en(\/|$)/.test(p) ? 'en' : /^\/es(\/|$)/.test(p) ? 'es' : null;
+    if (!lang) { try { var pref = localStorage.getItem('hkm_preferred_lang'); if (pref === 'en' || pref === 'es') lang = pref; } catch (e) {} }
+    if (!lang) return;
+    var T = {
+        en: { title: '404 - Page not found | His Kingdom Ministry', 'Feilkode 404': 'Error code 404', 'Beklager, siden ble ikke funnet': 'Sorry, the page was not found',
+              'Siden du leter etter har blitt flyttet, slettet eller eksisterer ikke lenger. Bruk hurtiglenkene under for å finne fram, eller gå tilbake til forsiden.': 'The page you are looking for has been moved, deleted or no longer exists. Use the quick links below to find your way, or go back to the home page.',
+              'Forside': 'Home', 'Tilbake til start': 'Back to the start', 'Nettbibel': 'Online Bible', 'Les og søk i Skriften': 'Read and search the Scriptures', 'Podcast': 'Podcast', 'Ukentlig oppmuntring': 'Weekly encouragement',
+              'Kurs & Leseplaner': 'Courses & reading plans', 'Voks videre i troen': 'Keep growing in faith', 'Kontakt oss': 'Contact us', 'Spørsmål eller forbønn': 'Questions or prayer requests', 'Arrangementer': 'Events', 'Se kommende samlinger': 'See upcoming gatherings', 'Gå til forsiden': 'Go to the home page',
+              links: { '/': '/en/', '/bibel': '/en/bibel', '/podcast': '/en/podcast', '/kurs': '/en/courses', '/kontakt': '/en/contact', '/arrangementer': '/en/events' } },
+        es: { title: '404 - Página no encontrada | His Kingdom Ministry', 'Feilkode 404': 'Código de error 404', 'Beklager, siden ble ikke funnet': 'Lo sentimos, no se encontró la página',
+              'Siden du leter etter har blitt flyttet, slettet eller eksisterer ikke lenger. Bruk hurtiglenkene under for å finne fram, eller gå tilbake til forsiden.': 'La página que buscas se ha movido, se ha eliminado o ya no existe. Usa los enlaces rápidos de abajo para orientarte o vuelve a la página de inicio.',
+              'Forside': 'Inicio', 'Tilbake til start': 'Volver al inicio', 'Nettbibel': 'Biblia en línea', 'Les og søk i Skriften': 'Lee y busca en las Escrituras', 'Podcast': 'Podcast', 'Ukentlig oppmuntring': 'Ánimo semanal',
+              'Kurs & Leseplaner': 'Cursos y planes de lectura', 'Voks videre i troen': 'Sigue creciendo en la fe', 'Kontakt oss': 'Contáctanos', 'Spørsmål eller forbønn': 'Preguntas o peticiones de oración', 'Arrangementer': 'Eventos', 'Se kommende samlinger': 'Ver próximas reuniones', 'Gå til forsiden': 'Ir a la página de inicio',
+              links: { '/': '/es/', '/bibel': '/es/bibel', '/podcast': '/es/podcast', '/kurs': '/es/cursos', '/kontakt': '/es/contacto', '/arrangementer': '/es/eventos' } }
+    }[lang];
+    document.documentElement.lang = lang;
+    document.title = T.title;
+    var main = document.querySelector('main') || document.body;
+    var walker = document.createTreeWalker(main, NodeFilter.SHOW_TEXT);
+    var n;
+    while ((n = walker.nextNode())) {
+        if (n.parentElement && n.parentElement.closest('header, footer, #mega-menu, .material-symbols-outlined')) continue;
+        var t = n.nodeValue.trim();
+        if (t && Object.prototype.hasOwnProperty.call(T, t) && t !== 'links' && t !== 'title') n.nodeValue = n.nodeValue.replace(t, T[t]);
+    }
+    main.querySelectorAll('a[href]').forEach(function (a) {
+        if (a.closest('header, footer, #mega-menu')) return;
+        var h = a.getAttribute('href');
+        if (T.links[h]) a.setAttribute('href', T.links[h]);
+    });
+})();
+</script>
 </body>
 </html>
