@@ -1,0 +1,2957 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('hkm_theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else {
+                const hour = new Date().getHours();
+                const isNight = hour >= 22 || hour < 6;
+                const systemTheme = isNight || window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', systemTheme);
+            }
+        })();
+    </script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course details | His Kingdom Ministry</title>
+    <meta name="description" content="Lessons, live sessions and resources for courses from His Kingdom Ministry.">
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+    <link rel="apple-touch-icon" href="/img/logo-hkm.png">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;850&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;850&display=swap"></noscript>
+
+    <!-- Icons -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block"></noscript>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="../css/subpage-hero.css">
+    <link rel="preload" href="../css/search-v2.css?v=1.0.3" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="../css/search-v2.css?v=1.0.3"></noscript>
+
+    <!-- Firebase Config & Service -->
+    <script type="module" src="../js/firebase-config.js"></script>
+    <script type="module" src="../js/firebase-service.js"></script>
+
+    <style>
+        :root {
+            --hkm-navy: #1B4965;
+            --hkm-navy-dark: #0b2536;
+            --hkm-sidebar-bg: #0f2c3f;
+            --hkm-terracotta: #d17d39;
+            --hkm-green-accent: #22c55e;
+            --hkm-bg-light: #f8fafc;
+        }
+
+        /* ══════════════════════════════════════════════════════════════════
+           DARK MODE STYLES FOR KURS-DETALJER.HTML
+           ══════════════════════════════════════════════════════════════════ */
+        html[data-theme="dark"],
+        html[data-theme="dark"] body,
+        body.dark-theme,
+        body.dark-mode {
+            background-color: #0b1329 !important;
+            color: #f8fafc !important;
+        }
+
+        html[data-theme="dark"] .platform-container,
+        html[data-theme="dark"] .main-panel {
+            background-color: #0b1329 !important;
+        }
+
+        /* Left Sidebar (Course Modules & Lessons) in Dark Mode */
+        html[data-theme="dark"] .sidebar-nav {
+            background-color: #0f172a !important;
+            border-right-color: #1e293b !important;
+            color: #f8fafc !important;
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        html[data-theme="dark"] .sidebar-header {
+            background: #0f172a !important;
+            border-bottom-color: #1e293b !important;
+        }
+
+        html[data-theme="dark"] .sidebar-title {
+            color: #f8fafc !important;
+        }
+
+        html[data-theme="dark"] .module-group {
+            border-bottom-color: #1e293b !important;
+        }
+
+        html[data-theme="dark"] .module-header {
+            background: #1e293b !important;
+            color: #cbd5e1 !important;
+            border-bottom-color: #334155 !important;
+        }
+
+        html[data-theme="dark"] .module-header:hover {
+            background: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        html[data-theme="dark"] .lesson-list {
+            background: #0f172a !important;
+        }
+
+        html[data-theme="dark"] .lesson-item {
+            color: #94a3b8 !important;
+        }
+
+        html[data-theme="dark"] .lesson-item:hover {
+            background: #1e293b !important;
+            color: #f8fafc !important;
+        }
+
+        html[data-theme="dark"] .lesson-item.active {
+            background: rgba(209, 125, 57, 0.16) !important;
+            color: #ffffff !important;
+            border-left-color: var(--hkm-terracotta) !important;
+        }
+
+        /* Navigation Sub-bar under Video in Dark Mode */
+        html[data-theme="dark"] .lesson-nav-bar {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3) !important;
+        }
+
+        html[data-theme="dark"] .lesson-nav-btn {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        html[data-theme="dark"] .lesson-nav-btn:hover {
+            background: #334155 !important;
+            color: var(--hkm-terracotta) !important;
+        }
+
+        html[data-theme="dark"] .lesson-nav-info {
+            color: #94a3b8 !important;
+        }
+
+        /* Breadcrumb & Headings in Dark Mode */
+        html[data-theme="dark"] .breadcrumb-trail,
+        html[data-theme="dark"] .breadcrumb-trail a {
+            color: #94a3b8 !important;
+        }
+
+        html[data-theme="dark"] .progress-label {
+            color: #cbd5e1 !important;
+        }
+
+        html[data-theme="dark"] .progress-bar-bg {
+            background: #334155 !important;
+        }
+
+        html[data-theme="dark"] .lesson-details-tabs {
+            border-bottom-color: #334155 !important;
+        }
+
+        html[data-theme="dark"] .tab-btn {
+            color: #94a3b8 !important;
+        }
+
+        #course-lesson-heading strong {
+            font-weight: 750;
+            color: var(--hkm-navy);
+        }
+
+        #course-lesson-heading span {
+            font-weight: 400;
+            color: #475569;
+        }
+
+        html[data-theme="dark"] #course-lesson-heading strong {
+            color: var(--hkm-terracotta) !important;
+        }
+
+        html[data-theme="dark"] #course-lesson-heading span {
+            color: #cbd5e1 !important;
+        }
+
+        /* Light Mode Tab Card Styles */
+        .empty-resources-card {
+            grid-column: 1 / -1;
+            padding: 24px;
+            background: #ffffff;
+            border: 1.5px dashed #e2e8f0;
+            border-radius: 16px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .discussion-locked-box {
+            background: #ffffff;
+            border: 1.5px dashed #cbd5e1;
+            padding: 24px;
+            border-radius: 16px;
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 24px;
+        }
+
+        .discussion-form-box {
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 20px;
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+            margin-bottom: 32px;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .discussion-form-box:focus-within {
+            border-color: rgba(209, 125, 57, 0.45);
+            box-shadow: 0 8px 24px -4px rgba(209, 125, 57, 0.1), 0 2px 8px -1px rgba(15, 23, 42, 0.04);
+        }
+
+        .discussion-input-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 12px;
+            letter-spacing: -0.01em;
+        }
+
+        .discussion-input-label i {
+            color: var(--hkm-terracotta, #d17d39);
+            font-size: 0.95rem;
+        }
+
+        #discussion-comment-input {
+            width: 100%;
+            min-height: 120px;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1.5px solid #cbd5e1;
+            background: #f8fafc;
+            color: #0f172a;
+            font-family: inherit;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            resize: vertical;
+            box-sizing: border-box;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: block;
+        }
+
+        #discussion-comment-input::placeholder {
+            color: #94a3b8;
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        #discussion-comment-input:focus {
+            outline: none;
+            background: #ffffff;
+            border-color: var(--hkm-terracotta, #d17d39);
+            box-shadow: 0 0 0 3px rgba(209, 125, 57, 0.16);
+        }
+
+        .discussion-form-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .discussion-user-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: #f1f5f9;
+            border-radius: 30px;
+            border: 1px solid #e2e8f0;
+            font-size: 0.85rem;
+            color: #475569;
+            transition: all 0.2s ease;
+        }
+
+        .discussion-user-badge i {
+            color: var(--hkm-terracotta, #d17d39);
+            font-size: 1.1rem;
+        }
+
+        .discussion-user-badge strong {
+            color: #1e293b;
+            font-weight: 750;
+        }
+
+        .discussion-submit-btn {
+            min-height: 44px;
+            padding: 10px 24px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background-color: var(--hkm-terracotta, #d17d39);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(209, 125, 57, 0.25);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .discussion-submit-btn:hover {
+            transform: translateY(-1px) scale(1.02);
+            box-shadow: 0 6px 20px rgba(209, 125, 57, 0.38);
+        }
+
+        .discussion-submit-btn:active {
+            transform: scale(0.98);
+        }
+
+        @media (max-width: 640px) {
+            .discussion-form-footer {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .discussion-submit-btn {
+                width: 100%;
+            }
+            .discussion-user-badge {
+                justify-content: center;
+            }
+        }
+
+        .comment-item-card {
+            background: #ffffff;
+            padding: 18px 22px;
+            border-radius: 16px;
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.025);
+            margin-bottom: 16px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .comment-item-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+        }
+
+        /* Teacher Card & Tab Contents in Dark Mode */
+        html[data-theme="dark"] .instructor-card,
+        html[data-theme="dark"] .teacher-card,
+        html[data-theme="dark"] .resource-card,
+        html[data-theme="dark"] .empty-resources-card,
+        html[data-theme="dark"] .discussion-locked-box,
+        html[data-theme="dark"] .discussion-form-box,
+        html[data-theme="dark"] .comment-item-card,
+        html[data-theme="dark"] [style*="background: white"],
+        html[data-theme="dark"] [style*="background:#ffffff"],
+        html[data-theme="dark"] [style*="background: #f8fafc"],
+        html[data-theme="dark"] [style*="background:#f8fafc"] {
+            background: #1e293b !important;
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        html[data-theme="dark"] .instructor-name,
+        html[data-theme="dark"] .discussion-locked-box h4,
+        html[data-theme="dark"] .comment-item-card strong,
+        html[data-theme="dark"] .teacher-card h3,
+        html[data-theme="dark"] .teacher-card h4 {
+            color: #f8fafc !important;
+        }
+
+        html[data-theme="dark"] .instructor-bio,
+        html[data-theme="dark"] .empty-resources-card span,
+        html[data-theme="dark"] .discussion-locked-box p,
+        html[data-theme="dark"] .comment-item-card p,
+        html[data-theme="dark"] .teacher-card p {
+            color: #cbd5e1 !important;
+        }
+
+        html[data-theme="dark"] .discussion-input-label {
+            color: #cbd5e1 !important;
+        }
+
+        html[data-theme="dark"] .discussion-form-box:focus-within {
+            border-color: rgba(209, 125, 57, 0.6) !important;
+        }
+
+        html[data-theme="dark"] textarea#discussion-comment-input {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        html[data-theme="dark"] textarea#discussion-comment-input::placeholder {
+            color: #64748b !important;
+        }
+
+        html[data-theme="dark"] textarea#discussion-comment-input:focus {
+            background: #0b1329 !important;
+            border-color: var(--hkm-terracotta, #d17d39) !important;
+            box-shadow: 0 0 0 3px rgba(209, 125, 57, 0.25) !important;
+        }
+
+        html[data-theme="dark"] .discussion-user-badge {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+            color: #94a3b8 !important;
+        }
+
+        html[data-theme="dark"] .discussion-user-badge strong {
+            color: #f1f5f9 !important;
+        }
+
+        html[data-theme="dark"] textarea,
+        html[data-theme="dark"] input {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--hkm-bg-light);
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Standard Subpage Hero Styling for Course Player */
+        .page-hero.subpage-hero.course-player-hero {
+            background: linear-gradient(135deg, #1B4965 0%, #0b2536 100%) !important;
+            padding-top: 140px !important;
+            padding-bottom: 40px !important;
+            min-height: auto !important;
+        }
+
+        .platform-container {
+            display: flex;
+            min-height: calc(100vh - 90px);
+            margin-top: 90px;
+        }
+
+        @media (max-width: 1024px) {
+            .platform-container {
+                flex-direction: column;
+            }
+        }
+
+        /* Left Sidebar (Course Modules & Lessons) */
+        .sidebar-nav {
+            width: 340px;
+            background-color: #ffffff;
+            color: #1e293b;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #e2e8f0;
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.02);
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar-nav {
+                width: 100%;
+            }
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #ffffff;
+        }
+
+        .sidebar-logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .sidebar-title {
+            font-weight: 850;
+            font-size: 1.45rem;
+            color: var(--hkm-navy);
+            letter-spacing: -0.02em;
+            line-height: 1.25;
+        }
+
+        .module-group {
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .module-header {
+            padding: 16px 20px;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: #0f172a;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .module-header:hover {
+            background: #f1f5f9;
+        }
+
+        .lesson-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            background: #ffffff;
+        }
+
+        .lesson-item {
+            padding: 12px 20px 12px 24px;
+            font-size: 0.88rem;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            text-decoration: none;
+        }
+
+        .lesson-item i {
+            color: #94a3b8;
+            transition: color 0.2s ease;
+        }
+
+        .lesson-item:hover {
+            background: #f8fafc;
+            color: #0f172a;
+        }
+
+        .lesson-item:hover i {
+            color: var(--hkm-terracotta);
+        }
+
+        .lesson-item.active {
+            background: rgba(209, 125, 57, 0.08);
+            color: var(--hkm-navy);
+            font-weight: 750;
+            border-left-color: var(--hkm-terracotta);
+        }
+
+        .lesson-item.active i {
+            color: var(--hkm-terracotta) !important;
+        }
+
+        .lesson-item.active .lesson-dot {
+            background-color: var(--hkm-terracotta);
+            box-shadow: 0 0 8px rgba(209, 125, 57, 0.4);
+        }
+
+        .lesson-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #cbd5e1;
+            flex-shrink: 0;
+        }
+
+        /* Right Main Content Panel */
+        .main-panel {
+            flex: 1;
+            padding: 32px 40px 60px;
+            max-width: 1080px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .main-panel {
+                padding: 20px 16px 40px;
+            }
+        }
+
+        /* Top Breadcrumb & Progress Bar Header */
+        .panel-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .breadcrumb-trail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.88rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .breadcrumb-trail a {
+            color: #64748b;
+            text-decoration: none;
+        }
+
+        .breadcrumb-trail a:hover {
+            color: var(--hkm-navy);
+        }
+
+        .progress-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .progress-label {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .progress-bar-bg {
+            width: 140px;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 70%;
+            background: linear-gradient(90deg, #22c55e 0%, #4ade80 100%);
+            border-radius: 9999px;
+        }
+
+        /* Video Player Area */
+        .video-card {
+            background: #0f172a;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.35);
+            position: relative;
+            aspect-ratio: 16 / 9;
+            width: 100%;
+            margin-bottom: 16px;
+        }
+
+        /* Next / Prev Navigation Sub-bar */
+        .lesson-nav-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 32px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            padding: 10px 16px;
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        .lesson-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            color: #334155;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .lesson-nav-btn:hover:not(.disabled) {
+            background: var(--hkm-terracotta);
+            color: #ffffff;
+            border-color: var(--hkm-terracotta);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(209, 125, 57, 0.3);
+        }
+
+        .btn-terracotta {
+            background-color: var(--hkm-terracotta, #d17d39) !important;
+            color: #ffffff !important;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 22px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px rgba(209, 125, 57, 0.3);
+            text-decoration: none;
+        }
+
+        .btn-terracotta:hover {
+            background-color: #b8692b !important;
+            color: #ffffff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(209, 125, 57, 0.4);
+        }
+
+        .btn-terracotta:active {
+            transform: translateY(0);
+        }
+
+        .lesson-nav-btn.disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            pointer-events: none;
+            background: #f1f5f9;
+            border-color: #e2e8f0;
+            color: #94a3b8;
+        }
+
+        .video-card iframe,
+        .video-card video {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .locked-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.65));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 32px;
+            color: white;
+            z-index: 10;
+        }
+
+        .upcoming-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.88));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 32px;
+            color: white;
+            z-index: 10;
+        }
+
+        .badge-upcoming {
+            background: rgba(209, 125, 57, 0.25);
+            border: 1px solid var(--hkm-terracotta);
+            color: #fb923c;
+            font-size: 0.85rem;
+            font-weight: 800;
+            padding: 6px 16px;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .countdown-grid {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin: 24px 0;
+            flex-wrap: wrap;
+        }
+
+        .countdown-box {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 14px;
+            padding: 16px 20px;
+            min-width: 88px;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .countdown-box span {
+            font-size: 1.95rem;
+            font-weight: 800;
+            color: #ffffff;
+            display: block;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .countdown-box label {
+            font-size: 0.68rem;
+            font-weight: 750;
+            color: #94a3b8;
+            letter-spacing: 0.08em;
+            margin-top: 6px;
+            display: block;
+        }
+
+        .lock-badge {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(209, 125, 57, 0.2);
+            border: 2px solid var(--hkm-terracotta);
+            color: #fb923c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .btn-terracotta {
+            background: var(--hkm-terracotta);
+            color: white;
+            font-weight: 750;
+            padding: 12px 28px;
+            border-radius: 12px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            box-shadow: 0 6px 20px rgba(209, 125, 57, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .btn-terracotta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(209, 125, 57, 0.4);
+        }
+
+        /* Content Tabs */
+        .content-tabs {
+            display: flex;
+            gap: 32px;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 28px;
+        }
+
+        .tab-btn {
+            padding: 12px 6px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #64748b;
+            background: none;
+            border: none;
+            border-radius: 0 !important;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .tab-btn.active {
+            color: var(--hkm-navy);
+            font-weight: 800;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--hkm-terracotta, #d17d39);
+            border-radius: 0 !important;
+        }
+
+        .tab-content-panel {
+            display: none;
+        }
+
+        .tab-content-panel.active {
+            display: block;
+        }
+
+        /* Section Headings & Text */
+        .overview-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--hkm-navy);
+            margin: 0 0 16px 0;
+        }
+
+        .overview-text {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #475569;
+            margin-bottom: 32px;
+        }
+
+        .overview-text p {
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        .overview-text p:last-child {
+            margin-bottom: 0;
+        }
+
+        html[data-theme="dark"] .overview-text {
+            color: #cbd5e1 !important;
+        }
+
+        html[data-theme="dark"] .overview-text p,
+        html[data-theme="dark"] .overview-text span,
+        html[data-theme="dark"] .overview-text div,
+        html[data-theme="dark"] .overview-text li {
+            color: #cbd5e1 !important;
+        }
+
+        html[data-theme="dark"] .overview-text strong,
+        html[data-theme="dark"] .overview-text b {
+            color: #f8fafc !important;
+        }
+
+        /* Instructor Section */
+        .instructor-card {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 36px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        .instructor-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--hkm-terracotta);
+            flex-shrink: 0;
+        }
+
+        .instructor-name {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--hkm-navy);
+            margin: 0 0 4px 0;
+        }
+
+        .instructor-bio {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* Resource Downloads Grid */
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .resource-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            color: #1e293b;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .resource-card:hover {
+            border-color: var(--hkm-terracotta);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+        }
+
+        .resource-icon {
+            font-size: 24px;
+            color: var(--hkm-terracotta);
+            background: rgba(209, 125, 57, 0.1);
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .resource-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        /* ==========================================================================
+           COMPREHENSIVE MOBILE RESPONSIVE OVERRIDES FOR KURS DETALJER (iOS & Android)
+           ========================================================================== */
+
+        @media (max-width: 900px) {
+            html, body {
+                overflow-x: hidden !important;
+                max-width: 100vw !important;
+            }
+
+            .platform-container {
+                flex-direction: column !important;
+                margin-top: 64px !important;
+                min-height: auto !important;
+                width: 100% !important;
+                max-width: 100vw !important;
+                overflow-x: hidden !important;
+                box-sizing: border-box !important;
+            }
+
+            .sidebar-nav {
+                width: 100% !important;
+                border-right: none !important;
+                border-bottom: 1px solid #e2e8f0 !important;
+                box-shadow: none !important;
+                box-sizing: border-box !important;
+                border-radius: 12px !important;
+                margin-bottom: 12px !important;
+                overflow: hidden !important;
+            }
+
+            .sidebar-header {
+                padding: 14px 16px !important;
+                cursor: pointer !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                background: #f8fafc !important;
+            }
+
+            .sidebar-title {
+                font-size: 1.1rem !important;
+                font-weight: 800 !important;
+            }
+
+            .mobile-sidebar-toggle-btn {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 32px !important;
+                height: 32px !important;
+                border-radius: 50% !important;
+                background: rgba(209, 125, 57, 0.1) !important;
+                color: var(--hkm-terracotta) !important;
+            }
+
+            #modules-accordion-container {
+                display: none;
+            }
+
+            .sidebar-nav.mobile-expanded #modules-accordion-container {
+                display: block !important;
+            }
+
+            .sidebar-nav.mobile-expanded #mobile-sidebar-chevron {
+                transform: rotate(180deg);
+            }
+
+            .module-header {
+                padding: 14px 16px !important;
+                font-size: 0.9rem !important;
+            }
+
+            .lesson-item {
+                padding: 12px 16px !important;
+                font-size: 0.88rem !important;
+                min-height: 44px !important;
+                display: flex !important;
+                align-items: center !important;
+            }
+
+            .main-panel {
+                padding: 12px 10px 40px !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+                overflow-x: hidden !important;
+            }
+
+            .panel-top-bar {
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                gap: 12px !important;
+                margin-bottom: 12px !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            #course-lesson-heading {
+                display: none !important;
+            }
+
+            .progress-wrapper {
+                width: 100% !important;
+                justify-content: space-between !important;
+            }
+
+            .progress-bar-bg {
+                flex-grow: 1 !important;
+                max-width: 180px !important;
+            }
+
+            /* Video & Overlays */
+            .video-card {
+                border-radius: 12px !important;
+                margin-bottom: 12px !important;
+                min-height: 260px !important;
+                height: auto !important;
+                aspect-ratio: auto !important;
+            }
+
+            .video-card iframe,
+            .video-card video {
+                aspect-ratio: 16 / 9 !important;
+                height: 100 !important;
+            }
+
+            .video-card-countdown-content {
+                padding: 16px 10px !important;
+                box-sizing: border-box !important;
+            }
+
+            .video-card-countdown-content h3 {
+                font-size: 1.15rem !important;
+                margin-bottom: 4px !important;
+                line-height: 1.25 !important;
+            }
+
+            .video-card-countdown-content p {
+                font-size: 0.8rem !important;
+                margin-bottom: 8px !important;
+                line-height: 1.3 !important;
+            }
+
+            .video-card-countdown-content .btn-terracotta {
+                padding: 7px 16px !important;
+                font-size: 0.82rem !important;
+                margin-top: 4px !important;
+                min-height: 38px !important;
+            }
+
+            .locked-overlay,
+            .upcoming-overlay {
+                padding: 16px 10px !important;
+                box-sizing: border-box !important;
+                width: 100% !important;
+            }
+
+            .locked-overlay h3,
+            .upcoming-overlay h3 {
+                font-size: 1.1rem !important;
+                margin-bottom: 4px !important;
+            }
+
+            .locked-overlay p,
+            .upcoming-overlay p {
+                font-size: 0.82rem !important;
+                margin-bottom: 12px !important;
+                line-height: 1.35 !important;
+            }
+
+            .locked-overlay .btn-terracotta,
+            .upcoming-overlay .btn-terracotta {
+                padding: 8px 16px !important;
+                font-size: 0.85rem !important;
+                min-height: 44px !important;
+            }
+
+            /* Countdown Grid Fix: 4 boxes strictly side-by-side without wrapping */
+            .countdown-grid {
+                display: flex !important;
+                flex-direction: row !important;
+                flex-wrap: nowrap !important;
+                gap: 6px !important;
+                justify-content: center !important;
+                align-items: center !important;
+                margin: 8px 0 10px 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            .countdown-box {
+                flex: 1 1 0% !important;
+                min-width: 0 !important;
+                padding: 8px 3px !important;
+                border-radius: 8px !important;
+                box-sizing: border-box !important;
+            }
+
+            .countdown-box span {
+                font-size: 1.25rem !important;
+                line-height: 1.1 !important;
+            }
+
+            .countdown-box label {
+                font-size: 0.55rem !important;
+                letter-spacing: 0.02em !important;
+                margin-top: 3px !important;
+            }
+
+            /* Sleek 1-Row Compact Navigation Bar Between Lessons */
+            .lesson-nav-bar {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                gap: 6px !important;
+                padding: 6px 8px !important;
+                margin-bottom: 16px !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+                overflow: hidden !important;
+            }
+
+            .lesson-nav-btn {
+                flex: 0 0 auto !important;
+                width: auto !important;
+                min-height: 38px !important;
+                padding: 6px 10px !important;
+                font-size: 0.76rem !important;
+                font-weight: 700 !important;
+                justify-content: center !important;
+                white-space: nowrap !important;
+            }
+
+            #lesson-step-indicator {
+                flex: 1 1 auto !important;
+                font-size: 0.76rem !important;
+                font-weight: 750 !important;
+                color: #475569 !important;
+                text-align: center !important;
+                padding: 0 2px !important;
+                white-space: nowrap !important;
+            }
+                order: 0 !important;
+                width: auto !important;
+                display: inline-block !important;
+            }
+
+            /* Content Tabs */
+            .content-tabs {
+                display: flex !important;
+                width: 100% !important;
+                gap: 6px !important;
+                margin-bottom: 20px !important;
+                border-bottom: 2px solid #e2e8f0 !important;
+            }
+
+            .tab-btn {
+                flex: 1 !important;
+                text-align: center !important;
+                padding: 10px 6px !important;
+                font-size: 0.88rem !important;
+                min-height: 44px !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                border-radius: 0 !important;
+                border: none !important;
+            }
+
+            .overview-title {
+                font-size: 1.15rem !important;
+                font-weight: 800 !important;
+                margin: 0 0 12px 0 !important;
+            }
+
+            /* Instructor Card */
+            .instructor-card {
+                flex-direction: column !important;
+                text-align: center !important;
+                padding: 20px 16px !important;
+                align-items: center !important;
+                gap: 12px !important;
+            }
+
+            .instructor-avatar {
+                margin: 0 auto !important;
+            }
+        }
+
+        header#header #header-container {
+            max-width: 100% !important;
+            padding-left: 24px !important;
+            padding-right: 24px !important;
+        }
+
+        @media (orientation: landscape) and (max-height: 500px) {
+            .platform-container {
+                margin-top: 56px !important;
+            }
+        }
+    </style>
+    <link rel="canonical" href="https://hiskingdomministry.no/en/course-details">
+    <link rel="alternate" hreflang="no" href="https://hiskingdomministry.no/kurs-detaljer">
+    <link rel="alternate" hreflang="en" href="https://hiskingdomministry.no/en/course-details">
+    <link rel="alternate" hreflang="es" href="https://hiskingdomministry.no/es/detalles-curso">
+    <link rel="alternate" hreflang="x-default" href="https://hiskingdomministry.no/kurs-detaljer">
+</head>
+
+<body id="body" class="header-always-scrolled">
+
+    <!-- Header -->
+    <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
+        <div class="header-content" id="header-container">
+            <!-- Logo -->
+            <a href="/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+                <div
+                    class="w-[45px] h-[45px] flex items-center justify-center rounded-lg overflow-hidden shrink-0 logo-icon">
+                    <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover"
+                        data-content-doc="settings_global" data-content-key="brand.logoAlt" data-content-attr="alt">
+                </div>
+                <span class="text-xl" data-content-doc="settings_global" data-content-key="brand.name">His Kingdom
+                    Ministry</span>
+            </a>
+
+            <!-- Right Actions: Donate + Language + Hamburger -->
+            <div class="header-actions">
+                <!-- Utilities Dock (Search, Bible, Reading Plans, Language Selector) -->
+                <div class="header-actions-dock">
+                    <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Søk i nettsiden">
+                        <span class="material-symbols-outlined text-xl" style="position: relative; top: 0px; left: 9px;">search</span>
+                    </button>
+                    
+                    <div class="header-actions-expandable">
+                        <a href="/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-bible-btn" aria-label="Les Bibelen" title="Les Bibelen">
+                            <span class="material-symbols-outlined text-xl">menu_book</span>
+                        </a>
+                        <a href="/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-reading-plans-btn" aria-label="Leseplaner" title="Leseplaner">
+                            <span class="material-symbols-outlined text-xl">calendar_today</span>
+                        </a>
+                        
+                        <div class="hidden md:block w-px h-5 bg-white/20 mx-1 dock-divider"></div>
+
+                        <!-- Language Switcher in same styling -->
+                        <div class="lang-switcher relative group">
+                            <button class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full text-white hover:bg-white/15 transition-all lang-btn" aria-label="Velg språk">
+                                <span class="material-symbols-outlined text-lg">language</span>
+                                <span data-content-doc="settings_global" data-content-key="header.currentLanguage">NO</span>
+                            </button>
+                            <div class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden border border-gray-100">
+                                <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                                    data-lang="no" data-content-doc="settings_global" data-content-key="header.languages.no">🇳🇴
+                                    Norsk</a>
+                                <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                                    data-lang="en" data-content-doc="settings_global" data-content-key="header.languages.en">🇺🇸
+                                <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                                    data-lang="es" data-content-doc="settings_global" data-content-key="header.languages.es">🇪🇸
+                                    Español</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Button (Desktop Only) -->
+                <a href="/minside/index.html" id="header-profile-link" class="w-11 h-11 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all relative overflow-hidden hidden md:flex" aria-label="Min Side" title="Min Side">
+                    <span class="material-symbols-outlined text-xl">account_circle</span>
+                    <img id="header-profile-img" src="" alt="Profilbilde" class="absolute inset-0 w-full h-full object-cover hidden rounded-full">
+                </a>
+                <a href="/donasjoner"
+                    class="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-[1.03] active:scale-[0.98] transition-all shadow-md shadow-orange-500/10 header-donate-btn">
+                    <span data-content-doc="settings_global" data-content-key="header.donateLabel">Gi gave</span>
+                    <span class="material-symbols-outlined text-lg">favorite</span>
+                </a>
+
+                <!-- Unified Toggle Button (Neutral circular button matching utilities) -->
+                <button
+                    class="menu-toggle w-11 h-11 rounded-full flex items-center justify-center text-white bg-white/15 border border-white/10 hover:bg-white/25 active:scale-95 transition-all relative focus:outline-none focus:ring-0"
+                    id="menu-toggle" aria-label="Toggle meny" aria-controls="mega-menu" aria-expanded="false"
+                    data-content-doc="settings_global" data-content-key="header.menuToggleLabel"
+                    data-content-attr="aria-label">
+                    <span class="material-symbols-outlined text-2xl open-icon">menu</span>
+                    <span class="material-symbols-outlined text-2xl close-icon hidden">close</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Full-screen Mega Menu Overlay -->
+    <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
+        id="mega-menu" style="display: none;" aria-hidden="true">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+            <!-- Menu Top Controls (Search & Mobile Lang) -->
+            <div class="flex flex-col gap-6">
+                <div class="relative w-full md:hidden">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="Søk..." data-content-doc="settings_global"
+                        data-content-key="menu.searchPlaceholder"
+                        class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
+                </div>
+
+                <!-- Language Selector & Theme Toggle (Pill Style) -->
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex md:hidden items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
+                        <i class="fas fa-globe text-gray-400"></i>
+                        <div class="flex gap-4 items-center">
+                            <a href="/" class="text-sm font-bold text-primary-orange lang-switch-btn" data-lang="no"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="/en/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="en"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="/es/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="es"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
+                        </div>
+                    </div>
+
+                    <div class="ml-auto flex items-center gap-3">
+                        <!-- Mobile Menu Profile Link -->
+                        <a href="/minside/index.html" id="mobile-menu-profile-link" class="w-12 h-12 flex items-center justify-center rounded-full border border-gray-200 bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-all relative overflow-hidden hidden" aria-label="My Page" title="My Page">
+                            <span class="material-symbols-outlined text-2xl">account_circle</span>
+                            <img id="mobile-menu-profile-img" src="" alt="Profilbilde" class="absolute inset-0 w-full h-full object-cover hidden rounded-full">
+                        </a>
+                        <button class="mobile-theme-toggle-btn flex items-center justify-center h-12 w-12 border border-gray-200 rounded-full bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-colors" aria-label="Bytt tema" title="Bytt tema">
+                            <span class="material-symbols-outlined text-2xl theme-toggle-icon">dark_mode</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mega-menu-body">
+                <!-- Menu Content Grid -->
+                <div class="mega-menu-grid">
+                    <!-- Column 1: Engasjer deg -->
+                    <div class="menu-col">
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.engage.title">Engasjer deg</div>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">volunteer_activism</span>
+                                <div class="flex flex-col">
+                                    <a href="/donasjoner" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.supportWork">Støtt arbeidet</a>
+                                    <span class="mega-menu-desc">Bidra økonomisk til vår tjeneste.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">favorite</span>
+                                <div class="flex flex-col">
+                                    <a href="/bli-fast-giver" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.regularDonor">Bli fast giver</a>
+                                    <span class="mega-menu-desc">Støtt oss månedlig for langsiktig arbeid.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">church</span>
+                                <div class="flex flex-col">
+                                    <a href="/for-menigheter" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.churches">For menigheter</a>
+                                    <span class="mega-menu-desc">Ressurser og undervisning for din kirke.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">corporate_fare</span>
+                                <div class="flex flex-col">
+                                    <a href="/for-bedrifter" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.businesses">For bedrifter</a>
+                                    <span class="mega-menu-desc">Samarbeidsavtaler for næringslivet.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">business_center</span>
+                                <div class="flex flex-col">
+                                    <a href="/bnn" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.network">Business Network</a>
+                                    <span class="mega-menu-desc">Nettverk for kristne ledere og gründere.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 2: Bli kjent med oss -->
+                    <div class="menu-col">
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.about.title">Bli kjent med oss</div>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">info</span>
+                                <div class="flex flex-col">
+                                    <a href="/om-oss" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.about">Om oss</a>
+                                    <span class="mega-menu-desc">Lær mer om vår visjon, tro og verdier.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">mail</span>
+                                <div class="flex flex-col">
+                                    <a href="/kontakt" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.contact">Kontakt oss</a>
+                                    <span class="mega-menu-desc">Send oss en melding eller still spørsmål.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 3: Ressurser -->
+                    <div class="menu-col">
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.resources.title">Ressurser</div>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">menu_book</span>
+                                <div class="flex flex-col">
+                                    <a href="/bibel" data-content-doc="settings_global" data-content-key="menu.sections.resources.bible">Les Bibelen</a>
+                                    <span class="mega-menu-desc">Les Guds ord med vår bibelleser.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">shopping_bag</span>
+                                <div class="flex flex-col">
+                                    <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.store">Butikk</a>
+                                    <span class="mega-menu-desc">Kristne klær, kopper og tilbehør.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">podcasts</span>
+                                <div class="flex flex-col">
+                                    <a href="/media" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.media">Media & Podcast</a>
+                                    <span class="mega-menu-desc">Se taler og lytt til våre podcaster.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">school</span>
+                                <div class="flex flex-col">
+                                    <a href="/kurs" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Kurs</a>
+                                    <span class="mega-menu-desc">Undervisning og kurs for vekst.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 4: Aktuell aktivitet -->
+                    <div class="menu-col">
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.activity.title">Aktuell aktivitet</div>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">calendar_month</span>
+                                <div class="flex flex-col">
+                                    <a href="/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Leseplaner</a>
+                                    <span class="mega-menu-desc">Følg våre daglige leseplaner.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">event</span>
+                                <div class="flex flex-col">
+                                    <a href="/arrangementer" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.events">Arrangementer</a>
+                                    <span class="mega-menu-desc">Bli med på seminarer og samlinger.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">feed</span>
+                                <div class="flex flex-col">
+                                    <a href="/blogg" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.blog">Nyheter & Blogg</a>
+                                    <span class="mega-menu-desc">Siste oppdateringer og artikler.</span>
+                                </div>
+                            </li>
+                            <li class="min-side-pill">
+                                <span class="material-symbols-outlined">person</span>
+                                <div class="flex flex-col">
+                                    <a href="/minside/index.html" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.myPage">Min Side</a>
+                                    <span class="mega-menu-desc">Din profil og leseplaner.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Menu Footer -->
+                <div class="mega-menu-footer">
+                    <a href="/donasjoner" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Støtt nå</span><i
+                            class="fas fa-heart heart"></i></a>
+                    <div class="menu-footer-links">
+                        <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Butikk</a>
+                        <a href="/donasjoner" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Skattefradrag</a>
+                        <a href="/om-oss" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">Om oss</a>
+                        <a href="/personvern" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Personvern</a>
+                        <a href="/betingelser" data-content-doc="settings_global" data-content-key="menu.footer.terms">Betingelser</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Platform Container -->
+    <div id="platform-container" class="platform-container">
+        <!-- Left Sidebar: Course Modules & Lessons Navigation -->
+        <aside class="sidebar-nav" id="sidebar-nav">
+            <div class="sidebar-header" onclick="window.toggleMobileSidebar()">
+                <span class="sidebar-title" id="sidebar-course-title">Seerkurs med aktivering</span>
+                <span class="mobile-sidebar-toggle-btn"><i class="fas fa-chevron-down" id="mobile-sidebar-chevron"></i></span>
+            </div>
+
+            <div id="modules-accordion-container">
+                <!-- Module 1 -->
+                <div class="module-group">
+                    <div class="module-header" onclick="window.toggleModule('mod-1')">
+                        <span>Module 1: Introduction</span>
+                        <i class="fas fa-chevron-down" id="mod-1-icon"></i>
+                    </div>
+                    <ul class="lesson-list" id="mod-1-list">
+                        <a href="../javascript:void(0)" class="lesson-item active" onclick="window.selectLesson(0)" style="cursor: pointer;">
+                            <span class="lesson-dot"></span>
+                            <span>Lesson 1.1: How to see in the spirit</span>
+                        </a>
+                        <a href="../javascript:void(0)" class="lesson-item" onclick="window.selectLesson(1)" style="cursor: pointer;">
+                            <span class="lesson-dot"></span>
+                            <span>Lesson 1.2: Hearing God’s voice</span>
+                        </a>
+                    </ul>
+                </div>
+
+                <!-- Module 2 -->
+                <div class="module-group">
+                    <div class="module-header" onclick="window.toggleModule('mod-2')">
+                        <span>Module 2: Practical activation</span>
+                        <i class="fas fa-chevron-down" id="mod-2-icon"></i>
+                    </div>
+                    <ul class="lesson-list" id="mod-2-list">
+                        <a href="../javascript:void(0)" class="lesson-item" onclick="window.selectLesson(2)" style="cursor: pointer;">
+                            <span class="lesson-dot"></span>
+                            <span>Lesson 2.1: Encounter with Jesus</span>
+                        </a>
+                    </ul>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Right Main Panel -->
+        <main class="main-panel">
+            <!-- Top Breadcrumb & Progress Bar -->
+            <div class="panel-top-bar">
+                <h2 id="course-lesson-heading" style="font-size: 1.25rem; margin: 0; letter-spacing: -0.01em;"><strong>Seer course with activation – Lesson 1:</strong> <span>How to see in the spirit</span></h2>
+
+                <div class="progress-wrapper">
+                    <span class="progress-label">70% complete</span>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Player Area -->
+            <div class="video-card" id="video-card-container" style="background: #0f172a; display: flex; align-items: center; justify-content: center; position: relative;">
+                <div style="color: rgba(255, 255, 255, 0.7); display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 0.95rem;">
+                    <i class="fas fa-circle-notch fa-spin" style="font-size: 24px; color: var(--hkm-terracotta);"></i>
+                    <span>Loading lesson...</span>
+                </div>
+            </div>
+
+            <!-- Next / Prev Lesson Navigation Sub-bar -->
+            <div class="lesson-nav-bar" id="lesson-nav-bar">
+                <button type="button" class="lesson-nav-btn" id="prev-lesson-btn" onclick="window.selectPrevLesson()">
+                    <i class="fas fa-chevron-left"></i> Previous lesson
+                </button>
+                <span id="lesson-step-indicator" style="font-size: 0.88rem; font-weight: 700; color: #64748b;">Lesson 1 of 1</span>
+                <button type="button" class="lesson-nav-btn" id="next-lesson-btn" onclick="window.selectNextLesson()">
+                    Next lesson <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- Content Tabs Header -->
+            <div class="content-tabs">
+                <button class="tab-btn active" onclick="window.switchTab('oversikt')">Overview</button>
+                <button class="tab-btn" onclick="window.switchTab('ressurser')">Resources</button>
+                <button class="tab-btn" onclick="window.switchTab('diskusjon')">Discussion</button>
+            </div>
+
+            <!-- Tab 1: Oversikt -->
+            <div class="tab-content-panel active" id="tab-oversikt">
+                <h2 class="overview-title" id="lesson-overview-title">Lesson overview: How to see in the spirit</h2>
+                <div class="overview-text" id="lesson-overview-text">
+                    <p>In this lesson Hilde Karin Knutsen goes through foundational Bible verses about seeing in the spiritual realm, and how you can practically activate your spiritual senses through faith and prayer.</p>
+                </div>
+
+                <!-- Dynamic Zoom Banner Container -->
+                <div id="zoom-banner-container" style="display: none;"></div>
+
+                <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--hkm-navy); margin-bottom: 12px;">Your teacher</h3>
+                <div class="instructor-card">
+                    <img src="/assets/Hilde Karin Knutsen-cVkzTBaQ.jpg" alt="Hilde Karin Knutsen" class="instructor-avatar">
+                    <div>
+                        <h4 class="instructor-name">Hilde Karin Knutsen</h4>
+                        <p class="instructor-bio">
+                            Lead teacher &amp; founder of His Kingdom Ministry. Teaches biblical faith, spiritual gifts and inner healing, with over 20 years of experience.
+                        </p>
+                    </div>
+                </div>
+
+                <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--hkm-navy); margin-bottom: 12px;">Download materials</h3>
+                <div class="resources-grid" id="overview-resources-grid">
+                </div>
+            </div>
+
+            <!-- Tab 2: Ressurser -->
+            <div class="tab-content-panel" id="tab-ressurser">
+                <h2 class="overview-title">Course resources &amp; notes</h2>
+                <p class="overview-text">
+                    Here you’ll find all related reading lists, Bible studies and downloadable material for this lesson.
+                </p>
+                <div class="resources-grid" id="tab-ressurser-grid">
+                </div>
+            </div>
+
+            <!-- Tab 3: Diskusjon -->
+            <div class="tab-content-panel" id="tab-diskusjon">
+                <h2 class="overview-title">Questions &amp; reflections</h2>
+                <p class="overview-text">
+                    Share your thoughts or ask the teachers and other participants questions about this lesson.
+                </p>
+                <div id="discussion-form-container">
+                    <div class="discussion-form-box">
+                        <label for="discussion-comment-input" class="discussion-input-label">
+                            <i class="fas fa-comment-dots"></i> Your reflection or question
+                        </label>
+                        <textarea id="discussion-comment-input" placeholder="What are you taking away from this lesson? Write a question, a testimony or a reflection here..." rows="4"></textarea>
+                        <div class="discussion-form-footer">
+                            <div class="discussion-user-badge" id="comment-author-info">
+                                <i class="fas fa-user-circle"></i>
+                                <span>Signed in as <strong>kursdeltaker</strong></span>
+                            </div>
+                            <button type="button" class="btn-terracotta discussion-submit-btn" id="post-comment-btn" onclick="window.handlePostComment()">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>Send reflection</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="discussion-comments-list" style="display: flex; flex-direction: column; gap: 14px;">
+                </div>
+            </div>
+        </main>
+    </div>
+
+    
+
+    <!-- App Scripts -->
+    <script type="module" src="/script.js?v=2026.06.21.10.01"></script>
+    <script type="module" src="/js/cookie-consent.js"></script>
+    <script type="module" src="/js/i18n.js"></script>
+
+    <div id="site-search-modal" class="search-overlay">
+        <div class="search-modal-container">
+            <button class="close-search-btn" id="close-site-search" aria-label="Lukk søk">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="search-modal-title" data-content-doc="settings_global" data-content-key="search.modalTitle">Søk i systemet</div>
+            <div class="search-input-group">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" id="site-search-input-v2" class="search-input-field" placeholder="Hva leter du etter? Skriv for forslag..." autocomplete="off">
+            </div>
+            
+            <!-- Live Suggestions Container -->
+            <div id="site-search-suggestions" class="search-suggestions-container hidden"></div>
+            
+            <!-- Full Results Container (When Enter is pressed) -->
+            <div id="site-search-results-v2" class="search-suggestions-container hidden"></div>
+            
+            <div class="search-help-text">
+                <span data-content-doc="settings_global" data-content-key="search.helpText">Trykk 'Enter' for fullstendig søk.</span>
+            </div>
+
+        </div>
+
+    <script type="module">
+        import { firebaseService } from '/js/firebase-service.js';
+
+        let currentCourse = null;
+        let currentLessonIndex = 0;
+        let currentUser = null;
+        let userHasAccess = false;
+
+        async function initPage() {
+            if (document.body) {
+                document.body.classList.remove('cms-loading');
+            }
+            if (typeof window.revealPublicUI === 'function') {
+                window.revealPublicUI('kurs-detaljer');
+            }
+            window.dispatchEvent(new CustomEvent('cmsContentLoaded'));
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const courseId = urlParams.get('id') || urlParams.get('courseId');
+            const lessonParam = urlParams.get('lesson') || urlParams.get('lessonId');
+            if (lessonParam !== null && lessonParam !== undefined) {
+                const pIdx = parseInt(lessonParam, 10);
+                if (!isNaN(pIdx) && pIdx >= 0) {
+                    currentLessonIndex = pIdx;
+                }
+            }
+
+            let count = 0;
+            while ((!window.firebaseService || !window.firebaseService.isInitialized || typeof firebase === 'undefined' || !firebase.auth) && count < 100) {
+                await new Promise(r => setTimeout(r, 50));
+                count++;
+            }
+
+            const handleUser = async (user) => {
+                const activeUser = user || (firebaseService && firebaseService.currentUser) || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
+                currentUser = activeUser;
+                if (activeUser || isUserLoggedIn()) {
+                    userHasAccess = true;
+                } else {
+                    userHasAccess = false;
+                }
+                await checkAccessAndUpdateUI();
+            };
+
+            if (typeof firebase !== 'undefined' && firebase.auth) {
+                firebase.auth().onAuthStateChanged(handleUser);
+            } else if (firebaseService && typeof firebaseService.onAuthChange === 'function') {
+                firebaseService.onAuthChange(handleUser);
+            }
+
+            // Immediately evaluate current auth state
+            const initialUser = typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : (firebaseService ? firebaseService.currentUser : null);
+            await handleUser(initialUser);
+
+            await loadCourseData(courseId);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initPage);
+        } else {
+            initPage();
+        }
+
+        function getAllCourseLessons() {
+            if (!currentCourse) return defaultLessons;
+            let collected = [];
+            if (Array.isArray(currentCourse.modules) && currentCourse.modules.length > 0) {
+                currentCourse.modules.forEach(m => {
+                    if (Array.isArray(m.lessons)) {
+                        collected.push(...m.lessons);
+                    }
+                });
+            }
+            if (!collected.length && Array.isArray(currentCourse.lessons) && currentCourse.lessons.length > 0) {
+                collected = currentCourse.lessons;
+            }
+            if (!collected.length) {
+                collected = defaultLessons;
+            }
+            currentCourse.lessons = collected;
+            return collected;
+        }
+
+        async function loadCourseData(targetId) {
+            try {
+                let courses = [];
+                try {
+                    const snap = await firebase.firestore().collection('siteContent').doc('collection_courses').get();
+                    if (snap.exists && snap.data()?.items) {
+                        courses = snap.data().items;
+                    }
+                } catch (e) {
+                    console.warn('Firestore collection_courses error:', e);
+                }
+
+                if (!courses.length) {
+                    try {
+                        const snap = await firebase.firestore().collection('courses').get();
+                        courses = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    } catch (e) {
+                        console.warn('Firestore courses fallback error:', e);
+                    }
+                }
+
+                if (targetId) {
+                    currentCourse = courses.find(c => String(c.id) === String(targetId));
+                }
+                if (!currentCourse && courses.length > 0) {
+                    currentCourse = courses[0];
+                }
+
+                if (!currentCourse) return;
+
+                const heroTitle = document.getElementById('hero-title');
+                if (heroTitle) heroTitle.textContent = currentCourse.title || 'Course details';
+
+                const sidebarTitle = document.getElementById('sidebar-course-title');
+                if (sidebarTitle) sidebarTitle.textContent = currentCourse.title || 'Course';
+
+                const bcCourse = document.getElementById('bc-course-title');
+                if (bcCourse) bcCourse.textContent = currentCourse.title || 'Course';
+
+                const courseImg = (currentCourse && (currentCourse.imageUrl || currentCourse.image || currentCourse.thumbnail)) || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=1200&q=80';
+                const coverImgEl = document.getElementById('course-cover-img');
+                if (coverImgEl) coverImgEl.src = courseImg;
+
+                const lessons = getAllCourseLessons();
+                renderSidebarModules(lessons);
+                await checkAccessAndUpdateUI();
+
+            } catch (err) {
+                console.error('Error loading course details:', err);
+            }
+        }
+
+        const defaultLessons = [
+            { title: 'How to see in the spirit', description: 'In this lesson Hilde Karin Knutsen goes through foundational Bible verses about seeing in the spiritual realm, and how you can practically activate your spiritual senses through faith and prayer.', videoUrl: '' },
+            { title: 'Hearing God’s voice', description: 'Learn to recognise God’s voice and tell it apart from other thoughts and impressions in your everyday prayer.', videoUrl: '' },
+            { title: 'Encounter with Jesus', description: 'A practical activation where we seek a personal encounter with Jesus in the spiritual realm.', videoUrl: '' },
+            { title: 'Spiritual discernment & protection', description: 'How to test the spirits and protect your spiritual life with the full armour of God.', videoUrl: '' }
+        ];
+
+        function startCountdownTimer(releaseDateStr) {
+            if (window.courseTimerInterval) clearInterval(window.courseTimerInterval);
+            
+            const targetDate = releaseDateStr ? new Date(releaseDateStr) : new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+
+            function update() {
+                const now = new Date().getTime();
+                const distance = targetDate.getTime() - now;
+                const fifteenMinsMs = 15 * 60 * 1000;
+
+                if (distance <= fifteenMinsMs) {
+                    clearInterval(window.courseTimerInterval);
+                    // Refresh UI to switch from countdown to Live Zoom room
+                    if (typeof window.selectLesson === 'function') {
+                        window.selectLesson(currentLessonIndex);
+                    }
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                const dEl = document.getElementById('cd-days');
+                const hEl = document.getElementById('cd-hours');
+                const mEl = document.getElementById('cd-mins');
+                const sEl = document.getElementById('cd-secs');
+
+                if (dEl) dEl.textContent = String(days).padStart(2, '0');
+                if (hEl) hEl.textContent = String(hours).padStart(2, '0');
+                if (mEl) mEl.textContent = String(minutes).padStart(2, '0');
+                if (sEl) sEl.textContent = String(seconds).padStart(2, '0');
+            }
+
+            update();
+            window.courseTimerInterval = setInterval(update, 1000);
+        }
+
+        function isUserLoggedIn() {
+            const user = currentUser || (firebaseService && firebaseService.currentUser) || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
+            if (user && (user.uid || user.email)) return true;
+            
+            try {
+                const fbKey = Object.keys(localStorage).find(key => key.startsWith('firebase:authUser'));
+                if (fbKey) {
+                    const raw = localStorage.getItem(fbKey);
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (parsed && (parsed.uid || parsed.email)) return true;
+                    }
+                }
+            } catch (e) {}
+
+            try {
+                const cached = localStorage.getItem('hkm_public_user_cache');
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    if (parsed && (parsed.uid || parsed.email)) return true;
+                }
+            } catch (e) {}
+
+            if (localStorage.getItem('hkm_is_admin') === 'true') return true;
+
+            return false;
+        }
+
+        async function checkUserCourseEnrollment(courseId) {
+            if (!courseId && !currentCourse) return false;
+            const targetId = courseId || (currentCourse ? (currentCourse.id || currentCourse.slug) : null);
+
+            // 1. Resolve active user from all possible sources
+            let activeUser = currentUser || (firebaseService && firebaseService.currentUser);
+            if (!activeUser && typeof firebase !== 'undefined' && firebase.auth) {
+                activeUser = firebase.auth().currentUser;
+            }
+            if (!activeUser) {
+                try {
+                    const fbKey = Object.keys(localStorage).find(key => key.startsWith('firebase:authUser'));
+                    if (fbKey) {
+                        const raw = localStorage.getItem(fbKey);
+                        if (raw) activeUser = JSON.parse(raw);
+                    }
+                } catch (e) {}
+            }
+            if (!activeUser) {
+                try {
+                    const cached = localStorage.getItem('hkm_public_user_cache');
+                    if (cached) activeUser = JSON.parse(cached);
+                } catch (e) {}
+            }
+
+            const email = activeUser ? (activeUser.email || '').toLowerCase().trim() : '';
+            const uid = activeUser ? (activeUser.uid || '') : '';
+
+            // 2. Admin access override: Thomas Knutsen or any admin email gets instant full access
+            if (
+                email === 'thomasknutsen87@gmail.com' ||
+                email.includes('admin') ||
+                (activeUser && (activeUser.isAdmin || activeUser.role === 'admin')) ||
+                localStorage.getItem('hkm_is_admin') === 'true'
+            ) {
+                try {
+                    if (targetId) localStorage.setItem(`hkm_enrolled_${targetId}`, 'true');
+                } catch (e) {}
+                return true;
+            }
+
+            // 3. LocalStorage enrollment check
+            try {
+                if (targetId && localStorage.getItem(`hkm_enrolled_${targetId}`) === 'true') return true;
+                if (currentCourse && localStorage.getItem(`hkm_enrolled_${currentCourse.id}`) === 'true') return true;
+                if (currentCourse && currentCourse.slug && localStorage.getItem(`hkm_enrolled_${currentCourse.slug}`) === 'true') return true;
+
+                const enrolledList = localStorage.getItem('hkm_enrolled_courses');
+                if (enrolledList) {
+                    const list = JSON.parse(enrolledList);
+                    if (Array.isArray(list)) {
+                        const keys = [String(targetId), currentCourse?.id, currentCourse?.slug, currentCourse?.title].filter(Boolean).map(String);
+                        if (list.some(item => keys.includes(String(item)))) return true;
+                    }
+                }
+            } catch (e) {}
+
+            if (!activeUser && !email && !uid) return false;
+
+            // Build all potential course identifier keys to match against
+            const courseKeys = [String(targetId)];
+            if (currentCourse) {
+                if (currentCourse.id) courseKeys.push(String(currentCourse.id));
+                if (currentCourse.slug) courseKeys.push(String(currentCourse.slug));
+                if (currentCourse.title) courseKeys.push(String(currentCourse.title));
+            }
+
+            // 4. Firestore check doc users/{uid}
+            if (uid && typeof firebase !== 'undefined' && firebase.firestore) {
+                try {
+                    const userDoc = await firebase.firestore().collection('users').doc(uid).get();
+                    if (userDoc.exists) {
+                        const uData = userDoc.data();
+                        if (uData && (uData.role === 'admin' || uData.isAdmin || uData.isSuperAdmin)) return true;
+                        if (uData && Array.isArray(uData.enrolledCourses)) {
+                            const userEnrolled = uData.enrolledCourses.map(String);
+                            if (courseKeys.some(k => userEnrolled.includes(k))) {
+                                try { if (targetId) localStorage.setItem(`hkm_enrolled_${targetId}`, 'true'); } catch (e) {}
+                                return true;
+                            }
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            // 5. Firestore collection 'user_enrollments' by userId
+            if (uid && typeof firebase !== 'undefined' && firebase.firestore) {
+                try {
+                    const snap = await firebase.firestore().collection('user_enrollments')
+                        .where('userId', '==', uid)
+                        .get();
+                    if (!snap.empty) {
+                        const found = snap.docs.some(doc => {
+                            const d = doc.data();
+                            return courseKeys.includes(String(d.courseId)) || courseKeys.includes(String(d.courseSlug)) || courseKeys.includes(String(d.courseTitle));
+                        });
+                        if (found) {
+                            try { if (targetId) localStorage.setItem(`hkm_enrolled_${targetId}`, 'true'); } catch (e) {}
+                            return true;
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            // 6. Firestore collection 'user_enrollments' by email
+            if (email && typeof firebase !== 'undefined' && firebase.firestore) {
+                try {
+                    const snap = await firebase.firestore().collection('user_enrollments')
+                        .where('email', '==', email)
+                        .get();
+                    if (!snap.empty) {
+                        const found = snap.docs.some(doc => {
+                            const d = doc.data();
+                            return courseKeys.includes(String(d.courseId)) || courseKeys.includes(String(d.courseSlug)) || courseKeys.includes(String(d.courseTitle));
+                        });
+                        if (found) {
+                            try { if (targetId) localStorage.setItem(`hkm_enrolled_${targetId}`, 'true'); } catch (e) {}
+                            return true;
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            // 7. Firestore collection 'courseEnrollments' by email
+            if (email && typeof firebase !== 'undefined' && firebase.firestore) {
+                try {
+                    const snap = await firebase.firestore().collection('courseEnrollments')
+                        .where('email', '==', email)
+                        .get();
+                    if (!snap.empty) {
+                        const found = snap.docs.some(doc => {
+                            const d = doc.data();
+                            return courseKeys.includes(String(d.courseId)) || courseKeys.includes(String(d.courseSlug)) || courseKeys.includes(String(d.courseTitle));
+                        });
+                        if (found) {
+                            try { if (targetId) localStorage.setItem(`hkm_enrolled_${targetId}`, 'true'); } catch (e) {}
+                            return true;
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            return false;
+        }
+
+        async function checkAccessAndUpdateUI() {
+            if (!currentCourse) return;
+            
+            const loggedIn = isUserLoggedIn();
+            const isFreeCourse = currentCourse.isFree === true || currentCourse.price === 0 || currentCourse.price === '0' || String(currentCourse.price).toLowerCase() === 'gratis';
+            
+            if (!loggedIn) {
+                userHasAccess = false;
+            } else if (isFreeCourse) {
+                userHasAccess = true;
+            } else {
+                const isEnrolled = await checkUserCourseEnrollment(currentCourse.id || currentCourse.slug);
+                userHasAccess = isEnrolled || loggedIn;
+            }
+
+            const profileBtn = document.getElementById('header-profile-link');
+            if (profileBtn) {
+                profileBtn.classList.remove('hidden');
+                profileBtn.classList.add('hidden', 'md:flex');
+            }
+
+            window.selectLesson(currentLessonIndex);
+        }
+
+        window.triggerEnrollmentModal = function() {
+            if (!currentCourse) return;
+            window.location.href = `/kurs.html?enroll=${encodeURIComponent(currentCourse.id)}`;
+        };
+
+        function parseVideoSource(url) {
+            if (!url || typeof url !== 'string') return null;
+            const trimmed = url.trim();
+            if (!trimmed) return null;
+
+            // YouTube parser: handles youtu.be, youtube.com/watch, embed, v, shorts
+            const ytMatch = trimmed.match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/i);
+            if (ytMatch && ytMatch[1]) {
+                return {
+                    type: 'youtube',
+                    id: ytMatch[1],
+                    embedUrl: `https://www.youtube.com/embed/${ytMatch[1]}?rel=0&autoplay=0`
+                };
+            }
+
+            // Vimeo parser: handles vimeo.com/12345, player.vimeo.com/video/12345
+            const vimMatch = trimmed.match(/(?:vimeo\.com\/(?:video\/)?|player\.vimeo\.com\/video\/)(\d+)/i);
+            if (vimMatch && vimMatch[1]) {
+                return {
+                    type: 'vimeo',
+                    id: vimMatch[1],
+                    embedUrl: `https://player.vimeo.com/video/${vimMatch[1]}?autoplay=0`
+                };
+            }
+
+            // Direct video stream / MP4 / WebM
+            return {
+                type: 'direct',
+                url: trimmed
+            };
+        }
+
+        function cleanLessonHtml(html) {
+            if (!html) return '';
+            if (!/<[a-z][\s\S]*>/i.test(html)) {
+                return html.replace(/\n/g, '<br>');
+            }
+
+            try {
+                const div = document.createElement('div');
+                div.innerHTML = html;
+
+                // Remove dangerous or non-content tags
+                div.querySelectorAll('script, iframe, object, embed').forEach(el => el.remove());
+
+                // Clean inline attributes and unwanted Google Docs / Word styles
+                div.querySelectorAll('*').forEach(el => {
+                    Array.from(el.attributes).forEach(attr => {
+                        if (attr.name.toLowerCase().startsWith('on')) {
+                            el.removeAttribute(attr.name);
+                        }
+                    });
+                    if (el.id && el.id.startsWith('docs-internal-guid')) {
+                        el.removeAttribute('id');
+                    }
+                    if (el.hasAttribute('style')) {
+                        el.style.removeProperty('color');
+                        el.style.removeProperty('background-color');
+                        el.style.removeProperty('background');
+                        el.style.removeProperty('font-family');
+                        el.style.removeProperty('font-size');
+                        el.style.removeProperty('line-height');
+                        el.style.removeProperty('font-variant');
+                        el.style.removeProperty('vertical-align');
+                        if (!el.getAttribute('style') || el.getAttribute('style').trim() === '') {
+                            el.removeAttribute('style');
+                        }
+                    }
+                });
+
+                // Remove empty paragraphs or empty wrapper divs
+                div.querySelectorAll('p, div').forEach(el => {
+                    if (!el.textContent.trim() && !el.querySelector('img, svg, audio, video')) {
+                        el.remove();
+                    }
+                });
+
+                return div.innerHTML.trim();
+            } catch (e) {
+                return String(html)
+                    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+                    .replace(/\son\w+="[^"]*"/gi, '');
+            }
+        }
+
+        function getPlainTextExcerpt(htmlOrText, maxLength = 180) {
+            if (!htmlOrText) return '';
+            try {
+                const tmp = document.createElement('div');
+                tmp.innerHTML = htmlOrText;
+                const text = (tmp.textContent || tmp.innerText || '').replace(/\s+/g, ' ').trim();
+                if (text.length <= maxLength) return text;
+                return text.substring(0, maxLength).trim() + '...';
+            } catch (e) {
+                return String(htmlOrText).replace(/<[^>]+>/g, '').substring(0, maxLength).trim();
+            }
+        }
+
+        function getLessonTypeIcon(l) {
+            if (l.videoUrl && String(l.videoUrl).trim().length > 0) {
+                return '<i class="fas fa-play-circle" style="font-size:0.95rem; margin-right:6px;" title="Videoopptak"></i>';
+            }
+            if (l.zoomUrl && String(l.zoomUrl).trim().length > 0) {
+                return '<i class="fas fa-video" style="font-size:0.95rem; margin-right:6px;" title="Live Zoom"></i>';
+            }
+            const lDate = l.date || l.releaseDate;
+            if (lDate) {
+                try {
+                    const d = new Date(lDate);
+                    if (!isNaN(d.getTime()) && d.getTime() > Date.now()) {
+                        return '<i class="fas fa-clock" style="font-size:0.95rem; margin-right:6px;" title="Upcoming session"></i>';
+                    }
+                } catch (e) {}
+            }
+            return '<i class="fas fa-file-alt" style="font-size:0.85rem; margin-right:6px;" title="Leksjonsnotat"></i>';
+        }
+
+        function renderSidebarModules(lessons) {
+            const container = document.getElementById('modules-accordion-container');
+            if (!lessons || !lessons.length) return;
+
+            let html = '';
+
+            if (currentCourse && Array.isArray(currentCourse.modules) && currentCourse.modules.length > 0) {
+                let lessonOffset = 0;
+                currentCourse.modules.forEach((mod, modIdx) => {
+                    const modLessons = mod.lessons || [];
+                    html += `
+                        <div class="module-group">
+                            <div class="module-header" onclick="window.toggleModule('mod-${modIdx}')">
+                                <span>${mod.title || `Modul ${modIdx + 1}`}</span>
+                                <i class="fas fa-chevron-down" id="mod-${modIdx}-icon"></i>
+                            </div>
+                            <ul class="lesson-list" id="mod-${modIdx}-list">
+                                ${modLessons.map((l, idx) => {
+                                    const overallIdx = lessonOffset + idx;
+                                    const rawTitle = l.title || `Lesson ${overallIdx + 1}`;
+                                    const displayTitle = /^leksjon/i.test(rawTitle) ? rawTitle : `Lesson ${overallIdx + 1}: ${rawTitle}`;
+                                    return `
+                                    <a href="javascript:void(0)" class="lesson-item ${overallIdx === currentLessonIndex ? 'active' : ''}" onclick="window.selectLesson(${overallIdx})" id="nav-lesson-${overallIdx}" style="cursor: pointer;">
+                                        ${getLessonTypeIcon(l)}
+                                        <span>${displayTitle}</span>
+                                    </a>
+                                    `;
+                                }).join('')}
+                            </ul>
+                        </div>
+                    `;
+                    lessonOffset += modLessons.length;
+                });
+            } else {
+                html = `
+                    <div class="module-group">
+                        <div class="module-header" onclick="window.toggleModule('mod-1')">
+                            <span>Lessons and live sessions</span>
+                            <i class="fas fa-chevron-down" id="mod-1-icon"></i>
+                        </div>
+                        <ul class="lesson-list" id="mod-1-list">
+                            ${lessons.map((l, idx) => {
+                                const rawTitle = l.title || `Lesson ${idx + 1}`;
+                                const displayTitle = /^leksjon/i.test(rawTitle) ? rawTitle : `Lesson ${idx + 1}: ${rawTitle}`;
+                                return `
+                                <a href="javascript:void(0)" class="lesson-item ${idx === currentLessonIndex ? 'active' : ''}" onclick="window.selectLesson(${idx})" id="nav-lesson(${idx})" style="cursor: pointer;">
+                                    ${getLessonTypeIcon(l)}
+                                    <span>${displayTitle}</span>
+                                </a>
+                                `;
+                            }).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        window.selectNextLesson = function() {
+            const nextIdx = (typeof window.currentLessonIndex === 'number' ? window.currentLessonIndex : currentLessonIndex) + 1;
+            window.selectLesson(nextIdx);
+        };
+
+        window.selectPrevLesson = function() {
+            const prevIdx = (typeof window.currentLessonIndex === 'number' ? window.currentLessonIndex : currentLessonIndex) - 1;
+            window.selectLesson(prevIdx);
+        };
+
+        window.selectLesson = function(index) {
+            if (!currentCourse) return;
+            let parsedIdx = parseInt(index, 10);
+            if (isNaN(parsedIdx)) parsedIdx = 0;
+
+            const lessons = getAllCourseLessons();
+            const total = lessons.length;
+            
+            if (parsedIdx < 0) parsedIdx = 0;
+            if (parsedIdx >= total) parsedIdx = total - 1;
+            
+            currentLessonIndex = parsedIdx;
+            window.currentLessonIndex = parsedIdx;
+            const lesson = lessons[parsedIdx] || lessons[0];
+            if (!lesson) return;
+
+            if (history.replaceState && currentCourse && currentCourse.id) {
+                try {
+                    const newUrl = window.location.pathname + `?id=${encodeURIComponent(currentCourse.id)}&lesson=${index}`;
+                    history.replaceState(null, '', newUrl);
+                } catch (e) {}
+            }
+
+            document.querySelectorAll('.lesson-item').forEach((el, idx) => {
+                el.classList.toggle('active', idx === index);
+            });
+
+            // Update Next / Prev Lesson sub-bar
+            const prevBtn = document.getElementById('prev-lesson-btn');
+            const nextBtn = document.getElementById('next-lesson-btn');
+            const stepIndicator = document.getElementById('lesson-step-indicator');
+
+            if (prevBtn) prevBtn.classList.toggle('disabled', index <= 0);
+            if (nextBtn) nextBtn.classList.toggle('disabled', index >= total - 1);
+            if (stepIndicator) stepIndicator.textContent = `Lesson ${index + 1} of ${total}`;
+
+            const courseHeading = document.getElementById('course-lesson-heading');
+            if (courseHeading && currentCourse) {
+                const cleanDisplayTitle = (lesson.title || `Lesson ${index + 1}`).replace(/^leksjon\s+\d+:\s*/i, '');
+                courseHeading.innerHTML = `<strong>${currentCourse.title || 'Course'} – Lesson ${index + 1}:</strong> <span>${cleanDisplayTitle}</span>`;
+            }
+
+            const overviewTitle = document.getElementById('lesson-overview-title');
+            if (overviewTitle) {
+                const cleanTitle = (lesson.title || '').replace(/^leksjon\s+\d+:\s*/i, '').trim();
+                overviewTitle.textContent = cleanTitle || 'Om leksjonen';
+            }
+
+            const overviewText = document.getElementById('lesson-overview-text');
+            if (overviewText) {
+                const desc = (lesson.description || '').trim();
+                const titleStr = (lesson.title || '').trim();
+                if (desc && desc.toLowerCase() !== titleStr.toLowerCase()) {
+                    overviewText.innerHTML = cleanLessonHtml(desc);
+                    overviewText.style.display = 'block';
+                } else {
+                    overviewText.innerHTML = '';
+                    overviewText.style.display = 'none';
+                }
+            }
+
+            // Calculate future countdown state
+            const hasRecordedVideo = Boolean(lesson && lesson.videoUrl && String(lesson.videoUrl).trim().length > 0);
+            const zoomUrl = lesson.zoomUrl || (currentCourse && currentCourse.zoomUrl);
+            const targetDateVal = lesson.date || lesson.releaseDate || (currentCourse && (currentCourse.releaseDate || currentCourse.startDate || currentCourse.date || currentCourse.zoomDate));
+            let isFutureCountdown = false;
+            let isWithin15Mins = false;
+
+            if (targetDateVal && !hasRecordedVideo) {
+                try {
+                    const d = new Date(targetDateVal);
+                    const now = Date.now();
+                    const diffMs = d.getTime() - now;
+                    if (!isNaN(d.getTime()) && diffMs > 0) {
+                        isFutureCountdown = true;
+                        if (diffMs <= 15 * 60 * 1000) {
+                            isWithin15Mins = true;
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            // Render Zoom banner in Overview tab ONLY if not showing live countdown video overlay
+            const zoomBanner = document.getElementById('zoom-banner-container');
+
+            if (zoomUrl && String(zoomUrl).trim().length > 0 && !isFutureCountdown) {
+                if (zoomBanner) {
+                    zoomBanner.style.display = 'block';
+                    zoomBanner.innerHTML = `
+                        <div style="background: rgba(209, 125, 57, 0.08); border: 1.5px solid var(--hkm-terracotta); border-radius: 14px; padding: 18px 22px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.08);">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; color: var(--hkm-terracotta); font-size: 1.05rem; margin-bottom: 4px;">
+                                    <i class="fas fa-video" style="font-size: 20px;"></i> Live Zoom meeting available
+                                </div>
+                                <p style="margin: 0; color: #475569; font-size: 0.9rem;">
+                                    You can follow this live session directly in the Zoom app by clicking the button on the right.
+                                </p>
+                            </div>
+                            <a href="${zoomUrl}" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="border: none; text-decoration: none; white-space: nowrap; border-radius: 8px;">
+                                <i class="fas fa-arrow-up-right-from-square"></i> Open in the Zoom app
+                            </a>
+                        </div>
+                    `;
+                }
+            } else {
+                if (zoomBanner) {
+                    zoomBanner.style.display = 'none';
+                    zoomBanner.innerHTML = '';
+                }
+            }
+
+            // Progress bar is only visible if watching a recorded lesson (videoUrl present)
+            const progressWrapper = document.querySelector('.progress-wrapper');
+
+            if (progressWrapper) {
+                if (hasRecordedVideo) {
+                    progressWrapper.style.display = 'flex';
+                    const totalLessons = (currentCourse && currentCourse.lessons) ? currentCourse.lessons.length : 1;
+                    const percent = Math.min(100, Math.round(((index + 1) / totalLessons) * 100));
+                    const label = progressWrapper.querySelector('.progress-label');
+                    const fill = progressWrapper.querySelector('.progress-bar-fill');
+                    if (label) label.textContent = `${percent}% complete`;
+                    if (fill) fill.style.width = `${percent}%`;
+                } else {
+                    progressWrapper.style.display = 'none';
+                }
+            }
+
+            // Render resources dynamically for both Overview tab and Ressurser tab
+            const rawResources = (lesson && (lesson.resources || lesson.materials || lesson.files)) || 
+                                 (currentCourse && (currentCourse.resources || currentCourse.materials)) || [];
+
+            const renderResourcesHTML = (resList) => {
+                if (!resList || !resList.length) {
+                    return `
+                        <div class="empty-resources-card">
+                            <i class="fas fa-folder-open" style="font-size: 20px; color: #94a3b8;"></i>
+                            <span>No documents or resource files have been added for this lesson yet.</span>
+                        </div>
+                    `;
+                }
+                return resList.map(r => {
+                    const title = typeof r === 'string' ? r : (r.title || r.name || 'Dokument');
+                    const url = typeof r === 'string' ? '#' : (r.url || r.link || '#');
+                    let icon = 'fas fa-file-alt';
+                    if (title.toLowerCase().endsWith('.pdf')) icon = 'fas fa-file-pdf';
+                    else if (title.toLowerCase().endsWith('.doc') || title.toLowerCase().endsWith('.docx')) icon = 'fas fa-file-word';
+                    else if (title.toLowerCase().endsWith('.xls') || title.toLowerCase().endsWith('.xlsx')) icon = 'fas fa-file-excel';
+                    
+                    return `
+                        <a href="${url}" target="_blank" download class="resource-card">
+                            <div class="resource-icon"><i class="${icon}"></i></div>
+                            <div class="resource-title">${title}</div>
+                        </a>
+                    `;
+                }).join('');
+            };
+
+            const overviewResGrid = document.getElementById('overview-resources-grid');
+            if (overviewResGrid) overviewResGrid.innerHTML = renderResourcesHTML(rawResources);
+
+            const tabResGrid = document.getElementById('tab-ressurser-grid');
+            if (tabResGrid) tabResGrid.innerHTML = renderResourcesHTML(rawResources);
+
+            // Update discussion comments for active lesson
+            if (typeof window.renderDiscussionComments === 'function') {
+                window.renderDiscussionComments(currentCourse?.id, index);
+            }
+
+            const videoContainer = document.getElementById('video-card-container');
+            const courseImg = (currentCourse && (currentCourse.imageUrl || currentCourse.image || currentCourse.thumbnail)) || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=1200&q=80';
+            const lockedOverlay = document.getElementById('locked-overlay');
+            const coverImgEl = document.getElementById('course-cover-img');
+
+            const hasAccess = userHasAccess || isUserLoggedIn();
+
+            // Check if course is upcoming (only for non-logged-in visitors)
+            const isUpcoming = !hasAccess && currentCourse && (
+                currentCourse.isUpcoming === true || 
+                currentCourse.status === 'upcoming'
+            );
+
+            if (isUpcoming) {
+                const releaseDateVal = currentCourse.releaseDate || currentCourse.startDate || currentCourse.date;
+                const releaseDateObj = releaseDateVal ? new Date(releaseDateVal) : new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+                const formattedDate = releaseDateObj.toLocaleDateString('no-NO', { day: 'numeric', month: 'long', year: 'numeric' });
+                const formattedTime = releaseDateObj.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
+
+                videoContainer.innerHTML = `
+                    <img id="course-cover-img" src="${courseImg}" alt="Kursbilde" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
+                    <div class="upcoming-overlay">
+                        <span class="badge-upcoming"><i class="fas fa-clock"></i> Upcoming course</span>
+                        <h3 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 6px;">Launches ${formattedDate}</h3>
+                        <p style="color: #cbd5e1; max-width: 460px; font-size: 0.95rem; line-height: 1.5; margin-bottom: 12px;">
+                            This course opens for playback at ${formattedTime}. Get ready!
+                        </p>
+                        
+                        <div class="countdown-grid" id="countdown-timer-grid">
+                            <div class="countdown-box"><span id="cd-days">00</span><label>DAYS</label></div>
+                            <div class="countdown-box"><span id="cd-hours">00</span><label>HOURS</label></div>
+                            <div class="countdown-box"><span id="cd-mins">00</span><label>MINUTES</label></div>
+                            <div class="countdown-box"><span id="cd-secs">00</span><label>SECONDS</label></div>
+                        </div>
+
+                        <button class="btn-terracotta" onclick="alert('You’ll get a reminder when the course launches!')">
+                            <i class="fas fa-bell"></i> Get a reminder at launch
+                        </button>
+                    </div>
+                `;
+                startCountdownTimer(releaseDateVal);
+                return;
+            }
+
+            if (hasAccess) {
+                if (coverImgEl) coverImgEl.style.display = 'none';
+                if (lockedOverlay) lockedOverlay.style.display = 'none';
+
+                if (isFutureCountdown) {
+                    videoContainer.style.backgroundImage = `linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.88)), url('${courseImg}')`;
+                    videoContainer.style.backgroundSize = 'cover';
+                    videoContainer.style.backgroundPosition = 'center';
+                    
+                    videoContainer.innerHTML = `
+                        <div class="video-card-countdown-content" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:white; text-align:center; padding:28px 24px; position:relative; z-index:2;">
+                            <div style="background: var(--hkm-terracotta); color: #ffffff; padding: 6px 16px; border-radius: 30px; font-size: 0.82rem; font-weight: 650; margin-bottom: 12px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.4);">
+                                <i class="fas fa-clock" style="color: #ffffff; font-size: 0.85rem;"></i> The lesson starts in
+                            </div>
+                            <h3 style="font-size:1.45rem; font-weight:750; margin-bottom:6px; letter-spacing: -0.01em;">${lesson.title}</h3>
+                            <p style="color:#cbd5e1; max-width:480px; font-size:0.9rem; line-height:1.45; margin-bottom:18px; opacity: 0.9;">
+                                ${getPlainTextExcerpt(lesson.description, 180) || 'Countdown in progress for this lesson. The Zoom meeting opens before the start!'}
+                            </p>
+
+                            <div class="countdown-grid" id="countdown-timer-grid" style="display:flex; gap:12px; margin-bottom:18px;">
+                                <div class="countdown-box"><span id="cd-days">00</span><label>DAYS</label></div>
+                                <div class="countdown-box"><span id="cd-hours">00</span><label>HOURS</label></div>
+                                <div class="countdown-box"><span id="cd-mins">00</span><label>MINUTES</label></div>
+                                <div class="countdown-box"><span id="cd-secs">00</span><label>SECONDS</label></div>
+                            </div>
+                            ${zoomUrl ? (
+                                isWithin15Mins
+                                    ? `<a href="${zoomUrl}" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="border: none; text-decoration: none; padding: 11px 24px; font-size: 0.92rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 8px; font-weight: 600; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.4);"><i class="fas fa-video"></i> Open Zoom link</a>`
+                                    : `<button disabled id="zoom-countdown-btn" style="opacity: 0.65; cursor: not-allowed; border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.12); color: #cbd5e1; padding: 11px 22px; font-size: 0.88rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 8px; font-weight: 600;"><i class="fas fa-lock" style="font-size: 0.85rem;"></i> Zoom link activates 15 min before start</button>`
+                            ) : ''}
+                        </div>
+                    `;
+                    startCountdownTimer(targetDateVal);
+                } else if (hasRecordedVideo) {
+                    videoContainer.style.backgroundImage = 'none';
+                    const videoSource = parseVideoSource(lesson.videoUrl);
+
+                    if (videoSource && videoSource.type === 'youtube') {
+                        videoContainer.innerHTML = `<iframe data-privacy-src="${videoSource.embedUrl}" title="${lesson.title || 'Leksjonsvideo'}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="width:100%;height:100%;border:none;border-radius:16px;"></iframe>`;
+                    } else if (videoSource && videoSource.type === 'vimeo') {
+                        videoContainer.innerHTML = `<iframe data-privacy-src="${videoSource.embedUrl}" title="${lesson.title || 'Leksjonsvideo'}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="width:100%;height:100%;border:none;border-radius:16px;"></iframe>`;
+                    } else if (videoSource && videoSource.type === 'direct') {
+                        videoContainer.innerHTML = `<video src="${videoSource.url}" controls playsinline style="width:100%;height:100%;border-radius:16px;"></video>`;
+                    } else {
+                        videoContainer.innerHTML = `<video src="${lesson.videoUrl}" controls playsinline style="width:100%;height:100%;border-radius:16px;"></video>`;
+                    }
+                } else if (zoomUrl && String(zoomUrl).trim().length > 0) {
+                    videoContainer.style.backgroundImage = `linear-gradient(rgba(15, 23, 42, 0.78), rgba(15, 23, 42, 0.88)), url('${courseImg}')`;
+                    videoContainer.style.backgroundSize = 'cover';
+                    videoContainer.style.backgroundPosition = 'center';
+                    
+                    videoContainer.innerHTML = `
+                        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:white; text-align:center; padding:32px 24px; position:relative; z-index:2;">
+                            <div style="background: rgba(209, 125, 57, 0.25); border: 1px solid var(--hkm-terracotta); color: #ffffff; padding: 6px 18px; border-radius: 30px; font-size: 0.88rem; font-weight: 800; margin-bottom: 18px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.3);">
+                                <i class="fas fa-video" style="color: #ffffff; font-size: 0.95rem;"></i> Live Zoom session available
+                            </div>
+                            <h3 style="font-size:1.8rem; font-weight:800; margin-bottom:10px;">${lesson.title}</h3>
+                            <p style="color:#cbd5e1; max-width:520px; font-size:0.95rem; line-height:1.6; margin-bottom:24px;">
+                                ${getPlainTextExcerpt(lesson.description, 200) || 'Click the button below to join the Zoom meeting for this lesson.'}
+                            </p>
+                            <a href="${zoomUrl}" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="font-size: 1.05rem; padding: 14px 32px; border-radius: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-video" style="font-size: 1.15rem;"></i> Open in the Zoom app
+                            </a>
+                        </div>
+                    `;
+                } else {
+                    videoContainer.style.backgroundImage = `linear-gradient(rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.85)), url('${courseImg}')`;
+                    videoContainer.style.backgroundSize = 'cover';
+                    videoContainer.style.backgroundPosition = 'center';
+
+                    videoContainer.innerHTML = `
+                        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:white; text-align:center; padding:32px 24px; position:relative; z-index:2;">
+                            <div style="width:64px; height:64px; border-radius:50%; background:rgba(209, 125, 57, 0.25); border:1px solid rgba(209, 125, 57, 0.5); display:flex; align-items:center; justify-content:center; margin-bottom:16px; backdrop-filter:blur(8px);">
+                                <i class="fas fa-graduation-cap" style="font-size:28px; color:#d17d39;"></i>
+                            </div>
+                            <h3 style="font-size:1.7rem; font-weight:800; margin-bottom:8px;">${lesson.title}</h3>
+                            <p style="color:#cbd5e1; max-width:520px; font-size:0.95rem; line-height:1.6; margin-bottom: 12px;">
+                                ${getPlainTextExcerpt(lesson.description, 200) || 'Read the text and tasks below for this lesson.'}
+                            </p>
+                            ${zoomUrl ? `
+                                <a href="${zoomUrl}" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="font-size: 0.98rem; padding: 12px 28px; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; margin-top: 12px;">
+                                    <i class="fas fa-video"></i> Open the Zoom meeting
+                                </a>
+                            ` : ''}
+                        </div>
+                    `;
+                }
+            } else {
+                if (coverImgEl) {
+                    coverImgEl.style.display = 'none';
+                }
+                videoContainer.style.backgroundImage = `linear-gradient(rgba(15, 23, 42, 0.82), rgba(15, 23, 42, 0.92)), url('${courseImg}')`;
+                videoContainer.style.backgroundSize = 'cover';
+                videoContainer.style.backgroundPosition = 'center';
+
+                const redirectParam = encodeURIComponent(window.location.href);
+                const loggedIn = isUserLoggedIn();
+                const cModel = currentCourse?.pricingModel || (currentCourse?.priceSuffix && currentCourse.priceSuffix.toLowerCase().includes('leksjon') ? 'per_lesson' : 'course');
+                let suffixStr = '';
+                if (currentCourse?.priceSuffix) {
+                    suffixStr = ' ' + currentCourse.priceSuffix;
+                } else if (cModel === 'per_lesson') {
+                    suffixStr = ' per lesson';
+                } else if (cModel === 'course') {
+                    suffixStr = ' totalt';
+                }
+                const priceBadgeText = currentCourse?.priceDisplay || (currentCourse?.price ? `kr ${currentCourse.price},-${suffixStr}` : 'Paid course');
+
+                if (!loggedIn) {
+                    videoContainer.innerHTML = `
+                        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; width:100%; text-align:center; padding:32px 24px; position:relative; z-index:10;">
+                            <div style="width:56px; height:56px; border-radius:50%; background:rgba(209, 125, 57, 0.2); border:1.5px solid var(--hkm-terracotta); display:flex; align-items:center; justify-content:center; margin-bottom:16px; box-shadow:0 4px 16px rgba(209, 125, 57, 0.3);">
+                                <i class="fas fa-lock" style="font-size:24px; color:var(--hkm-terracotta);"></i>
+                            </div>
+                            <h3 style="font-size: 1.7rem; font-weight: 800; margin-bottom: 8px; color: white;">Enrolment & payment required</h3>
+                            <p style="color: #cbd5e1; max-width: 520px; margin-bottom: 20px; font-size: 0.95rem; line-height: 1.5; hyphens: none;">
+                                This is a paid course (<strong style="color: white;">${priceBadgeText}</strong>). You must be registered, enrolled and have purchased access to <strong style="color: white; display: inline-block;">${currentCourse?.title || 'kurset'}</strong> to see the lessons.
+                            </p>
+                            <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
+                                <button type="button" onclick="window.triggerEnrollmentModal()" class="btn-terracotta" style="padding:12px 28px; border-radius:10px; border:none; cursor:pointer; font-size: 0.98rem; text-decoration:none;">
+                                    <i class="fas fa-shopping-cart"></i> Enrol & buy access (${priceBadgeText})
+                                </button>
+                                <a href="/minside/login.html?redirect=${redirectParam}" style="background: rgba(255,255,255,0.12); color: white; border: 1px solid rgba(255,255,255,0.3); text-decoration:none; padding:12px 22px; border-radius:10px; font-size: 0.92rem; font-weight: 600; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-sign-in-alt"></i> Have an account? Sign in
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    videoContainer.innerHTML = `
+                        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; width:100%; text-align:center; padding:32px 24px; position:relative; z-index:10;">
+                            <div style="width:56px; height:56px; border-radius:50%; background:rgba(209, 125, 57, 0.2); border:1px.5 solid var(--hkm-terracotta); display:flex; align-items:center; justify-content:center; margin-bottom:16px; box-shadow:0 4px 16px rgba(209, 125, 57, 0.3);">
+                                <i class="fas fa-credit-card" style="font-size:24px; color:var(--hkm-terracotta);"></i>
+                            </div>
+                            <h3 style="font-size: 1.7rem; font-weight: 800; margin-bottom: 8px; color: white;">Enrolment & payment required</h3>
+                            <p style="color: #cbd5e1; max-width: 520px; margin-bottom: 20px; font-size: 0.95rem; line-height: 1.5; hyphens: none;">
+                                You are signed in, but have not yet purchased access to <strong style="color: white; display: inline-block;">${currentCourse?.title || 'this course'}</strong> (${priceBadgeText}).
+                            </p>
+                            <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
+                                <button type="button" onclick="window.triggerEnrollmentModal()" class="btn-terracotta" style="padding:12px 28px; border-radius:10px; border:none; cursor:pointer; font-size: 0.98rem;">
+                                    <i class="fas fa-shopping-cart"></i> Enrol & buy access (${priceBadgeText})
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        };
+
+        window.toggleMobileSidebar = function() {
+            const sidebar = document.getElementById('sidebar-nav');
+            if (sidebar) {
+                sidebar.classList.toggle('mobile-expanded');
+            }
+        };
+
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content-panel').forEach(panel => panel.classList.remove('active'));
+
+            const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabName));
+            if (activeBtn) activeBtn.classList.add('active');
+
+            const activePanel = document.getElementById('tab-' + tabName);
+            if (activePanel) activePanel.classList.add('active');
+        };
+
+        window.toggleModule = function(modId) {
+            const list = document.getElementById(modId + '-list');
+            const icon = document.getElementById(modId + '-icon');
+            if (list) {
+                if (list.style.display === 'none') {
+                    list.style.display = 'block';
+                    if (icon) icon.className = 'fas fa-chevron-down';
+                } else {
+                    list.style.display = 'none';
+                    if (icon) icon.className = 'fas fa-chevron-right';
+                }
+            }
+        };
+
+        window.handlePostComment = function() {
+            const input = document.getElementById('discussion-comment-input');
+            if (!input) return;
+            const text = input.value.trim();
+            if (!text) return;
+
+            const user = currentUser || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
+            const userName = (user && (user.displayName || user.email)) ? (user.displayName || user.email.split('@')[0]) : 'Kursdeltaker';
+            const userEmail = user && user.email ? user.email : '';
+            const userPhoto = user && user.photoURL ? user.photoURL : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80';
+
+            const replyLink = window.location.origin + window.location.pathname + '?id=' + encodeURIComponent(currentCourse?.id || '') + '&lesson=' + currentLessonIndex + '#tab-diskusjon';
+
+            const storageKey = `hkm_comments_${currentCourse?.id || 'default'}_${currentLessonIndex}`;
+            let comments = [];
+            try {
+                const stored = localStorage.getItem(storageKey);
+                if (stored) comments = JSON.parse(stored);
+            } catch (e) {}
+
+            const newComment = {
+                author: userName,
+                avatar: userPhoto,
+                role: 'Kursdeltaker',
+                date: new Date().toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' }),
+                text: text
+            };
+
+            comments.unshift(newComment);
+
+            try {
+                localStorage.setItem(storageKey, JSON.stringify(comments));
+            } catch (e) {}
+
+            // Store message in Firestore collection 'discussion_messages' with replyLink and email metadata
+            if (typeof firebase !== 'undefined' && firebase.firestore) {
+                try {
+                    firebase.firestore().collection('discussion_messages').add({
+                        courseId: currentCourse?.id || '',
+                        courseTitle: currentCourse?.title || '',
+                        lessonIndex: currentLessonIndex,
+                        lessonTitle: (currentCourse?.lessons?.[currentLessonIndex]?.title) || `Lesson ${currentLessonIndex + 1}`,
+                        authorName: userName,
+                        authorEmail: userEmail,
+                        messageText: text,
+                        replyLink: replyLink,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        status: 'unread'
+                    });
+                } catch (e) {
+                    console.warn('Firestore discussion_messages error:', e);
+                }
+            }
+
+            input.value = '';
+            window.renderDiscussionComments(currentCourse?.id, currentLessonIndex);
+
+            // Show feedback toast notifying the user
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed; bottom:24px; right:24px; background:#1e293b; color:white; padding:14px 22px; border-radius:12px; font-size:0.9rem; z-index:9999; box-shadow:0 10px 25px rgba(0,0,0,0.25); border-left:4px solid var(--hkm-terracotta); display:flex; align-items:center; gap:10px;';
+            toast.innerHTML = `<i class="fas fa-check-circle" style="color:var(--hkm-terracotta); font-size:1.2rem;"></i> Your message has been posted and registered for email notification with a direct reply link!`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 4500);
+        };
+
+        window.renderDiscussionComments = function(courseId, lessonIdx) {
+            const listEl = document.getElementById('discussion-comments-list');
+            const formContainer = document.getElementById('discussion-form-container');
+            if (!listEl) return;
+
+            const lessons = getAllCourseLessons();
+            const lesson = lessons[lessonIdx] || lessons[0];
+            
+            let targetDateVal = lesson?.date || lesson?.releaseDate || (currentCourse && (currentCourse.releaseDate || currentCourse.startDate || currentCourse.date));
+            let isLocked = false;
+            
+            if (targetDateVal) {
+                try {
+                    const d = new Date(targetDateVal);
+                    const now = Date.now();
+                    const fifteenMinsMs = 15 * 60 * 1000;
+                    if (!isNaN(d.getTime()) && (d.getTime() - now) > fifteenMinsMs) {
+                        isLocked = true;
+                    }
+                } catch (e) {}
+            }
+
+            if (formContainer) {
+                if (isLocked) {
+                    formContainer.innerHTML = `
+                        <div class="discussion-locked-box">
+                            <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(209, 125, 57, 0.12); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                                <i class="fas fa-lock" style="font-size: 1.2rem; color: var(--hkm-terracotta);"></i>
+                            </div>
+                            <h4 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 6px;">The discussion is closed for now</h4>
+                            <p style="font-size: 0.9rem; max-width: 480px; margin: 0 auto; line-height: 1.5;">
+                                You can ask questions and send messages here from 15 minutes before the live meeting starts, and once the broadcast is under way or finished.
+                            </p>
+                        </div>
+                    `;
+                } else {
+                    const user = currentUser || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
+                    const userName = (user && (user.displayName || user.email)) ? (user.displayName || user.email.split('@')[0]) : 'Kursdeltaker';
+                    const userPhoto = user && user.photoURL ? user.photoURL : null;
+                    const avatarHtml = userPhoto 
+                        ? `<img src="${userPhoto}" alt="${userName}" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">` 
+                        : `<i class="fas fa-user-circle"></i>`;
+
+                    formContainer.innerHTML = `
+                        <div class="discussion-form-box">
+                            <label for="discussion-comment-input" class="discussion-input-label">
+                                <i class="fas fa-comment-dots"></i> Your reflection or question
+                            </label>
+                            <textarea id="discussion-comment-input" placeholder="What are you taking away from this lesson? Write a question, a testimony or a reflection here..." rows="4"></textarea>
+                            <div class="discussion-form-footer">
+                                <div class="discussion-user-badge" id="comment-author-info">
+                                    ${avatarHtml}
+                                    <span>Signed in as <strong>${userName}</strong></span>
+                                </div>
+                                <button type="button" class="btn-terracotta discussion-submit-btn" id="post-comment-btn" onclick="window.handlePostComment()">
+                                    <i class="fas fa-paper-plane"></i>
+                                    <span>Send reflection</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            const storageKey = `hkm_comments_${courseId || 'default'}_${lessonIdx}`;
+            let comments = [];
+            try {
+                const stored = localStorage.getItem(storageKey);
+                if (stored) comments = JSON.parse(stored);
+            } catch (e) {}
+
+            if (!comments || !comments.length) {
+                comments = [
+                    {
+                        author: 'Hilde Karin Knutsen',
+                        avatar: '/assets/Hilde Karin Knutsen-cVkzTBaQ.jpg',
+                        role: 'Lead teacher',
+                        date: 'I dag',
+                        text: 'Welcome to this lesson! Feel free to leave your thoughts or questions here.'
+                    }
+                ];
+            }
+
+            listEl.innerHTML = comments.map(c => `
+                <div class="comment-item-card">
+                    <img src="${c.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}" alt="${c.author}" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1.5px solid rgba(148, 163, 184, 0.3);">
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px; margin-bottom: 6px;">
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <strong style="font-size: 0.92rem; font-weight: 750;">${c.author}</strong>
+                                ${c.role ? `<span style="background: rgba(209,125,57,0.12); color: #d17d39; padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 700; white-space: nowrap; display: inline-block;">${c.role}</span>` : ''}
+                            </div>
+                            <span style="font-size: 0.78rem; opacity: 0.7; white-space: nowrap; margin-left: auto;">${c.date}</span>
+                        </div>
+                        <p style="font-size: 0.92rem; margin: 0; line-height: 1.5;">${c.text}</p>
+                    </div>
+                </div>
+            `).join('');
+        };
+    </script>
+</body>
+
+</html>

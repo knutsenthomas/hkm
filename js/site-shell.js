@@ -110,10 +110,11 @@ const ROUTES = {
         podcast: '/en/podcast',
         courses: '/en/courses',
         readingPlans: '/en/leseplaner',
+        fasting: '/en/fasting',
         events: '/en/events',
         blog: '/en/blog',
         privacy: '/en/privacy',
-        terms: '/betingelser',
+        terms: '/en/terms',
         accessibility: '/en/accessibility'
     },
     es: {
@@ -131,10 +132,11 @@ const ROUTES = {
         podcast: '/es/podcast',
         courses: '/es/cursos',
         readingPlans: '/es/leseplaner',
+        fasting: '/es/ayuno',
         events: '/es/eventos',
         blog: '/es/blog',
         privacy: '/es/privacidad',
-        terms: '/betingelser',
+        terms: '/es/terminos',
         accessibility: '/es/accesibilidad'
     }
 };
@@ -276,6 +278,7 @@ const COPY = {
             activity: {
                 title: 'Current Activity',
                 items: [
+                    ['event_upcoming', 'Prayer and fasting', '21 days together from 4 January.', 'fasting', 'menu.sections.resources.fasting'],
                     ['calendar_month', 'Reading Plans', 'Follow our structured reading plans.', 'readingPlans', 'menu.sections.resources.readingPlans'],
                     ['event', 'Events', 'Join our seminars and gatherings.', 'events', 'menu.sections.resources.events'],
                     ['feed', 'News & Blog', 'Latest updates and articles.', 'blog', 'menu.sections.resources.blog'],
@@ -366,6 +369,7 @@ const COPY = {
             activity: {
                 title: 'Actividad actual',
                 items: [
+                    ['event_upcoming', 'Oración y ayuno', '21 días juntos desde el 4 de enero.', 'fasting', 'menu.sections.resources.fasting'],
                     ['calendar_month', 'Planes de lectura', 'Sigue nuestros planes de lectura.', 'readingPlans', 'menu.sections.resources.readingPlans'],
                     ['event', 'Eventos', 'Participa en seminarios y encuentros.', 'events', 'menu.sections.resources.events'],
                     ['feed', 'Noticias y blog', 'Últimas noticias y artículos.', 'blog', 'menu.sections.resources.blog'],

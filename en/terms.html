@@ -1,0 +1,701 @@
+<!-- Vercel Trigger 5. mai 2026 -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+            <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('hkm_theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else {
+                const hour = new Date().getHours();
+                const isNight = hour >= 22 || hour < 6;
+                const systemTheme = isNight || window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', systemTheme);
+            }
+        })();
+    </script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms and conditions | His Kingdom Ministry</title>
+    <meta name="description"
+        content="Terms and conditions for purchases, courses, recurring payments and donations with His Kingdom Ministry.">
+
+    <!-- Google Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"></noscript>
+    <!-- Font Awesome -->
+    <!-- Font Awesome (Deferred) -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
+    <!-- Material Symbols Outlined -->
+    <!-- Material Symbols Outlined (Deferred) -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block"></noscript>
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="preload" href="../css/cookie-consent.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="../css/cookie-consent.css"></noscript>
+    
+    <!-- Firebase Config & Service (Moved to head for early loading) -->
+    <script type="module" src="../js/firebase-config.js"></script>
+    <script type="module" src="../js/firebase-service.js?v=2026.05.10.1"></script>
+    <script type="module" src="../js/content-manager.js?v=2026.05.10.8"></script>
+
+    <!-- Loader Safety Net -->
+    <script>
+        (function() {
+            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
+                }
+            }, 4000);
+        })();
+    </script>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+    <style>
+        .legal-text-container h3 {
+            color: var(--primary-orange);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        /* Dark Mode Styles for Legal Pages */
+        html[data-theme="dark"],
+        html[data-theme="dark"] body,
+        html[data-theme="dark"] .legal-page-body {
+            background-color: #0b1329 !important;
+            background: #0b1329 !important;
+            color: #f8fafc !important;
+        }
+
+        html[data-theme="dark"] .legal-text-container {
+            color: #e2e8f0 !important;
+        }
+
+        html[data-theme="dark"] .legal-text-container h1,
+        html[data-theme="dark"] .legal-text-container h2,
+        html[data-theme="dark"] .legal-text-container h3,
+        html[data-theme="dark"] .legal-text-container h4 {
+            color: var(--hkm-terracotta, #d17d39) !important;
+        }
+
+        html[data-theme="dark"] .legal-text-container p,
+        html[data-theme="dark"] .legal-text-container li,
+        html[data-theme="dark"] .legal-text-container span,
+        html[data-theme="dark"] .legal-text-container strong {
+            color: #e2e8f0 !important;
+        }
+    </style>
+        
+    <link rel="preload" href="../css/search-v2.css?v=1.0.3" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="../css/search-v2.css?v=1.0.3"></noscript>
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://hiskingdomministry.no/en/terms">
+    <meta property="og:title" content="Terms and conditions | His Kingdom Ministry">
+    <meta property="og:description" content="Terms and conditions for purchases, courses, recurring payments and donations with His Kingdom Ministry.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://hiskingdomministry.no/betingelser">
+    <meta property="twitter:title" content="Vilkår og betingelser | His Kingdom Ministry">
+    <meta property="twitter:description" content="Vilkår og betingelser for His Kingdom Ministry nettbutikk.">
+    <meta property="twitter:image" content="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80">
+    <link rel="canonical" href="https://hiskingdomministry.no/en/terms">
+    <link rel="alternate" hreflang="no" href="https://hiskingdomministry.no/betingelser">
+    <link rel="alternate" hreflang="en" href="https://hiskingdomministry.no/en/terms">
+    <link rel="alternate" hreflang="es" href="https://hiskingdomministry.no/es/terminos">
+    <link rel="alternate" hreflang="x-default" href="https://hiskingdomministry.no/betingelser">
+</head>
+
+<body class="cms-loading">
+    <!-- Header -->
+    <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
+        <div class="header-content" id="header-container">
+            <!-- Logo -->
+            <a href="/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+                <div
+                    class="w-[45px] h-[45px] flex items-center justify-center rounded-lg overflow-hidden shrink-0 logo-icon">
+                    <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover"
+                        data-content-doc="settings_global" data-content-key="brand.logoAlt" data-content-attr="alt">
+                </div>
+                <span class="text-xl" data-content-doc="settings_global" data-content-key="brand.name">His Kingdom
+                    Ministry</span>
+            </a>
+
+            <!-- Right Actions: Donate + Language + Hamburger -->
+            <div class="header-actions">
+                <!-- Utilities Dock (Search, Bible, Reading Plans, Language Selector) -->
+                <div class="header-actions-dock">
+                    <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Søk i nettsiden">
+                        <span class="material-symbols-outlined text-xl" style="position: relative; top: 0px; left: 9px;">search</span>
+                    </button>
+                    
+                    <div class="header-actions-expandable">
+                        <a href="/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-bible-btn" aria-label="Les Bibelen" title="Les Bibelen">
+                            <span class="material-symbols-outlined text-xl">menu_book</span>
+                        </a>
+                        <a href="/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-reading-plans-btn" aria-label="Leseplaner" title="Leseplaner">
+                            <span class="material-symbols-outlined text-xl">calendar_today</span>
+                        </a>
+                        
+                        <div class="hidden md:block w-px h-5 bg-white/20 mx-1 dock-divider"></div>
+
+                        <!-- Language Switcher in same styling -->
+                        <div class="lang-switcher relative group">
+                            <button class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full text-white hover:bg-white/15 transition-all lang-btn" aria-label="Velg språk">
+                                <span class="material-symbols-outlined text-lg">language</span>
+                                <span data-content-doc="settings_global" data-content-key="header.currentLanguage">NO</span>
+                            </button>
+                            <div class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden border border-gray-100">
+                                <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                                    data-lang="no" data-content-doc="settings_global" data-content-key="header.languages.no">🇳🇴
+                                    Norsk</a>
+                                <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                                    data-lang="en" data-content-doc="settings_global" data-content-key="header.languages.en">🇺🇸
+                                    English</a>
+                                <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                                    data-lang="es" data-content-doc="settings_global" data-content-key="header.languages.es">🇪🇸
+                                    Español</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Button -->
+                <a href="/minside/index.html" id="header-profile-link" class="w-11 h-11 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all relative overflow-hidden hidden" aria-label="Min Side" title="Min Side">
+                    <span class="material-symbols-outlined text-xl">account_circle</span>
+                    <img id="header-profile-img" src="" alt="Profilbilde" class="absolute inset-0 w-full h-full object-cover hidden rounded-full">
+                </a>
+
+                <!-- Primary CTA: Donate (Pill Style, gradient) -->
+                <a href="/donasjoner"
+                    class="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-[1.03] active:scale-[0.98] transition-all shadow-md shadow-orange-500/10 header-donate-btn">
+                    <span data-content-doc="settings_global" data-content-key="header.donateLabel">Gi gave</span>
+                    <span class="material-symbols-outlined text-lg">favorite</span>
+                </a>
+
+                <!-- Unified Toggle Button (Neutral circular button matching utilities) -->
+                <button
+                    class="menu-toggle w-11 h-11 rounded-full flex items-center justify-center text-white bg-white/15 border border-white/10 hover:bg-white/25 active:scale-95 transition-all relative focus:outline-none focus:ring-0"
+                    id="menu-toggle" aria-label="Toggle meny" aria-controls="mega-menu" aria-expanded="false"
+                    data-content-doc="settings_global" data-content-key="header.menuToggleLabel"
+                    data-content-attr="aria-label">
+                    <span class="material-symbols-outlined text-2xl open-icon">menu</span>
+                    <span class="material-symbols-outlined text-2xl close-icon hidden">close</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Full-screen Mega Menu Overlay -->
+    <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
+        id="mega-menu" style="display: none;" aria-hidden="true">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+            <!-- Menu Top Controls (Search & Mobile Lang) -->
+            <div class="flex flex-col gap-6">
+                <div class="relative w-full md:hidden">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="Søk..." data-content-doc="settings_global"
+                        data-content-key="menu.searchPlaceholder"
+                        class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
+                </div>
+
+                <!-- Language Selector & Theme Toggle (Pill Style) -->
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex md:hidden items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
+                        <i class="fas fa-globe text-gray-400"></i>
+                        <div class="flex gap-4 items-center">
+                            <a href="/" class="text-sm font-bold text-primary-orange lang-switch-btn" data-lang="no"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="/en/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="en"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="/es/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="es"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
+                        </div>
+                    </div>
+
+                    <div class="ml-auto flex items-center gap-3">
+                        <!-- Mobile Menu Profile Link -->
+                        <a href="/minside/index.html" id="mobile-menu-profile-link" class="w-12 h-12 flex items-center justify-center rounded-full border border-gray-200 bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-all relative overflow-hidden hidden" aria-label="My Page" title="My Page">
+                            <span class="material-symbols-outlined text-2xl">account_circle</span>
+                            <img id="mobile-menu-profile-img" src="" alt="Profilbilde" class="absolute inset-0 w-full h-full object-cover hidden rounded-full">
+                        </a>
+                        <button class="mobile-theme-toggle-btn flex items-center justify-center h-12 w-12 border border-gray-200 rounded-full bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-colors" aria-label="Bytt tema" title="Bytt tema">
+                            <span class="material-symbols-outlined text-2xl theme-toggle-icon">dark_mode</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mega-menu-body">
+                <!-- Menu Content Grid -->
+                <div class="mega-menu-grid">
+                    <!-- Column 1: Engasjer deg -->
+                    <div class="menu-col">
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.engage.title">Engasjer deg</div>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">volunteer_activism</span>
+                                <div class="flex flex-col">
+                                    <a href="/donasjoner" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.supportWork">Støtt arbeidet</a>
+                                    <span class="mega-menu-desc">Bidra økonomisk til vår tjeneste.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">favorite</span>
+                                <div class="flex flex-col">
+                                    <a href="/bli-fast-giver" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.regularDonor">Bli fast giver</a>
+                                    <span class="mega-menu-desc">Støtt oss månedlig for langsiktig arbeid.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">church</span>
+                                <div class="flex flex-col">
+                                    <a href="/for-menigheter" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.churches">For menigheter</a>
+                                    <span class="mega-menu-desc">Ressurser og undervisning for din kirke.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">corporate_fare</span>
+                                <div class="flex flex-col">
+                                    <a href="/for-bedrifter" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.businesses">For bedrifter</a>
+                                    <span class="mega-menu-desc">Samarbeidsavtaler for næringslivet.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">business_center</span>
+                                <div class="flex flex-col">
+                                    <a href="/bnn" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.network">Business Network</a>
+                                    <span class="mega-menu-desc">Nettverk for kristne ledere og gründere.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 2: Bli kjent med oss -->
+                    <div class="menu-col">
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.about.title">Bli kjent med oss</div>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">info</span>
+                                <div class="flex flex-col">
+                                    <a href="/om-oss" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.about">Om oss</a>
+                                    <span class="mega-menu-desc">Lær mer om vår visjon, tro og verdier.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">mail</span>
+                                <div class="flex flex-col">
+                                    <a href="/kontakt" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.contact">Kontakt oss</a>
+                                    <span class="mega-menu-desc">Send oss en melding eller still spørsmål.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 3: Ressurser -->
+                    <div class="menu-col">
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.resources.title">Ressurser</div>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">menu_book</span>
+                                <div class="flex flex-col">
+                                    <a href="/bibel" data-content-doc="settings_global" data-content-key="menu.sections.resources.bible">Les Bibelen</a>
+                                    <span class="mega-menu-desc">Les Guds ord med vår bibelleser.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">shopping_bag</span>
+                                <div class="flex flex-col">
+                                    <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.store">Butikk</a>
+                                    <span class="mega-menu-desc">Kristne klær, kopper og tilbehør.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">podcasts</span>
+                                <div class="flex flex-col">
+                                    <a href="/media" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.media">Media & Podcast</a>
+                                    <span class="mega-menu-desc">Se taler og lytt til våre podcaster.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">school</span>
+                                <div class="flex flex-col">
+                                    <a href="/kurs" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Kurs</a>
+                                    <span class="mega-menu-desc">Undervisning og kurs for vekst.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 4: Aktuell aktivitet -->
+                    <div class="menu-col">
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.activity.title">Aktuell aktivitet</div>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">calendar_month</span>
+                                <div class="flex flex-col">
+                                    <a href="/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Leseplaner</a>
+                                    <span class="mega-menu-desc">Følg våre daglige leseplaner.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">event</span>
+                                <div class="flex flex-col">
+                                    <a href="/arrangementer" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.events">Arrangementer</a>
+                                    <span class="mega-menu-desc">Bli med på seminarer og samlinger.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">feed</span>
+                                <div class="flex flex-col">
+                                    <a href="/blogg" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.blog">Nyheter & Blogg</a>
+                                    <span class="mega-menu-desc">Siste oppdateringer og artikler.</span>
+                                </div>
+                            </li>
+                            <li class="min-side-pill">
+                                <span class="material-symbols-outlined">person</span>
+                                <div class="flex flex-col">
+                                    <a href="/minside/index.html" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.myPage">Min Side</a>
+                                    <span class="mega-menu-desc">Din profil og leseplaner.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Menu Footer -->
+                <div class="mega-menu-footer">
+                    <a href="/donasjoner" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Støtt nå</span><i
+                            class="fas fa-heart heart"></i></a>
+                    <div class="menu-footer-links">
+                        <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Butikk</a>
+                        <a href="/donasjoner" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Skattefradrag</a>
+                        <a href="/om-oss" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">Om oss</a>
+                        <a href="/personvern" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Personvern</a>
+                        <a href="/betingelser" data-content-doc="settings_global" data-content-key="menu.footer.terms">Betingelser</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+      <section class="page-hero flex flex-col items-center justify-center" data-content-key="hero.backgroundImage"
+        style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');">
+        <div class="container text-center w-full">
+            <h1 class="page-hero-title mx-auto" data-content-key="hero.title">Terms and conditions</h1>
+            <p class="last-updated" data-content-key="hero.subtitle">Last updated: 5 May 2026. This translation is provided for convenience; the Norwegian version applies.</p>
+        </div>
+    </section>
+
+    <!-- Content -->
+    <section class="legal-page-body">
+        <div class="container">
+            <div class="legal-text-container">
+                <p data-content-key="content.intro">Terms and conditions for His Kingdom Ministry. These terms and conditions apply to all services and products provided by His Kingdom Ministry, including the online shop, courses, digital products and donations. By completing a transaction, registration or donation, you accept these terms and conditions in their entirety.</p>
+
+                <h2 data-content-key="content.sec1_title">1. Seller information</h2>
+                <ul>
+                    <li data-content-key="content.sec1_item1"><strong>Name of organisation:</strong> His Kingdom Ministry</li>
+                    <li data-content-key="content.sec1_item2"><strong>Organisation number:</strong> 933728927</li>
+                    <li data-content-key="content.sec1_item3"><strong>Email address:</strong> <a href="mailto:post@hiskingdomministry.no">post@hiskingdomministry.no</a></li>
+                </ul>
+
+                <h2 data-content-key="content.sec2_title">2. Ordering and entering into an agreement</h2>
+                <p data-content-key="content.sec2_text">Ordering goods through the online shop is binding once you have completed the ordering process and received an order confirmation from us by email. We reserve the right to cancel an order if the item is sold out, if there is an error in the product information or price, or if fraud is suspected. In that case you will be informed as soon as possible.</p>
+
+                <h2 data-content-key="content.sec3_title">3. Prices</h2>
+                <p data-content-key="content.sec3_text">All prices are stated in Norwegian kroner (NOK) and include VAT unless otherwise specified. Any shipping costs are added and will be clearly shown before you complete your purchase in the online shop. We reserve the right to change prices without notice. The price that applied at the time of ordering will be the applicable price.</p>
+
+                <h2 id="faste-betalinger" data-content-key="content.sec4_title">4. Payment and recurring payments</h2>
+                <p data-content-key="content.sec4_text">We offer card payment via Stripe and recurring payments via Stripe and PayPal. Vipps is available once the agreement for the relevant payment solution has been activated.</p>
+
+                <h3 data-content-key="content.sec4_sub1_title">4.1 Card payment (online shop)</h3>
+                <p data-content-key="content.sec4_sub1_text">When paying by card, the amount is reserved on your account when you order and charged when the goods are shipped or collected.</p>
+
+                <h3 data-content-key="content.sec4_sub2_title">4.2 Recurring payments</h3>
+                <p data-content-key="content.sec4_sub2_text">When entering into an agreement for recurring payments (e.g. regular giving or a subscription), the following applies:</p>
+                <ul>
+                    <li data-content-key="content.sec4_sub2_item1"><strong>Cancellation:</strong> You can end an agreement for recurring payments at any time. PayPal agreements are ended in PayPal, and active Vipps agreements in the Vipps app under "Recurring payments". Card agreements and other agreements can be ended by contacting us at post@hiskingdomministry.no. The cancellation takes effect from the next payment date.</li>
+                    <li data-content-key="content.sec4_sub2_item2"><strong>Commitment period:</strong> There is no commitment period for recurring payments with His Kingdom Ministry, unless this is specified for the individual product or service when the agreement is made.</li>
+                    <li data-content-key="content.sec4_sub2_item3"><strong>Changes to the agreement:</strong> Any changes to amount or frequency will be notified in accordance with the applicable rules of the payment service provider.</li>
+                </ul>
+
+                <h3>4.3 School payment for HKPC</h3>
+                <p>The monthly school agreement consists of 10 instalments of NOK 1,000, a total of NOK 10,000. The first instalment is paid at the start, and the agreement ends automatically after the 10 instalments. The registration fee of NOK 1,000 covers NOK 500 for administration and NOK 500 for board and lodging at the kickoff. It can be paid separately or included in the monthly agreement, which then consists of 10 payments of NOK 1,100, a total of NOK 11,000. A registered payment of the fee is deducted before the agreement is created. A terminated payment agreement or a failed payment does not in itself change the study agreement; any unpaid instalments are settled with the school.</p>
+
+                <h2 data-content-key="content.sec5_title">5. Delivery</h2>
+                <p data-content-key="content.sec5_text">We offer delivery to addresses in Norway for a fee. Delivery time is normally 3–7 working days from the day the order is confirmed, subject to delays caused by circumstances beyond our control. Shipping costs vary depending on factors such as weight, size and delivery method, and will be specified during the ordering process. You are responsible for providing a correct delivery address.</p>
+
+                <h2 data-content-key="content.sec6_title">6. Collection</h2>
+                <p data-content-key="content.sec6_text">You can choose to collect ordered goods. Send us a message if you would like this. You will receive a message when the goods are ready for collection. When collecting, you must show valid ID and, if required, the order confirmation.</p>
+
+                <h2 data-content-key="content.sec7_title">7. Right of withdrawal</h2>
+                <p data-content-key="content.sec7_text">Under the Norwegian Right of Withdrawal Act, as a consumer you have the right to withdraw from the purchase within 14 days from the day you received the item(s) (or from the conclusion of the agreement when purchasing digital services). To exercise your right of withdrawal, you must clearly inform us that you wish to withdraw from the purchase, for example by sending us a withdrawal form (which you can find at <a href="https://om.no/2ZOA" target="_blank">https://om.no/2ZOA</a>), by email or by post. The item(s) must be returned in the same condition as you received them, and in the original packaging if possible. You are responsible for the return costs unless otherwise agreed. We will refund the purchase price within 14 days from the day we received notice of your decision to withdraw, provided that we have received the item(s) back or you have provided proof that the item(s) have been sent.</p>
+
+                <h2 data-content-key="content.sec8_title">8. Complaints</h2>
+                <p data-content-key="content.sec8_text">If there are defects in the item you have purchased, you have the right to make a complaint under the Norwegian Consumer Purchases Act. The complaint deadline is normally two years from the date of purchase, or five years for goods intended to last considerably longer. Contact us as soon as possible after discovering the defect. Describe the defect in as much detail as possible. If the complaint is accepted, we will first try to repair the item or deliver a new equivalent item. If this is not possible or disproportionately costly, you may be entitled to a price reduction or to cancel the purchase.</p>
+
+                <h2 data-content-key="content.sec9_title">9. Privacy</h2>
+                <p data-content-key="content.sec9_text">We process your personal data in accordance with our privacy policy, which you can find here: <a href="/en/privacy">https://hiskingdomministry.no/en/privacy</a></p>
+
+                <h2 data-content-key="content.sec10_title">10. Courses and digital products</h2>
+                <p data-content-key="content.sec10_text">When registering for courses or purchasing digital products, the following applies:</p>
+                <ul>
+                    <li data-content-key="content.sec10_item1"><strong>Payment:</strong> The course fee must be paid in full before access to the course is granted, unless otherwise agreed or the course is free.</li>
+                    <li data-content-key="content.sec10_item2"><strong>Access:</strong> Access to the course is personal and may not be shared with others. The duration of access will be stated in the course description at registration.</li>
+                    <li data-content-key="content.sec10_item3"><strong>Right of withdrawal:</strong> When purchasing digital courses where delivery begins immediately after payment, you consent to delivery starting and to the right of withdrawal lapsing once you have logged in and started the course, in accordance with section 22 (n) of the Norwegian Right of Withdrawal Act.</li>
+                    <li data-content-key="content.sec10_item4"><strong>Copyright:</strong> All course material (videos, texts, files) is protected by copyright and is for personal use only. Commercial use or resale is strictly prohibited.</li>
+                </ul>
+
+                <h2 data-content-key="content.sec11_title">11. Intellectual property rights</h2>
+                <p data-content-key="content.sec11_text">All content in our online shop, including images, texts, logos and designs, is protected by copyright and other intellectual property rights and belongs to His Kingdom Ministry’s online shop or our partners. Any copying or use of this content without our written permission is prohibited.</p>
+
+                <h2 data-content-key="content.sec12_title">12. Limitation of liability</h2>
+                <p data-content-key="content.sec12_text">We are not liable for indirect losses, consequential damages or losses due to force majeure. Our liability is limited to the purchase price of the goods in question.</p>
+
+                <h2 data-content-key="content.sec13_title">13. Disputes</h2>
+                <p data-content-key="content.sec13_text">Any disputes arising in connection with these terms and conditions shall be sought resolved amicably. If agreement is not reached, the matter may be brought before the ordinary courts in Norway in accordance with Norwegian law.</p>
+
+                <h2 data-content-key="content.sec14_title">14. Changes to the terms</h2>
+                <p data-content-key="content.sec14_text">We reserve the right to change these terms and conditions at any time. The terms in force at any given time will be available in our online shop and in our physical shop.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer (Simplified) -->
+    <!-- Footer -->
+    <footer class="footer" id="kontakt">
+        <div class="container">
+            <div class="footer-layout-v2">
+                <!-- Left Section: Brand + Links -->
+                <div class="footer-left">
+                    <!-- Brand / Intro -->
+                    <div class="footer-brand">
+                        <a href="/" class="logo">
+                            <div class="logo-icon">
+                                <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo"
+                                    data-content-doc="settings_global" data-content-key="brand.logoAlt"
+                                    data-content-attr="alt" loading="lazy">
+                            </div>
+                            <span class="logo-text" data-content-doc="settings_global" data-content-key="brand.name">His
+                                Kingdom Ministry</span>
+                        </a>
+                        <p class="brand-description" data-content-doc="settings_global"
+                            data-content-key="footer.description">His Kingdom Ministry er en
+                            non-profit organisasjon dedikert til
+                            åndelig vekst gjennom undervisning, podcast og reisevirksomhet.</p>
+                    </div>
+
+                    <!-- Links Grid -->
+                    <div class="footer-nav-grid">
+                        <div class="nav-col">
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_about">Om oss</h4>
+                            <ul>
+                                <li><a href="/" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.home">Hjem</a></li>
+                                <li><a href="/om-oss" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.about">Om oss</a></li>
+                                <li><a href="/om-oss" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.vision">Vår visjon</a></li>
+                                <li><a href="/kontakt" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.contact">Kontakt oss</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_resources">Ressurser
+                            </h4>
+                            <ul>
+                                <li><a href="/bibel" data-content-doc="settings_global" data-content-key="footer.links.resources.bible">Les Bibelen</a></li>
+                                <li><a href="/media" data-content-doc="settings_global"
+                                        data-content-key="footer.links.resources.teaching">Undervisning</a></li>
+
+                                <li><a href="/arrangementer" data-content-doc="settings_global"
+                                    data-content-key="footer.links.resources.courses">Arrangementer</a></li>
+                                <li><a href="/blogg" data-content-doc="settings_global"
+                                    data-content-key="footer.links.resources.blog">Nyheter & blogg</a></li>
+                                <li><a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
+                                        data-content-key="footer.links.resources.store">Butikk</a></li>
+                                <li><a href="/minside/index.html" target="_blank" data-content-doc="settings_global"
+                                        data-content-key="footer.links.resources.myPage">Min Side</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_media">Media</h4>
+                            <ul>
+                                <li><a href="/media" data-content-doc="settings_global"
+                                        data-content-key="footer.links.media.podcast">Podcast</a></li>
+                                <li><a href="/media" data-content-doc="settings_global"
+                                        data-content-key="footer.links.media.videos">Videoer</a></li>
+                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"
+                                        data-content-doc="settings_global"
+                                        data-content-key="footer.links.media.youtube">YouTube</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_involvement">
+                                Involvering</h4>
+                            <ul>
+                                <li><a href="/arrangementer" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.calendar">Kalender</a></li>
+                                <li><a href="/donasjoner" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.donate">Gi en gave</a></li>
+                                <li><a href="/personvern" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.privacy">Personvern</a></li>
+                                <li><a href="/betingelser">Vilkår og betingelser</a></li>
+                                <li><a href="/tilgjengelighet" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.accessibility">Tilgjengelighet</a>
+                                </li>
+                                <li><a href="javascript:void(0)"
+                                        onclick="if(window.showCookieBanner){window.showCookieBanner();}else{localStorage.removeItem('hkm_cookie_consent');location.reload();}return false;"
+                                        data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.cookies">Cookies</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Section: Cards -->
+                <div class="footer-right">
+                    <!-- Follow Us Card -->
+                    <div class="footer-card">
+                        <h4 data-content-doc="settings_global" data-content-key="footer.title_follow">Følg oss</h4>
+                        <div class="footer-social-icons">
+                            <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank" aria-label="Facebook"><i
+                                    class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank" aria-label="Instagram"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank" aria-label="YouTube"><i
+                                    class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Contact Us Card -->
+                    <div class="footer-card contact-card">
+                        <h4 data-content-doc="settings_global" data-content-key="footer.title_contact">Kontakt oss</h4>
+                        <a href="/kontakt" class="btn btn-primary btn-block btn-sm" data-content-doc="settings_global"
+                            data-content-key="footer.contactButton">Kontaktskjema</a>
+
+                        <div class="contact-details">
+                            <div class="detail-item">
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.emailLabel">E-post:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.email">
+                                    post@hiskingdomministry.no</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.phoneLabel">Telefon:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.phone">+47 930 94
+                                    615</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.vippsLabel">Vipps:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.vipps">938361</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.accountLabel">Konto nr.:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.account">3000.66.08759
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; <span id="copyright-year">2026</span> <span data-content-doc="settings_global"
+                        data-content-key="footer.copyright">His Kingdom Ministry. Alle rettigheter reservert.</span></p>
+                <p class="footer-network" style="margin:.5rem 0 0;font-size:.875rem;line-height:1.6">Del av <a href="https://hiskingdomfoundation.no/" target="_blank" rel="noopener">His Kingdom Foundation</a> · <a href="https://www.hkpc.no/" target="_blank" rel="noopener">His Kingdom Prophetic Community</a> · <a href="https://hiskingdomdesigns.no/" target="_blank" rel="noopener">His Kingdom Designs</a></p>
+                <p class="footer-credit" style="margin:.25rem 0 .5rem;font-size:.8125rem">Nettside laget av <a href="https://www.tk-design.no/" target="_blank" rel="noopener">TK-design</a></p>
+                <a href="/admin/login.html" class="admin-link" id="admin-link" data-content-doc="settings_global"
+                    data-content-key="footer.adminLink">Admin</a>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module" src="../script.js?v=2026.06.21.10.01"></script>
+    <script type="module" src="../js/cookie-consent.js"></script>
+
+    <script type="module" src="../js/i18n.js"></script>
+    <script>
+        // Sørger for at siden alltid starter fra toppen ved innlasting
+        window.scrollTo(0, 0);
+        window.addEventListener('DOMContentLoaded', () => {
+            window.scrollTo(0, 0);
+            setTimeout(() => window.scrollTo(0, 0), 100);
+        });
+    </script>
+    <!-- Global Search Modal -->
+    <div id="site-search-modal" class="search-overlay">
+        <div class="search-modal-container">
+            <button class="close-search-btn" id="close-site-search" aria-label="Lukk søk">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="search-modal-title" data-content-doc="settings_global" data-content-key="search.modalTitle">Søk i systemet</div>
+            <div class="search-input-group">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" id="site-search-input-v2" class="search-input-field" placeholder="Hva leter du etter? Skriv for forslag..." autocomplete="off">
+            </div>
+            
+            <!-- Live Suggestions Container -->
+            <div id="site-search-suggestions" class="search-suggestions-container hidden"></div>
+            
+            <!-- Full Results Container (When Enter is pressed) -->
+            <div id="site-search-results-v2" class="search-suggestions-container hidden"></div>
+            
+            <div class="search-help-text">
+                <span data-content-doc="settings_global" data-content-key="search.helpText">Trykk 'Enter' for fullstendig søk.</span>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>
