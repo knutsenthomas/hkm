@@ -981,6 +981,8 @@ function tx(no, en, es) {
 // Static DOM Translation Utility
 function translateStaticHTML() {
     const lang = document.documentElement.lang || 'no';
+    const pageTitles = { no: 'Min Side | His Kingdom Ministry', en: 'My Page | His Kingdom Ministry', es: 'Mi página | His Kingdom Ministry' };
+    if (pageTitles[lang] && /Min Side|My Page|Mi página/.test(document.title)) document.title = pageTitles[lang];
     
     // Elements with data-i18n
     document.querySelectorAll('[data-i18n]').forEach(el => {

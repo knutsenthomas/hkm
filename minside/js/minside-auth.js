@@ -143,6 +143,8 @@ function t(key) {
 // Static HTML Translation Utility
 function translateStaticHTML() {
     const lang = document.documentElement.lang || 'no';
+    const pageTitles = { no: 'Logg inn | Min Side', en: 'Sign in | My Page', es: 'Iniciar sesión | Mi página' };
+    if (pageTitles[lang] && /Min Side|My Page|Mi página/.test(document.title)) document.title = pageTitles[lang];
     
     // Translate elements with data-i18n
     document.querySelectorAll('[data-i18n]').forEach(el => {
