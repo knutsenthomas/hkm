@@ -3,6 +3,7 @@
  * Unified toast and alert notifications for site and admin.
  */
 
+window.hkmTx = window.hkmTx || function (no, en, es) { const l = (document.documentElement.lang || 'no').slice(0, 2); return l === 'en' ? en : l === 'es' ? (es == null ? en : es) : no; };
 class HKMNotifications {
     constructor() {
         this.toastContainer = null;
@@ -33,7 +34,7 @@ class HKMNotifications {
                        window.location.hostname === 'localhost' || 
                        window.location.hostname === '127.0.0.1';
         
-        if (isLocal && safeMessage.includes('Kunne ikke laste arrangementer')) {
+        if (isLocal && safeMessage.includes(hkmTx("Kunne ikke laste arrangementer", "Could not load events", "No se pudieron cargar los eventos"))) {
             console.info('[HKMNotifications] Suppressing event loading warning in local environment.');
             return;
         }
@@ -65,7 +66,7 @@ class HKMNotifications {
             <div class="toast-content">
                 <p class="toast-message"></p>
             </div>
-            <button class="toast-close" aria-label="Lukk melding">
+            <button class="toast-close" aria-label="${hkmTx("Lukk melding", "Close message", "Cerrar mensaje")}">
                 <span class="material-symbols-outlined" style="font-size:18px;">close</span>
             </button>
             <div class="toast-progress">

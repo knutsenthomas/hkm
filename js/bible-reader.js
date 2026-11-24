@@ -3,6 +3,7 @@ import { firebaseService } from './firebase-service.js';
 import { biblicalCharacters } from './bibelske-personer-data.js';
 import { getBibleBookIntroduction } from './bible-book-introductions.js';
 
+window.hkmTx = window.hkmTx || function (no, en, es) { const l = (document.documentElement.lang || 'no').slice(0, 2); return l === 'en' ? en : l === 'es' ? (es == null ? en : es) : no; };
 const BIBLE_PROJECT_VIDEOS = {
     // Law/Pentateuch
     '1': { no: { title: 'Genesis 1-11', id: 'gGOI1KNVHUU' }, en: { title: 'Genesis 1-11', id: 'GQI72THyO5I' } },
@@ -501,7 +502,7 @@ class BibleReader {
                 planSidebar.innerHTML = `
                     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 40px 20px; color: var(--text-muted);">
                         <div class="spinner" style="margin-bottom: 16px; width: 28px; height: 28px; border: 3px solid var(--border-color); border-top-color: var(--bible-primary); border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                        <p style="font-size: 14px; font-weight: 600; margin: 0;">Laster leseplan...</p>
+                        <p style="font-size: 14px; font-weight: 600; margin: 0;">${hkmTx("Laster leseplan...", "Loading reading plan...", "Cargando plan de lectura...")}</p>
                     </div>
                 `;
             }
@@ -2172,7 +2173,7 @@ class BibleReader {
                             this.dom.verseToolbar.style.display = 'flex';
                             const sheetRefEl = document.getElementById('sheet-verse-reference');
                             if (sheetRefEl) {
-                                sheetRefEl.textContent = this.getSelectedVersesReference() || 'Velg vers';
+                                sheetRefEl.textContent = this.getSelectedVersesReference() || hkmTx("Velg vers", "Select verses", "Seleccionar versículos");
                             }
                         }
                         return;
@@ -2640,7 +2641,7 @@ class BibleReader {
         }
 
         if (!this.books || !this.books.length) {
-            container.innerHTML = `<div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 13px;">Laster bøker...</div>`;
+            container.innerHTML = `<div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 13px;">${hkmTx("Laster bøker...", "Loading books...", "Cargando libros...")}</div>`;
             return;
         }
 
@@ -2843,7 +2844,7 @@ class BibleReader {
             this.dom.readingPane.innerHTML = `
                 <div style="text-align: center; padding: 100px 0; color: #64748b;">
                     <div class="spinner" style="margin: 0 auto 16px;"></div>
-                    <p style="font-size: 15px;">Henter bibeltekst...</p>
+                    <p style="font-size: 15px;">${hkmTx("Henter bibeltekst...", "Fetching Bible text...", "Obteniendo el texto bíblico...")}</p>
                 </div>
             `;
         }
@@ -2869,9 +2870,9 @@ class BibleReader {
                 this.dom.readingPane.innerHTML = `
                     <div style="text-align: center; padding: 80px 20px; color: #ef4444;">
                         <span class="material-symbols-outlined" style="font-size: 48px;">error</span>
-                        <p style="margin-top: 12px; font-weight: 600;">Kunne ikke hente bibelteksten</p>
-                        <p style="font-size: 13px; color: #64748b; margin-top: 4px;">Sjekk nettforbindelsen din og prøv igjen.</p>
-                        <button class="btn btn-outline btn-sm" style="margin-top: 16px;" onclick="location.reload()">Last på nytt</button>
+                        <p style="margin-top: 12px; font-weight: 600;">${hkmTx("Kunne ikke hente bibelteksten", "Could not fetch the Bible text", "No se pudo obtener el texto bíblico")}</p>
+                        <p style="font-size: 13px; color: #64748b; margin-top: 4px;">${hkmTx("Sjekk nettforbindelsen din og prøv igjen.", "Check your internet connection and try again.", "Comprueba tu conexión a internet e inténtalo de nuevo.")}</p>
+                        <button class="btn btn-outline btn-sm" style="margin-top: 16px;" onclick="location.reload()">${hkmTx("Last på nytt", "Reload", "Volver a cargar")}</button>
                     </div>
                 `;
             }
@@ -2933,7 +2934,7 @@ class BibleReader {
             if (!crossRefs || crossRefs.length === 0) {
                 listEl.innerHTML = `
                     <div style="text-align: center; padding: 24px 0; color: var(--text-muted); font-size: 13.5px;">
-                        Ingen kryssreferanser funnet.
+                        ${hkmTx("Ingen kryssreferanser funnet.", "No cross-references found.", "No se encontraron referencias cruzadas.")}
                     </div>
                 `;
                 return;
@@ -2986,7 +2987,7 @@ class BibleReader {
         listEl.innerHTML = `
             <div style="text-align: center; padding: 24px 0; color: var(--text-muted);">
                 <div class="spinner" style="margin: 0 auto 10px;"></div>
-                <p style="font-size: 13px;">Henter kryssreferanser...</p>
+                <p style="font-size: 13px;">${hkmTx("Henter kryssreferanser...", "Fetching cross-references...", "Obteniendo referencias cruzadas...")}</p>
             </div>
         `;
 
@@ -3000,7 +3001,7 @@ class BibleReader {
             console.error("Error fetching verse cross references:", e);
             listEl.innerHTML = `
                 <div style="text-align: center; padding: 20px; color: #ef4444; font-size: 13px;">
-                    Kunne ikke laste kryssreferanser. Sjekk tilkoblingen din.
+                    ${hkmTx("Kunne ikke laste kryssreferanser. Sjekk tilkoblingen din.", "Could not load cross-references. Check your connection.", "No se pudieron cargar las referencias cruzadas. Comprueba tu conexión.")}
                 </div>
             `;
         }
@@ -3082,7 +3083,7 @@ class BibleReader {
                         <span class="material-symbols-outlined" style="font-size: 28px;">auto_stories</span>
                     </div>
                     <h2 style="font-size: 22px; font-weight: 800; margin: 0 0 8px 0; color: var(--text-base);">${bookName}</h2>
-                    <p style="color: var(--text-muted, #64748b); margin: 0 0 24px 0; font-size: 14.5px; line-height: 1.5;">Det er ingen skriftlig introduksjon for denne boken ennå.</p>
+                    <p style="color: var(--text-muted, #64748b); margin: 0 0 24px 0; font-size: 14.5px; line-height: 1.5;">${hkmTx("Det er ingen skriftlig introduksjon for denne boken ennå.", "There is no written introduction for this book yet.", "Aún no hay una introducción escrita para este libro.")}</p>
                     <button id="btn-close-empty-intro" style="min-height: 44px; padding: 10px 24px; font-size: 14px; font-weight: 700; border-radius: 9999px; background: #1B4965; color: #ffffff; border: none; cursor: pointer;">
                         ${labelClose}
                     </button>
@@ -3866,7 +3867,7 @@ class BibleReader {
 
             if (!matchedBook) {
                 console.warn("[BibleReader] Book not found:", lookupName);
-                alert(`Kunne ikke finne boken "${fullBookSearchName}". Sjekk stavemåte.`);
+                alert(hkmTx(`Kunne ikke finne boken "${fullBookSearchName}". Sjekk stavemåte.`, `Could not find the book "${fullBookSearchName}". Check the spelling.`, `No se encontró el libro "${fullBookSearchName}". Revisa la ortografía.`));
                 return;
             }
 
@@ -3876,7 +3877,7 @@ class BibleReader {
             const chapExists = this.chapters.some(c => c.id === targetChapterId);
 
             if (!chapExists) {
-                alert(`Fant boken ${matchedBook.name}, men kapittel ${chapterNum} finnes ikke.`);
+                alert(hkmTx(`Fant boken ${matchedBook.name}, men kapittel ${chapterNum} finnes ikke.`, `Found the book ${matchedBook.name}, but chapter ${chapterNum} does not exist.`, `Se encontró el libro ${matchedBook.name}, pero el capítulo ${chapterNum} no existe.`));
                 return;
             }
 
@@ -3887,7 +3888,7 @@ class BibleReader {
             }
         } catch (error) {
             console.error("[BibleReader] Error in parseAndNavigateToReference:", error);
-            alert("Det oppstod en feil under navigering til referansen.");
+            alert(hkmTx("Det oppstod en feil under navigering til referansen.", "An error occurred while navigating to the reference.", "Se produjo un error al ir a la referencia."));
         }
     }
 
@@ -3978,16 +3979,16 @@ class BibleReader {
                 <div class="dict-body" style="flex: 1; overflow-y: auto; padding: 20px;">
                     <div class="dict-search-container" style="margin-bottom: 20px; display: flex; gap: 8px;">
                         <input type="text" id="dict-search-input" placeholder="Søk på ord eller spørsmål..." style="flex: 1; height: 38px !important; padding: 0 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-base); color: var(--text-base); font-size: 13px; outline: none; box-sizing: border-box;">
-                        <button id="dict-search-submit-btn" style="background: var(--bible-primary, #d17d39); color: white; border: none; padding: 0 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 38px !important;">Søk</button>
+                        <button id="dict-search-submit-btn" style="background: var(--bible-primary, #d17d39); color: white; border: none; padding: 0 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 38px !important;">${hkmTx("Søk", "Search", "Buscar")}</button>
                     </div>
                     <div id="dict-welcome-state" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px 10px; color: var(--text-muted);">
                         <span class="material-symbols-outlined" style="font-size: 40px; color: var(--bible-primary, #d17d39); margin-bottom: 12px; opacity: 0.8;">menu_book</span>
-                        <h4 style="font-size: 14px; font-weight: 700; color: var(--text-base); margin: 0 0 6px 0;">Velkommen til Bibeleksikon</h4>
-                        <p style="font-size: 12px; line-height: 1.5; margin: 0;">Søk etter teologiske begreper, personer, hendelser eller still bibelrelaterte spørsmål direkte her.</p>
+                        <h4 style="font-size: 14px; font-weight: 700; color: var(--text-base); margin: 0 0 6px 0;">${hkmTx("Velkommen til Bibeleksikon", "Welcome to the Bible dictionary", "Bienvenido al diccionario bíblico")}</h4>
+                        <p style="font-size: 12px; line-height: 1.5; margin: 0;">${hkmTx("Søk etter teologiske begreper, personer, hendelser eller still bibelrelaterte spørsmål direkte her.", "Search for theological terms, people and events, or ask Bible-related questions directly here.", "Busca términos teológicos, personas y acontecimientos, o haz preguntas sobre la Biblia directamente aquí.")}</p>
                     </div>
                     <div id="dict-spinner" style="display: none; flex-direction: column; align-items: center; justify-content: center; height: 150px; color: var(--text-muted);">
                         <div class="hkm-spinner" style="width: 32px; height: 32px; border: 3px solid rgba(209,125,57,0.2); border-top-color: #d17d39; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px;"></div>
-                        <p style="font-size: 13px; margin: 0;">Analyserer og henter forklaring fra Bibeleksikon...</p>
+                        <p style="font-size: 13px; margin: 0;">${hkmTx("Analyserer og henter forklaring fra Bibeleksikon...", "Analysing and fetching an explanation from the Bible dictionary...", "Analizando y obteniendo una explicación del diccionario bíblico...")}</p>
                     </div>
                     <div id="dict-content-wrap" style="display: none;">
                         <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
@@ -4007,7 +4008,7 @@ class BibleReader {
                             </button>
                         </div>
                         <div id="dict-original-words-section" style="display: none; margin-bottom: 20px;">
-                            <h4 style="font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin: 0 0 10px 0;">Grunntekst (Originalspråk)</h4>
+                            <h4 style="font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin: 0 0 10px 0;">${hkmTx("Grunntekst (Originalspråk)", "Original text (original language)", "Texto original (idioma original)")}</h4>
                             <div id="dict-original-words-list"></div>
                         </div>
                         <div id="dict-cross-refs-section" style="display: none; margin-bottom: 20px;">
@@ -4322,7 +4323,7 @@ class BibleReader {
             // Render related resources
             if (dictRelatedBox) {
                 if (resources.length === 0) {
-                    dictRelatedBox.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 8px 0;">Ingen direkte treff på nettstedets blogger eller videoer for dette ordet.</div>';
+                    dictRelatedBox.innerHTML = ("<div style=\"font-size: 12px; color: var(--text-muted); padding: 8px 0;\">" + hkmTx("Ingen direkte treff på nettstedets blogger eller videoer for dette ordet.", "No direct matches in the site’s blog posts or videos for this word.", "No hay coincidencias directas en los blogs o vídeos del sitio para esta palabra.") + "</div>");
                 } else {
                     dictRelatedBox.innerHTML = resources.slice(0, 4).map(res => this.renderResourceCard(res)).join('');
                 }
@@ -4340,8 +4341,8 @@ class BibleReader {
             }
             this.dom.dictSpinner.style.display = 'none';
             this.dom.dictContentWrap.style.display = 'block';
-            this.dom.dictCategory.innerText = 'Feil';
-            this.dom.dictDefinition.innerHTML = 'Kunne ikke kontakte ordbok-tjenesten. Kontroller nettforbindelsen din.';
+            this.dom.dictCategory.innerText = hkmTx("Feil", "Error", "Error");
+            this.dom.dictDefinition.innerHTML = hkmTx("Kunne ikke kontakte ordbok-tjenesten. Kontroller nettforbindelsen din.", "Could not reach the dictionary service. Check your internet connection.", "No se pudo contactar con el servicio de diccionario. Comprueba tu conexión a internet.");
             this.dom.dictContextualNote.innerHTML = '';
         }
     }
@@ -4939,7 +4940,7 @@ class BibleReader {
         
         const db = this.getFirestore();
         if (this.currentUser && db) {
-            this.dom.notesList.innerHTML = `<div class="loading-state" style="padding: 20px; text-align: center;"><div class="spinner" style="margin: 0 auto 10px auto;"></div>Laster notater...</div>`;
+            this.dom.notesList.innerHTML = `<div class="loading-state" style="padding: 20px; text-align: center;"><div class="spinner" style="margin: 0 auto 10px auto;"></div>${hkmTx("Laster notater...", "Loading notes...", "Cargando notas...")}</div>`;
             try {
                 const snap = await db.collection('personal_notes')
                     .where('userId', '==', this.currentUser.uid)
@@ -4989,7 +4990,7 @@ class BibleReader {
         if (!this.currentUser) {
             syncBadge = `
                 <div style="background: rgba(209, 125, 57, 0.1); border: 1px solid rgba(209, 125, 57, 0.2); border-radius: 8px; padding: 10px; margin-bottom: 12px; font-size: 12px; color: #7f8c8d;">
-                    ⚠️ Lagres kun lokalt. <a href="/minside/login.html" style="color: var(--bible-primary); text-decoration: underline; font-weight: 600;">Logg inn</a> for å synkronisere med Min Side.
+                    ${hkmTx("⚠️ Lagres kun lokalt.", "⚠️ Saved only locally.", "⚠️ Solo se guarda localmente.")} <a href="/minside/login.html" style="color: var(--bible-primary); text-decoration: underline; font-weight: 600;">${hkmTx("Logg inn", "Sign in", "Iniciar sesión")}</a> ${hkmTx("for å synkronisere med Min Side.", "to sync with My Page.", "para sincronizar con Mi página.")}
                 </div>
             `;
         }
@@ -5022,7 +5023,7 @@ class BibleReader {
                             <strong class="note-title" style="font-size: 14px; font-weight: 600; color: var(--text-base); display: block; max-width: calc(100% - 24px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${n.title}</strong>
                             <span class="material-symbols-outlined delete-note-btn" data-id="${n.id}" style="font-size: 18px; color: #cbd5e1; cursor: pointer; transition: color 0.2s; flex-shrink: 0;">delete</span>
                         </div>
-                        <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 6px 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: normal;">${preview || '<i>Ingen tekst</i>'}</p>
+                        <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 6px 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: normal;">${preview || ("<i>" + hkmTx("Ingen tekst", "No text", "Sin texto") + "</i>")}</p>
                         <span style="font-size: 10px; color: #94a3b8;">${dateStr}</span>
                     </div>
                 `;
@@ -5075,21 +5076,21 @@ class BibleReader {
 
         this.dom.notesList.innerHTML = `
             <div class="note-form" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; box-sizing: border-box; text-align: left;">
-                <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-base);">${isEdit ? 'Rediger notat' : 'Nytt notat'}</h4>
+                <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-base);">${isEdit ? hkmTx("Rediger notat", "Edit note", "Editar nota") : hkmTx("Nytt notat", "New note", "Nueva nota")}</h4>
                 
                 <div style="margin-bottom: 12px;">
                     <label style="display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Tittel</label>
-                    <input type="text" id="note-form-title" class="bible-control-input" value="${defaultTitle}" style="width: 100% !important; height: 36px !important;" placeholder="Tittel på notatet..." />
+                    <input type="text" id="note-form-title" class="bible-control-input" value="${defaultTitle}" style="width: 100% !important; height: 36px !important;" placeholder="${hkmTx("Tittel på notatet...", "Note title...", "Título de la nota...")}" />
                 </div>
                 
                 <div style="margin-bottom: 16px;">
                     <label style="display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Tekst</label>
-                    <textarea id="note-form-body" style="width: 100%; height: 160px; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); font-size: 13px; font-family: inherit; line-height: 1.4; resize: vertical; outline: none; box-sizing: border-box;" placeholder="Skriv dine tanker, bønner eller refleksjoner her...">${bodyText}</textarea>
+                    <textarea id="note-form-body" style="width: 100%; height: 160px; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); font-size: 13px; font-family: inherit; line-height: 1.4; resize: vertical; outline: none; box-sizing: border-box;" placeholder="${hkmTx("Skriv dine tanker, bønner eller refleksjoner her...", "Write your thoughts, prayers or reflections here...", "Escribe aquí tus pensamientos, oraciones o reflexiones...")}">${bodyText}</textarea>
                 </div>
                 
                 <div style="display: flex; gap: 8px;">
-                    <button id="btn-save-note" style="flex: 1 !important; border-radius: 8px !important; padding: 8px 12px !important; font-size: 13px !important; background: var(--bible-primary) !important; color: #fff !important; font-weight: 600 !important; border: none !important; cursor: pointer !important; height: 38px !important; line-height: 1.2 !important; text-transform: none !important; box-shadow: none !important;">Lagre</button>
-                    <button id="btn-cancel-note" style="flex: 1 !important; border-radius: 8px !important; padding: 8px 12px !important; font-size: 13px !important; background: var(--bg-base) !important; color: var(--text-base) !important; border: 1px solid var(--border-color) !important; font-weight: 600 !important; cursor: pointer !important; height: 38px !important; line-height: 1.2 !important; text-transform: none !important; box-shadow: none !important;">Avbryt</button>
+                    <button id="btn-save-note" style="flex: 1 !important; border-radius: 8px !important; padding: 8px 12px !important; font-size: 13px !important; background: var(--bible-primary) !important; color: #fff !important; font-weight: 600 !important; border: none !important; cursor: pointer !important; height: 38px !important; line-height: 1.2 !important; text-transform: none !important; box-shadow: none !important;">${hkmTx("Lagre", "Save", "Guardar")}</button>
+                    <button id="btn-cancel-note" style="flex: 1 !important; border-radius: 8px !important; padding: 8px 12px !important; font-size: 13px !important; background: var(--bg-base) !important; color: var(--text-base) !important; border: 1px solid var(--border-color) !important; font-weight: 600 !important; cursor: pointer !important; height: 38px !important; line-height: 1.2 !important; text-transform: none !important; box-shadow: none !important;">${hkmTx("Avbryt", "Cancel", "Cancelar")}</button>
                 </div>
             </div>
         `;
@@ -5141,7 +5142,7 @@ class BibleReader {
                     }
                 } catch (e) {
                     console.error('Error saving note:', e);
-                    alert('Feil ved lagring: ' + e.message);
+                    alert((hkmTx("Feil ved lagring:", "Error saving:", "Error al guardar:") + " ") + e.message);
                 }
             } else {
                 // Save to localStorage
@@ -5176,7 +5177,7 @@ class BibleReader {
     }
 
     async deleteNote(noteId) {
-        if (!confirm('Vil du slette dette notatet?')) return;
+        if (!confirm(hkmTx("Vil du slette dette notatet?", "Delete this note?", "¿Eliminar esta nota?"))) return;
 
         const db = this.getFirestore();
         if (this.currentUser && db) {
@@ -5184,7 +5185,7 @@ class BibleReader {
                 await db.collection('personal_notes').doc(noteId).delete();
             } catch (e) {
                 console.error('Error deleting note:', e);
-                alert('Feil ved sletting: ' + e.message);
+                alert((hkmTx("Feil ved sletting:", "Error deleting:", "Error al eliminar:") + " ") + e.message);
             }
         } else {
             let localNotes = [];
@@ -5734,7 +5735,7 @@ class BibleReader {
         container.innerHTML = `
             <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
                 <div class="spinner" style="margin: 0 auto 12px; width: 24px; height: 24px;"></div>
-                <p style="font-size: 13px;">${this.getTranslation('loading_plan', 'Laster leseplan...')}</p>
+                <p style="font-size: 13px;">${this.getTranslation('loading_plan', hkmTx("Laster leseplan...", "Loading reading plan...", "Cargando plan de lectura..."))}</p>
             </div>
         `;
 
@@ -6027,7 +6028,7 @@ class BibleReader {
                 container.innerHTML = `
                     <div style="padding: 20px; text-align: center; color: #ef4444;">
                         <span class="material-symbols-outlined" style="font-size: 32px;">error</span>
-                        <p style="margin-top: 8px; font-weight: 600;">Kunne ikke hente leseplaner.</p>
+                        <p style="margin-top: 8px; font-weight: 600;">${hkmTx("Kunne ikke hente leseplaner.", "Could not fetch reading plans.", "No se pudieron obtener los planes de lectura.")}</p>
                     </div>
                 `;
             }
@@ -6035,7 +6036,7 @@ class BibleReader {
             container.innerHTML = `
                 <div style="padding: 20px; text-align: center; color: #64748b;">
                     <span class="material-symbols-outlined" style="font-size: 32px; margin-bottom: 8px;">cloud_off</span>
-                    <p style="margin: 0;">Leseplaner er midlertidig utilgjengelig (frakoblet modus).</p>
+                    <p style="margin: 0;">${hkmTx("Leseplaner er midlertidig utilgjengelig (frakoblet modus).", "Reading plans are temporarily unavailable (offline mode).", "Los planes de lectura no están disponibles temporalmente (modo sin conexión).")}</p>
                 </div>
             `;
         }
@@ -6067,7 +6068,7 @@ class BibleReader {
 
         const t_activePlan = this.getTranslation('active_plan', 'Aktiv leseplan');
         const t_progress = this.getTranslation('progress', 'Fremgang');
-        const t_day = this.getTranslation('day', 'Dag');
+        const t_day = this.getTranslation('day', hkmTx("Dag", "Day", "Día"));
         const t_showVerses = this.getTranslation('show_verses', 'Vis dagens vers');
         const t_openDevotional = this.getTranslation('open_devotional', 'Åpne dagens andakt');
         const t_daysOutline = this.getTranslation('days_outline', 'Oversikt over dager');
@@ -6122,7 +6123,7 @@ class BibleReader {
             <div style="padding: 16px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                     <span style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">${t_activePlan}</span>
-                    <button class="hkm-btn-secondary" style="height: 26px !important; padding: 2px 10px !important; font-size: 11px !important; border-radius: 6px !important;" onclick="window.bibleReader.showAvailablePlans()">Bytt plan</button>
+                    <button class="hkm-btn-secondary" style="height: 26px !important; padding: 2px 10px !important; font-size: 11px !important; border-radius: 6px !important;" onclick="window.bibleReader.showAvailablePlans()">${hkmTx("Bytt plan", "Change plan", "Cambiar plan")}</button>
                 </div>
                 <h3 class="hkm-rp-title">${globalPlan.title}</h3>
                 <p class="hkm-rp-subtitle">${globalPlan.description || ''}</p>
@@ -6160,7 +6161,7 @@ class BibleReader {
                         ${currentDayNum < expectedDay ? `
                         <button class="hkm-btn-secondary" style="border: 1px dashed #d17d39; color: #d17d39; margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="window.bibleReader.syncToExpectedDay('${globalPlan.id}', ${expectedDay})">
                             <span class="material-symbols-outlined" style="font-size: 18px;">sync</span>
-                            ${t_syncDevotion} (Dag ${expectedDay})
+                            ${t_syncDevotion} ${hkmTx("(Dag", "(Day", "(Día")} ${expectedDay})
                         </button>
                         ` : ''}
                     </div>
@@ -6426,7 +6427,7 @@ class BibleReader {
         }[lang] || {
             catchUp: 'Henger du litt etter? (Kom i rute)',
             reset: 'Tilbakestill leseplan',
-            cancel: 'Avbryt'
+            cancel: hkmTx("Avbryt", "Cancel", "Cancelar")
         };
 
         const sheet = document.createElement('div');
@@ -6586,7 +6587,7 @@ class BibleReader {
         const t_browsePlans = this.getTranslation('all_plans', 'Leseplaner');
         const t_startPlan = this.getTranslation('start_plan_btn', 'Start leseplan');
         const t_logInToSave = this.getTranslation('log_in_to_save', 'Logg inn på Min Side for å lagre din fremgang.');
-        const t_loginBtn = this.getTranslation('login_btn', 'Logg inn');
+        const t_loginBtn = this.getTranslation('login_btn', hkmTx("Logg inn", "Sign in", "Iniciar sesión"));
 
         let loginNotice = '';
          if (!this.currentUser) {
@@ -6675,7 +6676,7 @@ class BibleReader {
                             <div id="plan-preview-${p.id}" style="display: none; margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 12px; max-height: 200px; overflow-y: auto;">
                                 ${p.days.map(d => `
                                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 12px; cursor: pointer;" onclick="window.bibleReader.showDayVerses('${d.verses.replace(/'/g, "\\'")}')">
-                                    <span style="font-weight: 600; color: var(--text-base);">Dag ${d.dayNumber}:</span>
+                                    <span style="font-weight: 600; color: var(--text-base);">${hkmTx("Dag", "Day", "Día")} ${d.dayNumber}:</span>
                                     <span style="color: #d17d39; text-decoration: underline;">${d.verses}</span>
                                 </div>
                                 `).join('')}
@@ -6702,7 +6703,7 @@ class BibleReader {
         container.innerHTML = `
             <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
                 <div class="spinner" style="margin: 0 auto 12px; width: 24px; height: 24px;"></div>
-                <p style="font-size: 13px;">${this.getTranslation('loading_plan', 'Laster leseplan...')}</p>
+                <p style="font-size: 13px;">${this.getTranslation('loading_plan', hkmTx("Laster leseplan...", "Loading reading plan...", "Cargando plan de lectura..."))}</p>
             </div>
         `;
         
@@ -6711,7 +6712,7 @@ class BibleReader {
             container.innerHTML = `
                 <div style="padding: 20px; text-align: center; color: #64748b;">
                     <span class="material-symbols-outlined" style="font-size: 32px; margin-bottom: 8px;">cloud_off</span>
-                    <p style="margin: 0;">Leseplaner er midlertidig utilgjengelig (frakoblet modus).</p>
+                    <p style="margin: 0;">${hkmTx("Leseplaner er midlertidig utilgjengelig (frakoblet modus).", "Reading plans are temporarily unavailable (offline mode).", "Los planes de lectura no están disponibles temporalmente (modo sin conexión).")}</p>
                 </div>
             `;
             return;
@@ -9478,7 +9479,7 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
 
         document.body.appendChild(modal);
 
-        let scriptureHtml = '<p style="text-align: center; color: #64748b; padding: 40px 0;">Henter bibeltekst...</p>';
+        let scriptureHtml = ("<p style=\"text-align: center; color: #64748b; padding: 40px 0;\">" + hkmTx("Henter bibeltekst...", "Fetching Bible text...", "Obteniendo el texto bíblico...") + "</p>");
         if (dayConfig.verses) {
             try {
                 scriptureHtml = await this.fetchAndFilterVersesText(dayConfig.verses);
@@ -10398,7 +10399,7 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
             mainToolbar.className = 'sheet-action-bar';
             mainToolbar.innerHTML = `
                 <div class="sheet-handle-bar" style="width: 36px; height: 4px; background: rgba(0,0,0,0.2); border-radius: 2px; margin: 0 auto 8px auto;"></div>
-                <div id="sheet-verse-reference" class="sheet-verse-reference" style="font-weight: 800; font-size: 15px; text-align: center; color: var(--text-base, #0f172a); margin-bottom: 8px;">Velg vers</div>
+                <div id="sheet-verse-reference" class="sheet-verse-reference" style="font-weight: 800; font-size: 15px; text-align: center; color: var(--text-base, #0f172a); margin-bottom: 8px;">${hkmTx("Velg vers", "Select verses", "Seleccionar versículos")}</div>
 
                 <div class="sheet-scrollable-row" style="display: flex; align-items: center; justify-content: center; gap: 8px; overflow-x: auto; padding-bottom: 4px;">
                     <button class="color-swatch-circle" data-color="none" style="width: 32px; height: 32px; border-radius: 50%; background: var(--bg-card, #ffffff); border: 2px dashed #94a3b8; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Fjern farge">
@@ -10413,7 +10414,7 @@ async initReadingPlanMode(planId, dayNumFromUrl = null) {
 
                     <button id="toolbar-btn-bookmark" class="sheet-action-btn" style="display: flex; flex-direction: column; align-items: center; background: none; border: none; font-size: 11px; font-weight: 700; color: var(--text-base, #0f172a); cursor: pointer; padding: 4px 8px;" title="Lagre vers">
                         <span class="material-symbols-outlined" style="font-size: 20px; color: #d17d39;">bookmark</span>
-                        <span>Lagre</span>
+                        <span>${hkmTx("Lagre", "Save", "Guardar")}</span>
                     </button>
 
                     <button id="toolbar-btn-save-user" class="sheet-action-btn" style="display: flex; flex-direction: column; align-items: center; background: none; border: none; font-size: 11px; font-weight: 700; color: var(--text-base, #0f172a); cursor: pointer; padding: 4px 8px;" title="Skriv notat">

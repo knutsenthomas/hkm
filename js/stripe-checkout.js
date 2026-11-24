@@ -1,6 +1,7 @@
 import { trackConfirmedDonation } from './donation-analytics.js';
 // Replace with your public key
 // TODO: User needs to replace this placeholder or configure environment variables
+window.hkmTx = window.hkmTx || function (no, en, es) { const l = (document.documentElement.lang || 'no').slice(0, 2); return l === 'en' ? en : l === 'es' ? (es == null ? en : es) : no; };
 let stripe;
 const stripePublicKey = ("pk_live_51Pab8rAL393JGrO9bTUitYflDKlHGpLiqZCCBp0dCzBEV3ZFxARFfK6MgWraehq7i79tJHPIEzlpMwPiT2K3HsiZ00gJ1TQ71Y");
 const STRIPE_PAYMENT_INTENT_URL = "https://createpaymentintent-42bhgdjkcq-uc.a.run.app";
@@ -16,19 +17,19 @@ function getVippsStateMessage(state) {
 
     switch (normalizedState) {
         case "CAPTURED":
-            return "Vipps-betalingen er fullført. Tusen takk for gaven.";
+            return hkmTx("Vipps-betalingen er fullført. Tusen takk for gaven.", "The Vipps payment is complete. Thank you so much for your gift.", "El pago con Vipps se ha completado. Muchas gracias por tu donación.");
         case "AUTHORIZED":
-            return "Vipps-betalingen er godkjent og blir ferdigstilt nå.";
+            return hkmTx("Vipps-betalingen er godkjent og blir ferdigstilt nå.", "The Vipps payment has been approved and is being completed now.", "El pago con Vipps ha sido aprobado y se está completando.");
         case "ABORTED":
-            return "Vipps-betalingen ble avbrutt.";
+            return hkmTx("Vipps-betalingen ble avbrutt.", "The Vipps payment was cancelled.", "El pago con Vipps se interrumpió.");
         case "EXPIRED":
-            return "Vipps-betalingen utløp før den ble godkjent.";
+            return hkmTx("Vipps-betalingen utløp før den ble godkjent.", "The Vipps payment expired before it was approved.", "El pago con Vipps caducó antes de ser aprobado.");
         case "CANCELLED":
-            return "Vipps-betalingen ble kansellert.";
+            return hkmTx("Vipps-betalingen ble kansellert.", "The Vipps payment was cancelled.", "El pago con Vipps fue cancelado.");
         case "TERMINATED":
-            return "Vipps-betalingen ble avsluttet.";
+            return hkmTx("Vipps-betalingen ble avsluttet.", "The Vipps payment was ended.", "El pago con Vipps finalizó.");
         default:
-            return "Vi mottok svar fra Vipps, men klarte ikke å fastslå betalingsstatus.";
+            return hkmTx("Vi mottok svar fra Vipps, men klarte ikke å fastslå betalingsstatus.", "We received a response from Vipps but could not determine the payment status.", "Recibimos respuesta de Vipps, pero no pudimos determinar el estado del pago.");
     }
 }
 
@@ -99,11 +100,11 @@ async function initializeStripe(amount, customerDetails = {}, paymentMethodPrefe
 
     } catch (error) {
         console.error("Stripe initialization failed:", error);
-        const message = (error && error.message) ? error.message : "Ukjent feil";
+        const message = (error && error.message) ? error.message : hkmTx("Ukjent feil", "Unknown error", "Error desconocido");
         if (message.toLowerCase().includes("vipps")) {
-            alert("Vipps er ikke tilgjengelig akkurat nå. Sjekk at Vipps er aktivert i Stripe-kontoen, eller velg kort.");
+            alert(hkmTx("Vipps er ikke tilgjengelig akkurat nå. Sjekk at Vipps er aktivert i Stripe-kontoen, eller velg kort.", "Vipps is not available right now. Please choose card instead.", "Vipps no está disponible en este momento. Elige tarjeta en su lugar."));
         } else {
-            alert("Kunne ikke starte betalingen: " + message + ". Vennligst prøv igjen senere.");
+            alert((hkmTx("Kunne ikke starte betalingen:", "Could not start the payment:", "No se pudo iniciar el pago:") + " ") + message + hkmTx(". Vennligst prøv igjen senere.", ". Please try again later.", ". Inténtalo de nuevo más tarde."));
         }
 
         // Log to system logger if available
@@ -116,7 +117,7 @@ async function initializeStripe(amount, customerDetails = {}, paymentMethodPrefe
 async function startVippsPayment(amount, customerDetails = {}) {
     const parsedAmount = Number(amount);
     if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
-        alert("Vennligst velg eller skriv inn et gyldig beløp.");
+        alert(hkmTx("Vennligst velg eller skriv inn et gyldig beløp.", "Please choose or enter a valid amount.", "Elige o introduce un importe válido."));
         return;
     }
 
@@ -142,14 +143,14 @@ async function startVippsPayment(amount, customerDetails = {}) {
 
         const data = await parseJsonOrThrow(response);
         if (!data.redirectUrl) {
-            throw new Error("Vipps returnerte ikke redirectUrl.");
+            throw new Error(hkmTx("Vipps returnerte ikke redirectUrl.", "Vipps did not return a redirect address.", "Vipps no devolvió una dirección de redirección."));
         }
 
         window.location.href = data.redirectUrl;
     } catch (error) {
         console.error("Vipps initialization failed:", error);
-        const message = (error && error.message) ? error.message : "Ukjent Vipps-feil";
-        alert("Kunne ikke starte Vipps-betalingen: " + message);
+        const message = (error && error.message) ? error.message : hkmTx("Ukjent Vipps-feil", "Unknown Vipps error", "Error desconocido de Vipps");
+        alert((hkmTx("Kunne ikke starte Vipps-betalingen:", "Could not start the Vipps payment:", "No se pudo iniciar el pago con Vipps:") + " ") + message);
 
         if (window.hkmLogger) {
             window.hkmLogger.error(`Vipps Init Failed: ${message}`);
@@ -191,12 +192,12 @@ async function finalizeVippsReturn() {
 
         if (data.state === "CAPTURED") {
             trackConfirmedDonation("vipps", data);
-            alert("Vipps-betalingen er fullført. Takk for gaven.");
+            alert(hkmTx("Vipps-betalingen er fullført. Takk for gaven.", "The Vipps payment is complete. Thank you for your gift.", "El pago con Vipps se ha completado. Gracias por tu donación."));
         }
     } catch (error) {
         console.error("Vipps finalize failed:", error);
-        const message = (error && error.message) ? error.message : "Ukjent Vipps-feil";
-        alert("Vi klarte ikke å bekrefte Vipps-betalingen automatisk: " + message);
+        const message = (error && error.message) ? error.message : hkmTx("Ukjent Vipps-feil", "Unknown Vipps error", "Error desconocido de Vipps");
+        alert((hkmTx("Vi klarte ikke å bekrefte Vipps-betalingen automatisk:", "We could not confirm the Vipps payment automatically:", "No pudimos confirmar el pago con Vipps automáticamente:") + " ") + message);
     } finally {
         const cleanedParams = new URLSearchParams(window.location.search);
         cleanedParams.delete("vipps_reference");
@@ -240,7 +241,7 @@ async function handleSubmit(e, options = {}) {
         if (error.type === "card_error" || error.type === "validation_error") {
             showMessage(error.message);
         } else {
-            showMessage("En uventet feil oppstod: " + error.message);
+            showMessage((hkmTx("En uventet feil oppstod:", "An unexpected error occurred:", "Se produjo un error inesperado:") + " ") + error.message);
         }
     }
 
@@ -262,7 +263,7 @@ async function checkStatus() {
 
     if (error || !paymentIntent) {
         console.error("Stripe retrievePaymentIntent error:", error);
-        showMessage("Kunne ikke hente betalingsstatus.");
+        showMessage(hkmTx("Kunne ikke hente betalingsstatus.", "Could not fetch the payment status.", "No se pudo obtener el estado del pago."));
         return;
     }
 
@@ -270,9 +271,9 @@ async function checkStatus() {
         case "succeeded":
             trackConfirmedDonation("stripe", paymentIntent);
             if (window.showResultModal) {
-                window.showResultModal(true, "Betalingen var vellykket! Tusen takk for at du blir fast giver.");
+                window.showResultModal(true, hkmTx("Betalingen var vellykket! Tusen takk for at du blir fast giver.", "The payment was successful! Thank you so much for becoming a regular donor.", "¡El pago se realizó correctamente! Muchas gracias por convertirte en donante habitual."));
             } else {
-                showMessage("Betalingen var vellykket! Takk for din gave.");
+                showMessage(hkmTx("Betalingen var vellykket! Takk for din gave.", "The payment was successful! Thank you for your gift.", "¡El pago se realizó correctamente! Gracias por tu donación."));
             }
             // Record to Firestore
             await recordDonation(paymentIntent);
@@ -282,9 +283,9 @@ async function checkStatus() {
             break;
         case "requires_payment_method":
             if (window.showResultModal) {
-                window.showResultModal(false, "Betalingen feilet eller ble avbrutt. Vennligst prøv igjen.");
+                window.showResultModal(false, hkmTx("Betalingen feilet eller ble avbrutt. Vennligst prøv igjen.", "The payment failed or was cancelled. Please try again.", "El pago falló o fue cancelado. Inténtalo de nuevo."));
             } else {
-                showMessage("Betalingen feilet, vennligst prøv igjen.");
+                showMessage(hkmTx("Betalingen feilet, vennligst prøv igjen.", "The payment failed, please try again.", "El pago falló, inténtalo de nuevo."));
             }
             break;
         default:
