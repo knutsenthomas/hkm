@@ -2343,7 +2343,7 @@
                                 ${modLessons.map((l, idx) => {
                                     const overallIdx = lessonOffset + idx;
                                     const rawTitle = l.title || `Lesson ${overallIdx + 1}`;
-                                    const displayTitle = /^leksjon/i.test(rawTitle) ? rawTitle : `Lesson ${overallIdx + 1}: ${rawTitle}`;
+                                    const displayTitle = /^(leksjon|lesson|lección)/i.test(rawTitle) ? rawTitle : `Lesson ${overallIdx + 1}: ${rawTitle}`;
                                     return `
                                     <a href="javascript:void(0)" class="lesson-item ${overallIdx === currentLessonIndex ? 'active' : ''}" onclick="window.selectLesson(${overallIdx})" id="nav-lesson-${overallIdx}" style="cursor: pointer;">
                                         ${getLessonTypeIcon(l)}
@@ -2366,7 +2366,7 @@
                         <ul class="lesson-list" id="mod-1-list">
                             ${lessons.map((l, idx) => {
                                 const rawTitle = l.title || `Lesson ${idx + 1}`;
-                                const displayTitle = /^leksjon/i.test(rawTitle) ? rawTitle : `Lesson ${idx + 1}: ${rawTitle}`;
+                                const displayTitle = /^(leksjon|lesson|lección)/i.test(rawTitle) ? rawTitle : `Lesson ${idx + 1}: ${rawTitle}`;
                                 return `
                                 <a href="javascript:void(0)" class="lesson-item ${idx === currentLessonIndex ? 'active' : ''}" onclick="window.selectLesson(${idx})" id="nav-lesson(${idx})" style="cursor: pointer;">
                                     ${getLessonTypeIcon(l)}
