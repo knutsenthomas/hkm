@@ -548,6 +548,11 @@
                     });
                 }
 
+                // On mobile, Google sign-in returns by redirect; enrolled accounts are asked for their code here.
+                if (typeof firebase !== 'undefined') {
+                    firebase.auth().getRedirectResult().catch(err => signInWithChallenge(err));
+                }
+
                 // Auto-redirect if already logged in globally
                 if (typeof firebase !== 'undefined') {
                     firebase.auth().onAuthStateChanged(async (user) => {

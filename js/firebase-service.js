@@ -1029,6 +1029,8 @@ class FirebaseService {
             const result = await this.auth.getRedirectResult();
             return result || null;
         } catch (err) {
+            // A second-factor challenge must reach the login page, which asks for the code.
+            if (err?.code === 'auth/multi-factor-auth-required') throw err;
             console.warn("[FirebaseService] getRedirectResult error handled safely:", err);
             return null;
         }
