@@ -1,7 +1,6 @@
-// Two-factor authentication for every HKM account: an authenticator app (TOTP) or,
-// as a fallback, an SMS code. The site uses the compat SDK, which has no TOTP API,
+// Two-factor authentication for every HKM account: an authenticator app (TOTP). The site uses the compat SDK, which has no TOTP API,
 // so TOTP comes from the modular SDK of the same version, used on the compat
-// instance's own modular objects (`_delegate`). SMS uses the compat API.
+// instance's own modular objects (`_delegate`).
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { initializeAuth, inMemoryPersistence, TotpMultiFactorGenerator, getMultiFactorResolver } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
@@ -46,19 +45,9 @@ function messageFor(error) {
     case 'auth/invalid-totp-code': return 'Koden stemmer ikke. Sjekk at klokken på telefonen er riktig, og prøv en ny kode.';
     case 'auth/code-expired': return 'Koden er utløpt. Be om en ny.';
     case 'auth/too-many-requests': return 'For mange forsøk. Vent litt og prøv igjen.';
-    case 'auth/invalid-phone-number': return 'Telefonnummeret er ikke gyldig. Ta med landskode, for eksempel +47.';
     case 'auth/requires-recent-login': return 'Av sikkerhetshensyn må du logge inn på nytt før du setter opp tofaktor.';
-    case 'auth/captcha-check-failed': return 'Sikkerhetssjekken feilet. Last siden på nytt og prøv igjen.';
     default: return error?.message || 'Noe gikk galt. Prøv igjen.';
   }
-}
-
-function normalizePhone(input) {
-  const digits = String(input || '').replace(/[\s()-]/g, '');
-  if (/^\+[1-9]\d{6,14}$/.test(digits)) return digits;
-  if (/^00[1-9]\d{6,14}$/.test(digits)) return '+' + digits.slice(2);
-  if (/^[49]\d{7}$/.test(digits)) return '+47' + digits;
-  return null;
 }
 
 // The QR library is bundled with the site, so setup does not depend on an outside CDN.
@@ -75,7 +64,7 @@ const STYLE = `
 .hkm2f button.primary{background:#d17d39;border-color:#d17d39;color:#fff}.hkm2f button.link{border:0;background:none;color:#b45f22;min-height:36px;font-size:13px}
 .hkm2f .error{background:#fee2e2;color:#b91c1c;border-radius:8px;padding:10px;font-size:13px;margin:10px 0}
 .hkm2f img{display:block;margin:10px auto;border:1px solid #e5e7eb;border-radius:8px}.hkm2f ol{font-size:13px;color:#374151;padding-left:20px;margin:0 0 6px}
-.hkm2f .key{font-family:ui-monospace,monospace;word-break:break-all;font-size:12px;text-align:center;color:#6b7280}`;
+.hkm2f .tip{font-size:12px;color:#6b7280}.hkm2f .key{font-family:ui-monospace,monospace;word-break:break-all;font-size:12px;text-align:center;color:#6b7280}`;
 
 function openDialog() {
   if (!document.getElementById('hkm2f-style')) {
@@ -83,10 +72,10 @@ function openDialog() {
   }
   const backdrop = document.createElement('div');
   backdrop.className = 'hkm2f-backdrop';
-  backdrop.innerHTML = '<div class="hkm2f" role="dialog" aria-modal="true" aria-labelledby="hkm2f-title"></div><div id="hkm2f-recaptcha"></div>';
+  backdrop.innerHTML = '<div class="hkm2f" role="dialog" aria-modal="true" aria-labelledby="hkm2f-title"></div>';
   document.body.appendChild(backdrop);
   const box = backdrop.querySelector('.hkm2f');
-  return { box, recaptcha: backdrop.querySelector('#hkm2f-recaptcha'), close: () => backdrop.remove() };
+  return { box, close: () => backdrop.remove() };
 }
 
 const esc = value => String(value).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
@@ -125,53 +114,22 @@ export async function resolveChallenge(auth, error) {
 }
 
 function askForCode(resolver) {
-  const hints = resolver?.hints || [];
-  const totpHint = hints.find(hint => hint.factorId === 'totp');
-  const smsHint = hints.find(hint => hint.factorId === 'phone');
+  const totpHint = (resolver?.hints || []).find(hint => hint.factorId === 'totp');
+  // Accounts set up with SMS before it was removed have no app code; an administrator resets them.
+  if (!totpHint) return Promise.reject(new Error('Kontoen din har en tofaktormetode som ikke lenger brukes. Be en administrator om å nullstille tofaktor, så kan du sette opp en autentiseringsapp neste gang du logger inn.'));
   return new Promise((resolve, reject) => {
     const dialog = openDialog();
-    let verifier;
-    const render = method => {
-      dialog.box.innerHTML = `<h2 id="hkm2f-title">Bekreft at det er deg</h2><p>${method === 'totp' ? 'Skriv inn koden fra autentiseringsappen.' : 'Vi sender en kode på SMS.'}</p>`;
-      if (method === 'totp') {
-        codeForm(dialog.box, 'Bekreft og logg inn', (code, button) => busy(button, async () => {
-          try {
-            initModularBundle();
-            await resolver.resolveSignIn(TotpMultiFactorGenerator.assertionForSignIn(totpHint.uid, code));
-            dialog.close(); resolve();
-          } catch (err) { showError(dialog.box, err); }
-        }));
-      } else {
-        const send = document.createElement('button'); send.className = 'primary'; send.type = 'button';
-        send.textContent = `Send kode til ${smsHint.phoneNumber || 'mobilen'}`;
-        send.onclick = () => busy(send, async () => {
-          try {
-            verifier ||= new firebase.auth.RecaptchaVerifier(dialog.recaptcha, { size: 'invisible' });
-            const verificationId = await new firebase.auth.PhoneAuthProvider().verifyPhoneNumber({ multiFactorHint: smsHint, session: resolver.session }, verifier);
-            send.remove();
-            codeForm(dialog.box, 'Bekreft og logg inn', (code, button) => busy(button, async () => {
-              try {
-                const credential = firebase.auth.PhoneAuthProvider.credential(verificationId, code);
-                await resolver.resolveSignIn(firebase.auth.PhoneMultiFactorGenerator.assertion(credential));
-                dialog.close(); resolve();
-              } catch (err) { showError(dialog.box, err); }
-            }));
-          } catch (err) { verifier?.clear(); verifier = null; showError(dialog.box, err); }
-        });
-        dialog.box.appendChild(send);
-      }
-      if (totpHint && smsHint) {
-        const other = document.createElement('button'); other.className = 'link'; other.type = 'button';
-        other.textContent = method === 'totp' ? 'Bruk SMS i stedet' : 'Bruk autentiseringsappen i stedet';
-        other.onclick = () => render(method === 'totp' ? 'sms' : 'totp');
-        dialog.box.appendChild(other);
-      }
-      const cancel = document.createElement('button'); cancel.className = 'link'; cancel.type = 'button'; cancel.textContent = 'Avbryt';
-      cancel.onclick = () => { dialog.close(); reject(Object.assign(new Error('Innloggingen ble avbrutt.'), { code: 'auth/popup-closed-by-user' })); };
-      dialog.box.appendChild(cancel);
-    };
-    if (!totpHint && !smsHint) { dialog.close(); reject(new Error('Kontoen har en tofaktormetode vi ikke støtter her.')); return; }
-    render(totpHint ? 'totp' : 'sms');
+    dialog.box.innerHTML = '<h2 id="hkm2f-title">Bekreft at det er deg</h2><p>Skriv inn koden fra autentiseringsappen.</p>';
+    codeForm(dialog.box, 'Bekreft og logg inn', (code, button) => busy(button, async () => {
+      try {
+        initModularBundle();
+        await resolver.resolveSignIn(TotpMultiFactorGenerator.assertionForSignIn(totpHint.uid, code));
+        dialog.close(); resolve();
+      } catch (err) { showError(dialog.box, err); }
+    }));
+    const cancel = document.createElement('button'); cancel.className = 'link'; cancel.type = 'button'; cancel.textContent = 'Avbryt';
+    cancel.onclick = () => { dialog.close(); reject(Object.assign(new Error('Innloggingen ble avbrutt.'), { code: 'auth/popup-closed-by-user' })); };
+    dialog.box.appendChild(cancel);
   });
 }
 
@@ -179,68 +137,29 @@ function askForCode(resolver) {
 export function enroll(user) {
   return new Promise((resolve, reject) => {
     const dialog = openDialog();
-    let verifier;
     const header = '<h2 id="hkm2f-title">Sett opp tofaktor</h2><p>Alle kontoer hos His Kingdom Ministry må ha tofaktor. Du trenger bare gjøre dette én gang.</p>';
-    const footer = (back = true) => {
-      if (back) {
-        const other = document.createElement('button'); other.className = 'link'; other.type = 'button'; other.textContent = 'Velg en annen metode';
-        other.onclick = choose; dialog.box.appendChild(other);
-      }
+    const addCancel = () => {
       const cancel = document.createElement('button'); cancel.className = 'link'; cancel.type = 'button'; cancel.textContent = 'Avbryt og logg ut';
       cancel.onclick = () => { dialog.close(); reject(Object.assign(new Error('Tofaktor ble ikke satt opp.'), { code: 'auth/popup-closed-by-user' })); };
       dialog.box.appendChild(cancel);
     };
-    const done = () => { dialog.close(); resolve(); };
-    function choose() {
-      dialog.box.innerHTML = header;
-      const app = document.createElement('button'); app.className = 'primary'; app.type = 'button'; app.textContent = 'Autentiseringsapp (anbefalt)';
-      const sms = document.createElement('button'); sms.type = 'button'; sms.textContent = 'SMS til mobilen';
-      app.onclick = () => busy(app, totp); sms.onclick = smsStep;
-      dialog.box.append(app, sms); footer(false);
-    }
-    async function totp() {
+    dialog.box.innerHTML = header + '<p>Henter QR-koden …</p>';
+    addCancel();
+    (async () => {
       try {
         initModularBundle();
         const secret = await TotpMultiFactorGenerator.generateSecret(await user.multiFactor.getSession());
         const url = secret.generateQrCodeUrl(user.email || 'HKM-konto', ISSUER);
         const QRCode = await loadQr().catch(() => null);
         const qr = QRCode ? await QRCode.toDataURL(url, { margin: 1, width: 220 }) : '';
-        dialog.box.innerHTML = header + `<ol><li>Åpne autentiseringsappen og velg «Legg til» eller «+».</li><li>Skann QR-koden, eller trykk på lenken hvis du er på mobilen.</li><li>Skriv inn den sekssifrede koden appen viser.</li></ol>${qr ? `<img src="${qr}" width="220" height="220" alt="QR-kode for autentiseringsappen">` : ''}<p><a href="${esc(url)}">Åpne i autentiseringsappen på denne enheten</a></p><p class="key">Nøkkel: ${esc(secret.secretKey)}</p>`;
+        dialog.box.innerHTML = header + `<ol><li>Åpne autentiseringsappen og velg «Legg til» eller «+».</li><li>Skann QR-koden, eller trykk på lenken hvis du er på mobilen.</li><li>Skriv inn den sekssifrede koden appen viser.</li></ol>${qr ? `<img src="${qr}" width="220" height="220" alt="QR-kode for autentiseringsappen">` : ''}<p><a href="${esc(url)}">Åpne i autentiseringsappen på denne enheten</a></p><p class="key">Nøkkel: ${esc(secret.secretKey)}</p><p class="tip">Tips: Bruk en app som tar sikkerhetskopi av kodene, som iPhones Passord-app, Google Authenticator eller Microsoft Authenticator. Da følger kodene med hvis du bytter telefon.</p>`;
         codeForm(dialog.box, 'Bekreft og fullfør', (code, button) => busy(button, async () => {
-          try { await user.multiFactor.enroll(TotpMultiFactorGenerator.assertionForEnrollment(secret, code), 'Autentiseringsapp'); done(); }
+          try { await user.multiFactor.enroll(TotpMultiFactorGenerator.assertionForEnrollment(secret, code), 'Autentiseringsapp'); dialog.close(); resolve(); }
           catch (err) { showError(dialog.box, err); }
         }));
-        footer();
+        addCancel();
       } catch (err) { showError(dialog.box, err); }
-    }
-    function smsStep() {
-      dialog.box.innerHTML = header;
-      const form = document.createElement('form'); form.noValidate = true;
-      form.innerHTML = '<label for="hkm2f-phone">Mobilnummer</label><input id="hkm2f-phone" type="tel" autocomplete="tel" placeholder="+47 912 34 567" style="letter-spacing:normal"><button class="primary" type="submit">Send kode</button>';
-      form.addEventListener('submit', event => {
-        event.preventDefault();
-        const button = form.querySelector('button');
-        busy(button, async () => {
-          try {
-            const phoneNumber = normalizePhone(form.querySelector('input').value);
-            if (!phoneNumber) throw Object.assign(new Error(), { code: 'auth/invalid-phone-number' });
-            verifier ||= new firebase.auth.RecaptchaVerifier(dialog.recaptcha, { size: 'invisible' });
-            const session = await user.multiFactor.getSession();
-            const verificationId = await new firebase.auth.PhoneAuthProvider().verifyPhoneNumber({ phoneNumber, session }, verifier);
-            form.remove();
-            codeForm(dialog.box, 'Bekreft og fullfør', (code, codeButton) => busy(codeButton, async () => {
-              try {
-                const credential = firebase.auth.PhoneAuthProvider.credential(verificationId, code);
-                await user.multiFactor.enroll(firebase.auth.PhoneMultiFactorGenerator.assertion(credential), 'SMS');
-                done();
-              } catch (err) { showError(dialog.box, err); }
-            }));
-          } catch (err) { verifier?.clear(); verifier = null; showError(dialog.box, err); }
-        });
-      });
-      dialog.box.appendChild(form); footer();
-    }
-    choose();
+    })();
   });
 }
 
