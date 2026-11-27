@@ -1218,6 +1218,11 @@ export function createUsersAndAccess1Methods({ firebaseService, adminUtils, show
                         <button class="btn btn-outline edit-user-btn" type="button" data-id="${user.id}" style="white-space: nowrap;">Rediger</button>
                         ${
                           canDelete
+                            ? `<button class="icon-btn reset-2fa-btn" type="button" data-id="${user.id}" title="Nullstill tofaktor (mistet telefon)" aria-label="Nullstill tofaktor"><span class="material-symbols-outlined">lock_reset</span></button>`
+                            : ""
+                        }
+                        ${
+                          canDelete
                             ? `
                             <button class="icon-btn delete-user-btn danger" type="button" data-id="${user.id}" title="Slett">
                                 <span class="material-symbols-outlined">delete</span>
@@ -1254,6 +1259,23 @@ export function createUsersAndAccess1Methods({ firebaseService, adminUtils, show
           this.currentUserDetailId = userId;
           this.userEditMode = false;
           this.renderUsersSection();
+        };
+      });
+
+      container.querySelectorAll(".reset-2fa-btn").forEach((btn) => {
+        btn.onclick = async () => {
+          const user = users.find((u) => u.id === btn.dataset.id);
+          const label = user?.displayName || user?.fullName || user?.email || "brukeren";
+          if (!confirm(`Nullstille tofaktor for ${label}? Brukeren logges ut overalt og må sette opp tofaktor på nytt ved neste innlogging. Gjør dette bare når du vet at det er brukeren selv som har mistet telefonen.`)) return;
+          btn.disabled = true;
+          try {
+            await firebase.app().functions("us-central1").httpsCallable("resetSecondFactor")({ uid: btn.dataset.id });
+            alert(`Tofaktor er nullstilt for ${label}.`);
+          } catch (error) {
+            alert(error?.message || "Tofaktor kunne ikke nullstilles.");
+          } finally {
+            btn.disabled = false;
+          }
         };
       });
 
