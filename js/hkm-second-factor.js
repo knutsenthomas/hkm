@@ -14,7 +14,6 @@ function initModularBundle() {
 }
 
 const ISSUER = 'His Kingdom Ministry';
-const QR_LIB = 'https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js';
 
 export class EnrollmentRequired extends Error { constructor() { super('Tofaktor må settes opp.'); this.name = 'EnrollmentRequired'; } }
 export class SignInAgainRequired extends Error { constructor() { super('Logg inn på nytt og bekreft med koden din.'); this.name = 'SignInAgainRequired'; } }
@@ -62,15 +61,8 @@ function normalizePhone(input) {
   return null;
 }
 
-let qrLoader;
-function loadQr() {
-  qrLoader ||= new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = QR_LIB; script.onload = () => resolve(window.QRCode); script.onerror = reject;
-    document.head.appendChild(script);
-  });
-  return qrLoader;
-}
+// The QR library is bundled with the site, so setup does not depend on an outside CDN.
+const loadQr = () => import('./vendor/qrcode.mjs');
 
 // ---------- Minimal accessible dialog ----------
 const STYLE = `
