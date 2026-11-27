@@ -329,6 +329,7 @@ class FirebaseService {
 
             // Be explicit about local auth persistence for stable admin sessions.
             this.ensureAuthPersistence().catch(() => { });
+            this.enforceSecondFactor();
         } catch (error) {
             console.error("❌ Firebase initialization failed:", error);
         }
@@ -483,6 +484,27 @@ class FirebaseService {
                 id,
                 ...this._decodeFirestoreRestFields(doc.fields || {})
             };
+        });
+    }
+
+    // Every HKM session must have been completed with a second factor. Sessions from
+    // before two-factor became mandatory are signed out and sent to the login page.
+    enforceSecondFactor() {
+        if (!this.auth || this._secondFactorGate) return;
+        this._secondFactorGate = true;
+        const path = window.location.pathname;
+        if (/\/(minside|admin)\/login(\.html)?$/.test(path)) return;
+        this.auth.onAuthStateChanged(async (current) => {
+            if (!current) return;
+            try {
+                const token = await current.getIdTokenResult();
+                if (token.claims?.firebase?.sign_in_second_factor) return;
+            } catch (error) {
+                return; // Offline or refresh failed: leave the session to normal handling.
+            }
+            await this.auth.signOut().catch(() => { });
+            const target = path.startsWith('/admin') ? '/admin/login.html' : '/minside/login.html';
+            window.location.replace(target + '?reason=2fa');
         });
     }
 

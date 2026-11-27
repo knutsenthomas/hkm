@@ -46,6 +46,9 @@ async function start() {
     verify.hidden = false; retry.hidden = false;
     return;
   }
+  // Community requires a session completed with a second factor; the login page sets it up or asks for the code.
+  const token = await user.getIdTokenResult(true);
+  if (!token.claims?.firebase?.sign_in_second_factor) { await auth.signOut(); login(); return; }
   status.textContent = 'Åpner Community med HKM-kontoen din …';
   const response = await fetch(ENDPOINT, { method: 'POST', headers: {
     'Content-Type': 'application/json', Authorization: 'Bearer ' + await user.getIdToken(true),
@@ -57,6 +60,7 @@ async function start() {
       'duplicate-registration': 'Skolen har flere registreringer med denne e-postadressen. Kontakt studieadministrasjonen.',
       'account-link-conflict': 'Kontoen må kobles av studieadministrasjonen. Ingen personlige data er flyttet.',
       'verify-email': 'Bekreft e-postadressen din og prøv igjen.',
+      'mfa-required': 'Community krever tofaktor. Velg «Bytt HKM-konto», logg inn og bekreft med koden din.',
       'invalid-session': 'Innloggingen må fornyes. Velg «Bytt HKM-konto» og logg inn på nytt.',
     };
     status.textContent = messages[result.error] || 'Community kunne ikke åpnes akkurat nå. Prøv igjen.';

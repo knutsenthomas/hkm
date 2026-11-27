@@ -325,13 +325,47 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 
     <script type="module" src="../js/user-roles.js"></script>
+    <script type="module" src="../js/hkm-second-factor.js?v=20261127"></script>
 
     <!-- Auth Logic -->
     <script type="module">
             (async function () {
                 console.log("[HKM] Admin Auth Script loaded");
 
-                async function routeByRole() {
+                // Admin requires a session completed with a second factor.
+                let routing = null;
+                function routeByRole() {
+                    // Sign-in handlers and the auth listener may both call this; run the second-factor step once.
+                    routing ||= routeByRoleOnce().finally(() => { routing = null; });
+                    return routing;
+                }
+                async function routeByRoleOnce() {
+                    const twoFactor = window.HKMSecondFactor;
+                    if (!twoFactor) { showError('Sikkerhetsmodulen kunne ikke lastes. Last siden på nytt.'); return; }
+                    try {
+                        await twoFactor.completeSecondFactor(firebase.auth());
+                    } catch (error) {
+                        await firebase.auth().signOut().catch(() => {});
+                        if (error instanceof twoFactor.SignInAgainRequired) showInfo('Tofaktor er klar. Logg inn på nytt og bekreft med koden din.');
+                        else if (error?.code !== 'auth/popup-closed-by-user') showError(twoFactor.messageFor(error));
+                        return;
+                    }
+                    return routeByRoleAfterSecondFactor();
+                }
+
+                async function signInWithChallenge(error) {
+                    if (!window.HKMSecondFactor?.isChallenge(error)) return false;
+                    try {
+                        await window.HKMSecondFactor.resolveChallenge(firebase.auth(), error);
+                        await routeByRole();
+                    } catch (err) {
+                        await firebase.auth().signOut().catch(() => {});
+                        if (err?.code !== 'auth/popup-closed-by-user') showError(window.HKMSecondFactor.messageFor(err));
+                    }
+                    return true;
+                }
+
+                async function routeByRoleAfterSecondFactor() {
                     const service = window.firebaseService;
                     const user = firebase.auth().currentUser;
                     if (!user || !service) {
@@ -382,6 +416,7 @@
                 const infoBox = document.getElementById('info-box');
                 const showError = (msg) => { if (infoBox) infoBox.style.display = 'none'; if (errorBox) { errorBox.textContent = msg; errorBox.style.display = 'block'; } };
                 const showInfo = (msg) => { if (errorBox) errorBox.style.display = 'none'; if (infoBox) { infoBox.textContent = msg; infoBox.style.display = 'block'; } };
+                if (new URLSearchParams(window.location.search).get('reason') === '2fa') showInfo('Tofaktor er nå påkrevd for alle kontoer. Logg inn igjen for å sette det opp.');
 
                 const loginForm = document.getElementById('login-form');
                 if (loginForm) {
@@ -430,6 +465,7 @@
                             ['apiKey', 'oobCode', 'mode', 'lang', 'continueUrl'].forEach(key => clean.searchParams.delete(key));
                             history.replaceState(null, '', clean.pathname + clean.search);
                         } catch (err) {
+                            if (await signInWithChallenge(err)) return;
                             console.error('[HKM] Email link sign-in failed:', err);
                             showError(['auth/invalid-action-code', 'auth/expired-action-code'].includes(err.code)
                                 ? 'Innloggingslenken er utløpt eller allerede brukt. Be om en ny lenke.'
@@ -451,6 +487,7 @@
                             await firebase.auth().signInWithPopup(provider);
                             await routeByRole();
                         } catch (err) {
+                            if (await signInWithChallenge(err)) return;
                             console.error('[HKM] Apple login error:', err);
                             if (err.code !== 'auth/popup-closed-by-user') showError('Kunne ikke logge inn med Apple. Prøv igjen.');
                         } finally {
@@ -475,6 +512,7 @@
                                 await service.loginWithGoogle();
                                 await routeByRole();
                             } catch (err) {
+                                 if (await signInWithChallenge(err)) return;
                                  console.error("[HKM] Google login error:", err);
                                  if (typeof showToast === 'function') {
                                      let msg = 'Kunne ikke logge inn med Google. Prøv igjen.';

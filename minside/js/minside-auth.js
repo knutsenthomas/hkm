@@ -325,6 +325,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    if (new URLSearchParams(window.location.search).get('reason') === '2fa') {
+        showMessage('Tofaktor er nå påkrevd for alle kontoer. Logg inn igjen for å sette det opp.', 'success');
+    }
+
     try {
         const service = await waitForFirebaseReady();
         if (service && service.isInitialized && typeof service.getGoogleRedirectResult === 'function') {
@@ -337,7 +341,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
     } catch (error) {
-        if (isGoogleRedirectError(error)) {
+        if (window.HKMSecondFactor?.isChallenge(error)) {
+            continueAfterChallenge(error).catch(err => showMessage(window.HKMSecondFactor.messageFor(err), 'error'));
+        } else if (isGoogleRedirectError(error)) {
             console.error(error);
             showMessage(getErrorMessage(error), 'error');
         }
@@ -373,6 +379,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     const handleGoogleError = (error, btn, origContent) => {
+        if (window.HKMSecondFactor?.isChallenge(error)) {
+            continueAfterChallenge(error).catch(err => {
+                firebase.auth().signOut().catch(() => {});
+                if (err?.code !== 'auth/popup-closed-by-user') showMessage(window.HKMSecondFactor.messageFor(err), 'error');
+                btn.disabled = false; btn.innerHTML = origContent;
+            });
+            return;
+        }
         console.error(error);
         let msg = getErrorMessage(error);
         if (error.code === 'auth/unauthorized-domain') {
@@ -472,11 +486,53 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await routeByRole();
             })
             .catch((error) => {
+                if (window.HKMSecondFactor?.isChallenge(error)) {
+                    safeLocalStorageRemove('emailForSignIn');
+                    continueAfterChallenge(error).catch(err => showMessage(window.HKMSecondFactor.messageFor(err), 'error'));
+                    return;
+                }
                 showMessage(getErrorMessage(error), 'error');
             });
     }
 
-    async function routeByRole() {
+    // Every HKM account must finish sign-in with a second factor before entering Min side.
+    let routing = null;
+    function routeByRole() {
+        routing ||= routeByRoleOnce().finally(() => { routing = null; });
+        return routing;
+    }
+    async function routeByRoleOnce() {
+        const twoFactor = window.HKMSecondFactor;
+        if (!twoFactor) {
+            showMessage('Sikkerhetsmodulen kunne ikke lastes. Last siden på nytt.', 'error');
+            return;
+        }
+        try {
+            await twoFactor.completeSecondFactor(firebase.auth());
+        } catch (error) {
+            await firebase.auth().signOut().catch(() => {});
+            if (error instanceof twoFactor.SignInAgainRequired) showMessage('Tofaktor er klar. Logg inn på nytt og bekreft med koden din.', 'success');
+            else if (error?.code !== 'auth/popup-closed-by-user') showMessage(twoFactor.messageFor(error), 'error');
+            resetButtons();
+            return;
+        }
+        return routeByRoleAfterSecondFactor();
+    }
+
+    function resetButtons() {
+        document.querySelectorAll('#google-login, #apple-login, #magic-form button[type="submit"]').forEach(btn => { btn.disabled = false; });
+        const g = document.getElementById('google-login'); if (g && !g.querySelector('img')) g.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt=""> Google';
+    }
+
+    // Enrolled users are asked for their code; then sign-in continues as normal.
+    async function continueAfterChallenge(error) {
+        await window.HKMSecondFactor.resolveChallenge(firebase.auth(), error);
+        const user = firebase.auth().currentUser;
+        if (user) await ensureMemberProfile(user);
+        await routeByRole();
+    }
+
+    async function routeByRoleAfterSecondFactor() {
         try {
             const currentUser = firebase.auth().currentUser;
             if (currentUser) {
