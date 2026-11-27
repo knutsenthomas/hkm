@@ -2,7 +2,16 @@
 // as a fallback, an SMS code. The site uses the compat SDK, which has no TOTP API,
 // so TOTP comes from the modular SDK of the same version, used on the compat
 // instance's own modular objects (`_delegate`). SMS uses the compat API.
-import { multiFactor, TotpMultiFactorGenerator } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { initializeAuth, inMemoryPersistence, TotpMultiFactorGenerator } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+// The modular bundle only makes network requests after an Auth instance of its own
+// exists. This helper instance keeps nothing; all sign-in state stays in compat.
+function initModularBundle() {
+  const options = firebase.app().options;
+  const app = getApps().find(item => item.name === 'hkm-second-factor') || initializeApp(options, 'hkm-second-factor');
+  try { initializeAuth(app, { persistence: inMemoryPersistence }); } catch { /* already initialized */ }
+}
 
 const ISSUER = 'His Kingdom Ministry';
 const QR_LIB = 'https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js';
@@ -25,8 +34,15 @@ export async function requireSecondFactor(user) {
   if (!(await sessionHasSecondFactor(user, true))) throw new SignInAgainRequired();
 }
 
+// Errors from the modular bundle reach compat code wrapped as network errors; the real one is in customData.
+function realCode(error) {
+  const inner = error?.customData?.message || '';
+  const match = /\((auth\/[a-z-]+)\)/.exec(inner);
+  return match ? match[1] : error?.code;
+}
+
 function messageFor(error) {
-  switch (error?.code) {
+  switch (realCode(error)) {
     case 'auth/invalid-verification-code':
     case 'auth/invalid-totp-code': return 'Koden stemmer ikke. Sjekk at klokken på telefonen er riktig, og prøv en ny kode.';
     case 'auth/code-expired': return 'Koden er utløpt. Be om en ny.';
@@ -118,7 +134,8 @@ export function resolveChallenge(auth, error) {
       if (method === 'totp') {
         codeForm(dialog.box, 'Bekreft og logg inn', (code, button) => busy(button, async () => {
           try {
-            await resolver._delegate.resolveSignIn(TotpMultiFactorGenerator.assertionForSignIn(totpHint.uid, code));
+            initModularBundle();
+            await resolver.resolveSignIn(TotpMultiFactorGenerator.assertionForSignIn(totpHint.uid, code));
             dialog.close(); resolve();
           } catch (err) { showError(dialog.box, err); }
         }));
@@ -181,14 +198,14 @@ export function enroll(user) {
     }
     async function totp() {
       try {
-        const modularUser = user._delegate || user;
-        const secret = await TotpMultiFactorGenerator.generateSecret(await multiFactor(modularUser).getSession());
+        initModularBundle();
+        const secret = await TotpMultiFactorGenerator.generateSecret(await user.multiFactor.getSession());
         const url = secret.generateQrCodeUrl(user.email || 'HKM-konto', ISSUER);
         const QRCode = await loadQr().catch(() => null);
         const qr = QRCode ? await QRCode.toDataURL(url, { margin: 1, width: 220 }) : '';
         dialog.box.innerHTML = header + `<ol><li>Åpne autentiseringsappen og velg «Legg til» eller «+».</li><li>Skann QR-koden, eller trykk på lenken hvis du er på mobilen.</li><li>Skriv inn den sekssifrede koden appen viser.</li></ol>${qr ? `<img src="${qr}" width="220" height="220" alt="QR-kode for autentiseringsappen">` : ''}<p><a href="${esc(url)}">Åpne i autentiseringsappen på denne enheten</a></p><p class="key">Nøkkel: ${esc(secret.secretKey)}</p>`;
         codeForm(dialog.box, 'Bekreft og fullfør', (code, button) => busy(button, async () => {
-          try { await multiFactor(modularUser).enroll(TotpMultiFactorGenerator.assertionForEnrollment(secret, code), 'Autentiseringsapp'); done(); }
+          try { await user.multiFactor.enroll(TotpMultiFactorGenerator.assertionForEnrollment(secret, code), 'Autentiseringsapp'); done(); }
           catch (err) { showError(dialog.box, err); }
         }));
         footer();
