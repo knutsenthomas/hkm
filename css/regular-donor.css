@@ -209,3 +209,21 @@ html[data-theme="dark"] .donor-impact-grid article { border-color: #334155; }
 @media (max-width:900px) {
     .donations-page-view .donor-welcome-copy:not(.donor-cause-detail) { padding-top:16px; }
 }
+
+/* Mørk modus: innsamlingskort («Velg hjertesaken») og innsamlingsdetalj */
+html[data-theme="dark"] .donor-campaigns { background:#0f172a; }
+html[data-theme="dark"] .donor-campaigns h2 { color:#f8fafc; }
+html[data-theme="dark"] .donor-campaigns .container > p { color:#cbd5e1; }
+html[data-theme="dark"] .donor-campaign-card { background:#1e293b; border-color:#334155; box-shadow:0 20px 60px rgba(0,0,0,.25); }
+html[data-theme="dark"] .donor-campaign-card h3 { color:#f8fafc; }
+html[data-theme="dark"] .donor-campaign-card p { color:#cbd5e1; }
+html[data-theme="dark"] .donor-cause-detail .donor-cause-progress { background:#1e293b; border-color:#334155; }
+html[data-theme="dark"] .donor-cause-progress strong,
+html[data-theme="dark"] .donor-cause-detail .donor-cause-progress strong { color:#f8fafc; }
+html[data-theme="dark"] .donor-cause-progress span,
+html[data-theme="dark"] .donor-activity-heading { color:#cbd5e1; }
+html[data-theme="dark"] .donor-cause-progress progress,
+html[data-theme="dark"] .donor-cause-progress progress::-webkit-progress-bar { background:#334155; }
+html[data-theme="dark"] .donor-cause-more { color:#ffcfaa; border-color:#e8a66f; background:transparent; }
+html[data-theme="dark"] .donor-cause-more:hover { background:#483326; }
+html[data-theme="dark"] .donor-cause-notice { background:#483326; border-color:#e8a66f; color:#f8fafc; }
