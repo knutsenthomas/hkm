@@ -222,6 +222,12 @@
         if (fallback && fallback.isConnected) fallback.remove();
         return;
       }
+      // Sign-in and account pages load no optional cookies, so they get no extra footer link.
+      if (!footer && !publicPage()) {
+        if (settings.isConnected) settings.remove();
+        if (fallback && fallback.isConnected) fallback.remove();
+        return;
+      }
       if (!footer) {
         if (!fallback) {
           fallback = document.createElement('footer'); fallback.id = 'site-privacy-footer';
