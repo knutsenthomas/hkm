@@ -18,9 +18,9 @@ const authTranslations = {
         'login.passwordMinPlaceholder': 'Minst 6 tegn',
         'login.confirmPasswordLabel': 'Bekreft Passord',
         'login.submitRegister': 'Opprett profil',
-        'login.magicSubtitle': 'Skriv inn din e-post, så sender vi deg en engangslink for å logge inn uten passord.',
-        'login.submitMagic': 'Send meg link',
-        'login.divider': 'eller logg inn med',
+        'login.magicSubtitle': 'Skriv inn e-posten din, så sender vi en innloggingslenke. Første gang oppretter vi en profil for deg.',
+        'login.submitMagic': 'Send innloggingslenke',
+        'login.divider': 'eller med e-post',
         'login.backLink': 'Tilbake til nettsiden',
         
         // Buttons / feedback / states
@@ -32,7 +32,8 @@ const authTranslations = {
         'auth.googleSuccess': 'Google-innlogging fullført. Sender deg videre...',
         'auth.roleVerificationSlow': 'Innlogging er gjennomført, men rolleverifisering er treg. Prøver medlemssiden først.',
         'auth.passwordMismatch': 'Passordene er ikke like.',
-        'auth.magicLinkSuccess': 'Vi har sendt en magisk link til din e-post!',
+        'auth.magicLinkSuccess': 'Vi har sendt en innloggingslenke til e-posten din.',
+        'auth.openingApple': 'Åpner Apple...',
         'auth.googlePopupBlocked': 'Google-vinduet ble blokkert. Prøver redirect-innlogging.',
         'auth.googlePopupClosed': 'Google-innlogging ble lukket før den var ferdig.',
         'auth.googleUnauthorizedDomain': 'Domenet er ikke godkjent for Google-innlogging i Firebase.',
@@ -62,9 +63,9 @@ const authTranslations = {
         'login.passwordMinPlaceholder': 'At least 6 characters',
         'login.confirmPasswordLabel': 'Confirm Password',
         'login.submitRegister': 'Create profile',
-        'login.magicSubtitle': 'Enter your email, and we will send you a one-time link to log in without a password.',
-        'login.submitMagic': 'Send me link',
-        'login.divider': 'or log in with',
+        'login.magicSubtitle': 'Enter your email and we will send you a sign-in link. The first time, we create a profile for you.',
+        'login.submitMagic': 'Send sign-in link',
+        'login.divider': 'or with email',
         'login.backLink': 'Back to website',
         
         // Buttons / feedback
@@ -76,7 +77,8 @@ const authTranslations = {
         'auth.googleSuccess': 'Google login completed. Redirecting...',
         'auth.roleVerificationSlow': 'Login completed, but role verification is slow. Retrying dashboard.',
         'auth.passwordMismatch': 'Passwords do not match.',
-        'auth.magicLinkSuccess': 'We have sent a magic link to your email!',
+        'auth.magicLinkSuccess': 'We have sent a sign-in link to your email.',
+        'auth.openingApple': 'Opening Apple...',
         'auth.googlePopupBlocked': 'Google popup blocked. Retrying with redirect.',
         'auth.googlePopupClosed': 'Google login was closed before completion.',
         'auth.googleUnauthorizedDomain': 'The domain is not authorized for Google login in Firebase.',
@@ -106,9 +108,9 @@ const authTranslations = {
         'login.passwordMinPlaceholder': 'Mínimo 6 caracteres',
         'login.confirmPasswordLabel': 'Confirmar contraseña',
         'login.submitRegister': 'Crear perfil',
-        'login.magicSubtitle': 'Introduce tu correo electrónico y te enviaremos un enlace único para iniciar sesión sin contraseña.',
-        'login.submitMagic': 'Enviarme enlace',
-        'login.divider': 'o inicia sesión con',
+        'login.magicSubtitle': 'Introduce tu correo y te enviaremos un enlace para iniciar sesión. La primera vez creamos un perfil para ti.',
+        'login.submitMagic': 'Enviar enlace de acceso',
+        'login.divider': 'o con correo',
         'login.backLink': 'Volver al sitio web',
         
         // Buttons / feedback
@@ -120,7 +122,8 @@ const authTranslations = {
         'auth.googleSuccess': 'Inicio de sesión con Google completado. Redirigiendo...',
         'auth.roleVerificationSlow': 'Inicio de sesión completado, pero la verificación de rol es lenta. Intentando panel.',
         'auth.passwordMismatch': 'Las contraseñas no coinciden.',
-        'auth.magicLinkSuccess': '¡Hemos enviado un enlace mágico a tu correo electrónico!',
+        'auth.magicLinkSuccess': 'Hemos enviado un enlace de acceso a tu correo.',
+        'auth.openingApple': 'Abriendo Apple...',
         'auth.googlePopupBlocked': 'Ventana emergente de Google bloqueada. Reintentando con redirección.',
         'auth.googlePopupClosed': 'El inicio de sesión de Google se cerró antes de completarse.',
         'auth.googleUnauthorizedDomain': 'El dominio no está autorizado para el inicio de sesión de Google en Firebase.',
@@ -322,6 +325,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    if (new URLSearchParams(window.location.search).get('reason') === '2fa') {
+        showMessage('Tofaktor er nå påkrevd for alle kontoer. Logg inn igjen for å sette det opp.', 'success');
+    }
+
     try {
         const service = await waitForFirebaseReady();
         if (service && service.isInitialized && typeof service.getGoogleRedirectResult === 'function') {
@@ -334,65 +341,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
     } catch (error) {
-        if (isGoogleRedirectError(error)) {
+        if (window.HKMSecondFactor?.isChallenge(error)) {
+            continueAfterChallenge(error).catch(err => showMessage(window.HKMSecondFactor.messageFor(err), 'error'));
+        } else if (isGoogleRedirectError(error)) {
             console.error(error);
             showMessage(getErrorMessage(error), 'error');
         }
     }
-
-    // --- 1. Email/Password Login ---
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-        const btn = e.target.querySelector('button[type="submit"]');
-
-        btn.disabled = true;
-        btn.textContent = t('auth.loggingIn');
-        hideMessage();
-
-        try {
-            const service = await waitForFirebaseReady();
-            if (!service || !service.isInitialized) throw new Error("Firebase mismatch");
-            await service.login(email, password);
-            await routeByRole();
-        } catch (error) {
-            console.error(error);
-            showMessage(getErrorMessage(error), 'error');
-            btn.disabled = false;
-            btn.textContent = t('login.submitLogin');
-        }
-    });
-
-    // --- 2. Registration ---
-    document.getElementById('register-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('register-email').value;
-        const name = document.getElementById('register-name').value;
-        const password = document.getElementById('register-password').value;
-        const confirm = document.getElementById('register-confirm').value;
-        const btn = e.target.querySelector('button[type="submit"]');
-
-        if (password !== confirm) {
-            return showMessage(t('auth.passwordMismatch'), 'error');
-        }
-
-        btn.disabled = true;
-        btn.textContent = t('auth.creatingProfile');
-        hideMessage();
-
-        try {
-            const service = await waitForFirebaseReady();
-            const userCredential = await service.register(email, password);
-            await userCredential.user.updateProfile({ displayName: name });
-            await routeByRole();
-        } catch (error) {
-            console.error(error);
-            showMessage(getErrorMessage(error), 'error');
-            btn.disabled = false;
-            btn.textContent = t('login.submitRegister');
-        }
-    });
 
     // --- 3. Magic Link Login (Send) ---
     document.getElementById('magic-form').addEventListener('submit', async (e) => {
@@ -424,6 +379,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     const handleGoogleError = (error, btn, origContent) => {
+        if (window.HKMSecondFactor?.isChallenge(error)) {
+            continueAfterChallenge(error).catch(err => {
+                firebase.auth().signOut().catch(() => {});
+                if (err?.code !== 'auth/popup-closed-by-user') showMessage(window.HKMSecondFactor.messageFor(err), 'error');
+                btn.disabled = false; btn.innerHTML = origContent;
+            });
+            return;
+        }
         console.error(error);
         let msg = getErrorMessage(error);
         if (error.code === 'auth/unauthorized-domain') {
@@ -460,7 +423,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const service = window.firebaseService;
         if (service && service.isInitialized) {
-            service.loginWithGoogle({ redirectFallback: true })
+            service.loginWithGoogle({ redirectFallback: true, preferPopup: true })
                 .then(async (result) => {
                     clearSafety();
                     if (!result) return; // redirected
@@ -474,7 +437,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             waitForFirebaseReady().then(async (srv) => {
                 if (!srv || !srv.isInitialized) throw new Error("Firebase mismatch");
-                const result = await srv.loginWithGoogle({ redirectFallback: true });
+                const result = await srv.loginWithGoogle({ redirectFallback: true, preferPopup: true });
                 clearSafety();
                 if (!result) return;
                 await ensureMemberProfile(result.user);
@@ -483,6 +446,26 @@ document.addEventListener('DOMContentLoaded', async () => {
                 clearSafety();
                 handleGoogleError(error, btn, origContent);
             });
+        }
+    });
+
+    // --- 4b. Apple Login ---
+    const appleBtn = document.getElementById('apple-login');
+    if (appleBtn) appleBtn.addEventListener('click', async () => {
+        const origContent = appleBtn.innerHTML;
+        appleBtn.disabled = true;
+        appleBtn.textContent = t('auth.openingApple');
+        hideMessage();
+        try {
+            await waitForFirebaseReady();
+            const provider = new firebase.auth.OAuthProvider('apple.com');
+            provider.addScope('email');
+            provider.addScope('name');
+            const result = await firebase.auth().signInWithPopup(provider);
+            await ensureMemberProfile(result.user);
+            await routeByRole();
+        } catch (error) {
+            handleGoogleError(error, appleBtn, origContent);
         }
     });
 
@@ -497,16 +480,59 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         firebase.auth().signInWithEmailLink(email, window.location.href)
-            .then(async () => {
+            .then(async (result) => {
                 safeLocalStorageRemove('emailForSignIn');
+                if (result && result.user) await ensureMemberProfile(result.user);
                 await routeByRole();
             })
             .catch((error) => {
+                if (window.HKMSecondFactor?.isChallenge(error)) {
+                    safeLocalStorageRemove('emailForSignIn');
+                    continueAfterChallenge(error).catch(err => showMessage(window.HKMSecondFactor.messageFor(err), 'error'));
+                    return;
+                }
                 showMessage(getErrorMessage(error), 'error');
             });
     }
 
-    async function routeByRole() {
+    // Every HKM account must finish sign-in with a second factor before entering Min side.
+    let routing = null;
+    function routeByRole() {
+        routing ||= routeByRoleOnce().finally(() => { routing = null; });
+        return routing;
+    }
+    async function routeByRoleOnce() {
+        const twoFactor = window.HKMSecondFactor;
+        if (!twoFactor) {
+            showMessage('Sikkerhetsmodulen kunne ikke lastes. Last siden på nytt.', 'error');
+            return;
+        }
+        try {
+            await twoFactor.completeSecondFactor(firebase.auth());
+        } catch (error) {
+            await firebase.auth().signOut().catch(() => {});
+            if (error instanceof twoFactor.SignInAgainRequired) showMessage('Tofaktor er klar. Logg inn på nytt og bekreft med koden din.', 'success');
+            else if (error?.code !== 'auth/popup-closed-by-user') showMessage(twoFactor.messageFor(error), 'error');
+            resetButtons();
+            return;
+        }
+        return routeByRoleAfterSecondFactor();
+    }
+
+    function resetButtons() {
+        document.querySelectorAll('#google-login, #apple-login, #magic-form button[type="submit"]').forEach(btn => { btn.disabled = false; });
+        const g = document.getElementById('google-login'); if (g && !g.querySelector('img')) g.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt=""> Google';
+    }
+
+    // Enrolled users are asked for their code; then sign-in continues as normal.
+    async function continueAfterChallenge(error) {
+        await window.HKMSecondFactor.resolveChallenge(firebase.auth(), error);
+        const user = firebase.auth().currentUser;
+        if (user) await ensureMemberProfile(user);
+        await routeByRole();
+    }
+
+    async function routeByRoleAfterSecondFactor() {
         try {
             const currentUser = firebase.auth().currentUser;
             if (currentUser) {

@@ -329,6 +329,7 @@ class FirebaseService {
 
             // Be explicit about local auth persistence for stable admin sessions.
             this.ensureAuthPersistence().catch(() => { });
+            this.enforceSecondFactor();
         } catch (error) {
             console.error("❌ Firebase initialization failed:", error);
         }
@@ -483,6 +484,27 @@ class FirebaseService {
                 id,
                 ...this._decodeFirestoreRestFields(doc.fields || {})
             };
+        });
+    }
+
+    // Every HKM session must have been completed with a second factor. Sessions from
+    // before two-factor became mandatory are signed out and sent to the login page.
+    enforceSecondFactor() {
+        if (!this.auth || this._secondFactorGate) return;
+        this._secondFactorGate = true;
+        const path = window.location.pathname;
+        if (/\/(minside|admin)\/login(\.html)?$/.test(path)) return;
+        this.auth.onAuthStateChanged(async (current) => {
+            if (!current) return;
+            try {
+                const token = await current.getIdTokenResult();
+                if (token.claims?.firebase?.sign_in_second_factor) return;
+            } catch (error) {
+                return; // Offline or refresh failed: leave the session to normal handling.
+            }
+            await this.auth.signOut().catch(() => { });
+            const target = path.startsWith('/admin') ? '/admin/login.html' : '/minside/login.html';
+            window.location.replace(target + '?reason=2fa');
         });
     }
 
@@ -966,7 +988,8 @@ class FirebaseService {
 
         // Mobile browsers (Safari/Chrome on iOS/Android) block popups or fail in webviews.
         // Use signInWithRedirect for mobile devices or when explicitly requested.
-        if (isMobile || options.useRedirect) {
+        // Login pages ask for a popup first: popup errors carry the two-factor resolver.
+        if ((isMobile && !options.preferPopup) || options.useRedirect) {
             console.log("[FirebaseService] Mobile device or useRedirect -> using signInWithRedirect");
             await this.auth.signInWithRedirect(provider);
             return null;
@@ -976,6 +999,8 @@ class FirebaseService {
             return await this.auth.signInWithPopup(provider);
         } catch (error) {
             console.warn("[FirebaseService] signInWithPopup error:", error?.code, error?.message);
+            // Google accepted the account; the login page now asks for the second factor.
+            if (error?.code === 'auth/multi-factor-auth-required') throw error;
 
             const redirectFallbackCodes = new Set([
                 'auth/operation-not-supported-in-this-environment',
@@ -1007,6 +1032,8 @@ class FirebaseService {
             const result = await this.auth.getRedirectResult();
             return result || null;
         } catch (err) {
+            // A second-factor challenge must reach the login page, which asks for the code.
+            if (err?.code === 'auth/multi-factor-auth-required') throw err;
             console.warn("[FirebaseService] getRedirectResult error handled safely:", err);
             return null;
         }

@@ -288,28 +288,29 @@
         <h1 class="login-title">Velkommen tilbake</h1>
         <p class="login-subtitle">Logg inn for å styre His Kingdom Ministry</p>
 
-        <div id="error-box" class="error-message">Feil e-post eller passord. Vennegod forsøk igjen.</div>
+        <div id="error-box" class="error-message" role="alert"></div>
+        <div id="info-box" class="error-message" role="status" style="background: #ecfdf5; color: #065f46; border-color: #a7f3d0;"></div>
 
-        <form id="login-form" method="post" action="">
+        <!-- Admin sign-in is passwordless: Google, Apple or an email link. -->
+        <button type="button" id="google-login" class="btn-login" style="background-color: #ffffff; color: #1f2937; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px;">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="">
+            Logg inn med Google
+        </button>
+        <button type="button" id="apple-login" class="btn-login" style="background-color: #ffffff; color: #1f2937; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px;">
+            <svg width="18" height="18" viewBox="0 0 170 170" aria-hidden="true" fill="currentColor"><path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.04-7.6-7.7-11.71-13.98-5.33-8.15-9.63-17.75-12.89-28.81-3.26-11.06-4.9-21.78-4.9-32.16 0-14.89 3.86-27.17 11.59-36.85 7.73-9.68 17.5-14.58 29.3-14.71 4.79 0 10.23 1.25 16.32 3.75 6.09 2.5 10.05 3.81 11.88 3.93 1.41-.12 5.54-1.49 12.39-4.11 6.86-2.62 12.56-3.81 17.1-3.58 12.53.65 22.48 5.48 29.86 14.5-10.99 6.64-16.38 15.62-16.18 26.96.22 8.81 3.59 16.27 10.12 22.38 6.53 6.11 14.36 9.69 23.5 10.74-2.18 6.53-4.68 12.53-7.51 18.01zm-32.74-120.2c0 6.74-2.45 13.23-7.36 19.46-5.87 7.29-13.06 11.55-21.57 12.79-.11-1.09-.16-2.07-.16-2.94 0-6.63 2.61-13.24 7.84-19.82 5.23-6.58 12.31-10.75 21.25-12.51.21 1.09.32 2.1.32 3.02z"/></svg>
+            Logg inn med Apple
+        </button>
+        <div style="margin: 20px 0; display: flex; align-items: center; color: var(--text-muted); font-size: 13px;">
+            <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+            <span style="padding: 0 10px;">eller med e-post</span>
+            <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+        </div>
+        <form id="login-form" method="post" action="" novalidate>
             <div class="form-group">
-                <label>E-post</label>
-                <input type="email" id="email" name="email" autocomplete="username" class="form-control" placeholder="knutsenthomas@gmail.com" required>
+                <label for="email">E-post</label>
+                <input type="email" id="email" name="email" autocomplete="email" class="form-control" placeholder="navn@eksempel.no" required>
             </div>
-            <div class="form-group">
-                <label>Passord</label>
-                <input type="password" id="password" name="password" autocomplete="current-password" class="form-control" placeholder="••••••••" required>
-            </div>
-            <button type="submit" class="btn-login">Logg inn</button>
-            <div style="margin: 20px 0; display: flex; align-items: center; color: var(--text-muted); font-size: 13px;">
-                <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
-                <span style="padding: 0 10px;">eller</span>
-                <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
-            </div>
-            <button type="button" id="google-login" class="btn-login"
-                style="background-color: #ffffff; color: #1f2937; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; gap: 10px;">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="Google">
-                Logg inn med Google
-            </button>
+            <button type="submit" class="btn-login">Send innloggingslenke</button>
         </form>
 
         <a href="/" class="back-link">Tilbake til nettsiden</a>
@@ -324,13 +325,47 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 
     <script type="module" src="../js/user-roles.js"></script>
+    <script type="module" src="../js/hkm-second-factor.js?v=20261127c"></script>
 
     <!-- Auth Logic -->
     <script type="module">
             (async function () {
                 console.log("[HKM] Admin Auth Script loaded");
 
-                async function routeByRole() {
+                // Admin requires a session completed with a second factor.
+                let routing = null;
+                function routeByRole() {
+                    // Sign-in handlers and the auth listener may both call this; run the second-factor step once.
+                    routing ||= routeByRoleOnce().finally(() => { routing = null; });
+                    return routing;
+                }
+                async function routeByRoleOnce() {
+                    const twoFactor = window.HKMSecondFactor;
+                    if (!twoFactor) { showError('Sikkerhetsmodulen kunne ikke lastes. Last siden på nytt.'); return; }
+                    try {
+                        await twoFactor.completeSecondFactor(firebase.auth());
+                    } catch (error) {
+                        await firebase.auth().signOut().catch(() => {});
+                        if (error instanceof twoFactor.SignInAgainRequired) showInfo('Tofaktor er klar. Logg inn på nytt og bekreft med koden din.');
+                        else if (error?.code !== 'auth/popup-closed-by-user') showError(twoFactor.messageFor(error));
+                        return;
+                    }
+                    return routeByRoleAfterSecondFactor();
+                }
+
+                async function signInWithChallenge(error) {
+                    if (!window.HKMSecondFactor?.isChallenge(error)) return false;
+                    try {
+                        await window.HKMSecondFactor.resolveChallenge(firebase.auth(), error);
+                        await routeByRole();
+                    } catch (err) {
+                        await firebase.auth().signOut().catch(() => {});
+                        if (err?.code !== 'auth/popup-closed-by-user') showError(window.HKMSecondFactor.messageFor(err));
+                    }
+                    return true;
+                }
+
+                async function routeByRoleAfterSecondFactor() {
                     const service = window.firebaseService;
                     const user = firebase.auth().currentUser;
                     if (!user || !service) {
@@ -377,45 +412,87 @@
                     window.location.href = canAccessAdmin ? adminDestination : '/minside/index.html';
                 }
 
+                const errorBox = document.getElementById('error-box');
+                const infoBox = document.getElementById('info-box');
+                const showError = (msg) => { if (infoBox) infoBox.style.display = 'none'; if (errorBox) { errorBox.textContent = msg; errorBox.style.display = 'block'; } };
+                const showInfo = (msg) => { if (errorBox) errorBox.style.display = 'none'; if (infoBox) { infoBox.textContent = msg; infoBox.style.display = 'block'; } };
+                if (new URLSearchParams(window.location.search).get('reason') === '2fa') showInfo('Tofaktor er nå påkrevd for alle kontoer. Logg inn igjen for å sette det opp.');
+
                 const loginForm = document.getElementById('login-form');
                 if (loginForm) {
                     loginForm.addEventListener('submit', async (e) => {
                         e.preventDefault();
-                        console.log("[HKM] Login attempt started");
-
-                        const service = window.firebaseService;
-                        const email = document.getElementById('email').value;
-                        const password = document.getElementById('password').value;
-                        const btn = loginForm.querySelector('button');
-                        const errorBox = document.getElementById('error-box');
-
-                        if (!btn) return;
-                        const originalText = btn.textContent;
-                        btn.textContent = 'Logger inn...';
-                        btn.disabled = true;
-                        if (errorBox) errorBox.style.display = 'none';
-
-                        if (!service || !service.isInitialized) {
-                            console.error("[HKM] Firebase service not ready", { service: !!service, initialized: service?.isInitialized });
-                            showToast('Tjenesten er ikke helt klar. Vennligst prøv igjen om et sekund.', 'warning');
-                            btn.textContent = originalText;
-                            btn.disabled = false;
+                        const email = document.getElementById('email').value.trim();
+                        const btn = loginForm.querySelector('button[type="submit"]');
+                        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                            showError('Skriv inn en gyldig e-postadresse.');
                             return;
                         }
-
+                        const service = window.firebaseService;
+                        if (!service || !service.isInitialized) {
+                            showError('Tjenesten er ikke helt klar. Prøv igjen om et sekund.');
+                            return;
+                        }
+                        const originalText = btn.textContent;
+                        btn.textContent = 'Sender lenke...';
+                        btn.disabled = true;
                         try {
-                            console.log("[HKM] Logging in...");
-                            await service.login(email, password);
-                            console.log("[HKM] Login success, routing...");
+                            // Keep the admin deep link (for example ?aiOAuth=) when the link is opened.
+                            await firebase.auth().sendSignInLinkToEmail(email, { url: window.location.href, handleCodeInApp: true });
+                            try { localStorage.setItem('emailForSignIn', email); } catch (err) {}
+                            showInfo(`Vi har sendt en innloggingslenke til ${email}. Åpne den på denne enheten.`);
+                            btn.textContent = 'Send ny lenke';
+                        } catch (err) {
+                            console.error('[HKM] Email link error:', err);
+                            showError(err.code === 'auth/invalid-email' ? 'Skriv inn en gyldig e-postadresse.' : 'Kunne ikke sende innloggingslenke. Prøv igjen.');
+                            btn.textContent = originalText;
+                        } finally {
+                            btn.disabled = false;
+                        }
+                    });
+                }
+
+                // Complete sign-in when the page is opened from the emailed link.
+                if (typeof firebase !== 'undefined' && firebase.auth().isSignInWithEmailLink(window.location.href)) {
+                    let email = null;
+                    try { email = localStorage.getItem('emailForSignIn'); } catch (err) {}
+                    if (!email) email = window.prompt('Bekreft e-postadressen din for å fullføre innloggingen:');
+                    if (email) {
+                        try {
+                            await firebase.auth().signInWithEmailLink(email, window.location.href);
+                            try { localStorage.removeItem('emailForSignIn'); } catch (err) {}
+                            const clean = new URL(window.location.href);
+                            ['apiKey', 'oobCode', 'mode', 'lang', 'continueUrl'].forEach(key => clean.searchParams.delete(key));
+                            history.replaceState(null, '', clean.pathname + clean.search);
+                        } catch (err) {
+                            if (await signInWithChallenge(err)) return;
+                            console.error('[HKM] Email link sign-in failed:', err);
+                            showError(['auth/invalid-action-code', 'auth/expired-action-code'].includes(err.code)
+                                ? 'Innloggingslenken er utløpt eller allerede brukt. Be om en ny lenke.'
+                                : 'Kunne ikke fullføre innloggingen. Be om en ny lenke.');
+                        }
+                    }
+                }
+
+                const appleBtn = document.getElementById('apple-login');
+                if (appleBtn) {
+                    appleBtn.addEventListener('click', async () => {
+                        const original = appleBtn.innerHTML;
+                        appleBtn.disabled = true;
+                        appleBtn.textContent = 'Logger inn...';
+                        try {
+                            const provider = new firebase.auth.OAuthProvider('apple.com');
+                            provider.addScope('email');
+                            provider.addScope('name');
+                            await firebase.auth().signInWithPopup(provider);
                             await routeByRole();
                         } catch (err) {
-                            console.error("[HKM] Login error:", err);
-                            if (errorBox) {
-                                errorBox.textContent = "Feil e-post eller passord. Vennligst prøv igjen.";
-                                errorBox.style.display = 'block';
-                            }
-                            btn.textContent = originalText;
-                            btn.disabled = false;
+                            if (await signInWithChallenge(err)) return;
+                            console.error('[HKM] Apple login error:', err);
+                            if (err.code !== 'auth/popup-closed-by-user') showError('Kunne ikke logge inn med Apple. Prøv igjen.');
+                        } finally {
+                            appleBtn.disabled = false;
+                            appleBtn.innerHTML = original;
                         }
                     });
                 }
@@ -432,9 +509,10 @@
 
                         const loginFlow = async () => {
                             try {
-                                await service.loginWithGoogle();
+                                await service.loginWithGoogle({ preferPopup: true, redirectFallback: true });
                                 await routeByRole();
                             } catch (err) {
+                                 if (await signInWithChallenge(err)) return;
                                  console.error("[HKM] Google login error:", err);
                                  if (typeof showToast === 'function') {
                                      let msg = 'Kunne ikke logge inn med Google. Prøv igjen.';
@@ -468,6 +546,11 @@
                             }
                         }
                     });
+                }
+
+                // On mobile, Google sign-in returns by redirect; enrolled accounts are asked for their code here.
+                if (typeof firebase !== 'undefined') {
+                    firebase.auth().getRedirectResult().catch(err => signInWithChallenge(err));
                 }
 
                 // Auto-redirect if already logged in globally

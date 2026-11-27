@@ -3070,16 +3070,10 @@ class MinSideManager {
                     </div>
                     <div class="info-rows">
                         <div class="info-row">
-                            <span class="material-symbols-outlined info-row-icon" style="color: #7c3aed !important; background: rgba(124, 58, 237, 0.1) !important;">lock_reset</span>
+                            <span class="material-symbols-outlined info-row-icon" style="color: #7c3aed !important; background: rgba(124, 58, 237, 0.1) !important;">key</span>
                             <div class="info-row-content">
-                                <div class="info-row-label">${isNo ? 'Passord' : (isEs ? 'Contraseña' : 'Password')}</div>
-                                <div class="info-row-display" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 4px;">
-                                    <span class="info-row-value" style="font-weight: 700; letter-spacing: 0.15em;">••••••••••••</span>
-                                    <button type="button" class="btn btn-ghost btn-sm" id="reset-password-btn" style="border-radius: 10px; font-weight: 700;">
-                                        <span class="material-symbols-outlined" style="font-size: 16px;">key</span>
-                                        <span>${isNo ? 'Endre passord' : (isEs ? 'Cambiar contraseña' : 'Change password')}</span>
-                                    </button>
-                                </div>
+                                <div class="info-row-label">${isNo ? 'Innlogging' : (isEs ? 'Inicio de sesión' : 'Sign-in')}</div>
+                                <div class="info-row-value" style="margin-top: 4px;">${isNo ? 'Uten passord: innloggingslenke på e-post, Google eller Apple.' : (isEs ? 'Sin contraseña: enlace por correo, Google o Apple.' : 'No password: email sign-in link, Google or Apple.')}</div>
                             </div>
                         </div>
 
@@ -3410,18 +3404,6 @@ class MinSideManager {
         });
 
         // ── Wire up events ──
-        container.querySelector('#reset-password-btn')?.addEventListener('click', async () => {
-            const email = this.currentUser?.email;
-            if (!email) return;
-            try {
-                await firebase.auth().sendPasswordResetEmail(email);
-                this._notify(tx(`E-post for å tilbakestille passord er sendt til ${email}!`, `Password reset email sent to ${email}!`, `Correo para restablecer la contraseña enviado a ${email}`), 'success');
-            } catch (err) {
-                console.error('Password reset error:', err);
-                this._notify(tx('Kunne ikke sende e-post for passordtilbakestilling.', 'Failed to send password reset email.', 'No se pudo enviar el correo para restablecer la contraseña.'), 'warning');
-            }
-        });
-
         // Wire up SSN Eye Visibility Toggle
         const toggleSsnEye = container.querySelector('#toggle-ssn-eye');
         if (toggleSsnEye) {
