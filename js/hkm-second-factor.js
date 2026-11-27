@@ -3,7 +3,7 @@
 // so TOTP comes from the modular SDK of the same version, used on the compat
 // instance's own modular objects (`_delegate`). SMS uses the compat API.
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { initializeAuth, inMemoryPersistence, TotpMultiFactorGenerator } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { initializeAuth, inMemoryPersistence, TotpMultiFactorGenerator, getMultiFactorResolver } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
 // The modular bundle only makes network requests after an Auth instance of its own
 // exists. This helper instance keeps nothing; all sign-in state stays in compat.
@@ -113,8 +113,18 @@ async function busy(button, work) {
 }
 
 /** Sign-in step for enrolled users. Resolves after Firebase accepts the code. */
-export function resolveChallenge(auth, error) {
-  const resolver = error.resolver;
+export async function resolveChallenge(auth, error) {
+  // The compat SDK attaches a resolver to popup errors but not to redirect results
+  // (Google sign-in on mobile). Build one from the error's server response then.
+  let resolver = error.resolver;
+  if (!resolver && error?.customData?._serverResponse) {
+    initModularBundle();
+    resolver = getMultiFactorResolver(auth._delegate || auth, error);
+  }
+  return askForCode(resolver);
+}
+
+function askForCode(resolver) {
   const hints = resolver?.hints || [];
   const totpHint = hints.find(hint => hint.factorId === 'totp');
   const smsHint = hints.find(hint => hint.factorId === 'phone');

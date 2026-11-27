@@ -423,7 +423,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const service = window.firebaseService;
         if (service && service.isInitialized) {
-            service.loginWithGoogle({ redirectFallback: true })
+            service.loginWithGoogle({ redirectFallback: true, preferPopup: true })
                 .then(async (result) => {
                     clearSafety();
                     if (!result) return; // redirected
@@ -437,7 +437,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             waitForFirebaseReady().then(async (srv) => {
                 if (!srv || !srv.isInitialized) throw new Error("Firebase mismatch");
-                const result = await srv.loginWithGoogle({ redirectFallback: true });
+                const result = await srv.loginWithGoogle({ redirectFallback: true, preferPopup: true });
                 clearSafety();
                 if (!result) return;
                 await ensureMemberProfile(result.user);

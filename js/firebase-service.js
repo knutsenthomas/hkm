@@ -988,7 +988,8 @@ class FirebaseService {
 
         // Mobile browsers (Safari/Chrome on iOS/Android) block popups or fail in webviews.
         // Use signInWithRedirect for mobile devices or when explicitly requested.
-        if (isMobile || options.useRedirect) {
+        // Login pages ask for a popup first: popup errors carry the two-factor resolver.
+        if ((isMobile && !options.preferPopup) || options.useRedirect) {
             console.log("[FirebaseService] Mobile device or useRedirect -> using signInWithRedirect");
             await this.auth.signInWithRedirect(provider);
             return null;
@@ -998,6 +999,8 @@ class FirebaseService {
             return await this.auth.signInWithPopup(provider);
         } catch (error) {
             console.warn("[FirebaseService] signInWithPopup error:", error?.code, error?.message);
+            // Google accepted the account; the login page now asks for the second factor.
+            if (error?.code === 'auth/multi-factor-auth-required') throw error;
 
             const redirectFallbackCodes = new Set([
                 'auth/operation-not-supported-in-this-environment',
