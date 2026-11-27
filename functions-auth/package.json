@@ -1,0 +1,12 @@
+{
+  "name": "hkm-auth-policy",
+  "private": true,
+  "description": "Blocks password sign-in and sign-up for HKM accounts (email link, Google and Apple only).",
+  "main": "index.cjs",
+  "engines": { "node": "22" },
+  "scripts": { "test": "node --test index.test.cjs" },
+  "dependencies": {
+    "firebase-admin": "^14.2.0",
+    "firebase-functions": "^7.0.0"
+  }
+}

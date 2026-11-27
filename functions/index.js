@@ -10412,9 +10412,3 @@ exports.syncGivingSettlementReports = onSchedule({
   const failed = ['stripe', 'paypal', 'vipps'].filter((_, index) => results[index].status === 'rejected');
   if (failed.length) throw new Error(`Giving report sync failed for: ${failed.join(', ')}`);
 });
-
-// Passwordless sign-in for every HKM account (email link, Google or Apple).
-// Requires Firebase Authentication with Identity Platform on this project.
-const authPolicy = require('./auth-policy.cjs');
-exports.blockPasswordSignUp = authPolicy.blockPasswordSignUp;
-exports.blockPasswordSignIn = authPolicy.blockPasswordSignIn;

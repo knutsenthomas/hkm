@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { usesPassword, rejectPassword } = require('./auth-policy.cjs');
+const { usesPassword, rejectPassword } = require('./index.cjs');
 
 const event = (method, credential) => ({
   eventType: `providers/cloud.auth/eventTypes/user.beforeSignIn:${method}`,
