@@ -3,7 +3,8 @@
 // Firebase keeps passwords and email links under one provider, so the provider
 // stays enabled and these blocking functions refuse the password method itself.
 const { beforeUserCreated, beforeUserSignedIn, HttpsError } = require('firebase-functions/v2/identity');
-const { onCall } = require('firebase-functions/v2/https');
+const { onCall, onRequest } = require('firebase-functions/v2/https');
+const { createHandler: createAppSsoHandler, firestoreDeps: appSsoDeps } = require('./app-sso.cjs');
 
 const PASSWORD_MESSAGE = 'Innlogging med passord er slått av. Bruk innloggingslenke på e-post, Google eller Apple.';
 
@@ -13,8 +14,17 @@ function usesPassword(event) {
   return method === 'password';
 }
 
+/** True when the account has a second factor, so this event completes a sign-in that already passed its first step. */
+function completesSecondFactor(event) {
+  return (event?.data?.multiFactor?.enrolledFactors || []).length > 0;
+}
+
+// Firebase checks the first step (link, Google, Apple or password) before it asks for the
+// code, and checks again when the code is accepted. The second check reports the email
+// provider as "password" even after an email link, so it must not be refused: a real
+// password sign-in was already stopped at the first step.
 function rejectPassword(event) {
-  if (usesPassword(event)) throw new HttpsError('permission-denied', PASSWORD_MESSAGE);
+  if (usesPassword(event) && !completesSecondFactor(event)) throw new HttpsError('permission-denied', PASSWORD_MESSAGE);
 }
 
 const blockPasswordSignUp = beforeUserCreated({ region: 'us-central1', maxInstances: 10 }, rejectPassword);
@@ -59,7 +69,19 @@ function adminDeps() {
 
 const resetSecondFactor = onCall({ region: 'us-central1', maxInstances: 5 }, request => resetSecondFactorHandler(request, adminDeps()));
 
+// Innlogging i HKM-appen via Min side (se app-sso.cjs).
+let appSsoHandler;
+const appSso = onRequest({ region: 'us-central1', maxInstances: 3, concurrency: 20, timeoutSeconds: 20, invoker: 'public' }, (req, res) => {
+  if (!appSsoHandler) {
+    const admin = require('firebase-admin');
+    adminApp ||= admin.apps.length ? admin.app() : admin.initializeApp();
+    appSsoHandler = createAppSsoHandler(appSsoDeps(admin));
+  }
+  return appSsoHandler(req, res);
+});
+
 module.exports = {
-  usesPassword, rejectPassword, blockPasswordSignUp, blockPasswordSignIn, PASSWORD_MESSAGE,
+  appSso,
+  usesPassword, completesSecondFactor, rejectPassword, blockPasswordSignUp, blockPasswordSignIn, PASSWORD_MESSAGE,
   resetSecondFactorHandler, resetSecondFactor,
 };

@@ -59,3 +59,13 @@ test('reset is refused without a second-factor session, for non-admins, for ones
   await resetSecondFactorHandler({ auth: adminAuth('boss'), data: { uid: 'admin2' } }, d);
   assert.deepEqual(d.calls.cleared, ['admin2']);
 });
+
+test('completing a second factor after an email link is allowed', () => {
+  const finish = { eventType: 'providers/cloud.auth/eventTypes/user.beforeSignIn:password', data: { multiFactor: { enrolledFactors: [{ uid: 'f1', factorId: 'totp' }] } } };
+  assert.doesNotThrow(() => rejectPassword(finish));
+});
+
+test('a password sign-in without a second factor is still refused', () => {
+  const plain = { eventType: 'providers/cloud.auth/eventTypes/user.beforeSignIn:password', data: { multiFactor: { enrolledFactors: [] } } };
+  assert.throws(() => rejectPassword(plain), /passord er slått av/);
+});
