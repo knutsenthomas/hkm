@@ -765,6 +765,196 @@ service cloud.firestore {
          request.resource.data.userId == request.auth.uid);
     }
 
+    // ===============================================================
+    // HKM-appen: grupper, invitasjoner og bønnedeling (tatt over fra Pust)
+    // ===============================================================
+
+    // Faste bønner som admin kan overstyre per språk. Alle kan lese.
+    match /fixedPrayers/{language}/entries/{prayerId} {
+      allow read: if language in ['no', 'en'];
+      allow create, update: if isAdmin()
+        && language in ['no', 'en']
+        && request.resource.data.keys().hasOnly(['title', 'text', 'reference', 'theme'])
+        && request.resource.data.title is string && request.resource.data.title.size() > 0 && request.resource.data.title.size() <= 200
+        && request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 10000
+        && (!('reference' in request.resource.data) || (request.resource.data.reference is string && request.resource.data.reference.size() <= 200))
+        && (!('theme' in request.resource.data) || (request.resource.data.theme is string && request.resource.data.theme.size() <= 300));
+      allow delete: if isAdmin() && language in ['no', 'en'];
+    }
+
+    function appGroupDoc(groupId) {
+      return /databases/$(database)/documents/groups/$(groupId);
+    }
+
+    function appClaimDoc(groupId) {
+      return /databases/$(database)/documents/groupInviteClaims/$(request.auth.uid)/groups/$(groupId);
+    }
+
+    function validAppInvite(token, groupId, ownerId) {
+      let invite = get(/databases/$(database)/documents/clientGroupInvites/$(token)).data;
+      return invite.groupId == groupId && invite.ownerId == ownerId && invite.expiresAt > request.time;
+    }
+
+    // En invitasjon gir bare den innloggede personen medlemskap i én gruppe.
+    function isInvitedJoin(groupId) {
+      let claim = getAfter(appClaimDoc(groupId)).data;
+      let member = claim.member;
+      return signedIn()
+        && !(request.auth.uid in resource.data.memberIds)
+        && (!exists(appClaimDoc(groupId)) || claim.token != get(appClaimDoc(groupId)).data.token)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'membersList', 'membersCount'])
+        && member.keys().hasOnly(['userId', 'name', 'avatar', 'role'])
+        && member.userId == request.auth.uid && member.role == 'Medlem'
+        && member.name is string && member.name.size() > 0 && member.name.size() <= 100
+        && member.avatar == ''
+        && request.resource.data.memberIds == resource.data.memberIds.concat([request.auth.uid])
+        && request.resource.data.membersList == resource.data.membersList.concat([member])
+        && request.resource.data.membersCount == request.resource.data.memberIds.size()
+        && validAppInvite(claim.token, groupId, resource.data.ownerId);
+    }
+
+    match /clientGroupInvites/{token} {
+      allow get: if signedIn() && resource.data.expiresAt > request.time;
+      allow create: if signedIn()
+        && token.matches('^[a-f0-9]{64}$')
+        && request.resource.data.keys().hasOnly(['groupId', 'ownerId', 'expiresAt'])
+        && request.resource.data.groupId is string
+        && request.resource.data.ownerId == request.auth.uid
+        && get(appGroupDoc(request.resource.data.groupId)).data.ownerId == request.auth.uid
+        && request.resource.data.expiresAt is timestamp
+        && request.resource.data.expiresAt > request.time
+        && request.resource.data.expiresAt <= request.time + duration.value(7, 'd');
+    }
+
+    match /groupInviteClaims/{uid}/groups/{groupId} {
+      allow create, update: if isSelf(uid)
+        && request.resource.data.keys().hasOnly(['token', 'member'])
+        && request.resource.data.token is string && request.resource.data.token.matches('^[a-f0-9]{64}$')
+        && (!exists(appClaimDoc(groupId)) || request.resource.data.token != resource.data.token)
+        && !(uid in get(appGroupDoc(groupId)).data.memberIds)
+        && uid in getAfter(appGroupDoc(groupId)).data.memberIds
+        && validAppInvite(request.resource.data.token, groupId, get(appGroupDoc(groupId)).data.ownerId);
+    }
+
+    function addsOwnGroupItem(before, after) {
+      let item = after[after.size() - 1];
+      return after.size() == before.size() + 1
+        && (after == before.concat([item]) || after == [after[0]].concat(before))
+        && (after == before.concat([item]) ? item.authorId : after[0].authorId) == request.auth.uid;
+    }
+
+    function togglesOwnGroupPrayer(before, after) {
+      let removed = before.removeAll(after);
+      let added = after.removeAll(before);
+      return removed.size() == 1 && added.size() == 1
+        && after == before.removeAll(removed).concat(added)
+        && removed[0].authorId == request.auth.uid
+        && added[0].diff(removed[0]).affectedKeys().hasOnly(['answered'])
+        && added[0].answered is bool;
+    }
+
+    // Grupper: bare medlemmer kan lese. Eieren styrer gruppen; medlemmer kan
+    // legge til egne meldinger og bønner og markere egne bønner som besvart.
+    match /groups/{groupId} {
+      allow read: if signedIn() && request.auth.uid in resource.data.memberIds;
+
+      allow create: if signedIn()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.memberIds == [request.auth.uid]
+        && request.resource.data.id == groupId
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 200;
+
+      allow update: if isInvitedJoin(groupId) || (signedIn()
+        && request.auth.uid in resource.data.memberIds
+        && request.resource.data.ownerId == resource.data.ownerId
+        && request.resource.data.memberIds == resource.data.memberIds
+        && request.resource.data.id == resource.data.id
+        && (
+          request.auth.uid == resource.data.ownerId
+          || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['chatMessages'])
+            && addsOwnGroupItem(resource.data.get('chatMessages', []), request.resource.data.chatMessages))
+          || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['sharedPrayers'])
+            && (addsOwnGroupItem(resource.data.get('sharedPrayers', []), request.resource.data.sharedPrayers)
+              || togglesOwnGroupPrayer(resource.data.get('sharedPrayers', []), request.resource.data.sharedPrayers)))
+        ))
+        // Eieren kan fjerne ett medlem om gangen (ikke seg selv).
+        || (signedIn() && request.auth.uid == resource.data.ownerId
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'membersList', 'membersCount'])
+          && request.auth.uid in request.resource.data.memberIds
+          && request.resource.data.memberIds.size() == resource.data.memberIds.size() - 1
+          && request.resource.data.memberIds.toSet().size() == request.resource.data.memberIds.size()
+          && request.resource.data.memberIds.toSet().difference(resource.data.memberIds.toSet()).size() == 0
+          && request.resource.data.membersCount == request.resource.data.memberIds.size());
+
+      allow delete: if signedIn() && resource.data.ownerId == request.auth.uid;
+    }
+
+    // Bønnedeling med valgte mottakere. Å være i samme gruppe gir ikke tilgang;
+    // bare de som står i mottakerlisten kan lese.
+    function validPrayerShare(data) {
+      return data.keys().hasOnly(['id', 'ownerId', 'authorName', 'sourcePrayerId',
+          'title', 'text', 'privacy', 'date', 'status', 'archived', 'updates',
+          'icon', 'recipientIds', 'chainEnabled', 'updatedAt'])
+        && data.ownerId is string && data.authorName is string
+        && data.authorName.size() <= 100 && data.sourcePrayerId is string
+        && data.title is string && data.title.size() <= 200
+        && data.text is string && data.text.size() <= 10000
+        && data.privacy == 'private' && data.date is string && data.icon is string
+        && data.status in ['active', 'answered'] && data.archived is bool
+        && data.updates is list && data.updates.size() <= 100
+        && data.recipientIds is list && data.recipientIds.size() >= 1
+        && data.recipientIds.size() <= 100
+        && data.recipientIds.toSet().size() == data.recipientIds.size()
+        && data.ownerId in data.recipientIds
+        && data.chainEnabled is bool && data.updatedAt is number;
+    }
+
+    function isPrayerRecipient(shareId) {
+      return signedIn() && request.auth.uid in
+        get(/databases/$(database)/documents/prayerShares/$(shareId)).data.recipientIds;
+    }
+
+    match /prayerShares/{shareId} {
+      allow list: if signedIn() && request.auth.uid in resource.data.recipientIds;
+      // Eieren må kunne se at en delt bønn ikke finnes ennå før den opprettes.
+      allow get: if signedIn() && (
+        (!exists(/databases/$(database)/documents/prayerShares/$(shareId))
+          && shareId.matches(request.auth.uid + '--.*'))
+        || request.auth.uid in resource.data.recipientIds);
+
+      allow create: if signedIn() && validPrayerShare(request.resource.data)
+        && request.resource.data.ownerId == request.auth.uid && request.resource.data.id == shareId
+        && shareId == request.auth.uid + '--' + request.resource.data.sourcePrayerId
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid)/prayers/$(request.resource.data.sourcePrayerId));
+      allow update: if signedIn() && validPrayerShare(request.resource.data)
+        && request.resource.data.id == resource.data.id
+        && request.resource.data.ownerId == resource.data.ownerId
+        && request.resource.data.sourcePrayerId == resource.data.sourcePrayerId
+        && (request.auth.uid == resource.data.ownerId
+          || (request.auth.uid in resource.data.recipientIds && resource.data.chainEnabled == true
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['recipientIds', 'updatedAt'])
+            && request.resource.data.recipientIds.toSet().hasAll(resource.data.recipientIds)));
+      allow delete: if signedIn() && request.auth.uid == resource.data.ownerId;
+
+      match /activity/{eventId} {
+        allow read: if isPrayerRecipient(shareId);
+        allow create: if isPrayerRecipient(shareId)
+          && request.resource.data.keys().hasOnly(['actorId', 'actorName', 'kind', 'text', 'createdAt'])
+          && request.resource.data.actorId == request.auth.uid
+          && request.resource.data.actorName is string && request.resource.data.actorName.size() <= 100
+          && request.resource.data.kind in ['prayed', 'comment']
+          && request.resource.data.text is string && request.resource.data.text.size() <= 2000
+          && (request.resource.data.kind != 'prayed' || request.resource.data.text == '')
+          && request.resource.data.createdAt is number;
+        allow update: if false;
+        allow delete: if isPrayerRecipient(shareId)
+          && (request.auth.uid == resource.data.actorId
+            || request.auth.uid == get(/databases/$(database)/documents/prayerShares/$(shareId)).data.ownerId);
+      }
+    }
+
     // Default deny
     match /{document=**} {
       allow read, write: if false;
