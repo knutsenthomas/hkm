@@ -10,7 +10,14 @@ const PASSWORD_MESSAGE = 'Innlogging med passord er slått av. Bruk innloggingsl
 /** True when Firebase reports the email/password method (not an email link). */
 function usesPassword(event) {
   const method = event?.credential?.signInMethod || String(event?.eventType || '').split(':').pop();
-  return method === 'password';
+  if (method !== 'password') return false;
+  // When an account has a second factor, Firebase runs this check after the authenticator
+  // code and reports the email provider only as "password", also for an email-link sign-in.
+  // Those sign-ins already passed the second factor, so they are let through. Accounts
+  // without a second factor keep the strict rule (they must set one up after an email link,
+  // Google or Apple, never with a password).
+  const factors = event?.data?.multiFactor?.enrolledFactors;
+  return !(Array.isArray(factors) && factors.length > 0);
 }
 
 function rejectPassword(event) {

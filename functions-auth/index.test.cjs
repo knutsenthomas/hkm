@@ -22,6 +22,12 @@ test('email link, Google and Apple are allowed', () => {
   assert.equal(usesPassword(event('emailLink', { providerId: 'password', signInMethod: 'emailLink' })), false);
 });
 
+test('the check after the authenticator code is allowed, but not a password without a second factor', () => {
+  const withFactor = { ...event('password'), data: { multiFactor: { enrolledFactors: [{ uid: 'f1', factorId: 'totp' }] } } };
+  assert.equal(usesPassword(withFactor), false);
+  assert.equal(usesPassword({ ...event('password'), data: { multiFactor: { enrolledFactors: [] } } }), true);
+});
+
 test('events without a method are allowed', () => {
   assert.equal(usesPassword({ eventType: 'providers/cloud.auth/eventTypes/user.beforeSignIn' }), false);
 });
