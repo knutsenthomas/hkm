@@ -5,13 +5,8 @@
 const { beforeUserCreated, beforeUserSignedIn, HttpsError } = require('firebase-functions/v2/identity');
 const { onCall, onRequest } = require('firebase-functions/v2/https');
 const { createHandler: createAppSsoHandler, firestoreDeps: appSsoDeps } = require('./app-sso.cjs');
-const { createHandler: createEmailCodeHandler, firestoreDeps: emailCodeDeps } = require('./email-code.cjs');
-const { defineSecret } = require('firebase-functions/params');
-// Samme e-postkonto som resten av HKM bruker (post@hiskingdomministry.no).
-const emailUser = defineSecret('EMAIL_USER');
-const emailPass = defineSecret('EMAIL_PASS');
 
-const PASSWORD_MESSAGE = 'Innlogging med passord er slått av. Bruk innloggingslenke på e-post, Google eller Apple.';
+const PASSWORD_MESSAGE = 'Innlogging med passord er slått av. Bruk kode på e-post, Google eller Apple.';
 
 /** True when Firebase reports the email/password method (not an email link). */
 function usesPassword(event) {
@@ -91,22 +86,10 @@ const appSso = onRequest({ region: 'us-central1', maxInstances: 3, concurrency: 
   return appSsoHandler(req, res);
 });
 
-// Innlogging med 6-sifret kode på e-post (se email-code.cjs).
-let emailCodeHandler;
-const emailCode = onRequest({ region: 'us-central1', maxInstances: 5, concurrency: 20, timeoutSeconds: 30, invoker: 'public', secrets: [emailUser, emailPass] }, (req, res) => {
-  if (!emailCodeHandler) {
-    const crypto = require('node:crypto');
-    const user = emailUser.value().trim() || 'post@hiskingdomministry.no';
-    const pass = emailPass.value().trim();
-    // Koden hashes med en hemmelighet avledet av e-postpassordet, så hashene ikke kan prøves mot alle koder.
-    const pepper = crypto.createHash('sha256').update('hkm-email-code:' + pass).digest('hex');
-    emailCodeHandler = createEmailCodeHandler(emailCodeDeps(adminServices(), { user, pass, pepper }));
-  }
-  return emailCodeHandler(req, res);
-});
+// E-postkoden ligger i communitySso (hkp-community-app/functions-sso), felles for alle HKM-apper.
 
 module.exports = {
-  appSso, emailCode,
+  appSso,
   usesPassword, completesSecondFactor, rejectPassword, blockPasswordSignUp, blockPasswordSignIn, PASSWORD_MESSAGE,
   resetSecondFactorHandler, resetSecondFactor,
 };
