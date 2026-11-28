@@ -1,8 +1,19 @@
 // Translations Dictionary for Min Side Authentication
 const authTranslations = {
     no: {
-        'login.title': 'Min Side',
-        'login.subtitle': 'Velkommen til ditt åndelige fellesskap',
+        'login.title': 'Velkommen',
+        'login.sendCode': 'Send kode',
+        'login.codeLabel': 'Kode',
+        'login.verifyCode': 'Logg inn',
+        'login.resendCode': 'Send ny kode',
+        'login.changeEmail': 'Bruk en annen e-post',
+        'auth.codeSent': 'Vi har sendt en 6-sifret kode til {email}. Den gjelder i 10 minutter.',
+        'auth.sendingCode': 'Sender kode...',
+        'auth.checkingCode': 'Sjekker kode...',
+        'auth.invalidEmail': 'Skriv inn en gyldig e-postadresse.',
+        'auth.invalidCode': 'Skriv inn den 6-sifrede koden.',
+        'auth.codeResent': 'Ny kode er sendt.',
+        'login.subtitle': 'Logg inn på Min side med e-post, Google eller Apple.',
         'login.modeLogin': 'Logg inn',
         'login.modeRegister': 'Ny bruker',
         'login.modeMagic': 'Magisk Link',
@@ -20,7 +31,7 @@ const authTranslations = {
         'login.submitRegister': 'Opprett profil',
         'login.magicSubtitle': 'Skriv inn e-posten din, så sender vi en innloggingslenke. Første gang oppretter vi en profil for deg.',
         'login.submitMagic': 'Send innloggingslenke',
-        'login.divider': 'eller med e-post',
+        'login.divider': 'eller',
         'login.backLink': 'Tilbake til nettsiden',
         
         // Buttons / feedback / states
@@ -46,8 +57,19 @@ const authTranslations = {
         'error.unknown': 'En ukjent feil oppstod.'
     },
     en: {
-        'login.title': 'My Page',
-        'login.subtitle': 'Welcome to your spiritual community',
+        'login.title': 'Welcome',
+        'login.sendCode': 'Send code',
+        'login.codeLabel': 'Code',
+        'login.verifyCode': 'Sign in',
+        'login.resendCode': 'Send a new code',
+        'login.changeEmail': 'Use another email',
+        'auth.codeSent': 'We sent a 6-digit code to {email}. It is valid for 10 minutes.',
+        'auth.sendingCode': 'Sending code...',
+        'auth.checkingCode': 'Checking code...',
+        'auth.invalidEmail': 'Enter a valid email address.',
+        'auth.invalidCode': 'Enter the 6-digit code.',
+        'auth.codeResent': 'A new code has been sent.',
+        'login.subtitle': 'Sign in to My Page with email, Google or Apple.',
         'login.modeLogin': 'Login',
         'login.modeRegister': 'Register',
         'login.modeMagic': 'Magic Link',
@@ -65,7 +87,7 @@ const authTranslations = {
         'login.submitRegister': 'Create profile',
         'login.magicSubtitle': 'Enter your email and we will send you a sign-in link. The first time, we create a profile for you.',
         'login.submitMagic': 'Send sign-in link',
-        'login.divider': 'or with email',
+        'login.divider': 'or',
         'login.backLink': 'Back to website',
         
         // Buttons / feedback
@@ -91,8 +113,19 @@ const authTranslations = {
         'error.unknown': 'An unknown error occurred.'
     },
     es: {
-        'login.title': 'Mi página',
-        'login.subtitle': 'Bienvenido a tu comunidad espiritual',
+        'login.title': 'Bienvenido',
+        'login.sendCode': 'Enviar código',
+        'login.codeLabel': 'Código',
+        'login.verifyCode': 'Iniciar sesión',
+        'login.resendCode': 'Enviar un código nuevo',
+        'login.changeEmail': 'Usar otro correo',
+        'auth.codeSent': 'Hemos enviado un código de 6 dígitos a {email}. Es válido durante 10 minutos.',
+        'auth.sendingCode': 'Enviando código...',
+        'auth.checkingCode': 'Comprobando código...',
+        'auth.invalidEmail': 'Introduce un correo válido.',
+        'auth.invalidCode': 'Introduce el código de 6 dígitos.',
+        'auth.codeResent': 'Se ha enviado un código nuevo.',
+        'login.subtitle': 'Inicia sesión en Mi página con correo, Google o Apple.',
         'login.modeLogin': 'Iniciar sesión',
         'login.modeRegister': 'Registrarse',
         'login.modeMagic': 'Enlace mágico',
@@ -110,7 +143,7 @@ const authTranslations = {
         'login.submitRegister': 'Crear perfil',
         'login.magicSubtitle': 'Introduce tu correo y te enviaremos un enlace para iniciar sesión. La primera vez creamos un perfil para ti.',
         'login.submitMagic': 'Enviar enlace de acceso',
-        'login.divider': 'o con correo',
+        'login.divider': 'o',
         'login.backLink': 'Volver al sitio web',
         
         // Buttons / feedback
@@ -252,9 +285,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (feedbackBox) feedbackBox.style.display = 'none';
     }
 
-    if (new URLSearchParams(window.location.search).get('mode') === 'register') {
-        setMode('register');
-    }
+    // ?mode=register lands on the same email step: a first sign-in creates the profile.
 
     async function waitForFirebaseReady(timeoutMs = 5000) {
         const startedAt = Date.now();
@@ -349,33 +380,120 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // --- 3. Magic Link Login (Send) ---
-    document.getElementById('magic-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('email-magic').value;
-        const btn = e.target.querySelector('button[type="submit"]');
+    // --- 3. Sign-in with a 6-digit code by email (same as the HKM, HKPC and Pust apps) ---
+    const EMAIL_CODE_ENDPOINT = 'https://us-central1-his-kingdom-ministry.cloudfunctions.net/emailCode';
+    const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    const requestForm = document.getElementById('code-request-form');
+    const verifyForm = document.getElementById('code-verify-form');
+    const emailInput = document.getElementById('email-code');
+    const codeInput = document.getElementById('login-code');
+    const socialBlock = document.getElementById('social-login');
+    let pendingEmail = '';
 
-        btn.disabled = true;
-        btn.textContent = t('auth.sendingLink');
-        hideMessage();
+    function currentLanguage() {
+        const lang = document.documentElement.lang || 'no';
+        return lang === 'en' ? 'en' : 'no';
+    }
 
-        const actionCodeSettings = {
-            url: window.location.href,
-            handleCodeInApp: true
-        };
+    async function postEmailCode(path, payload) {
+        const response = await fetch(`${EMAIL_CODE_ENDPOINT}/${path}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...payload, language: currentLanguage() })
+        });
+        const body = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(body.error || t('error.unknown'));
+        return body;
+    }
 
-        try {
-            await waitForFirebaseReady();
-            await firebase.auth().sendSignInLinkToEmail(email, actionCodeSettings);
-            safeLocalStorageSet('emailForSignIn', email);
-            showMessage(t('auth.magicLinkSuccess'), 'success');
-            btn.textContent = t('auth.linkSent');
-        } catch (error) {
-            console.error(error);
-            showMessage(getErrorMessage(error), 'error');
-            btn.disabled = false;
-            btn.textContent = t('login.submitMagic');
+    function showStep(step) {
+        document.getElementById('section-email').classList.toggle('active', step === 'email');
+        document.getElementById('section-code').classList.toggle('active', step === 'code');
+        if (socialBlock) socialBlock.style.display = step === 'code' ? 'none' : '';
+        if (step === 'code') {
+            document.getElementById('code-sent-text').textContent = t('auth.codeSent').replace('{email}', pendingEmail);
+            codeInput.value = '';
+            setTimeout(() => codeInput.focus(), 50);
+        } else {
+            setTimeout(() => emailInput.focus(), 50);
         }
+    }
+
+    async function sendCode(email, btn) {
+        const label = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = t('auth.sendingCode');
+        try {
+            await postEmailCode('send', { email });
+            return true;
+        } catch (error) {
+            showMessage(error.message, 'error');
+            return false;
+        } finally {
+            btn.disabled = false;
+            btn.textContent = label;
+        }
+    }
+
+    requestForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        hideMessage();
+        const email = emailInput.value.trim().toLowerCase();
+        if (!EMAIL_PATTERN.test(email)) {
+            showMessage(t('auth.invalidEmail'), 'error');
+            return;
+        }
+        if (await sendCode(email, requestForm.querySelector('button[type="submit"]'))) {
+            pendingEmail = email;
+            showStep('code');
+        }
+    });
+
+    codeInput.addEventListener('input', () => {
+        codeInput.value = codeInput.value.replace(/\D/g, '').slice(0, 6);
+        if (codeInput.value.length === 6) verifyForm.requestSubmit();
+    });
+
+    verifyForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        hideMessage();
+        const code = codeInput.value.trim();
+        if (!/^\d{6}$/.test(code)) {
+            showMessage(t('auth.invalidCode'), 'error');
+            return;
+        }
+        const btn = verifyForm.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        btn.textContent = t('auth.checkingCode');
+        try {
+            const { link } = await postEmailCode('verify', { email: pendingEmail, code });
+            await waitForFirebaseReady();
+            const result = await firebase.auth().signInWithEmailLink(pendingEmail, link);
+            if (result && result.user) await ensureMemberProfile(result.user);
+            await routeByRole();
+        } catch (error) {
+            if (window.HKMSecondFactor?.isChallenge(error)) {
+                continueAfterChallenge(error).catch(err => showMessage(window.HKMSecondFactor.messageFor(err), 'error'));
+                return;
+            }
+            showMessage(error.code ? getErrorMessage(error) : error.message, 'error');
+            codeInput.value = '';
+            codeInput.focus();
+        } finally {
+            btn.disabled = false;
+            btn.textContent = t('login.verifyCode');
+        }
+    });
+
+    document.getElementById('resend-code').addEventListener('click', async (e) => {
+        hideMessage();
+        if (await sendCode(pendingEmail, e.currentTarget)) showMessage(t('auth.codeResent'), 'success');
+    });
+
+    document.getElementById('change-email').addEventListener('click', () => {
+        hideMessage();
+        pendingEmail = '';
+        showStep('email');
     });
 
     const handleGoogleError = (error, btn, origContent) => {
@@ -520,7 +638,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function resetButtons() {
-        document.querySelectorAll('#google-login, #apple-login, #magic-form button[type="submit"]').forEach(btn => { btn.disabled = false; });
+        document.querySelectorAll('#google-login, #apple-login, #code-request-form button[type="submit"], #code-verify-form button[type="submit"]').forEach(btn => { btn.disabled = false; });
         const g = document.getElementById('google-login'); if (g && !g.querySelector('img')) g.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt=""> Google';
     }
 
