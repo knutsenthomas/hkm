@@ -300,6 +300,35 @@
             display: block;
         }
 
+        .code-sent-text {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            line-height: 1.5;
+            text-align: left;
+        }
+
+        .code-input {
+            font-size: 24px;
+            letter-spacing: 10px;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .code-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+
+        .btn[disabled] {
+            opacity: 0.65;
+            cursor: default;
+            transform: none !important;
+        }
+
         .feedback-message {
             padding: 12px;
             border-radius: 8px;
@@ -490,6 +519,35 @@
 
         <div id="feedback-box" class="feedback-message"></div>
 
+        <!-- Same sign-in as the HKM, HKPC and Pust apps: a 6-digit code by email, Google or Apple. -->
+        <div id="section-email" class="auth-mode-section active">
+            <form id="code-request-form" method="post" action="" novalidate>
+                <div class="form-group">
+                    <label for="email-code" data-i18n="login.emailLabel">E-post</label>
+                    <input type="email" id="email-code" name="email" autocomplete="email" class="form-control" placeholder="din@epost.no" data-i18n-placeholder="login.emailPlaceholder" required>
+                </div>
+                <button type="submit" class="btn btn-primary" data-i18n="login.sendCode">Send kode</button>
+            </form>
+        </div>
+
+        <div id="section-code" class="auth-mode-section">
+            <p class="code-sent-text" id="code-sent-text"></p>
+            <form id="code-verify-form" method="post" action="" novalidate>
+                <div class="form-group">
+                    <label for="login-code" data-i18n="login.codeLabel">Kode</label>
+                    <input type="text" id="login-code" name="code" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" class="form-control code-input" placeholder="000000" required>
+                </div>
+                <button type="submit" class="btn btn-primary" data-i18n="login.verifyCode">Logg inn</button>
+            </form>
+            <div class="code-actions">
+                <button type="button" id="resend-code" class="toggle-auth-mode" data-i18n="login.resendCode">Send ny kode</button>
+                <button type="button" id="change-email" class="toggle-auth-mode" data-i18n="login.changeEmail">Bruk en annen e-post</button>
+            </div>
+        </div>
+
+        <div id="social-login">
+        <div class="divider"><span data-i18n="login.divider">eller</span></div>
+
         <button id="google-login" class="btn btn-google" style="margin-bottom: 12px;">
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="">
             Google
@@ -498,21 +556,6 @@
             <svg width="18" height="18" viewBox="0 0 170 170" aria-hidden="true" fill="currentColor"><path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.04-7.6-7.7-11.71-13.98-5.33-8.15-9.63-17.75-12.89-28.81-3.26-11.06-4.9-21.78-4.9-32.16 0-14.89 3.86-27.17 11.59-36.85 7.73-9.68 17.5-14.58 29.3-14.71 4.79 0 10.23 1.25 16.32 3.75 6.09 2.5 10.05 3.81 11.88 3.93 1.41-.12 5.54-1.49 12.39-4.11 6.86-2.62 12.56-3.81 17.1-3.58 12.53.65 22.48 5.48 29.86 14.5-10.99 6.64-16.38 15.62-16.18 26.96.22 8.81 3.59 16.27 10.12 22.38 6.53 6.11 14.36 9.69 23.5 10.74-2.18 6.53-4.68 12.53-7.51 18.01zm-32.74-120.2c0 6.74-2.45 13.23-7.36 19.46-5.87 7.29-13.06 11.55-21.57 12.79-.11-1.09-.16-2.07-.16-2.94 0-6.63 2.61-13.24 7.84-19.82 5.23-6.58 12.31-10.75 21.25-12.51.21 1.09.32 2.1.32 3.02z"/></svg>
             Apple
         </button>
-
-        <div class="divider" style="margin-bottom: 24px;"><span data-i18n="login.divider">eller med e-post</span></div>
-
-        <!-- Sign-in is passwordless: an email link, Google or Apple. -->
-        <div id="section-magic" class="auth-mode-section active">
-            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;" data-i18n="login.magicSubtitle">
-                Skriv inn e-posten din, så sender vi en innloggingslenke. Første gang oppretter vi en profil for deg.
-            </p>
-            <form id="magic-form" method="post" action="">
-                <div class="form-group">
-                    <label for="email-magic" data-i18n="login.emailLabel">E-post</label>
-                    <input type="email" id="email-magic" name="email" autocomplete="email" class="form-control" placeholder="din@epost.no" data-i18n-placeholder="login.emailPlaceholder" required>
-                </div>
-                <button type="submit" class="btn btn-primary" data-i18n="login.submitMagic">Send innloggingslenke</button>
-            </form>
         </div>
 
 
@@ -529,7 +572,7 @@
     <script type="module" src="../js/user-roles.js"></script>
     <script type="module" src="../js/firebase-service.js"></script>
     <script type="module" src="../js/hkm-second-factor.js?v=20261127d"></script>
-    <script type="module" src="js/minside-auth.js?v=20261127_2FA"></script>
+    <script type="module" src="js/minside-auth.js?v=20261128_code"></script>
     <script type="module" src="../js/i18n.js"></script>
     
 </body>
