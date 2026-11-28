@@ -4190,10 +4190,10 @@ export function createContentEditor2Methods({ firebaseService, adminUtils, showE
                   if (!successfulLanguages.length) {
                     const translationSettings =
                       await this._getTranslationSettings();
-                    const hasGeminiKey = !!translationSettings?.geminiApiKey;
+                    const hasGeminiKey = !!translationSettings?.geminiEnabled;
                     if (!hasGeminiKey) {
                       throw new Error(
-                        "Ingen språk ble oversatt. MyMemory-kvote/no-op stopper oversettelse nå. Legg inn Gemini API key i Integrasjoner for stabil oversettelse.",
+                        "Ingen språk ble oversatt. MyMemory-kvote/no-op stopper oversettelse nå. Velg Gemini under Integrasjoner for stabil oversettelse.",
                       );
                     }
 
