@@ -228,6 +228,67 @@ async function fetchPodcastEpisodesFromRss(limit = 10) {
  * AI endpoint: Suggest SEO tags, meta title, and meta description for podcast episodes using Gemini.
  */
 /**
+ * Admin translation through Gemini. The key stays on the server (GEMINI_API_KEY secret),
+ * so it never has to be stored in Firestore or sent to a browser.
+ */
+const ADMIN_TRANSLATE_LANGS = { no: "Norwegian Bokmal", en: "English", es: "Spanish" };
+const ADMIN_TRANSLATE_DEFAULT_MODEL = "gemini-2.5-flash";
+
+async function requireAdminCall(request) {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Logg inn for å fortsette.");
+  const snap = await db.collection("users").doc(request.auth.uid).get();
+  const role = snap.exists ? String(snap.data().role || "") : "";
+  if (role !== "admin" && role !== "superadmin") {
+    throw new HttpsError("permission-denied", "Krever administratortilgang.");
+  }
+}
+
+exports.adminTranslateText = onCall({ secrets: [geminiApiKeyParam], timeoutSeconds: 60 }, async (request) => {
+  await requireAdminCall(request);
+  const { text, targetLang, sourceLang = "no", model } = request.data || {};
+  const raw = String(text || "");
+  if (!raw.trim()) return { text: raw };
+  if (raw.length > 20000) throw new HttpsError("invalid-argument", "Teksten er for lang.");
+  const sourceName = ADMIN_TRANSLATE_LANGS[sourceLang] || ADMIN_TRANSLATE_LANGS.no;
+  const targetName = ADMIN_TRANSLATE_LANGS[targetLang];
+  if (!targetName) throw new HttpsError("invalid-argument", "Ukjent målspråk.");
+
+  const apiKey = getGeminiApiKey();
+  if (!apiKey) throw new HttpsError("failed-precondition", "Gemini er ikke konfigurert på serveren.");
+
+  const requested = /^gemini-[\w.-]{1,40}$/.test(String(model || "")) ? String(model) : "";
+  const models = [...new Set([requested, ADMIN_TRANSLATE_DEFAULT_MODEL].filter(Boolean))];
+  const prompt = `Translate the following text from ${sourceName} to ${targetName}.\n\nRules:\n- Preserve meaning and tone.\n- Keep HTML tags unchanged.\n- Return only translated text, no explanation.\n\nText:\n${raw}`;
+
+  let lastError = "";
+  for (const m of models) {
+    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(m)}:generateContent`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+      body: JSON.stringify({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.1, topP: 0.8, maxOutputTokens: 4096 },
+      }),
+    });
+    if (resp.ok) {
+      const data = await resp.json();
+      const out = (data?.candidates?.[0]?.content?.parts || [])
+        .map((p) => (typeof p?.text === "string" ? p.text : ""))
+        .join("")
+        .trim();
+      if (out) return { text: out, model: m };
+      lastError = "empty response";
+      continue;
+    }
+    lastError = `${resp.status}`;
+    // Unknown/retired model: try the default. Anything else: stop.
+    if (resp.status !== 404 && resp.status !== 400) break;
+  }
+  console.warn("[adminTranslateText] Gemini failed:", lastError);
+  throw new HttpsError("unavailable", `Gemini svarte ikke (${lastError}).`);
+});
+
+/**
  * Universal AI Engine: Handles text generation, newsletters, and DALL-E 3 image generation.
  */
 exports.aiProcess = onCall({ timeoutSeconds: 180, secrets: [geminiApiKeyParam, openaiApiKeyParam] }, async (request) => {
@@ -790,47 +851,44 @@ async function transcribePodcastEpisode({ audioUrl, episodeId, episodeTitle, ini
   }
 }
 
+// Access token for the function's own service account (no stored private key).
+async function getRuntimeAccessToken(scope) {
+  const url = "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" +
+    `?scopes=${encodeURIComponent(scope)}`;
+  const resp = await fetch(url, { headers: { "Metadata-Flavor": "Google" } });
+  if (!resp.ok) throw new Error(`metadata token request failed (${resp.status})`);
+  const body = await resp.json();
+  if (!body.access_token) throw new Error("metadata token missing");
+  return body.access_token;
+}
+
 exports.getAnalyticsOverview = onRequest({
-  secrets: [gaPropertyIdParam, gaServiceAccountEmailParam, gaServiceAccountPrivateKeyParam]
+  // Runs as the App Engine default service account, which already has read access to GA4.
+  serviceAccount: "his-kingdom-ministry@appspot.gserviceaccount.com",
+  secrets: [gaPropertyIdParam]
 }, async (req, res) => {
   return cors(req, res, async () => {
     await verifyAdmin(req, res, async () => {
       try {
       let propertyId = "";
-      let clientEmail = "";
-      let privateKeyRaw = "";
 
-      // Load from Firestore first so admin updates take effect immediately
       try {
-        // Admin-only doc (content/settings_integrations is public and must not hold keys)
-        const settingsDoc = await admin.firestore().collection('settings').doc('integrations_private').get();
-        if (settingsDoc.exists) {
-            const ga = settingsDoc.data().googleAnalytics || {};
-            propertyId = ga.propertyId || "";
-            clientEmail = ga.serviceEmail || "";
-            privateKeyRaw = ga.privateKey || "";
-            console.log("[Analytics] Loaded credentials from Firestore settings_integrations.");
-        }
+        // Admin-only doc first, then the public doc (property ID is not secret).
+        const [privateDoc, publicDoc] = await Promise.all([
+          admin.firestore().collection('settings').doc('integrations_private').get(),
+          admin.firestore().collection('content').doc('settings_integrations').get(),
+        ]);
+        propertyId = (privateDoc.exists && privateDoc.data().googleAnalytics?.propertyId) ||
+          (publicDoc.exists && publicDoc.data().googleAnalytics?.propertyId) || "";
       } catch (fErr) {
-        console.warn("[Analytics] Error loading from Firestore, using Secrets:", fErr.message);
+        console.warn("[Analytics] Error loading property ID from Firestore:", fErr.message);
       }
-
-      // Fallback to Secrets if Firestore is unconfigured
       if (!propertyId) propertyId = gaPropertyIdParam.value();
-      if (!clientEmail) clientEmail = gaServiceAccountEmailParam.value();
-      if (!privateKeyRaw) privateKeyRaw = gaServiceAccountPrivateKeyParam.value();
 
-      console.log(`[Analytics] Resolved - Property ID: ${propertyId}, Email: ${clientEmail}`);
-
-      const privateKey = (privateKeyRaw || "")
-        .replace(/\\n/g, "\n")
-        .replace(/\n\n/g, "\n")
-        .trim();
-
-      if (!propertyId || !clientEmail || !privateKey) {
+      if (!propertyId) {
         return res.status(503).json({
           status: "unconfigured",
-          message: `Konfigurasjon mangler: ${!propertyId ? 'Property ID ' : ''}${!clientEmail ? 'Email ' : ''}${!privateKey ? 'Key' : ''}`
+          message: "Konfigurasjon mangler: Property ID"
         });
       }
 
@@ -838,7 +896,7 @@ exports.getAnalyticsOverview = onRequest({
       const allowedDays = [1, 7, 14, 30, 60, 90, 180, 365];
       const rangeDays = allowedDays.includes(requestedDays) ? requestedDays : 30;
       const rangeStartDate = `${rangeDays}daysAgo`;
-      const accessToken = await getGaAccessToken({ clientEmail, privateKey });
+      const accessToken = await getRuntimeAccessToken("https://www.googleapis.com/auth/analytics.readonly");
 
       const [
         summaryReport,

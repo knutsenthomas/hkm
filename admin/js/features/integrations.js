@@ -328,17 +328,10 @@ export function createIntegrationsMethods({ firebaseService, adminUtils, showErr
                                 <label>GA4 Property ID</label>
                                 <input type="text" id="ga-property-id" class="form-control" placeholder="f.eks. 123456789">
                             </div>
-                            <div class="form-group" style="margin-bottom: 12px;">
-                                <label>Service Account Email</label>
-                                <input type="text" id="ga-service-email" class="form-control" placeholder="analytics-bot@project.iam.gserviceaccount.com">
-                            </div>
-                            <div class="form-group">
-                                <label>Service Account Private Key</label>
-                                <textarea id="ga-private-key" class="form-control" style="height: 80px; font-family: monospace; font-size: 11px;" placeholder="-----BEGIN PRIVATE KEY-----\n..."></textarea>
-                            </div>
+                            <p style="font-size: 12px; color: #64748b; margin: 0;">Statistikken hentes med prosjektets egen Google-konto. Ingen nøkkel trengs.</p>
                         </div>
                         <div style="margin-top: 24px;">
-                            <button class="btn-primary" id="save-ga-settings" style="width: 100%; background: #ef4444;">Lagre Analytics-nøkler</button>
+                            <button class="btn-primary" id="save-ga-settings" style="width: 100%; background: #ef4444;">Lagre Analytics</button>
                         </div>
                     </div>
                 </div>
@@ -361,13 +354,10 @@ export function createIntegrationsMethods({ firebaseService, adminUtils, showErr
                                     <option value="gemini">Gemini (Google AI)</option>
                                 </select>
                             </div>
-                            <div class="form-group" style="margin-bottom: 15px;">
-                                <label>Gemini API Key</label>
-                                <input type="password" id="gemini-api-key" class="form-control" placeholder="AIza...">
-                            </div>
+                            <p style="font-size: 12px; color: #64748b; margin: 0 0 15px;">Gemini-nøkkelen ligger sikkert på serveren.</p>
                             <div class="form-group">
                                 <label>Modell</label>
-                                <input type="text" id="gemini-model" class="form-control" placeholder="gemini-1.5-flash">
+                                <input type="text" id="gemini-model" class="form-control" placeholder="gemini-2.5-flash">
                             </div>
                         </div>
                         <div style="margin-top: 24px;">
@@ -1265,25 +1255,16 @@ export function createIntegrationsMethods({ firebaseService, adminUtils, showErr
           (await firebaseService.getPageContent("settings_integrations")) || {};
         const privateSettings = await this._getPrivateIntegrations();
 
-        // AI Settings
-        const translation = {
-          ...(settings.translation || {}),
-          geminiApiKey:
-            privateSettings.translation?.geminiApiKey ||
-            settings.translation?.geminiApiKey ||
-            "",
-        };
+        // AI Settings (the Gemini key itself lives on the server)
+        const translation = settings.translation || {};
         const provEl = document.getElementById("translation-provider");
         if (provEl)
           provEl.value =
             translation.provider === "gemini" ? "gemini" : "google";
 
-        const geminiKeyEl = document.getElementById("gemini-api-key");
-        if (geminiKeyEl) geminiKeyEl.value = translation.geminiApiKey || "";
-
         const geminiModelEl = document.getElementById("gemini-model");
         if (geminiModelEl)
-          geminiModelEl.value = translation.geminiModel || "gemini-1.5-flash";
+          geminiModelEl.value = translation.geminiModel || "gemini-2.5-flash";
 
         // Google Calendar Settings
         const gcal = settings.googleCalendar || {};
@@ -1304,12 +1285,6 @@ export function createIntegrationsMethods({ firebaseService, adminUtils, showErr
         };
         const gaPropEl = document.getElementById("ga-property-id");
         if (gaPropEl) gaPropEl.value = ga.propertyId || "";
-
-        const gaEmailEl = document.getElementById("ga-service-email");
-        if (gaEmailEl) gaEmailEl.value = ga.serviceEmail || "";
-
-        const gaKeyEl = document.getElementById("ga-private-key");
-        if (gaKeyEl) gaKeyEl.value = ga.privateKey || "";
 
         // Update GCal Status Badge
         const statusBadge = document.getElementById("gcal-status");
@@ -1348,11 +1323,11 @@ export function createIntegrationsMethods({ firebaseService, adminUtils, showErr
           document.getElementById("gcal-api-key")?.value.trim() || "";
         const translationProvider =
           document.getElementById("translation-provider")?.value || "google";
-        const geminiApiKey =
-          document.getElementById("gemini-api-key")?.value.trim() || "";
         const geminiModel =
           document.getElementById("gemini-model")?.value.trim() ||
-          "gemini-1.5-flash";
+          "gemini-2.5-flash";
+        const gaPropertyId =
+          document.getElementById("ga-property-id")?.value.trim() || "";
 
         const rows = Array.from(
           document.querySelectorAll("#gcal-list .gcal-row"),
@@ -1389,23 +1364,14 @@ export function createIntegrationsMethods({ firebaseService, adminUtils, showErr
           updatedAt: new Date().toISOString(),
         };
 
-        const privateSettings = {
-          translation: { geminiApiKey },
-          googleAnalytics: {
-            propertyId:
-              document.getElementById("ga-property-id")?.value.trim() || "",
-            serviceEmail:
-              document.getElementById("ga-service-email")?.value.trim() || "",
-            privateKey:
-              document.getElementById("ga-private-key")?.value.trim() || "",
-          },
-          updatedAt: new Date().toISOString(),
-        };
-
+        // Only the property ID is stored; it is not secret, but keep it admin-only.
         await firebaseService.db
           .collection("settings")
           .doc("integrations_private")
-          .set(privateSettings);
+          .set({
+            googleAnalytics: { propertyId: gaPropertyId },
+            updatedAt: new Date().toISOString(),
+          });
         // Full overwrite so old secret fields are removed from the public doc.
         await firebaseService.db
           .collection("content")

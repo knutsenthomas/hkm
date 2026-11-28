@@ -115,26 +115,15 @@ export function createTranslationMethods({ firebaseService, adminUtils, showErro
         settings.translation && typeof settings.translation === "object"
           ? settings.translation
           : {};
-      const privateSettings =
-        typeof this._getPrivateIntegrations === "function"
-          ? await this._getPrivateIntegrations()
-          : {};
-      const fallbackGeminiKey = String(
-        privateSettings.translation?.geminiApiKey ||
-          translation.geminiApiKey ||
-          settings.googleAI?.apiKey ||
-          settings.googleAi?.apiKey ||
-          "",
-      ).trim();
-
       const provider =
         String(translation.provider || "google").toLowerCase() === "gemini"
           ? "gemini"
           : "google";
 
+      // The Gemini key lives on the server (adminTranslateText); the browser never sees it.
       this._translationSettingsCache = {
         provider,
-        geminiApiKey: fallbackGeminiKey,
+        geminiEnabled: provider === "gemini",
         geminiModel:
           String(translation.geminiModel || "gemini-1.5-flash").trim() ||
           "gemini-1.5-flash",
@@ -247,7 +236,7 @@ export function createTranslationMethods({ firebaseService, adminUtils, showErro
     async _diagnoseTranslationProviders() {
       const settings = await this._getTranslationSettings();
       const out = {
-        hasGeminiKey: !!settings.geminiApiKey,
+        hasGeminiKey: !!settings.geminiEnabled,
         gemini: "not-tested",
         myMemory: "disabled",
         google: "unknown",
@@ -372,72 +361,35 @@ export function createTranslationMethods({ firebaseService, adminUtils, showErro
 
     async _translateTextChunkWithGemini(text, targetLang, sourceLang = "no") {
       const settings = await this._getTranslationSettings();
-      if (this._geminiRejectedKey === settings.geminiApiKey) {
-        throw new Error(
-          "Gemini-tilgangen er avvist. Kontroller API-nøkkelen i integrasjonsinnstillinger.",
-        );
+      if (!settings.geminiEnabled) {
+        throw new Error("Gemini er ikke valgt i integrasjonsinnstillinger.");
       }
-      if (!settings.geminiApiKey) {
-        throw new Error("Gemini API key mangler i integrasjonsinnstillinger.");
+      if (Number(this._geminiBlockedUntil || 0) > Date.now()) {
+        throw new Error("Gemini er midlertidig utilgjengelig.");
       }
 
-      const languageMap = {
-        no: "Norwegian Bokmal",
-        en: "English",
-        es: "Spanish",
-      };
-
-      const sourceName = languageMap[sourceLang] || sourceLang;
-      const targetName = languageMap[targetLang] || targetLang;
-
-      const model = encodeURIComponent(
-        settings.geminiModel || "gemini-1.5-flash",
-      );
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(settings.geminiApiKey)}`;
-
-      const prompt = `Translate the following text from ${sourceName} to ${targetName}.\n\nRules:\n- Preserve meaning and tone.\n- Keep HTML tags unchanged.\n- Return only translated text, no explanation.\n\nText:\n${text}`;
-
-      const res = await this._fetchWithTimeout(
-        endpoint,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-                role: "user",
-                parts: [{ text: prompt }],
-              },
-            ],
-            generationConfig: {
-              temperature: 0.1,
-              topP: 0.8,
-              topK: 40,
-              maxOutputTokens: 1024,
-            },
-          }),
-        },
-        45000,
-      );
-
-      if (!res.ok) {
-        const errorBody = await res.text().catch(() => "");
-        if ([401, 403].includes(res.status))
-          this._geminiRejectedKey = settings.geminiApiKey;
-        throw new Error(
-          `Gemini request failed (${res.status}): ${errorBody || "Unknown error"}`,
-        );
+      try {
+        const callable = firebase
+          .functions()
+          .httpsCallable("adminTranslateText", { timeout: 60000 });
+        const result = await callable({
+          text,
+          targetLang,
+          sourceLang,
+          model: settings.geminiModel,
+        });
+        const translated = String(result?.data?.text || "").trim();
+        if (!translated) {
+          throw new Error("Gemini svarte uten oversatt tekst.");
+        }
+        return translated;
+      } catch (error) {
+        // Don't hammer the server when Gemini is down or not configured.
+        if (/permission|precondition|unavailable/i.test(String(error?.code || ""))) {
+          this._geminiBlockedUntil = Date.now() + 5 * 60 * 1000;
+        }
+        throw error;
       }
-
-      const data = await res.json();
-      const translated = this._extractGeminiText(data);
-      if (!translated) {
-        throw new Error("Gemini svarte uten oversatt tekst.");
-      }
-
-      return translated;
     },
 
     async _translateTextChunkWithGoogleTranslate(
@@ -490,7 +442,7 @@ export function createTranslationMethods({ firebaseService, adminUtils, showErro
       if (this._translationCache.has(cacheKey))
         return this._translationCache.get(cacheKey);
       let translated;
-      if (settings.provider === "gemini" && settings.geminiApiKey) {
+      if (settings.geminiEnabled) {
         try {
           translated = await this._translateTextChunkWithGemini(
             raw,
