@@ -1241,13 +1241,38 @@ export function createIntegrationsMethods({ firebaseService, adminUtils, showErr
       );
     },
 
+    // Secrets (Gemini key, GA service account) live in settings/integrations_private,
+    // which only admins can read. content/settings_integrations is public.
+    async _getPrivateIntegrations() {
+      try {
+        if (!firebaseService.isInitialized && firebaseService.waitForInitialization) {
+          await firebaseService.waitForInitialization();
+        }
+        const snap = await firebaseService.db
+          .collection("settings")
+          .doc("integrations_private")
+          .get();
+        return snap.exists ? snap.data() || {} : {};
+      } catch (error) {
+        console.warn("[Integrations] Could not load private settings:", error);
+        return {};
+      }
+    },
+
     async _loadIntegrationsSettings() {
       try {
         const settings =
           (await firebaseService.getPageContent("settings_integrations")) || {};
+        const privateSettings = await this._getPrivateIntegrations();
 
         // AI Settings
-        const translation = settings.translation || {};
+        const translation = {
+          ...(settings.translation || {}),
+          geminiApiKey:
+            privateSettings.translation?.geminiApiKey ||
+            settings.translation?.geminiApiKey ||
+            "",
+        };
         const provEl = document.getElementById("translation-provider");
         if (provEl)
           provEl.value =
@@ -1273,7 +1298,10 @@ export function createIntegrationsMethods({ firebaseService, adminUtils, showErr
         }
 
         // Google Analytics Settings
-        const ga = settings.googleAnalytics || {};
+        const ga = {
+          ...(settings.googleAnalytics || {}),
+          ...(privateSettings.googleAnalytics || {}),
+        };
         const gaPropEl = document.getElementById("ga-property-id");
         if (gaPropEl) gaPropEl.value = ga.propertyId || "";
 
@@ -1336,8 +1364,11 @@ export function createIntegrationsMethods({ firebaseService, adminUtils, showErr
           }))
           .filter((item) => item.id);
 
+        // Never keep secrets in the public document.
+        const { googleAnalytics: _oldGa, googleAI: _oldAi, googleAi: _oldAi2, ...publicBase } =
+          currentSettings;
         const newSettings = {
-          ...currentSettings,
+          ...publicBase,
           googleCalendar: {
             ...currentSettings.googleCalendar,
             apiKey: gcalApiKey,
@@ -1353,9 +1384,13 @@ export function createIntegrationsMethods({ firebaseService, adminUtils, showErr
           googleCalendars: calendars,
           translation: {
             provider: translationProvider,
-            geminiApiKey,
             geminiModel,
           },
+          updatedAt: new Date().toISOString(),
+        };
+
+        const privateSettings = {
+          translation: { geminiApiKey },
           googleAnalytics: {
             propertyId:
               document.getElementById("ga-property-id")?.value.trim() || "",
@@ -1367,10 +1402,18 @@ export function createIntegrationsMethods({ firebaseService, adminUtils, showErr
           updatedAt: new Date().toISOString(),
         };
 
-        await firebaseService.savePageContent(
-          "settings_integrations",
-          newSettings,
-        );
+        await firebaseService.db
+          .collection("settings")
+          .doc("integrations_private")
+          .set(privateSettings);
+        // Full overwrite so old secret fields are removed from the public doc.
+        await firebaseService.db
+          .collection("content")
+          .doc("settings_integrations")
+          .set(newSettings);
+        if (typeof firebaseService._setCachedContent === "function") {
+          firebaseService._setCachedContent("settings_integrations", newSettings);
+        }
         this._translationSettingsCache = null;
         this._translationSettingsCacheLoadedAt = 0;
 
