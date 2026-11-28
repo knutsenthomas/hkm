@@ -53,15 +53,23 @@ async function resetSecondFactorHandler({ auth, data }, deps) {
   return { ok: true };
 }
 
-let adminApp;
-function adminDeps() {
-  const admin = require('firebase-admin');
-  adminApp ||= admin.apps.length ? admin.app() : admin.initializeApp();
+// firebase-admin 14 har ikke lenger admin.apps/admin.auth(); bruk de modulære inngangene.
+function adminServices() {
+  const { getApps, initializeApp } = require('firebase-admin/app');
+  const app = getApps()[0] || initializeApp();
   return {
-    roleOf: async uid => (await admin.firestore().collection('users').doc(uid).get()).get('role') || null,
+    auth: require('firebase-admin/auth').getAuth(app),
+    db: require('firebase-admin/firestore').getFirestore(app),
+  };
+}
+
+function adminDeps() {
+  const { auth, db } = adminServices();
+  return {
+    roleOf: async uid => (await db.collection('users').doc(uid).get()).get('role') || null,
     clearFactors: async uid => {
-      await admin.auth().updateUser(uid, { multiFactor: { enrolledFactors: null } });
-      await admin.auth().revokeRefreshTokens(uid);
+      await auth.updateUser(uid, { multiFactor: { enrolledFactors: null } });
+      await auth.revokeRefreshTokens(uid);
     },
     log: entry => console.log(JSON.stringify(entry)),
   };
@@ -73,9 +81,7 @@ const resetSecondFactor = onCall({ region: 'us-central1', maxInstances: 5 }, req
 let appSsoHandler;
 const appSso = onRequest({ region: 'us-central1', maxInstances: 3, concurrency: 20, timeoutSeconds: 20, invoker: 'public' }, (req, res) => {
   if (!appSsoHandler) {
-    const admin = require('firebase-admin');
-    adminApp ||= admin.apps.length ? admin.app() : admin.initializeApp();
-    appSsoHandler = createAppSsoHandler(appSsoDeps(admin));
+    appSsoHandler = createAppSsoHandler(appSsoDeps(adminServices()));
   }
   return appSsoHandler(req, res);
 });

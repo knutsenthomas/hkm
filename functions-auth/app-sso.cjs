@@ -90,12 +90,11 @@ function createHandler(deps) {
   };
 }
 
-function firestoreDeps(admin) {
-  const db = admin.firestore();
+function firestoreDeps({ auth, db }) {
   const codes = db.collection('app_sso_codes');
   return {
     now: () => Date.now(),
-    verifyIdToken: token => admin.auth().verifyIdToken(token, true),
+    verifyIdToken: token => auth.verifyIdToken(token, true),
     saveCode: (key, value) => codes.doc(key).set(value),
     takeCode: key => db.runTransaction(async tx => {
       const ref = codes.doc(key);
@@ -104,7 +103,7 @@ function firestoreDeps(admin) {
       tx.delete(ref);
       return snap.data();
     }),
-    createCustomToken: (uid, claims) => admin.auth().createCustomToken(uid, claims),
+    createCustomToken: (uid, claims) => auth.createCustomToken(uid, claims),
   };
 }
 
