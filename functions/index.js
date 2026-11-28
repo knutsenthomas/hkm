@@ -10306,6 +10306,17 @@ exports.updateCauseActivitySettings = onDocumentWritten({document:'content/colle
   await refreshCauseActivity(db);
 });
 
+// YouTube-kanalen «Hilde Karin Knutsen» til appen: alle offentlige videoer i content/youtube_videos.
+const youtubeApiKeyParam = defineSecret('YOUTUBE_API_KEY');
+exports.syncYoutubeVideos = onSchedule({
+  schedule: 'every 6 hours', region: 'europe-west1', timeoutSeconds: 120,
+  maxInstances: 1, secrets: [youtubeApiKeyParam],
+}, async () => {
+  const { syncYoutubeVideos } = require('./youtube-videos.cjs');
+  const count = await syncYoutubeVideos({ db, apiKey: youtubeApiKeyParam.value(), Timestamp });
+  console.info('YouTube-videoer synkronisert', count);
+});
+
 // Read-only at Vipps: importing gifts never initiates or changes a payment.
 exports.syncVippsDonations = onSchedule({
   schedule: 'every 60 minutes', region: 'us-central1', timeoutSeconds: 540,
