@@ -381,7 +381,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // --- 3. Sign-in with a 6-digit code by email (same as the HKM, HKPC and Pust apps) ---
-    const EMAIL_CODE_ENDPOINT = 'https://us-central1-his-kingdom-ministry.cloudfunctions.net/emailCode';
+    // Shared with the HKPC and HKM apps; app: 'hkm' gives the email HKM's look.
+    const EMAIL_CODE_ENDPOINT = 'https://europe-west1-his-kingdom-ministry.cloudfunctions.net/communitySso/email-code';
+    const EMAIL_CODE_ERRORS = {
+        no: {
+            'invalid-email': 'Skriv inn en gyldig e-postadresse.',
+            'invalid-code': 'Koden er feil eller har gått ut.',
+            'too-many-requests': 'For mange forsøk. Vent litt og prøv igjen.',
+            'too-many-attempts': 'For mange feil koder. Be om en ny kode senere.',
+        },
+        en: {
+            'invalid-email': 'Enter a valid email address.',
+            'invalid-code': 'The code is wrong or has expired.',
+            'too-many-requests': 'Too many attempts. Wait a moment and try again.',
+            'too-many-attempts': 'Too many wrong codes. Ask for a new code later.',
+        },
+    };
     const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
     const requestForm = document.getElementById('code-request-form');
     const verifyForm = document.getElementById('code-verify-form');
@@ -396,13 +411,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function postEmailCode(path, payload) {
-        const response = await fetch(`${EMAIL_CODE_ENDPOINT}/${path}`, {
+        const lang = currentLanguage();
+        const response = await fetch(`${EMAIL_CODE_ENDPOINT}${path === 'verify' ? '/verify' : ''}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...payload, language: currentLanguage() })
+            body: JSON.stringify({ ...payload, language: lang, app: 'hkm' })
         });
         const body = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(body.error || t('error.unknown'));
+        if (!response.ok) {
+            const known = EMAIL_CODE_ERRORS[lang][body.error];
+            throw new Error(known || (lang === 'en' ? 'Sign-in is not available right now. Try again.' : 'Innloggingen er ikke tilgjengelig akkurat nå. Prøv igjen.'));
+        }
         return body;
     }
 
