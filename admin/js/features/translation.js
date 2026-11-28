@@ -115,8 +115,13 @@ export function createTranslationMethods({ firebaseService, adminUtils, showErro
         settings.translation && typeof settings.translation === "object"
           ? settings.translation
           : {};
+      const privateSettings =
+        typeof this._getPrivateIntegrations === "function"
+          ? await this._getPrivateIntegrations()
+          : {};
       const fallbackGeminiKey = String(
-        translation.geminiApiKey ||
+        privateSettings.translation?.geminiApiKey ||
+          translation.geminiApiKey ||
           settings.googleAI?.apiKey ||
           settings.googleAi?.apiKey ||
           "",

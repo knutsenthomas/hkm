@@ -802,7 +802,8 @@ exports.getAnalyticsOverview = onRequest({
 
       // Load from Firestore first so admin updates take effect immediately
       try {
-        const settingsDoc = await admin.firestore().collection('content').doc('settings_integrations').get();
+        // Admin-only doc (content/settings_integrations is public and must not hold keys)
+        const settingsDoc = await admin.firestore().collection('settings').doc('integrations_private').get();
         if (settingsDoc.exists) {
             const ga = settingsDoc.data().googleAnalytics || {};
             propertyId = ga.propertyId || "";
